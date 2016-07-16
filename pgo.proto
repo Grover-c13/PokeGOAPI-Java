@@ -1,0 +1,135 @@
+package mx.may.courtney.pgo;
+
+
+message RequestEnvelop {
+  required int32 unknown1 = 1;
+  optional int64 rpc_id = 3;
+  repeated Request requests = 4;
+  optional Unknown6 unknown6 = 6;
+  optional fixed64 latitude = 7;
+  optional fixed64 longitude = 8;
+  optional fixed64 altitude = 9;
+  optional AuthInfo auth = 10;
+  optional int64 unknown12 = 12;
+
+
+  message Unknown3 {
+    required string unknown4 = 1;
+  }
+
+  message Unknown6 {
+    required int32 unknown1 = 1;
+    required Unknown2 unknown2 = 2;
+
+    message Unknown2 {
+      required bytes unknown1 = 1;
+    }
+
+  }
+  message AuthInfo {
+    required string provider = 1;
+    required JWT token = 2;
+
+    message JWT {
+      required string contents = 1;
+      required int32 unknown13  = 2;
+    }
+  }
+}
+
+message ResponseEnvelop {
+  required int32 unknown1 = 1;
+  optional int64 unknown2 = 2;
+  optional string api_url = 3;
+  optional Unknown6 unknown6 = 6;
+  optional Unknown7 unknown7 = 7;
+  repeated Payload payload = 100;
+
+  message Unknown6 {
+    required int32 unknown1 = 1;
+    required Unknown2 unknown2 = 2;
+
+    message Unknown2 {
+      required bytes unknown1 = 1;
+    }
+
+  }
+
+  message Unknown7 {
+    optional bytes unknown71 = 1;
+    optional int64 unknown72 = 2;
+    optional bytes unknown73 = 3;
+  }
+
+
+
+
+  
+  
+}
+
+message Request {
+    required int32 type = 1;
+    extensions 2 to max;
+}
+
+message SettingsRequest
+{
+	extend Request {
+		optional SettingsRequest settingsRequest = 2;
+	}
+	required string UUID = 2;
+}
+
+
+
+message Payload {
+	optional int32 uknown = 1;
+	optional bytes data = 2;
+	extensions 3 to max;
+}
+
+
+
+message ClientPlayerDetails
+{
+	optional int64 creation_time = 1;
+	optional string username = 2;
+	optional int32 team = 5;
+	optional bytes tutorial = 7; 
+	optional PlayerAvatar avatar = 8; 
+	optional int32 poke_storage = 9;
+	optional int32 item_storage = 10;
+	optional DailyBonus daily_bonus = 11;
+	optional string badge = 12;
+	optional ContactSettingsProto settings = 13;
+	optional Currency currency = 14;
+}
+
+
+message PlayerAvatar {
+	optional int32 Avatar = 8;
+	optional int32 Skin = 2;
+	optional int32 Hair = 3;
+	optional int32 Shirt = 4;
+	optional int32 Pants = 5;
+	optional int32 Hat = 6;
+	optional int32 Shoes = 7;
+	optional int32 Eyes = 9;
+	optional int32 Backpack = 10;
+ }
+
+message DailyBonus {
+  optional int64 NextCollectTimestampMs = 1;
+  optional int64 NextDefenderBonusCollectTimestampMs = 2;
+}
+
+message Currency {
+  required string type = 1;
+  optional int32 amount = 2;
+}
+
+message ContactSettingsProto {
+	optional bool SendMarketingEmails = 1;
+	optional bool SendPushNotifications = 2;
+}
