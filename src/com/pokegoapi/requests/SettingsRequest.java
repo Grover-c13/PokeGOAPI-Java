@@ -2,6 +2,7 @@ package com.pokegoapi.requests;
 
 import com.google.protobuf.ByteString;
 
+import com.pokegoapi.main.Communication;
 import com.pokegoapi.main.Communication.Payload;
 import com.pokegoapi.main.Player;
 import com.pokegoapi.main.Request;
@@ -24,9 +25,9 @@ public class SettingsRequest extends Request {
 	}
 
 	@Override
-	public int getRpcId()
+	public Communication.Method getRpcId()
 	{
-		return 5;
+		return Communication.Method.DOWNLOAD_SETTINGS;
 	}
 
 	@Override

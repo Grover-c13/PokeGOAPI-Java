@@ -121,7 +121,7 @@ public class RequestHandler
 	private void resetBuilder()
 	{
 		builder =  RequestEnvelop.newBuilder();
-		builder.setUnknown1(2);
+		builder.setDirection(Communication.Direction.REQUEST);
 		builder.setRpcId(8145806132888207460l);
 		builder.setAuth(auth);
 		builder.setUnknown12(989);

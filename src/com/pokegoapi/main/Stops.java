@@ -141,43 +141,45 @@ public final class Stops {
     double getModifier();
   }
   /**
-   * Protobuf type {@code com.pokegoapi.main.FortDetailsOutProto}
-   *
    * <pre>
    * FORT SEARCH
    * </pre>
+   *
+   * Protobuf type {@code com.pokegoapi.main.FortDetailsOutProto}
    */
-  public static final class FortDetailsOutProto extends
+  public  static final class FortDetailsOutProto extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:com.pokegoapi.main.FortDetailsOutProto)
       FortDetailsOutProtoOrBuilder {
     // Use FortDetailsOutProto.newBuilder() to construct.
     private FortDetailsOutProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private FortDetailsOutProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final FortDetailsOutProto defaultInstance;
-    public static FortDetailsOutProto getDefaultInstance() {
-      return defaultInstance;
+    private FortDetailsOutProto() {
+      id_ = "";
+      team_ = 0;
+      name_ = "";
+      imageUrl_ = "";
+      fp_ = 0;
+      stamina_ = 0;
+      maxStamina_ = 0;
+      fortType_ = 0;
+      latitude_ = 0L;
+      longitude_ = 0L;
+      description_ = "";
+      modifier_ = 0D;
     }
 
-    public FortDetailsOutProto getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private FortDetailsOutProto(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -266,7 +268,7 @@ public final class Stops {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -284,24 +286,9 @@ public final class Stops {
               com.pokegoapi.main.Stops.FortDetailsOutProto.class, com.pokegoapi.main.Stops.FortDetailsOutProto.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<FortDetailsOutProto> PARSER =
-        new com.google.protobuf.AbstractParser<FortDetailsOutProto>() {
-      public FortDetailsOutProto parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new FortDetailsOutProto(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<FortDetailsOutProto> getParserForType() {
-      return PARSER;
-    }
-
     private int bitField0_;
     public static final int ID_FIELD_NUMBER = 1;
-    private java.lang.Object id_;
+    private volatile java.lang.Object id_;
     /**
      * <code>optional string Id = 1;</code>
      */
@@ -358,7 +345,7 @@ public final class Stops {
     }
 
     public static final int NAME_FIELD_NUMBER = 4;
-    private java.lang.Object name_;
+    private volatile java.lang.Object name_;
     /**
      * <code>optional string Name = 4;</code>
      */
@@ -400,7 +387,7 @@ public final class Stops {
     }
 
     public static final int IMAGEURL_FIELD_NUMBER = 5;
-    private java.lang.Object imageUrl_;
+    private volatile java.lang.Object imageUrl_;
     /**
      * <code>optional string ImageUrl = 5;</code>
      */
@@ -532,7 +519,7 @@ public final class Stops {
     }
 
     public static final int DESCRIPTION_FIELD_NUMBER = 12;
-    private java.lang.Object description_;
+    private volatile java.lang.Object description_;
     /**
      * <code>optional string Description = 12;</code>
      */
@@ -588,20 +575,6 @@ public final class Stops {
       return modifier_;
     }
 
-    private void initFields() {
-      id_ = "";
-      team_ = 0;
-      name_ = "";
-      imageUrl_ = "";
-      fp_ = 0;
-      stamina_ = 0;
-      maxStamina_ = 0;
-      fortType_ = 0;
-      latitude_ = 0L;
-      longitude_ = 0L;
-      description_ = "";
-      modifier_ = 0D;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -614,18 +587,17 @@ public final class Stops {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getIdBytes());
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, id_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeInt32(2, team_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBytes(4, getNameBytes());
+        com.google.protobuf.GeneratedMessage.writeString(output, 4, name_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeBytes(5, getImageUrlBytes());
+        com.google.protobuf.GeneratedMessage.writeString(output, 5, imageUrl_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeInt32(6, fp_);
@@ -646,35 +618,31 @@ public final class Stops {
         output.writeInt64(11, longitude_);
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
-        output.writeBytes(12, getDescriptionBytes());
+        com.google.protobuf.GeneratedMessage.writeString(output, 12, description_);
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
         output.writeDouble(13, modifier_);
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getIdBytes());
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, id_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(2, team_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(4, getNameBytes());
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(4, name_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(5, getImageUrlBytes());
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(5, imageUrl_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
@@ -701,23 +669,156 @@ public final class Stops {
           .computeInt64Size(11, longitude_);
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(12, getDescriptionBytes());
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(12, description_);
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
         size += com.google.protobuf.CodedOutputStream
           .computeDoubleSize(13, modifier_);
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.pokegoapi.main.Stops.FortDetailsOutProto)) {
+        return super.equals(obj);
+      }
+      com.pokegoapi.main.Stops.FortDetailsOutProto other = (com.pokegoapi.main.Stops.FortDetailsOutProto) obj;
+
+      boolean result = true;
+      result = result && (hasId() == other.hasId());
+      if (hasId()) {
+        result = result && getId()
+            .equals(other.getId());
+      }
+      result = result && (hasTeam() == other.hasTeam());
+      if (hasTeam()) {
+        result = result && (getTeam()
+            == other.getTeam());
+      }
+      result = result && (hasName() == other.hasName());
+      if (hasName()) {
+        result = result && getName()
+            .equals(other.getName());
+      }
+      result = result && (hasImageUrl() == other.hasImageUrl());
+      if (hasImageUrl()) {
+        result = result && getImageUrl()
+            .equals(other.getImageUrl());
+      }
+      result = result && (hasFp() == other.hasFp());
+      if (hasFp()) {
+        result = result && (getFp()
+            == other.getFp());
+      }
+      result = result && (hasStamina() == other.hasStamina());
+      if (hasStamina()) {
+        result = result && (getStamina()
+            == other.getStamina());
+      }
+      result = result && (hasMaxStamina() == other.hasMaxStamina());
+      if (hasMaxStamina()) {
+        result = result && (getMaxStamina()
+            == other.getMaxStamina());
+      }
+      result = result && (hasFortType() == other.hasFortType());
+      if (hasFortType()) {
+        result = result && (getFortType()
+            == other.getFortType());
+      }
+      result = result && (hasLatitude() == other.hasLatitude());
+      if (hasLatitude()) {
+        result = result && (getLatitude()
+            == other.getLatitude());
+      }
+      result = result && (hasLongitude() == other.hasLongitude());
+      if (hasLongitude()) {
+        result = result && (getLongitude()
+            == other.getLongitude());
+      }
+      result = result && (hasDescription() == other.hasDescription());
+      if (hasDescription()) {
+        result = result && getDescription()
+            .equals(other.getDescription());
+      }
+      result = result && (hasModifier() == other.hasModifier());
+      if (hasModifier()) {
+        result = result && (
+            java.lang.Double.doubleToLongBits(getModifier())
+            == java.lang.Double.doubleToLongBits(
+                other.getModifier()));
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptorForType().hashCode();
+      if (hasId()) {
+        hash = (37 * hash) + ID_FIELD_NUMBER;
+        hash = (53 * hash) + getId().hashCode();
+      }
+      if (hasTeam()) {
+        hash = (37 * hash) + TEAM_FIELD_NUMBER;
+        hash = (53 * hash) + getTeam();
+      }
+      if (hasName()) {
+        hash = (37 * hash) + NAME_FIELD_NUMBER;
+        hash = (53 * hash) + getName().hashCode();
+      }
+      if (hasImageUrl()) {
+        hash = (37 * hash) + IMAGEURL_FIELD_NUMBER;
+        hash = (53 * hash) + getImageUrl().hashCode();
+      }
+      if (hasFp()) {
+        hash = (37 * hash) + FP_FIELD_NUMBER;
+        hash = (53 * hash) + getFp();
+      }
+      if (hasStamina()) {
+        hash = (37 * hash) + STAMINA_FIELD_NUMBER;
+        hash = (53 * hash) + getStamina();
+      }
+      if (hasMaxStamina()) {
+        hash = (37 * hash) + MAXSTAMINA_FIELD_NUMBER;
+        hash = (53 * hash) + getMaxStamina();
+      }
+      if (hasFortType()) {
+        hash = (37 * hash) + FORTTYPE_FIELD_NUMBER;
+        hash = (53 * hash) + getFortType();
+      }
+      if (hasLatitude()) {
+        hash = (37 * hash) + LATITUDE_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getLatitude());
+      }
+      if (hasLongitude()) {
+        hash = (37 * hash) + LONGITUDE_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getLongitude());
+      }
+      if (hasDescription()) {
+        hash = (37 * hash) + DESCRIPTION_FIELD_NUMBER;
+        hash = (53 * hash) + getDescription().hashCode();
+      }
+      if (hasModifier()) {
+        hash = (37 * hash) + MODIFIER_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            java.lang.Double.doubleToLongBits(getModifier()));
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static com.pokegoapi.main.Stops.FortDetailsOutProto parseFrom(
@@ -743,42 +844,53 @@ public final class Stops {
     }
     public static com.pokegoapi.main.Stops.FortDetailsOutProto parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Stops.FortDetailsOutProto parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Stops.FortDetailsOutProto parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Stops.FortDetailsOutProto parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Stops.FortDetailsOutProto parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Stops.FortDetailsOutProto parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.pokegoapi.main.Stops.FortDetailsOutProto prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(com.pokegoapi.main.Stops.FortDetailsOutProto prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -787,11 +899,11 @@ public final class Stops {
       return builder;
     }
     /**
-     * Protobuf type {@code com.pokegoapi.main.FortDetailsOutProto}
-     *
      * <pre>
      * FORT SEARCH
      * </pre>
+     *
+     * Protobuf type {@code com.pokegoapi.main.FortDetailsOutProto}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
@@ -823,10 +935,6 @@ public final class Stops {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         id_ = "";
@@ -854,10 +962,6 @@ public final class Stops {
         modifier_ = 0D;
         bitField0_ = (bitField0_ & ~0x00000800);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -989,7 +1093,8 @@ public final class Stops {
         if (other.hasModifier()) {
           setModifier(other.getModifier());
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
@@ -1006,7 +1111,7 @@ public final class Stops {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.pokegoapi.main.Stops.FortDetailsOutProto) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -1579,12 +1684,39 @@ public final class Stops {
       // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.FortDetailsOutProto)
     }
 
+    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.FortDetailsOutProto)
+    private static final com.pokegoapi.main.Stops.FortDetailsOutProto DEFAULT_INSTANCE;
     static {
-      defaultInstance = new FortDetailsOutProto(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new com.pokegoapi.main.Stops.FortDetailsOutProto();
     }
 
-    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.FortDetailsOutProto)
+    public static com.pokegoapi.main.Stops.FortDetailsOutProto getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<FortDetailsOutProto>
+        PARSER = new com.google.protobuf.AbstractParser<FortDetailsOutProto>() {
+      public FortDetailsOutProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new FortDetailsOutProto(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<FortDetailsOutProto> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FortDetailsOutProto> getParserForType() {
+      return PARSER;
+    }
+
+    public com.pokegoapi.main.Stops.FortDetailsOutProto getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface FortDetailsProtoOrBuilder extends
@@ -1626,37 +1758,30 @@ public final class Stops {
   /**
    * Protobuf type {@code com.pokegoapi.main.FortDetailsProto}
    */
-  public static final class FortDetailsProto extends
+  public  static final class FortDetailsProto extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:com.pokegoapi.main.FortDetailsProto)
       FortDetailsProtoOrBuilder {
     // Use FortDetailsProto.newBuilder() to construct.
     private FortDetailsProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private FortDetailsProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final FortDetailsProto defaultInstance;
-    public static FortDetailsProto getDefaultInstance() {
-      return defaultInstance;
+    private FortDetailsProto() {
+      id_ = "";
+      latitude_ = 0L;
+      longitude_ = 0L;
     }
 
-    public FortDetailsProto getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private FortDetailsProto(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -1697,7 +1822,7 @@ public final class Stops {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -1715,24 +1840,9 @@ public final class Stops {
               com.pokegoapi.main.Stops.FortDetailsProto.class, com.pokegoapi.main.Stops.FortDetailsProto.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<FortDetailsProto> PARSER =
-        new com.google.protobuf.AbstractParser<FortDetailsProto>() {
-      public FortDetailsProto parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new FortDetailsProto(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<FortDetailsProto> getParserForType() {
-      return PARSER;
-    }
-
     private int bitField0_;
     public static final int ID_FIELD_NUMBER = 1;
-    private java.lang.Object id_;
+    private volatile java.lang.Object id_;
     /**
      * <code>required string Id = 1;</code>
      */
@@ -1803,11 +1913,6 @@ public final class Stops {
       return longitude_;
     }
 
-    private void initFields() {
-      id_ = "";
-      latitude_ = 0L;
-      longitude_ = 0L;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -1824,9 +1929,8 @@ public final class Stops {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getIdBytes());
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, id_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeInt64(2, latitude_);
@@ -1834,18 +1938,16 @@ public final class Stops {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeInt64(3, longitude_);
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getIdBytes());
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, id_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
@@ -1855,16 +1957,66 @@ public final class Stops {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(3, longitude_);
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.pokegoapi.main.Stops.FortDetailsProto)) {
+        return super.equals(obj);
+      }
+      com.pokegoapi.main.Stops.FortDetailsProto other = (com.pokegoapi.main.Stops.FortDetailsProto) obj;
+
+      boolean result = true;
+      result = result && (hasId() == other.hasId());
+      if (hasId()) {
+        result = result && getId()
+            .equals(other.getId());
+      }
+      result = result && (hasLatitude() == other.hasLatitude());
+      if (hasLatitude()) {
+        result = result && (getLatitude()
+            == other.getLatitude());
+      }
+      result = result && (hasLongitude() == other.hasLongitude());
+      if (hasLongitude()) {
+        result = result && (getLongitude()
+            == other.getLongitude());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptorForType().hashCode();
+      if (hasId()) {
+        hash = (37 * hash) + ID_FIELD_NUMBER;
+        hash = (53 * hash) + getId().hashCode();
+      }
+      if (hasLatitude()) {
+        hash = (37 * hash) + LATITUDE_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getLatitude());
+      }
+      if (hasLongitude()) {
+        hash = (37 * hash) + LONGITUDE_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getLongitude());
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static com.pokegoapi.main.Stops.FortDetailsProto parseFrom(
@@ -1890,42 +2042,53 @@ public final class Stops {
     }
     public static com.pokegoapi.main.Stops.FortDetailsProto parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Stops.FortDetailsProto parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Stops.FortDetailsProto parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Stops.FortDetailsProto parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Stops.FortDetailsProto parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Stops.FortDetailsProto parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.pokegoapi.main.Stops.FortDetailsProto prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(com.pokegoapi.main.Stops.FortDetailsProto prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -1966,10 +2129,6 @@ public final class Stops {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         id_ = "";
@@ -1979,10 +2138,6 @@ public final class Stops {
         longitude_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000004);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -2045,13 +2200,13 @@ public final class Stops {
         if (other.hasLongitude()) {
           setLongitude(other.getLongitude());
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!hasId()) {
-          
           return false;
         }
         return true;
@@ -2066,7 +2221,7 @@ public final class Stops {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.pokegoapi.main.Stops.FortDetailsProto) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -2219,22 +2374,49 @@ public final class Stops {
       // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.FortDetailsProto)
     }
 
+    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.FortDetailsProto)
+    private static final com.pokegoapi.main.Stops.FortDetailsProto DEFAULT_INSTANCE;
     static {
-      defaultInstance = new FortDetailsProto(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new com.pokegoapi.main.Stops.FortDetailsProto();
     }
 
-    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.FortDetailsProto)
+    public static com.pokegoapi.main.Stops.FortDetailsProto getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<FortDetailsProto>
+        PARSER = new com.google.protobuf.AbstractParser<FortDetailsProto>() {
+      public FortDetailsProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new FortDetailsProto(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<FortDetailsProto> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FortDetailsProto> getParserForType() {
+      return PARSER;
+    }
+
+    public com.pokegoapi.main.Stops.FortDetailsProto getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_FortDetailsOutProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_FortDetailsOutProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_FortDetailsProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_FortDetailsProto_fieldAccessorTable;
 
@@ -2242,7 +2424,7 @@ public final class Stops {
       getDescriptor() {
     return descriptor;
   }
-  private static com.google.protobuf.Descriptors.FileDescriptor
+  private static  com.google.protobuf.Descriptors.FileDescriptor
       descriptor;
   static {
     java.lang.String[] descriptorData = {

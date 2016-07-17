@@ -8,6 +8,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 
 import com.pokegoapi.api.inventory.Pokemon;
+import com.pokegoapi.main.Communication;
 import com.pokegoapi.main.Inventory.InventoryRequestProto;
 import com.pokegoapi.main.Inventory.InventoryRequestProto.Builder;
 import com.pokegoapi.main.Inventory.InventoryResponseProto;
@@ -22,9 +23,9 @@ public class InventoryRequest extends Request {
 	
 
 	
-	public int getRpcId()
+	public Communication.Method getRpcId()
 	{
-		return 4;
+		return Communication.Method.GET_INVENTORY;
 	}
 
 	public InventoryRequest()

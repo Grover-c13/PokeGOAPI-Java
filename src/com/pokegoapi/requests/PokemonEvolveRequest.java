@@ -1,5 +1,6 @@
 package com.pokegoapi.requests;
 
+import com.pokegoapi.main.Communication;
 import com.pokegoapi.main.Inventory.EvolvePokemonProto.Builder;
 import com.pokegoapi.main.Inventory.EvolvePokemonProto;
 import com.pokegoapi.main.Inventory.EvolvePokemonOutProto;
@@ -18,9 +19,9 @@ public class PokemonEvolveRequest extends Request {
 	}
 	
 	@Override
-	public int getRpcId()
+	public Communication.Method getRpcId()
 	{
-		return 125;
+		return Communication.Method.EVOLVE_POKEMON;
 	}
 	
 

@@ -8,6 +8,7 @@ import com.pokegoapi.api.DailyBonus;
 import com.pokegoapi.api.PlayerAvatar;
 import com.pokegoapi.api.PlayerProfile;
 import com.pokegoapi.api.Team;
+import com.pokegoapi.main.Communication;
 import com.pokegoapi.main.Player.ClientPlayerDetails;
 import com.pokegoapi.main.Player.Currency;
 import com.pokegoapi.main.Communication.Payload;
@@ -15,10 +16,10 @@ import com.pokegoapi.main.Request;
 
 public class ProfileRequest extends Request {
 	private PlayerProfile profile;
-	public int getRpcId()
+	public Communication.Method getRpcId()
 	{
 		profile = new PlayerProfile();
-		return 2;
+		return Communication.Method.GET_PLAYER_PROFILE;
 	}
 
 	public PlayerProfile getProfile()

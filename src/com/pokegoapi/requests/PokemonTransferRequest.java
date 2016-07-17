@@ -1,5 +1,6 @@
 package com.pokegoapi.requests;
 
+import com.pokegoapi.main.Communication;
 import com.pokegoapi.main.Inventory.TransferPokemonProto.Builder;
 import com.pokegoapi.main.Communication.Payload;
 import com.pokegoapi.main.Inventory.TransferPokemonOutProto;
@@ -21,9 +22,9 @@ public class PokemonTransferRequest extends Request {
 	}
 	
 	@Override
-	public int getRpcId()
+	public Communication.Method getRpcId()
 	{
-		return 112;
+		return Communication.Method.RELEASE_POKEMON;
 	}
 	
 	public int getCandies()

@@ -24,37 +24,28 @@ public final class Inventory {
   /**
    * Protobuf type {@code com.pokegoapi.main.InventoryRequestProto}
    */
-  public static final class InventoryRequestProto extends
+  public  static final class InventoryRequestProto extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:com.pokegoapi.main.InventoryRequestProto)
       InventoryRequestProtoOrBuilder {
     // Use InventoryRequestProto.newBuilder() to construct.
     private InventoryRequestProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private InventoryRequestProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final InventoryRequestProto defaultInstance;
-    public static InventoryRequestProto getDefaultInstance() {
-      return defaultInstance;
+    private InventoryRequestProto() {
+      timestamp_ = 0L;
     }
 
-    public InventoryRequestProto getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private InventoryRequestProto(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -84,7 +75,7 @@ public final class Inventory {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -100,21 +91,6 @@ public final class Inventory {
       return com.pokegoapi.main.Inventory.internal_static_com_pokegoapi_main_InventoryRequestProto_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               com.pokegoapi.main.Inventory.InventoryRequestProto.class, com.pokegoapi.main.Inventory.InventoryRequestProto.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<InventoryRequestProto> PARSER =
-        new com.google.protobuf.AbstractParser<InventoryRequestProto>() {
-      public InventoryRequestProto parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new InventoryRequestProto(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<InventoryRequestProto> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -133,9 +109,6 @@ public final class Inventory {
       return timestamp_;
     }
 
-    private void initFields() {
-      timestamp_ = 0L;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -148,16 +121,14 @@ public final class Inventory {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeInt64(1, timestamp_);
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -165,16 +136,47 @@ public final class Inventory {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(1, timestamp_);
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.pokegoapi.main.Inventory.InventoryRequestProto)) {
+        return super.equals(obj);
+      }
+      com.pokegoapi.main.Inventory.InventoryRequestProto other = (com.pokegoapi.main.Inventory.InventoryRequestProto) obj;
+
+      boolean result = true;
+      result = result && (hasTimestamp() == other.hasTimestamp());
+      if (hasTimestamp()) {
+        result = result && (getTimestamp()
+            == other.getTimestamp());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptorForType().hashCode();
+      if (hasTimestamp()) {
+        hash = (37 * hash) + TIMESTAMP_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getTimestamp());
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static com.pokegoapi.main.Inventory.InventoryRequestProto parseFrom(
@@ -200,42 +202,53 @@ public final class Inventory {
     }
     public static com.pokegoapi.main.Inventory.InventoryRequestProto parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.InventoryRequestProto parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Inventory.InventoryRequestProto parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.InventoryRequestProto parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Inventory.InventoryRequestProto parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.InventoryRequestProto parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryRequestProto prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryRequestProto prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -276,19 +289,11 @@ public final class Inventory {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         timestamp_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -335,7 +340,8 @@ public final class Inventory {
         if (other.hasTimestamp()) {
           setTimestamp(other.getTimestamp());
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
@@ -352,7 +358,7 @@ public final class Inventory {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.pokegoapi.main.Inventory.InventoryRequestProto) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -397,12 +403,39 @@ public final class Inventory {
       // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.InventoryRequestProto)
     }
 
+    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryRequestProto)
+    private static final com.pokegoapi.main.Inventory.InventoryRequestProto DEFAULT_INSTANCE;
     static {
-      defaultInstance = new InventoryRequestProto(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new com.pokegoapi.main.Inventory.InventoryRequestProto();
     }
 
-    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryRequestProto)
+    public static com.pokegoapi.main.Inventory.InventoryRequestProto getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<InventoryRequestProto>
+        PARSER = new com.google.protobuf.AbstractParser<InventoryRequestProto>() {
+      public InventoryRequestProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new InventoryRequestProto(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<InventoryRequestProto> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<InventoryRequestProto> getParserForType() {
+      return PARSER;
+    }
+
+    public com.pokegoapi.main.Inventory.InventoryRequestProto getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface PokemonProtoOrBuilder extends
@@ -692,37 +725,57 @@ public final class Inventory {
   /**
    * Protobuf type {@code com.pokegoapi.main.PokemonProto}
    */
-  public static final class PokemonProto extends
+  public  static final class PokemonProto extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:com.pokegoapi.main.PokemonProto)
       PokemonProtoOrBuilder {
     // Use PokemonProto.newBuilder() to construct.
     private PokemonProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private PokemonProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final PokemonProto defaultInstance;
-    public static PokemonProto getDefaultInstance() {
-      return defaultInstance;
+    private PokemonProto() {
+      entId_ = 0L;
+      pokemonId_ = 0;
+      cp_ = 0;
+      stamina_ = 0;
+      maxStamina_ = 0;
+      move1_ = 0;
+      move2_ = 0;
+      deployedFortId_ = 0;
+      ownerName_ = "";
+      isEgg_ = false;
+      eggKmWalkedTarget_ = 0D;
+      eggKmWalkedStart_ = 0D;
+      origin_ = 0;
+      heightM_ = 0F;
+      weightKg_ = 0F;
+      individualAttack_ = 0;
+      individualDefense_ = 0;
+      individualStamina_ = 0;
+      cpMultiplier_ = 0F;
+      pokeball_ = 0;
+      capturedS2CellId_ = 0L;
+      battlesAttacked_ = 0;
+      battlesDefended_ = 0;
+      eggIncubatorId_ = 0;
+      creationTimeMs_ = 0L;
+      numUpgrades_ = 0;
+      additionalCpMultiplier_ = 0F;
+      favorite_ = false;
+      nickname_ = "";
+      fromFort_ = false;
     }
 
-    public PokemonProto getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private PokemonProto(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -899,7 +952,7 @@ public final class Inventory {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -915,21 +968,6 @@ public final class Inventory {
       return com.pokegoapi.main.Inventory.internal_static_com_pokegoapi_main_PokemonProto_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               com.pokegoapi.main.Inventory.PokemonProto.class, com.pokegoapi.main.Inventory.PokemonProto.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<PokemonProto> PARSER =
-        new com.google.protobuf.AbstractParser<PokemonProto>() {
-      public PokemonProto parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new PokemonProto(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<PokemonProto> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -1054,7 +1092,7 @@ public final class Inventory {
     }
 
     public static final int OWNERNAME_FIELD_NUMBER = 9;
-    private java.lang.Object ownerName_;
+    private volatile java.lang.Object ownerName_;
     /**
      * <code>optional string OwnerName = 9;</code>
      */
@@ -1381,7 +1419,7 @@ public final class Inventory {
     }
 
     public static final int NICKNAME_FIELD_NUMBER = 30;
-    private java.lang.Object nickname_;
+    private volatile java.lang.Object nickname_;
     /**
      * <code>optional string Nickname = 30;</code>
      */
@@ -1437,38 +1475,6 @@ public final class Inventory {
       return fromFort_;
     }
 
-    private void initFields() {
-      entId_ = 0L;
-      pokemonId_ = 0;
-      cp_ = 0;
-      stamina_ = 0;
-      maxStamina_ = 0;
-      move1_ = 0;
-      move2_ = 0;
-      deployedFortId_ = 0;
-      ownerName_ = "";
-      isEgg_ = false;
-      eggKmWalkedTarget_ = 0D;
-      eggKmWalkedStart_ = 0D;
-      origin_ = 0;
-      heightM_ = 0F;
-      weightKg_ = 0F;
-      individualAttack_ = 0;
-      individualDefense_ = 0;
-      individualStamina_ = 0;
-      cpMultiplier_ = 0F;
-      pokeball_ = 0;
-      capturedS2CellId_ = 0L;
-      battlesAttacked_ = 0;
-      battlesDefended_ = 0;
-      eggIncubatorId_ = 0;
-      creationTimeMs_ = 0L;
-      numUpgrades_ = 0;
-      additionalCpMultiplier_ = 0F;
-      favorite_ = false;
-      nickname_ = "";
-      fromFort_ = false;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -1481,7 +1487,6 @@ public final class Inventory {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeFixed64(1, entId_);
       }
@@ -1507,7 +1512,7 @@ public final class Inventory {
         output.writeInt32(8, deployedFortId_);
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        output.writeBytes(9, getOwnerNameBytes());
+        com.google.protobuf.GeneratedMessage.writeString(output, 9, ownerName_);
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         output.writeBool(10, isEgg_);
@@ -1567,17 +1572,16 @@ public final class Inventory {
         output.writeBool(29, favorite_);
       }
       if (((bitField0_ & 0x10000000) == 0x10000000)) {
-        output.writeBytes(30, getNicknameBytes());
+        com.google.protobuf.GeneratedMessage.writeString(output, 30, nickname_);
       }
       if (((bitField0_ & 0x20000000) == 0x20000000)) {
         output.writeBool(31, fromFort_);
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -1614,8 +1618,7 @@ public final class Inventory {
           .computeInt32Size(8, deployedFortId_);
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(9, getOwnerNameBytes());
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(9, ownerName_);
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
@@ -1694,23 +1697,337 @@ public final class Inventory {
           .computeBoolSize(29, favorite_);
       }
       if (((bitField0_ & 0x10000000) == 0x10000000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(30, getNicknameBytes());
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(30, nickname_);
       }
       if (((bitField0_ & 0x20000000) == 0x20000000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(31, fromFort_);
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.pokegoapi.main.Inventory.PokemonProto)) {
+        return super.equals(obj);
+      }
+      com.pokegoapi.main.Inventory.PokemonProto other = (com.pokegoapi.main.Inventory.PokemonProto) obj;
+
+      boolean result = true;
+      result = result && (hasEntId() == other.hasEntId());
+      if (hasEntId()) {
+        result = result && (getEntId()
+            == other.getEntId());
+      }
+      result = result && (hasPokemonId() == other.hasPokemonId());
+      if (hasPokemonId()) {
+        result = result && (getPokemonId()
+            == other.getPokemonId());
+      }
+      result = result && (hasCp() == other.hasCp());
+      if (hasCp()) {
+        result = result && (getCp()
+            == other.getCp());
+      }
+      result = result && (hasStamina() == other.hasStamina());
+      if (hasStamina()) {
+        result = result && (getStamina()
+            == other.getStamina());
+      }
+      result = result && (hasMaxStamina() == other.hasMaxStamina());
+      if (hasMaxStamina()) {
+        result = result && (getMaxStamina()
+            == other.getMaxStamina());
+      }
+      result = result && (hasMove1() == other.hasMove1());
+      if (hasMove1()) {
+        result = result && (getMove1()
+            == other.getMove1());
+      }
+      result = result && (hasMove2() == other.hasMove2());
+      if (hasMove2()) {
+        result = result && (getMove2()
+            == other.getMove2());
+      }
+      result = result && (hasDeployedFortId() == other.hasDeployedFortId());
+      if (hasDeployedFortId()) {
+        result = result && (getDeployedFortId()
+            == other.getDeployedFortId());
+      }
+      result = result && (hasOwnerName() == other.hasOwnerName());
+      if (hasOwnerName()) {
+        result = result && getOwnerName()
+            .equals(other.getOwnerName());
+      }
+      result = result && (hasIsEgg() == other.hasIsEgg());
+      if (hasIsEgg()) {
+        result = result && (getIsEgg()
+            == other.getIsEgg());
+      }
+      result = result && (hasEggKmWalkedTarget() == other.hasEggKmWalkedTarget());
+      if (hasEggKmWalkedTarget()) {
+        result = result && (
+            java.lang.Double.doubleToLongBits(getEggKmWalkedTarget())
+            == java.lang.Double.doubleToLongBits(
+                other.getEggKmWalkedTarget()));
+      }
+      result = result && (hasEggKmWalkedStart() == other.hasEggKmWalkedStart());
+      if (hasEggKmWalkedStart()) {
+        result = result && (
+            java.lang.Double.doubleToLongBits(getEggKmWalkedStart())
+            == java.lang.Double.doubleToLongBits(
+                other.getEggKmWalkedStart()));
+      }
+      result = result && (hasOrigin() == other.hasOrigin());
+      if (hasOrigin()) {
+        result = result && (getOrigin()
+            == other.getOrigin());
+      }
+      result = result && (hasHeightM() == other.hasHeightM());
+      if (hasHeightM()) {
+        result = result && (
+            java.lang.Float.floatToIntBits(getHeightM())
+            == java.lang.Float.floatToIntBits(
+                other.getHeightM()));
+      }
+      result = result && (hasWeightKg() == other.hasWeightKg());
+      if (hasWeightKg()) {
+        result = result && (
+            java.lang.Float.floatToIntBits(getWeightKg())
+            == java.lang.Float.floatToIntBits(
+                other.getWeightKg()));
+      }
+      result = result && (hasIndividualAttack() == other.hasIndividualAttack());
+      if (hasIndividualAttack()) {
+        result = result && (getIndividualAttack()
+            == other.getIndividualAttack());
+      }
+      result = result && (hasIndividualDefense() == other.hasIndividualDefense());
+      if (hasIndividualDefense()) {
+        result = result && (getIndividualDefense()
+            == other.getIndividualDefense());
+      }
+      result = result && (hasIndividualStamina() == other.hasIndividualStamina());
+      if (hasIndividualStamina()) {
+        result = result && (getIndividualStamina()
+            == other.getIndividualStamina());
+      }
+      result = result && (hasCpMultiplier() == other.hasCpMultiplier());
+      if (hasCpMultiplier()) {
+        result = result && (
+            java.lang.Float.floatToIntBits(getCpMultiplier())
+            == java.lang.Float.floatToIntBits(
+                other.getCpMultiplier()));
+      }
+      result = result && (hasPokeball() == other.hasPokeball());
+      if (hasPokeball()) {
+        result = result && (getPokeball()
+            == other.getPokeball());
+      }
+      result = result && (hasCapturedS2CellId() == other.hasCapturedS2CellId());
+      if (hasCapturedS2CellId()) {
+        result = result && (getCapturedS2CellId()
+            == other.getCapturedS2CellId());
+      }
+      result = result && (hasBattlesAttacked() == other.hasBattlesAttacked());
+      if (hasBattlesAttacked()) {
+        result = result && (getBattlesAttacked()
+            == other.getBattlesAttacked());
+      }
+      result = result && (hasBattlesDefended() == other.hasBattlesDefended());
+      if (hasBattlesDefended()) {
+        result = result && (getBattlesDefended()
+            == other.getBattlesDefended());
+      }
+      result = result && (hasEggIncubatorId() == other.hasEggIncubatorId());
+      if (hasEggIncubatorId()) {
+        result = result && (getEggIncubatorId()
+            == other.getEggIncubatorId());
+      }
+      result = result && (hasCreationTimeMs() == other.hasCreationTimeMs());
+      if (hasCreationTimeMs()) {
+        result = result && (getCreationTimeMs()
+            == other.getCreationTimeMs());
+      }
+      result = result && (hasNumUpgrades() == other.hasNumUpgrades());
+      if (hasNumUpgrades()) {
+        result = result && (getNumUpgrades()
+            == other.getNumUpgrades());
+      }
+      result = result && (hasAdditionalCpMultiplier() == other.hasAdditionalCpMultiplier());
+      if (hasAdditionalCpMultiplier()) {
+        result = result && (
+            java.lang.Float.floatToIntBits(getAdditionalCpMultiplier())
+            == java.lang.Float.floatToIntBits(
+                other.getAdditionalCpMultiplier()));
+      }
+      result = result && (hasFavorite() == other.hasFavorite());
+      if (hasFavorite()) {
+        result = result && (getFavorite()
+            == other.getFavorite());
+      }
+      result = result && (hasNickname() == other.hasNickname());
+      if (hasNickname()) {
+        result = result && getNickname()
+            .equals(other.getNickname());
+      }
+      result = result && (hasFromFort() == other.hasFromFort());
+      if (hasFromFort()) {
+        result = result && (getFromFort()
+            == other.getFromFort());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptorForType().hashCode();
+      if (hasEntId()) {
+        hash = (37 * hash) + ENTID_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getEntId());
+      }
+      if (hasPokemonId()) {
+        hash = (37 * hash) + POKEMONID_FIELD_NUMBER;
+        hash = (53 * hash) + getPokemonId();
+      }
+      if (hasCp()) {
+        hash = (37 * hash) + CP_FIELD_NUMBER;
+        hash = (53 * hash) + getCp();
+      }
+      if (hasStamina()) {
+        hash = (37 * hash) + STAMINA_FIELD_NUMBER;
+        hash = (53 * hash) + getStamina();
+      }
+      if (hasMaxStamina()) {
+        hash = (37 * hash) + MAXSTAMINA_FIELD_NUMBER;
+        hash = (53 * hash) + getMaxStamina();
+      }
+      if (hasMove1()) {
+        hash = (37 * hash) + MOVE1_FIELD_NUMBER;
+        hash = (53 * hash) + getMove1();
+      }
+      if (hasMove2()) {
+        hash = (37 * hash) + MOVE2_FIELD_NUMBER;
+        hash = (53 * hash) + getMove2();
+      }
+      if (hasDeployedFortId()) {
+        hash = (37 * hash) + DEPLOYEDFORTID_FIELD_NUMBER;
+        hash = (53 * hash) + getDeployedFortId();
+      }
+      if (hasOwnerName()) {
+        hash = (37 * hash) + OWNERNAME_FIELD_NUMBER;
+        hash = (53 * hash) + getOwnerName().hashCode();
+      }
+      if (hasIsEgg()) {
+        hash = (37 * hash) + ISEGG_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getIsEgg());
+      }
+      if (hasEggKmWalkedTarget()) {
+        hash = (37 * hash) + EGGKMWALKEDTARGET_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            java.lang.Double.doubleToLongBits(getEggKmWalkedTarget()));
+      }
+      if (hasEggKmWalkedStart()) {
+        hash = (37 * hash) + EGGKMWALKEDSTART_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            java.lang.Double.doubleToLongBits(getEggKmWalkedStart()));
+      }
+      if (hasOrigin()) {
+        hash = (37 * hash) + ORIGIN_FIELD_NUMBER;
+        hash = (53 * hash) + getOrigin();
+      }
+      if (hasHeightM()) {
+        hash = (37 * hash) + HEIGHTM_FIELD_NUMBER;
+        hash = (53 * hash) + java.lang.Float.floatToIntBits(
+            getHeightM());
+      }
+      if (hasWeightKg()) {
+        hash = (37 * hash) + WEIGHTKG_FIELD_NUMBER;
+        hash = (53 * hash) + java.lang.Float.floatToIntBits(
+            getWeightKg());
+      }
+      if (hasIndividualAttack()) {
+        hash = (37 * hash) + INDIVIDUALATTACK_FIELD_NUMBER;
+        hash = (53 * hash) + getIndividualAttack();
+      }
+      if (hasIndividualDefense()) {
+        hash = (37 * hash) + INDIVIDUALDEFENSE_FIELD_NUMBER;
+        hash = (53 * hash) + getIndividualDefense();
+      }
+      if (hasIndividualStamina()) {
+        hash = (37 * hash) + INDIVIDUALSTAMINA_FIELD_NUMBER;
+        hash = (53 * hash) + getIndividualStamina();
+      }
+      if (hasCpMultiplier()) {
+        hash = (37 * hash) + CPMULTIPLIER_FIELD_NUMBER;
+        hash = (53 * hash) + java.lang.Float.floatToIntBits(
+            getCpMultiplier());
+      }
+      if (hasPokeball()) {
+        hash = (37 * hash) + POKEBALL_FIELD_NUMBER;
+        hash = (53 * hash) + getPokeball();
+      }
+      if (hasCapturedS2CellId()) {
+        hash = (37 * hash) + CAPTUREDS2CELLID_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getCapturedS2CellId());
+      }
+      if (hasBattlesAttacked()) {
+        hash = (37 * hash) + BATTLESATTACKED_FIELD_NUMBER;
+        hash = (53 * hash) + getBattlesAttacked();
+      }
+      if (hasBattlesDefended()) {
+        hash = (37 * hash) + BATTLESDEFENDED_FIELD_NUMBER;
+        hash = (53 * hash) + getBattlesDefended();
+      }
+      if (hasEggIncubatorId()) {
+        hash = (37 * hash) + EGGINCUBATORID_FIELD_NUMBER;
+        hash = (53 * hash) + getEggIncubatorId();
+      }
+      if (hasCreationTimeMs()) {
+        hash = (37 * hash) + CREATIONTIMEMS_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getCreationTimeMs());
+      }
+      if (hasNumUpgrades()) {
+        hash = (37 * hash) + NUMUPGRADES_FIELD_NUMBER;
+        hash = (53 * hash) + getNumUpgrades();
+      }
+      if (hasAdditionalCpMultiplier()) {
+        hash = (37 * hash) + ADDITIONALCPMULTIPLIER_FIELD_NUMBER;
+        hash = (53 * hash) + java.lang.Float.floatToIntBits(
+            getAdditionalCpMultiplier());
+      }
+      if (hasFavorite()) {
+        hash = (37 * hash) + FAVORITE_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getFavorite());
+      }
+      if (hasNickname()) {
+        hash = (37 * hash) + NICKNAME_FIELD_NUMBER;
+        hash = (53 * hash) + getNickname().hashCode();
+      }
+      if (hasFromFort()) {
+        hash = (37 * hash) + FROMFORT_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getFromFort());
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static com.pokegoapi.main.Inventory.PokemonProto parseFrom(
@@ -1736,42 +2053,53 @@ public final class Inventory {
     }
     public static com.pokegoapi.main.Inventory.PokemonProto parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.PokemonProto parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Inventory.PokemonProto parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.PokemonProto parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Inventory.PokemonProto parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.PokemonProto parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.pokegoapi.main.Inventory.PokemonProto prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(com.pokegoapi.main.Inventory.PokemonProto prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -1812,10 +2140,6 @@ public final class Inventory {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         entId_ = 0L;
@@ -1879,10 +2203,6 @@ public final class Inventory {
         fromFort_ = false;
         bitField0_ = (bitField0_ & ~0x20000000);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -2136,7 +2456,8 @@ public final class Inventory {
         if (other.hasFromFort()) {
           setFromFort(other.getFromFort());
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
@@ -2153,7 +2474,7 @@ public final class Inventory {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.pokegoapi.main.Inventory.PokemonProto) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -3214,12 +3535,39 @@ public final class Inventory {
       // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.PokemonProto)
     }
 
+    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.PokemonProto)
+    private static final com.pokegoapi.main.Inventory.PokemonProto DEFAULT_INSTANCE;
     static {
-      defaultInstance = new PokemonProto(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new com.pokegoapi.main.Inventory.PokemonProto();
     }
 
-    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.PokemonProto)
+    public static com.pokegoapi.main.Inventory.PokemonProto getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<PokemonProto>
+        PARSER = new com.google.protobuf.AbstractParser<PokemonProto>() {
+      public PokemonProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new PokemonProto(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<PokemonProto> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PokemonProto> getParserForType() {
+      return PARSER;
+    }
+
+    public com.pokegoapi.main.Inventory.PokemonProto getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface InventoryResponseProtoOrBuilder extends
@@ -3262,37 +3610,29 @@ public final class Inventory {
   /**
    * Protobuf type {@code com.pokegoapi.main.InventoryResponseProto}
    */
-  public static final class InventoryResponseProto extends
+  public  static final class InventoryResponseProto extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:com.pokegoapi.main.InventoryResponseProto)
       InventoryResponseProtoOrBuilder {
     // Use InventoryResponseProto.newBuilder() to construct.
     private InventoryResponseProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private InventoryResponseProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final InventoryResponseProto defaultInstance;
-    public static InventoryResponseProto getDefaultInstance() {
-      return defaultInstance;
+    private InventoryResponseProto() {
+      timestamp_ = 0L;
+      items_ = java.util.Collections.emptyList();
     }
 
-    public InventoryResponseProto getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private InventoryResponseProto(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -3321,7 +3661,8 @@ public final class Inventory {
                 items_ = new java.util.ArrayList<com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto>();
                 mutable_bitField0_ |= 0x00000002;
               }
-              items_.add(input.readMessage(com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto.PARSER, extensionRegistry));
+              items_.add(
+                  input.readMessage(com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto.PARSER, extensionRegistry));
               break;
             }
           }
@@ -3330,7 +3671,7 @@ public final class Inventory {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
           items_ = java.util.Collections.unmodifiableList(items_);
@@ -3349,21 +3690,6 @@ public final class Inventory {
       return com.pokegoapi.main.Inventory.internal_static_com_pokegoapi_main_InventoryResponseProto_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               com.pokegoapi.main.Inventory.InventoryResponseProto.class, com.pokegoapi.main.Inventory.InventoryResponseProto.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<InventoryResponseProto> PARSER =
-        new com.google.protobuf.AbstractParser<InventoryResponseProto>() {
-      public InventoryResponseProto parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new InventoryResponseProto(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<InventoryResponseProto> getParserForType() {
-      return PARSER;
     }
 
     public interface InventoryItemResponseProtoOrBuilder extends
@@ -3395,37 +3721,28 @@ public final class Inventory {
     /**
      * Protobuf type {@code com.pokegoapi.main.InventoryResponseProto.InventoryItemResponseProto}
      */
-    public static final class InventoryItemResponseProto extends
+    public  static final class InventoryItemResponseProto extends
         com.google.protobuf.GeneratedMessage implements
         // @@protoc_insertion_point(message_implements:com.pokegoapi.main.InventoryResponseProto.InventoryItemResponseProto)
         InventoryItemResponseProtoOrBuilder {
       // Use InventoryItemResponseProto.newBuilder() to construct.
       private InventoryItemResponseProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
         super(builder);
-        this.unknownFields = builder.getUnknownFields();
       }
-      private InventoryItemResponseProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-      private static final InventoryItemResponseProto defaultInstance;
-      public static InventoryItemResponseProto getDefaultInstance() {
-        return defaultInstance;
+      private InventoryItemResponseProto() {
+        timestamp_ = 0L;
       }
 
-      public InventoryItemResponseProto getDefaultInstanceForType() {
-        return defaultInstance;
-      }
-
-      private final com.google.protobuf.UnknownFieldSet unknownFields;
       @java.lang.Override
       public final com.google.protobuf.UnknownFieldSet
-          getUnknownFields() {
+      getUnknownFields() {
         return this.unknownFields;
       }
       private InventoryItemResponseProto(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        initFields();
+        this();
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -3468,7 +3785,7 @@ public final class Inventory {
           throw e.setUnfinishedMessage(this);
         } catch (java.io.IOException e) {
           throw new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this);
+              e).setUnfinishedMessage(this);
         } finally {
           this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
@@ -3484,21 +3801,6 @@ public final class Inventory {
         return com.pokegoapi.main.Inventory.internal_static_com_pokegoapi_main_InventoryResponseProto_InventoryItemResponseProto_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
                 com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto.class, com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto.Builder.class);
-      }
-
-      public static com.google.protobuf.Parser<InventoryItemResponseProto> PARSER =
-          new com.google.protobuf.AbstractParser<InventoryItemResponseProto>() {
-        public InventoryItemResponseProto parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          return new InventoryItemResponseProto(input, extensionRegistry);
-        }
-      };
-
-      @java.lang.Override
-      public com.google.protobuf.Parser<InventoryItemResponseProto> getParserForType() {
-        return PARSER;
       }
 
       private int bitField0_;
@@ -3529,19 +3831,15 @@ public final class Inventory {
        * <code>required .com.pokegoapi.main.InventoryItemProto item = 3;</code>
        */
       public com.pokegoapi.main.Inventory.InventoryItemProto getItem() {
-        return item_;
+        return item_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.getDefaultInstance() : item_;
       }
       /**
        * <code>required .com.pokegoapi.main.InventoryItemProto item = 3;</code>
        */
       public com.pokegoapi.main.Inventory.InventoryItemProtoOrBuilder getItemOrBuilder() {
-        return item_;
+        return item_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.getDefaultInstance() : item_;
       }
 
-      private void initFields() {
-        timestamp_ = 0L;
-        item_ = com.pokegoapi.main.Inventory.InventoryItemProto.getDefaultInstance();
-      }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
@@ -3562,19 +3860,17 @@ public final class Inventory {
 
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
-        getSerializedSize();
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           output.writeInt64(1, timestamp_);
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
-          output.writeMessage(3, item_);
+          output.writeMessage(3, getItem());
         }
-        getUnknownFields().writeTo(output);
+        unknownFields.writeTo(output);
       }
 
-      private int memoizedSerializedSize = -1;
       public int getSerializedSize() {
-        int size = memoizedSerializedSize;
+        int size = memoizedSize;
         if (size != -1) return size;
 
         size = 0;
@@ -3584,18 +3880,58 @@ public final class Inventory {
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeMessageSize(3, item_);
+            .computeMessageSize(3, getItem());
         }
-        size += getUnknownFields().getSerializedSize();
-        memoizedSerializedSize = size;
+        size += unknownFields.getSerializedSize();
+        memoizedSize = size;
         return size;
       }
 
       private static final long serialVersionUID = 0L;
       @java.lang.Override
-      protected java.lang.Object writeReplace()
-          throws java.io.ObjectStreamException {
-        return super.writeReplace();
+      public boolean equals(final java.lang.Object obj) {
+        if (obj == this) {
+         return true;
+        }
+        if (!(obj instanceof com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto)) {
+          return super.equals(obj);
+        }
+        com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto other = (com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto) obj;
+
+        boolean result = true;
+        result = result && (hasTimestamp() == other.hasTimestamp());
+        if (hasTimestamp()) {
+          result = result && (getTimestamp()
+              == other.getTimestamp());
+        }
+        result = result && (hasItem() == other.hasItem());
+        if (hasItem()) {
+          result = result && getItem()
+              .equals(other.getItem());
+        }
+        result = result && unknownFields.equals(other.unknownFields);
+        return result;
+      }
+
+      @java.lang.Override
+      public int hashCode() {
+        if (memoizedHashCode != 0) {
+          return memoizedHashCode;
+        }
+        int hash = 41;
+        hash = (19 * hash) + getDescriptorForType().hashCode();
+        if (hasTimestamp()) {
+          hash = (37 * hash) + TIMESTAMP_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+              getTimestamp());
+        }
+        if (hasItem()) {
+          hash = (37 * hash) + ITEM_FIELD_NUMBER;
+          hash = (53 * hash) + getItem().hashCode();
+        }
+        hash = (29 * hash) + unknownFields.hashCode();
+        memoizedHashCode = hash;
+        return hash;
       }
 
       public static com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto parseFrom(
@@ -3621,42 +3957,53 @@ public final class Inventory {
       }
       public static com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto parseFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto parseFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto parseDelimitedFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto parseDelimitedFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto parseFrom(
           com.google.protobuf.CodedInputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto parseFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
-      public static Builder newBuilder() { return Builder.create(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto prototype) {
-        return newBuilder().mergeFrom(prototype);
+      public static Builder newBuilder() {
+        return DEFAULT_INSTANCE.toBuilder();
       }
-      public Builder toBuilder() { return newBuilder(this); }
+      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto prototype) {
+        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() {
+        return this == DEFAULT_INSTANCE
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
 
       @java.lang.Override
       protected Builder newBuilderForType(
@@ -3698,25 +4045,17 @@ public final class Inventory {
             getItemFieldBuilder();
           }
         }
-        private static Builder create() {
-          return new Builder();
-        }
-
         public Builder clear() {
           super.clear();
           timestamp_ = 0L;
           bitField0_ = (bitField0_ & ~0x00000001);
           if (itemBuilder_ == null) {
-            item_ = com.pokegoapi.main.Inventory.InventoryItemProto.getDefaultInstance();
+            item_ = null;
           } else {
             itemBuilder_.clear();
           }
           bitField0_ = (bitField0_ & ~0x00000002);
           return this;
-        }
-
-        public Builder clone() {
-          return create().mergeFrom(buildPartial());
         }
 
         public com.google.protobuf.Descriptors.Descriptor
@@ -3774,17 +4113,16 @@ public final class Inventory {
           if (other.hasItem()) {
             mergeItem(other.getItem());
           }
-          this.mergeUnknownFields(other.getUnknownFields());
+          this.mergeUnknownFields(other.unknownFields);
+          onChanged();
           return this;
         }
 
         public final boolean isInitialized() {
           if (!hasItem()) {
-            
             return false;
           }
           if (!getItem().isInitialized()) {
-            
             return false;
           }
           return true;
@@ -3799,7 +4137,7 @@ public final class Inventory {
             parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
           } catch (com.google.protobuf.InvalidProtocolBufferException e) {
             parsedMessage = (com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto) e.getUnfinishedMessage();
-            throw e;
+            throw e.unwrapIOException();
           } finally {
             if (parsedMessage != null) {
               mergeFrom(parsedMessage);
@@ -3841,7 +4179,7 @@ public final class Inventory {
           return this;
         }
 
-        private com.pokegoapi.main.Inventory.InventoryItemProto item_ = com.pokegoapi.main.Inventory.InventoryItemProto.getDefaultInstance();
+        private com.pokegoapi.main.Inventory.InventoryItemProto item_ = null;
         private com.google.protobuf.SingleFieldBuilder<
             com.pokegoapi.main.Inventory.InventoryItemProto, com.pokegoapi.main.Inventory.InventoryItemProto.Builder, com.pokegoapi.main.Inventory.InventoryItemProtoOrBuilder> itemBuilder_;
         /**
@@ -3855,7 +4193,7 @@ public final class Inventory {
          */
         public com.pokegoapi.main.Inventory.InventoryItemProto getItem() {
           if (itemBuilder_ == null) {
-            return item_;
+            return item_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.getDefaultInstance() : item_;
           } else {
             return itemBuilder_.getMessage();
           }
@@ -3896,6 +4234,7 @@ public final class Inventory {
         public Builder mergeItem(com.pokegoapi.main.Inventory.InventoryItemProto value) {
           if (itemBuilder_ == null) {
             if (((bitField0_ & 0x00000002) == 0x00000002) &&
+                item_ != null &&
                 item_ != com.pokegoapi.main.Inventory.InventoryItemProto.getDefaultInstance()) {
               item_ =
                 com.pokegoapi.main.Inventory.InventoryItemProto.newBuilder(item_).mergeFrom(value).buildPartial();
@@ -3914,7 +4253,7 @@ public final class Inventory {
          */
         public Builder clearItem() {
           if (itemBuilder_ == null) {
-            item_ = com.pokegoapi.main.Inventory.InventoryItemProto.getDefaultInstance();
+            item_ = null;
             onChanged();
           } else {
             itemBuilder_.clear();
@@ -3937,7 +4276,8 @@ public final class Inventory {
           if (itemBuilder_ != null) {
             return itemBuilder_.getMessageOrBuilder();
           } else {
-            return item_;
+            return item_ == null ?
+                com.pokegoapi.main.Inventory.InventoryItemProto.getDefaultInstance() : item_;
           }
         }
         /**
@@ -3960,12 +4300,39 @@ public final class Inventory {
         // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.InventoryResponseProto.InventoryItemResponseProto)
       }
 
+      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryResponseProto.InventoryItemResponseProto)
+      private static final com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto DEFAULT_INSTANCE;
       static {
-        defaultInstance = new InventoryItemResponseProto(true);
-        defaultInstance.initFields();
+        DEFAULT_INSTANCE = new com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto();
       }
 
-      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryResponseProto.InventoryItemResponseProto)
+      public static com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto getDefaultInstance() {
+        return DEFAULT_INSTANCE;
+      }
+
+      @java.lang.Deprecated public static final com.google.protobuf.Parser<InventoryItemResponseProto>
+          PARSER = new com.google.protobuf.AbstractParser<InventoryItemResponseProto>() {
+        public InventoryItemResponseProto parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+            return new InventoryItemResponseProto(input, extensionRegistry);
+        }
+      };
+
+      public static com.google.protobuf.Parser<InventoryItemResponseProto> parser() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Parser<InventoryItemResponseProto> getParserForType() {
+        return PARSER;
+      }
+
+      public com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto getDefaultInstanceForType() {
+        return DEFAULT_INSTANCE;
+      }
+
     }
 
     private int bitField0_;
@@ -4019,10 +4386,6 @@ public final class Inventory {
       return items_.get(index);
     }
 
-    private void initFields() {
-      timestamp_ = 0L;
-      items_ = java.util.Collections.emptyList();
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -4041,19 +4404,17 @@ public final class Inventory {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeInt64(2, timestamp_);
       }
       for (int i = 0; i < items_.size(); i++) {
         output.writeMessage(3, items_.get(i));
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -4065,16 +4426,53 @@ public final class Inventory {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, items_.get(i));
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.pokegoapi.main.Inventory.InventoryResponseProto)) {
+        return super.equals(obj);
+      }
+      com.pokegoapi.main.Inventory.InventoryResponseProto other = (com.pokegoapi.main.Inventory.InventoryResponseProto) obj;
+
+      boolean result = true;
+      result = result && (hasTimestamp() == other.hasTimestamp());
+      if (hasTimestamp()) {
+        result = result && (getTimestamp()
+            == other.getTimestamp());
+      }
+      result = result && getItemsList()
+          .equals(other.getItemsList());
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptorForType().hashCode();
+      if (hasTimestamp()) {
+        hash = (37 * hash) + TIMESTAMP_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getTimestamp());
+      }
+      if (getItemsCount() > 0) {
+        hash = (37 * hash) + ITEMS_FIELD_NUMBER;
+        hash = (53 * hash) + getItemsList().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static com.pokegoapi.main.Inventory.InventoryResponseProto parseFrom(
@@ -4100,42 +4498,53 @@ public final class Inventory {
     }
     public static com.pokegoapi.main.Inventory.InventoryResponseProto parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.InventoryResponseProto parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Inventory.InventoryResponseProto parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.InventoryResponseProto parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Inventory.InventoryResponseProto parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.InventoryResponseProto parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryResponseProto prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryResponseProto prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -4177,10 +4586,6 @@ public final class Inventory {
           getItemsFieldBuilder();
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         timestamp_ = 0L;
@@ -4192,10 +4597,6 @@ public final class Inventory {
           itemsBuilder_.clear();
         }
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -4277,14 +4678,14 @@ public final class Inventory {
             }
           }
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         for (int i = 0; i < getItemsCount(); i++) {
           if (!getItems(i).isInitialized()) {
-            
             return false;
           }
         }
@@ -4300,7 +4701,7 @@ public final class Inventory {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.pokegoapi.main.Inventory.InventoryResponseProto) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -4585,12 +4986,39 @@ public final class Inventory {
       // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.InventoryResponseProto)
     }
 
+    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryResponseProto)
+    private static final com.pokegoapi.main.Inventory.InventoryResponseProto DEFAULT_INSTANCE;
     static {
-      defaultInstance = new InventoryResponseProto(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new com.pokegoapi.main.Inventory.InventoryResponseProto();
     }
 
-    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryResponseProto)
+    public static com.pokegoapi.main.Inventory.InventoryResponseProto getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<InventoryResponseProto>
+        PARSER = new com.google.protobuf.AbstractParser<InventoryResponseProto>() {
+      public InventoryResponseProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new InventoryResponseProto(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<InventoryResponseProto> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<InventoryResponseProto> getParserForType() {
+      return PARSER;
+    }
+
+    public com.pokegoapi.main.Inventory.InventoryResponseProto getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface InventoryItemProtoOrBuilder extends
@@ -4730,37 +5158,27 @@ public final class Inventory {
   /**
    * Protobuf type {@code com.pokegoapi.main.InventoryItemProto}
    */
-  public static final class InventoryItemProto extends
+  public  static final class InventoryItemProto extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:com.pokegoapi.main.InventoryItemProto)
       InventoryItemProtoOrBuilder {
     // Use InventoryItemProto.newBuilder() to construct.
     private InventoryItemProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private InventoryItemProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final InventoryItemProto defaultInstance;
-    public static InventoryItemProto getDefaultInstance() {
-      return defaultInstance;
+    private InventoryItemProto() {
     }
 
-    public InventoryItemProto getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private InventoryItemProto(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -4915,7 +5333,7 @@ public final class Inventory {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -4931,21 +5349,6 @@ public final class Inventory {
       return com.pokegoapi.main.Inventory.internal_static_com_pokegoapi_main_InventoryItemProto_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               com.pokegoapi.main.Inventory.InventoryItemProto.class, com.pokegoapi.main.Inventory.InventoryItemProto.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<InventoryItemProto> PARSER =
-        new com.google.protobuf.AbstractParser<InventoryItemProto>() {
-      public InventoryItemProto parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new InventoryItemProto(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<InventoryItemProto> getParserForType() {
-      return PARSER;
     }
 
     public interface ItemProtoOrBuilder extends
@@ -4982,37 +5385,30 @@ public final class Inventory {
     /**
      * Protobuf type {@code com.pokegoapi.main.InventoryItemProto.ItemProto}
      */
-    public static final class ItemProto extends
+    public  static final class ItemProto extends
         com.google.protobuf.GeneratedMessage implements
         // @@protoc_insertion_point(message_implements:com.pokegoapi.main.InventoryItemProto.ItemProto)
         ItemProtoOrBuilder {
       // Use ItemProto.newBuilder() to construct.
       private ItemProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
         super(builder);
-        this.unknownFields = builder.getUnknownFields();
       }
-      private ItemProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-      private static final ItemProto defaultInstance;
-      public static ItemProto getDefaultInstance() {
-        return defaultInstance;
+      private ItemProto() {
+        item_ = 0;
+        count_ = 0;
+        unseen_ = false;
       }
 
-      public ItemProto getDefaultInstanceForType() {
-        return defaultInstance;
-      }
-
-      private final com.google.protobuf.UnknownFieldSet unknownFields;
       @java.lang.Override
       public final com.google.protobuf.UnknownFieldSet
-          getUnknownFields() {
+      getUnknownFields() {
         return this.unknownFields;
       }
       private ItemProto(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        initFields();
+        this();
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -5052,7 +5448,7 @@ public final class Inventory {
           throw e.setUnfinishedMessage(this);
         } catch (java.io.IOException e) {
           throw new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this);
+              e).setUnfinishedMessage(this);
         } finally {
           this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
@@ -5068,21 +5464,6 @@ public final class Inventory {
         return com.pokegoapi.main.Inventory.internal_static_com_pokegoapi_main_InventoryItemProto_ItemProto_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
                 com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.class, com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.Builder.class);
-      }
-
-      public static com.google.protobuf.Parser<ItemProto> PARSER =
-          new com.google.protobuf.AbstractParser<ItemProto>() {
-        public ItemProto parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          return new ItemProto(input, extensionRegistry);
-        }
-      };
-
-      @java.lang.Override
-      public com.google.protobuf.Parser<ItemProto> getParserForType() {
-        return PARSER;
       }
 
       private int bitField0_;
@@ -5131,11 +5512,6 @@ public final class Inventory {
         return unseen_;
       }
 
-      private void initFields() {
-        item_ = 0;
-        count_ = 0;
-        unseen_ = false;
-      }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
@@ -5156,7 +5532,6 @@ public final class Inventory {
 
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
-        getSerializedSize();
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           output.writeInt32(1, item_);
         }
@@ -5166,12 +5541,11 @@ public final class Inventory {
         if (((bitField0_ & 0x00000004) == 0x00000004)) {
           output.writeBool(3, unseen_);
         }
-        getUnknownFields().writeTo(output);
+        unknownFields.writeTo(output);
       }
 
-      private int memoizedSerializedSize = -1;
       public int getSerializedSize() {
-        int size = memoizedSerializedSize;
+        int size = memoizedSize;
         if (size != -1) return size;
 
         size = 0;
@@ -5187,16 +5561,65 @@ public final class Inventory {
           size += com.google.protobuf.CodedOutputStream
             .computeBoolSize(3, unseen_);
         }
-        size += getUnknownFields().getSerializedSize();
-        memoizedSerializedSize = size;
+        size += unknownFields.getSerializedSize();
+        memoizedSize = size;
         return size;
       }
 
       private static final long serialVersionUID = 0L;
       @java.lang.Override
-      protected java.lang.Object writeReplace()
-          throws java.io.ObjectStreamException {
-        return super.writeReplace();
+      public boolean equals(final java.lang.Object obj) {
+        if (obj == this) {
+         return true;
+        }
+        if (!(obj instanceof com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto)) {
+          return super.equals(obj);
+        }
+        com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto other = (com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto) obj;
+
+        boolean result = true;
+        result = result && (hasItem() == other.hasItem());
+        if (hasItem()) {
+          result = result && (getItem()
+              == other.getItem());
+        }
+        result = result && (hasCount() == other.hasCount());
+        if (hasCount()) {
+          result = result && (getCount()
+              == other.getCount());
+        }
+        result = result && (hasUnseen() == other.hasUnseen());
+        if (hasUnseen()) {
+          result = result && (getUnseen()
+              == other.getUnseen());
+        }
+        result = result && unknownFields.equals(other.unknownFields);
+        return result;
+      }
+
+      @java.lang.Override
+      public int hashCode() {
+        if (memoizedHashCode != 0) {
+          return memoizedHashCode;
+        }
+        int hash = 41;
+        hash = (19 * hash) + getDescriptorForType().hashCode();
+        if (hasItem()) {
+          hash = (37 * hash) + ITEM_FIELD_NUMBER;
+          hash = (53 * hash) + getItem();
+        }
+        if (hasCount()) {
+          hash = (37 * hash) + COUNT_FIELD_NUMBER;
+          hash = (53 * hash) + getCount();
+        }
+        if (hasUnseen()) {
+          hash = (37 * hash) + UNSEEN_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+              getUnseen());
+        }
+        hash = (29 * hash) + unknownFields.hashCode();
+        memoizedHashCode = hash;
+        return hash;
       }
 
       public static com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto parseFrom(
@@ -5222,42 +5645,53 @@ public final class Inventory {
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto parseFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto parseFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto parseDelimitedFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto parseDelimitedFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto parseFrom(
           com.google.protobuf.CodedInputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto parseFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
-      public static Builder newBuilder() { return Builder.create(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto prototype) {
-        return newBuilder().mergeFrom(prototype);
+      public static Builder newBuilder() {
+        return DEFAULT_INSTANCE.toBuilder();
       }
-      public Builder toBuilder() { return newBuilder(this); }
+      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto prototype) {
+        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() {
+        return this == DEFAULT_INSTANCE
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
 
       @java.lang.Override
       protected Builder newBuilderForType(
@@ -5298,10 +5732,6 @@ public final class Inventory {
           if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           }
         }
-        private static Builder create() {
-          return new Builder();
-        }
-
         public Builder clear() {
           super.clear();
           item_ = 0;
@@ -5311,10 +5741,6 @@ public final class Inventory {
           unseen_ = false;
           bitField0_ = (bitField0_ & ~0x00000004);
           return this;
-        }
-
-        public Builder clone() {
-          return create().mergeFrom(buildPartial());
         }
 
         public com.google.protobuf.Descriptors.Descriptor
@@ -5375,17 +5801,16 @@ public final class Inventory {
           if (other.hasUnseen()) {
             setUnseen(other.getUnseen());
           }
-          this.mergeUnknownFields(other.getUnknownFields());
+          this.mergeUnknownFields(other.unknownFields);
+          onChanged();
           return this;
         }
 
         public final boolean isInitialized() {
           if (!hasItem()) {
-            
             return false;
           }
           if (!hasCount()) {
-            
             return false;
           }
           return true;
@@ -5400,7 +5825,7 @@ public final class Inventory {
             parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
           } catch (com.google.protobuf.InvalidProtocolBufferException e) {
             parsedMessage = (com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto) e.getUnfinishedMessage();
-            throw e;
+            throw e.unwrapIOException();
           } finally {
             if (parsedMessage != null) {
               mergeFrom(parsedMessage);
@@ -5509,12 +5934,39 @@ public final class Inventory {
         // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.InventoryItemProto.ItemProto)
       }
 
+      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto.ItemProto)
+      private static final com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto DEFAULT_INSTANCE;
       static {
-        defaultInstance = new ItemProto(true);
-        defaultInstance.initFields();
+        DEFAULT_INSTANCE = new com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto();
       }
 
-      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto.ItemProto)
+      public static com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto getDefaultInstance() {
+        return DEFAULT_INSTANCE;
+      }
+
+      @java.lang.Deprecated public static final com.google.protobuf.Parser<ItemProto>
+          PARSER = new com.google.protobuf.AbstractParser<ItemProto>() {
+        public ItemProto parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+            return new ItemProto(input, extensionRegistry);
+        }
+      };
+
+      public static com.google.protobuf.Parser<ItemProto> parser() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Parser<ItemProto> getParserForType() {
+        return PARSER;
+      }
+
+      public com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto getDefaultInstanceForType() {
+        return DEFAULT_INSTANCE;
+      }
+
     }
 
     public interface PokedexEntryProtoOrBuilder extends
@@ -5569,37 +6021,32 @@ public final class Inventory {
     /**
      * Protobuf type {@code com.pokegoapi.main.InventoryItemProto.PokedexEntryProto}
      */
-    public static final class PokedexEntryProto extends
+    public  static final class PokedexEntryProto extends
         com.google.protobuf.GeneratedMessage implements
         // @@protoc_insertion_point(message_implements:com.pokegoapi.main.InventoryItemProto.PokedexEntryProto)
         PokedexEntryProtoOrBuilder {
       // Use PokedexEntryProto.newBuilder() to construct.
       private PokedexEntryProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
         super(builder);
-        this.unknownFields = builder.getUnknownFields();
       }
-      private PokedexEntryProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-      private static final PokedexEntryProto defaultInstance;
-      public static PokedexEntryProto getDefaultInstance() {
-        return defaultInstance;
-      }
-
-      public PokedexEntryProto getDefaultInstanceForType() {
-        return defaultInstance;
+      private PokedexEntryProto() {
+        pokedexEntryNumber_ = 0;
+        timesEncountered_ = 0;
+        timesCaptured_ = 0;
+        evolutionStonePieces_ = 0;
+        evolutionStones_ = 0;
       }
 
-      private final com.google.protobuf.UnknownFieldSet unknownFields;
       @java.lang.Override
       public final com.google.protobuf.UnknownFieldSet
-          getUnknownFields() {
+      getUnknownFields() {
         return this.unknownFields;
       }
       private PokedexEntryProto(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        initFields();
+        this();
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -5649,7 +6096,7 @@ public final class Inventory {
           throw e.setUnfinishedMessage(this);
         } catch (java.io.IOException e) {
           throw new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this);
+              e).setUnfinishedMessage(this);
         } finally {
           this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
@@ -5665,21 +6112,6 @@ public final class Inventory {
         return com.pokegoapi.main.Inventory.internal_static_com_pokegoapi_main_InventoryItemProto_PokedexEntryProto_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
                 com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto.class, com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto.Builder.class);
-      }
-
-      public static com.google.protobuf.Parser<PokedexEntryProto> PARSER =
-          new com.google.protobuf.AbstractParser<PokedexEntryProto>() {
-        public PokedexEntryProto parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          return new PokedexEntryProto(input, extensionRegistry);
-        }
-      };
-
-      @java.lang.Override
-      public com.google.protobuf.Parser<PokedexEntryProto> getParserForType() {
-        return PARSER;
       }
 
       private int bitField0_;
@@ -5758,13 +6190,6 @@ public final class Inventory {
         return evolutionStones_;
       }
 
-      private void initFields() {
-        pokedexEntryNumber_ = 0;
-        timesEncountered_ = 0;
-        timesCaptured_ = 0;
-        evolutionStonePieces_ = 0;
-        evolutionStones_ = 0;
-      }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
@@ -5781,7 +6206,6 @@ public final class Inventory {
 
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
-        getSerializedSize();
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           output.writeInt32(1, pokedexEntryNumber_);
         }
@@ -5797,12 +6221,11 @@ public final class Inventory {
         if (((bitField0_ & 0x00000010) == 0x00000010)) {
           output.writeInt32(5, evolutionStones_);
         }
-        getUnknownFields().writeTo(output);
+        unknownFields.writeTo(output);
       }
 
-      private int memoizedSerializedSize = -1;
       public int getSerializedSize() {
-        int size = memoizedSerializedSize;
+        int size = memoizedSize;
         if (size != -1) return size;
 
         size = 0;
@@ -5826,16 +6249,82 @@ public final class Inventory {
           size += com.google.protobuf.CodedOutputStream
             .computeInt32Size(5, evolutionStones_);
         }
-        size += getUnknownFields().getSerializedSize();
-        memoizedSerializedSize = size;
+        size += unknownFields.getSerializedSize();
+        memoizedSize = size;
         return size;
       }
 
       private static final long serialVersionUID = 0L;
       @java.lang.Override
-      protected java.lang.Object writeReplace()
-          throws java.io.ObjectStreamException {
-        return super.writeReplace();
+      public boolean equals(final java.lang.Object obj) {
+        if (obj == this) {
+         return true;
+        }
+        if (!(obj instanceof com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto)) {
+          return super.equals(obj);
+        }
+        com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto other = (com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto) obj;
+
+        boolean result = true;
+        result = result && (hasPokedexEntryNumber() == other.hasPokedexEntryNumber());
+        if (hasPokedexEntryNumber()) {
+          result = result && (getPokedexEntryNumber()
+              == other.getPokedexEntryNumber());
+        }
+        result = result && (hasTimesEncountered() == other.hasTimesEncountered());
+        if (hasTimesEncountered()) {
+          result = result && (getTimesEncountered()
+              == other.getTimesEncountered());
+        }
+        result = result && (hasTimesCaptured() == other.hasTimesCaptured());
+        if (hasTimesCaptured()) {
+          result = result && (getTimesCaptured()
+              == other.getTimesCaptured());
+        }
+        result = result && (hasEvolutionStonePieces() == other.hasEvolutionStonePieces());
+        if (hasEvolutionStonePieces()) {
+          result = result && (getEvolutionStonePieces()
+              == other.getEvolutionStonePieces());
+        }
+        result = result && (hasEvolutionStones() == other.hasEvolutionStones());
+        if (hasEvolutionStones()) {
+          result = result && (getEvolutionStones()
+              == other.getEvolutionStones());
+        }
+        result = result && unknownFields.equals(other.unknownFields);
+        return result;
+      }
+
+      @java.lang.Override
+      public int hashCode() {
+        if (memoizedHashCode != 0) {
+          return memoizedHashCode;
+        }
+        int hash = 41;
+        hash = (19 * hash) + getDescriptorForType().hashCode();
+        if (hasPokedexEntryNumber()) {
+          hash = (37 * hash) + POKEDEXENTRYNUMBER_FIELD_NUMBER;
+          hash = (53 * hash) + getPokedexEntryNumber();
+        }
+        if (hasTimesEncountered()) {
+          hash = (37 * hash) + TIMESENCOUNTERED_FIELD_NUMBER;
+          hash = (53 * hash) + getTimesEncountered();
+        }
+        if (hasTimesCaptured()) {
+          hash = (37 * hash) + TIMESCAPTURED_FIELD_NUMBER;
+          hash = (53 * hash) + getTimesCaptured();
+        }
+        if (hasEvolutionStonePieces()) {
+          hash = (37 * hash) + EVOLUTIONSTONEPIECES_FIELD_NUMBER;
+          hash = (53 * hash) + getEvolutionStonePieces();
+        }
+        if (hasEvolutionStones()) {
+          hash = (37 * hash) + EVOLUTIONSTONES_FIELD_NUMBER;
+          hash = (53 * hash) + getEvolutionStones();
+        }
+        hash = (29 * hash) + unknownFields.hashCode();
+        memoizedHashCode = hash;
+        return hash;
       }
 
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto parseFrom(
@@ -5861,42 +6350,53 @@ public final class Inventory {
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto parseFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto parseFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto parseDelimitedFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto parseDelimitedFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto parseFrom(
           com.google.protobuf.CodedInputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto parseFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
-      public static Builder newBuilder() { return Builder.create(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto prototype) {
-        return newBuilder().mergeFrom(prototype);
+      public static Builder newBuilder() {
+        return DEFAULT_INSTANCE.toBuilder();
       }
-      public Builder toBuilder() { return newBuilder(this); }
+      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto prototype) {
+        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() {
+        return this == DEFAULT_INSTANCE
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
 
       @java.lang.Override
       protected Builder newBuilderForType(
@@ -5937,10 +6437,6 @@ public final class Inventory {
           if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           }
         }
-        private static Builder create() {
-          return new Builder();
-        }
-
         public Builder clear() {
           super.clear();
           pokedexEntryNumber_ = 0;
@@ -5954,10 +6450,6 @@ public final class Inventory {
           evolutionStones_ = 0;
           bitField0_ = (bitField0_ & ~0x00000010);
           return this;
-        }
-
-        public Builder clone() {
-          return create().mergeFrom(buildPartial());
         }
 
         public com.google.protobuf.Descriptors.Descriptor
@@ -6032,13 +6524,13 @@ public final class Inventory {
           if (other.hasEvolutionStones()) {
             setEvolutionStones(other.getEvolutionStones());
           }
-          this.mergeUnknownFields(other.getUnknownFields());
+          this.mergeUnknownFields(other.unknownFields);
+          onChanged();
           return this;
         }
 
         public final boolean isInitialized() {
           if (!hasPokedexEntryNumber()) {
-            
             return false;
           }
           return true;
@@ -6053,7 +6545,7 @@ public final class Inventory {
             parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
           } catch (com.google.protobuf.InvalidProtocolBufferException e) {
             parsedMessage = (com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto) e.getUnfinishedMessage();
-            throw e;
+            throw e.unwrapIOException();
           } finally {
             if (parsedMessage != null) {
               mergeFrom(parsedMessage);
@@ -6226,12 +6718,39 @@ public final class Inventory {
         // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.InventoryItemProto.PokedexEntryProto)
       }
 
+      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto.PokedexEntryProto)
+      private static final com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto DEFAULT_INSTANCE;
       static {
-        defaultInstance = new PokedexEntryProto(true);
-        defaultInstance.initFields();
+        DEFAULT_INSTANCE = new com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto();
       }
 
-      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto.PokedexEntryProto)
+      public static com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto getDefaultInstance() {
+        return DEFAULT_INSTANCE;
+      }
+
+      @java.lang.Deprecated public static final com.google.protobuf.Parser<PokedexEntryProto>
+          PARSER = new com.google.protobuf.AbstractParser<PokedexEntryProto>() {
+        public PokedexEntryProto parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+            return new PokedexEntryProto(input, extensionRegistry);
+        }
+      };
+
+      public static com.google.protobuf.Parser<PokedexEntryProto> parser() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Parser<PokedexEntryProto> getParserForType() {
+        return PARSER;
+      }
+
+      public com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto getDefaultInstanceForType() {
+        return DEFAULT_INSTANCE;
+      }
+
     }
 
     public interface PlayerStatsProtoOrBuilder extends
@@ -6439,37 +6958,49 @@ public final class Inventory {
     /**
      * Protobuf type {@code com.pokegoapi.main.InventoryItemProto.PlayerStatsProto}
      */
-    public static final class PlayerStatsProto extends
+    public  static final class PlayerStatsProto extends
         com.google.protobuf.GeneratedMessage implements
         // @@protoc_insertion_point(message_implements:com.pokegoapi.main.InventoryItemProto.PlayerStatsProto)
         PlayerStatsProtoOrBuilder {
       // Use PlayerStatsProto.newBuilder() to construct.
       private PlayerStatsProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
         super(builder);
-        this.unknownFields = builder.getUnknownFields();
       }
-      private PlayerStatsProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-      private static final PlayerStatsProto defaultInstance;
-      public static PlayerStatsProto getDefaultInstance() {
-        return defaultInstance;
+      private PlayerStatsProto() {
+        level_ = 0;
+        experience_ = 0L;
+        prevLevelExp_ = 0L;
+        nextLevelExp_ = 0L;
+        kmWalked_ = 0F;
+        numPokemonEncountered_ = 0;
+        numUniquePokedexEntries_ = 0;
+        numPokemonCaptured_ = 0;
+        numEvolutions_ = 0;
+        pokeStopVisits_ = 0;
+        numberOfPokeballThrown_ = 0;
+        numEggsHatched_ = 0;
+        bigMagikarpCaught_ = 0;
+        numBattleAttackWon_ = 0;
+        numBattleAttackTotal_ = 0;
+        numBattleDefendedWon_ = 0;
+        numBattleTrainingWon_ = 0;
+        numBattleTrainingTotal_ = 0;
+        prestigeRaisedTotal_ = 0;
+        prestigeDroppedTotal_ = 0;
+        numPokemonDeployed_ = 0;
+        smallRattataCaught_ = 0;
       }
 
-      public PlayerStatsProto getDefaultInstanceForType() {
-        return defaultInstance;
-      }
-
-      private final com.google.protobuf.UnknownFieldSet unknownFields;
       @java.lang.Override
       public final com.google.protobuf.UnknownFieldSet
-          getUnknownFields() {
+      getUnknownFields() {
         return this.unknownFields;
       }
       private PlayerStatsProto(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        initFields();
+        this();
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -6604,7 +7135,7 @@ public final class Inventory {
           throw e.setUnfinishedMessage(this);
         } catch (java.io.IOException e) {
           throw new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this);
+              e).setUnfinishedMessage(this);
         } finally {
           this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
@@ -6620,21 +7151,6 @@ public final class Inventory {
         return com.pokegoapi.main.Inventory.internal_static_com_pokegoapi_main_InventoryItemProto_PlayerStatsProto_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
                 com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto.class, com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto.Builder.class);
-      }
-
-      public static com.google.protobuf.Parser<PlayerStatsProto> PARSER =
-          new com.google.protobuf.AbstractParser<PlayerStatsProto>() {
-        public PlayerStatsProto parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          return new PlayerStatsProto(input, extensionRegistry);
-        }
-      };
-
-      @java.lang.Override
-      public com.google.protobuf.Parser<PlayerStatsProto> getParserForType() {
-        return PARSER;
       }
 
       private int bitField0_;
@@ -6968,30 +7484,6 @@ public final class Inventory {
         return smallRattataCaught_;
       }
 
-      private void initFields() {
-        level_ = 0;
-        experience_ = 0L;
-        prevLevelExp_ = 0L;
-        nextLevelExp_ = 0L;
-        kmWalked_ = 0F;
-        numPokemonEncountered_ = 0;
-        numUniquePokedexEntries_ = 0;
-        numPokemonCaptured_ = 0;
-        numEvolutions_ = 0;
-        pokeStopVisits_ = 0;
-        numberOfPokeballThrown_ = 0;
-        numEggsHatched_ = 0;
-        bigMagikarpCaught_ = 0;
-        numBattleAttackWon_ = 0;
-        numBattleAttackTotal_ = 0;
-        numBattleDefendedWon_ = 0;
-        numBattleTrainingWon_ = 0;
-        numBattleTrainingTotal_ = 0;
-        prestigeRaisedTotal_ = 0;
-        prestigeDroppedTotal_ = 0;
-        numPokemonDeployed_ = 0;
-        smallRattataCaught_ = 0;
-      }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
@@ -7092,7 +7584,6 @@ public final class Inventory {
 
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
-        getSerializedSize();
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           output.writeInt32(1, level_);
         }
@@ -7159,12 +7650,11 @@ public final class Inventory {
         if (((bitField0_ & 0x00200000) == 0x00200000)) {
           output.writeInt32(23, smallRattataCaught_);
         }
-        getUnknownFields().writeTo(output);
+        unknownFields.writeTo(output);
       }
 
-      private int memoizedSerializedSize = -1;
       public int getSerializedSize() {
-        int size = memoizedSerializedSize;
+        int size = memoizedSize;
         if (size != -1) return size;
 
         size = 0;
@@ -7256,16 +7746,241 @@ public final class Inventory {
           size += com.google.protobuf.CodedOutputStream
             .computeInt32Size(23, smallRattataCaught_);
         }
-        size += getUnknownFields().getSerializedSize();
-        memoizedSerializedSize = size;
+        size += unknownFields.getSerializedSize();
+        memoizedSize = size;
         return size;
       }
 
       private static final long serialVersionUID = 0L;
       @java.lang.Override
-      protected java.lang.Object writeReplace()
-          throws java.io.ObjectStreamException {
-        return super.writeReplace();
+      public boolean equals(final java.lang.Object obj) {
+        if (obj == this) {
+         return true;
+        }
+        if (!(obj instanceof com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto)) {
+          return super.equals(obj);
+        }
+        com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto other = (com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto) obj;
+
+        boolean result = true;
+        result = result && (hasLevel() == other.hasLevel());
+        if (hasLevel()) {
+          result = result && (getLevel()
+              == other.getLevel());
+        }
+        result = result && (hasExperience() == other.hasExperience());
+        if (hasExperience()) {
+          result = result && (getExperience()
+              == other.getExperience());
+        }
+        result = result && (hasPrevLevelExp() == other.hasPrevLevelExp());
+        if (hasPrevLevelExp()) {
+          result = result && (getPrevLevelExp()
+              == other.getPrevLevelExp());
+        }
+        result = result && (hasNextLevelExp() == other.hasNextLevelExp());
+        if (hasNextLevelExp()) {
+          result = result && (getNextLevelExp()
+              == other.getNextLevelExp());
+        }
+        result = result && (hasKmWalked() == other.hasKmWalked());
+        if (hasKmWalked()) {
+          result = result && (
+              java.lang.Float.floatToIntBits(getKmWalked())
+              == java.lang.Float.floatToIntBits(
+                  other.getKmWalked()));
+        }
+        result = result && (hasNumPokemonEncountered() == other.hasNumPokemonEncountered());
+        if (hasNumPokemonEncountered()) {
+          result = result && (getNumPokemonEncountered()
+              == other.getNumPokemonEncountered());
+        }
+        result = result && (hasNumUniquePokedexEntries() == other.hasNumUniquePokedexEntries());
+        if (hasNumUniquePokedexEntries()) {
+          result = result && (getNumUniquePokedexEntries()
+              == other.getNumUniquePokedexEntries());
+        }
+        result = result && (hasNumPokemonCaptured() == other.hasNumPokemonCaptured());
+        if (hasNumPokemonCaptured()) {
+          result = result && (getNumPokemonCaptured()
+              == other.getNumPokemonCaptured());
+        }
+        result = result && (hasNumEvolutions() == other.hasNumEvolutions());
+        if (hasNumEvolutions()) {
+          result = result && (getNumEvolutions()
+              == other.getNumEvolutions());
+        }
+        result = result && (hasPokeStopVisits() == other.hasPokeStopVisits());
+        if (hasPokeStopVisits()) {
+          result = result && (getPokeStopVisits()
+              == other.getPokeStopVisits());
+        }
+        result = result && (hasNumberOfPokeballThrown() == other.hasNumberOfPokeballThrown());
+        if (hasNumberOfPokeballThrown()) {
+          result = result && (getNumberOfPokeballThrown()
+              == other.getNumberOfPokeballThrown());
+        }
+        result = result && (hasNumEggsHatched() == other.hasNumEggsHatched());
+        if (hasNumEggsHatched()) {
+          result = result && (getNumEggsHatched()
+              == other.getNumEggsHatched());
+        }
+        result = result && (hasBigMagikarpCaught() == other.hasBigMagikarpCaught());
+        if (hasBigMagikarpCaught()) {
+          result = result && (getBigMagikarpCaught()
+              == other.getBigMagikarpCaught());
+        }
+        result = result && (hasNumBattleAttackWon() == other.hasNumBattleAttackWon());
+        if (hasNumBattleAttackWon()) {
+          result = result && (getNumBattleAttackWon()
+              == other.getNumBattleAttackWon());
+        }
+        result = result && (hasNumBattleAttackTotal() == other.hasNumBattleAttackTotal());
+        if (hasNumBattleAttackTotal()) {
+          result = result && (getNumBattleAttackTotal()
+              == other.getNumBattleAttackTotal());
+        }
+        result = result && (hasNumBattleDefendedWon() == other.hasNumBattleDefendedWon());
+        if (hasNumBattleDefendedWon()) {
+          result = result && (getNumBattleDefendedWon()
+              == other.getNumBattleDefendedWon());
+        }
+        result = result && (hasNumBattleTrainingWon() == other.hasNumBattleTrainingWon());
+        if (hasNumBattleTrainingWon()) {
+          result = result && (getNumBattleTrainingWon()
+              == other.getNumBattleTrainingWon());
+        }
+        result = result && (hasNumBattleTrainingTotal() == other.hasNumBattleTrainingTotal());
+        if (hasNumBattleTrainingTotal()) {
+          result = result && (getNumBattleTrainingTotal()
+              == other.getNumBattleTrainingTotal());
+        }
+        result = result && (hasPrestigeRaisedTotal() == other.hasPrestigeRaisedTotal());
+        if (hasPrestigeRaisedTotal()) {
+          result = result && (getPrestigeRaisedTotal()
+              == other.getPrestigeRaisedTotal());
+        }
+        result = result && (hasPrestigeDroppedTotal() == other.hasPrestigeDroppedTotal());
+        if (hasPrestigeDroppedTotal()) {
+          result = result && (getPrestigeDroppedTotal()
+              == other.getPrestigeDroppedTotal());
+        }
+        result = result && (hasNumPokemonDeployed() == other.hasNumPokemonDeployed());
+        if (hasNumPokemonDeployed()) {
+          result = result && (getNumPokemonDeployed()
+              == other.getNumPokemonDeployed());
+        }
+        result = result && (hasSmallRattataCaught() == other.hasSmallRattataCaught());
+        if (hasSmallRattataCaught()) {
+          result = result && (getSmallRattataCaught()
+              == other.getSmallRattataCaught());
+        }
+        result = result && unknownFields.equals(other.unknownFields);
+        return result;
+      }
+
+      @java.lang.Override
+      public int hashCode() {
+        if (memoizedHashCode != 0) {
+          return memoizedHashCode;
+        }
+        int hash = 41;
+        hash = (19 * hash) + getDescriptorForType().hashCode();
+        if (hasLevel()) {
+          hash = (37 * hash) + LEVEL_FIELD_NUMBER;
+          hash = (53 * hash) + getLevel();
+        }
+        if (hasExperience()) {
+          hash = (37 * hash) + EXPERIENCE_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+              getExperience());
+        }
+        if (hasPrevLevelExp()) {
+          hash = (37 * hash) + PREVLEVELEXP_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+              getPrevLevelExp());
+        }
+        if (hasNextLevelExp()) {
+          hash = (37 * hash) + NEXTLEVELEXP_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+              getNextLevelExp());
+        }
+        if (hasKmWalked()) {
+          hash = (37 * hash) + KMWALKED_FIELD_NUMBER;
+          hash = (53 * hash) + java.lang.Float.floatToIntBits(
+              getKmWalked());
+        }
+        if (hasNumPokemonEncountered()) {
+          hash = (37 * hash) + NUMPOKEMONENCOUNTERED_FIELD_NUMBER;
+          hash = (53 * hash) + getNumPokemonEncountered();
+        }
+        if (hasNumUniquePokedexEntries()) {
+          hash = (37 * hash) + NUMUNIQUEPOKEDEXENTRIES_FIELD_NUMBER;
+          hash = (53 * hash) + getNumUniquePokedexEntries();
+        }
+        if (hasNumPokemonCaptured()) {
+          hash = (37 * hash) + NUMPOKEMONCAPTURED_FIELD_NUMBER;
+          hash = (53 * hash) + getNumPokemonCaptured();
+        }
+        if (hasNumEvolutions()) {
+          hash = (37 * hash) + NUMEVOLUTIONS_FIELD_NUMBER;
+          hash = (53 * hash) + getNumEvolutions();
+        }
+        if (hasPokeStopVisits()) {
+          hash = (37 * hash) + POKESTOPVISITS_FIELD_NUMBER;
+          hash = (53 * hash) + getPokeStopVisits();
+        }
+        if (hasNumberOfPokeballThrown()) {
+          hash = (37 * hash) + NUMBEROFPOKEBALLTHROWN_FIELD_NUMBER;
+          hash = (53 * hash) + getNumberOfPokeballThrown();
+        }
+        if (hasNumEggsHatched()) {
+          hash = (37 * hash) + NUMEGGSHATCHED_FIELD_NUMBER;
+          hash = (53 * hash) + getNumEggsHatched();
+        }
+        if (hasBigMagikarpCaught()) {
+          hash = (37 * hash) + BIGMAGIKARPCAUGHT_FIELD_NUMBER;
+          hash = (53 * hash) + getBigMagikarpCaught();
+        }
+        if (hasNumBattleAttackWon()) {
+          hash = (37 * hash) + NUMBATTLEATTACKWON_FIELD_NUMBER;
+          hash = (53 * hash) + getNumBattleAttackWon();
+        }
+        if (hasNumBattleAttackTotal()) {
+          hash = (37 * hash) + NUMBATTLEATTACKTOTAL_FIELD_NUMBER;
+          hash = (53 * hash) + getNumBattleAttackTotal();
+        }
+        if (hasNumBattleDefendedWon()) {
+          hash = (37 * hash) + NUMBATTLEDEFENDEDWON_FIELD_NUMBER;
+          hash = (53 * hash) + getNumBattleDefendedWon();
+        }
+        if (hasNumBattleTrainingWon()) {
+          hash = (37 * hash) + NUMBATTLETRAININGWON_FIELD_NUMBER;
+          hash = (53 * hash) + getNumBattleTrainingWon();
+        }
+        if (hasNumBattleTrainingTotal()) {
+          hash = (37 * hash) + NUMBATTLETRAININGTOTAL_FIELD_NUMBER;
+          hash = (53 * hash) + getNumBattleTrainingTotal();
+        }
+        if (hasPrestigeRaisedTotal()) {
+          hash = (37 * hash) + PRESTIGERAISEDTOTAL_FIELD_NUMBER;
+          hash = (53 * hash) + getPrestigeRaisedTotal();
+        }
+        if (hasPrestigeDroppedTotal()) {
+          hash = (37 * hash) + PRESTIGEDROPPEDTOTAL_FIELD_NUMBER;
+          hash = (53 * hash) + getPrestigeDroppedTotal();
+        }
+        if (hasNumPokemonDeployed()) {
+          hash = (37 * hash) + NUMPOKEMONDEPLOYED_FIELD_NUMBER;
+          hash = (53 * hash) + getNumPokemonDeployed();
+        }
+        if (hasSmallRattataCaught()) {
+          hash = (37 * hash) + SMALLRATTATACAUGHT_FIELD_NUMBER;
+          hash = (53 * hash) + getSmallRattataCaught();
+        }
+        hash = (29 * hash) + unknownFields.hashCode();
+        memoizedHashCode = hash;
+        return hash;
       }
 
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto parseFrom(
@@ -7291,42 +8006,53 @@ public final class Inventory {
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto parseFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto parseFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto parseDelimitedFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto parseDelimitedFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto parseFrom(
           com.google.protobuf.CodedInputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto parseFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
-      public static Builder newBuilder() { return Builder.create(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto prototype) {
-        return newBuilder().mergeFrom(prototype);
+      public static Builder newBuilder() {
+        return DEFAULT_INSTANCE.toBuilder();
       }
-      public Builder toBuilder() { return newBuilder(this); }
+      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto prototype) {
+        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() {
+        return this == DEFAULT_INSTANCE
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
 
       @java.lang.Override
       protected Builder newBuilderForType(
@@ -7367,10 +8093,6 @@ public final class Inventory {
           if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           }
         }
-        private static Builder create() {
-          return new Builder();
-        }
-
         public Builder clear() {
           super.clear();
           level_ = 0;
@@ -7418,10 +8140,6 @@ public final class Inventory {
           smallRattataCaught_ = 0;
           bitField0_ = (bitField0_ & ~0x00200000);
           return this;
-        }
-
-        public Builder clone() {
-          return create().mergeFrom(buildPartial());
         }
 
         public com.google.protobuf.Descriptors.Descriptor
@@ -7615,97 +8333,76 @@ public final class Inventory {
           if (other.hasSmallRattataCaught()) {
             setSmallRattataCaught(other.getSmallRattataCaught());
           }
-          this.mergeUnknownFields(other.getUnknownFields());
+          this.mergeUnknownFields(other.unknownFields);
+          onChanged();
           return this;
         }
 
         public final boolean isInitialized() {
           if (!hasLevel()) {
-            
             return false;
           }
           if (!hasExperience()) {
-            
             return false;
           }
           if (!hasPrevLevelExp()) {
-            
             return false;
           }
           if (!hasNextLevelExp()) {
-            
             return false;
           }
           if (!hasKmWalked()) {
-            
             return false;
           }
           if (!hasNumPokemonEncountered()) {
-            
             return false;
           }
           if (!hasNumUniquePokedexEntries()) {
-            
             return false;
           }
           if (!hasNumPokemonCaptured()) {
-            
             return false;
           }
           if (!hasNumEvolutions()) {
-            
             return false;
           }
           if (!hasPokeStopVisits()) {
-            
             return false;
           }
           if (!hasNumberOfPokeballThrown()) {
-            
             return false;
           }
           if (!hasNumEggsHatched()) {
-            
             return false;
           }
           if (!hasBigMagikarpCaught()) {
-            
             return false;
           }
           if (!hasNumBattleAttackWon()) {
-            
             return false;
           }
           if (!hasNumBattleAttackTotal()) {
-            
             return false;
           }
           if (!hasNumBattleDefendedWon()) {
-            
             return false;
           }
           if (!hasNumBattleTrainingWon()) {
-            
             return false;
           }
           if (!hasNumBattleTrainingTotal()) {
-            
             return false;
           }
           if (!hasPrestigeRaisedTotal()) {
-            
             return false;
           }
           if (!hasPrestigeDroppedTotal()) {
-            
             return false;
           }
           if (!hasNumPokemonDeployed()) {
-            
             return false;
           }
           if (!hasSmallRattataCaught()) {
-            
             return false;
           }
           return true;
@@ -7720,7 +8417,7 @@ public final class Inventory {
             parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
           } catch (com.google.protobuf.InvalidProtocolBufferException e) {
             parsedMessage = (com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto) e.getUnfinishedMessage();
-            throw e;
+            throw e.unwrapIOException();
           } finally {
             if (parsedMessage != null) {
               mergeFrom(parsedMessage);
@@ -8437,12 +9134,39 @@ public final class Inventory {
         // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.InventoryItemProto.PlayerStatsProto)
       }
 
+      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto.PlayerStatsProto)
+      private static final com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto DEFAULT_INSTANCE;
       static {
-        defaultInstance = new PlayerStatsProto(true);
-        defaultInstance.initFields();
+        DEFAULT_INSTANCE = new com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto();
       }
 
-      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto.PlayerStatsProto)
+      public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto getDefaultInstance() {
+        return DEFAULT_INSTANCE;
+      }
+
+      @java.lang.Deprecated public static final com.google.protobuf.Parser<PlayerStatsProto>
+          PARSER = new com.google.protobuf.AbstractParser<PlayerStatsProto>() {
+        public PlayerStatsProto parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+            return new PlayerStatsProto(input, extensionRegistry);
+        }
+      };
+
+      public static com.google.protobuf.Parser<PlayerStatsProto> parser() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Parser<PlayerStatsProto> getParserForType() {
+        return PARSER;
+      }
+
+      public com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto getDefaultInstanceForType() {
+        return DEFAULT_INSTANCE;
+      }
+
     }
 
     public interface AppliedItemProtoOrBuilder extends
@@ -8488,37 +9212,31 @@ public final class Inventory {
     /**
      * Protobuf type {@code com.pokegoapi.main.InventoryItemProto.AppliedItemProto}
      */
-    public static final class AppliedItemProto extends
+    public  static final class AppliedItemProto extends
         com.google.protobuf.GeneratedMessage implements
         // @@protoc_insertion_point(message_implements:com.pokegoapi.main.InventoryItemProto.AppliedItemProto)
         AppliedItemProtoOrBuilder {
       // Use AppliedItemProto.newBuilder() to construct.
       private AppliedItemProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
         super(builder);
-        this.unknownFields = builder.getUnknownFields();
       }
-      private AppliedItemProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-      private static final AppliedItemProto defaultInstance;
-      public static AppliedItemProto getDefaultInstance() {
-        return defaultInstance;
-      }
-
-      public AppliedItemProto getDefaultInstanceForType() {
-        return defaultInstance;
+      private AppliedItemProto() {
+        item_ = 0;
+        itemType_ = 0;
+        expirationMs_ = 0L;
+        appliedMs_ = 0L;
       }
 
-      private final com.google.protobuf.UnknownFieldSet unknownFields;
       @java.lang.Override
       public final com.google.protobuf.UnknownFieldSet
-          getUnknownFields() {
+      getUnknownFields() {
         return this.unknownFields;
       }
       private AppliedItemProto(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        initFields();
+        this();
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -8563,7 +9281,7 @@ public final class Inventory {
           throw e.setUnfinishedMessage(this);
         } catch (java.io.IOException e) {
           throw new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this);
+              e).setUnfinishedMessage(this);
         } finally {
           this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
@@ -8579,21 +9297,6 @@ public final class Inventory {
         return com.pokegoapi.main.Inventory.internal_static_com_pokegoapi_main_InventoryItemProto_AppliedItemProto_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
                 com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto.class, com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto.Builder.class);
-      }
-
-      public static com.google.protobuf.Parser<AppliedItemProto> PARSER =
-          new com.google.protobuf.AbstractParser<AppliedItemProto>() {
-        public AppliedItemProto parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          return new AppliedItemProto(input, extensionRegistry);
-        }
-      };
-
-      @java.lang.Override
-      public com.google.protobuf.Parser<AppliedItemProto> getParserForType() {
-        return PARSER;
       }
 
       private int bitField0_;
@@ -8657,12 +9360,6 @@ public final class Inventory {
         return appliedMs_;
       }
 
-      private void initFields() {
-        item_ = 0;
-        itemType_ = 0;
-        expirationMs_ = 0L;
-        appliedMs_ = 0L;
-      }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
@@ -8675,7 +9372,6 @@ public final class Inventory {
 
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
-        getSerializedSize();
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           output.writeInt32(1, item_);
         }
@@ -8688,12 +9384,11 @@ public final class Inventory {
         if (((bitField0_ & 0x00000008) == 0x00000008)) {
           output.writeInt64(4, appliedMs_);
         }
-        getUnknownFields().writeTo(output);
+        unknownFields.writeTo(output);
       }
 
-      private int memoizedSerializedSize = -1;
       public int getSerializedSize() {
-        int size = memoizedSerializedSize;
+        int size = memoizedSize;
         if (size != -1) return size;
 
         size = 0;
@@ -8713,16 +9408,75 @@ public final class Inventory {
           size += com.google.protobuf.CodedOutputStream
             .computeInt64Size(4, appliedMs_);
         }
-        size += getUnknownFields().getSerializedSize();
-        memoizedSerializedSize = size;
+        size += unknownFields.getSerializedSize();
+        memoizedSize = size;
         return size;
       }
 
       private static final long serialVersionUID = 0L;
       @java.lang.Override
-      protected java.lang.Object writeReplace()
-          throws java.io.ObjectStreamException {
-        return super.writeReplace();
+      public boolean equals(final java.lang.Object obj) {
+        if (obj == this) {
+         return true;
+        }
+        if (!(obj instanceof com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto)) {
+          return super.equals(obj);
+        }
+        com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto other = (com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto) obj;
+
+        boolean result = true;
+        result = result && (hasItem() == other.hasItem());
+        if (hasItem()) {
+          result = result && (getItem()
+              == other.getItem());
+        }
+        result = result && (hasItemType() == other.hasItemType());
+        if (hasItemType()) {
+          result = result && (getItemType()
+              == other.getItemType());
+        }
+        result = result && (hasExpirationMs() == other.hasExpirationMs());
+        if (hasExpirationMs()) {
+          result = result && (getExpirationMs()
+              == other.getExpirationMs());
+        }
+        result = result && (hasAppliedMs() == other.hasAppliedMs());
+        if (hasAppliedMs()) {
+          result = result && (getAppliedMs()
+              == other.getAppliedMs());
+        }
+        result = result && unknownFields.equals(other.unknownFields);
+        return result;
+      }
+
+      @java.lang.Override
+      public int hashCode() {
+        if (memoizedHashCode != 0) {
+          return memoizedHashCode;
+        }
+        int hash = 41;
+        hash = (19 * hash) + getDescriptorForType().hashCode();
+        if (hasItem()) {
+          hash = (37 * hash) + ITEM_FIELD_NUMBER;
+          hash = (53 * hash) + getItem();
+        }
+        if (hasItemType()) {
+          hash = (37 * hash) + ITEMTYPE_FIELD_NUMBER;
+          hash = (53 * hash) + getItemType();
+        }
+        if (hasExpirationMs()) {
+          hash = (37 * hash) + EXPIRATIONMS_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+              getExpirationMs());
+        }
+        if (hasAppliedMs()) {
+          hash = (37 * hash) + APPLIEDMS_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+              getAppliedMs());
+        }
+        hash = (29 * hash) + unknownFields.hashCode();
+        memoizedHashCode = hash;
+        return hash;
       }
 
       public static com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto parseFrom(
@@ -8748,42 +9502,53 @@ public final class Inventory {
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto parseFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto parseFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto parseDelimitedFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto parseDelimitedFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto parseFrom(
           com.google.protobuf.CodedInputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto parseFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
-      public static Builder newBuilder() { return Builder.create(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto prototype) {
-        return newBuilder().mergeFrom(prototype);
+      public static Builder newBuilder() {
+        return DEFAULT_INSTANCE.toBuilder();
       }
-      public Builder toBuilder() { return newBuilder(this); }
+      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto prototype) {
+        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() {
+        return this == DEFAULT_INSTANCE
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
 
       @java.lang.Override
       protected Builder newBuilderForType(
@@ -8824,10 +9589,6 @@ public final class Inventory {
           if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           }
         }
-        private static Builder create() {
-          return new Builder();
-        }
-
         public Builder clear() {
           super.clear();
           item_ = 0;
@@ -8839,10 +9600,6 @@ public final class Inventory {
           appliedMs_ = 0L;
           bitField0_ = (bitField0_ & ~0x00000008);
           return this;
-        }
-
-        public Builder clone() {
-          return create().mergeFrom(buildPartial());
         }
 
         public com.google.protobuf.Descriptors.Descriptor
@@ -8910,7 +9667,8 @@ public final class Inventory {
           if (other.hasAppliedMs()) {
             setAppliedMs(other.getAppliedMs());
           }
-          this.mergeUnknownFields(other.getUnknownFields());
+          this.mergeUnknownFields(other.unknownFields);
+          onChanged();
           return this;
         }
 
@@ -8927,7 +9685,7 @@ public final class Inventory {
             parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
           } catch (com.google.protobuf.InvalidProtocolBufferException e) {
             parsedMessage = (com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto) e.getUnfinishedMessage();
-            throw e;
+            throw e.unwrapIOException();
           } finally {
             if (parsedMessage != null) {
               mergeFrom(parsedMessage);
@@ -9068,12 +9826,39 @@ public final class Inventory {
         // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.InventoryItemProto.AppliedItemProto)
       }
 
+      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto.AppliedItemProto)
+      private static final com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto DEFAULT_INSTANCE;
       static {
-        defaultInstance = new AppliedItemProto(true);
-        defaultInstance.initFields();
+        DEFAULT_INSTANCE = new com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto();
       }
 
-      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto.AppliedItemProto)
+      public static com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto getDefaultInstance() {
+        return DEFAULT_INSTANCE;
+      }
+
+      @java.lang.Deprecated public static final com.google.protobuf.Parser<AppliedItemProto>
+          PARSER = new com.google.protobuf.AbstractParser<AppliedItemProto>() {
+        public AppliedItemProto parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+            return new AppliedItemProto(input, extensionRegistry);
+        }
+      };
+
+      public static com.google.protobuf.Parser<AppliedItemProto> parser() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Parser<AppliedItemProto> getParserForType() {
+        return PARSER;
+      }
+
+      public com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto getDefaultInstanceForType() {
+        return DEFAULT_INSTANCE;
+      }
+
     }
 
     public interface PlayerCameraProtoOrBuilder extends
@@ -9092,37 +9877,28 @@ public final class Inventory {
     /**
      * Protobuf type {@code com.pokegoapi.main.InventoryItemProto.PlayerCameraProto}
      */
-    public static final class PlayerCameraProto extends
+    public  static final class PlayerCameraProto extends
         com.google.protobuf.GeneratedMessage implements
         // @@protoc_insertion_point(message_implements:com.pokegoapi.main.InventoryItemProto.PlayerCameraProto)
         PlayerCameraProtoOrBuilder {
       // Use PlayerCameraProto.newBuilder() to construct.
       private PlayerCameraProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
         super(builder);
-        this.unknownFields = builder.getUnknownFields();
       }
-      private PlayerCameraProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-      private static final PlayerCameraProto defaultInstance;
-      public static PlayerCameraProto getDefaultInstance() {
-        return defaultInstance;
+      private PlayerCameraProto() {
+        defaultCamera_ = false;
       }
 
-      public PlayerCameraProto getDefaultInstanceForType() {
-        return defaultInstance;
-      }
-
-      private final com.google.protobuf.UnknownFieldSet unknownFields;
       @java.lang.Override
       public final com.google.protobuf.UnknownFieldSet
-          getUnknownFields() {
+      getUnknownFields() {
         return this.unknownFields;
       }
       private PlayerCameraProto(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        initFields();
+        this();
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -9152,7 +9928,7 @@ public final class Inventory {
           throw e.setUnfinishedMessage(this);
         } catch (java.io.IOException e) {
           throw new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this);
+              e).setUnfinishedMessage(this);
         } finally {
           this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
@@ -9168,21 +9944,6 @@ public final class Inventory {
         return com.pokegoapi.main.Inventory.internal_static_com_pokegoapi_main_InventoryItemProto_PlayerCameraProto_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
                 com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto.class, com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto.Builder.class);
-      }
-
-      public static com.google.protobuf.Parser<PlayerCameraProto> PARSER =
-          new com.google.protobuf.AbstractParser<PlayerCameraProto>() {
-        public PlayerCameraProto parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          return new PlayerCameraProto(input, extensionRegistry);
-        }
-      };
-
-      @java.lang.Override
-      public com.google.protobuf.Parser<PlayerCameraProto> getParserForType() {
-        return PARSER;
       }
 
       private int bitField0_;
@@ -9201,9 +9962,6 @@ public final class Inventory {
         return defaultCamera_;
       }
 
-      private void initFields() {
-        defaultCamera_ = false;
-      }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
@@ -9220,16 +9978,14 @@ public final class Inventory {
 
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
-        getSerializedSize();
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           output.writeBool(1, defaultCamera_);
         }
-        getUnknownFields().writeTo(output);
+        unknownFields.writeTo(output);
       }
 
-      private int memoizedSerializedSize = -1;
       public int getSerializedSize() {
-        int size = memoizedSerializedSize;
+        int size = memoizedSize;
         if (size != -1) return size;
 
         size = 0;
@@ -9237,16 +9993,47 @@ public final class Inventory {
           size += com.google.protobuf.CodedOutputStream
             .computeBoolSize(1, defaultCamera_);
         }
-        size += getUnknownFields().getSerializedSize();
-        memoizedSerializedSize = size;
+        size += unknownFields.getSerializedSize();
+        memoizedSize = size;
         return size;
       }
 
       private static final long serialVersionUID = 0L;
       @java.lang.Override
-      protected java.lang.Object writeReplace()
-          throws java.io.ObjectStreamException {
-        return super.writeReplace();
+      public boolean equals(final java.lang.Object obj) {
+        if (obj == this) {
+         return true;
+        }
+        if (!(obj instanceof com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto)) {
+          return super.equals(obj);
+        }
+        com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto other = (com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto) obj;
+
+        boolean result = true;
+        result = result && (hasDefaultCamera() == other.hasDefaultCamera());
+        if (hasDefaultCamera()) {
+          result = result && (getDefaultCamera()
+              == other.getDefaultCamera());
+        }
+        result = result && unknownFields.equals(other.unknownFields);
+        return result;
+      }
+
+      @java.lang.Override
+      public int hashCode() {
+        if (memoizedHashCode != 0) {
+          return memoizedHashCode;
+        }
+        int hash = 41;
+        hash = (19 * hash) + getDescriptorForType().hashCode();
+        if (hasDefaultCamera()) {
+          hash = (37 * hash) + DEFAULTCAMERA_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+              getDefaultCamera());
+        }
+        hash = (29 * hash) + unknownFields.hashCode();
+        memoizedHashCode = hash;
+        return hash;
       }
 
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto parseFrom(
@@ -9272,42 +10059,53 @@ public final class Inventory {
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto parseFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto parseFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto parseDelimitedFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto parseDelimitedFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto parseFrom(
           com.google.protobuf.CodedInputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto parseFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
-      public static Builder newBuilder() { return Builder.create(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto prototype) {
-        return newBuilder().mergeFrom(prototype);
+      public static Builder newBuilder() {
+        return DEFAULT_INSTANCE.toBuilder();
       }
-      public Builder toBuilder() { return newBuilder(this); }
+      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto prototype) {
+        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() {
+        return this == DEFAULT_INSTANCE
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
 
       @java.lang.Override
       protected Builder newBuilderForType(
@@ -9348,19 +10146,11 @@ public final class Inventory {
           if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           }
         }
-        private static Builder create() {
-          return new Builder();
-        }
-
         public Builder clear() {
           super.clear();
           defaultCamera_ = false;
           bitField0_ = (bitField0_ & ~0x00000001);
           return this;
-        }
-
-        public Builder clone() {
-          return create().mergeFrom(buildPartial());
         }
 
         public com.google.protobuf.Descriptors.Descriptor
@@ -9407,13 +10197,13 @@ public final class Inventory {
           if (other.hasDefaultCamera()) {
             setDefaultCamera(other.getDefaultCamera());
           }
-          this.mergeUnknownFields(other.getUnknownFields());
+          this.mergeUnknownFields(other.unknownFields);
+          onChanged();
           return this;
         }
 
         public final boolean isInitialized() {
           if (!hasDefaultCamera()) {
-            
             return false;
           }
           return true;
@@ -9428,7 +10218,7 @@ public final class Inventory {
             parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
           } catch (com.google.protobuf.InvalidProtocolBufferException e) {
             parsedMessage = (com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto) e.getUnfinishedMessage();
-            throw e;
+            throw e.unwrapIOException();
           } finally {
             if (parsedMessage != null) {
               mergeFrom(parsedMessage);
@@ -9473,12 +10263,39 @@ public final class Inventory {
         // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.InventoryItemProto.PlayerCameraProto)
       }
 
+      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto.PlayerCameraProto)
+      private static final com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto DEFAULT_INSTANCE;
       static {
-        defaultInstance = new PlayerCameraProto(true);
-        defaultInstance.initFields();
+        DEFAULT_INSTANCE = new com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto();
       }
 
-      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto.PlayerCameraProto)
+      public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto getDefaultInstance() {
+        return DEFAULT_INSTANCE;
+      }
+
+      @java.lang.Deprecated public static final com.google.protobuf.Parser<PlayerCameraProto>
+          PARSER = new com.google.protobuf.AbstractParser<PlayerCameraProto>() {
+        public PlayerCameraProto parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+            return new PlayerCameraProto(input, extensionRegistry);
+        }
+      };
+
+      public static com.google.protobuf.Parser<PlayerCameraProto> parser() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Parser<PlayerCameraProto> getParserForType() {
+        return PARSER;
+      }
+
+      public com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto getDefaultInstanceForType() {
+        return DEFAULT_INSTANCE;
+      }
+
     }
 
     public interface PlayerCurrencyProtoOrBuilder extends
@@ -9497,37 +10314,28 @@ public final class Inventory {
     /**
      * Protobuf type {@code com.pokegoapi.main.InventoryItemProto.PlayerCurrencyProto}
      */
-    public static final class PlayerCurrencyProto extends
+    public  static final class PlayerCurrencyProto extends
         com.google.protobuf.GeneratedMessage implements
         // @@protoc_insertion_point(message_implements:com.pokegoapi.main.InventoryItemProto.PlayerCurrencyProto)
         PlayerCurrencyProtoOrBuilder {
       // Use PlayerCurrencyProto.newBuilder() to construct.
       private PlayerCurrencyProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
         super(builder);
-        this.unknownFields = builder.getUnknownFields();
       }
-      private PlayerCurrencyProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-      private static final PlayerCurrencyProto defaultInstance;
-      public static PlayerCurrencyProto getDefaultInstance() {
-        return defaultInstance;
+      private PlayerCurrencyProto() {
+        gems_ = 0;
       }
 
-      public PlayerCurrencyProto getDefaultInstanceForType() {
-        return defaultInstance;
-      }
-
-      private final com.google.protobuf.UnknownFieldSet unknownFields;
       @java.lang.Override
       public final com.google.protobuf.UnknownFieldSet
-          getUnknownFields() {
+      getUnknownFields() {
         return this.unknownFields;
       }
       private PlayerCurrencyProto(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        initFields();
+        this();
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -9557,7 +10365,7 @@ public final class Inventory {
           throw e.setUnfinishedMessage(this);
         } catch (java.io.IOException e) {
           throw new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this);
+              e).setUnfinishedMessage(this);
         } finally {
           this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
@@ -9573,21 +10381,6 @@ public final class Inventory {
         return com.pokegoapi.main.Inventory.internal_static_com_pokegoapi_main_InventoryItemProto_PlayerCurrencyProto_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
                 com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto.class, com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto.Builder.class);
-      }
-
-      public static com.google.protobuf.Parser<PlayerCurrencyProto> PARSER =
-          new com.google.protobuf.AbstractParser<PlayerCurrencyProto>() {
-        public PlayerCurrencyProto parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          return new PlayerCurrencyProto(input, extensionRegistry);
-        }
-      };
-
-      @java.lang.Override
-      public com.google.protobuf.Parser<PlayerCurrencyProto> getParserForType() {
-        return PARSER;
       }
 
       private int bitField0_;
@@ -9606,9 +10399,6 @@ public final class Inventory {
         return gems_;
       }
 
-      private void initFields() {
-        gems_ = 0;
-      }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
@@ -9625,16 +10415,14 @@ public final class Inventory {
 
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
-        getSerializedSize();
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           output.writeInt32(1, gems_);
         }
-        getUnknownFields().writeTo(output);
+        unknownFields.writeTo(output);
       }
 
-      private int memoizedSerializedSize = -1;
       public int getSerializedSize() {
-        int size = memoizedSerializedSize;
+        int size = memoizedSize;
         if (size != -1) return size;
 
         size = 0;
@@ -9642,16 +10430,46 @@ public final class Inventory {
           size += com.google.protobuf.CodedOutputStream
             .computeInt32Size(1, gems_);
         }
-        size += getUnknownFields().getSerializedSize();
-        memoizedSerializedSize = size;
+        size += unknownFields.getSerializedSize();
+        memoizedSize = size;
         return size;
       }
 
       private static final long serialVersionUID = 0L;
       @java.lang.Override
-      protected java.lang.Object writeReplace()
-          throws java.io.ObjectStreamException {
-        return super.writeReplace();
+      public boolean equals(final java.lang.Object obj) {
+        if (obj == this) {
+         return true;
+        }
+        if (!(obj instanceof com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto)) {
+          return super.equals(obj);
+        }
+        com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto other = (com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto) obj;
+
+        boolean result = true;
+        result = result && (hasGems() == other.hasGems());
+        if (hasGems()) {
+          result = result && (getGems()
+              == other.getGems());
+        }
+        result = result && unknownFields.equals(other.unknownFields);
+        return result;
+      }
+
+      @java.lang.Override
+      public int hashCode() {
+        if (memoizedHashCode != 0) {
+          return memoizedHashCode;
+        }
+        int hash = 41;
+        hash = (19 * hash) + getDescriptorForType().hashCode();
+        if (hasGems()) {
+          hash = (37 * hash) + GEMS_FIELD_NUMBER;
+          hash = (53 * hash) + getGems();
+        }
+        hash = (29 * hash) + unknownFields.hashCode();
+        memoizedHashCode = hash;
+        return hash;
       }
 
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto parseFrom(
@@ -9677,42 +10495,53 @@ public final class Inventory {
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto parseFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto parseFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto parseDelimitedFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto parseDelimitedFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto parseFrom(
           com.google.protobuf.CodedInputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto parseFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
-      public static Builder newBuilder() { return Builder.create(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto prototype) {
-        return newBuilder().mergeFrom(prototype);
+      public static Builder newBuilder() {
+        return DEFAULT_INSTANCE.toBuilder();
       }
-      public Builder toBuilder() { return newBuilder(this); }
+      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto prototype) {
+        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() {
+        return this == DEFAULT_INSTANCE
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
 
       @java.lang.Override
       protected Builder newBuilderForType(
@@ -9753,19 +10582,11 @@ public final class Inventory {
           if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           }
         }
-        private static Builder create() {
-          return new Builder();
-        }
-
         public Builder clear() {
           super.clear();
           gems_ = 0;
           bitField0_ = (bitField0_ & ~0x00000001);
           return this;
-        }
-
-        public Builder clone() {
-          return create().mergeFrom(buildPartial());
         }
 
         public com.google.protobuf.Descriptors.Descriptor
@@ -9812,13 +10633,13 @@ public final class Inventory {
           if (other.hasGems()) {
             setGems(other.getGems());
           }
-          this.mergeUnknownFields(other.getUnknownFields());
+          this.mergeUnknownFields(other.unknownFields);
+          onChanged();
           return this;
         }
 
         public final boolean isInitialized() {
           if (!hasGems()) {
-            
             return false;
           }
           return true;
@@ -9833,7 +10654,7 @@ public final class Inventory {
             parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
           } catch (com.google.protobuf.InvalidProtocolBufferException e) {
             parsedMessage = (com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto) e.getUnfinishedMessage();
-            throw e;
+            throw e.unwrapIOException();
           } finally {
             if (parsedMessage != null) {
               mergeFrom(parsedMessage);
@@ -9878,12 +10699,39 @@ public final class Inventory {
         // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.InventoryItemProto.PlayerCurrencyProto)
       }
 
+      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto.PlayerCurrencyProto)
+      private static final com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto DEFAULT_INSTANCE;
       static {
-        defaultInstance = new PlayerCurrencyProto(true);
-        defaultInstance.initFields();
+        DEFAULT_INSTANCE = new com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto();
       }
 
-      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto.PlayerCurrencyProto)
+      public static com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto getDefaultInstance() {
+        return DEFAULT_INSTANCE;
+      }
+
+      @java.lang.Deprecated public static final com.google.protobuf.Parser<PlayerCurrencyProto>
+          PARSER = new com.google.protobuf.AbstractParser<PlayerCurrencyProto>() {
+        public PlayerCurrencyProto parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+            return new PlayerCurrencyProto(input, extensionRegistry);
+        }
+      };
+
+      public static com.google.protobuf.Parser<PlayerCurrencyProto> parser() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Parser<PlayerCurrencyProto> getParserForType() {
+        return PARSER;
+      }
+
+      public com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto getDefaultInstanceForType() {
+        return DEFAULT_INSTANCE;
+      }
+
     }
 
     public interface InventoryUpgradesProtoOrBuilder extends
@@ -9902,37 +10750,28 @@ public final class Inventory {
     /**
      * Protobuf type {@code com.pokegoapi.main.InventoryItemProto.InventoryUpgradesProto}
      */
-    public static final class InventoryUpgradesProto extends
+    public  static final class InventoryUpgradesProto extends
         com.google.protobuf.GeneratedMessage implements
         // @@protoc_insertion_point(message_implements:com.pokegoapi.main.InventoryItemProto.InventoryUpgradesProto)
         InventoryUpgradesProtoOrBuilder {
       // Use InventoryUpgradesProto.newBuilder() to construct.
       private InventoryUpgradesProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
         super(builder);
-        this.unknownFields = builder.getUnknownFields();
       }
-      private InventoryUpgradesProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-      private static final InventoryUpgradesProto defaultInstance;
-      public static InventoryUpgradesProto getDefaultInstance() {
-        return defaultInstance;
+      private InventoryUpgradesProto() {
+        inventoryUpgrade_ = 0;
       }
 
-      public InventoryUpgradesProto getDefaultInstanceForType() {
-        return defaultInstance;
-      }
-
-      private final com.google.protobuf.UnknownFieldSet unknownFields;
       @java.lang.Override
       public final com.google.protobuf.UnknownFieldSet
-          getUnknownFields() {
+      getUnknownFields() {
         return this.unknownFields;
       }
       private InventoryUpgradesProto(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        initFields();
+        this();
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -9962,7 +10801,7 @@ public final class Inventory {
           throw e.setUnfinishedMessage(this);
         } catch (java.io.IOException e) {
           throw new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this);
+              e).setUnfinishedMessage(this);
         } finally {
           this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
@@ -9978,21 +10817,6 @@ public final class Inventory {
         return com.pokegoapi.main.Inventory.internal_static_com_pokegoapi_main_InventoryItemProto_InventoryUpgradesProto_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
                 com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto.class, com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto.Builder.class);
-      }
-
-      public static com.google.protobuf.Parser<InventoryUpgradesProto> PARSER =
-          new com.google.protobuf.AbstractParser<InventoryUpgradesProto>() {
-        public InventoryUpgradesProto parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          return new InventoryUpgradesProto(input, extensionRegistry);
-        }
-      };
-
-      @java.lang.Override
-      public com.google.protobuf.Parser<InventoryUpgradesProto> getParserForType() {
-        return PARSER;
       }
 
       private int bitField0_;
@@ -10011,9 +10835,6 @@ public final class Inventory {
         return inventoryUpgrade_;
       }
 
-      private void initFields() {
-        inventoryUpgrade_ = 0;
-      }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
@@ -10030,16 +10851,14 @@ public final class Inventory {
 
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
-        getSerializedSize();
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           output.writeInt32(1, inventoryUpgrade_);
         }
-        getUnknownFields().writeTo(output);
+        unknownFields.writeTo(output);
       }
 
-      private int memoizedSerializedSize = -1;
       public int getSerializedSize() {
-        int size = memoizedSerializedSize;
+        int size = memoizedSize;
         if (size != -1) return size;
 
         size = 0;
@@ -10047,16 +10866,46 @@ public final class Inventory {
           size += com.google.protobuf.CodedOutputStream
             .computeInt32Size(1, inventoryUpgrade_);
         }
-        size += getUnknownFields().getSerializedSize();
-        memoizedSerializedSize = size;
+        size += unknownFields.getSerializedSize();
+        memoizedSize = size;
         return size;
       }
 
       private static final long serialVersionUID = 0L;
       @java.lang.Override
-      protected java.lang.Object writeReplace()
-          throws java.io.ObjectStreamException {
-        return super.writeReplace();
+      public boolean equals(final java.lang.Object obj) {
+        if (obj == this) {
+         return true;
+        }
+        if (!(obj instanceof com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto)) {
+          return super.equals(obj);
+        }
+        com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto other = (com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto) obj;
+
+        boolean result = true;
+        result = result && (hasInventoryUpgrade() == other.hasInventoryUpgrade());
+        if (hasInventoryUpgrade()) {
+          result = result && (getInventoryUpgrade()
+              == other.getInventoryUpgrade());
+        }
+        result = result && unknownFields.equals(other.unknownFields);
+        return result;
+      }
+
+      @java.lang.Override
+      public int hashCode() {
+        if (memoizedHashCode != 0) {
+          return memoizedHashCode;
+        }
+        int hash = 41;
+        hash = (19 * hash) + getDescriptorForType().hashCode();
+        if (hasInventoryUpgrade()) {
+          hash = (37 * hash) + INVENTORYUPGRADE_FIELD_NUMBER;
+          hash = (53 * hash) + getInventoryUpgrade();
+        }
+        hash = (29 * hash) + unknownFields.hashCode();
+        memoizedHashCode = hash;
+        return hash;
       }
 
       public static com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto parseFrom(
@@ -10082,42 +10931,53 @@ public final class Inventory {
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto parseFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto parseFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto parseDelimitedFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto parseDelimitedFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto parseFrom(
           com.google.protobuf.CodedInputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto parseFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
-      public static Builder newBuilder() { return Builder.create(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto prototype) {
-        return newBuilder().mergeFrom(prototype);
+      public static Builder newBuilder() {
+        return DEFAULT_INSTANCE.toBuilder();
       }
-      public Builder toBuilder() { return newBuilder(this); }
+      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto prototype) {
+        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() {
+        return this == DEFAULT_INSTANCE
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
 
       @java.lang.Override
       protected Builder newBuilderForType(
@@ -10158,19 +11018,11 @@ public final class Inventory {
           if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           }
         }
-        private static Builder create() {
-          return new Builder();
-        }
-
         public Builder clear() {
           super.clear();
           inventoryUpgrade_ = 0;
           bitField0_ = (bitField0_ & ~0x00000001);
           return this;
-        }
-
-        public Builder clone() {
-          return create().mergeFrom(buildPartial());
         }
 
         public com.google.protobuf.Descriptors.Descriptor
@@ -10217,13 +11069,13 @@ public final class Inventory {
           if (other.hasInventoryUpgrade()) {
             setInventoryUpgrade(other.getInventoryUpgrade());
           }
-          this.mergeUnknownFields(other.getUnknownFields());
+          this.mergeUnknownFields(other.unknownFields);
+          onChanged();
           return this;
         }
 
         public final boolean isInitialized() {
           if (!hasInventoryUpgrade()) {
-            
             return false;
           }
           return true;
@@ -10238,7 +11090,7 @@ public final class Inventory {
             parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
           } catch (com.google.protobuf.InvalidProtocolBufferException e) {
             parsedMessage = (com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto) e.getUnfinishedMessage();
-            throw e;
+            throw e.unwrapIOException();
           } finally {
             if (parsedMessage != null) {
               mergeFrom(parsedMessage);
@@ -10283,12 +11135,39 @@ public final class Inventory {
         // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.InventoryItemProto.InventoryUpgradesProto)
       }
 
+      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto.InventoryUpgradesProto)
+      private static final com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto DEFAULT_INSTANCE;
       static {
-        defaultInstance = new InventoryUpgradesProto(true);
-        defaultInstance.initFields();
+        DEFAULT_INSTANCE = new com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto();
       }
 
-      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto.InventoryUpgradesProto)
+      public static com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto getDefaultInstance() {
+        return DEFAULT_INSTANCE;
+      }
+
+      @java.lang.Deprecated public static final com.google.protobuf.Parser<InventoryUpgradesProto>
+          PARSER = new com.google.protobuf.AbstractParser<InventoryUpgradesProto>() {
+        public InventoryUpgradesProto parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+            return new InventoryUpgradesProto(input, extensionRegistry);
+        }
+      };
+
+      public static com.google.protobuf.Parser<InventoryUpgradesProto> parser() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Parser<InventoryUpgradesProto> getParserForType() {
+        return PARSER;
+      }
+
+      public com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto getDefaultInstanceForType() {
+        return DEFAULT_INSTANCE;
+      }
+
     }
 
     public interface EggIncubatorProtoOrBuilder extends
@@ -10370,37 +11249,33 @@ public final class Inventory {
     /**
      * Protobuf type {@code com.pokegoapi.main.InventoryItemProto.EggIncubatorProto}
      */
-    public static final class EggIncubatorProto extends
+    public  static final class EggIncubatorProto extends
         com.google.protobuf.GeneratedMessage implements
         // @@protoc_insertion_point(message_implements:com.pokegoapi.main.InventoryItemProto.EggIncubatorProto)
         EggIncubatorProtoOrBuilder {
       // Use EggIncubatorProto.newBuilder() to construct.
       private EggIncubatorProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
         super(builder);
-        this.unknownFields = builder.getUnknownFields();
       }
-      private EggIncubatorProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-      private static final EggIncubatorProto defaultInstance;
-      public static EggIncubatorProto getDefaultInstance() {
-        return defaultInstance;
-      }
-
-      public EggIncubatorProto getDefaultInstanceForType() {
-        return defaultInstance;
+      private EggIncubatorProto() {
+        itemId_ = "";
+        incubatorType_ = 0;
+        usesRemaining_ = 0;
+        pokemonId_ = 0L;
+        startKmWalked_ = 0D;
+        targetKmWalked_ = 0D;
       }
 
-      private final com.google.protobuf.UnknownFieldSet unknownFields;
       @java.lang.Override
       public final com.google.protobuf.UnknownFieldSet
-          getUnknownFields() {
+      getUnknownFields() {
         return this.unknownFields;
       }
       private EggIncubatorProto(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        initFields();
+        this();
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -10469,7 +11344,7 @@ public final class Inventory {
           throw e.setUnfinishedMessage(this);
         } catch (java.io.IOException e) {
           throw new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this);
+              e).setUnfinishedMessage(this);
         } finally {
           this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
@@ -10487,24 +11362,9 @@ public final class Inventory {
                 com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto.class, com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto.Builder.class);
       }
 
-      public static com.google.protobuf.Parser<EggIncubatorProto> PARSER =
-          new com.google.protobuf.AbstractParser<EggIncubatorProto>() {
-        public EggIncubatorProto parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          return new EggIncubatorProto(input, extensionRegistry);
-        }
-      };
-
-      @java.lang.Override
-      public com.google.protobuf.Parser<EggIncubatorProto> getParserForType() {
-        return PARSER;
-      }
-
       private int bitField0_;
       public static final int ITEMID_FIELD_NUMBER = 1;
-      private java.lang.Object itemId_;
+      private volatile java.lang.Object itemId_;
       /**
        * <code>optional string ItemId = 1;</code>
        */
@@ -10557,13 +11417,13 @@ public final class Inventory {
        * <code>optional .com.pokegoapi.main.InventoryItemProto.ItemProto Item = 2;</code>
        */
       public com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto getItem() {
-        return item_;
+        return item_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.getDefaultInstance() : item_;
       }
       /**
        * <code>optional .com.pokegoapi.main.InventoryItemProto.ItemProto Item = 2;</code>
        */
       public com.pokegoapi.main.Inventory.InventoryItemProto.ItemProtoOrBuilder getItemOrBuilder() {
-        return item_;
+        return item_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.getDefaultInstance() : item_;
       }
 
       public static final int INCUBATORTYPE_FIELD_NUMBER = 3;
@@ -10641,15 +11501,6 @@ public final class Inventory {
         return targetKmWalked_;
       }
 
-      private void initFields() {
-        itemId_ = "";
-        item_ = com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.getDefaultInstance();
-        incubatorType_ = 0;
-        usesRemaining_ = 0;
-        pokemonId_ = 0L;
-        startKmWalked_ = 0D;
-        targetKmWalked_ = 0D;
-      }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
@@ -10668,12 +11519,11 @@ public final class Inventory {
 
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
-        getSerializedSize();
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          output.writeBytes(1, getItemIdBytes());
+          com.google.protobuf.GeneratedMessage.writeString(output, 1, itemId_);
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
-          output.writeMessage(2, item_);
+          output.writeMessage(2, getItem());
         }
         if (((bitField0_ & 0x00000004) == 0x00000004)) {
           output.writeInt32(3, incubatorType_);
@@ -10690,22 +11540,20 @@ public final class Inventory {
         if (((bitField0_ & 0x00000040) == 0x00000040)) {
           output.writeDouble(7, targetKmWalked_);
         }
-        getUnknownFields().writeTo(output);
+        unknownFields.writeTo(output);
       }
 
-      private int memoizedSerializedSize = -1;
       public int getSerializedSize() {
-        int size = memoizedSerializedSize;
+        int size = memoizedSize;
         if (size != -1) return size;
 
         size = 0;
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          size += com.google.protobuf.CodedOutputStream
-            .computeBytesSize(1, getItemIdBytes());
+          size += com.google.protobuf.GeneratedMessage.computeStringSize(1, itemId_);
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeMessageSize(2, item_);
+            .computeMessageSize(2, getItem());
         }
         if (((bitField0_ & 0x00000004) == 0x00000004)) {
           size += com.google.protobuf.CodedOutputStream
@@ -10727,16 +11575,107 @@ public final class Inventory {
           size += com.google.protobuf.CodedOutputStream
             .computeDoubleSize(7, targetKmWalked_);
         }
-        size += getUnknownFields().getSerializedSize();
-        memoizedSerializedSize = size;
+        size += unknownFields.getSerializedSize();
+        memoizedSize = size;
         return size;
       }
 
       private static final long serialVersionUID = 0L;
       @java.lang.Override
-      protected java.lang.Object writeReplace()
-          throws java.io.ObjectStreamException {
-        return super.writeReplace();
+      public boolean equals(final java.lang.Object obj) {
+        if (obj == this) {
+         return true;
+        }
+        if (!(obj instanceof com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto)) {
+          return super.equals(obj);
+        }
+        com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto other = (com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto) obj;
+
+        boolean result = true;
+        result = result && (hasItemId() == other.hasItemId());
+        if (hasItemId()) {
+          result = result && getItemId()
+              .equals(other.getItemId());
+        }
+        result = result && (hasItem() == other.hasItem());
+        if (hasItem()) {
+          result = result && getItem()
+              .equals(other.getItem());
+        }
+        result = result && (hasIncubatorType() == other.hasIncubatorType());
+        if (hasIncubatorType()) {
+          result = result && (getIncubatorType()
+              == other.getIncubatorType());
+        }
+        result = result && (hasUsesRemaining() == other.hasUsesRemaining());
+        if (hasUsesRemaining()) {
+          result = result && (getUsesRemaining()
+              == other.getUsesRemaining());
+        }
+        result = result && (hasPokemonId() == other.hasPokemonId());
+        if (hasPokemonId()) {
+          result = result && (getPokemonId()
+              == other.getPokemonId());
+        }
+        result = result && (hasStartKmWalked() == other.hasStartKmWalked());
+        if (hasStartKmWalked()) {
+          result = result && (
+              java.lang.Double.doubleToLongBits(getStartKmWalked())
+              == java.lang.Double.doubleToLongBits(
+                  other.getStartKmWalked()));
+        }
+        result = result && (hasTargetKmWalked() == other.hasTargetKmWalked());
+        if (hasTargetKmWalked()) {
+          result = result && (
+              java.lang.Double.doubleToLongBits(getTargetKmWalked())
+              == java.lang.Double.doubleToLongBits(
+                  other.getTargetKmWalked()));
+        }
+        result = result && unknownFields.equals(other.unknownFields);
+        return result;
+      }
+
+      @java.lang.Override
+      public int hashCode() {
+        if (memoizedHashCode != 0) {
+          return memoizedHashCode;
+        }
+        int hash = 41;
+        hash = (19 * hash) + getDescriptorForType().hashCode();
+        if (hasItemId()) {
+          hash = (37 * hash) + ITEMID_FIELD_NUMBER;
+          hash = (53 * hash) + getItemId().hashCode();
+        }
+        if (hasItem()) {
+          hash = (37 * hash) + ITEM_FIELD_NUMBER;
+          hash = (53 * hash) + getItem().hashCode();
+        }
+        if (hasIncubatorType()) {
+          hash = (37 * hash) + INCUBATORTYPE_FIELD_NUMBER;
+          hash = (53 * hash) + getIncubatorType();
+        }
+        if (hasUsesRemaining()) {
+          hash = (37 * hash) + USESREMAINING_FIELD_NUMBER;
+          hash = (53 * hash) + getUsesRemaining();
+        }
+        if (hasPokemonId()) {
+          hash = (37 * hash) + POKEMONID_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+              getPokemonId());
+        }
+        if (hasStartKmWalked()) {
+          hash = (37 * hash) + STARTKMWALKED_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+              java.lang.Double.doubleToLongBits(getStartKmWalked()));
+        }
+        if (hasTargetKmWalked()) {
+          hash = (37 * hash) + TARGETKMWALKED_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+              java.lang.Double.doubleToLongBits(getTargetKmWalked()));
+        }
+        hash = (29 * hash) + unknownFields.hashCode();
+        memoizedHashCode = hash;
+        return hash;
       }
 
       public static com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto parseFrom(
@@ -10762,42 +11701,53 @@ public final class Inventory {
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto parseFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto parseFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto parseDelimitedFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto parseDelimitedFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto parseFrom(
           com.google.protobuf.CodedInputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto parseFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
-      public static Builder newBuilder() { return Builder.create(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto prototype) {
-        return newBuilder().mergeFrom(prototype);
+      public static Builder newBuilder() {
+        return DEFAULT_INSTANCE.toBuilder();
       }
-      public Builder toBuilder() { return newBuilder(this); }
+      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto prototype) {
+        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() {
+        return this == DEFAULT_INSTANCE
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
 
       @java.lang.Override
       protected Builder newBuilderForType(
@@ -10839,16 +11789,12 @@ public final class Inventory {
             getItemFieldBuilder();
           }
         }
-        private static Builder create() {
-          return new Builder();
-        }
-
         public Builder clear() {
           super.clear();
           itemId_ = "";
           bitField0_ = (bitField0_ & ~0x00000001);
           if (itemBuilder_ == null) {
-            item_ = com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.getDefaultInstance();
+            item_ = null;
           } else {
             itemBuilder_.clear();
           }
@@ -10864,10 +11810,6 @@ public final class Inventory {
           targetKmWalked_ = 0D;
           bitField0_ = (bitField0_ & ~0x00000040);
           return this;
-        }
-
-        public Builder clone() {
-          return create().mergeFrom(buildPartial());
         }
 
         public com.google.protobuf.Descriptors.Descriptor
@@ -10962,14 +11904,14 @@ public final class Inventory {
           if (other.hasTargetKmWalked()) {
             setTargetKmWalked(other.getTargetKmWalked());
           }
-          this.mergeUnknownFields(other.getUnknownFields());
+          this.mergeUnknownFields(other.unknownFields);
+          onChanged();
           return this;
         }
 
         public final boolean isInitialized() {
           if (hasItem()) {
             if (!getItem().isInitialized()) {
-              
               return false;
             }
           }
@@ -10985,7 +11927,7 @@ public final class Inventory {
             parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
           } catch (com.google.protobuf.InvalidProtocolBufferException e) {
             parsedMessage = (com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto) e.getUnfinishedMessage();
-            throw e;
+            throw e.unwrapIOException();
           } finally {
             if (parsedMessage != null) {
               mergeFrom(parsedMessage);
@@ -11071,7 +12013,7 @@ public final class Inventory {
           return this;
         }
 
-        private com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto item_ = com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.getDefaultInstance();
+        private com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto item_ = null;
         private com.google.protobuf.SingleFieldBuilder<
             com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto, com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.Builder, com.pokegoapi.main.Inventory.InventoryItemProto.ItemProtoOrBuilder> itemBuilder_;
         /**
@@ -11085,7 +12027,7 @@ public final class Inventory {
          */
         public com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto getItem() {
           if (itemBuilder_ == null) {
-            return item_;
+            return item_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.getDefaultInstance() : item_;
           } else {
             return itemBuilder_.getMessage();
           }
@@ -11126,6 +12068,7 @@ public final class Inventory {
         public Builder mergeItem(com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto value) {
           if (itemBuilder_ == null) {
             if (((bitField0_ & 0x00000002) == 0x00000002) &&
+                item_ != null &&
                 item_ != com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.getDefaultInstance()) {
               item_ =
                 com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.newBuilder(item_).mergeFrom(value).buildPartial();
@@ -11144,7 +12087,7 @@ public final class Inventory {
          */
         public Builder clearItem() {
           if (itemBuilder_ == null) {
-            item_ = com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.getDefaultInstance();
+            item_ = null;
             onChanged();
           } else {
             itemBuilder_.clear();
@@ -11167,7 +12110,8 @@ public final class Inventory {
           if (itemBuilder_ != null) {
             return itemBuilder_.getMessageOrBuilder();
           } else {
-            return item_;
+            return item_ == null ?
+                com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.getDefaultInstance() : item_;
           }
         }
         /**
@@ -11350,12 +12294,39 @@ public final class Inventory {
         // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.InventoryItemProto.EggIncubatorProto)
       }
 
+      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto.EggIncubatorProto)
+      private static final com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto DEFAULT_INSTANCE;
       static {
-        defaultInstance = new EggIncubatorProto(true);
-        defaultInstance.initFields();
+        DEFAULT_INSTANCE = new com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto();
       }
 
-      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto.EggIncubatorProto)
+      public static com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto getDefaultInstance() {
+        return DEFAULT_INSTANCE;
+      }
+
+      @java.lang.Deprecated public static final com.google.protobuf.Parser<EggIncubatorProto>
+          PARSER = new com.google.protobuf.AbstractParser<EggIncubatorProto>() {
+        public EggIncubatorProto parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+            return new EggIncubatorProto(input, extensionRegistry);
+        }
+      };
+
+      public static com.google.protobuf.Parser<EggIncubatorProto> parser() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Parser<EggIncubatorProto> getParserForType() {
+        return PARSER;
+      }
+
+      public com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto getDefaultInstanceForType() {
+        return DEFAULT_INSTANCE;
+      }
+
     }
 
     public interface PokemonFamilyProtoOrBuilder extends
@@ -11383,37 +12354,29 @@ public final class Inventory {
     /**
      * Protobuf type {@code com.pokegoapi.main.InventoryItemProto.PokemonFamilyProto}
      */
-    public static final class PokemonFamilyProto extends
+    public  static final class PokemonFamilyProto extends
         com.google.protobuf.GeneratedMessage implements
         // @@protoc_insertion_point(message_implements:com.pokegoapi.main.InventoryItemProto.PokemonFamilyProto)
         PokemonFamilyProtoOrBuilder {
       // Use PokemonFamilyProto.newBuilder() to construct.
       private PokemonFamilyProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
         super(builder);
-        this.unknownFields = builder.getUnknownFields();
       }
-      private PokemonFamilyProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-      private static final PokemonFamilyProto defaultInstance;
-      public static PokemonFamilyProto getDefaultInstance() {
-        return defaultInstance;
+      private PokemonFamilyProto() {
+        familyId_ = 0;
+        candy_ = 0;
       }
 
-      public PokemonFamilyProto getDefaultInstanceForType() {
-        return defaultInstance;
-      }
-
-      private final com.google.protobuf.UnknownFieldSet unknownFields;
       @java.lang.Override
       public final com.google.protobuf.UnknownFieldSet
-          getUnknownFields() {
+      getUnknownFields() {
         return this.unknownFields;
       }
       private PokemonFamilyProto(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        initFields();
+        this();
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -11448,7 +12411,7 @@ public final class Inventory {
           throw e.setUnfinishedMessage(this);
         } catch (java.io.IOException e) {
           throw new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this);
+              e).setUnfinishedMessage(this);
         } finally {
           this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
@@ -11464,21 +12427,6 @@ public final class Inventory {
         return com.pokegoapi.main.Inventory.internal_static_com_pokegoapi_main_InventoryItemProto_PokemonFamilyProto_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
                 com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto.class, com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto.Builder.class);
-      }
-
-      public static com.google.protobuf.Parser<PokemonFamilyProto> PARSER =
-          new com.google.protobuf.AbstractParser<PokemonFamilyProto>() {
-        public PokemonFamilyProto parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          return new PokemonFamilyProto(input, extensionRegistry);
-        }
-      };
-
-      @java.lang.Override
-      public com.google.protobuf.Parser<PokemonFamilyProto> getParserForType() {
-        return PARSER;
       }
 
       private int bitField0_;
@@ -11512,10 +12460,6 @@ public final class Inventory {
         return candy_;
       }
 
-      private void initFields() {
-        familyId_ = 0;
-        candy_ = 0;
-      }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
@@ -11536,19 +12480,17 @@ public final class Inventory {
 
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
-        getSerializedSize();
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           output.writeInt32(1, familyId_);
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
           output.writeInt32(2, candy_);
         }
-        getUnknownFields().writeTo(output);
+        unknownFields.writeTo(output);
       }
 
-      private int memoizedSerializedSize = -1;
       public int getSerializedSize() {
-        int size = memoizedSerializedSize;
+        int size = memoizedSize;
         if (size != -1) return size;
 
         size = 0;
@@ -11560,16 +12502,55 @@ public final class Inventory {
           size += com.google.protobuf.CodedOutputStream
             .computeInt32Size(2, candy_);
         }
-        size += getUnknownFields().getSerializedSize();
-        memoizedSerializedSize = size;
+        size += unknownFields.getSerializedSize();
+        memoizedSize = size;
         return size;
       }
 
       private static final long serialVersionUID = 0L;
       @java.lang.Override
-      protected java.lang.Object writeReplace()
-          throws java.io.ObjectStreamException {
-        return super.writeReplace();
+      public boolean equals(final java.lang.Object obj) {
+        if (obj == this) {
+         return true;
+        }
+        if (!(obj instanceof com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto)) {
+          return super.equals(obj);
+        }
+        com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto other = (com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto) obj;
+
+        boolean result = true;
+        result = result && (hasFamilyId() == other.hasFamilyId());
+        if (hasFamilyId()) {
+          result = result && (getFamilyId()
+              == other.getFamilyId());
+        }
+        result = result && (hasCandy() == other.hasCandy());
+        if (hasCandy()) {
+          result = result && (getCandy()
+              == other.getCandy());
+        }
+        result = result && unknownFields.equals(other.unknownFields);
+        return result;
+      }
+
+      @java.lang.Override
+      public int hashCode() {
+        if (memoizedHashCode != 0) {
+          return memoizedHashCode;
+        }
+        int hash = 41;
+        hash = (19 * hash) + getDescriptorForType().hashCode();
+        if (hasFamilyId()) {
+          hash = (37 * hash) + FAMILYID_FIELD_NUMBER;
+          hash = (53 * hash) + getFamilyId();
+        }
+        if (hasCandy()) {
+          hash = (37 * hash) + CANDY_FIELD_NUMBER;
+          hash = (53 * hash) + getCandy();
+        }
+        hash = (29 * hash) + unknownFields.hashCode();
+        memoizedHashCode = hash;
+        return hash;
       }
 
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto parseFrom(
@@ -11595,42 +12576,53 @@ public final class Inventory {
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto parseFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto parseFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto parseDelimitedFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto parseDelimitedFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto parseFrom(
           com.google.protobuf.CodedInputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input);
       }
       public static com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto parseFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessage
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
-      public static Builder newBuilder() { return Builder.create(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto prototype) {
-        return newBuilder().mergeFrom(prototype);
+      public static Builder newBuilder() {
+        return DEFAULT_INSTANCE.toBuilder();
       }
-      public Builder toBuilder() { return newBuilder(this); }
+      public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto prototype) {
+        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() {
+        return this == DEFAULT_INSTANCE
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
 
       @java.lang.Override
       protected Builder newBuilderForType(
@@ -11671,10 +12663,6 @@ public final class Inventory {
           if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           }
         }
-        private static Builder create() {
-          return new Builder();
-        }
-
         public Builder clear() {
           super.clear();
           familyId_ = 0;
@@ -11682,10 +12670,6 @@ public final class Inventory {
           candy_ = 0;
           bitField0_ = (bitField0_ & ~0x00000002);
           return this;
-        }
-
-        public Builder clone() {
-          return create().mergeFrom(buildPartial());
         }
 
         public com.google.protobuf.Descriptors.Descriptor
@@ -11739,17 +12723,16 @@ public final class Inventory {
           if (other.hasCandy()) {
             setCandy(other.getCandy());
           }
-          this.mergeUnknownFields(other.getUnknownFields());
+          this.mergeUnknownFields(other.unknownFields);
+          onChanged();
           return this;
         }
 
         public final boolean isInitialized() {
           if (!hasFamilyId()) {
-            
             return false;
           }
           if (!hasCandy()) {
-            
             return false;
           }
           return true;
@@ -11764,7 +12747,7 @@ public final class Inventory {
             parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
           } catch (com.google.protobuf.InvalidProtocolBufferException e) {
             parsedMessage = (com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto) e.getUnfinishedMessage();
-            throw e;
+            throw e.unwrapIOException();
           } finally {
             if (parsedMessage != null) {
               mergeFrom(parsedMessage);
@@ -11841,12 +12824,39 @@ public final class Inventory {
         // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.InventoryItemProto.PokemonFamilyProto)
       }
 
+      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto.PokemonFamilyProto)
+      private static final com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto DEFAULT_INSTANCE;
       static {
-        defaultInstance = new PokemonFamilyProto(true);
-        defaultInstance.initFields();
+        DEFAULT_INSTANCE = new com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto();
       }
 
-      // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto.PokemonFamilyProto)
+      public static com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto getDefaultInstance() {
+        return DEFAULT_INSTANCE;
+      }
+
+      @java.lang.Deprecated public static final com.google.protobuf.Parser<PokemonFamilyProto>
+          PARSER = new com.google.protobuf.AbstractParser<PokemonFamilyProto>() {
+        public PokemonFamilyProto parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+            return new PokemonFamilyProto(input, extensionRegistry);
+        }
+      };
+
+      public static com.google.protobuf.Parser<PokemonFamilyProto> parser() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Parser<PokemonFamilyProto> getParserForType() {
+        return PARSER;
+      }
+
+      public com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto getDefaultInstanceForType() {
+        return DEFAULT_INSTANCE;
+      }
+
     }
 
     private int bitField0_;
@@ -11862,13 +12872,13 @@ public final class Inventory {
      * <code>optional .com.pokegoapi.main.PokemonProto Pokemon = 1;</code>
      */
     public com.pokegoapi.main.Inventory.PokemonProto getPokemon() {
-      return pokemon_;
+      return pokemon_ == null ? com.pokegoapi.main.Inventory.PokemonProto.getDefaultInstance() : pokemon_;
     }
     /**
      * <code>optional .com.pokegoapi.main.PokemonProto Pokemon = 1;</code>
      */
     public com.pokegoapi.main.Inventory.PokemonProtoOrBuilder getPokemonOrBuilder() {
-      return pokemon_;
+      return pokemon_ == null ? com.pokegoapi.main.Inventory.PokemonProto.getDefaultInstance() : pokemon_;
     }
 
     public static final int ITEM_FIELD_NUMBER = 2;
@@ -11883,13 +12893,13 @@ public final class Inventory {
      * <code>optional .com.pokegoapi.main.InventoryItemProto.ItemProto Item = 2;</code>
      */
     public com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto getItem() {
-      return item_;
+      return item_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.getDefaultInstance() : item_;
     }
     /**
      * <code>optional .com.pokegoapi.main.InventoryItemProto.ItemProto Item = 2;</code>
      */
     public com.pokegoapi.main.Inventory.InventoryItemProto.ItemProtoOrBuilder getItemOrBuilder() {
-      return item_;
+      return item_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.getDefaultInstance() : item_;
     }
 
     public static final int POKEDEXENTRY_FIELD_NUMBER = 3;
@@ -11904,13 +12914,13 @@ public final class Inventory {
      * <code>optional .com.pokegoapi.main.InventoryItemProto.PokedexEntryProto PokedexEntry = 3;</code>
      */
     public com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto getPokedexEntry() {
-      return pokedexEntry_;
+      return pokedexEntry_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto.getDefaultInstance() : pokedexEntry_;
     }
     /**
      * <code>optional .com.pokegoapi.main.InventoryItemProto.PokedexEntryProto PokedexEntry = 3;</code>
      */
     public com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProtoOrBuilder getPokedexEntryOrBuilder() {
-      return pokedexEntry_;
+      return pokedexEntry_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto.getDefaultInstance() : pokedexEntry_;
     }
 
     public static final int PLAYERSTATS_FIELD_NUMBER = 4;
@@ -11925,13 +12935,13 @@ public final class Inventory {
      * <code>optional .com.pokegoapi.main.InventoryItemProto.PlayerStatsProto PlayerStats = 4;</code>
      */
     public com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto getPlayerStats() {
-      return playerStats_;
+      return playerStats_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto.getDefaultInstance() : playerStats_;
     }
     /**
      * <code>optional .com.pokegoapi.main.InventoryItemProto.PlayerStatsProto PlayerStats = 4;</code>
      */
     public com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProtoOrBuilder getPlayerStatsOrBuilder() {
-      return playerStats_;
+      return playerStats_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto.getDefaultInstance() : playerStats_;
     }
 
     public static final int PLAYERCURRENCY_FIELD_NUMBER = 5;
@@ -11946,13 +12956,13 @@ public final class Inventory {
      * <code>optional .com.pokegoapi.main.InventoryItemProto.PlayerCurrencyProto PlayerCurrency = 5;</code>
      */
     public com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto getPlayerCurrency() {
-      return playerCurrency_;
+      return playerCurrency_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto.getDefaultInstance() : playerCurrency_;
     }
     /**
      * <code>optional .com.pokegoapi.main.InventoryItemProto.PlayerCurrencyProto PlayerCurrency = 5;</code>
      */
     public com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProtoOrBuilder getPlayerCurrencyOrBuilder() {
-      return playerCurrency_;
+      return playerCurrency_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto.getDefaultInstance() : playerCurrency_;
     }
 
     public static final int PLAYERCAMERA_FIELD_NUMBER = 6;
@@ -11967,13 +12977,13 @@ public final class Inventory {
      * <code>optional .com.pokegoapi.main.InventoryItemProto.PlayerCameraProto PlayerCamera = 6;</code>
      */
     public com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto getPlayerCamera() {
-      return playerCamera_;
+      return playerCamera_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto.getDefaultInstance() : playerCamera_;
     }
     /**
      * <code>optional .com.pokegoapi.main.InventoryItemProto.PlayerCameraProto PlayerCamera = 6;</code>
      */
     public com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProtoOrBuilder getPlayerCameraOrBuilder() {
-      return playerCamera_;
+      return playerCamera_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto.getDefaultInstance() : playerCamera_;
     }
 
     public static final int INVENTORYUPGRADES_FIELD_NUMBER = 7;
@@ -11988,13 +12998,13 @@ public final class Inventory {
      * <code>optional .com.pokegoapi.main.InventoryItemProto.InventoryUpgradesProto InventoryUpgrades = 7;</code>
      */
     public com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto getInventoryUpgrades() {
-      return inventoryUpgrades_;
+      return inventoryUpgrades_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto.getDefaultInstance() : inventoryUpgrades_;
     }
     /**
      * <code>optional .com.pokegoapi.main.InventoryItemProto.InventoryUpgradesProto InventoryUpgrades = 7;</code>
      */
     public com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProtoOrBuilder getInventoryUpgradesOrBuilder() {
-      return inventoryUpgrades_;
+      return inventoryUpgrades_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto.getDefaultInstance() : inventoryUpgrades_;
     }
 
     public static final int APPLIEDITEM_FIELD_NUMBER = 8;
@@ -12009,13 +13019,13 @@ public final class Inventory {
      * <code>optional .com.pokegoapi.main.InventoryItemProto.AppliedItemProto AppliedItem = 8;</code>
      */
     public com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto getAppliedItem() {
-      return appliedItem_;
+      return appliedItem_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto.getDefaultInstance() : appliedItem_;
     }
     /**
      * <code>optional .com.pokegoapi.main.InventoryItemProto.AppliedItemProto AppliedItem = 8;</code>
      */
     public com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProtoOrBuilder getAppliedItemOrBuilder() {
-      return appliedItem_;
+      return appliedItem_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto.getDefaultInstance() : appliedItem_;
     }
 
     public static final int EGGINCUBATORS_FIELD_NUMBER = 9;
@@ -12030,13 +13040,13 @@ public final class Inventory {
      * <code>optional .com.pokegoapi.main.InventoryItemProto.EggIncubatorProto EggIncubators = 9;</code>
      */
     public com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto getEggIncubators() {
-      return eggIncubators_;
+      return eggIncubators_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto.getDefaultInstance() : eggIncubators_;
     }
     /**
      * <code>optional .com.pokegoapi.main.InventoryItemProto.EggIncubatorProto EggIncubators = 9;</code>
      */
     public com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProtoOrBuilder getEggIncubatorsOrBuilder() {
-      return eggIncubators_;
+      return eggIncubators_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto.getDefaultInstance() : eggIncubators_;
     }
 
     public static final int POKEMONFAMILY_FIELD_NUMBER = 10;
@@ -12051,27 +13061,15 @@ public final class Inventory {
      * <code>optional .com.pokegoapi.main.InventoryItemProto.PokemonFamilyProto PokemonFamily = 10;</code>
      */
     public com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto getPokemonFamily() {
-      return pokemonFamily_;
+      return pokemonFamily_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto.getDefaultInstance() : pokemonFamily_;
     }
     /**
      * <code>optional .com.pokegoapi.main.InventoryItemProto.PokemonFamilyProto PokemonFamily = 10;</code>
      */
     public com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProtoOrBuilder getPokemonFamilyOrBuilder() {
-      return pokemonFamily_;
+      return pokemonFamily_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto.getDefaultInstance() : pokemonFamily_;
     }
 
-    private void initFields() {
-      pokemon_ = com.pokegoapi.main.Inventory.PokemonProto.getDefaultInstance();
-      item_ = com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.getDefaultInstance();
-      pokedexEntry_ = com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto.getDefaultInstance();
-      playerStats_ = com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto.getDefaultInstance();
-      playerCurrency_ = com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto.getDefaultInstance();
-      playerCamera_ = com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto.getDefaultInstance();
-      inventoryUpgrades_ = com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto.getDefaultInstance();
-      appliedItem_ = com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto.getDefaultInstance();
-      eggIncubators_ = com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto.getDefaultInstance();
-      pokemonFamily_ = com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto.getDefaultInstance();
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -12132,96 +13130,205 @@ public final class Inventory {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeMessage(1, pokemon_);
+        output.writeMessage(1, getPokemon());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeMessage(2, item_);
+        output.writeMessage(2, getItem());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeMessage(3, pokedexEntry_);
+        output.writeMessage(3, getPokedexEntry());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeMessage(4, playerStats_);
+        output.writeMessage(4, getPlayerStats());
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeMessage(5, playerCurrency_);
+        output.writeMessage(5, getPlayerCurrency());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeMessage(6, playerCamera_);
+        output.writeMessage(6, getPlayerCamera());
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeMessage(7, inventoryUpgrades_);
+        output.writeMessage(7, getInventoryUpgrades());
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        output.writeMessage(8, appliedItem_);
+        output.writeMessage(8, getAppliedItem());
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        output.writeMessage(9, eggIncubators_);
+        output.writeMessage(9, getEggIncubators());
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
-        output.writeMessage(10, pokemonFamily_);
+        output.writeMessage(10, getPokemonFamily());
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, pokemon_);
+          .computeMessageSize(1, getPokemon());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, item_);
+          .computeMessageSize(2, getItem());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, pokedexEntry_);
+          .computeMessageSize(3, getPokedexEntry());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, playerStats_);
+          .computeMessageSize(4, getPlayerStats());
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, playerCurrency_);
+          .computeMessageSize(5, getPlayerCurrency());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(6, playerCamera_);
+          .computeMessageSize(6, getPlayerCamera());
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(7, inventoryUpgrades_);
+          .computeMessageSize(7, getInventoryUpgrades());
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(8, appliedItem_);
+          .computeMessageSize(8, getAppliedItem());
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(9, eggIncubators_);
+          .computeMessageSize(9, getEggIncubators());
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(10, pokemonFamily_);
+          .computeMessageSize(10, getPokemonFamily());
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.pokegoapi.main.Inventory.InventoryItemProto)) {
+        return super.equals(obj);
+      }
+      com.pokegoapi.main.Inventory.InventoryItemProto other = (com.pokegoapi.main.Inventory.InventoryItemProto) obj;
+
+      boolean result = true;
+      result = result && (hasPokemon() == other.hasPokemon());
+      if (hasPokemon()) {
+        result = result && getPokemon()
+            .equals(other.getPokemon());
+      }
+      result = result && (hasItem() == other.hasItem());
+      if (hasItem()) {
+        result = result && getItem()
+            .equals(other.getItem());
+      }
+      result = result && (hasPokedexEntry() == other.hasPokedexEntry());
+      if (hasPokedexEntry()) {
+        result = result && getPokedexEntry()
+            .equals(other.getPokedexEntry());
+      }
+      result = result && (hasPlayerStats() == other.hasPlayerStats());
+      if (hasPlayerStats()) {
+        result = result && getPlayerStats()
+            .equals(other.getPlayerStats());
+      }
+      result = result && (hasPlayerCurrency() == other.hasPlayerCurrency());
+      if (hasPlayerCurrency()) {
+        result = result && getPlayerCurrency()
+            .equals(other.getPlayerCurrency());
+      }
+      result = result && (hasPlayerCamera() == other.hasPlayerCamera());
+      if (hasPlayerCamera()) {
+        result = result && getPlayerCamera()
+            .equals(other.getPlayerCamera());
+      }
+      result = result && (hasInventoryUpgrades() == other.hasInventoryUpgrades());
+      if (hasInventoryUpgrades()) {
+        result = result && getInventoryUpgrades()
+            .equals(other.getInventoryUpgrades());
+      }
+      result = result && (hasAppliedItem() == other.hasAppliedItem());
+      if (hasAppliedItem()) {
+        result = result && getAppliedItem()
+            .equals(other.getAppliedItem());
+      }
+      result = result && (hasEggIncubators() == other.hasEggIncubators());
+      if (hasEggIncubators()) {
+        result = result && getEggIncubators()
+            .equals(other.getEggIncubators());
+      }
+      result = result && (hasPokemonFamily() == other.hasPokemonFamily());
+      if (hasPokemonFamily()) {
+        result = result && getPokemonFamily()
+            .equals(other.getPokemonFamily());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptorForType().hashCode();
+      if (hasPokemon()) {
+        hash = (37 * hash) + POKEMON_FIELD_NUMBER;
+        hash = (53 * hash) + getPokemon().hashCode();
+      }
+      if (hasItem()) {
+        hash = (37 * hash) + ITEM_FIELD_NUMBER;
+        hash = (53 * hash) + getItem().hashCode();
+      }
+      if (hasPokedexEntry()) {
+        hash = (37 * hash) + POKEDEXENTRY_FIELD_NUMBER;
+        hash = (53 * hash) + getPokedexEntry().hashCode();
+      }
+      if (hasPlayerStats()) {
+        hash = (37 * hash) + PLAYERSTATS_FIELD_NUMBER;
+        hash = (53 * hash) + getPlayerStats().hashCode();
+      }
+      if (hasPlayerCurrency()) {
+        hash = (37 * hash) + PLAYERCURRENCY_FIELD_NUMBER;
+        hash = (53 * hash) + getPlayerCurrency().hashCode();
+      }
+      if (hasPlayerCamera()) {
+        hash = (37 * hash) + PLAYERCAMERA_FIELD_NUMBER;
+        hash = (53 * hash) + getPlayerCamera().hashCode();
+      }
+      if (hasInventoryUpgrades()) {
+        hash = (37 * hash) + INVENTORYUPGRADES_FIELD_NUMBER;
+        hash = (53 * hash) + getInventoryUpgrades().hashCode();
+      }
+      if (hasAppliedItem()) {
+        hash = (37 * hash) + APPLIEDITEM_FIELD_NUMBER;
+        hash = (53 * hash) + getAppliedItem().hashCode();
+      }
+      if (hasEggIncubators()) {
+        hash = (37 * hash) + EGGINCUBATORS_FIELD_NUMBER;
+        hash = (53 * hash) + getEggIncubators().hashCode();
+      }
+      if (hasPokemonFamily()) {
+        hash = (37 * hash) + POKEMONFAMILY_FIELD_NUMBER;
+        hash = (53 * hash) + getPokemonFamily().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static com.pokegoapi.main.Inventory.InventoryItemProto parseFrom(
@@ -12247,42 +13354,53 @@ public final class Inventory {
     }
     public static com.pokegoapi.main.Inventory.InventoryItemProto parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.InventoryItemProto parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Inventory.InventoryItemProto parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.InventoryItemProto parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Inventory.InventoryItemProto parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.InventoryItemProto parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(com.pokegoapi.main.Inventory.InventoryItemProto prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -12333,77 +13451,69 @@ public final class Inventory {
           getPokemonFamilyFieldBuilder();
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         if (pokemonBuilder_ == null) {
-          pokemon_ = com.pokegoapi.main.Inventory.PokemonProto.getDefaultInstance();
+          pokemon_ = null;
         } else {
           pokemonBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000001);
         if (itemBuilder_ == null) {
-          item_ = com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.getDefaultInstance();
+          item_ = null;
         } else {
           itemBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000002);
         if (pokedexEntryBuilder_ == null) {
-          pokedexEntry_ = com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto.getDefaultInstance();
+          pokedexEntry_ = null;
         } else {
           pokedexEntryBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000004);
         if (playerStatsBuilder_ == null) {
-          playerStats_ = com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto.getDefaultInstance();
+          playerStats_ = null;
         } else {
           playerStatsBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000008);
         if (playerCurrencyBuilder_ == null) {
-          playerCurrency_ = com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto.getDefaultInstance();
+          playerCurrency_ = null;
         } else {
           playerCurrencyBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000010);
         if (playerCameraBuilder_ == null) {
-          playerCamera_ = com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto.getDefaultInstance();
+          playerCamera_ = null;
         } else {
           playerCameraBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000020);
         if (inventoryUpgradesBuilder_ == null) {
-          inventoryUpgrades_ = com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto.getDefaultInstance();
+          inventoryUpgrades_ = null;
         } else {
           inventoryUpgradesBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000040);
         if (appliedItemBuilder_ == null) {
-          appliedItem_ = com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto.getDefaultInstance();
+          appliedItem_ = null;
         } else {
           appliedItemBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000080);
         if (eggIncubatorsBuilder_ == null) {
-          eggIncubators_ = com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto.getDefaultInstance();
+          eggIncubators_ = null;
         } else {
           eggIncubatorsBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000100);
         if (pokemonFamilyBuilder_ == null) {
-          pokemonFamily_ = com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto.getDefaultInstance();
+          pokemonFamily_ = null;
         } else {
           pokemonFamilyBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000200);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -12553,56 +13663,49 @@ public final class Inventory {
         if (other.hasPokemonFamily()) {
           mergePokemonFamily(other.getPokemonFamily());
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (hasItem()) {
           if (!getItem().isInitialized()) {
-            
             return false;
           }
         }
         if (hasPokedexEntry()) {
           if (!getPokedexEntry().isInitialized()) {
-            
             return false;
           }
         }
         if (hasPlayerStats()) {
           if (!getPlayerStats().isInitialized()) {
-            
             return false;
           }
         }
         if (hasPlayerCurrency()) {
           if (!getPlayerCurrency().isInitialized()) {
-            
             return false;
           }
         }
         if (hasPlayerCamera()) {
           if (!getPlayerCamera().isInitialized()) {
-            
             return false;
           }
         }
         if (hasInventoryUpgrades()) {
           if (!getInventoryUpgrades().isInitialized()) {
-            
             return false;
           }
         }
         if (hasEggIncubators()) {
           if (!getEggIncubators().isInitialized()) {
-            
             return false;
           }
         }
         if (hasPokemonFamily()) {
           if (!getPokemonFamily().isInitialized()) {
-            
             return false;
           }
         }
@@ -12618,7 +13721,7 @@ public final class Inventory {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.pokegoapi.main.Inventory.InventoryItemProto) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -12628,7 +13731,7 @@ public final class Inventory {
       }
       private int bitField0_;
 
-      private com.pokegoapi.main.Inventory.PokemonProto pokemon_ = com.pokegoapi.main.Inventory.PokemonProto.getDefaultInstance();
+      private com.pokegoapi.main.Inventory.PokemonProto pokemon_ = null;
       private com.google.protobuf.SingleFieldBuilder<
           com.pokegoapi.main.Inventory.PokemonProto, com.pokegoapi.main.Inventory.PokemonProto.Builder, com.pokegoapi.main.Inventory.PokemonProtoOrBuilder> pokemonBuilder_;
       /**
@@ -12642,7 +13745,7 @@ public final class Inventory {
        */
       public com.pokegoapi.main.Inventory.PokemonProto getPokemon() {
         if (pokemonBuilder_ == null) {
-          return pokemon_;
+          return pokemon_ == null ? com.pokegoapi.main.Inventory.PokemonProto.getDefaultInstance() : pokemon_;
         } else {
           return pokemonBuilder_.getMessage();
         }
@@ -12683,6 +13786,7 @@ public final class Inventory {
       public Builder mergePokemon(com.pokegoapi.main.Inventory.PokemonProto value) {
         if (pokemonBuilder_ == null) {
           if (((bitField0_ & 0x00000001) == 0x00000001) &&
+              pokemon_ != null &&
               pokemon_ != com.pokegoapi.main.Inventory.PokemonProto.getDefaultInstance()) {
             pokemon_ =
               com.pokegoapi.main.Inventory.PokemonProto.newBuilder(pokemon_).mergeFrom(value).buildPartial();
@@ -12701,7 +13805,7 @@ public final class Inventory {
        */
       public Builder clearPokemon() {
         if (pokemonBuilder_ == null) {
-          pokemon_ = com.pokegoapi.main.Inventory.PokemonProto.getDefaultInstance();
+          pokemon_ = null;
           onChanged();
         } else {
           pokemonBuilder_.clear();
@@ -12724,7 +13828,8 @@ public final class Inventory {
         if (pokemonBuilder_ != null) {
           return pokemonBuilder_.getMessageOrBuilder();
         } else {
-          return pokemon_;
+          return pokemon_ == null ?
+              com.pokegoapi.main.Inventory.PokemonProto.getDefaultInstance() : pokemon_;
         }
       }
       /**
@@ -12744,7 +13849,7 @@ public final class Inventory {
         return pokemonBuilder_;
       }
 
-      private com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto item_ = com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.getDefaultInstance();
+      private com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto item_ = null;
       private com.google.protobuf.SingleFieldBuilder<
           com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto, com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.Builder, com.pokegoapi.main.Inventory.InventoryItemProto.ItemProtoOrBuilder> itemBuilder_;
       /**
@@ -12758,7 +13863,7 @@ public final class Inventory {
        */
       public com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto getItem() {
         if (itemBuilder_ == null) {
-          return item_;
+          return item_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.getDefaultInstance() : item_;
         } else {
           return itemBuilder_.getMessage();
         }
@@ -12799,6 +13904,7 @@ public final class Inventory {
       public Builder mergeItem(com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto value) {
         if (itemBuilder_ == null) {
           if (((bitField0_ & 0x00000002) == 0x00000002) &&
+              item_ != null &&
               item_ != com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.getDefaultInstance()) {
             item_ =
               com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.newBuilder(item_).mergeFrom(value).buildPartial();
@@ -12817,7 +13923,7 @@ public final class Inventory {
        */
       public Builder clearItem() {
         if (itemBuilder_ == null) {
-          item_ = com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.getDefaultInstance();
+          item_ = null;
           onChanged();
         } else {
           itemBuilder_.clear();
@@ -12840,7 +13946,8 @@ public final class Inventory {
         if (itemBuilder_ != null) {
           return itemBuilder_.getMessageOrBuilder();
         } else {
-          return item_;
+          return item_ == null ?
+              com.pokegoapi.main.Inventory.InventoryItemProto.ItemProto.getDefaultInstance() : item_;
         }
       }
       /**
@@ -12860,7 +13967,7 @@ public final class Inventory {
         return itemBuilder_;
       }
 
-      private com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto pokedexEntry_ = com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto.getDefaultInstance();
+      private com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto pokedexEntry_ = null;
       private com.google.protobuf.SingleFieldBuilder<
           com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto, com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto.Builder, com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProtoOrBuilder> pokedexEntryBuilder_;
       /**
@@ -12874,7 +13981,7 @@ public final class Inventory {
        */
       public com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto getPokedexEntry() {
         if (pokedexEntryBuilder_ == null) {
-          return pokedexEntry_;
+          return pokedexEntry_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto.getDefaultInstance() : pokedexEntry_;
         } else {
           return pokedexEntryBuilder_.getMessage();
         }
@@ -12915,6 +14022,7 @@ public final class Inventory {
       public Builder mergePokedexEntry(com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto value) {
         if (pokedexEntryBuilder_ == null) {
           if (((bitField0_ & 0x00000004) == 0x00000004) &&
+              pokedexEntry_ != null &&
               pokedexEntry_ != com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto.getDefaultInstance()) {
             pokedexEntry_ =
               com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto.newBuilder(pokedexEntry_).mergeFrom(value).buildPartial();
@@ -12933,7 +14041,7 @@ public final class Inventory {
        */
       public Builder clearPokedexEntry() {
         if (pokedexEntryBuilder_ == null) {
-          pokedexEntry_ = com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto.getDefaultInstance();
+          pokedexEntry_ = null;
           onChanged();
         } else {
           pokedexEntryBuilder_.clear();
@@ -12956,7 +14064,8 @@ public final class Inventory {
         if (pokedexEntryBuilder_ != null) {
           return pokedexEntryBuilder_.getMessageOrBuilder();
         } else {
-          return pokedexEntry_;
+          return pokedexEntry_ == null ?
+              com.pokegoapi.main.Inventory.InventoryItemProto.PokedexEntryProto.getDefaultInstance() : pokedexEntry_;
         }
       }
       /**
@@ -12976,7 +14085,7 @@ public final class Inventory {
         return pokedexEntryBuilder_;
       }
 
-      private com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto playerStats_ = com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto.getDefaultInstance();
+      private com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto playerStats_ = null;
       private com.google.protobuf.SingleFieldBuilder<
           com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto, com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto.Builder, com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProtoOrBuilder> playerStatsBuilder_;
       /**
@@ -12990,7 +14099,7 @@ public final class Inventory {
        */
       public com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto getPlayerStats() {
         if (playerStatsBuilder_ == null) {
-          return playerStats_;
+          return playerStats_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto.getDefaultInstance() : playerStats_;
         } else {
           return playerStatsBuilder_.getMessage();
         }
@@ -13031,6 +14140,7 @@ public final class Inventory {
       public Builder mergePlayerStats(com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto value) {
         if (playerStatsBuilder_ == null) {
           if (((bitField0_ & 0x00000008) == 0x00000008) &&
+              playerStats_ != null &&
               playerStats_ != com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto.getDefaultInstance()) {
             playerStats_ =
               com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto.newBuilder(playerStats_).mergeFrom(value).buildPartial();
@@ -13049,7 +14159,7 @@ public final class Inventory {
        */
       public Builder clearPlayerStats() {
         if (playerStatsBuilder_ == null) {
-          playerStats_ = com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto.getDefaultInstance();
+          playerStats_ = null;
           onChanged();
         } else {
           playerStatsBuilder_.clear();
@@ -13072,7 +14182,8 @@ public final class Inventory {
         if (playerStatsBuilder_ != null) {
           return playerStatsBuilder_.getMessageOrBuilder();
         } else {
-          return playerStats_;
+          return playerStats_ == null ?
+              com.pokegoapi.main.Inventory.InventoryItemProto.PlayerStatsProto.getDefaultInstance() : playerStats_;
         }
       }
       /**
@@ -13092,7 +14203,7 @@ public final class Inventory {
         return playerStatsBuilder_;
       }
 
-      private com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto playerCurrency_ = com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto.getDefaultInstance();
+      private com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto playerCurrency_ = null;
       private com.google.protobuf.SingleFieldBuilder<
           com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto, com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto.Builder, com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProtoOrBuilder> playerCurrencyBuilder_;
       /**
@@ -13106,7 +14217,7 @@ public final class Inventory {
        */
       public com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto getPlayerCurrency() {
         if (playerCurrencyBuilder_ == null) {
-          return playerCurrency_;
+          return playerCurrency_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto.getDefaultInstance() : playerCurrency_;
         } else {
           return playerCurrencyBuilder_.getMessage();
         }
@@ -13147,6 +14258,7 @@ public final class Inventory {
       public Builder mergePlayerCurrency(com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto value) {
         if (playerCurrencyBuilder_ == null) {
           if (((bitField0_ & 0x00000010) == 0x00000010) &&
+              playerCurrency_ != null &&
               playerCurrency_ != com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto.getDefaultInstance()) {
             playerCurrency_ =
               com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto.newBuilder(playerCurrency_).mergeFrom(value).buildPartial();
@@ -13165,7 +14277,7 @@ public final class Inventory {
        */
       public Builder clearPlayerCurrency() {
         if (playerCurrencyBuilder_ == null) {
-          playerCurrency_ = com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto.getDefaultInstance();
+          playerCurrency_ = null;
           onChanged();
         } else {
           playerCurrencyBuilder_.clear();
@@ -13188,7 +14300,8 @@ public final class Inventory {
         if (playerCurrencyBuilder_ != null) {
           return playerCurrencyBuilder_.getMessageOrBuilder();
         } else {
-          return playerCurrency_;
+          return playerCurrency_ == null ?
+              com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCurrencyProto.getDefaultInstance() : playerCurrency_;
         }
       }
       /**
@@ -13208,7 +14321,7 @@ public final class Inventory {
         return playerCurrencyBuilder_;
       }
 
-      private com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto playerCamera_ = com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto.getDefaultInstance();
+      private com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto playerCamera_ = null;
       private com.google.protobuf.SingleFieldBuilder<
           com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto, com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto.Builder, com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProtoOrBuilder> playerCameraBuilder_;
       /**
@@ -13222,7 +14335,7 @@ public final class Inventory {
        */
       public com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto getPlayerCamera() {
         if (playerCameraBuilder_ == null) {
-          return playerCamera_;
+          return playerCamera_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto.getDefaultInstance() : playerCamera_;
         } else {
           return playerCameraBuilder_.getMessage();
         }
@@ -13263,6 +14376,7 @@ public final class Inventory {
       public Builder mergePlayerCamera(com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto value) {
         if (playerCameraBuilder_ == null) {
           if (((bitField0_ & 0x00000020) == 0x00000020) &&
+              playerCamera_ != null &&
               playerCamera_ != com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto.getDefaultInstance()) {
             playerCamera_ =
               com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto.newBuilder(playerCamera_).mergeFrom(value).buildPartial();
@@ -13281,7 +14395,7 @@ public final class Inventory {
        */
       public Builder clearPlayerCamera() {
         if (playerCameraBuilder_ == null) {
-          playerCamera_ = com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto.getDefaultInstance();
+          playerCamera_ = null;
           onChanged();
         } else {
           playerCameraBuilder_.clear();
@@ -13304,7 +14418,8 @@ public final class Inventory {
         if (playerCameraBuilder_ != null) {
           return playerCameraBuilder_.getMessageOrBuilder();
         } else {
-          return playerCamera_;
+          return playerCamera_ == null ?
+              com.pokegoapi.main.Inventory.InventoryItemProto.PlayerCameraProto.getDefaultInstance() : playerCamera_;
         }
       }
       /**
@@ -13324,7 +14439,7 @@ public final class Inventory {
         return playerCameraBuilder_;
       }
 
-      private com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto inventoryUpgrades_ = com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto.getDefaultInstance();
+      private com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto inventoryUpgrades_ = null;
       private com.google.protobuf.SingleFieldBuilder<
           com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto, com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto.Builder, com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProtoOrBuilder> inventoryUpgradesBuilder_;
       /**
@@ -13338,7 +14453,7 @@ public final class Inventory {
        */
       public com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto getInventoryUpgrades() {
         if (inventoryUpgradesBuilder_ == null) {
-          return inventoryUpgrades_;
+          return inventoryUpgrades_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto.getDefaultInstance() : inventoryUpgrades_;
         } else {
           return inventoryUpgradesBuilder_.getMessage();
         }
@@ -13379,6 +14494,7 @@ public final class Inventory {
       public Builder mergeInventoryUpgrades(com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto value) {
         if (inventoryUpgradesBuilder_ == null) {
           if (((bitField0_ & 0x00000040) == 0x00000040) &&
+              inventoryUpgrades_ != null &&
               inventoryUpgrades_ != com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto.getDefaultInstance()) {
             inventoryUpgrades_ =
               com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto.newBuilder(inventoryUpgrades_).mergeFrom(value).buildPartial();
@@ -13397,7 +14513,7 @@ public final class Inventory {
        */
       public Builder clearInventoryUpgrades() {
         if (inventoryUpgradesBuilder_ == null) {
-          inventoryUpgrades_ = com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto.getDefaultInstance();
+          inventoryUpgrades_ = null;
           onChanged();
         } else {
           inventoryUpgradesBuilder_.clear();
@@ -13420,7 +14536,8 @@ public final class Inventory {
         if (inventoryUpgradesBuilder_ != null) {
           return inventoryUpgradesBuilder_.getMessageOrBuilder();
         } else {
-          return inventoryUpgrades_;
+          return inventoryUpgrades_ == null ?
+              com.pokegoapi.main.Inventory.InventoryItemProto.InventoryUpgradesProto.getDefaultInstance() : inventoryUpgrades_;
         }
       }
       /**
@@ -13440,7 +14557,7 @@ public final class Inventory {
         return inventoryUpgradesBuilder_;
       }
 
-      private com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto appliedItem_ = com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto.getDefaultInstance();
+      private com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto appliedItem_ = null;
       private com.google.protobuf.SingleFieldBuilder<
           com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto, com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto.Builder, com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProtoOrBuilder> appliedItemBuilder_;
       /**
@@ -13454,7 +14571,7 @@ public final class Inventory {
        */
       public com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto getAppliedItem() {
         if (appliedItemBuilder_ == null) {
-          return appliedItem_;
+          return appliedItem_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto.getDefaultInstance() : appliedItem_;
         } else {
           return appliedItemBuilder_.getMessage();
         }
@@ -13495,6 +14612,7 @@ public final class Inventory {
       public Builder mergeAppliedItem(com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto value) {
         if (appliedItemBuilder_ == null) {
           if (((bitField0_ & 0x00000080) == 0x00000080) &&
+              appliedItem_ != null &&
               appliedItem_ != com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto.getDefaultInstance()) {
             appliedItem_ =
               com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto.newBuilder(appliedItem_).mergeFrom(value).buildPartial();
@@ -13513,7 +14631,7 @@ public final class Inventory {
        */
       public Builder clearAppliedItem() {
         if (appliedItemBuilder_ == null) {
-          appliedItem_ = com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto.getDefaultInstance();
+          appliedItem_ = null;
           onChanged();
         } else {
           appliedItemBuilder_.clear();
@@ -13536,7 +14654,8 @@ public final class Inventory {
         if (appliedItemBuilder_ != null) {
           return appliedItemBuilder_.getMessageOrBuilder();
         } else {
-          return appliedItem_;
+          return appliedItem_ == null ?
+              com.pokegoapi.main.Inventory.InventoryItemProto.AppliedItemProto.getDefaultInstance() : appliedItem_;
         }
       }
       /**
@@ -13556,7 +14675,7 @@ public final class Inventory {
         return appliedItemBuilder_;
       }
 
-      private com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto eggIncubators_ = com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto.getDefaultInstance();
+      private com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto eggIncubators_ = null;
       private com.google.protobuf.SingleFieldBuilder<
           com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto, com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto.Builder, com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProtoOrBuilder> eggIncubatorsBuilder_;
       /**
@@ -13570,7 +14689,7 @@ public final class Inventory {
        */
       public com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto getEggIncubators() {
         if (eggIncubatorsBuilder_ == null) {
-          return eggIncubators_;
+          return eggIncubators_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto.getDefaultInstance() : eggIncubators_;
         } else {
           return eggIncubatorsBuilder_.getMessage();
         }
@@ -13611,6 +14730,7 @@ public final class Inventory {
       public Builder mergeEggIncubators(com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto value) {
         if (eggIncubatorsBuilder_ == null) {
           if (((bitField0_ & 0x00000100) == 0x00000100) &&
+              eggIncubators_ != null &&
               eggIncubators_ != com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto.getDefaultInstance()) {
             eggIncubators_ =
               com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto.newBuilder(eggIncubators_).mergeFrom(value).buildPartial();
@@ -13629,7 +14749,7 @@ public final class Inventory {
        */
       public Builder clearEggIncubators() {
         if (eggIncubatorsBuilder_ == null) {
-          eggIncubators_ = com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto.getDefaultInstance();
+          eggIncubators_ = null;
           onChanged();
         } else {
           eggIncubatorsBuilder_.clear();
@@ -13652,7 +14772,8 @@ public final class Inventory {
         if (eggIncubatorsBuilder_ != null) {
           return eggIncubatorsBuilder_.getMessageOrBuilder();
         } else {
-          return eggIncubators_;
+          return eggIncubators_ == null ?
+              com.pokegoapi.main.Inventory.InventoryItemProto.EggIncubatorProto.getDefaultInstance() : eggIncubators_;
         }
       }
       /**
@@ -13672,7 +14793,7 @@ public final class Inventory {
         return eggIncubatorsBuilder_;
       }
 
-      private com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto pokemonFamily_ = com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto.getDefaultInstance();
+      private com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto pokemonFamily_ = null;
       private com.google.protobuf.SingleFieldBuilder<
           com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto, com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto.Builder, com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProtoOrBuilder> pokemonFamilyBuilder_;
       /**
@@ -13686,7 +14807,7 @@ public final class Inventory {
        */
       public com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto getPokemonFamily() {
         if (pokemonFamilyBuilder_ == null) {
-          return pokemonFamily_;
+          return pokemonFamily_ == null ? com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto.getDefaultInstance() : pokemonFamily_;
         } else {
           return pokemonFamilyBuilder_.getMessage();
         }
@@ -13727,6 +14848,7 @@ public final class Inventory {
       public Builder mergePokemonFamily(com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto value) {
         if (pokemonFamilyBuilder_ == null) {
           if (((bitField0_ & 0x00000200) == 0x00000200) &&
+              pokemonFamily_ != null &&
               pokemonFamily_ != com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto.getDefaultInstance()) {
             pokemonFamily_ =
               com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto.newBuilder(pokemonFamily_).mergeFrom(value).buildPartial();
@@ -13745,7 +14867,7 @@ public final class Inventory {
        */
       public Builder clearPokemonFamily() {
         if (pokemonFamilyBuilder_ == null) {
-          pokemonFamily_ = com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto.getDefaultInstance();
+          pokemonFamily_ = null;
           onChanged();
         } else {
           pokemonFamilyBuilder_.clear();
@@ -13768,7 +14890,8 @@ public final class Inventory {
         if (pokemonFamilyBuilder_ != null) {
           return pokemonFamilyBuilder_.getMessageOrBuilder();
         } else {
-          return pokemonFamily_;
+          return pokemonFamily_ == null ?
+              com.pokegoapi.main.Inventory.InventoryItemProto.PokemonFamilyProto.getDefaultInstance() : pokemonFamily_;
         }
       }
       /**
@@ -13791,12 +14914,39 @@ public final class Inventory {
       // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.InventoryItemProto)
     }
 
+    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto)
+    private static final com.pokegoapi.main.Inventory.InventoryItemProto DEFAULT_INSTANCE;
     static {
-      defaultInstance = new InventoryItemProto(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new com.pokegoapi.main.Inventory.InventoryItemProto();
     }
 
-    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.InventoryItemProto)
+    public static com.pokegoapi.main.Inventory.InventoryItemProto getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<InventoryItemProto>
+        PARSER = new com.google.protobuf.AbstractParser<InventoryItemProto>() {
+      public InventoryItemProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new InventoryItemProto(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<InventoryItemProto> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<InventoryItemProto> getParserForType() {
+      return PARSER;
+    }
+
+    public com.pokegoapi.main.Inventory.InventoryItemProto getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface TransferPokemonProtoOrBuilder extends
@@ -13813,43 +14963,34 @@ public final class Inventory {
     long getPokemonId();
   }
   /**
-   * Protobuf type {@code com.pokegoapi.main.TransferPokemonProto}
-   *
    * <pre>
    * POKEMON TRANSFER
    * </pre>
+   *
+   * Protobuf type {@code com.pokegoapi.main.TransferPokemonProto}
    */
-  public static final class TransferPokemonProto extends
+  public  static final class TransferPokemonProto extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:com.pokegoapi.main.TransferPokemonProto)
       TransferPokemonProtoOrBuilder {
     // Use TransferPokemonProto.newBuilder() to construct.
     private TransferPokemonProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private TransferPokemonProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final TransferPokemonProto defaultInstance;
-    public static TransferPokemonProto getDefaultInstance() {
-      return defaultInstance;
+    private TransferPokemonProto() {
+      pokemonId_ = 0L;
     }
 
-    public TransferPokemonProto getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private TransferPokemonProto(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -13879,7 +15020,7 @@ public final class Inventory {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -13895,21 +15036,6 @@ public final class Inventory {
       return com.pokegoapi.main.Inventory.internal_static_com_pokegoapi_main_TransferPokemonProto_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               com.pokegoapi.main.Inventory.TransferPokemonProto.class, com.pokegoapi.main.Inventory.TransferPokemonProto.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<TransferPokemonProto> PARSER =
-        new com.google.protobuf.AbstractParser<TransferPokemonProto>() {
-      public TransferPokemonProto parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new TransferPokemonProto(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<TransferPokemonProto> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -13928,9 +15054,6 @@ public final class Inventory {
       return pokemonId_;
     }
 
-    private void initFields() {
-      pokemonId_ = 0L;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -13947,16 +15070,14 @@ public final class Inventory {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeFixed64(1, pokemonId_);
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -13964,16 +15085,47 @@ public final class Inventory {
         size += com.google.protobuf.CodedOutputStream
           .computeFixed64Size(1, pokemonId_);
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.pokegoapi.main.Inventory.TransferPokemonProto)) {
+        return super.equals(obj);
+      }
+      com.pokegoapi.main.Inventory.TransferPokemonProto other = (com.pokegoapi.main.Inventory.TransferPokemonProto) obj;
+
+      boolean result = true;
+      result = result && (hasPokemonId() == other.hasPokemonId());
+      if (hasPokemonId()) {
+        result = result && (getPokemonId()
+            == other.getPokemonId());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptorForType().hashCode();
+      if (hasPokemonId()) {
+        hash = (37 * hash) + POKEMONID_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getPokemonId());
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static com.pokegoapi.main.Inventory.TransferPokemonProto parseFrom(
@@ -13999,42 +15151,53 @@ public final class Inventory {
     }
     public static com.pokegoapi.main.Inventory.TransferPokemonProto parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.TransferPokemonProto parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Inventory.TransferPokemonProto parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.TransferPokemonProto parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Inventory.TransferPokemonProto parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.TransferPokemonProto parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.pokegoapi.main.Inventory.TransferPokemonProto prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(com.pokegoapi.main.Inventory.TransferPokemonProto prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -14043,11 +15206,11 @@ public final class Inventory {
       return builder;
     }
     /**
-     * Protobuf type {@code com.pokegoapi.main.TransferPokemonProto}
-     *
      * <pre>
      * POKEMON TRANSFER
      * </pre>
+     *
+     * Protobuf type {@code com.pokegoapi.main.TransferPokemonProto}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
@@ -14079,19 +15242,11 @@ public final class Inventory {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         pokemonId_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -14138,13 +15293,13 @@ public final class Inventory {
         if (other.hasPokemonId()) {
           setPokemonId(other.getPokemonId());
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!hasPokemonId()) {
-          
           return false;
         }
         return true;
@@ -14159,7 +15314,7 @@ public final class Inventory {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.pokegoapi.main.Inventory.TransferPokemonProto) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -14204,12 +15359,39 @@ public final class Inventory {
       // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.TransferPokemonProto)
     }
 
+    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.TransferPokemonProto)
+    private static final com.pokegoapi.main.Inventory.TransferPokemonProto DEFAULT_INSTANCE;
     static {
-      defaultInstance = new TransferPokemonProto(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new com.pokegoapi.main.Inventory.TransferPokemonProto();
     }
 
-    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.TransferPokemonProto)
+    public static com.pokegoapi.main.Inventory.TransferPokemonProto getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<TransferPokemonProto>
+        PARSER = new com.google.protobuf.AbstractParser<TransferPokemonProto>() {
+      public TransferPokemonProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new TransferPokemonProto(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<TransferPokemonProto> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<TransferPokemonProto> getParserForType() {
+      return PARSER;
+    }
+
+    public com.pokegoapi.main.Inventory.TransferPokemonProto getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface TransferPokemonOutProtoOrBuilder extends
@@ -14237,37 +15419,29 @@ public final class Inventory {
   /**
    * Protobuf type {@code com.pokegoapi.main.TransferPokemonOutProto}
    */
-  public static final class TransferPokemonOutProto extends
+  public  static final class TransferPokemonOutProto extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:com.pokegoapi.main.TransferPokemonOutProto)
       TransferPokemonOutProtoOrBuilder {
     // Use TransferPokemonOutProto.newBuilder() to construct.
     private TransferPokemonOutProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private TransferPokemonOutProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final TransferPokemonOutProto defaultInstance;
-    public static TransferPokemonOutProto getDefaultInstance() {
-      return defaultInstance;
+    private TransferPokemonOutProto() {
+      status_ = 0;
+      candyAwarded_ = 0;
     }
 
-    public TransferPokemonOutProto getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private TransferPokemonOutProto(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -14302,7 +15476,7 @@ public final class Inventory {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -14318,21 +15492,6 @@ public final class Inventory {
       return com.pokegoapi.main.Inventory.internal_static_com_pokegoapi_main_TransferPokemonOutProto_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               com.pokegoapi.main.Inventory.TransferPokemonOutProto.class, com.pokegoapi.main.Inventory.TransferPokemonOutProto.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<TransferPokemonOutProto> PARSER =
-        new com.google.protobuf.AbstractParser<TransferPokemonOutProto>() {
-      public TransferPokemonOutProto parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new TransferPokemonOutProto(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<TransferPokemonOutProto> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -14366,10 +15525,6 @@ public final class Inventory {
       return candyAwarded_;
     }
 
-    private void initFields() {
-      status_ = 0;
-      candyAwarded_ = 0;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -14382,19 +15537,17 @@ public final class Inventory {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeInt32(1, status_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeInt32(2, candyAwarded_);
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -14406,16 +15559,55 @@ public final class Inventory {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(2, candyAwarded_);
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.pokegoapi.main.Inventory.TransferPokemonOutProto)) {
+        return super.equals(obj);
+      }
+      com.pokegoapi.main.Inventory.TransferPokemonOutProto other = (com.pokegoapi.main.Inventory.TransferPokemonOutProto) obj;
+
+      boolean result = true;
+      result = result && (hasStatus() == other.hasStatus());
+      if (hasStatus()) {
+        result = result && (getStatus()
+            == other.getStatus());
+      }
+      result = result && (hasCandyAwarded() == other.hasCandyAwarded());
+      if (hasCandyAwarded()) {
+        result = result && (getCandyAwarded()
+            == other.getCandyAwarded());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptorForType().hashCode();
+      if (hasStatus()) {
+        hash = (37 * hash) + STATUS_FIELD_NUMBER;
+        hash = (53 * hash) + getStatus();
+      }
+      if (hasCandyAwarded()) {
+        hash = (37 * hash) + CANDYAWARDED_FIELD_NUMBER;
+        hash = (53 * hash) + getCandyAwarded();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static com.pokegoapi.main.Inventory.TransferPokemonOutProto parseFrom(
@@ -14441,42 +15633,53 @@ public final class Inventory {
     }
     public static com.pokegoapi.main.Inventory.TransferPokemonOutProto parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.TransferPokemonOutProto parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Inventory.TransferPokemonOutProto parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.TransferPokemonOutProto parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Inventory.TransferPokemonOutProto parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.TransferPokemonOutProto parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.pokegoapi.main.Inventory.TransferPokemonOutProto prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(com.pokegoapi.main.Inventory.TransferPokemonOutProto prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -14517,10 +15720,6 @@ public final class Inventory {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         status_ = 0;
@@ -14528,10 +15727,6 @@ public final class Inventory {
         candyAwarded_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -14585,7 +15780,8 @@ public final class Inventory {
         if (other.hasCandyAwarded()) {
           setCandyAwarded(other.getCandyAwarded());
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
@@ -14602,7 +15798,7 @@ public final class Inventory {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.pokegoapi.main.Inventory.TransferPokemonOutProto) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -14679,12 +15875,39 @@ public final class Inventory {
       // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.TransferPokemonOutProto)
     }
 
+    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.TransferPokemonOutProto)
+    private static final com.pokegoapi.main.Inventory.TransferPokemonOutProto DEFAULT_INSTANCE;
     static {
-      defaultInstance = new TransferPokemonOutProto(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new com.pokegoapi.main.Inventory.TransferPokemonOutProto();
     }
 
-    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.TransferPokemonOutProto)
+    public static com.pokegoapi.main.Inventory.TransferPokemonOutProto getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<TransferPokemonOutProto>
+        PARSER = new com.google.protobuf.AbstractParser<TransferPokemonOutProto>() {
+      public TransferPokemonOutProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new TransferPokemonOutProto(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<TransferPokemonOutProto> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<TransferPokemonOutProto> getParserForType() {
+      return PARSER;
+    }
+
+    public com.pokegoapi.main.Inventory.TransferPokemonOutProto getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface EvolvePokemonProtoOrBuilder extends
@@ -14701,43 +15924,34 @@ public final class Inventory {
     long getPokemonId();
   }
   /**
-   * Protobuf type {@code com.pokegoapi.main.EvolvePokemonProto}
-   *
    * <pre>
    * EVOLVE
    * </pre>
+   *
+   * Protobuf type {@code com.pokegoapi.main.EvolvePokemonProto}
    */
-  public static final class EvolvePokemonProto extends
+  public  static final class EvolvePokemonProto extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:com.pokegoapi.main.EvolvePokemonProto)
       EvolvePokemonProtoOrBuilder {
     // Use EvolvePokemonProto.newBuilder() to construct.
     private EvolvePokemonProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private EvolvePokemonProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final EvolvePokemonProto defaultInstance;
-    public static EvolvePokemonProto getDefaultInstance() {
-      return defaultInstance;
+    private EvolvePokemonProto() {
+      pokemonId_ = 0L;
     }
 
-    public EvolvePokemonProto getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private EvolvePokemonProto(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -14767,7 +15981,7 @@ public final class Inventory {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -14783,21 +15997,6 @@ public final class Inventory {
       return com.pokegoapi.main.Inventory.internal_static_com_pokegoapi_main_EvolvePokemonProto_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               com.pokegoapi.main.Inventory.EvolvePokemonProto.class, com.pokegoapi.main.Inventory.EvolvePokemonProto.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<EvolvePokemonProto> PARSER =
-        new com.google.protobuf.AbstractParser<EvolvePokemonProto>() {
-      public EvolvePokemonProto parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new EvolvePokemonProto(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<EvolvePokemonProto> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -14816,9 +16015,6 @@ public final class Inventory {
       return pokemonId_;
     }
 
-    private void initFields() {
-      pokemonId_ = 0L;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -14835,16 +16031,14 @@ public final class Inventory {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeFixed64(1, pokemonId_);
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -14852,16 +16046,47 @@ public final class Inventory {
         size += com.google.protobuf.CodedOutputStream
           .computeFixed64Size(1, pokemonId_);
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.pokegoapi.main.Inventory.EvolvePokemonProto)) {
+        return super.equals(obj);
+      }
+      com.pokegoapi.main.Inventory.EvolvePokemonProto other = (com.pokegoapi.main.Inventory.EvolvePokemonProto) obj;
+
+      boolean result = true;
+      result = result && (hasPokemonId() == other.hasPokemonId());
+      if (hasPokemonId()) {
+        result = result && (getPokemonId()
+            == other.getPokemonId());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptorForType().hashCode();
+      if (hasPokemonId()) {
+        hash = (37 * hash) + POKEMONID_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getPokemonId());
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static com.pokegoapi.main.Inventory.EvolvePokemonProto parseFrom(
@@ -14887,42 +16112,53 @@ public final class Inventory {
     }
     public static com.pokegoapi.main.Inventory.EvolvePokemonProto parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.EvolvePokemonProto parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Inventory.EvolvePokemonProto parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.EvolvePokemonProto parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Inventory.EvolvePokemonProto parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.EvolvePokemonProto parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.pokegoapi.main.Inventory.EvolvePokemonProto prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(com.pokegoapi.main.Inventory.EvolvePokemonProto prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -14931,11 +16167,11 @@ public final class Inventory {
       return builder;
     }
     /**
-     * Protobuf type {@code com.pokegoapi.main.EvolvePokemonProto}
-     *
      * <pre>
      * EVOLVE
      * </pre>
+     *
+     * Protobuf type {@code com.pokegoapi.main.EvolvePokemonProto}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
@@ -14967,19 +16203,11 @@ public final class Inventory {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         pokemonId_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -15026,13 +16254,13 @@ public final class Inventory {
         if (other.hasPokemonId()) {
           setPokemonId(other.getPokemonId());
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!hasPokemonId()) {
-          
           return false;
         }
         return true;
@@ -15047,7 +16275,7 @@ public final class Inventory {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.pokegoapi.main.Inventory.EvolvePokemonProto) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -15092,12 +16320,39 @@ public final class Inventory {
       // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.EvolvePokemonProto)
     }
 
+    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.EvolvePokemonProto)
+    private static final com.pokegoapi.main.Inventory.EvolvePokemonProto DEFAULT_INSTANCE;
     static {
-      defaultInstance = new EvolvePokemonProto(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new com.pokegoapi.main.Inventory.EvolvePokemonProto();
     }
 
-    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.EvolvePokemonProto)
+    public static com.pokegoapi.main.Inventory.EvolvePokemonProto getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<EvolvePokemonProto>
+        PARSER = new com.google.protobuf.AbstractParser<EvolvePokemonProto>() {
+      public EvolvePokemonProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new EvolvePokemonProto(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<EvolvePokemonProto> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<EvolvePokemonProto> getParserForType() {
+      return PARSER;
+    }
+
+    public com.pokegoapi.main.Inventory.EvolvePokemonProto getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface EvolvePokemonOutProtoOrBuilder extends
@@ -15147,37 +16402,30 @@ public final class Inventory {
   /**
    * Protobuf type {@code com.pokegoapi.main.EvolvePokemonOutProto}
    */
-  public static final class EvolvePokemonOutProto extends
+  public  static final class EvolvePokemonOutProto extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:com.pokegoapi.main.EvolvePokemonOutProto)
       EvolvePokemonOutProtoOrBuilder {
     // Use EvolvePokemonOutProto.newBuilder() to construct.
     private EvolvePokemonOutProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private EvolvePokemonOutProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final EvolvePokemonOutProto defaultInstance;
-    public static EvolvePokemonOutProto getDefaultInstance() {
-      return defaultInstance;
+    private EvolvePokemonOutProto() {
+      result_ = 0;
+      expAwarded_ = 0;
+      candyAwarded_ = 0;
     }
 
-    public EvolvePokemonOutProto getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private EvolvePokemonOutProto(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -15230,7 +16478,7 @@ public final class Inventory {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -15246,21 +16494,6 @@ public final class Inventory {
       return com.pokegoapi.main.Inventory.internal_static_com_pokegoapi_main_EvolvePokemonOutProto_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               com.pokegoapi.main.Inventory.EvolvePokemonOutProto.class, com.pokegoapi.main.Inventory.EvolvePokemonOutProto.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<EvolvePokemonOutProto> PARSER =
-        new com.google.protobuf.AbstractParser<EvolvePokemonOutProto>() {
-      public EvolvePokemonOutProto parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new EvolvePokemonOutProto(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<EvolvePokemonOutProto> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -15291,13 +16524,13 @@ public final class Inventory {
      * <code>optional .com.pokegoapi.main.PokemonProto EvolvedPokemon = 2;</code>
      */
     public com.pokegoapi.main.Inventory.PokemonProto getEvolvedPokemon() {
-      return evolvedPokemon_;
+      return evolvedPokemon_ == null ? com.pokegoapi.main.Inventory.PokemonProto.getDefaultInstance() : evolvedPokemon_;
     }
     /**
      * <code>optional .com.pokegoapi.main.PokemonProto EvolvedPokemon = 2;</code>
      */
     public com.pokegoapi.main.Inventory.PokemonProtoOrBuilder getEvolvedPokemonOrBuilder() {
-      return evolvedPokemon_;
+      return evolvedPokemon_ == null ? com.pokegoapi.main.Inventory.PokemonProto.getDefaultInstance() : evolvedPokemon_;
     }
 
     public static final int EXPAWARDED_FIELD_NUMBER = 3;
@@ -15330,12 +16563,6 @@ public final class Inventory {
       return candyAwarded_;
     }
 
-    private void initFields() {
-      result_ = 0;
-      evolvedPokemon_ = com.pokegoapi.main.Inventory.PokemonProto.getDefaultInstance();
-      expAwarded_ = 0;
-      candyAwarded_ = 0;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -15352,12 +16579,11 @@ public final class Inventory {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeInt32(1, result_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeMessage(2, evolvedPokemon_);
+        output.writeMessage(2, getEvolvedPokemon());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeInt32(3, expAwarded_);
@@ -15365,12 +16591,11 @@ public final class Inventory {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeInt32(4, candyAwarded_);
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -15380,7 +16605,7 @@ public final class Inventory {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, evolvedPokemon_);
+          .computeMessageSize(2, getEvolvedPokemon());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
@@ -15390,16 +16615,73 @@ public final class Inventory {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(4, candyAwarded_);
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.pokegoapi.main.Inventory.EvolvePokemonOutProto)) {
+        return super.equals(obj);
+      }
+      com.pokegoapi.main.Inventory.EvolvePokemonOutProto other = (com.pokegoapi.main.Inventory.EvolvePokemonOutProto) obj;
+
+      boolean result = true;
+      result = result && (hasResult() == other.hasResult());
+      if (hasResult()) {
+        result = result && (getResult()
+            == other.getResult());
+      }
+      result = result && (hasEvolvedPokemon() == other.hasEvolvedPokemon());
+      if (hasEvolvedPokemon()) {
+        result = result && getEvolvedPokemon()
+            .equals(other.getEvolvedPokemon());
+      }
+      result = result && (hasExpAwarded() == other.hasExpAwarded());
+      if (hasExpAwarded()) {
+        result = result && (getExpAwarded()
+            == other.getExpAwarded());
+      }
+      result = result && (hasCandyAwarded() == other.hasCandyAwarded());
+      if (hasCandyAwarded()) {
+        result = result && (getCandyAwarded()
+            == other.getCandyAwarded());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptorForType().hashCode();
+      if (hasResult()) {
+        hash = (37 * hash) + RESULT_FIELD_NUMBER;
+        hash = (53 * hash) + getResult();
+      }
+      if (hasEvolvedPokemon()) {
+        hash = (37 * hash) + EVOLVEDPOKEMON_FIELD_NUMBER;
+        hash = (53 * hash) + getEvolvedPokemon().hashCode();
+      }
+      if (hasExpAwarded()) {
+        hash = (37 * hash) + EXPAWARDED_FIELD_NUMBER;
+        hash = (53 * hash) + getExpAwarded();
+      }
+      if (hasCandyAwarded()) {
+        hash = (37 * hash) + CANDYAWARDED_FIELD_NUMBER;
+        hash = (53 * hash) + getCandyAwarded();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static com.pokegoapi.main.Inventory.EvolvePokemonOutProto parseFrom(
@@ -15425,42 +16707,53 @@ public final class Inventory {
     }
     public static com.pokegoapi.main.Inventory.EvolvePokemonOutProto parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.EvolvePokemonOutProto parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Inventory.EvolvePokemonOutProto parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.EvolvePokemonOutProto parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Inventory.EvolvePokemonOutProto parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Inventory.EvolvePokemonOutProto parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.pokegoapi.main.Inventory.EvolvePokemonOutProto prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(com.pokegoapi.main.Inventory.EvolvePokemonOutProto prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -15502,16 +16795,12 @@ public final class Inventory {
           getEvolvedPokemonFieldBuilder();
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         result_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
         if (evolvedPokemonBuilder_ == null) {
-          evolvedPokemon_ = com.pokegoapi.main.Inventory.PokemonProto.getDefaultInstance();
+          evolvedPokemon_ = null;
         } else {
           evolvedPokemonBuilder_.clear();
         }
@@ -15521,10 +16810,6 @@ public final class Inventory {
         candyAwarded_ = 0;
         bitField0_ = (bitField0_ & ~0x00000008);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -15596,13 +16881,13 @@ public final class Inventory {
         if (other.hasCandyAwarded()) {
           setCandyAwarded(other.getCandyAwarded());
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!hasResult()) {
-          
           return false;
         }
         return true;
@@ -15617,7 +16902,7 @@ public final class Inventory {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.pokegoapi.main.Inventory.EvolvePokemonOutProto) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -15659,7 +16944,7 @@ public final class Inventory {
         return this;
       }
 
-      private com.pokegoapi.main.Inventory.PokemonProto evolvedPokemon_ = com.pokegoapi.main.Inventory.PokemonProto.getDefaultInstance();
+      private com.pokegoapi.main.Inventory.PokemonProto evolvedPokemon_ = null;
       private com.google.protobuf.SingleFieldBuilder<
           com.pokegoapi.main.Inventory.PokemonProto, com.pokegoapi.main.Inventory.PokemonProto.Builder, com.pokegoapi.main.Inventory.PokemonProtoOrBuilder> evolvedPokemonBuilder_;
       /**
@@ -15673,7 +16958,7 @@ public final class Inventory {
        */
       public com.pokegoapi.main.Inventory.PokemonProto getEvolvedPokemon() {
         if (evolvedPokemonBuilder_ == null) {
-          return evolvedPokemon_;
+          return evolvedPokemon_ == null ? com.pokegoapi.main.Inventory.PokemonProto.getDefaultInstance() : evolvedPokemon_;
         } else {
           return evolvedPokemonBuilder_.getMessage();
         }
@@ -15714,6 +16999,7 @@ public final class Inventory {
       public Builder mergeEvolvedPokemon(com.pokegoapi.main.Inventory.PokemonProto value) {
         if (evolvedPokemonBuilder_ == null) {
           if (((bitField0_ & 0x00000002) == 0x00000002) &&
+              evolvedPokemon_ != null &&
               evolvedPokemon_ != com.pokegoapi.main.Inventory.PokemonProto.getDefaultInstance()) {
             evolvedPokemon_ =
               com.pokegoapi.main.Inventory.PokemonProto.newBuilder(evolvedPokemon_).mergeFrom(value).buildPartial();
@@ -15732,7 +17018,7 @@ public final class Inventory {
        */
       public Builder clearEvolvedPokemon() {
         if (evolvedPokemonBuilder_ == null) {
-          evolvedPokemon_ = com.pokegoapi.main.Inventory.PokemonProto.getDefaultInstance();
+          evolvedPokemon_ = null;
           onChanged();
         } else {
           evolvedPokemonBuilder_.clear();
@@ -15755,7 +17041,8 @@ public final class Inventory {
         if (evolvedPokemonBuilder_ != null) {
           return evolvedPokemonBuilder_.getMessageOrBuilder();
         } else {
-          return evolvedPokemon_;
+          return evolvedPokemon_ == null ?
+              com.pokegoapi.main.Inventory.PokemonProto.getDefaultInstance() : evolvedPokemon_;
         }
       }
       /**
@@ -15842,102 +17129,129 @@ public final class Inventory {
       // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.EvolvePokemonOutProto)
     }
 
+    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.EvolvePokemonOutProto)
+    private static final com.pokegoapi.main.Inventory.EvolvePokemonOutProto DEFAULT_INSTANCE;
     static {
-      defaultInstance = new EvolvePokemonOutProto(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new com.pokegoapi.main.Inventory.EvolvePokemonOutProto();
     }
 
-    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.EvolvePokemonOutProto)
+    public static com.pokegoapi.main.Inventory.EvolvePokemonOutProto getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<EvolvePokemonOutProto>
+        PARSER = new com.google.protobuf.AbstractParser<EvolvePokemonOutProto>() {
+      public EvolvePokemonOutProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new EvolvePokemonOutProto(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<EvolvePokemonOutProto> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<EvolvePokemonOutProto> getParserForType() {
+      return PARSER;
+    }
+
+    public com.pokegoapi.main.Inventory.EvolvePokemonOutProto getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_InventoryRequestProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_InventoryRequestProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_PokemonProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_PokemonProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_InventoryResponseProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_InventoryResponseProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_InventoryResponseProto_InventoryItemResponseProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_InventoryResponseProto_InventoryItemResponseProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_InventoryItemProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_InventoryItemProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_InventoryItemProto_ItemProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_InventoryItemProto_ItemProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_InventoryItemProto_PokedexEntryProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_InventoryItemProto_PokedexEntryProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_InventoryItemProto_PlayerStatsProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_InventoryItemProto_PlayerStatsProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_InventoryItemProto_AppliedItemProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_InventoryItemProto_AppliedItemProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_InventoryItemProto_PlayerCameraProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_InventoryItemProto_PlayerCameraProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_InventoryItemProto_PlayerCurrencyProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_InventoryItemProto_PlayerCurrencyProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_InventoryItemProto_InventoryUpgradesProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_InventoryItemProto_InventoryUpgradesProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_InventoryItemProto_EggIncubatorProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_InventoryItemProto_EggIncubatorProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_InventoryItemProto_PokemonFamilyProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_InventoryItemProto_PokemonFamilyProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_TransferPokemonProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_TransferPokemonProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_TransferPokemonOutProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_TransferPokemonOutProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_EvolvePokemonProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_EvolvePokemonProto_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_EvolvePokemonOutProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_EvolvePokemonOutProto_fieldAccessorTable;
 
@@ -15945,7 +17259,7 @@ public final class Inventory {
       getDescriptor() {
     return descriptor;
   }
-  private static com.google.protobuf.Descriptors.FileDescriptor
+  private static  com.google.protobuf.Descriptors.FileDescriptor
       descriptor;
   static {
     java.lang.String[] descriptorData = {
