@@ -84,7 +84,7 @@ public class ProfileRequest extends Request {
 
 	
 
-	public ByteString getInput() 
+	public byte[] getInput() 
 	{
 		return null;
 	}

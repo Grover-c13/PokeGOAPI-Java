@@ -5,6 +5,7 @@ import java.util.List;
 
 import main.Pokemon.RequestEnvelop.AuthInfo;
 import main.RequestHandler;
+import requests.FortDetailsRequest;
 import requests.InventoryRequest;
 import requests.ProfileRequest;
 
@@ -53,6 +54,8 @@ public class PokemonGo
 	}
 	
 	
+	
+	
 	private void getInventory()
 	{
 		InventoryRequest invRequest = new InventoryRequest();
@@ -64,6 +67,17 @@ public class PokemonGo
 			this.pokemon.add(newPokemon);
 		}
 		
+	}
+	
+	
+	public FortDetails getFortDetails(String id, long lon, long lat)
+	{
+		FortDetailsRequest request = new FortDetailsRequest(id);
+		request.setLatitude(lat);
+		request.setLongitude(lon);
+		requestHandler.addRequest(request);
+		requestHandler.sendRequests();
+		return new FortDetails(request.getOutput());
 	}
 	
 }

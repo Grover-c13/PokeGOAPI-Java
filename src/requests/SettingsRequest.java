@@ -41,7 +41,7 @@ public class SettingsRequest extends Request {
 	}
 	
 
-	public ByteString getInput() 
+	public byte[] getInput() 
 	{
 		return null;
 	}

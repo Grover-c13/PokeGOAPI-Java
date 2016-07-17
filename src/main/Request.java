@@ -11,7 +11,7 @@ public abstract class Request
 	
 	public abstract int getRpcId();
 	public abstract void handleResponse(Payload payload);
-	public abstract ByteString getInput();
+	public abstract byte[] getInput();
 	
 	public Request()
 	{
@@ -30,7 +30,7 @@ public abstract class Request
 	{
 		if(getInput() != null)
 		{
-			builder.setData(getInput()).build();
+			builder.setData(ByteString.copyFrom(this.getInput())).build();
 		}
 		
 		return builder.build();

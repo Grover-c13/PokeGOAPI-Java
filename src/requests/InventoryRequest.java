@@ -70,9 +70,9 @@ public class InventoryRequest extends Request {
 	}
 
 
-	public ByteString getInput() 
+	public byte[] getInput() 
 	{
-		return builder.build().toByteString();
+		return builder.build().toByteArray();
 	}
 
 

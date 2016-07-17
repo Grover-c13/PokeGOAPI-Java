@@ -52,7 +52,9 @@ public class RequestHandler
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		try 
 		{
+			
 			RequestEnvelop request = builder.build();
+			System.out.println(request);
 			request.writeTo(stream);
 		} 
 		catch (IOException e1)

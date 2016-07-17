@@ -27200,6 +27200,2225 @@ public final class Pokemon {
     // @@protoc_insertion_point(class_scope:main.InventoryItemProto)
   }
 
+  public interface FortDetailsOutProtoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:main.FortDetailsOutProto)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional string Id = 1;</code>
+     */
+    boolean hasId();
+    /**
+     * <code>optional string Id = 1;</code>
+     */
+    java.lang.String getId();
+    /**
+     * <code>optional string Id = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getIdBytes();
+
+    /**
+     * <code>optional int32 Team = 2;</code>
+     */
+    boolean hasTeam();
+    /**
+     * <code>optional int32 Team = 2;</code>
+     */
+    int getTeam();
+
+    /**
+     * <code>optional string Name = 4;</code>
+     */
+    boolean hasName();
+    /**
+     * <code>optional string Name = 4;</code>
+     */
+    java.lang.String getName();
+    /**
+     * <code>optional string Name = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getNameBytes();
+
+    /**
+     * <code>optional string ImageUrl = 5;</code>
+     */
+    boolean hasImageUrl();
+    /**
+     * <code>optional string ImageUrl = 5;</code>
+     */
+    java.lang.String getImageUrl();
+    /**
+     * <code>optional string ImageUrl = 5;</code>
+     */
+    com.google.protobuf.ByteString
+        getImageUrlBytes();
+
+    /**
+     * <code>optional int32 Fp = 6;</code>
+     */
+    boolean hasFp();
+    /**
+     * <code>optional int32 Fp = 6;</code>
+     */
+    int getFp();
+
+    /**
+     * <code>optional int32 Stamina = 7;</code>
+     */
+    boolean hasStamina();
+    /**
+     * <code>optional int32 Stamina = 7;</code>
+     */
+    int getStamina();
+
+    /**
+     * <code>optional int32 MaxStamina = 8;</code>
+     */
+    boolean hasMaxStamina();
+    /**
+     * <code>optional int32 MaxStamina = 8;</code>
+     */
+    int getMaxStamina();
+
+    /**
+     * <code>optional int32 FortType = 9;</code>
+     */
+    boolean hasFortType();
+    /**
+     * <code>optional int32 FortType = 9;</code>
+     */
+    int getFortType();
+
+    /**
+     * <code>optional int64 Latitude = 10;</code>
+     */
+    boolean hasLatitude();
+    /**
+     * <code>optional int64 Latitude = 10;</code>
+     */
+    long getLatitude();
+
+    /**
+     * <code>optional int64 Longitude = 11;</code>
+     */
+    boolean hasLongitude();
+    /**
+     * <code>optional int64 Longitude = 11;</code>
+     */
+    long getLongitude();
+
+    /**
+     * <code>optional string Description = 12;</code>
+     */
+    boolean hasDescription();
+    /**
+     * <code>optional string Description = 12;</code>
+     */
+    java.lang.String getDescription();
+    /**
+     * <code>optional string Description = 12;</code>
+     */
+    com.google.protobuf.ByteString
+        getDescriptionBytes();
+
+    /**
+     * <code>optional double Modifier = 13;</code>
+     */
+    boolean hasModifier();
+    /**
+     * <code>optional double Modifier = 13;</code>
+     */
+    double getModifier();
+  }
+  /**
+   * Protobuf type {@code main.FortDetailsOutProto}
+   *
+   * <pre>
+   * FORT SEARCH
+   * </pre>
+   */
+  public static final class FortDetailsOutProto extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:main.FortDetailsOutProto)
+      FortDetailsOutProtoOrBuilder {
+    // Use FortDetailsOutProto.newBuilder() to construct.
+    private FortDetailsOutProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private FortDetailsOutProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final FortDetailsOutProto defaultInstance;
+    public static FortDetailsOutProto getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public FortDetailsOutProto getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private FortDetailsOutProto(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000001;
+              id_ = bs;
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              team_ = input.readInt32();
+              break;
+            }
+            case 34: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000004;
+              name_ = bs;
+              break;
+            }
+            case 42: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000008;
+              imageUrl_ = bs;
+              break;
+            }
+            case 48: {
+              bitField0_ |= 0x00000010;
+              fp_ = input.readInt32();
+              break;
+            }
+            case 56: {
+              bitField0_ |= 0x00000020;
+              stamina_ = input.readInt32();
+              break;
+            }
+            case 64: {
+              bitField0_ |= 0x00000040;
+              maxStamina_ = input.readInt32();
+              break;
+            }
+            case 72: {
+              bitField0_ |= 0x00000080;
+              fortType_ = input.readInt32();
+              break;
+            }
+            case 80: {
+              bitField0_ |= 0x00000100;
+              latitude_ = input.readInt64();
+              break;
+            }
+            case 88: {
+              bitField0_ |= 0x00000200;
+              longitude_ = input.readInt64();
+              break;
+            }
+            case 98: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000400;
+              description_ = bs;
+              break;
+            }
+            case 105: {
+              bitField0_ |= 0x00000800;
+              modifier_ = input.readDouble();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return main.Pokemon.internal_static_main_FortDetailsOutProto_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return main.Pokemon.internal_static_main_FortDetailsOutProto_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              main.Pokemon.FortDetailsOutProto.class, main.Pokemon.FortDetailsOutProto.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<FortDetailsOutProto> PARSER =
+        new com.google.protobuf.AbstractParser<FortDetailsOutProto>() {
+      public FortDetailsOutProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new FortDetailsOutProto(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FortDetailsOutProto> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    public static final int ID_FIELD_NUMBER = 1;
+    private java.lang.Object id_;
+    /**
+     * <code>optional string Id = 1;</code>
+     */
+    public boolean hasId() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional string Id = 1;</code>
+     */
+    public java.lang.String getId() {
+      java.lang.Object ref = id_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          id_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string Id = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getIdBytes() {
+      java.lang.Object ref = id_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        id_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int TEAM_FIELD_NUMBER = 2;
+    private int team_;
+    /**
+     * <code>optional int32 Team = 2;</code>
+     */
+    public boolean hasTeam() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional int32 Team = 2;</code>
+     */
+    public int getTeam() {
+      return team_;
+    }
+
+    public static final int NAME_FIELD_NUMBER = 4;
+    private java.lang.Object name_;
+    /**
+     * <code>optional string Name = 4;</code>
+     */
+    public boolean hasName() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional string Name = 4;</code>
+     */
+    public java.lang.String getName() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          name_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string Name = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getNameBytes() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        name_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int IMAGEURL_FIELD_NUMBER = 5;
+    private java.lang.Object imageUrl_;
+    /**
+     * <code>optional string ImageUrl = 5;</code>
+     */
+    public boolean hasImageUrl() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional string ImageUrl = 5;</code>
+     */
+    public java.lang.String getImageUrl() {
+      java.lang.Object ref = imageUrl_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          imageUrl_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string ImageUrl = 5;</code>
+     */
+    public com.google.protobuf.ByteString
+        getImageUrlBytes() {
+      java.lang.Object ref = imageUrl_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        imageUrl_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int FP_FIELD_NUMBER = 6;
+    private int fp_;
+    /**
+     * <code>optional int32 Fp = 6;</code>
+     */
+    public boolean hasFp() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional int32 Fp = 6;</code>
+     */
+    public int getFp() {
+      return fp_;
+    }
+
+    public static final int STAMINA_FIELD_NUMBER = 7;
+    private int stamina_;
+    /**
+     * <code>optional int32 Stamina = 7;</code>
+     */
+    public boolean hasStamina() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional int32 Stamina = 7;</code>
+     */
+    public int getStamina() {
+      return stamina_;
+    }
+
+    public static final int MAXSTAMINA_FIELD_NUMBER = 8;
+    private int maxStamina_;
+    /**
+     * <code>optional int32 MaxStamina = 8;</code>
+     */
+    public boolean hasMaxStamina() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional int32 MaxStamina = 8;</code>
+     */
+    public int getMaxStamina() {
+      return maxStamina_;
+    }
+
+    public static final int FORTTYPE_FIELD_NUMBER = 9;
+    private int fortType_;
+    /**
+     * <code>optional int32 FortType = 9;</code>
+     */
+    public boolean hasFortType() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional int32 FortType = 9;</code>
+     */
+    public int getFortType() {
+      return fortType_;
+    }
+
+    public static final int LATITUDE_FIELD_NUMBER = 10;
+    private long latitude_;
+    /**
+     * <code>optional int64 Latitude = 10;</code>
+     */
+    public boolean hasLatitude() {
+      return ((bitField0_ & 0x00000100) == 0x00000100);
+    }
+    /**
+     * <code>optional int64 Latitude = 10;</code>
+     */
+    public long getLatitude() {
+      return latitude_;
+    }
+
+    public static final int LONGITUDE_FIELD_NUMBER = 11;
+    private long longitude_;
+    /**
+     * <code>optional int64 Longitude = 11;</code>
+     */
+    public boolean hasLongitude() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    /**
+     * <code>optional int64 Longitude = 11;</code>
+     */
+    public long getLongitude() {
+      return longitude_;
+    }
+
+    public static final int DESCRIPTION_FIELD_NUMBER = 12;
+    private java.lang.Object description_;
+    /**
+     * <code>optional string Description = 12;</code>
+     */
+    public boolean hasDescription() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>optional string Description = 12;</code>
+     */
+    public java.lang.String getDescription() {
+      java.lang.Object ref = description_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          description_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string Description = 12;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDescriptionBytes() {
+      java.lang.Object ref = description_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        description_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int MODIFIER_FIELD_NUMBER = 13;
+    private double modifier_;
+    /**
+     * <code>optional double Modifier = 13;</code>
+     */
+    public boolean hasModifier() {
+      return ((bitField0_ & 0x00000800) == 0x00000800);
+    }
+    /**
+     * <code>optional double Modifier = 13;</code>
+     */
+    public double getModifier() {
+      return modifier_;
+    }
+
+    private void initFields() {
+      id_ = "";
+      team_ = 0;
+      name_ = "";
+      imageUrl_ = "";
+      fp_ = 0;
+      stamina_ = 0;
+      maxStamina_ = 0;
+      fortType_ = 0;
+      latitude_ = 0L;
+      longitude_ = 0L;
+      description_ = "";
+      modifier_ = 0D;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(1, getIdBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeInt32(2, team_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBytes(4, getNameBytes());
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeBytes(5, getImageUrlBytes());
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeInt32(6, fp_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeInt32(7, stamina_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeInt32(8, maxStamina_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeInt32(9, fortType_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        output.writeInt64(10, latitude_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeInt64(11, longitude_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeBytes(12, getDescriptionBytes());
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeDouble(13, modifier_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, getIdBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, team_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(4, getNameBytes());
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(5, getImageUrlBytes());
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(6, fp_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(7, stamina_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(8, maxStamina_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(9, fortType_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(10, latitude_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(11, longitude_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(12, getDescriptionBytes());
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(13, modifier_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static main.Pokemon.FortDetailsOutProto parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static main.Pokemon.FortDetailsOutProto parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static main.Pokemon.FortDetailsOutProto parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static main.Pokemon.FortDetailsOutProto parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static main.Pokemon.FortDetailsOutProto parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static main.Pokemon.FortDetailsOutProto parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static main.Pokemon.FortDetailsOutProto parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static main.Pokemon.FortDetailsOutProto parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static main.Pokemon.FortDetailsOutProto parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static main.Pokemon.FortDetailsOutProto parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(main.Pokemon.FortDetailsOutProto prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code main.FortDetailsOutProto}
+     *
+     * <pre>
+     * FORT SEARCH
+     * </pre>
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:main.FortDetailsOutProto)
+        main.Pokemon.FortDetailsOutProtoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return main.Pokemon.internal_static_main_FortDetailsOutProto_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return main.Pokemon.internal_static_main_FortDetailsOutProto_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                main.Pokemon.FortDetailsOutProto.class, main.Pokemon.FortDetailsOutProto.Builder.class);
+      }
+
+      // Construct using main.Pokemon.FortDetailsOutProto.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        id_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        team_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        name_ = "";
+        bitField0_ = (bitField0_ & ~0x00000004);
+        imageUrl_ = "";
+        bitField0_ = (bitField0_ & ~0x00000008);
+        fp_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        stamina_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000020);
+        maxStamina_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000040);
+        fortType_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000080);
+        latitude_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000100);
+        longitude_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000200);
+        description_ = "";
+        bitField0_ = (bitField0_ & ~0x00000400);
+        modifier_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00000800);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return main.Pokemon.internal_static_main_FortDetailsOutProto_descriptor;
+      }
+
+      public main.Pokemon.FortDetailsOutProto getDefaultInstanceForType() {
+        return main.Pokemon.FortDetailsOutProto.getDefaultInstance();
+      }
+
+      public main.Pokemon.FortDetailsOutProto build() {
+        main.Pokemon.FortDetailsOutProto result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public main.Pokemon.FortDetailsOutProto buildPartial() {
+        main.Pokemon.FortDetailsOutProto result = new main.Pokemon.FortDetailsOutProto(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.id_ = id_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.team_ = team_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.name_ = name_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.imageUrl_ = imageUrl_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.fp_ = fp_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.stamina_ = stamina_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.maxStamina_ = maxStamina_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.fortType_ = fortType_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000100;
+        }
+        result.latitude_ = latitude_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000200;
+        }
+        result.longitude_ = longitude_;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        result.description_ = description_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000800;
+        }
+        result.modifier_ = modifier_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof main.Pokemon.FortDetailsOutProto) {
+          return mergeFrom((main.Pokemon.FortDetailsOutProto)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(main.Pokemon.FortDetailsOutProto other) {
+        if (other == main.Pokemon.FortDetailsOutProto.getDefaultInstance()) return this;
+        if (other.hasId()) {
+          bitField0_ |= 0x00000001;
+          id_ = other.id_;
+          onChanged();
+        }
+        if (other.hasTeam()) {
+          setTeam(other.getTeam());
+        }
+        if (other.hasName()) {
+          bitField0_ |= 0x00000004;
+          name_ = other.name_;
+          onChanged();
+        }
+        if (other.hasImageUrl()) {
+          bitField0_ |= 0x00000008;
+          imageUrl_ = other.imageUrl_;
+          onChanged();
+        }
+        if (other.hasFp()) {
+          setFp(other.getFp());
+        }
+        if (other.hasStamina()) {
+          setStamina(other.getStamina());
+        }
+        if (other.hasMaxStamina()) {
+          setMaxStamina(other.getMaxStamina());
+        }
+        if (other.hasFortType()) {
+          setFortType(other.getFortType());
+        }
+        if (other.hasLatitude()) {
+          setLatitude(other.getLatitude());
+        }
+        if (other.hasLongitude()) {
+          setLongitude(other.getLongitude());
+        }
+        if (other.hasDescription()) {
+          bitField0_ |= 0x00000400;
+          description_ = other.description_;
+          onChanged();
+        }
+        if (other.hasModifier()) {
+          setModifier(other.getModifier());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        main.Pokemon.FortDetailsOutProto parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (main.Pokemon.FortDetailsOutProto) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object id_ = "";
+      /**
+       * <code>optional string Id = 1;</code>
+       */
+      public boolean hasId() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional string Id = 1;</code>
+       */
+      public java.lang.String getId() {
+        java.lang.Object ref = id_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            id_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string Id = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getIdBytes() {
+        java.lang.Object ref = id_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          id_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string Id = 1;</code>
+       */
+      public Builder setId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        id_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string Id = 1;</code>
+       */
+      public Builder clearId() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        id_ = getDefaultInstance().getId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string Id = 1;</code>
+       */
+      public Builder setIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        id_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int team_ ;
+      /**
+       * <code>optional int32 Team = 2;</code>
+       */
+      public boolean hasTeam() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional int32 Team = 2;</code>
+       */
+      public int getTeam() {
+        return team_;
+      }
+      /**
+       * <code>optional int32 Team = 2;</code>
+       */
+      public Builder setTeam(int value) {
+        bitField0_ |= 0x00000002;
+        team_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 Team = 2;</code>
+       */
+      public Builder clearTeam() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        team_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object name_ = "";
+      /**
+       * <code>optional string Name = 4;</code>
+       */
+      public boolean hasName() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional string Name = 4;</code>
+       */
+      public java.lang.String getName() {
+        java.lang.Object ref = name_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            name_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string Name = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getNameBytes() {
+        java.lang.Object ref = name_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          name_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string Name = 4;</code>
+       */
+      public Builder setName(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        name_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string Name = 4;</code>
+       */
+      public Builder clearName() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        name_ = getDefaultInstance().getName();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string Name = 4;</code>
+       */
+      public Builder setNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        name_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object imageUrl_ = "";
+      /**
+       * <code>optional string ImageUrl = 5;</code>
+       */
+      public boolean hasImageUrl() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional string ImageUrl = 5;</code>
+       */
+      public java.lang.String getImageUrl() {
+        java.lang.Object ref = imageUrl_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            imageUrl_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string ImageUrl = 5;</code>
+       */
+      public com.google.protobuf.ByteString
+          getImageUrlBytes() {
+        java.lang.Object ref = imageUrl_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          imageUrl_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string ImageUrl = 5;</code>
+       */
+      public Builder setImageUrl(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000008;
+        imageUrl_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string ImageUrl = 5;</code>
+       */
+      public Builder clearImageUrl() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        imageUrl_ = getDefaultInstance().getImageUrl();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string ImageUrl = 5;</code>
+       */
+      public Builder setImageUrlBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000008;
+        imageUrl_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int fp_ ;
+      /**
+       * <code>optional int32 Fp = 6;</code>
+       */
+      public boolean hasFp() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional int32 Fp = 6;</code>
+       */
+      public int getFp() {
+        return fp_;
+      }
+      /**
+       * <code>optional int32 Fp = 6;</code>
+       */
+      public Builder setFp(int value) {
+        bitField0_ |= 0x00000010;
+        fp_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 Fp = 6;</code>
+       */
+      public Builder clearFp() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        fp_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int stamina_ ;
+      /**
+       * <code>optional int32 Stamina = 7;</code>
+       */
+      public boolean hasStamina() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional int32 Stamina = 7;</code>
+       */
+      public int getStamina() {
+        return stamina_;
+      }
+      /**
+       * <code>optional int32 Stamina = 7;</code>
+       */
+      public Builder setStamina(int value) {
+        bitField0_ |= 0x00000020;
+        stamina_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 Stamina = 7;</code>
+       */
+      public Builder clearStamina() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        stamina_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int maxStamina_ ;
+      /**
+       * <code>optional int32 MaxStamina = 8;</code>
+       */
+      public boolean hasMaxStamina() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>optional int32 MaxStamina = 8;</code>
+       */
+      public int getMaxStamina() {
+        return maxStamina_;
+      }
+      /**
+       * <code>optional int32 MaxStamina = 8;</code>
+       */
+      public Builder setMaxStamina(int value) {
+        bitField0_ |= 0x00000040;
+        maxStamina_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 MaxStamina = 8;</code>
+       */
+      public Builder clearMaxStamina() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        maxStamina_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int fortType_ ;
+      /**
+       * <code>optional int32 FortType = 9;</code>
+       */
+      public boolean hasFortType() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional int32 FortType = 9;</code>
+       */
+      public int getFortType() {
+        return fortType_;
+      }
+      /**
+       * <code>optional int32 FortType = 9;</code>
+       */
+      public Builder setFortType(int value) {
+        bitField0_ |= 0x00000080;
+        fortType_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 FortType = 9;</code>
+       */
+      public Builder clearFortType() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        fortType_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private long latitude_ ;
+      /**
+       * <code>optional int64 Latitude = 10;</code>
+       */
+      public boolean hasLatitude() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      /**
+       * <code>optional int64 Latitude = 10;</code>
+       */
+      public long getLatitude() {
+        return latitude_;
+      }
+      /**
+       * <code>optional int64 Latitude = 10;</code>
+       */
+      public Builder setLatitude(long value) {
+        bitField0_ |= 0x00000100;
+        latitude_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 Latitude = 10;</code>
+       */
+      public Builder clearLatitude() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        latitude_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long longitude_ ;
+      /**
+       * <code>optional int64 Longitude = 11;</code>
+       */
+      public boolean hasLongitude() {
+        return ((bitField0_ & 0x00000200) == 0x00000200);
+      }
+      /**
+       * <code>optional int64 Longitude = 11;</code>
+       */
+      public long getLongitude() {
+        return longitude_;
+      }
+      /**
+       * <code>optional int64 Longitude = 11;</code>
+       */
+      public Builder setLongitude(long value) {
+        bitField0_ |= 0x00000200;
+        longitude_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 Longitude = 11;</code>
+       */
+      public Builder clearLongitude() {
+        bitField0_ = (bitField0_ & ~0x00000200);
+        longitude_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object description_ = "";
+      /**
+       * <code>optional string Description = 12;</code>
+       */
+      public boolean hasDescription() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      /**
+       * <code>optional string Description = 12;</code>
+       */
+      public java.lang.String getDescription() {
+        java.lang.Object ref = description_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            description_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string Description = 12;</code>
+       */
+      public com.google.protobuf.ByteString
+          getDescriptionBytes() {
+        java.lang.Object ref = description_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          description_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string Description = 12;</code>
+       */
+      public Builder setDescription(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000400;
+        description_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string Description = 12;</code>
+       */
+      public Builder clearDescription() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        description_ = getDefaultInstance().getDescription();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string Description = 12;</code>
+       */
+      public Builder setDescriptionBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000400;
+        description_ = value;
+        onChanged();
+        return this;
+      }
+
+      private double modifier_ ;
+      /**
+       * <code>optional double Modifier = 13;</code>
+       */
+      public boolean hasModifier() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional double Modifier = 13;</code>
+       */
+      public double getModifier() {
+        return modifier_;
+      }
+      /**
+       * <code>optional double Modifier = 13;</code>
+       */
+      public Builder setModifier(double value) {
+        bitField0_ |= 0x00000800;
+        modifier_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional double Modifier = 13;</code>
+       */
+      public Builder clearModifier() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        modifier_ = 0D;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:main.FortDetailsOutProto)
+    }
+
+    static {
+      defaultInstance = new FortDetailsOutProto(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:main.FortDetailsOutProto)
+  }
+
+  public interface FortDetailsProtoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:main.FortDetailsProto)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>required string Id = 1;</code>
+     */
+    boolean hasId();
+    /**
+     * <code>required string Id = 1;</code>
+     */
+    java.lang.String getId();
+    /**
+     * <code>required string Id = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getIdBytes();
+
+    /**
+     * <code>optional int64 Latitude = 2;</code>
+     */
+    boolean hasLatitude();
+    /**
+     * <code>optional int64 Latitude = 2;</code>
+     */
+    long getLatitude();
+
+    /**
+     * <code>optional int64 Longitude = 3;</code>
+     */
+    boolean hasLongitude();
+    /**
+     * <code>optional int64 Longitude = 3;</code>
+     */
+    long getLongitude();
+  }
+  /**
+   * Protobuf type {@code main.FortDetailsProto}
+   */
+  public static final class FortDetailsProto extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:main.FortDetailsProto)
+      FortDetailsProtoOrBuilder {
+    // Use FortDetailsProto.newBuilder() to construct.
+    private FortDetailsProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private FortDetailsProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final FortDetailsProto defaultInstance;
+    public static FortDetailsProto getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public FortDetailsProto getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private FortDetailsProto(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000001;
+              id_ = bs;
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              latitude_ = input.readInt64();
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
+              longitude_ = input.readInt64();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return main.Pokemon.internal_static_main_FortDetailsProto_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return main.Pokemon.internal_static_main_FortDetailsProto_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              main.Pokemon.FortDetailsProto.class, main.Pokemon.FortDetailsProto.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<FortDetailsProto> PARSER =
+        new com.google.protobuf.AbstractParser<FortDetailsProto>() {
+      public FortDetailsProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new FortDetailsProto(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FortDetailsProto> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    public static final int ID_FIELD_NUMBER = 1;
+    private java.lang.Object id_;
+    /**
+     * <code>required string Id = 1;</code>
+     */
+    public boolean hasId() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>required string Id = 1;</code>
+     */
+    public java.lang.String getId() {
+      java.lang.Object ref = id_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          id_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>required string Id = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getIdBytes() {
+      java.lang.Object ref = id_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        id_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int LATITUDE_FIELD_NUMBER = 2;
+    private long latitude_;
+    /**
+     * <code>optional int64 Latitude = 2;</code>
+     */
+    public boolean hasLatitude() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional int64 Latitude = 2;</code>
+     */
+    public long getLatitude() {
+      return latitude_;
+    }
+
+    public static final int LONGITUDE_FIELD_NUMBER = 3;
+    private long longitude_;
+    /**
+     * <code>optional int64 Longitude = 3;</code>
+     */
+    public boolean hasLongitude() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional int64 Longitude = 3;</code>
+     */
+    public long getLongitude() {
+      return longitude_;
+    }
+
+    private void initFields() {
+      id_ = "";
+      latitude_ = 0L;
+      longitude_ = 0L;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      if (!hasId()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(1, getIdBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeInt64(2, latitude_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeInt64(3, longitude_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, getIdBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(2, latitude_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(3, longitude_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static main.Pokemon.FortDetailsProto parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static main.Pokemon.FortDetailsProto parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static main.Pokemon.FortDetailsProto parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static main.Pokemon.FortDetailsProto parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static main.Pokemon.FortDetailsProto parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static main.Pokemon.FortDetailsProto parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static main.Pokemon.FortDetailsProto parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static main.Pokemon.FortDetailsProto parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static main.Pokemon.FortDetailsProto parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static main.Pokemon.FortDetailsProto parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(main.Pokemon.FortDetailsProto prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code main.FortDetailsProto}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:main.FortDetailsProto)
+        main.Pokemon.FortDetailsProtoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return main.Pokemon.internal_static_main_FortDetailsProto_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return main.Pokemon.internal_static_main_FortDetailsProto_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                main.Pokemon.FortDetailsProto.class, main.Pokemon.FortDetailsProto.Builder.class);
+      }
+
+      // Construct using main.Pokemon.FortDetailsProto.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        id_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        latitude_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        longitude_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return main.Pokemon.internal_static_main_FortDetailsProto_descriptor;
+      }
+
+      public main.Pokemon.FortDetailsProto getDefaultInstanceForType() {
+        return main.Pokemon.FortDetailsProto.getDefaultInstance();
+      }
+
+      public main.Pokemon.FortDetailsProto build() {
+        main.Pokemon.FortDetailsProto result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public main.Pokemon.FortDetailsProto buildPartial() {
+        main.Pokemon.FortDetailsProto result = new main.Pokemon.FortDetailsProto(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.id_ = id_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.latitude_ = latitude_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.longitude_ = longitude_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof main.Pokemon.FortDetailsProto) {
+          return mergeFrom((main.Pokemon.FortDetailsProto)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(main.Pokemon.FortDetailsProto other) {
+        if (other == main.Pokemon.FortDetailsProto.getDefaultInstance()) return this;
+        if (other.hasId()) {
+          bitField0_ |= 0x00000001;
+          id_ = other.id_;
+          onChanged();
+        }
+        if (other.hasLatitude()) {
+          setLatitude(other.getLatitude());
+        }
+        if (other.hasLongitude()) {
+          setLongitude(other.getLongitude());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        if (!hasId()) {
+          
+          return false;
+        }
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        main.Pokemon.FortDetailsProto parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (main.Pokemon.FortDetailsProto) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object id_ = "";
+      /**
+       * <code>required string Id = 1;</code>
+       */
+      public boolean hasId() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>required string Id = 1;</code>
+       */
+      public java.lang.String getId() {
+        java.lang.Object ref = id_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            id_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>required string Id = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getIdBytes() {
+        java.lang.Object ref = id_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          id_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>required string Id = 1;</code>
+       */
+      public Builder setId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        id_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string Id = 1;</code>
+       */
+      public Builder clearId() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        id_ = getDefaultInstance().getId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string Id = 1;</code>
+       */
+      public Builder setIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        id_ = value;
+        onChanged();
+        return this;
+      }
+
+      private long latitude_ ;
+      /**
+       * <code>optional int64 Latitude = 2;</code>
+       */
+      public boolean hasLatitude() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional int64 Latitude = 2;</code>
+       */
+      public long getLatitude() {
+        return latitude_;
+      }
+      /**
+       * <code>optional int64 Latitude = 2;</code>
+       */
+      public Builder setLatitude(long value) {
+        bitField0_ |= 0x00000002;
+        latitude_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 Latitude = 2;</code>
+       */
+      public Builder clearLatitude() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        latitude_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long longitude_ ;
+      /**
+       * <code>optional int64 Longitude = 3;</code>
+       */
+      public boolean hasLongitude() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional int64 Longitude = 3;</code>
+       */
+      public long getLongitude() {
+        return longitude_;
+      }
+      /**
+       * <code>optional int64 Longitude = 3;</code>
+       */
+      public Builder setLongitude(long value) {
+        bitField0_ |= 0x00000004;
+        longitude_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 Longitude = 3;</code>
+       */
+      public Builder clearLongitude() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        longitude_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:main.FortDetailsProto)
+    }
+
+    static {
+      defaultInstance = new FortDetailsProto(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:main.FortDetailsProto)
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_main_RequestEnvelop_descriptor;
   private static
@@ -27360,6 +29579,16 @@ public final class Pokemon {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_main_InventoryItemProto_PokemonFamilyProto_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_main_FortDetailsOutProto_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_main_FortDetailsOutProto_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_main_FortDetailsProto_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_main_FortDetailsProto_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -27483,7 +29712,14 @@ public final class Pokemon {
       "ining\030\004 \001(\005\022\021\n\tPokemonId\030\005 \001(\003\022\025\n\rStartK" +
       "mWalked\030\006 \001(\001\022\026\n\016TargetKmWalked\030\007 \001(\001\0325\n" +
       "\022PokemonFamilyProto\022\020\n\010FamilyId\030\001 \002(\005\022\r\n" +
-      "\005Candy\030\002 \002(\005"
+      "\005Candy\030\002 \002(\005\"\336\001\n\023FortDetailsOutProto\022\n\n\002" +
+      "Id\030\001 \001(\t\022\014\n\004Team\030\002 \001(\005\022\014\n\004Name\030\004 \001(\t\022\020\n\010" +
+      "ImageUrl\030\005 \001(\t\022\n\n\002Fp\030\006 \001(\005\022\017\n\007Stamina\030\007 " +
+      "\001(\005\022\022\n\nMaxStamina\030\010 \001(\005\022\020\n\010FortType\030\t \001(" +
+      "\005\022\020\n\010Latitude\030\n \001(\003\022\021\n\tLongitude\030\013 \001(\003\022\023" +
+      "\n\013Description\030\014 \001(\t\022\020\n\010Modifier\030\r \001(\001\"C\n",
+      "\020FortDetailsProto\022\n\n\002Id\030\001 \002(\t\022\020\n\010Latitud" +
+      "e\030\002 \001(\003\022\021\n\tLongitude\030\003 \001(\003"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -27689,6 +29925,18 @@ public final class Pokemon {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_main_InventoryItemProto_PokemonFamilyProto_descriptor,
         new java.lang.String[] { "FamilyId", "Candy", });
+    internal_static_main_FortDetailsOutProto_descriptor =
+      getDescriptor().getMessageTypes().get(14);
+    internal_static_main_FortDetailsOutProto_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_main_FortDetailsOutProto_descriptor,
+        new java.lang.String[] { "Id", "Team", "Name", "ImageUrl", "Fp", "Stamina", "MaxStamina", "FortType", "Latitude", "Longitude", "Description", "Modifier", });
+    internal_static_main_FortDetailsProto_descriptor =
+      getDescriptor().getMessageTypes().get(15);
+    internal_static_main_FortDetailsProto_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_main_FortDetailsProto_descriptor,
+        new java.lang.String[] { "Id", "Latitude", "Longitude", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
