@@ -4,6 +4,7 @@ package com.pokegoapi.requests;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 
+import com.pokegoapi.main.Communication;
 import com.pokegoapi.main.Request;
 import com.pokegoapi.main.Stops.FortDetailsOutProto;
 import com.pokegoapi.main.Stops.FortDetailsProto;
@@ -57,9 +58,9 @@ public class FortDetailsRequest extends Request
 	}
 
 	@Override
-	public int getRpcId() 
+	public Communication.Method getRpcId()
 	{
-		return 104;
+		return Communication.Method.FORT_DETAILS;
 	}
 
 	@Override

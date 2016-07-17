@@ -29,37 +29,28 @@ public final class Player {
   /**
    * Protobuf type {@code com.pokegoapi.main.SettingsRequest}
    */
-  public static final class SettingsRequest extends
+  public  static final class SettingsRequest extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:com.pokegoapi.main.SettingsRequest)
       SettingsRequestOrBuilder {
     // Use SettingsRequest.newBuilder() to construct.
     private SettingsRequest(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private SettingsRequest(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final SettingsRequest defaultInstance;
-    public static SettingsRequest getDefaultInstance() {
-      return defaultInstance;
+    private SettingsRequest() {
+      uUID_ = "";
     }
 
-    public SettingsRequest getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private SettingsRequest(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -90,7 +81,7 @@ public final class Player {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -108,24 +99,9 @@ public final class Player {
               com.pokegoapi.main.Player.SettingsRequest.class, com.pokegoapi.main.Player.SettingsRequest.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<SettingsRequest> PARSER =
-        new com.google.protobuf.AbstractParser<SettingsRequest>() {
-      public SettingsRequest parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new SettingsRequest(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<SettingsRequest> getParserForType() {
-      return PARSER;
-    }
-
     private int bitField0_;
     public static final int UUID_FIELD_NUMBER = 1;
-    private java.lang.Object uUID_;
+    private volatile java.lang.Object uUID_;
     /**
      * <code>required string UUID = 1;</code>
      */
@@ -166,9 +142,6 @@ public final class Player {
       }
     }
 
-    private void initFields() {
-      uUID_ = "";
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -185,33 +158,60 @@ public final class Player {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getUUIDBytes());
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, uUID_);
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getUUIDBytes());
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, uUID_);
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.pokegoapi.main.Player.SettingsRequest)) {
+        return super.equals(obj);
+      }
+      com.pokegoapi.main.Player.SettingsRequest other = (com.pokegoapi.main.Player.SettingsRequest) obj;
+
+      boolean result = true;
+      result = result && (hasUUID() == other.hasUUID());
+      if (hasUUID()) {
+        result = result && getUUID()
+            .equals(other.getUUID());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptorForType().hashCode();
+      if (hasUUID()) {
+        hash = (37 * hash) + UUID_FIELD_NUMBER;
+        hash = (53 * hash) + getUUID().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static com.pokegoapi.main.Player.SettingsRequest parseFrom(
@@ -237,42 +237,53 @@ public final class Player {
     }
     public static com.pokegoapi.main.Player.SettingsRequest parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Player.SettingsRequest parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Player.SettingsRequest parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Player.SettingsRequest parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Player.SettingsRequest parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Player.SettingsRequest parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.pokegoapi.main.Player.SettingsRequest prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(com.pokegoapi.main.Player.SettingsRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -313,19 +324,11 @@ public final class Player {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         uUID_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -374,13 +377,13 @@ public final class Player {
           uUID_ = other.uUID_;
           onChanged();
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!hasUUID()) {
-          
           return false;
         }
         return true;
@@ -395,7 +398,7 @@ public final class Player {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.pokegoapi.main.Player.SettingsRequest) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -484,12 +487,39 @@ public final class Player {
       // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.SettingsRequest)
     }
 
+    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.SettingsRequest)
+    private static final com.pokegoapi.main.Player.SettingsRequest DEFAULT_INSTANCE;
     static {
-      defaultInstance = new SettingsRequest(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new com.pokegoapi.main.Player.SettingsRequest();
     }
 
-    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.SettingsRequest)
+    public static com.pokegoapi.main.Player.SettingsRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<SettingsRequest>
+        PARSER = new com.google.protobuf.AbstractParser<SettingsRequest>() {
+      public SettingsRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new SettingsRequest(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<SettingsRequest> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<SettingsRequest> getParserForType() {
+      return PARSER;
+    }
+
+    public com.pokegoapi.main.Player.SettingsRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface ClientPlayerDetailsOrBuilder extends
@@ -635,37 +665,35 @@ public final class Player {
   /**
    * Protobuf type {@code com.pokegoapi.main.ClientPlayerDetails}
    */
-  public static final class ClientPlayerDetails extends
+  public  static final class ClientPlayerDetails extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:com.pokegoapi.main.ClientPlayerDetails)
       ClientPlayerDetailsOrBuilder {
     // Use ClientPlayerDetails.newBuilder() to construct.
     private ClientPlayerDetails(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private ClientPlayerDetails(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final ClientPlayerDetails defaultInstance;
-    public static ClientPlayerDetails getDefaultInstance() {
-      return defaultInstance;
+    private ClientPlayerDetails() {
+      creationTime_ = 0L;
+      username_ = "";
+      team_ = 0;
+      tutorial_ = com.google.protobuf.ByteString.EMPTY;
+      pokeStorage_ = 0;
+      itemStorage_ = 0;
+      badge_ = "";
+      currency_ = java.util.Collections.emptyList();
     }
 
-    public ClientPlayerDetails getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private ClientPlayerDetails(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -765,7 +793,8 @@ public final class Player {
                 currency_ = new java.util.ArrayList<com.pokegoapi.main.Player.Currency>();
                 mutable_bitField0_ |= 0x00000400;
               }
-              currency_.add(input.readMessage(com.pokegoapi.main.Player.Currency.PARSER, extensionRegistry));
+              currency_.add(
+                  input.readMessage(com.pokegoapi.main.Player.Currency.PARSER, extensionRegistry));
               break;
             }
           }
@@ -774,7 +803,7 @@ public final class Player {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000400) == 0x00000400)) {
           currency_ = java.util.Collections.unmodifiableList(currency_);
@@ -795,21 +824,6 @@ public final class Player {
               com.pokegoapi.main.Player.ClientPlayerDetails.class, com.pokegoapi.main.Player.ClientPlayerDetails.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<ClientPlayerDetails> PARSER =
-        new com.google.protobuf.AbstractParser<ClientPlayerDetails>() {
-      public ClientPlayerDetails parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ClientPlayerDetails(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<ClientPlayerDetails> getParserForType() {
-      return PARSER;
-    }
-
     private int bitField0_;
     public static final int CREATION_TIME_FIELD_NUMBER = 1;
     private long creationTime_;
@@ -827,7 +841,7 @@ public final class Player {
     }
 
     public static final int USERNAME_FIELD_NUMBER = 2;
-    private java.lang.Object username_;
+    private volatile java.lang.Object username_;
     /**
      * <code>optional string username = 2;</code>
      */
@@ -910,13 +924,13 @@ public final class Player {
      * <code>optional .com.pokegoapi.main.PlayerAvatar avatar = 8;</code>
      */
     public com.pokegoapi.main.Player.PlayerAvatar getAvatar() {
-      return avatar_;
+      return avatar_ == null ? com.pokegoapi.main.Player.PlayerAvatar.getDefaultInstance() : avatar_;
     }
     /**
      * <code>optional .com.pokegoapi.main.PlayerAvatar avatar = 8;</code>
      */
     public com.pokegoapi.main.Player.PlayerAvatarOrBuilder getAvatarOrBuilder() {
-      return avatar_;
+      return avatar_ == null ? com.pokegoapi.main.Player.PlayerAvatar.getDefaultInstance() : avatar_;
     }
 
     public static final int POKE_STORAGE_FIELD_NUMBER = 9;
@@ -961,17 +975,17 @@ public final class Player {
      * <code>optional .com.pokegoapi.main.DailyBonus daily_bonus = 11;</code>
      */
     public com.pokegoapi.main.Player.DailyBonus getDailyBonus() {
-      return dailyBonus_;
+      return dailyBonus_ == null ? com.pokegoapi.main.Player.DailyBonus.getDefaultInstance() : dailyBonus_;
     }
     /**
      * <code>optional .com.pokegoapi.main.DailyBonus daily_bonus = 11;</code>
      */
     public com.pokegoapi.main.Player.DailyBonusOrBuilder getDailyBonusOrBuilder() {
-      return dailyBonus_;
+      return dailyBonus_ == null ? com.pokegoapi.main.Player.DailyBonus.getDefaultInstance() : dailyBonus_;
     }
 
     public static final int BADGE_FIELD_NUMBER = 12;
-    private java.lang.Object badge_;
+    private volatile java.lang.Object badge_;
     /**
      * <code>optional string badge = 12;</code>
      */
@@ -1024,13 +1038,13 @@ public final class Player {
      * <code>optional .com.pokegoapi.main.ContactSettingsProto settings = 13;</code>
      */
     public com.pokegoapi.main.Player.ContactSettingsProto getSettings() {
-      return settings_;
+      return settings_ == null ? com.pokegoapi.main.Player.ContactSettingsProto.getDefaultInstance() : settings_;
     }
     /**
      * <code>optional .com.pokegoapi.main.ContactSettingsProto settings = 13;</code>
      */
     public com.pokegoapi.main.Player.ContactSettingsProtoOrBuilder getSettingsOrBuilder() {
-      return settings_;
+      return settings_ == null ? com.pokegoapi.main.Player.ContactSettingsProto.getDefaultInstance() : settings_;
     }
 
     public static final int CURRENCY_FIELD_NUMBER = 14;
@@ -1068,19 +1082,6 @@ public final class Player {
       return currency_.get(index);
     }
 
-    private void initFields() {
-      creationTime_ = 0L;
-      username_ = "";
-      team_ = 0;
-      tutorial_ = com.google.protobuf.ByteString.EMPTY;
-      avatar_ = com.pokegoapi.main.Player.PlayerAvatar.getDefaultInstance();
-      pokeStorage_ = 0;
-      itemStorage_ = 0;
-      dailyBonus_ = com.pokegoapi.main.Player.DailyBonus.getDefaultInstance();
-      badge_ = "";
-      settings_ = com.pokegoapi.main.Player.ContactSettingsProto.getDefaultInstance();
-      currency_ = java.util.Collections.emptyList();
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -1099,12 +1100,11 @@ public final class Player {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeInt64(1, creationTime_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getUsernameBytes());
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, username_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeInt32(5, team_);
@@ -1113,7 +1113,7 @@ public final class Player {
         output.writeBytes(7, tutorial_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeMessage(8, avatar_);
+        output.writeMessage(8, getAvatar());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         output.writeInt32(9, pokeStorage_);
@@ -1122,23 +1122,22 @@ public final class Player {
         output.writeInt32(10, itemStorage_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        output.writeMessage(11, dailyBonus_);
+        output.writeMessage(11, getDailyBonus());
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        output.writeBytes(12, getBadgeBytes());
+        com.google.protobuf.GeneratedMessage.writeString(output, 12, badge_);
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
-        output.writeMessage(13, settings_);
+        output.writeMessage(13, getSettings());
       }
       for (int i = 0; i < currency_.size(); i++) {
         output.writeMessage(14, currency_.get(i));
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -1147,8 +1146,7 @@ public final class Player {
           .computeInt64Size(1, creationTime_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getUsernameBytes());
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, username_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
@@ -1160,7 +1158,7 @@ public final class Player {
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(8, avatar_);
+          .computeMessageSize(8, getAvatar());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
@@ -1172,30 +1170,147 @@ public final class Player {
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(11, dailyBonus_);
+          .computeMessageSize(11, getDailyBonus());
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(12, getBadgeBytes());
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(12, badge_);
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(13, settings_);
+          .computeMessageSize(13, getSettings());
       }
       for (int i = 0; i < currency_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(14, currency_.get(i));
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.pokegoapi.main.Player.ClientPlayerDetails)) {
+        return super.equals(obj);
+      }
+      com.pokegoapi.main.Player.ClientPlayerDetails other = (com.pokegoapi.main.Player.ClientPlayerDetails) obj;
+
+      boolean result = true;
+      result = result && (hasCreationTime() == other.hasCreationTime());
+      if (hasCreationTime()) {
+        result = result && (getCreationTime()
+            == other.getCreationTime());
+      }
+      result = result && (hasUsername() == other.hasUsername());
+      if (hasUsername()) {
+        result = result && getUsername()
+            .equals(other.getUsername());
+      }
+      result = result && (hasTeam() == other.hasTeam());
+      if (hasTeam()) {
+        result = result && (getTeam()
+            == other.getTeam());
+      }
+      result = result && (hasTutorial() == other.hasTutorial());
+      if (hasTutorial()) {
+        result = result && getTutorial()
+            .equals(other.getTutorial());
+      }
+      result = result && (hasAvatar() == other.hasAvatar());
+      if (hasAvatar()) {
+        result = result && getAvatar()
+            .equals(other.getAvatar());
+      }
+      result = result && (hasPokeStorage() == other.hasPokeStorage());
+      if (hasPokeStorage()) {
+        result = result && (getPokeStorage()
+            == other.getPokeStorage());
+      }
+      result = result && (hasItemStorage() == other.hasItemStorage());
+      if (hasItemStorage()) {
+        result = result && (getItemStorage()
+            == other.getItemStorage());
+      }
+      result = result && (hasDailyBonus() == other.hasDailyBonus());
+      if (hasDailyBonus()) {
+        result = result && getDailyBonus()
+            .equals(other.getDailyBonus());
+      }
+      result = result && (hasBadge() == other.hasBadge());
+      if (hasBadge()) {
+        result = result && getBadge()
+            .equals(other.getBadge());
+      }
+      result = result && (hasSettings() == other.hasSettings());
+      if (hasSettings()) {
+        result = result && getSettings()
+            .equals(other.getSettings());
+      }
+      result = result && getCurrencyList()
+          .equals(other.getCurrencyList());
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptorForType().hashCode();
+      if (hasCreationTime()) {
+        hash = (37 * hash) + CREATION_TIME_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getCreationTime());
+      }
+      if (hasUsername()) {
+        hash = (37 * hash) + USERNAME_FIELD_NUMBER;
+        hash = (53 * hash) + getUsername().hashCode();
+      }
+      if (hasTeam()) {
+        hash = (37 * hash) + TEAM_FIELD_NUMBER;
+        hash = (53 * hash) + getTeam();
+      }
+      if (hasTutorial()) {
+        hash = (37 * hash) + TUTORIAL_FIELD_NUMBER;
+        hash = (53 * hash) + getTutorial().hashCode();
+      }
+      if (hasAvatar()) {
+        hash = (37 * hash) + AVATAR_FIELD_NUMBER;
+        hash = (53 * hash) + getAvatar().hashCode();
+      }
+      if (hasPokeStorage()) {
+        hash = (37 * hash) + POKE_STORAGE_FIELD_NUMBER;
+        hash = (53 * hash) + getPokeStorage();
+      }
+      if (hasItemStorage()) {
+        hash = (37 * hash) + ITEM_STORAGE_FIELD_NUMBER;
+        hash = (53 * hash) + getItemStorage();
+      }
+      if (hasDailyBonus()) {
+        hash = (37 * hash) + DAILY_BONUS_FIELD_NUMBER;
+        hash = (53 * hash) + getDailyBonus().hashCode();
+      }
+      if (hasBadge()) {
+        hash = (37 * hash) + BADGE_FIELD_NUMBER;
+        hash = (53 * hash) + getBadge().hashCode();
+      }
+      if (hasSettings()) {
+        hash = (37 * hash) + SETTINGS_FIELD_NUMBER;
+        hash = (53 * hash) + getSettings().hashCode();
+      }
+      if (getCurrencyCount() > 0) {
+        hash = (37 * hash) + CURRENCY_FIELD_NUMBER;
+        hash = (53 * hash) + getCurrencyList().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static com.pokegoapi.main.Player.ClientPlayerDetails parseFrom(
@@ -1221,42 +1336,53 @@ public final class Player {
     }
     public static com.pokegoapi.main.Player.ClientPlayerDetails parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Player.ClientPlayerDetails parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Player.ClientPlayerDetails parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Player.ClientPlayerDetails parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Player.ClientPlayerDetails parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Player.ClientPlayerDetails parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.pokegoapi.main.Player.ClientPlayerDetails prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(com.pokegoapi.main.Player.ClientPlayerDetails prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -1301,10 +1427,6 @@ public final class Player {
           getCurrencyFieldBuilder();
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         creationTime_ = 0L;
@@ -1316,7 +1438,7 @@ public final class Player {
         tutorial_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000008);
         if (avatarBuilder_ == null) {
-          avatar_ = com.pokegoapi.main.Player.PlayerAvatar.getDefaultInstance();
+          avatar_ = null;
         } else {
           avatarBuilder_.clear();
         }
@@ -1326,7 +1448,7 @@ public final class Player {
         itemStorage_ = 0;
         bitField0_ = (bitField0_ & ~0x00000040);
         if (dailyBonusBuilder_ == null) {
-          dailyBonus_ = com.pokegoapi.main.Player.DailyBonus.getDefaultInstance();
+          dailyBonus_ = null;
         } else {
           dailyBonusBuilder_.clear();
         }
@@ -1334,7 +1456,7 @@ public final class Player {
         badge_ = "";
         bitField0_ = (bitField0_ & ~0x00000100);
         if (settingsBuilder_ == null) {
-          settings_ = com.pokegoapi.main.Player.ContactSettingsProto.getDefaultInstance();
+          settings_ = null;
         } else {
           settingsBuilder_.clear();
         }
@@ -1346,10 +1468,6 @@ public final class Player {
           currencyBuilder_.clear();
         }
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -1510,14 +1628,14 @@ public final class Player {
             }
           }
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         for (int i = 0; i < getCurrencyCount(); i++) {
           if (!getCurrency(i).isInitialized()) {
-            
             return false;
           }
         }
@@ -1533,7 +1651,7 @@ public final class Player {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.pokegoapi.main.Player.ClientPlayerDetails) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -1718,7 +1836,7 @@ public final class Player {
         return this;
       }
 
-      private com.pokegoapi.main.Player.PlayerAvatar avatar_ = com.pokegoapi.main.Player.PlayerAvatar.getDefaultInstance();
+      private com.pokegoapi.main.Player.PlayerAvatar avatar_ = null;
       private com.google.protobuf.SingleFieldBuilder<
           com.pokegoapi.main.Player.PlayerAvatar, com.pokegoapi.main.Player.PlayerAvatar.Builder, com.pokegoapi.main.Player.PlayerAvatarOrBuilder> avatarBuilder_;
       /**
@@ -1732,7 +1850,7 @@ public final class Player {
        */
       public com.pokegoapi.main.Player.PlayerAvatar getAvatar() {
         if (avatarBuilder_ == null) {
-          return avatar_;
+          return avatar_ == null ? com.pokegoapi.main.Player.PlayerAvatar.getDefaultInstance() : avatar_;
         } else {
           return avatarBuilder_.getMessage();
         }
@@ -1773,6 +1891,7 @@ public final class Player {
       public Builder mergeAvatar(com.pokegoapi.main.Player.PlayerAvatar value) {
         if (avatarBuilder_ == null) {
           if (((bitField0_ & 0x00000010) == 0x00000010) &&
+              avatar_ != null &&
               avatar_ != com.pokegoapi.main.Player.PlayerAvatar.getDefaultInstance()) {
             avatar_ =
               com.pokegoapi.main.Player.PlayerAvatar.newBuilder(avatar_).mergeFrom(value).buildPartial();
@@ -1791,7 +1910,7 @@ public final class Player {
        */
       public Builder clearAvatar() {
         if (avatarBuilder_ == null) {
-          avatar_ = com.pokegoapi.main.Player.PlayerAvatar.getDefaultInstance();
+          avatar_ = null;
           onChanged();
         } else {
           avatarBuilder_.clear();
@@ -1814,7 +1933,8 @@ public final class Player {
         if (avatarBuilder_ != null) {
           return avatarBuilder_.getMessageOrBuilder();
         } else {
-          return avatar_;
+          return avatar_ == null ?
+              com.pokegoapi.main.Player.PlayerAvatar.getDefaultInstance() : avatar_;
         }
       }
       /**
@@ -1898,7 +2018,7 @@ public final class Player {
         return this;
       }
 
-      private com.pokegoapi.main.Player.DailyBonus dailyBonus_ = com.pokegoapi.main.Player.DailyBonus.getDefaultInstance();
+      private com.pokegoapi.main.Player.DailyBonus dailyBonus_ = null;
       private com.google.protobuf.SingleFieldBuilder<
           com.pokegoapi.main.Player.DailyBonus, com.pokegoapi.main.Player.DailyBonus.Builder, com.pokegoapi.main.Player.DailyBonusOrBuilder> dailyBonusBuilder_;
       /**
@@ -1912,7 +2032,7 @@ public final class Player {
        */
       public com.pokegoapi.main.Player.DailyBonus getDailyBonus() {
         if (dailyBonusBuilder_ == null) {
-          return dailyBonus_;
+          return dailyBonus_ == null ? com.pokegoapi.main.Player.DailyBonus.getDefaultInstance() : dailyBonus_;
         } else {
           return dailyBonusBuilder_.getMessage();
         }
@@ -1953,6 +2073,7 @@ public final class Player {
       public Builder mergeDailyBonus(com.pokegoapi.main.Player.DailyBonus value) {
         if (dailyBonusBuilder_ == null) {
           if (((bitField0_ & 0x00000080) == 0x00000080) &&
+              dailyBonus_ != null &&
               dailyBonus_ != com.pokegoapi.main.Player.DailyBonus.getDefaultInstance()) {
             dailyBonus_ =
               com.pokegoapi.main.Player.DailyBonus.newBuilder(dailyBonus_).mergeFrom(value).buildPartial();
@@ -1971,7 +2092,7 @@ public final class Player {
        */
       public Builder clearDailyBonus() {
         if (dailyBonusBuilder_ == null) {
-          dailyBonus_ = com.pokegoapi.main.Player.DailyBonus.getDefaultInstance();
+          dailyBonus_ = null;
           onChanged();
         } else {
           dailyBonusBuilder_.clear();
@@ -1994,7 +2115,8 @@ public final class Player {
         if (dailyBonusBuilder_ != null) {
           return dailyBonusBuilder_.getMessageOrBuilder();
         } else {
-          return dailyBonus_;
+          return dailyBonus_ == null ?
+              com.pokegoapi.main.Player.DailyBonus.getDefaultInstance() : dailyBonus_;
         }
       }
       /**
@@ -2090,7 +2212,7 @@ public final class Player {
         return this;
       }
 
-      private com.pokegoapi.main.Player.ContactSettingsProto settings_ = com.pokegoapi.main.Player.ContactSettingsProto.getDefaultInstance();
+      private com.pokegoapi.main.Player.ContactSettingsProto settings_ = null;
       private com.google.protobuf.SingleFieldBuilder<
           com.pokegoapi.main.Player.ContactSettingsProto, com.pokegoapi.main.Player.ContactSettingsProto.Builder, com.pokegoapi.main.Player.ContactSettingsProtoOrBuilder> settingsBuilder_;
       /**
@@ -2104,7 +2226,7 @@ public final class Player {
        */
       public com.pokegoapi.main.Player.ContactSettingsProto getSettings() {
         if (settingsBuilder_ == null) {
-          return settings_;
+          return settings_ == null ? com.pokegoapi.main.Player.ContactSettingsProto.getDefaultInstance() : settings_;
         } else {
           return settingsBuilder_.getMessage();
         }
@@ -2145,6 +2267,7 @@ public final class Player {
       public Builder mergeSettings(com.pokegoapi.main.Player.ContactSettingsProto value) {
         if (settingsBuilder_ == null) {
           if (((bitField0_ & 0x00000200) == 0x00000200) &&
+              settings_ != null &&
               settings_ != com.pokegoapi.main.Player.ContactSettingsProto.getDefaultInstance()) {
             settings_ =
               com.pokegoapi.main.Player.ContactSettingsProto.newBuilder(settings_).mergeFrom(value).buildPartial();
@@ -2163,7 +2286,7 @@ public final class Player {
        */
       public Builder clearSettings() {
         if (settingsBuilder_ == null) {
-          settings_ = com.pokegoapi.main.Player.ContactSettingsProto.getDefaultInstance();
+          settings_ = null;
           onChanged();
         } else {
           settingsBuilder_.clear();
@@ -2186,7 +2309,8 @@ public final class Player {
         if (settingsBuilder_ != null) {
           return settingsBuilder_.getMessageOrBuilder();
         } else {
-          return settings_;
+          return settings_ == null ?
+              com.pokegoapi.main.Player.ContactSettingsProto.getDefaultInstance() : settings_;
         }
       }
       /**
@@ -2449,12 +2573,39 @@ public final class Player {
       // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.ClientPlayerDetails)
     }
 
+    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.ClientPlayerDetails)
+    private static final com.pokegoapi.main.Player.ClientPlayerDetails DEFAULT_INSTANCE;
     static {
-      defaultInstance = new ClientPlayerDetails(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new com.pokegoapi.main.Player.ClientPlayerDetails();
     }
 
-    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.ClientPlayerDetails)
+    public static com.pokegoapi.main.Player.ClientPlayerDetails getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<ClientPlayerDetails>
+        PARSER = new com.google.protobuf.AbstractParser<ClientPlayerDetails>() {
+      public ClientPlayerDetails parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new ClientPlayerDetails(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<ClientPlayerDetails> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ClientPlayerDetails> getParserForType() {
+      return PARSER;
+    }
+
+    public com.pokegoapi.main.Player.ClientPlayerDetails getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface PlayerAvatarOrBuilder extends
@@ -2545,37 +2696,36 @@ public final class Player {
   /**
    * Protobuf type {@code com.pokegoapi.main.PlayerAvatar}
    */
-  public static final class PlayerAvatar extends
+  public  static final class PlayerAvatar extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:com.pokegoapi.main.PlayerAvatar)
       PlayerAvatarOrBuilder {
     // Use PlayerAvatar.newBuilder() to construct.
     private PlayerAvatar(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private PlayerAvatar(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final PlayerAvatar defaultInstance;
-    public static PlayerAvatar getDefaultInstance() {
-      return defaultInstance;
+    private PlayerAvatar() {
+      avatar_ = 0;
+      skin_ = 0;
+      hair_ = 0;
+      shirt_ = 0;
+      pants_ = 0;
+      hat_ = 0;
+      shoes_ = 0;
+      eyes_ = 0;
+      backpack_ = 0;
     }
 
-    public PlayerAvatar getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private PlayerAvatar(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -2645,7 +2795,7 @@ public final class Player {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -2661,21 +2811,6 @@ public final class Player {
       return com.pokegoapi.main.Player.internal_static_com_pokegoapi_main_PlayerAvatar_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               com.pokegoapi.main.Player.PlayerAvatar.class, com.pokegoapi.main.Player.PlayerAvatar.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<PlayerAvatar> PARSER =
-        new com.google.protobuf.AbstractParser<PlayerAvatar>() {
-      public PlayerAvatar parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new PlayerAvatar(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<PlayerAvatar> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -2814,17 +2949,6 @@ public final class Player {
       return backpack_;
     }
 
-    private void initFields() {
-      avatar_ = 0;
-      skin_ = 0;
-      hair_ = 0;
-      shirt_ = 0;
-      pants_ = 0;
-      hat_ = 0;
-      shoes_ = 0;
-      eyes_ = 0;
-      backpack_ = 0;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -2837,7 +2961,6 @@ public final class Player {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeInt32(2, skin_);
       }
@@ -2865,12 +2988,11 @@ public final class Player {
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         output.writeInt32(10, backpack_);
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -2910,16 +3032,118 @@ public final class Player {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(10, backpack_);
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.pokegoapi.main.Player.PlayerAvatar)) {
+        return super.equals(obj);
+      }
+      com.pokegoapi.main.Player.PlayerAvatar other = (com.pokegoapi.main.Player.PlayerAvatar) obj;
+
+      boolean result = true;
+      result = result && (hasAvatar() == other.hasAvatar());
+      if (hasAvatar()) {
+        result = result && (getAvatar()
+            == other.getAvatar());
+      }
+      result = result && (hasSkin() == other.hasSkin());
+      if (hasSkin()) {
+        result = result && (getSkin()
+            == other.getSkin());
+      }
+      result = result && (hasHair() == other.hasHair());
+      if (hasHair()) {
+        result = result && (getHair()
+            == other.getHair());
+      }
+      result = result && (hasShirt() == other.hasShirt());
+      if (hasShirt()) {
+        result = result && (getShirt()
+            == other.getShirt());
+      }
+      result = result && (hasPants() == other.hasPants());
+      if (hasPants()) {
+        result = result && (getPants()
+            == other.getPants());
+      }
+      result = result && (hasHat() == other.hasHat());
+      if (hasHat()) {
+        result = result && (getHat()
+            == other.getHat());
+      }
+      result = result && (hasShoes() == other.hasShoes());
+      if (hasShoes()) {
+        result = result && (getShoes()
+            == other.getShoes());
+      }
+      result = result && (hasEyes() == other.hasEyes());
+      if (hasEyes()) {
+        result = result && (getEyes()
+            == other.getEyes());
+      }
+      result = result && (hasBackpack() == other.hasBackpack());
+      if (hasBackpack()) {
+        result = result && (getBackpack()
+            == other.getBackpack());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptorForType().hashCode();
+      if (hasAvatar()) {
+        hash = (37 * hash) + AVATAR_FIELD_NUMBER;
+        hash = (53 * hash) + getAvatar();
+      }
+      if (hasSkin()) {
+        hash = (37 * hash) + SKIN_FIELD_NUMBER;
+        hash = (53 * hash) + getSkin();
+      }
+      if (hasHair()) {
+        hash = (37 * hash) + HAIR_FIELD_NUMBER;
+        hash = (53 * hash) + getHair();
+      }
+      if (hasShirt()) {
+        hash = (37 * hash) + SHIRT_FIELD_NUMBER;
+        hash = (53 * hash) + getShirt();
+      }
+      if (hasPants()) {
+        hash = (37 * hash) + PANTS_FIELD_NUMBER;
+        hash = (53 * hash) + getPants();
+      }
+      if (hasHat()) {
+        hash = (37 * hash) + HAT_FIELD_NUMBER;
+        hash = (53 * hash) + getHat();
+      }
+      if (hasShoes()) {
+        hash = (37 * hash) + SHOES_FIELD_NUMBER;
+        hash = (53 * hash) + getShoes();
+      }
+      if (hasEyes()) {
+        hash = (37 * hash) + EYES_FIELD_NUMBER;
+        hash = (53 * hash) + getEyes();
+      }
+      if (hasBackpack()) {
+        hash = (37 * hash) + BACKPACK_FIELD_NUMBER;
+        hash = (53 * hash) + getBackpack();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static com.pokegoapi.main.Player.PlayerAvatar parseFrom(
@@ -2945,42 +3169,53 @@ public final class Player {
     }
     public static com.pokegoapi.main.Player.PlayerAvatar parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Player.PlayerAvatar parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Player.PlayerAvatar parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Player.PlayerAvatar parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Player.PlayerAvatar parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Player.PlayerAvatar parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.pokegoapi.main.Player.PlayerAvatar prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(com.pokegoapi.main.Player.PlayerAvatar prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -3021,10 +3256,6 @@ public final class Player {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         avatar_ = 0;
@@ -3046,10 +3277,6 @@ public final class Player {
         backpack_ = 0;
         bitField0_ = (bitField0_ & ~0x00000100);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -3152,7 +3379,8 @@ public final class Player {
         if (other.hasBackpack()) {
           setBackpack(other.getBackpack());
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
@@ -3169,7 +3397,7 @@ public final class Player {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.pokegoapi.main.Player.PlayerAvatar) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -3470,12 +3698,39 @@ public final class Player {
       // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.PlayerAvatar)
     }
 
+    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.PlayerAvatar)
+    private static final com.pokegoapi.main.Player.PlayerAvatar DEFAULT_INSTANCE;
     static {
-      defaultInstance = new PlayerAvatar(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new com.pokegoapi.main.Player.PlayerAvatar();
     }
 
-    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.PlayerAvatar)
+    public static com.pokegoapi.main.Player.PlayerAvatar getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<PlayerAvatar>
+        PARSER = new com.google.protobuf.AbstractParser<PlayerAvatar>() {
+      public PlayerAvatar parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new PlayerAvatar(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<PlayerAvatar> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PlayerAvatar> getParserForType() {
+      return PARSER;
+    }
+
+    public com.pokegoapi.main.Player.PlayerAvatar getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface DailyBonusOrBuilder extends
@@ -3503,37 +3758,29 @@ public final class Player {
   /**
    * Protobuf type {@code com.pokegoapi.main.DailyBonus}
    */
-  public static final class DailyBonus extends
+  public  static final class DailyBonus extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:com.pokegoapi.main.DailyBonus)
       DailyBonusOrBuilder {
     // Use DailyBonus.newBuilder() to construct.
     private DailyBonus(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private DailyBonus(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final DailyBonus defaultInstance;
-    public static DailyBonus getDefaultInstance() {
-      return defaultInstance;
+    private DailyBonus() {
+      nextCollectTimestampMs_ = 0L;
+      nextDefenderBonusCollectTimestampMs_ = 0L;
     }
 
-    public DailyBonus getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private DailyBonus(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -3568,7 +3815,7 @@ public final class Player {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -3584,21 +3831,6 @@ public final class Player {
       return com.pokegoapi.main.Player.internal_static_com_pokegoapi_main_DailyBonus_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               com.pokegoapi.main.Player.DailyBonus.class, com.pokegoapi.main.Player.DailyBonus.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<DailyBonus> PARSER =
-        new com.google.protobuf.AbstractParser<DailyBonus>() {
-      public DailyBonus parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new DailyBonus(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<DailyBonus> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -3632,10 +3864,6 @@ public final class Player {
       return nextDefenderBonusCollectTimestampMs_;
     }
 
-    private void initFields() {
-      nextCollectTimestampMs_ = 0L;
-      nextDefenderBonusCollectTimestampMs_ = 0L;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -3648,19 +3876,17 @@ public final class Player {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeInt64(1, nextCollectTimestampMs_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeInt64(2, nextDefenderBonusCollectTimestampMs_);
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -3672,16 +3898,57 @@ public final class Player {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(2, nextDefenderBonusCollectTimestampMs_);
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.pokegoapi.main.Player.DailyBonus)) {
+        return super.equals(obj);
+      }
+      com.pokegoapi.main.Player.DailyBonus other = (com.pokegoapi.main.Player.DailyBonus) obj;
+
+      boolean result = true;
+      result = result && (hasNextCollectTimestampMs() == other.hasNextCollectTimestampMs());
+      if (hasNextCollectTimestampMs()) {
+        result = result && (getNextCollectTimestampMs()
+            == other.getNextCollectTimestampMs());
+      }
+      result = result && (hasNextDefenderBonusCollectTimestampMs() == other.hasNextDefenderBonusCollectTimestampMs());
+      if (hasNextDefenderBonusCollectTimestampMs()) {
+        result = result && (getNextDefenderBonusCollectTimestampMs()
+            == other.getNextDefenderBonusCollectTimestampMs());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptorForType().hashCode();
+      if (hasNextCollectTimestampMs()) {
+        hash = (37 * hash) + NEXTCOLLECTTIMESTAMPMS_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getNextCollectTimestampMs());
+      }
+      if (hasNextDefenderBonusCollectTimestampMs()) {
+        hash = (37 * hash) + NEXTDEFENDERBONUSCOLLECTTIMESTAMPMS_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+            getNextDefenderBonusCollectTimestampMs());
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static com.pokegoapi.main.Player.DailyBonus parseFrom(
@@ -3707,42 +3974,53 @@ public final class Player {
     }
     public static com.pokegoapi.main.Player.DailyBonus parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Player.DailyBonus parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Player.DailyBonus parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Player.DailyBonus parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Player.DailyBonus parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Player.DailyBonus parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.pokegoapi.main.Player.DailyBonus prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(com.pokegoapi.main.Player.DailyBonus prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -3783,10 +4061,6 @@ public final class Player {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         nextCollectTimestampMs_ = 0L;
@@ -3794,10 +4068,6 @@ public final class Player {
         nextDefenderBonusCollectTimestampMs_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -3851,7 +4121,8 @@ public final class Player {
         if (other.hasNextDefenderBonusCollectTimestampMs()) {
           setNextDefenderBonusCollectTimestampMs(other.getNextDefenderBonusCollectTimestampMs());
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
@@ -3868,7 +4139,7 @@ public final class Player {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.pokegoapi.main.Player.DailyBonus) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -3945,12 +4216,39 @@ public final class Player {
       // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.DailyBonus)
     }
 
+    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.DailyBonus)
+    private static final com.pokegoapi.main.Player.DailyBonus DEFAULT_INSTANCE;
     static {
-      defaultInstance = new DailyBonus(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new com.pokegoapi.main.Player.DailyBonus();
     }
 
-    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.DailyBonus)
+    public static com.pokegoapi.main.Player.DailyBonus getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<DailyBonus>
+        PARSER = new com.google.protobuf.AbstractParser<DailyBonus>() {
+      public DailyBonus parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new DailyBonus(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<DailyBonus> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<DailyBonus> getParserForType() {
+      return PARSER;
+    }
+
+    public com.pokegoapi.main.Player.DailyBonus getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface CurrencyOrBuilder extends
@@ -3983,37 +4281,29 @@ public final class Player {
   /**
    * Protobuf type {@code com.pokegoapi.main.Currency}
    */
-  public static final class Currency extends
+  public  static final class Currency extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:com.pokegoapi.main.Currency)
       CurrencyOrBuilder {
     // Use Currency.newBuilder() to construct.
     private Currency(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private Currency(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final Currency defaultInstance;
-    public static Currency getDefaultInstance() {
-      return defaultInstance;
+    private Currency() {
+      type_ = "";
+      amount_ = 0;
     }
 
-    public Currency getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private Currency(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -4049,7 +4339,7 @@ public final class Player {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -4067,24 +4357,9 @@ public final class Player {
               com.pokegoapi.main.Player.Currency.class, com.pokegoapi.main.Player.Currency.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<Currency> PARSER =
-        new com.google.protobuf.AbstractParser<Currency>() {
-      public Currency parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Currency(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<Currency> getParserForType() {
-      return PARSER;
-    }
-
     private int bitField0_;
     public static final int TYPE_FIELD_NUMBER = 1;
-    private java.lang.Object type_;
+    private volatile java.lang.Object type_;
     /**
      * <code>required string type = 1;</code>
      */
@@ -4140,10 +4415,6 @@ public final class Player {
       return amount_;
     }
 
-    private void initFields() {
-      type_ = "";
-      amount_ = 0;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -4160,40 +4431,76 @@ public final class Player {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getTypeBytes());
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, type_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeInt32(2, amount_);
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getTypeBytes());
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, type_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(2, amount_);
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.pokegoapi.main.Player.Currency)) {
+        return super.equals(obj);
+      }
+      com.pokegoapi.main.Player.Currency other = (com.pokegoapi.main.Player.Currency) obj;
+
+      boolean result = true;
+      result = result && (hasType() == other.hasType());
+      if (hasType()) {
+        result = result && getType()
+            .equals(other.getType());
+      }
+      result = result && (hasAmount() == other.hasAmount());
+      if (hasAmount()) {
+        result = result && (getAmount()
+            == other.getAmount());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptorForType().hashCode();
+      if (hasType()) {
+        hash = (37 * hash) + TYPE_FIELD_NUMBER;
+        hash = (53 * hash) + getType().hashCode();
+      }
+      if (hasAmount()) {
+        hash = (37 * hash) + AMOUNT_FIELD_NUMBER;
+        hash = (53 * hash) + getAmount();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static com.pokegoapi.main.Player.Currency parseFrom(
@@ -4219,42 +4526,53 @@ public final class Player {
     }
     public static com.pokegoapi.main.Player.Currency parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Player.Currency parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Player.Currency parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Player.Currency parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Player.Currency parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Player.Currency parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.pokegoapi.main.Player.Currency prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(com.pokegoapi.main.Player.Currency prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -4295,10 +4613,6 @@ public final class Player {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         type_ = "";
@@ -4306,10 +4620,6 @@ public final class Player {
         amount_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -4365,13 +4675,13 @@ public final class Player {
         if (other.hasAmount()) {
           setAmount(other.getAmount());
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
       public final boolean isInitialized() {
         if (!hasType()) {
-          
           return false;
         }
         return true;
@@ -4386,7 +4696,7 @@ public final class Player {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.pokegoapi.main.Player.Currency) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -4507,12 +4817,39 @@ public final class Player {
       // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.Currency)
     }
 
+    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.Currency)
+    private static final com.pokegoapi.main.Player.Currency DEFAULT_INSTANCE;
     static {
-      defaultInstance = new Currency(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new com.pokegoapi.main.Player.Currency();
     }
 
-    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.Currency)
+    public static com.pokegoapi.main.Player.Currency getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<Currency>
+        PARSER = new com.google.protobuf.AbstractParser<Currency>() {
+      public Currency parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new Currency(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<Currency> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Currency> getParserForType() {
+      return PARSER;
+    }
+
+    public com.pokegoapi.main.Player.Currency getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   public interface ContactSettingsProtoOrBuilder extends
@@ -4540,37 +4877,29 @@ public final class Player {
   /**
    * Protobuf type {@code com.pokegoapi.main.ContactSettingsProto}
    */
-  public static final class ContactSettingsProto extends
+  public  static final class ContactSettingsProto extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:com.pokegoapi.main.ContactSettingsProto)
       ContactSettingsProtoOrBuilder {
     // Use ContactSettingsProto.newBuilder() to construct.
     private ContactSettingsProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private ContactSettingsProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final ContactSettingsProto defaultInstance;
-    public static ContactSettingsProto getDefaultInstance() {
-      return defaultInstance;
+    private ContactSettingsProto() {
+      sendMarketingEmails_ = false;
+      sendPushNotifications_ = false;
     }
 
-    public ContactSettingsProto getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private ContactSettingsProto(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -4605,7 +4934,7 @@ public final class Player {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -4621,21 +4950,6 @@ public final class Player {
       return com.pokegoapi.main.Player.internal_static_com_pokegoapi_main_ContactSettingsProto_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               com.pokegoapi.main.Player.ContactSettingsProto.class, com.pokegoapi.main.Player.ContactSettingsProto.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<ContactSettingsProto> PARSER =
-        new com.google.protobuf.AbstractParser<ContactSettingsProto>() {
-      public ContactSettingsProto parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ContactSettingsProto(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<ContactSettingsProto> getParserForType() {
-      return PARSER;
     }
 
     private int bitField0_;
@@ -4669,10 +4983,6 @@ public final class Player {
       return sendPushNotifications_;
     }
 
-    private void initFields() {
-      sendMarketingEmails_ = false;
-      sendPushNotifications_ = false;
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -4685,19 +4995,17 @@ public final class Player {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBool(1, sendMarketingEmails_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeBool(2, sendPushNotifications_);
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
@@ -4709,16 +5017,57 @@ public final class Player {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(2, sendPushNotifications_);
       }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.pokegoapi.main.Player.ContactSettingsProto)) {
+        return super.equals(obj);
+      }
+      com.pokegoapi.main.Player.ContactSettingsProto other = (com.pokegoapi.main.Player.ContactSettingsProto) obj;
+
+      boolean result = true;
+      result = result && (hasSendMarketingEmails() == other.hasSendMarketingEmails());
+      if (hasSendMarketingEmails()) {
+        result = result && (getSendMarketingEmails()
+            == other.getSendMarketingEmails());
+      }
+      result = result && (hasSendPushNotifications() == other.hasSendPushNotifications());
+      if (hasSendPushNotifications()) {
+        result = result && (getSendPushNotifications()
+            == other.getSendPushNotifications());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptorForType().hashCode();
+      if (hasSendMarketingEmails()) {
+        hash = (37 * hash) + SENDMARKETINGEMAILS_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getSendMarketingEmails());
+      }
+      if (hasSendPushNotifications()) {
+        hash = (37 * hash) + SENDPUSHNOTIFICATIONS_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getSendPushNotifications());
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
     }
 
     public static com.pokegoapi.main.Player.ContactSettingsProto parseFrom(
@@ -4744,42 +5093,53 @@ public final class Player {
     }
     public static com.pokegoapi.main.Player.ContactSettingsProto parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Player.ContactSettingsProto parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Player.ContactSettingsProto parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Player.ContactSettingsProto parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.pokegoapi.main.Player.ContactSettingsProto parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
     }
     public static com.pokegoapi.main.Player.ContactSettingsProto parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.pokegoapi.main.Player.ContactSettingsProto prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(com.pokegoapi.main.Player.ContactSettingsProto prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -4820,10 +5180,6 @@ public final class Player {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         sendMarketingEmails_ = false;
@@ -4831,10 +5187,6 @@ public final class Player {
         sendPushNotifications_ = false;
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -4888,7 +5240,8 @@ public final class Player {
         if (other.hasSendPushNotifications()) {
           setSendPushNotifications(other.getSendPushNotifications());
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
@@ -4905,7 +5258,7 @@ public final class Player {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.pokegoapi.main.Player.ContactSettingsProto) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -4982,42 +5335,69 @@ public final class Player {
       // @@protoc_insertion_point(builder_scope:com.pokegoapi.main.ContactSettingsProto)
     }
 
+    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.ContactSettingsProto)
+    private static final com.pokegoapi.main.Player.ContactSettingsProto DEFAULT_INSTANCE;
     static {
-      defaultInstance = new ContactSettingsProto(true);
-      defaultInstance.initFields();
+      DEFAULT_INSTANCE = new com.pokegoapi.main.Player.ContactSettingsProto();
     }
 
-    // @@protoc_insertion_point(class_scope:com.pokegoapi.main.ContactSettingsProto)
+    public static com.pokegoapi.main.Player.ContactSettingsProto getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<ContactSettingsProto>
+        PARSER = new com.google.protobuf.AbstractParser<ContactSettingsProto>() {
+      public ContactSettingsProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new ContactSettingsProto(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<ContactSettingsProto> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ContactSettingsProto> getParserForType() {
+      return PARSER;
+    }
+
+    public com.pokegoapi.main.Player.ContactSettingsProto getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_SettingsRequest_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_SettingsRequest_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_ClientPlayerDetails_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_ClientPlayerDetails_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_PlayerAvatar_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_PlayerAvatar_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_DailyBonus_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_DailyBonus_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_Currency_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_Currency_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_pokegoapi_main_ContactSettingsProto_descriptor;
-  private static
+  private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_pokegoapi_main_ContactSettingsProto_fieldAccessorTable;
 
@@ -5025,7 +5405,7 @@ public final class Player {
       getDescriptor() {
     return descriptor;
   }
-  private static com.google.protobuf.Descriptors.FileDescriptor
+  private static  com.google.protobuf.Descriptors.FileDescriptor
       descriptor;
   static {
     java.lang.String[] descriptorData = {

@@ -9,7 +9,7 @@ public abstract class Request
 	private Builder builder;
 	
 	
-	public abstract int getRpcId();
+	public abstract Communication.Method getRpcId();
 	public abstract void handleResponse(Payload payload);
 	public abstract byte[] getInput();
 	
