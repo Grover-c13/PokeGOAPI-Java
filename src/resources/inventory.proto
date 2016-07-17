@@ -1,0 +1,154 @@
+package com.pokegoapi.main;
+
+message InventoryRequestProto
+{
+	optional int64 timestamp = 1;
+}
+
+
+
+message PokemonProto {
+ 	optional fixed64 entId = 1;
+    optional int32 PokemonId = 2;
+    optional int32 Cp = 3;
+    optional int32 Stamina = 4;
+    optional int32 MaxStamina = 5;
+    optional int32 Move1 = 6;
+    optional int32 Move2 = 7;
+    optional int32 DeployedFortId = 8;
+    optional string OwnerName = 9;
+    optional bool IsEgg = 10;
+    optional double EggKmWalkedTarget = 11;
+    optional double EggKmWalkedStart = 12;
+    optional int32 Origin = 14;
+    optional float HeightM = 15;
+    optional float WeightKg = 16;
+    optional int32 IndividualAttack = 17;
+    optional int32 IndividualDefense = 18;
+    optional int32 IndividualStamina = 19;
+    optional float CpMultiplier = 20;
+    optional int32 Pokeball = 21;
+    optional uint64 CapturedS2CellId = 22;
+    optional int32 BattlesAttacked = 23;
+    optional int32 BattlesDefended = 24;
+    optional int32 EggIncubatorId = 25;
+    optional int64 CreationTimeMs = 26;
+    optional int32 NumUpgrades = 27;
+    optional float AdditionalCpMultiplier = 28;
+    optional bool Favorite = 29;
+    optional string Nickname = 30;
+    optional bool FromFort = 31;
+
+}
+ 
+message InventoryResponseProto
+{
+	optional int64 timestamp = 2;
+	repeated InventoryItemResponseProto items = 3;
+
+	message InventoryItemResponseProto
+	{
+		optional int64 timestamp = 1;
+		required InventoryItemProto item = 3;
+	}
+}
+ 
+
+message InventoryItemProto {
+    optional PokemonProto Pokemon = 1;
+    optional ItemProto Item = 2;
+	optional PokedexEntryProto PokedexEntry = 3;
+    optional PlayerStatsProto PlayerStats = 4;
+	optional PlayerCurrencyProto PlayerCurrency = 5;
+    optional PlayerCameraProto PlayerCamera = 6;
+    optional InventoryUpgradesProto InventoryUpgrades = 7;
+    optional AppliedItemProto AppliedItem = 8;
+	optional EggIncubatorProto EggIncubators = 9;
+	optional PokemonFamilyProto PokemonFamily = 10;
+	
+	message ItemProto {
+		required int32 Item = 1;
+		required int32 Count = 2;
+		optional bool Unseen = 3;
+	}
+
+	message PokedexEntryProto {
+		required int32 PokedexEntryNumber = 1;
+		optional int32 TimesEncountered = 2;
+		optional int32 TimesCaptured = 3;
+		optional int32 EvolutionStonePieces = 4;
+		optional int32 EvolutionStones = 5;
+	}
+	 
+	message PlayerStatsProto {
+		required int32 Level = 1;
+		required int64 Experience = 2;
+		required int64 PrevLevelExp = 3;
+		required int64 NextLevelExp = 4;
+		required float KmWalked = 5;
+		required int32 NumPokemonEncountered = 6;
+		required int32 NumUniquePokedexEntries = 7;
+		required int32 NumPokemonCaptured = 8;
+		required int32 NumEvolutions = 9;
+		required int32 PokeStopVisits = 10;
+		required int32 NumberOfPokeballThrown = 11;
+		required int32 NumEggsHatched = 12;
+		required int32 BigMagikarpCaught = 13;
+		required int32 NumBattleAttackWon = 14;
+		required int32 NumBattleAttackTotal = 15;
+		required int32 NumBattleDefendedWon = 16;
+		required int32 NumBattleTrainingWon = 17;
+		required int32 NumBattleTrainingTotal = 18;
+		required int32 PrestigeRaisedTotal = 19;
+		required int32 PrestigeDroppedTotal = 20;
+		required int32 NumPokemonDeployed = 21;
+		required int32 SmallRattataCaught = 23;
+	}
+	 
+	message AppliedItemProto {
+		optional int32 Item = 1;
+		optional int32 ItemType = 2;
+		optional int64 ExpirationMs = 3;
+		optional int64 AppliedMs = 4;
+	}
+	 
+	message PlayerCameraProto
+	{
+		required bool DefaultCamera = 1;
+	}
+ 
+ 
+	message PlayerCurrencyProto {
+		required int32 Gems = 1;
+	}
+	
+	message InventoryUpgradesProto {
+		required int32 InventoryUpgrade = 1;
+	}
+	
+	message EggIncubatorProto {
+		optional  string ItemId = 1;
+		optional ItemProto Item = 2;
+		optional int32 IncubatorType = 3;
+		optional int32 UsesRemaining = 4;
+		optional int64 PokemonId = 5;
+		optional double StartKmWalked = 6;
+		optional double TargetKmWalked = 7;
+	}
+	
+	message PokemonFamilyProto {
+		required int32 FamilyId = 1;
+		required int32 Candy = 2;
+	}
+ }
+ 
+  // POKEMON TRANSFER
+message TransferPokemonProto {
+    required fixed64 PokemonId = 1;
+}
+
+message TransferPokemonOutProto {
+    optional int32 Status = 1;
+    optional int32 CandyAwarded = 2;
+}
+ 

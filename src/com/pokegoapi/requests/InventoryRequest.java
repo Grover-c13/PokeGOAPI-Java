@@ -3,21 +3,16 @@ package com.pokegoapi.requests;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.google.protobuf.ByteString;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import com.pokegoapi.api.ContactSettings;
-import com.pokegoapi.api.DailyBonus;
-import com.pokegoapi.api.PlayerAvatar;
-import com.pokegoapi.api.PlayerProfile;
-import com.pokegoapi.api.Team;
+
 import com.pokegoapi.api.inventory.PokemonDetails;
-import com.pokegoapi.main.Pokemon.ClientPlayerDetails;
-import com.pokegoapi.main.Pokemon.InventoryRequestProto.Builder;
-import com.pokegoapi.main.Pokemon.InventoryResponseProto;
-import com.pokegoapi.main.Pokemon.InventoryResponseProto.InventoryItemResponseProto;
-import com.pokegoapi.main.Pokemon.Payload;
-import com.pokegoapi.main.Pokemon;
+import com.pokegoapi.main.Inventory.InventoryRequestProto;
+import com.pokegoapi.main.Inventory.InventoryRequestProto.Builder;
+import com.pokegoapi.main.Inventory.InventoryResponseProto;
+import com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto;
+import com.pokegoapi.main.Communication.Payload;
 import com.pokegoapi.main.Request;
 
 public class InventoryRequest extends Request {
@@ -34,7 +29,7 @@ public class InventoryRequest extends Request {
 
 	public InventoryRequest()
 	{
-		builder = Pokemon.InventoryRequestProto.newBuilder();
+		builder = InventoryRequestProto.newBuilder();
 		pokemon = new LinkedList<PokemonDetails>();
 	}
 

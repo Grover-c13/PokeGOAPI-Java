@@ -1,0 +1,51 @@
+package com.pokegoapi.main;
+
+
+message SettingsRequest
+{
+	required string UUID = 1;
+}
+
+
+message ClientPlayerDetails
+{
+	optional int64 creation_time = 1;
+	optional string username = 2;
+	optional int32 team = 5;
+	optional bytes tutorial = 7; 
+	optional PlayerAvatar avatar = 8; 
+	optional int32 poke_storage = 9;
+	optional int32 item_storage = 10;
+	optional DailyBonus daily_bonus = 11;
+	optional string badge = 12;
+	optional ContactSettingsProto settings = 13;
+	repeated Currency currency = 14;
+}
+
+
+message PlayerAvatar {
+	optional int32 Avatar = 8;
+	optional int32 Skin = 2;
+	optional int32 Hair = 3;
+	optional int32 Shirt = 4;
+	optional int32 Pants = 5;
+	optional int32 Hat = 6;
+	optional int32 Shoes = 7;
+	optional int32 Eyes = 9;
+	optional int32 Backpack = 10;
+ }
+
+message DailyBonus {
+  optional int64 NextCollectTimestampMs = 1;
+  optional int64 NextDefenderBonusCollectTimestampMs = 2;
+}
+
+message Currency {
+  required string type = 1;
+  optional int32 amount = 2;
+}
+
+message ContactSettingsProto {
+	optional bool SendMarketingEmails = 1;
+	optional bool SendPushNotifications = 2;
+}

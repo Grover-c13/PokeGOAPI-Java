@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.pokegoapi.api.inventory.PokeBank;
 import com.pokegoapi.api.inventory.PokemonDetails;
-import com.pokegoapi.main.Pokemon.RequestEnvelop.AuthInfo;
+import com.pokegoapi.main.Communication.RequestEnvelop.AuthInfo;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.requests.FortDetailsRequest;
 import com.pokegoapi.requests.InventoryRequest;

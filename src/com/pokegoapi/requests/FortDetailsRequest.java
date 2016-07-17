@@ -1,14 +1,14 @@
 package com.pokegoapi.requests;
 
-import com.google.protobuf.ByteString;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import com.pokegoapi.main.Pokemon;
+
 import com.pokegoapi.main.Request;
-import com.pokegoapi.main.Pokemon.FortDetailsOutProto;
-import com.pokegoapi.main.Pokemon.FortDetailsProto;
-import com.pokegoapi.main.Pokemon.FortDetailsProto.Builder;
-import com.pokegoapi.main.Pokemon.Payload;
+import com.pokegoapi.main.Stops.FortDetailsOutProto;
+import com.pokegoapi.main.Stops.FortDetailsProto;
+import com.pokegoapi.main.Stops.FortDetailsProto.Builder;
+import com.pokegoapi.main.Communication.Payload;
 
 public class FortDetailsRequest extends Request
 {
@@ -21,7 +21,7 @@ public class FortDetailsRequest extends Request
 	
 	public FortDetailsRequest(String id)
 	{
-		builder = Pokemon.FortDetailsProto.newBuilder();
+		builder = FortDetailsProto.newBuilder();
 		builder.setId(id);
 	}
 	

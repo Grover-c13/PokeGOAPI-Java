@@ -14,11 +14,11 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClients;
 
 import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.main.Pokemon.Payload;
-import com.pokegoapi.main.Pokemon.RequestEnvelop;
-import com.pokegoapi.main.Pokemon.RequestEnvelop.AuthInfo;
-import com.pokegoapi.main.Pokemon.RequestEnvelop.Builder;
-import com.pokegoapi.main.Pokemon.ResponseEnvelop;
+import com.pokegoapi.main.Communication.Payload;
+import com.pokegoapi.main.Communication.RequestEnvelop;
+import com.pokegoapi.main.Communication.RequestEnvelop.AuthInfo;
+import com.pokegoapi.main.Communication.RequestEnvelop.Builder;
+import com.pokegoapi.main.Communication.ResponseEnvelop;
 
 
 

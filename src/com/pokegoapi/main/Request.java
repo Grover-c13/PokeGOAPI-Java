@@ -1,8 +1,8 @@
 package com.pokegoapi.main;
 import com.google.protobuf.ByteString;
 
-import com.pokegoapi.main.Pokemon.Payload;
-import com.pokegoapi.main.Pokemon.Request.Builder;
+import com.pokegoapi.main.Communication.Payload;
+import com.pokegoapi.main.Communication.Request.Builder;
 
 public abstract class Request 
 {
@@ -15,7 +15,7 @@ public abstract class Request
 	
 	public Request()
 	{
-		builder = Pokemon.Request.newBuilder();
+		builder = Communication.Request.newBuilder();
 		builder.setType(getRpcId());
 	}
 	
@@ -26,7 +26,7 @@ public abstract class Request
 	
 
 	
-	public Pokemon.Request getRequest()
+	public Communication.Request getRequest()
 	{
 		if(getInput() != null)
 		{

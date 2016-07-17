@@ -1,0 +1,26 @@
+package com.pokegoapi.main;
+
+// FORT SEARCH
+message FortDetailsOutProto {
+    optional string Id = 1;
+    optional int32 Team = 2;
+  	optional string Name = 4;
+    optional string ImageUrl = 5;
+    optional int32 Fp = 6;
+    optional int32 Stamina = 7;
+    optional int32 MaxStamina = 8;
+    optional int32 FortType = 9;
+   	optional int64 Latitude = 10;
+   	optional int64 Longitude = 11;
+   	optional string Description = 12;
+   	optional double Modifier = 13;
+ }
+
+ 
+message FortDetailsProto {
+	required string Id = 1; 
+	optional int64 Latitude = 2; 
+	optional int64 Longitude = 3; 
+}
+
+ 

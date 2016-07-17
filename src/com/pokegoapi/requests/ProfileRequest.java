@@ -8,8 +8,9 @@ import com.pokegoapi.api.DailyBonus;
 import com.pokegoapi.api.PlayerAvatar;
 import com.pokegoapi.api.PlayerProfile;
 import com.pokegoapi.api.Team;
-import com.pokegoapi.main.Pokemon.ClientPlayerDetails;
-import com.pokegoapi.main.Pokemon.Payload;
+import com.pokegoapi.main.Player.ClientPlayerDetails;
+import com.pokegoapi.main.Player.Currency;
+import com.pokegoapi.main.Communication.Payload;
 import com.pokegoapi.main.Request;
 
 public class ProfileRequest extends Request {
@@ -42,7 +43,7 @@ public class ProfileRequest extends Request {
 			DailyBonus bonusAPI = new DailyBonus();
 			ContactSettings contactAPI = new ContactSettings();
 			
-			for(com.pokegoapi.main.Pokemon.Currency currency : details.getCurrencyList() )
+			for(Currency currency : details.getCurrencyList() )
 			{
 				profile.addCurrency(currency.getType(), currency.getAmount());
 			}

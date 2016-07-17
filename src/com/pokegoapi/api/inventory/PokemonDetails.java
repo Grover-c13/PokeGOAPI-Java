@@ -4,7 +4,7 @@ package com.pokegoapi.api.inventory;
 
 
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.main.Pokemon.PokemonProto;
+import com.pokegoapi.main.Inventory.PokemonProto;
 import com.pokegoapi.requests.PokemonTransferRequest;
 
 public class PokemonDetails
