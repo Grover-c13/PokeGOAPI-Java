@@ -27,7 +27,12 @@ public class GoogleLogin extends Login
 	public static final String OAUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/device/code";
 	public static final String OAUTH_TOKEN_ENDPOINT = "https://www.googleapis.com/oauth2/v4/token";
 
-	
+	/**
+	 * Returns an AuthInfo object given a token, this should not be an access token but rather an id_token
+	 * 
+	 * @param  		String the id_token stored from a previous oauth attempt.
+	 * @return      AuthInfo a AuthInfo proto structure to be encapsulated in server requests
+	 */
 	public AuthInfo login(String token)
 	{
 		Builder builder = AuthInfo.newBuilder();
@@ -36,7 +41,14 @@ public class GoogleLogin extends Login
 		return builder.build();
 	}
 	
-	
+	/**
+	 * Starts a login flow for google using a username and password, this uses googles device oauth endpoint, a URL and code is display
+	 * not really ideal right now.
+	 * 
+	 * @param  		String Google username
+	 * @param  		String Google password
+	 * @return      AuthInfo a AuthInfo proto structure to be encapsulated in server requests
+	 */
 	public AuthInfo login(String username, String password) throws LoginFailedException 
 	{
 		HttpClient client = HttpClients.createDefault();

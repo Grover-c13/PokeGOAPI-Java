@@ -1,5 +1,6 @@
 package requests;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import api.ContactSettings;
@@ -79,6 +80,13 @@ public class ProfileRequest extends Request {
 		if (value == 2) return Team.TEAM_VALOR;
 
 		return Team.TEAM_NONE;
+	}
+
+	
+
+	public ByteString getInput() 
+	{
+		return null;
 	}
 
 

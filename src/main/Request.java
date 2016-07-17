@@ -1,4 +1,6 @@
 package main;
+import com.google.protobuf.ByteString;
+
 import main.Pokemon.Payload;
 import main.Pokemon.Request.Builder;
 
@@ -9,7 +11,7 @@ public abstract class Request
 	
 	public abstract int getRpcId();
 	public abstract void handleResponse(Payload payload);
-
+	public abstract ByteString getInput();
 	
 	public Request()
 	{
@@ -26,6 +28,11 @@ public abstract class Request
 	
 	public Pokemon.Request getRequest()
 	{
+		if(getInput() != null)
+		{
+			builder.setData(getInput()).build();
+		}
+		
 		return builder.build();
 	}
 	
