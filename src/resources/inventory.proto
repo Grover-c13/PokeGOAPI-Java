@@ -1,137 +1,4 @@
-package com.pokegoapi.main; // not having package can cause issues with generated java code :(
-
-message RequestEnvelop {
-  required int32 unknown1 = 1;
-  optional int64 rpc_id = 3;
-  repeated Request requests = 4;
-  optional Unknown6 unknown6 = 6;
-  optional fixed64 latitude = 7;
-  optional fixed64 longitude = 8;
-  optional fixed64 altitude = 9;
-  optional AuthInfo auth = 10;
-  optional int64 unknown12 = 12;
-
-
-  message Unknown3 {
-    required string unknown4 = 1;
-  }
-
-  message Unknown6 {
-    required int32 unknown1 = 1;
-    required Unknown2 unknown2 = 2;
-
-    message Unknown2 {
-      required bytes unknown1 = 1;
-    }
-
-  }
-  message AuthInfo {
-    required string provider = 1;
-    required JWT token = 2;
-
-    message JWT {
-      required string contents = 1;
-      required int32 unknown13  = 2;
-    }
-  }
-}
-
-message ResponseEnvelop {
-  required int32 unknown1 = 1;
-  optional int64 unknown2 = 2;
-  optional string api_url = 3;
-  optional Unknown6 unknown6 = 6;
-  optional Unknown7 unknown7 = 7;
-  repeated Payload payload = 100;
-
-  message Unknown6 {
-    required int32 unknown1 = 1;
-    required Unknown2 unknown2 = 2;
-
-    message Unknown2 {
-      required bytes unknown1 = 1;
-    }
-
-  }
-
-  message Unknown7 {
-    optional bytes unknown71 = 1;
-    optional int64 unknown72 = 2;
-    optional bytes unknown73 = 3;
-  }
-
-
-
-
-  
-  
-}
-
-message Request
-{
-	required int32 type = 1;
-	optional bytes data = 2;
-}
-
-message SettingsRequest
-{
-	required string UUID = 1;
-}
-
-
-
-message Payload {
-	optional int32 uknown = 1;
-	optional bytes data = 2;
-}
-
-
-
-message ClientPlayerDetails
-{
-	optional int64 creation_time = 1;
-	optional string username = 2;
-	optional int32 team = 5;
-	optional bytes tutorial = 7; 
-	optional PlayerAvatar avatar = 8; 
-	optional int32 poke_storage = 9;
-	optional int32 item_storage = 10;
-	optional DailyBonus daily_bonus = 11;
-	optional string badge = 12;
-	optional ContactSettingsProto settings = 13;
-	repeated Currency currency = 14;
-}
-
-
-message PlayerAvatar {
-	optional int32 Avatar = 8;
-	optional int32 Skin = 2;
-	optional int32 Hair = 3;
-	optional int32 Shirt = 4;
-	optional int32 Pants = 5;
-	optional int32 Hat = 6;
-	optional int32 Shoes = 7;
-	optional int32 Eyes = 9;
-	optional int32 Backpack = 10;
- }
-
-message DailyBonus {
-  optional int64 NextCollectTimestampMs = 1;
-  optional int64 NextDefenderBonusCollectTimestampMs = 2;
-}
-
-message Currency {
-  required string type = 1;
-  optional int32 amount = 2;
-}
-
-message ContactSettingsProto {
-	optional bool SendMarketingEmails = 1;
-	optional bool SendPushNotifications = 2;
-}
-
-
-// INVENTORY PROTOS
+package com.pokegoapi.main;
 
 message InventoryRequestProto
 {
@@ -140,7 +7,7 @@ message InventoryRequestProto
 
 
 
- message PokemonProto {
+message PokemonProto {
  	optional fixed64 entId = 1;
     optional int32 PokemonId = 2;
     optional int32 Cp = 3;
@@ -275,32 +142,7 @@ message InventoryItemProto {
 	}
  }
  
- 
-// FORT SEARCH
-message FortDetailsOutProto {
-    optional string Id = 1;
-    optional int32 Team = 2;
-  	optional string Name = 4;
-    optional string ImageUrl = 5;
-    optional int32 Fp = 6;
-    optional int32 Stamina = 7;
-    optional int32 MaxStamina = 8;
-    optional int32 FortType = 9;
-   	optional int64 Latitude = 10;
-   	optional int64 Longitude = 11;
-   	optional string Description = 12;
-   	optional double Modifier = 13;
- }
-
- 
-message FortDetailsProto {
-	required string Id = 1; 
-	optional int64 Latitude = 2; 
-	optional int64 Longitude = 3; 
-}
-
- 
- // POKEMON TRANSFER
+// POKEMON TRANSFER
 message TransferPokemonProto {
     required fixed64 PokemonId = 1;
 }
@@ -309,3 +151,18 @@ message TransferPokemonOutProto {
     optional int32 Status = 1;
     optional int32 CandyAwarded = 2;
 }
+
+
+// EVOLVE
+message EvolvePokemonProto {
+	required fixed64 PokemonId = 1;
+}
+ 
+ 
+message EvolvePokemonOutProto {
+	required int32 Result = 1;
+	optional PokemonProto EvolvedPokemon = 2;
+	optional int32 ExpAwarded = 3;
+	optional int32 CandyAwarded = 4;
+}
+ 

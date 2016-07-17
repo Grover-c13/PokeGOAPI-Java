@@ -1,6 +1,6 @@
 package com.pokegoapi.api;
 
-import com.pokegoapi.main.Pokemon.FortDetailsOutProto;
+import com.pokegoapi.main.Stops.FortDetailsOutProto;
 
 public class FortDetails 
 {

@@ -3,39 +3,35 @@ package com.pokegoapi.requests;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.google.protobuf.ByteString;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import com.pokegoapi.api.ContactSettings;
-import com.pokegoapi.api.DailyBonus;
-import com.pokegoapi.api.PlayerAvatar;
-import com.pokegoapi.api.PlayerProfile;
-import com.pokegoapi.api.Team;
-import com.pokegoapi.api.inventory.PokemonDetails;
-import com.pokegoapi.main.Pokemon.ClientPlayerDetails;
-import com.pokegoapi.main.Pokemon.InventoryRequestProto.Builder;
-import com.pokegoapi.main.Pokemon.InventoryResponseProto;
-import com.pokegoapi.main.Pokemon.InventoryResponseProto.InventoryItemResponseProto;
-import com.pokegoapi.main.Pokemon.Payload;
-import com.pokegoapi.main.Pokemon;
+
+import com.pokegoapi.api.inventory.Pokemon;
+import com.pokegoapi.main.Communication;
+import com.pokegoapi.main.Inventory.InventoryRequestProto;
+import com.pokegoapi.main.Inventory.InventoryRequestProto.Builder;
+import com.pokegoapi.main.Inventory.InventoryResponseProto;
+import com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto;
+import com.pokegoapi.main.Communication.Payload;
 import com.pokegoapi.main.Request;
 
 public class InventoryRequest extends Request {
 
 	private Builder builder;
-	private List<PokemonDetails> pokemon;
+	private List<Pokemon> pokemon;
 	
 
 	
-	public int getRpcId()
+	public Communication.Method getRpcId()
 	{
-		return 4;
+		return Communication.Method.GET_INVENTORY;
 	}
 
 	public InventoryRequest()
 	{
-		builder = Pokemon.InventoryRequestProto.newBuilder();
-		pokemon = new LinkedList<PokemonDetails>();
+		builder = InventoryRequestProto.newBuilder();
+		pokemon = new LinkedList<Pokemon>();
 	}
 
 	public void setTimestamp(long timestamp)
@@ -43,7 +39,7 @@ public class InventoryRequest extends Request {
 		builder.setTimestamp(timestamp);
 	}
 	
-	public List<PokemonDetails> getPokemon()
+	public List<Pokemon> getPokemon()
 	{
 		return pokemon;
 	}
@@ -58,7 +54,7 @@ public class InventoryRequest extends Request {
 			{
 				if(item.getItem().hasPokemon())
 				{
-					pokemon.add(new PokemonDetails(item.getItem().getPokemon()));
+					pokemon.add(new Pokemon(item.getItem().getPokemon()));
 				}
 			}
 			System.out.println(response);

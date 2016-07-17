@@ -1,11 +1,11 @@
 package com.pokegoapi.requests;
 
-import com.pokegoapi.main.Pokemon.TransferPokemonProto.Builder;
-import com.pokegoapi.main.Pokemon.Payload;
-import com.pokegoapi.main.Pokemon.TransferPokemonOutProto;
-import com.pokegoapi.main.Pokemon.TransferPokemonProto;
+import com.pokegoapi.main.Communication;
+import com.pokegoapi.main.Inventory.TransferPokemonProto.Builder;
+import com.pokegoapi.main.Communication.Payload;
+import com.pokegoapi.main.Inventory.TransferPokemonOutProto;
+import com.pokegoapi.main.Inventory.TransferPokemonProto;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.main.Pokemon;
 import com.pokegoapi.main.Request;
 
 public class PokemonTransferRequest extends Request {
@@ -17,14 +17,14 @@ public class PokemonTransferRequest extends Request {
 	{
 		candies = 0;
 		status = 0;
-		builder = Pokemon.TransferPokemonProto.newBuilder();
+		builder = TransferPokemonProto.newBuilder();
 		builder.setPokemonId(entid);
 	}
 	
 	@Override
-	public int getRpcId()
+	public Communication.Method getRpcId()
 	{
-		return 112;
+		return Communication.Method.RELEASE_POKEMON;
 	}
 	
 	public int getCandies()

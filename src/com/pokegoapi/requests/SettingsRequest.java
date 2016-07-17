@@ -2,17 +2,20 @@ package com.pokegoapi.requests;
 
 import com.google.protobuf.ByteString;
 
-import com.pokegoapi.main.Pokemon;
-import com.pokegoapi.main.Pokemon.Payload;
+import com.pokegoapi.main.Communication;
+import com.pokegoapi.main.Communication.Payload;
+import com.pokegoapi.main.Player;
 import com.pokegoapi.main.Request;
+import com.pokegoapi.main.Player.SettingsRequest.Builder;
+
 
 public class SettingsRequest extends Request {
-	private Pokemon.SettingsRequest.Builder settingsRequestBuilder;
+	private Builder settingsRequestBuilder;
 
 
 	public SettingsRequest()
 	{
-		settingsRequestBuilder = Pokemon.SettingsRequest.newBuilder();
+		settingsRequestBuilder = Player.SettingsRequest.newBuilder();
 	}
 
 
@@ -22,9 +25,9 @@ public class SettingsRequest extends Request {
 	}
 
 	@Override
-	public int getRpcId()
+	public Communication.Method getRpcId()
 	{
-		return 5;
+		return Communication.Method.DOWNLOAD_SETTINGS;
 	}
 
 	@Override

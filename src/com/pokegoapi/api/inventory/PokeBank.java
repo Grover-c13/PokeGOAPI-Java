@@ -5,26 +5,26 @@ import java.util.List;
 import com.pokegoapi.api.PokemonGo;
 
 public class PokeBank {
-	List<PokemonDetails> pokemons;
+	List<Pokemon> pokemons;
 	private PokemonGo instance;
 	
 	public PokeBank(PokemonGo instance)
 	{
 		this.instance = instance;
-		pokemons = new ArrayList<PokemonDetails>();
+		pokemons = new ArrayList<Pokemon>();
 	}
 	
-	public void addPokemon(PokemonDetails pokemon)
+	public void addPokemon(Pokemon pokemon)
 	{
 		pokemon.setAPIInstance(instance);
 		pokemons.add(pokemon);
 	}
 	
 	
-	public List<PokemonDetails> getPokemonByPokemonId(int id)
+	public List<Pokemon> getPokemonByPokemonId(int id)
 	{
-		List<PokemonDetails> list = new ArrayList<PokemonDetails>();
-		for (PokemonDetails details : pokemons)
+		List<Pokemon> list = new ArrayList<Pokemon>();
+		for (Pokemon details : pokemons)
 		{
 			if (details.getPokemonId() == id)
 			{
@@ -35,10 +35,22 @@ public class PokeBank {
 		return list;
 	}
 	
-	
+	protected void removePokemon(Pokemon pokemon)
+	{
+		List<Pokemon> list = new ArrayList<Pokemon>();
+		for (Pokemon details : pokemons)
+		{
+			if (!details.equals(pokemon))
+			{
+				list.add(details);
+			}
+		}
+		
+		pokemons = list;
+	}
 
 	
-	public List<PokemonDetails> getPokemon()
+	public List<Pokemon> getPokemon()
 	{
 		return pokemons;
 	}

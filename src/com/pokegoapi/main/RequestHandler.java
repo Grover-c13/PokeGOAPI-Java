@@ -14,11 +14,11 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClients;
 
 import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.main.Pokemon.Payload;
-import com.pokegoapi.main.Pokemon.RequestEnvelop;
-import com.pokegoapi.main.Pokemon.RequestEnvelop.AuthInfo;
-import com.pokegoapi.main.Pokemon.RequestEnvelop.Builder;
-import com.pokegoapi.main.Pokemon.ResponseEnvelop;
+import com.pokegoapi.main.Communication.Payload;
+import com.pokegoapi.main.Communication.RequestEnvelop;
+import com.pokegoapi.main.Communication.RequestEnvelop.AuthInfo;
+import com.pokegoapi.main.Communication.RequestEnvelop.Builder;
+import com.pokegoapi.main.Communication.ResponseEnvelop;
 
 
 
@@ -30,6 +30,8 @@ public class RequestHandler
 	private List<Request> requests;
 	private String api_endpoint;
 	private HttpClient client;
+
+	private Communication.UnknownAuth lastAuth;
 	
 	public RequestHandler(AuthInfo auth)
 	{
@@ -87,6 +89,10 @@ public class RequestHandler
 			{
 				api_endpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
 			}
+
+			if (responseEnvelop.hasUnknownAuth()) {
+				lastAuth = responseEnvelop.getUnknownAuth();
+			}
 			
 			// map each reply to the numeric response, ie first response = first request and send back to the requests to handle.
 			int count = 0;
@@ -121,9 +127,13 @@ public class RequestHandler
 	private void resetBuilder()
 	{
 		builder =  RequestEnvelop.newBuilder();
-		builder.setUnknown1(2);
+		builder.setDirection(Communication.Direction.REQUEST);
 		builder.setRpcId(8145806132888207460l);
-		builder.setAuth(auth);
+		if (lastAuth != null && lastAuth.hasTimestamp()) {
+			builder.setUnknownAuth(lastAuth);
+		} else {
+			builder.setAuth(auth);
+		}
 		builder.setUnknown12(989);
 		hasRequests = false;
 		requests.clear();
@@ -144,6 +154,17 @@ public class RequestHandler
 		}
 		return builder.build();
 	}
-	
+
+	public void setLatitude(double latitude) {
+		builder.setLatitude(latitude);
+	}
+
+	public void setLongitude(double longitude) {
+		builder.setLongitude(longitude);
+	}
+
+	public void setAltitude(double altitude) {
+		builder.setAltitude(altitude);
+	}
 
 }
