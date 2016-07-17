@@ -13653,6 +13653,15 @@ public final class Pokemon {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <code>optional fixed64 entId = 1;</code>
+     */
+    boolean hasEntId();
+    /**
+     * <code>optional fixed64 entId = 1;</code>
+     */
+    long getEntId();
+
+    /**
      * <code>optional int32 PokemonId = 2;</code>
      */
     boolean hasPokemonId();
@@ -13707,18 +13716,13 @@ public final class Pokemon {
     int getMove2();
 
     /**
-     * <code>optional string DeployedFortId = 8;</code>
+     * <code>optional int32 DeployedFortId = 8;</code>
      */
     boolean hasDeployedFortId();
     /**
-     * <code>optional string DeployedFortId = 8;</code>
+     * <code>optional int32 DeployedFortId = 8;</code>
      */
-    java.lang.String getDeployedFortId();
-    /**
-     * <code>optional string DeployedFortId = 8;</code>
-     */
-    com.google.protobuf.ByteString
-        getDeployedFortIdBytes();
+    int getDeployedFortId();
 
     /**
      * <code>optional string OwnerName = 9;</code>
@@ -13834,11 +13838,11 @@ public final class Pokemon {
     int getPokeball();
 
     /**
-     * <code>optional int64 CapturedS2CellId = 22;</code>
+     * <code>optional uint64 CapturedS2CellId = 22;</code>
      */
     boolean hasCapturedS2CellId();
     /**
-     * <code>optional int64 CapturedS2CellId = 22;</code>
+     * <code>optional uint64 CapturedS2CellId = 22;</code>
      */
     long getCapturedS2CellId();
 
@@ -13861,18 +13865,13 @@ public final class Pokemon {
     int getBattlesDefended();
 
     /**
-     * <code>optional string EggIncubatorId = 25;</code>
+     * <code>optional int32 EggIncubatorId = 25;</code>
      */
     boolean hasEggIncubatorId();
     /**
-     * <code>optional string EggIncubatorId = 25;</code>
+     * <code>optional int32 EggIncubatorId = 25;</code>
      */
-    java.lang.String getEggIncubatorId();
-    /**
-     * <code>optional string EggIncubatorId = 25;</code>
-     */
-    com.google.protobuf.ByteString
-        getEggIncubatorIdBytes();
+    int getEggIncubatorId();
 
     /**
      * <code>optional int64 CreationTimeMs = 26;</code>
@@ -13932,15 +13931,6 @@ public final class Pokemon {
      * <code>optional bool FromFort = 31;</code>
      */
     boolean getFromFort();
-
-    /**
-     * <code>optional uint64 Id = 1;</code>
-     */
-    boolean hasId();
-    /**
-     * <code>optional uint64 Id = 1;</code>
-     */
-    long getId();
   }
   /**
    * Protobuf type {@code main.PokemonProto}
@@ -13994,157 +13984,155 @@ public final class Pokemon {
               }
               break;
             }
-            case 8: {
-              bitField0_ |= 0x20000000;
-              id_ = input.readUInt64();
+            case 9: {
+              bitField0_ |= 0x00000001;
+              entId_ = input.readFixed64();
               break;
             }
             case 16: {
-              bitField0_ |= 0x00000001;
+              bitField0_ |= 0x00000002;
               pokemonId_ = input.readInt32();
               break;
             }
             case 24: {
-              bitField0_ |= 0x00000002;
+              bitField0_ |= 0x00000004;
               cp_ = input.readInt32();
               break;
             }
             case 32: {
-              bitField0_ |= 0x00000004;
+              bitField0_ |= 0x00000008;
               stamina_ = input.readInt32();
               break;
             }
             case 40: {
-              bitField0_ |= 0x00000008;
+              bitField0_ |= 0x00000010;
               maxStamina_ = input.readInt32();
               break;
             }
             case 48: {
-              bitField0_ |= 0x00000010;
+              bitField0_ |= 0x00000020;
               move1_ = input.readInt32();
               break;
             }
             case 56: {
-              bitField0_ |= 0x00000020;
+              bitField0_ |= 0x00000040;
               move2_ = input.readInt32();
               break;
             }
-            case 66: {
-              com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x00000040;
-              deployedFortId_ = bs;
+            case 64: {
+              bitField0_ |= 0x00000080;
+              deployedFortId_ = input.readInt32();
               break;
             }
             case 74: {
               com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x00000080;
+              bitField0_ |= 0x00000100;
               ownerName_ = bs;
               break;
             }
             case 80: {
-              bitField0_ |= 0x00000100;
+              bitField0_ |= 0x00000200;
               isEgg_ = input.readBool();
               break;
             }
             case 89: {
-              bitField0_ |= 0x00000200;
+              bitField0_ |= 0x00000400;
               eggKmWalkedTarget_ = input.readDouble();
               break;
             }
             case 97: {
-              bitField0_ |= 0x00000400;
+              bitField0_ |= 0x00000800;
               eggKmWalkedStart_ = input.readDouble();
               break;
             }
             case 112: {
-              bitField0_ |= 0x00000800;
+              bitField0_ |= 0x00001000;
               origin_ = input.readInt32();
               break;
             }
             case 125: {
-              bitField0_ |= 0x00001000;
+              bitField0_ |= 0x00002000;
               heightM_ = input.readFloat();
               break;
             }
             case 133: {
-              bitField0_ |= 0x00002000;
+              bitField0_ |= 0x00004000;
               weightKg_ = input.readFloat();
               break;
             }
             case 136: {
-              bitField0_ |= 0x00004000;
+              bitField0_ |= 0x00008000;
               individualAttack_ = input.readInt32();
               break;
             }
             case 144: {
-              bitField0_ |= 0x00008000;
+              bitField0_ |= 0x00010000;
               individualDefense_ = input.readInt32();
               break;
             }
             case 152: {
-              bitField0_ |= 0x00010000;
+              bitField0_ |= 0x00020000;
               individualStamina_ = input.readInt32();
               break;
             }
             case 165: {
-              bitField0_ |= 0x00020000;
+              bitField0_ |= 0x00040000;
               cpMultiplier_ = input.readFloat();
               break;
             }
             case 168: {
-              bitField0_ |= 0x00040000;
+              bitField0_ |= 0x00080000;
               pokeball_ = input.readInt32();
               break;
             }
             case 176: {
-              bitField0_ |= 0x00080000;
-              capturedS2CellId_ = input.readInt64();
+              bitField0_ |= 0x00100000;
+              capturedS2CellId_ = input.readUInt64();
               break;
             }
             case 184: {
-              bitField0_ |= 0x00100000;
+              bitField0_ |= 0x00200000;
               battlesAttacked_ = input.readInt32();
               break;
             }
             case 192: {
-              bitField0_ |= 0x00200000;
+              bitField0_ |= 0x00400000;
               battlesDefended_ = input.readInt32();
               break;
             }
-            case 202: {
-              com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x00400000;
-              eggIncubatorId_ = bs;
+            case 200: {
+              bitField0_ |= 0x00800000;
+              eggIncubatorId_ = input.readInt32();
               break;
             }
             case 208: {
-              bitField0_ |= 0x00800000;
+              bitField0_ |= 0x01000000;
               creationTimeMs_ = input.readInt64();
               break;
             }
             case 216: {
-              bitField0_ |= 0x01000000;
+              bitField0_ |= 0x02000000;
               numUpgrades_ = input.readInt32();
               break;
             }
             case 229: {
-              bitField0_ |= 0x02000000;
+              bitField0_ |= 0x04000000;
               additionalCpMultiplier_ = input.readFloat();
               break;
             }
             case 232: {
-              bitField0_ |= 0x04000000;
+              bitField0_ |= 0x08000000;
               favorite_ = input.readBool();
               break;
             }
             case 242: {
               com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x08000000;
+              bitField0_ |= 0x10000000;
               nickname_ = bs;
               break;
             }
             case 248: {
-              bitField0_ |= 0x10000000;
+              bitField0_ |= 0x20000000;
               fromFort_ = input.readBool();
               break;
             }
@@ -14188,13 +14176,28 @@ public final class Pokemon {
     }
 
     private int bitField0_;
+    public static final int ENTID_FIELD_NUMBER = 1;
+    private long entId_;
+    /**
+     * <code>optional fixed64 entId = 1;</code>
+     */
+    public boolean hasEntId() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional fixed64 entId = 1;</code>
+     */
+    public long getEntId() {
+      return entId_;
+    }
+
     public static final int POKEMONID_FIELD_NUMBER = 2;
     private int pokemonId_;
     /**
      * <code>optional int32 PokemonId = 2;</code>
      */
     public boolean hasPokemonId() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
+      return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
      * <code>optional int32 PokemonId = 2;</code>
@@ -14209,7 +14212,7 @@ public final class Pokemon {
      * <code>optional int32 Cp = 3;</code>
      */
     public boolean hasCp() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
      * <code>optional int32 Cp = 3;</code>
@@ -14224,7 +14227,7 @@ public final class Pokemon {
      * <code>optional int32 Stamina = 4;</code>
      */
     public boolean hasStamina() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
      * <code>optional int32 Stamina = 4;</code>
@@ -14239,7 +14242,7 @@ public final class Pokemon {
      * <code>optional int32 MaxStamina = 5;</code>
      */
     public boolean hasMaxStamina() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
      * <code>optional int32 MaxStamina = 5;</code>
@@ -14254,7 +14257,7 @@ public final class Pokemon {
      * <code>optional int32 Move1 = 6;</code>
      */
     public boolean hasMove1() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
+      return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
      * <code>optional int32 Move1 = 6;</code>
@@ -14269,7 +14272,7 @@ public final class Pokemon {
      * <code>optional int32 Move2 = 7;</code>
      */
     public boolean hasMove2() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
+      return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
      * <code>optional int32 Move2 = 7;</code>
@@ -14279,45 +14282,18 @@ public final class Pokemon {
     }
 
     public static final int DEPLOYEDFORTID_FIELD_NUMBER = 8;
-    private java.lang.Object deployedFortId_;
+    private int deployedFortId_;
     /**
-     * <code>optional string DeployedFortId = 8;</code>
+     * <code>optional int32 DeployedFortId = 8;</code>
      */
     public boolean hasDeployedFortId() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
+      return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
-     * <code>optional string DeployedFortId = 8;</code>
+     * <code>optional int32 DeployedFortId = 8;</code>
      */
-    public java.lang.String getDeployedFortId() {
-      java.lang.Object ref = deployedFortId_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          deployedFortId_ = s;
-        }
-        return s;
-      }
-    }
-    /**
-     * <code>optional string DeployedFortId = 8;</code>
-     */
-    public com.google.protobuf.ByteString
-        getDeployedFortIdBytes() {
-      java.lang.Object ref = deployedFortId_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        deployedFortId_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public int getDeployedFortId() {
+      return deployedFortId_;
     }
 
     public static final int OWNERNAME_FIELD_NUMBER = 9;
@@ -14326,7 +14302,7 @@ public final class Pokemon {
      * <code>optional string OwnerName = 9;</code>
      */
     public boolean hasOwnerName() {
-      return ((bitField0_ & 0x00000080) == 0x00000080);
+      return ((bitField0_ & 0x00000100) == 0x00000100);
     }
     /**
      * <code>optional string OwnerName = 9;</code>
@@ -14368,7 +14344,7 @@ public final class Pokemon {
      * <code>optional bool IsEgg = 10;</code>
      */
     public boolean hasIsEgg() {
-      return ((bitField0_ & 0x00000100) == 0x00000100);
+      return ((bitField0_ & 0x00000200) == 0x00000200);
     }
     /**
      * <code>optional bool IsEgg = 10;</code>
@@ -14383,7 +14359,7 @@ public final class Pokemon {
      * <code>optional double EggKmWalkedTarget = 11;</code>
      */
     public boolean hasEggKmWalkedTarget() {
-      return ((bitField0_ & 0x00000200) == 0x00000200);
+      return ((bitField0_ & 0x00000400) == 0x00000400);
     }
     /**
      * <code>optional double EggKmWalkedTarget = 11;</code>
@@ -14398,7 +14374,7 @@ public final class Pokemon {
      * <code>optional double EggKmWalkedStart = 12;</code>
      */
     public boolean hasEggKmWalkedStart() {
-      return ((bitField0_ & 0x00000400) == 0x00000400);
+      return ((bitField0_ & 0x00000800) == 0x00000800);
     }
     /**
      * <code>optional double EggKmWalkedStart = 12;</code>
@@ -14413,7 +14389,7 @@ public final class Pokemon {
      * <code>optional int32 Origin = 14;</code>
      */
     public boolean hasOrigin() {
-      return ((bitField0_ & 0x00000800) == 0x00000800);
+      return ((bitField0_ & 0x00001000) == 0x00001000);
     }
     /**
      * <code>optional int32 Origin = 14;</code>
@@ -14428,7 +14404,7 @@ public final class Pokemon {
      * <code>optional float HeightM = 15;</code>
      */
     public boolean hasHeightM() {
-      return ((bitField0_ & 0x00001000) == 0x00001000);
+      return ((bitField0_ & 0x00002000) == 0x00002000);
     }
     /**
      * <code>optional float HeightM = 15;</code>
@@ -14443,7 +14419,7 @@ public final class Pokemon {
      * <code>optional float WeightKg = 16;</code>
      */
     public boolean hasWeightKg() {
-      return ((bitField0_ & 0x00002000) == 0x00002000);
+      return ((bitField0_ & 0x00004000) == 0x00004000);
     }
     /**
      * <code>optional float WeightKg = 16;</code>
@@ -14458,7 +14434,7 @@ public final class Pokemon {
      * <code>optional int32 IndividualAttack = 17;</code>
      */
     public boolean hasIndividualAttack() {
-      return ((bitField0_ & 0x00004000) == 0x00004000);
+      return ((bitField0_ & 0x00008000) == 0x00008000);
     }
     /**
      * <code>optional int32 IndividualAttack = 17;</code>
@@ -14473,7 +14449,7 @@ public final class Pokemon {
      * <code>optional int32 IndividualDefense = 18;</code>
      */
     public boolean hasIndividualDefense() {
-      return ((bitField0_ & 0x00008000) == 0x00008000);
+      return ((bitField0_ & 0x00010000) == 0x00010000);
     }
     /**
      * <code>optional int32 IndividualDefense = 18;</code>
@@ -14488,7 +14464,7 @@ public final class Pokemon {
      * <code>optional int32 IndividualStamina = 19;</code>
      */
     public boolean hasIndividualStamina() {
-      return ((bitField0_ & 0x00010000) == 0x00010000);
+      return ((bitField0_ & 0x00020000) == 0x00020000);
     }
     /**
      * <code>optional int32 IndividualStamina = 19;</code>
@@ -14503,7 +14479,7 @@ public final class Pokemon {
      * <code>optional float CpMultiplier = 20;</code>
      */
     public boolean hasCpMultiplier() {
-      return ((bitField0_ & 0x00020000) == 0x00020000);
+      return ((bitField0_ & 0x00040000) == 0x00040000);
     }
     /**
      * <code>optional float CpMultiplier = 20;</code>
@@ -14518,7 +14494,7 @@ public final class Pokemon {
      * <code>optional int32 Pokeball = 21;</code>
      */
     public boolean hasPokeball() {
-      return ((bitField0_ & 0x00040000) == 0x00040000);
+      return ((bitField0_ & 0x00080000) == 0x00080000);
     }
     /**
      * <code>optional int32 Pokeball = 21;</code>
@@ -14530,13 +14506,13 @@ public final class Pokemon {
     public static final int CAPTUREDS2CELLID_FIELD_NUMBER = 22;
     private long capturedS2CellId_;
     /**
-     * <code>optional int64 CapturedS2CellId = 22;</code>
+     * <code>optional uint64 CapturedS2CellId = 22;</code>
      */
     public boolean hasCapturedS2CellId() {
-      return ((bitField0_ & 0x00080000) == 0x00080000);
+      return ((bitField0_ & 0x00100000) == 0x00100000);
     }
     /**
-     * <code>optional int64 CapturedS2CellId = 22;</code>
+     * <code>optional uint64 CapturedS2CellId = 22;</code>
      */
     public long getCapturedS2CellId() {
       return capturedS2CellId_;
@@ -14548,7 +14524,7 @@ public final class Pokemon {
      * <code>optional int32 BattlesAttacked = 23;</code>
      */
     public boolean hasBattlesAttacked() {
-      return ((bitField0_ & 0x00100000) == 0x00100000);
+      return ((bitField0_ & 0x00200000) == 0x00200000);
     }
     /**
      * <code>optional int32 BattlesAttacked = 23;</code>
@@ -14563,7 +14539,7 @@ public final class Pokemon {
      * <code>optional int32 BattlesDefended = 24;</code>
      */
     public boolean hasBattlesDefended() {
-      return ((bitField0_ & 0x00200000) == 0x00200000);
+      return ((bitField0_ & 0x00400000) == 0x00400000);
     }
     /**
      * <code>optional int32 BattlesDefended = 24;</code>
@@ -14573,45 +14549,18 @@ public final class Pokemon {
     }
 
     public static final int EGGINCUBATORID_FIELD_NUMBER = 25;
-    private java.lang.Object eggIncubatorId_;
+    private int eggIncubatorId_;
     /**
-     * <code>optional string EggIncubatorId = 25;</code>
+     * <code>optional int32 EggIncubatorId = 25;</code>
      */
     public boolean hasEggIncubatorId() {
-      return ((bitField0_ & 0x00400000) == 0x00400000);
+      return ((bitField0_ & 0x00800000) == 0x00800000);
     }
     /**
-     * <code>optional string EggIncubatorId = 25;</code>
+     * <code>optional int32 EggIncubatorId = 25;</code>
      */
-    public java.lang.String getEggIncubatorId() {
-      java.lang.Object ref = eggIncubatorId_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          eggIncubatorId_ = s;
-        }
-        return s;
-      }
-    }
-    /**
-     * <code>optional string EggIncubatorId = 25;</code>
-     */
-    public com.google.protobuf.ByteString
-        getEggIncubatorIdBytes() {
-      java.lang.Object ref = eggIncubatorId_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        eggIncubatorId_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public int getEggIncubatorId() {
+      return eggIncubatorId_;
     }
 
     public static final int CREATIONTIMEMS_FIELD_NUMBER = 26;
@@ -14620,7 +14569,7 @@ public final class Pokemon {
      * <code>optional int64 CreationTimeMs = 26;</code>
      */
     public boolean hasCreationTimeMs() {
-      return ((bitField0_ & 0x00800000) == 0x00800000);
+      return ((bitField0_ & 0x01000000) == 0x01000000);
     }
     /**
      * <code>optional int64 CreationTimeMs = 26;</code>
@@ -14635,7 +14584,7 @@ public final class Pokemon {
      * <code>optional int32 NumUpgrades = 27;</code>
      */
     public boolean hasNumUpgrades() {
-      return ((bitField0_ & 0x01000000) == 0x01000000);
+      return ((bitField0_ & 0x02000000) == 0x02000000);
     }
     /**
      * <code>optional int32 NumUpgrades = 27;</code>
@@ -14650,7 +14599,7 @@ public final class Pokemon {
      * <code>optional float AdditionalCpMultiplier = 28;</code>
      */
     public boolean hasAdditionalCpMultiplier() {
-      return ((bitField0_ & 0x02000000) == 0x02000000);
+      return ((bitField0_ & 0x04000000) == 0x04000000);
     }
     /**
      * <code>optional float AdditionalCpMultiplier = 28;</code>
@@ -14665,7 +14614,7 @@ public final class Pokemon {
      * <code>optional bool Favorite = 29;</code>
      */
     public boolean hasFavorite() {
-      return ((bitField0_ & 0x04000000) == 0x04000000);
+      return ((bitField0_ & 0x08000000) == 0x08000000);
     }
     /**
      * <code>optional bool Favorite = 29;</code>
@@ -14680,7 +14629,7 @@ public final class Pokemon {
      * <code>optional string Nickname = 30;</code>
      */
     public boolean hasNickname() {
-      return ((bitField0_ & 0x08000000) == 0x08000000);
+      return ((bitField0_ & 0x10000000) == 0x10000000);
     }
     /**
      * <code>optional string Nickname = 30;</code>
@@ -14722,7 +14671,7 @@ public final class Pokemon {
      * <code>optional bool FromFort = 31;</code>
      */
     public boolean hasFromFort() {
-      return ((bitField0_ & 0x10000000) == 0x10000000);
+      return ((bitField0_ & 0x20000000) == 0x20000000);
     }
     /**
      * <code>optional bool FromFort = 31;</code>
@@ -14731,29 +14680,15 @@ public final class Pokemon {
       return fromFort_;
     }
 
-    public static final int ID_FIELD_NUMBER = 1;
-    private long id_;
-    /**
-     * <code>optional uint64 Id = 1;</code>
-     */
-    public boolean hasId() {
-      return ((bitField0_ & 0x20000000) == 0x20000000);
-    }
-    /**
-     * <code>optional uint64 Id = 1;</code>
-     */
-    public long getId() {
-      return id_;
-    }
-
     private void initFields() {
+      entId_ = 0L;
       pokemonId_ = 0;
       cp_ = 0;
       stamina_ = 0;
       maxStamina_ = 0;
       move1_ = 0;
       move2_ = 0;
-      deployedFortId_ = "";
+      deployedFortId_ = 0;
       ownerName_ = "";
       isEgg_ = false;
       eggKmWalkedTarget_ = 0D;
@@ -14769,14 +14704,13 @@ public final class Pokemon {
       capturedS2CellId_ = 0L;
       battlesAttacked_ = 0;
       battlesDefended_ = 0;
-      eggIncubatorId_ = "";
+      eggIncubatorId_ = 0;
       creationTimeMs_ = 0L;
       numUpgrades_ = 0;
       additionalCpMultiplier_ = 0F;
       favorite_ = false;
       nickname_ = "";
       fromFort_ = false;
-      id_ = 0L;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -14791,94 +14725,94 @@ public final class Pokemon {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
-      if (((bitField0_ & 0x20000000) == 0x20000000)) {
-        output.writeUInt64(1, id_);
-      }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt32(2, pokemonId_);
+        output.writeFixed64(1, entId_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeInt32(3, cp_);
+        output.writeInt32(2, pokemonId_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeInt32(4, stamina_);
+        output.writeInt32(3, cp_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeInt32(5, maxStamina_);
+        output.writeInt32(4, stamina_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeInt32(6, move1_);
+        output.writeInt32(5, maxStamina_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeInt32(7, move2_);
+        output.writeInt32(6, move1_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeBytes(8, getDeployedFortIdBytes());
+        output.writeInt32(7, move2_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        output.writeBytes(9, getOwnerNameBytes());
+        output.writeInt32(8, deployedFortId_);
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        output.writeBool(10, isEgg_);
+        output.writeBytes(9, getOwnerNameBytes());
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
-        output.writeDouble(11, eggKmWalkedTarget_);
+        output.writeBool(10, isEgg_);
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
-        output.writeDouble(12, eggKmWalkedStart_);
+        output.writeDouble(11, eggKmWalkedTarget_);
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
-        output.writeInt32(14, origin_);
+        output.writeDouble(12, eggKmWalkedStart_);
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
-        output.writeFloat(15, heightM_);
+        output.writeInt32(14, origin_);
       }
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
-        output.writeFloat(16, weightKg_);
+        output.writeFloat(15, heightM_);
       }
       if (((bitField0_ & 0x00004000) == 0x00004000)) {
-        output.writeInt32(17, individualAttack_);
+        output.writeFloat(16, weightKg_);
       }
       if (((bitField0_ & 0x00008000) == 0x00008000)) {
-        output.writeInt32(18, individualDefense_);
+        output.writeInt32(17, individualAttack_);
       }
       if (((bitField0_ & 0x00010000) == 0x00010000)) {
-        output.writeInt32(19, individualStamina_);
+        output.writeInt32(18, individualDefense_);
       }
       if (((bitField0_ & 0x00020000) == 0x00020000)) {
-        output.writeFloat(20, cpMultiplier_);
+        output.writeInt32(19, individualStamina_);
       }
       if (((bitField0_ & 0x00040000) == 0x00040000)) {
-        output.writeInt32(21, pokeball_);
+        output.writeFloat(20, cpMultiplier_);
       }
       if (((bitField0_ & 0x00080000) == 0x00080000)) {
-        output.writeInt64(22, capturedS2CellId_);
+        output.writeInt32(21, pokeball_);
       }
       if (((bitField0_ & 0x00100000) == 0x00100000)) {
-        output.writeInt32(23, battlesAttacked_);
+        output.writeUInt64(22, capturedS2CellId_);
       }
       if (((bitField0_ & 0x00200000) == 0x00200000)) {
-        output.writeInt32(24, battlesDefended_);
+        output.writeInt32(23, battlesAttacked_);
       }
       if (((bitField0_ & 0x00400000) == 0x00400000)) {
-        output.writeBytes(25, getEggIncubatorIdBytes());
+        output.writeInt32(24, battlesDefended_);
       }
       if (((bitField0_ & 0x00800000) == 0x00800000)) {
-        output.writeInt64(26, creationTimeMs_);
+        output.writeInt32(25, eggIncubatorId_);
       }
       if (((bitField0_ & 0x01000000) == 0x01000000)) {
-        output.writeInt32(27, numUpgrades_);
+        output.writeInt64(26, creationTimeMs_);
       }
       if (((bitField0_ & 0x02000000) == 0x02000000)) {
-        output.writeFloat(28, additionalCpMultiplier_);
+        output.writeInt32(27, numUpgrades_);
       }
       if (((bitField0_ & 0x04000000) == 0x04000000)) {
-        output.writeBool(29, favorite_);
+        output.writeFloat(28, additionalCpMultiplier_);
       }
       if (((bitField0_ & 0x08000000) == 0x08000000)) {
-        output.writeBytes(30, getNicknameBytes());
+        output.writeBool(29, favorite_);
       }
       if (((bitField0_ & 0x10000000) == 0x10000000)) {
+        output.writeBytes(30, getNicknameBytes());
+      }
+      if (((bitField0_ & 0x20000000) == 0x20000000)) {
         output.writeBool(31, fromFort_);
       }
       getUnknownFields().writeTo(output);
@@ -14890,123 +14824,123 @@ public final class Pokemon {
       if (size != -1) return size;
 
       size = 0;
-      if (((bitField0_ & 0x20000000) == 0x20000000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(1, id_);
-      }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, pokemonId_);
+          .computeFixed64Size(1, entId_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(3, cp_);
+          .computeInt32Size(2, pokemonId_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(4, stamina_);
+          .computeInt32Size(3, cp_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(5, maxStamina_);
+          .computeInt32Size(4, stamina_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(6, move1_);
+          .computeInt32Size(5, maxStamina_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(7, move2_);
+          .computeInt32Size(6, move1_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(8, getDeployedFortIdBytes());
+          .computeInt32Size(7, move2_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(9, getOwnerNameBytes());
+          .computeInt32Size(8, deployedFortId_);
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(10, isEgg_);
+          .computeBytesSize(9, getOwnerNameBytes());
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(11, eggKmWalkedTarget_);
+          .computeBoolSize(10, isEgg_);
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(12, eggKmWalkedStart_);
+          .computeDoubleSize(11, eggKmWalkedTarget_);
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(14, origin_);
+          .computeDoubleSize(12, eggKmWalkedStart_);
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(15, heightM_);
+          .computeInt32Size(14, origin_);
       }
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(16, weightKg_);
+          .computeFloatSize(15, heightM_);
       }
       if (((bitField0_ & 0x00004000) == 0x00004000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(17, individualAttack_);
+          .computeFloatSize(16, weightKg_);
       }
       if (((bitField0_ & 0x00008000) == 0x00008000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(18, individualDefense_);
+          .computeInt32Size(17, individualAttack_);
       }
       if (((bitField0_ & 0x00010000) == 0x00010000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(19, individualStamina_);
+          .computeInt32Size(18, individualDefense_);
       }
       if (((bitField0_ & 0x00020000) == 0x00020000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(20, cpMultiplier_);
+          .computeInt32Size(19, individualStamina_);
       }
       if (((bitField0_ & 0x00040000) == 0x00040000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(21, pokeball_);
+          .computeFloatSize(20, cpMultiplier_);
       }
       if (((bitField0_ & 0x00080000) == 0x00080000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(22, capturedS2CellId_);
+          .computeInt32Size(21, pokeball_);
       }
       if (((bitField0_ & 0x00100000) == 0x00100000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(23, battlesAttacked_);
+          .computeUInt64Size(22, capturedS2CellId_);
       }
       if (((bitField0_ & 0x00200000) == 0x00200000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(24, battlesDefended_);
+          .computeInt32Size(23, battlesAttacked_);
       }
       if (((bitField0_ & 0x00400000) == 0x00400000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(25, getEggIncubatorIdBytes());
+          .computeInt32Size(24, battlesDefended_);
       }
       if (((bitField0_ & 0x00800000) == 0x00800000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(26, creationTimeMs_);
+          .computeInt32Size(25, eggIncubatorId_);
       }
       if (((bitField0_ & 0x01000000) == 0x01000000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(27, numUpgrades_);
+          .computeInt64Size(26, creationTimeMs_);
       }
       if (((bitField0_ & 0x02000000) == 0x02000000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(28, additionalCpMultiplier_);
+          .computeInt32Size(27, numUpgrades_);
       }
       if (((bitField0_ & 0x04000000) == 0x04000000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(29, favorite_);
+          .computeFloatSize(28, additionalCpMultiplier_);
       }
       if (((bitField0_ & 0x08000000) == 0x08000000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(30, getNicknameBytes());
+          .computeBoolSize(29, favorite_);
       }
       if (((bitField0_ & 0x10000000) == 0x10000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(30, getNicknameBytes());
+      }
+      if (((bitField0_ & 0x20000000) == 0x20000000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(31, fromFort_);
       }
@@ -15127,65 +15061,65 @@ public final class Pokemon {
 
       public Builder clear() {
         super.clear();
-        pokemonId_ = 0;
+        entId_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000001);
-        cp_ = 0;
+        pokemonId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
-        stamina_ = 0;
+        cp_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
-        maxStamina_ = 0;
+        stamina_ = 0;
         bitField0_ = (bitField0_ & ~0x00000008);
-        move1_ = 0;
+        maxStamina_ = 0;
         bitField0_ = (bitField0_ & ~0x00000010);
-        move2_ = 0;
+        move1_ = 0;
         bitField0_ = (bitField0_ & ~0x00000020);
-        deployedFortId_ = "";
+        move2_ = 0;
         bitField0_ = (bitField0_ & ~0x00000040);
-        ownerName_ = "";
+        deployedFortId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000080);
-        isEgg_ = false;
+        ownerName_ = "";
         bitField0_ = (bitField0_ & ~0x00000100);
-        eggKmWalkedTarget_ = 0D;
+        isEgg_ = false;
         bitField0_ = (bitField0_ & ~0x00000200);
-        eggKmWalkedStart_ = 0D;
+        eggKmWalkedTarget_ = 0D;
         bitField0_ = (bitField0_ & ~0x00000400);
-        origin_ = 0;
+        eggKmWalkedStart_ = 0D;
         bitField0_ = (bitField0_ & ~0x00000800);
-        heightM_ = 0F;
+        origin_ = 0;
         bitField0_ = (bitField0_ & ~0x00001000);
-        weightKg_ = 0F;
+        heightM_ = 0F;
         bitField0_ = (bitField0_ & ~0x00002000);
-        individualAttack_ = 0;
+        weightKg_ = 0F;
         bitField0_ = (bitField0_ & ~0x00004000);
-        individualDefense_ = 0;
+        individualAttack_ = 0;
         bitField0_ = (bitField0_ & ~0x00008000);
-        individualStamina_ = 0;
+        individualDefense_ = 0;
         bitField0_ = (bitField0_ & ~0x00010000);
-        cpMultiplier_ = 0F;
+        individualStamina_ = 0;
         bitField0_ = (bitField0_ & ~0x00020000);
-        pokeball_ = 0;
+        cpMultiplier_ = 0F;
         bitField0_ = (bitField0_ & ~0x00040000);
-        capturedS2CellId_ = 0L;
+        pokeball_ = 0;
         bitField0_ = (bitField0_ & ~0x00080000);
-        battlesAttacked_ = 0;
+        capturedS2CellId_ = 0L;
         bitField0_ = (bitField0_ & ~0x00100000);
-        battlesDefended_ = 0;
+        battlesAttacked_ = 0;
         bitField0_ = (bitField0_ & ~0x00200000);
-        eggIncubatorId_ = "";
+        battlesDefended_ = 0;
         bitField0_ = (bitField0_ & ~0x00400000);
-        creationTimeMs_ = 0L;
+        eggIncubatorId_ = 0;
         bitField0_ = (bitField0_ & ~0x00800000);
-        numUpgrades_ = 0;
+        creationTimeMs_ = 0L;
         bitField0_ = (bitField0_ & ~0x01000000);
-        additionalCpMultiplier_ = 0F;
+        numUpgrades_ = 0;
         bitField0_ = (bitField0_ & ~0x02000000);
-        favorite_ = false;
+        additionalCpMultiplier_ = 0F;
         bitField0_ = (bitField0_ & ~0x04000000);
-        nickname_ = "";
+        favorite_ = false;
         bitField0_ = (bitField0_ & ~0x08000000);
-        fromFort_ = false;
+        nickname_ = "";
         bitField0_ = (bitField0_ & ~0x10000000);
-        id_ = 0L;
+        fromFort_ = false;
         bitField0_ = (bitField0_ & ~0x20000000);
         return this;
       }
@@ -15218,123 +15152,123 @@ public final class Pokemon {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.pokemonId_ = pokemonId_;
+        result.entId_ = entId_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.cp_ = cp_;
+        result.pokemonId_ = pokemonId_;
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.stamina_ = stamina_;
+        result.cp_ = cp_;
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
         }
-        result.maxStamina_ = maxStamina_;
+        result.stamina_ = stamina_;
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000010;
         }
-        result.move1_ = move1_;
+        result.maxStamina_ = maxStamina_;
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
         }
-        result.move2_ = move2_;
+        result.move1_ = move1_;
         if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
           to_bitField0_ |= 0x00000040;
         }
-        result.deployedFortId_ = deployedFortId_;
+        result.move2_ = move2_;
         if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
           to_bitField0_ |= 0x00000080;
         }
-        result.ownerName_ = ownerName_;
+        result.deployedFortId_ = deployedFortId_;
         if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
           to_bitField0_ |= 0x00000100;
         }
-        result.isEgg_ = isEgg_;
+        result.ownerName_ = ownerName_;
         if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
           to_bitField0_ |= 0x00000200;
         }
-        result.eggKmWalkedTarget_ = eggKmWalkedTarget_;
+        result.isEgg_ = isEgg_;
         if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
           to_bitField0_ |= 0x00000400;
         }
-        result.eggKmWalkedStart_ = eggKmWalkedStart_;
+        result.eggKmWalkedTarget_ = eggKmWalkedTarget_;
         if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
           to_bitField0_ |= 0x00000800;
         }
-        result.origin_ = origin_;
+        result.eggKmWalkedStart_ = eggKmWalkedStart_;
         if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
           to_bitField0_ |= 0x00001000;
         }
-        result.heightM_ = heightM_;
+        result.origin_ = origin_;
         if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
           to_bitField0_ |= 0x00002000;
         }
-        result.weightKg_ = weightKg_;
+        result.heightM_ = heightM_;
         if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
           to_bitField0_ |= 0x00004000;
         }
-        result.individualAttack_ = individualAttack_;
+        result.weightKg_ = weightKg_;
         if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
           to_bitField0_ |= 0x00008000;
         }
-        result.individualDefense_ = individualDefense_;
+        result.individualAttack_ = individualAttack_;
         if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
           to_bitField0_ |= 0x00010000;
         }
-        result.individualStamina_ = individualStamina_;
+        result.individualDefense_ = individualDefense_;
         if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
           to_bitField0_ |= 0x00020000;
         }
-        result.cpMultiplier_ = cpMultiplier_;
+        result.individualStamina_ = individualStamina_;
         if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
           to_bitField0_ |= 0x00040000;
         }
-        result.pokeball_ = pokeball_;
+        result.cpMultiplier_ = cpMultiplier_;
         if (((from_bitField0_ & 0x00080000) == 0x00080000)) {
           to_bitField0_ |= 0x00080000;
         }
-        result.capturedS2CellId_ = capturedS2CellId_;
+        result.pokeball_ = pokeball_;
         if (((from_bitField0_ & 0x00100000) == 0x00100000)) {
           to_bitField0_ |= 0x00100000;
         }
-        result.battlesAttacked_ = battlesAttacked_;
+        result.capturedS2CellId_ = capturedS2CellId_;
         if (((from_bitField0_ & 0x00200000) == 0x00200000)) {
           to_bitField0_ |= 0x00200000;
         }
-        result.battlesDefended_ = battlesDefended_;
+        result.battlesAttacked_ = battlesAttacked_;
         if (((from_bitField0_ & 0x00400000) == 0x00400000)) {
           to_bitField0_ |= 0x00400000;
         }
-        result.eggIncubatorId_ = eggIncubatorId_;
+        result.battlesDefended_ = battlesDefended_;
         if (((from_bitField0_ & 0x00800000) == 0x00800000)) {
           to_bitField0_ |= 0x00800000;
         }
-        result.creationTimeMs_ = creationTimeMs_;
+        result.eggIncubatorId_ = eggIncubatorId_;
         if (((from_bitField0_ & 0x01000000) == 0x01000000)) {
           to_bitField0_ |= 0x01000000;
         }
-        result.numUpgrades_ = numUpgrades_;
+        result.creationTimeMs_ = creationTimeMs_;
         if (((from_bitField0_ & 0x02000000) == 0x02000000)) {
           to_bitField0_ |= 0x02000000;
         }
-        result.additionalCpMultiplier_ = additionalCpMultiplier_;
+        result.numUpgrades_ = numUpgrades_;
         if (((from_bitField0_ & 0x04000000) == 0x04000000)) {
           to_bitField0_ |= 0x04000000;
         }
-        result.favorite_ = favorite_;
+        result.additionalCpMultiplier_ = additionalCpMultiplier_;
         if (((from_bitField0_ & 0x08000000) == 0x08000000)) {
           to_bitField0_ |= 0x08000000;
         }
-        result.nickname_ = nickname_;
+        result.favorite_ = favorite_;
         if (((from_bitField0_ & 0x10000000) == 0x10000000)) {
           to_bitField0_ |= 0x10000000;
         }
-        result.fromFort_ = fromFort_;
+        result.nickname_ = nickname_;
         if (((from_bitField0_ & 0x20000000) == 0x20000000)) {
           to_bitField0_ |= 0x20000000;
         }
-        result.id_ = id_;
+        result.fromFort_ = fromFort_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -15351,6 +15285,9 @@ public final class Pokemon {
 
       public Builder mergeFrom(main.Pokemon.PokemonProto other) {
         if (other == main.Pokemon.PokemonProto.getDefaultInstance()) return this;
+        if (other.hasEntId()) {
+          setEntId(other.getEntId());
+        }
         if (other.hasPokemonId()) {
           setPokemonId(other.getPokemonId());
         }
@@ -15370,12 +15307,10 @@ public final class Pokemon {
           setMove2(other.getMove2());
         }
         if (other.hasDeployedFortId()) {
-          bitField0_ |= 0x00000040;
-          deployedFortId_ = other.deployedFortId_;
-          onChanged();
+          setDeployedFortId(other.getDeployedFortId());
         }
         if (other.hasOwnerName()) {
-          bitField0_ |= 0x00000080;
+          bitField0_ |= 0x00000100;
           ownerName_ = other.ownerName_;
           onChanged();
         }
@@ -15422,9 +15357,7 @@ public final class Pokemon {
           setBattlesDefended(other.getBattlesDefended());
         }
         if (other.hasEggIncubatorId()) {
-          bitField0_ |= 0x00400000;
-          eggIncubatorId_ = other.eggIncubatorId_;
-          onChanged();
+          setEggIncubatorId(other.getEggIncubatorId());
         }
         if (other.hasCreationTimeMs()) {
           setCreationTimeMs(other.getCreationTimeMs());
@@ -15439,15 +15372,12 @@ public final class Pokemon {
           setFavorite(other.getFavorite());
         }
         if (other.hasNickname()) {
-          bitField0_ |= 0x08000000;
+          bitField0_ |= 0x10000000;
           nickname_ = other.nickname_;
           onChanged();
         }
         if (other.hasFromFort()) {
           setFromFort(other.getFromFort());
-        }
-        if (other.hasId()) {
-          setId(other.getId());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -15476,12 +15406,44 @@ public final class Pokemon {
       }
       private int bitField0_;
 
+      private long entId_ ;
+      /**
+       * <code>optional fixed64 entId = 1;</code>
+       */
+      public boolean hasEntId() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional fixed64 entId = 1;</code>
+       */
+      public long getEntId() {
+        return entId_;
+      }
+      /**
+       * <code>optional fixed64 entId = 1;</code>
+       */
+      public Builder setEntId(long value) {
+        bitField0_ |= 0x00000001;
+        entId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional fixed64 entId = 1;</code>
+       */
+      public Builder clearEntId() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        entId_ = 0L;
+        onChanged();
+        return this;
+      }
+
       private int pokemonId_ ;
       /**
        * <code>optional int32 PokemonId = 2;</code>
        */
       public boolean hasPokemonId() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
+        return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
        * <code>optional int32 PokemonId = 2;</code>
@@ -15493,7 +15455,7 @@ public final class Pokemon {
        * <code>optional int32 PokemonId = 2;</code>
        */
       public Builder setPokemonId(int value) {
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000002;
         pokemonId_ = value;
         onChanged();
         return this;
@@ -15502,7 +15464,7 @@ public final class Pokemon {
        * <code>optional int32 PokemonId = 2;</code>
        */
       public Builder clearPokemonId() {
-        bitField0_ = (bitField0_ & ~0x00000001);
+        bitField0_ = (bitField0_ & ~0x00000002);
         pokemonId_ = 0;
         onChanged();
         return this;
@@ -15513,7 +15475,7 @@ public final class Pokemon {
        * <code>optional int32 Cp = 3;</code>
        */
       public boolean hasCp() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
        * <code>optional int32 Cp = 3;</code>
@@ -15525,7 +15487,7 @@ public final class Pokemon {
        * <code>optional int32 Cp = 3;</code>
        */
       public Builder setCp(int value) {
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         cp_ = value;
         onChanged();
         return this;
@@ -15534,7 +15496,7 @@ public final class Pokemon {
        * <code>optional int32 Cp = 3;</code>
        */
       public Builder clearCp() {
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
         cp_ = 0;
         onChanged();
         return this;
@@ -15545,7 +15507,7 @@ public final class Pokemon {
        * <code>optional int32 Stamina = 4;</code>
        */
       public boolean hasStamina() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
        * <code>optional int32 Stamina = 4;</code>
@@ -15557,7 +15519,7 @@ public final class Pokemon {
        * <code>optional int32 Stamina = 4;</code>
        */
       public Builder setStamina(int value) {
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         stamina_ = value;
         onChanged();
         return this;
@@ -15566,7 +15528,7 @@ public final class Pokemon {
        * <code>optional int32 Stamina = 4;</code>
        */
       public Builder clearStamina() {
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000008);
         stamina_ = 0;
         onChanged();
         return this;
@@ -15577,7 +15539,7 @@ public final class Pokemon {
        * <code>optional int32 MaxStamina = 5;</code>
        */
       public boolean hasMaxStamina() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
        * <code>optional int32 MaxStamina = 5;</code>
@@ -15589,7 +15551,7 @@ public final class Pokemon {
        * <code>optional int32 MaxStamina = 5;</code>
        */
       public Builder setMaxStamina(int value) {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         maxStamina_ = value;
         onChanged();
         return this;
@@ -15598,7 +15560,7 @@ public final class Pokemon {
        * <code>optional int32 MaxStamina = 5;</code>
        */
       public Builder clearMaxStamina() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         maxStamina_ = 0;
         onChanged();
         return this;
@@ -15609,7 +15571,7 @@ public final class Pokemon {
        * <code>optional int32 Move1 = 6;</code>
        */
       public boolean hasMove1() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
+        return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
        * <code>optional int32 Move1 = 6;</code>
@@ -15621,7 +15583,7 @@ public final class Pokemon {
        * <code>optional int32 Move1 = 6;</code>
        */
       public Builder setMove1(int value) {
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         move1_ = value;
         onChanged();
         return this;
@@ -15630,7 +15592,7 @@ public final class Pokemon {
        * <code>optional int32 Move1 = 6;</code>
        */
       public Builder clearMove1() {
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
         move1_ = 0;
         onChanged();
         return this;
@@ -15641,7 +15603,7 @@ public final class Pokemon {
        * <code>optional int32 Move2 = 7;</code>
        */
       public boolean hasMove2() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
        * <code>optional int32 Move2 = 7;</code>
@@ -15653,7 +15615,7 @@ public final class Pokemon {
        * <code>optional int32 Move2 = 7;</code>
        */
       public Builder setMove2(int value) {
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         move2_ = value;
         onChanged();
         return this;
@@ -15662,84 +15624,40 @@ public final class Pokemon {
        * <code>optional int32 Move2 = 7;</code>
        */
       public Builder clearMove2() {
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
         move2_ = 0;
         onChanged();
         return this;
       }
 
-      private java.lang.Object deployedFortId_ = "";
+      private int deployedFortId_ ;
       /**
-       * <code>optional string DeployedFortId = 8;</code>
+       * <code>optional int32 DeployedFortId = 8;</code>
        */
       public boolean hasDeployedFortId() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
+        return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
-       * <code>optional string DeployedFortId = 8;</code>
+       * <code>optional int32 DeployedFortId = 8;</code>
        */
-      public java.lang.String getDeployedFortId() {
-        java.lang.Object ref = deployedFortId_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          if (bs.isValidUtf8()) {
-            deployedFortId_ = s;
-          }
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      public int getDeployedFortId() {
+        return deployedFortId_;
       }
       /**
-       * <code>optional string DeployedFortId = 8;</code>
+       * <code>optional int32 DeployedFortId = 8;</code>
        */
-      public com.google.protobuf.ByteString
-          getDeployedFortIdBytes() {
-        java.lang.Object ref = deployedFortId_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          deployedFortId_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string DeployedFortId = 8;</code>
-       */
-      public Builder setDeployedFortId(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000040;
+      public Builder setDeployedFortId(int value) {
+        bitField0_ |= 0x00000080;
         deployedFortId_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string DeployedFortId = 8;</code>
+       * <code>optional int32 DeployedFortId = 8;</code>
        */
       public Builder clearDeployedFortId() {
-        bitField0_ = (bitField0_ & ~0x00000040);
-        deployedFortId_ = getDefaultInstance().getDeployedFortId();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string DeployedFortId = 8;</code>
-       */
-      public Builder setDeployedFortIdBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000040;
-        deployedFortId_ = value;
+        bitField0_ = (bitField0_ & ~0x00000080);
+        deployedFortId_ = 0;
         onChanged();
         return this;
       }
@@ -15749,7 +15667,7 @@ public final class Pokemon {
        * <code>optional string OwnerName = 9;</code>
        */
       public boolean hasOwnerName() {
-        return ((bitField0_ & 0x00000080) == 0x00000080);
+        return ((bitField0_ & 0x00000100) == 0x00000100);
       }
       /**
        * <code>optional string OwnerName = 9;</code>
@@ -15792,7 +15710,7 @@ public final class Pokemon {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000080;
+  bitField0_ |= 0x00000100;
         ownerName_ = value;
         onChanged();
         return this;
@@ -15801,7 +15719,7 @@ public final class Pokemon {
        * <code>optional string OwnerName = 9;</code>
        */
       public Builder clearOwnerName() {
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000100);
         ownerName_ = getDefaultInstance().getOwnerName();
         onChanged();
         return this;
@@ -15814,7 +15732,7 @@ public final class Pokemon {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000080;
+  bitField0_ |= 0x00000100;
         ownerName_ = value;
         onChanged();
         return this;
@@ -15825,7 +15743,7 @@ public final class Pokemon {
        * <code>optional bool IsEgg = 10;</code>
        */
       public boolean hasIsEgg() {
-        return ((bitField0_ & 0x00000100) == 0x00000100);
+        return ((bitField0_ & 0x00000200) == 0x00000200);
       }
       /**
        * <code>optional bool IsEgg = 10;</code>
@@ -15837,7 +15755,7 @@ public final class Pokemon {
        * <code>optional bool IsEgg = 10;</code>
        */
       public Builder setIsEgg(boolean value) {
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000200;
         isEgg_ = value;
         onChanged();
         return this;
@@ -15846,7 +15764,7 @@ public final class Pokemon {
        * <code>optional bool IsEgg = 10;</code>
        */
       public Builder clearIsEgg() {
-        bitField0_ = (bitField0_ & ~0x00000100);
+        bitField0_ = (bitField0_ & ~0x00000200);
         isEgg_ = false;
         onChanged();
         return this;
@@ -15857,7 +15775,7 @@ public final class Pokemon {
        * <code>optional double EggKmWalkedTarget = 11;</code>
        */
       public boolean hasEggKmWalkedTarget() {
-        return ((bitField0_ & 0x00000200) == 0x00000200);
+        return ((bitField0_ & 0x00000400) == 0x00000400);
       }
       /**
        * <code>optional double EggKmWalkedTarget = 11;</code>
@@ -15869,7 +15787,7 @@ public final class Pokemon {
        * <code>optional double EggKmWalkedTarget = 11;</code>
        */
       public Builder setEggKmWalkedTarget(double value) {
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000400;
         eggKmWalkedTarget_ = value;
         onChanged();
         return this;
@@ -15878,7 +15796,7 @@ public final class Pokemon {
        * <code>optional double EggKmWalkedTarget = 11;</code>
        */
       public Builder clearEggKmWalkedTarget() {
-        bitField0_ = (bitField0_ & ~0x00000200);
+        bitField0_ = (bitField0_ & ~0x00000400);
         eggKmWalkedTarget_ = 0D;
         onChanged();
         return this;
@@ -15889,7 +15807,7 @@ public final class Pokemon {
        * <code>optional double EggKmWalkedStart = 12;</code>
        */
       public boolean hasEggKmWalkedStart() {
-        return ((bitField0_ & 0x00000400) == 0x00000400);
+        return ((bitField0_ & 0x00000800) == 0x00000800);
       }
       /**
        * <code>optional double EggKmWalkedStart = 12;</code>
@@ -15901,7 +15819,7 @@ public final class Pokemon {
        * <code>optional double EggKmWalkedStart = 12;</code>
        */
       public Builder setEggKmWalkedStart(double value) {
-        bitField0_ |= 0x00000400;
+        bitField0_ |= 0x00000800;
         eggKmWalkedStart_ = value;
         onChanged();
         return this;
@@ -15910,7 +15828,7 @@ public final class Pokemon {
        * <code>optional double EggKmWalkedStart = 12;</code>
        */
       public Builder clearEggKmWalkedStart() {
-        bitField0_ = (bitField0_ & ~0x00000400);
+        bitField0_ = (bitField0_ & ~0x00000800);
         eggKmWalkedStart_ = 0D;
         onChanged();
         return this;
@@ -15921,7 +15839,7 @@ public final class Pokemon {
        * <code>optional int32 Origin = 14;</code>
        */
       public boolean hasOrigin() {
-        return ((bitField0_ & 0x00000800) == 0x00000800);
+        return ((bitField0_ & 0x00001000) == 0x00001000);
       }
       /**
        * <code>optional int32 Origin = 14;</code>
@@ -15933,7 +15851,7 @@ public final class Pokemon {
        * <code>optional int32 Origin = 14;</code>
        */
       public Builder setOrigin(int value) {
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00001000;
         origin_ = value;
         onChanged();
         return this;
@@ -15942,7 +15860,7 @@ public final class Pokemon {
        * <code>optional int32 Origin = 14;</code>
        */
       public Builder clearOrigin() {
-        bitField0_ = (bitField0_ & ~0x00000800);
+        bitField0_ = (bitField0_ & ~0x00001000);
         origin_ = 0;
         onChanged();
         return this;
@@ -15953,7 +15871,7 @@ public final class Pokemon {
        * <code>optional float HeightM = 15;</code>
        */
       public boolean hasHeightM() {
-        return ((bitField0_ & 0x00001000) == 0x00001000);
+        return ((bitField0_ & 0x00002000) == 0x00002000);
       }
       /**
        * <code>optional float HeightM = 15;</code>
@@ -15965,7 +15883,7 @@ public final class Pokemon {
        * <code>optional float HeightM = 15;</code>
        */
       public Builder setHeightM(float value) {
-        bitField0_ |= 0x00001000;
+        bitField0_ |= 0x00002000;
         heightM_ = value;
         onChanged();
         return this;
@@ -15974,7 +15892,7 @@ public final class Pokemon {
        * <code>optional float HeightM = 15;</code>
        */
       public Builder clearHeightM() {
-        bitField0_ = (bitField0_ & ~0x00001000);
+        bitField0_ = (bitField0_ & ~0x00002000);
         heightM_ = 0F;
         onChanged();
         return this;
@@ -15985,7 +15903,7 @@ public final class Pokemon {
        * <code>optional float WeightKg = 16;</code>
        */
       public boolean hasWeightKg() {
-        return ((bitField0_ & 0x00002000) == 0x00002000);
+        return ((bitField0_ & 0x00004000) == 0x00004000);
       }
       /**
        * <code>optional float WeightKg = 16;</code>
@@ -15997,7 +15915,7 @@ public final class Pokemon {
        * <code>optional float WeightKg = 16;</code>
        */
       public Builder setWeightKg(float value) {
-        bitField0_ |= 0x00002000;
+        bitField0_ |= 0x00004000;
         weightKg_ = value;
         onChanged();
         return this;
@@ -16006,7 +15924,7 @@ public final class Pokemon {
        * <code>optional float WeightKg = 16;</code>
        */
       public Builder clearWeightKg() {
-        bitField0_ = (bitField0_ & ~0x00002000);
+        bitField0_ = (bitField0_ & ~0x00004000);
         weightKg_ = 0F;
         onChanged();
         return this;
@@ -16017,7 +15935,7 @@ public final class Pokemon {
        * <code>optional int32 IndividualAttack = 17;</code>
        */
       public boolean hasIndividualAttack() {
-        return ((bitField0_ & 0x00004000) == 0x00004000);
+        return ((bitField0_ & 0x00008000) == 0x00008000);
       }
       /**
        * <code>optional int32 IndividualAttack = 17;</code>
@@ -16029,7 +15947,7 @@ public final class Pokemon {
        * <code>optional int32 IndividualAttack = 17;</code>
        */
       public Builder setIndividualAttack(int value) {
-        bitField0_ |= 0x00004000;
+        bitField0_ |= 0x00008000;
         individualAttack_ = value;
         onChanged();
         return this;
@@ -16038,7 +15956,7 @@ public final class Pokemon {
        * <code>optional int32 IndividualAttack = 17;</code>
        */
       public Builder clearIndividualAttack() {
-        bitField0_ = (bitField0_ & ~0x00004000);
+        bitField0_ = (bitField0_ & ~0x00008000);
         individualAttack_ = 0;
         onChanged();
         return this;
@@ -16049,7 +15967,7 @@ public final class Pokemon {
        * <code>optional int32 IndividualDefense = 18;</code>
        */
       public boolean hasIndividualDefense() {
-        return ((bitField0_ & 0x00008000) == 0x00008000);
+        return ((bitField0_ & 0x00010000) == 0x00010000);
       }
       /**
        * <code>optional int32 IndividualDefense = 18;</code>
@@ -16061,7 +15979,7 @@ public final class Pokemon {
        * <code>optional int32 IndividualDefense = 18;</code>
        */
       public Builder setIndividualDefense(int value) {
-        bitField0_ |= 0x00008000;
+        bitField0_ |= 0x00010000;
         individualDefense_ = value;
         onChanged();
         return this;
@@ -16070,7 +15988,7 @@ public final class Pokemon {
        * <code>optional int32 IndividualDefense = 18;</code>
        */
       public Builder clearIndividualDefense() {
-        bitField0_ = (bitField0_ & ~0x00008000);
+        bitField0_ = (bitField0_ & ~0x00010000);
         individualDefense_ = 0;
         onChanged();
         return this;
@@ -16081,7 +15999,7 @@ public final class Pokemon {
        * <code>optional int32 IndividualStamina = 19;</code>
        */
       public boolean hasIndividualStamina() {
-        return ((bitField0_ & 0x00010000) == 0x00010000);
+        return ((bitField0_ & 0x00020000) == 0x00020000);
       }
       /**
        * <code>optional int32 IndividualStamina = 19;</code>
@@ -16093,7 +16011,7 @@ public final class Pokemon {
        * <code>optional int32 IndividualStamina = 19;</code>
        */
       public Builder setIndividualStamina(int value) {
-        bitField0_ |= 0x00010000;
+        bitField0_ |= 0x00020000;
         individualStamina_ = value;
         onChanged();
         return this;
@@ -16102,7 +16020,7 @@ public final class Pokemon {
        * <code>optional int32 IndividualStamina = 19;</code>
        */
       public Builder clearIndividualStamina() {
-        bitField0_ = (bitField0_ & ~0x00010000);
+        bitField0_ = (bitField0_ & ~0x00020000);
         individualStamina_ = 0;
         onChanged();
         return this;
@@ -16113,7 +16031,7 @@ public final class Pokemon {
        * <code>optional float CpMultiplier = 20;</code>
        */
       public boolean hasCpMultiplier() {
-        return ((bitField0_ & 0x00020000) == 0x00020000);
+        return ((bitField0_ & 0x00040000) == 0x00040000);
       }
       /**
        * <code>optional float CpMultiplier = 20;</code>
@@ -16125,7 +16043,7 @@ public final class Pokemon {
        * <code>optional float CpMultiplier = 20;</code>
        */
       public Builder setCpMultiplier(float value) {
-        bitField0_ |= 0x00020000;
+        bitField0_ |= 0x00040000;
         cpMultiplier_ = value;
         onChanged();
         return this;
@@ -16134,7 +16052,7 @@ public final class Pokemon {
        * <code>optional float CpMultiplier = 20;</code>
        */
       public Builder clearCpMultiplier() {
-        bitField0_ = (bitField0_ & ~0x00020000);
+        bitField0_ = (bitField0_ & ~0x00040000);
         cpMultiplier_ = 0F;
         onChanged();
         return this;
@@ -16145,7 +16063,7 @@ public final class Pokemon {
        * <code>optional int32 Pokeball = 21;</code>
        */
       public boolean hasPokeball() {
-        return ((bitField0_ & 0x00040000) == 0x00040000);
+        return ((bitField0_ & 0x00080000) == 0x00080000);
       }
       /**
        * <code>optional int32 Pokeball = 21;</code>
@@ -16157,7 +16075,7 @@ public final class Pokemon {
        * <code>optional int32 Pokeball = 21;</code>
        */
       public Builder setPokeball(int value) {
-        bitField0_ |= 0x00040000;
+        bitField0_ |= 0x00080000;
         pokeball_ = value;
         onChanged();
         return this;
@@ -16166,7 +16084,7 @@ public final class Pokemon {
        * <code>optional int32 Pokeball = 21;</code>
        */
       public Builder clearPokeball() {
-        bitField0_ = (bitField0_ & ~0x00040000);
+        bitField0_ = (bitField0_ & ~0x00080000);
         pokeball_ = 0;
         onChanged();
         return this;
@@ -16174,31 +16092,31 @@ public final class Pokemon {
 
       private long capturedS2CellId_ ;
       /**
-       * <code>optional int64 CapturedS2CellId = 22;</code>
+       * <code>optional uint64 CapturedS2CellId = 22;</code>
        */
       public boolean hasCapturedS2CellId() {
-        return ((bitField0_ & 0x00080000) == 0x00080000);
+        return ((bitField0_ & 0x00100000) == 0x00100000);
       }
       /**
-       * <code>optional int64 CapturedS2CellId = 22;</code>
+       * <code>optional uint64 CapturedS2CellId = 22;</code>
        */
       public long getCapturedS2CellId() {
         return capturedS2CellId_;
       }
       /**
-       * <code>optional int64 CapturedS2CellId = 22;</code>
+       * <code>optional uint64 CapturedS2CellId = 22;</code>
        */
       public Builder setCapturedS2CellId(long value) {
-        bitField0_ |= 0x00080000;
+        bitField0_ |= 0x00100000;
         capturedS2CellId_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int64 CapturedS2CellId = 22;</code>
+       * <code>optional uint64 CapturedS2CellId = 22;</code>
        */
       public Builder clearCapturedS2CellId() {
-        bitField0_ = (bitField0_ & ~0x00080000);
+        bitField0_ = (bitField0_ & ~0x00100000);
         capturedS2CellId_ = 0L;
         onChanged();
         return this;
@@ -16209,7 +16127,7 @@ public final class Pokemon {
        * <code>optional int32 BattlesAttacked = 23;</code>
        */
       public boolean hasBattlesAttacked() {
-        return ((bitField0_ & 0x00100000) == 0x00100000);
+        return ((bitField0_ & 0x00200000) == 0x00200000);
       }
       /**
        * <code>optional int32 BattlesAttacked = 23;</code>
@@ -16221,7 +16139,7 @@ public final class Pokemon {
        * <code>optional int32 BattlesAttacked = 23;</code>
        */
       public Builder setBattlesAttacked(int value) {
-        bitField0_ |= 0x00100000;
+        bitField0_ |= 0x00200000;
         battlesAttacked_ = value;
         onChanged();
         return this;
@@ -16230,7 +16148,7 @@ public final class Pokemon {
        * <code>optional int32 BattlesAttacked = 23;</code>
        */
       public Builder clearBattlesAttacked() {
-        bitField0_ = (bitField0_ & ~0x00100000);
+        bitField0_ = (bitField0_ & ~0x00200000);
         battlesAttacked_ = 0;
         onChanged();
         return this;
@@ -16241,7 +16159,7 @@ public final class Pokemon {
        * <code>optional int32 BattlesDefended = 24;</code>
        */
       public boolean hasBattlesDefended() {
-        return ((bitField0_ & 0x00200000) == 0x00200000);
+        return ((bitField0_ & 0x00400000) == 0x00400000);
       }
       /**
        * <code>optional int32 BattlesDefended = 24;</code>
@@ -16253,7 +16171,7 @@ public final class Pokemon {
        * <code>optional int32 BattlesDefended = 24;</code>
        */
       public Builder setBattlesDefended(int value) {
-        bitField0_ |= 0x00200000;
+        bitField0_ |= 0x00400000;
         battlesDefended_ = value;
         onChanged();
         return this;
@@ -16262,84 +16180,40 @@ public final class Pokemon {
        * <code>optional int32 BattlesDefended = 24;</code>
        */
       public Builder clearBattlesDefended() {
-        bitField0_ = (bitField0_ & ~0x00200000);
+        bitField0_ = (bitField0_ & ~0x00400000);
         battlesDefended_ = 0;
         onChanged();
         return this;
       }
 
-      private java.lang.Object eggIncubatorId_ = "";
+      private int eggIncubatorId_ ;
       /**
-       * <code>optional string EggIncubatorId = 25;</code>
+       * <code>optional int32 EggIncubatorId = 25;</code>
        */
       public boolean hasEggIncubatorId() {
-        return ((bitField0_ & 0x00400000) == 0x00400000);
+        return ((bitField0_ & 0x00800000) == 0x00800000);
       }
       /**
-       * <code>optional string EggIncubatorId = 25;</code>
+       * <code>optional int32 EggIncubatorId = 25;</code>
        */
-      public java.lang.String getEggIncubatorId() {
-        java.lang.Object ref = eggIncubatorId_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          if (bs.isValidUtf8()) {
-            eggIncubatorId_ = s;
-          }
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      public int getEggIncubatorId() {
+        return eggIncubatorId_;
       }
       /**
-       * <code>optional string EggIncubatorId = 25;</code>
+       * <code>optional int32 EggIncubatorId = 25;</code>
        */
-      public com.google.protobuf.ByteString
-          getEggIncubatorIdBytes() {
-        java.lang.Object ref = eggIncubatorId_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          eggIncubatorId_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string EggIncubatorId = 25;</code>
-       */
-      public Builder setEggIncubatorId(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00400000;
+      public Builder setEggIncubatorId(int value) {
+        bitField0_ |= 0x00800000;
         eggIncubatorId_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string EggIncubatorId = 25;</code>
+       * <code>optional int32 EggIncubatorId = 25;</code>
        */
       public Builder clearEggIncubatorId() {
-        bitField0_ = (bitField0_ & ~0x00400000);
-        eggIncubatorId_ = getDefaultInstance().getEggIncubatorId();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string EggIncubatorId = 25;</code>
-       */
-      public Builder setEggIncubatorIdBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00400000;
-        eggIncubatorId_ = value;
+        bitField0_ = (bitField0_ & ~0x00800000);
+        eggIncubatorId_ = 0;
         onChanged();
         return this;
       }
@@ -16349,7 +16223,7 @@ public final class Pokemon {
        * <code>optional int64 CreationTimeMs = 26;</code>
        */
       public boolean hasCreationTimeMs() {
-        return ((bitField0_ & 0x00800000) == 0x00800000);
+        return ((bitField0_ & 0x01000000) == 0x01000000);
       }
       /**
        * <code>optional int64 CreationTimeMs = 26;</code>
@@ -16361,7 +16235,7 @@ public final class Pokemon {
        * <code>optional int64 CreationTimeMs = 26;</code>
        */
       public Builder setCreationTimeMs(long value) {
-        bitField0_ |= 0x00800000;
+        bitField0_ |= 0x01000000;
         creationTimeMs_ = value;
         onChanged();
         return this;
@@ -16370,7 +16244,7 @@ public final class Pokemon {
        * <code>optional int64 CreationTimeMs = 26;</code>
        */
       public Builder clearCreationTimeMs() {
-        bitField0_ = (bitField0_ & ~0x00800000);
+        bitField0_ = (bitField0_ & ~0x01000000);
         creationTimeMs_ = 0L;
         onChanged();
         return this;
@@ -16381,7 +16255,7 @@ public final class Pokemon {
        * <code>optional int32 NumUpgrades = 27;</code>
        */
       public boolean hasNumUpgrades() {
-        return ((bitField0_ & 0x01000000) == 0x01000000);
+        return ((bitField0_ & 0x02000000) == 0x02000000);
       }
       /**
        * <code>optional int32 NumUpgrades = 27;</code>
@@ -16393,7 +16267,7 @@ public final class Pokemon {
        * <code>optional int32 NumUpgrades = 27;</code>
        */
       public Builder setNumUpgrades(int value) {
-        bitField0_ |= 0x01000000;
+        bitField0_ |= 0x02000000;
         numUpgrades_ = value;
         onChanged();
         return this;
@@ -16402,7 +16276,7 @@ public final class Pokemon {
        * <code>optional int32 NumUpgrades = 27;</code>
        */
       public Builder clearNumUpgrades() {
-        bitField0_ = (bitField0_ & ~0x01000000);
+        bitField0_ = (bitField0_ & ~0x02000000);
         numUpgrades_ = 0;
         onChanged();
         return this;
@@ -16413,7 +16287,7 @@ public final class Pokemon {
        * <code>optional float AdditionalCpMultiplier = 28;</code>
        */
       public boolean hasAdditionalCpMultiplier() {
-        return ((bitField0_ & 0x02000000) == 0x02000000);
+        return ((bitField0_ & 0x04000000) == 0x04000000);
       }
       /**
        * <code>optional float AdditionalCpMultiplier = 28;</code>
@@ -16425,7 +16299,7 @@ public final class Pokemon {
        * <code>optional float AdditionalCpMultiplier = 28;</code>
        */
       public Builder setAdditionalCpMultiplier(float value) {
-        bitField0_ |= 0x02000000;
+        bitField0_ |= 0x04000000;
         additionalCpMultiplier_ = value;
         onChanged();
         return this;
@@ -16434,7 +16308,7 @@ public final class Pokemon {
        * <code>optional float AdditionalCpMultiplier = 28;</code>
        */
       public Builder clearAdditionalCpMultiplier() {
-        bitField0_ = (bitField0_ & ~0x02000000);
+        bitField0_ = (bitField0_ & ~0x04000000);
         additionalCpMultiplier_ = 0F;
         onChanged();
         return this;
@@ -16445,7 +16319,7 @@ public final class Pokemon {
        * <code>optional bool Favorite = 29;</code>
        */
       public boolean hasFavorite() {
-        return ((bitField0_ & 0x04000000) == 0x04000000);
+        return ((bitField0_ & 0x08000000) == 0x08000000);
       }
       /**
        * <code>optional bool Favorite = 29;</code>
@@ -16457,7 +16331,7 @@ public final class Pokemon {
        * <code>optional bool Favorite = 29;</code>
        */
       public Builder setFavorite(boolean value) {
-        bitField0_ |= 0x04000000;
+        bitField0_ |= 0x08000000;
         favorite_ = value;
         onChanged();
         return this;
@@ -16466,7 +16340,7 @@ public final class Pokemon {
        * <code>optional bool Favorite = 29;</code>
        */
       public Builder clearFavorite() {
-        bitField0_ = (bitField0_ & ~0x04000000);
+        bitField0_ = (bitField0_ & ~0x08000000);
         favorite_ = false;
         onChanged();
         return this;
@@ -16477,7 +16351,7 @@ public final class Pokemon {
        * <code>optional string Nickname = 30;</code>
        */
       public boolean hasNickname() {
-        return ((bitField0_ & 0x08000000) == 0x08000000);
+        return ((bitField0_ & 0x10000000) == 0x10000000);
       }
       /**
        * <code>optional string Nickname = 30;</code>
@@ -16520,7 +16394,7 @@ public final class Pokemon {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x08000000;
+  bitField0_ |= 0x10000000;
         nickname_ = value;
         onChanged();
         return this;
@@ -16529,7 +16403,7 @@ public final class Pokemon {
        * <code>optional string Nickname = 30;</code>
        */
       public Builder clearNickname() {
-        bitField0_ = (bitField0_ & ~0x08000000);
+        bitField0_ = (bitField0_ & ~0x10000000);
         nickname_ = getDefaultInstance().getNickname();
         onChanged();
         return this;
@@ -16542,7 +16416,7 @@ public final class Pokemon {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x08000000;
+  bitField0_ |= 0x10000000;
         nickname_ = value;
         onChanged();
         return this;
@@ -16553,7 +16427,7 @@ public final class Pokemon {
        * <code>optional bool FromFort = 31;</code>
        */
       public boolean hasFromFort() {
-        return ((bitField0_ & 0x10000000) == 0x10000000);
+        return ((bitField0_ & 0x20000000) == 0x20000000);
       }
       /**
        * <code>optional bool FromFort = 31;</code>
@@ -16565,7 +16439,7 @@ public final class Pokemon {
        * <code>optional bool FromFort = 31;</code>
        */
       public Builder setFromFort(boolean value) {
-        bitField0_ |= 0x10000000;
+        bitField0_ |= 0x20000000;
         fromFort_ = value;
         onChanged();
         return this;
@@ -16574,40 +16448,8 @@ public final class Pokemon {
        * <code>optional bool FromFort = 31;</code>
        */
       public Builder clearFromFort() {
-        bitField0_ = (bitField0_ & ~0x10000000);
-        fromFort_ = false;
-        onChanged();
-        return this;
-      }
-
-      private long id_ ;
-      /**
-       * <code>optional uint64 Id = 1;</code>
-       */
-      public boolean hasId() {
-        return ((bitField0_ & 0x20000000) == 0x20000000);
-      }
-      /**
-       * <code>optional uint64 Id = 1;</code>
-       */
-      public long getId() {
-        return id_;
-      }
-      /**
-       * <code>optional uint64 Id = 1;</code>
-       */
-      public Builder setId(long value) {
-        bitField0_ |= 0x20000000;
-        id_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional uint64 Id = 1;</code>
-       */
-      public Builder clearId() {
         bitField0_ = (bitField0_ & ~0x20000000);
-        id_ = 0L;
+        fromFort_ = false;
         onChanged();
         return this;
       }
@@ -29642,84 +29484,84 @@ public final class Pokemon {
       "nt\030\002 \001(\005\"R\n\024ContactSettingsProto\022\033\n\023Send" +
       "MarketingEmails\030\001 \001(\010\022\035\n\025SendPushNotific" +
       "ations\030\002 \001(\010\"*\n\025InventoryRequestProto\022\021\n" +
-      "\ttimestamp\030\001 \001(\003\"\375\004\n\014PokemonProto\022\021\n\tPok" +
-      "emonId\030\002 \001(\005\022\n\n\002Cp\030\003 \001(\005\022\017\n\007Stamina\030\004 \001(" +
-      "\005\022\022\n\nMaxStamina\030\005 \001(\005\022\r\n\005Move1\030\006 \001(\005\022\r\n\005" +
-      "Move2\030\007 \001(\005\022\026\n\016DeployedFortId\030\010 \001(\t\022\021\n\tO" +
-      "wnerName\030\t \001(\t\022\r\n\005IsEgg\030\n \001(\010\022\031\n\021EggKmWa" +
-      "lkedTarget\030\013 \001(\001\022\030\n\020EggKmWalkedStart\030\014 \001",
-      "(\001\022\016\n\006Origin\030\016 \001(\005\022\017\n\007HeightM\030\017 \001(\002\022\020\n\010W" +
-      "eightKg\030\020 \001(\002\022\030\n\020IndividualAttack\030\021 \001(\005\022" +
-      "\031\n\021IndividualDefense\030\022 \001(\005\022\031\n\021Individual" +
-      "Stamina\030\023 \001(\005\022\024\n\014CpMultiplier\030\024 \001(\002\022\020\n\010P" +
-      "okeball\030\025 \001(\005\022\030\n\020CapturedS2CellId\030\026 \001(\003\022" +
-      "\027\n\017BattlesAttacked\030\027 \001(\005\022\027\n\017BattlesDefen" +
-      "ded\030\030 \001(\005\022\026\n\016EggIncubatorId\030\031 \001(\t\022\026\n\016Cre" +
-      "ationTimeMs\030\032 \001(\003\022\023\n\013NumUpgrades\030\033 \001(\005\022\036" +
-      "\n\026AdditionalCpMultiplier\030\034 \001(\002\022\020\n\010Favori" +
-      "te\030\035 \001(\010\022\020\n\010Nickname\030\036 \001(\t\022\020\n\010FromFort\030\037",
-      " \001(\010\022\n\n\002Id\030\001 \001(\004\"\314\001\n\026InventoryResponsePr" +
-      "oto\022\021\n\ttimestamp\030\002 \001(\003\022F\n\005items\030\003 \003(\01327." +
-      "main.InventoryResponseProto.InventoryIte" +
-      "mResponseProto\032W\n\032InventoryItemResponseP" +
-      "roto\022\021\n\ttimestamp\030\001 \001(\003\022&\n\004item\030\003 \002(\0132\030." +
-      "main.InventoryItemProto\"\232\017\n\022InventoryIte" +
-      "mProto\022#\n\007Pokemon\030\001 \001(\0132\022.main.PokemonPr" +
-      "oto\0220\n\004Item\030\002 \001(\0132\".main.InventoryItemPr" +
-      "oto.ItemProto\022@\n\014PokedexEntry\030\003 \001(\0132*.ma" +
-      "in.InventoryItemProto.PokedexEntryProto\022",
-      ">\n\013PlayerStats\030\004 \001(\0132).main.InventoryIte" +
-      "mProto.PlayerStatsProto\022D\n\016PlayerCurrenc" +
-      "y\030\005 \001(\0132,.main.InventoryItemProto.Player" +
-      "CurrencyProto\022@\n\014PlayerCamera\030\006 \001(\0132*.ma" +
-      "in.InventoryItemProto.PlayerCameraProto\022" +
-      "J\n\021InventoryUpgrades\030\007 \001(\0132/.main.Invent" +
-      "oryItemProto.InventoryUpgradesProto\022>\n\013A" +
-      "ppliedItem\030\010 \001(\0132).main.InventoryItemPro" +
-      "to.AppliedItemProto\022A\n\rEggIncubators\030\t \001" +
-      "(\0132*.main.InventoryItemProto.EggIncubato",
-      "rProto\022B\n\rPokemonFamily\030\n \001(\0132+.main.Inv" +
-      "entoryItemProto.PokemonFamilyProto\0328\n\tIt" +
-      "emProto\022\014\n\004Item\030\001 \002(\005\022\r\n\005Count\030\002 \002(\005\022\016\n\006" +
-      "Unseen\030\003 \001(\010\032\227\001\n\021PokedexEntryProto\022\032\n\022Po" +
-      "kedexEntryNumber\030\001 \002(\005\022\030\n\020TimesEncounter" +
-      "ed\030\002 \001(\005\022\025\n\rTimesCaptured\030\003 \001(\005\022\034\n\024Evolu" +
-      "tionStonePieces\030\004 \001(\005\022\027\n\017EvolutionStones" +
-      "\030\005 \001(\005\032\332\004\n\020PlayerStatsProto\022\r\n\005Level\030\001 \002" +
-      "(\005\022\022\n\nExperience\030\002 \002(\003\022\024\n\014PrevLevelExp\030\003" +
-      " \002(\003\022\024\n\014NextLevelExp\030\004 \002(\003\022\020\n\010KmWalked\030\005",
-      " \002(\002\022\035\n\025NumPokemonEncountered\030\006 \002(\005\022\037\n\027N" +
-      "umUniquePokedexEntries\030\007 \002(\005\022\032\n\022NumPokem" +
-      "onCaptured\030\010 \002(\005\022\025\n\rNumEvolutions\030\t \002(\005\022" +
-      "\026\n\016PokeStopVisits\030\n \002(\005\022\036\n\026NumberOfPokeb" +
-      "allThrown\030\013 \002(\005\022\026\n\016NumEggsHatched\030\014 \002(\005\022" +
-      "\031\n\021BigMagikarpCaught\030\r \002(\005\022\032\n\022NumBattleA" +
-      "ttackWon\030\016 \002(\005\022\034\n\024NumBattleAttackTotal\030\017" +
-      " \002(\005\022\034\n\024NumBattleDefendedWon\030\020 \002(\005\022\034\n\024Nu" +
-      "mBattleTrainingWon\030\021 \002(\005\022\036\n\026NumBattleTra" +
-      "iningTotal\030\022 \002(\005\022\033\n\023PrestigeRaisedTotal\030",
-      "\023 \002(\005\022\034\n\024PrestigeDroppedTotal\030\024 \002(\005\022\032\n\022N" +
-      "umPokemonDeployed\030\025 \002(\005\022\032\n\022SmallRattataC" +
-      "aught\030\027 \002(\005\032[\n\020AppliedItemProto\022\014\n\004Item\030" +
-      "\001 \001(\005\022\020\n\010ItemType\030\002 \001(\005\022\024\n\014ExpirationMs\030" +
-      "\003 \001(\003\022\021\n\tAppliedMs\030\004 \001(\003\032*\n\021PlayerCamera" +
-      "Proto\022\025\n\rDefaultCamera\030\001 \002(\010\032#\n\023PlayerCu" +
-      "rrencyProto\022\014\n\004Gems\030\001 \002(\005\0322\n\026InventoryUp" +
-      "gradesProto\022\030\n\020InventoryUpgrade\030\001 \002(\005\032\305\001" +
-      "\n\021EggIncubatorProto\022\016\n\006ItemId\030\001 \001(\t\0220\n\004I" +
-      "tem\030\002 \001(\0132\".main.InventoryItemProto.Item",
-      "Proto\022\025\n\rIncubatorType\030\003 \001(\005\022\025\n\rUsesRema" +
-      "ining\030\004 \001(\005\022\021\n\tPokemonId\030\005 \001(\003\022\025\n\rStartK" +
-      "mWalked\030\006 \001(\001\022\026\n\016TargetKmWalked\030\007 \001(\001\0325\n" +
-      "\022PokemonFamilyProto\022\020\n\010FamilyId\030\001 \002(\005\022\r\n" +
-      "\005Candy\030\002 \002(\005\"\336\001\n\023FortDetailsOutProto\022\n\n\002" +
-      "Id\030\001 \001(\t\022\014\n\004Team\030\002 \001(\005\022\014\n\004Name\030\004 \001(\t\022\020\n\010" +
-      "ImageUrl\030\005 \001(\t\022\n\n\002Fp\030\006 \001(\005\022\017\n\007Stamina\030\007 " +
-      "\001(\005\022\022\n\nMaxStamina\030\010 \001(\005\022\020\n\010FortType\030\t \001(" +
-      "\005\022\020\n\010Latitude\030\n \001(\003\022\021\n\tLongitude\030\013 \001(\003\022\023" +
-      "\n\013Description\030\014 \001(\t\022\020\n\010Modifier\030\r \001(\001\"C\n",
-      "\020FortDetailsProto\022\n\n\002Id\030\001 \002(\t\022\020\n\010Latitud" +
-      "e\030\002 \001(\003\022\021\n\tLongitude\030\003 \001(\003"
+      "\ttimestamp\030\001 \001(\003\"\200\005\n\014PokemonProto\022\r\n\005ent" +
+      "Id\030\001 \001(\006\022\021\n\tPokemonId\030\002 \001(\005\022\n\n\002Cp\030\003 \001(\005\022" +
+      "\017\n\007Stamina\030\004 \001(\005\022\022\n\nMaxStamina\030\005 \001(\005\022\r\n\005" +
+      "Move1\030\006 \001(\005\022\r\n\005Move2\030\007 \001(\005\022\026\n\016DeployedFo" +
+      "rtId\030\010 \001(\005\022\021\n\tOwnerName\030\t \001(\t\022\r\n\005IsEgg\030\n" +
+      " \001(\010\022\031\n\021EggKmWalkedTarget\030\013 \001(\001\022\030\n\020EggKm",
+      "WalkedStart\030\014 \001(\001\022\016\n\006Origin\030\016 \001(\005\022\017\n\007Hei" +
+      "ghtM\030\017 \001(\002\022\020\n\010WeightKg\030\020 \001(\002\022\030\n\020Individu" +
+      "alAttack\030\021 \001(\005\022\031\n\021IndividualDefense\030\022 \001(" +
+      "\005\022\031\n\021IndividualStamina\030\023 \001(\005\022\024\n\014CpMultip" +
+      "lier\030\024 \001(\002\022\020\n\010Pokeball\030\025 \001(\005\022\030\n\020Captured" +
+      "S2CellId\030\026 \001(\004\022\027\n\017BattlesAttacked\030\027 \001(\005\022" +
+      "\027\n\017BattlesDefended\030\030 \001(\005\022\026\n\016EggIncubator" +
+      "Id\030\031 \001(\005\022\026\n\016CreationTimeMs\030\032 \001(\003\022\023\n\013NumU" +
+      "pgrades\030\033 \001(\005\022\036\n\026AdditionalCpMultiplier\030" +
+      "\034 \001(\002\022\020\n\010Favorite\030\035 \001(\010\022\020\n\010Nickname\030\036 \001(",
+      "\t\022\020\n\010FromFort\030\037 \001(\010\"\314\001\n\026InventoryRespons" +
+      "eProto\022\021\n\ttimestamp\030\002 \001(\003\022F\n\005items\030\003 \003(\013" +
+      "27.main.InventoryResponseProto.Inventory" +
+      "ItemResponseProto\032W\n\032InventoryItemRespon" +
+      "seProto\022\021\n\ttimestamp\030\001 \001(\003\022&\n\004item\030\003 \002(\013" +
+      "2\030.main.InventoryItemProto\"\232\017\n\022Inventory" +
+      "ItemProto\022#\n\007Pokemon\030\001 \001(\0132\022.main.Pokemo" +
+      "nProto\0220\n\004Item\030\002 \001(\0132\".main.InventoryIte" +
+      "mProto.ItemProto\022@\n\014PokedexEntry\030\003 \001(\0132*" +
+      ".main.InventoryItemProto.PokedexEntryPro",
+      "to\022>\n\013PlayerStats\030\004 \001(\0132).main.Inventory" +
+      "ItemProto.PlayerStatsProto\022D\n\016PlayerCurr" +
+      "ency\030\005 \001(\0132,.main.InventoryItemProto.Pla" +
+      "yerCurrencyProto\022@\n\014PlayerCamera\030\006 \001(\0132*" +
+      ".main.InventoryItemProto.PlayerCameraPro" +
+      "to\022J\n\021InventoryUpgrades\030\007 \001(\0132/.main.Inv" +
+      "entoryItemProto.InventoryUpgradesProto\022>" +
+      "\n\013AppliedItem\030\010 \001(\0132).main.InventoryItem" +
+      "Proto.AppliedItemProto\022A\n\rEggIncubators\030" +
+      "\t \001(\0132*.main.InventoryItemProto.EggIncub",
+      "atorProto\022B\n\rPokemonFamily\030\n \001(\0132+.main." +
+      "InventoryItemProto.PokemonFamilyProto\0328\n" +
+      "\tItemProto\022\014\n\004Item\030\001 \002(\005\022\r\n\005Count\030\002 \002(\005\022" +
+      "\016\n\006Unseen\030\003 \001(\010\032\227\001\n\021PokedexEntryProto\022\032\n" +
+      "\022PokedexEntryNumber\030\001 \002(\005\022\030\n\020TimesEncoun" +
+      "tered\030\002 \001(\005\022\025\n\rTimesCaptured\030\003 \001(\005\022\034\n\024Ev" +
+      "olutionStonePieces\030\004 \001(\005\022\027\n\017EvolutionSto" +
+      "nes\030\005 \001(\005\032\332\004\n\020PlayerStatsProto\022\r\n\005Level\030" +
+      "\001 \002(\005\022\022\n\nExperience\030\002 \002(\003\022\024\n\014PrevLevelEx" +
+      "p\030\003 \002(\003\022\024\n\014NextLevelExp\030\004 \002(\003\022\020\n\010KmWalke",
+      "d\030\005 \002(\002\022\035\n\025NumPokemonEncountered\030\006 \002(\005\022\037" +
+      "\n\027NumUniquePokedexEntries\030\007 \002(\005\022\032\n\022NumPo" +
+      "kemonCaptured\030\010 \002(\005\022\025\n\rNumEvolutions\030\t \002" +
+      "(\005\022\026\n\016PokeStopVisits\030\n \002(\005\022\036\n\026NumberOfPo" +
+      "keballThrown\030\013 \002(\005\022\026\n\016NumEggsHatched\030\014 \002" +
+      "(\005\022\031\n\021BigMagikarpCaught\030\r \002(\005\022\032\n\022NumBatt" +
+      "leAttackWon\030\016 \002(\005\022\034\n\024NumBattleAttackTota" +
+      "l\030\017 \002(\005\022\034\n\024NumBattleDefendedWon\030\020 \002(\005\022\034\n" +
+      "\024NumBattleTrainingWon\030\021 \002(\005\022\036\n\026NumBattle" +
+      "TrainingTotal\030\022 \002(\005\022\033\n\023PrestigeRaisedTot",
+      "al\030\023 \002(\005\022\034\n\024PrestigeDroppedTotal\030\024 \002(\005\022\032" +
+      "\n\022NumPokemonDeployed\030\025 \002(\005\022\032\n\022SmallRatta" +
+      "taCaught\030\027 \002(\005\032[\n\020AppliedItemProto\022\014\n\004It" +
+      "em\030\001 \001(\005\022\020\n\010ItemType\030\002 \001(\005\022\024\n\014Expiration" +
+      "Ms\030\003 \001(\003\022\021\n\tAppliedMs\030\004 \001(\003\032*\n\021PlayerCam" +
+      "eraProto\022\025\n\rDefaultCamera\030\001 \002(\010\032#\n\023Playe" +
+      "rCurrencyProto\022\014\n\004Gems\030\001 \002(\005\0322\n\026Inventor" +
+      "yUpgradesProto\022\030\n\020InventoryUpgrade\030\001 \002(\005" +
+      "\032\305\001\n\021EggIncubatorProto\022\016\n\006ItemId\030\001 \001(\t\0220" +
+      "\n\004Item\030\002 \001(\0132\".main.InventoryItemProto.I",
+      "temProto\022\025\n\rIncubatorType\030\003 \001(\005\022\025\n\rUsesR" +
+      "emaining\030\004 \001(\005\022\021\n\tPokemonId\030\005 \001(\003\022\025\n\rSta" +
+      "rtKmWalked\030\006 \001(\001\022\026\n\016TargetKmWalked\030\007 \001(\001" +
+      "\0325\n\022PokemonFamilyProto\022\020\n\010FamilyId\030\001 \002(\005" +
+      "\022\r\n\005Candy\030\002 \002(\005\"\336\001\n\023FortDetailsOutProto\022" +
+      "\n\n\002Id\030\001 \001(\t\022\014\n\004Team\030\002 \001(\005\022\014\n\004Name\030\004 \001(\t\022" +
+      "\020\n\010ImageUrl\030\005 \001(\t\022\n\n\002Fp\030\006 \001(\005\022\017\n\007Stamina" +
+      "\030\007 \001(\005\022\022\n\nMaxStamina\030\010 \001(\005\022\020\n\010FortType\030\t" +
+      " \001(\005\022\020\n\010Latitude\030\n \001(\003\022\021\n\tLongitude\030\013 \001(" +
+      "\003\022\023\n\013Description\030\014 \001(\t\022\020\n\010Modifier\030\r \001(\001",
+      "\"C\n\020FortDetailsProto\022\n\n\002Id\030\001 \002(\t\022\020\n\010Lati" +
+      "tude\030\002 \001(\003\022\021\n\tLongitude\030\003 \001(\003"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -29852,7 +29694,7 @@ public final class Pokemon {
     internal_static_main_PokemonProto_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_main_PokemonProto_descriptor,
-        new java.lang.String[] { "PokemonId", "Cp", "Stamina", "MaxStamina", "Move1", "Move2", "DeployedFortId", "OwnerName", "IsEgg", "EggKmWalkedTarget", "EggKmWalkedStart", "Origin", "HeightM", "WeightKg", "IndividualAttack", "IndividualDefense", "IndividualStamina", "CpMultiplier", "Pokeball", "CapturedS2CellId", "BattlesAttacked", "BattlesDefended", "EggIncubatorId", "CreationTimeMs", "NumUpgrades", "AdditionalCpMultiplier", "Favorite", "Nickname", "FromFort", "Id", });
+        new java.lang.String[] { "EntId", "PokemonId", "Cp", "Stamina", "MaxStamina", "Move1", "Move2", "DeployedFortId", "OwnerName", "IsEgg", "EggKmWalkedTarget", "EggKmWalkedStart", "Origin", "HeightM", "WeightKg", "IndividualAttack", "IndividualDefense", "IndividualStamina", "CpMultiplier", "Pokeball", "CapturedS2CellId", "BattlesAttacked", "BattlesDefended", "EggIncubatorId", "CreationTimeMs", "NumUpgrades", "AdditionalCpMultiplier", "Favorite", "Nickname", "FromFort", });
     internal_static_main_InventoryResponseProto_descriptor =
       getDescriptor().getMessageTypes().get(12);
     internal_static_main_InventoryResponseProto_fieldAccessorTable = new

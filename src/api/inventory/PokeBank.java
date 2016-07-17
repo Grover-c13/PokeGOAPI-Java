@@ -1,6 +1,8 @@
-package api;
+package api.inventory;
 
 import java.util.List;
+
+import api.PokemonDetails;
 
 public class PokeBank {
 	// class for handling pokemon

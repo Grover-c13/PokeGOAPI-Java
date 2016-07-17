@@ -1,7 +1,9 @@
 package api;
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.Descriptors.Descriptor;
+import java.util.Map.Entry;
+
+
+import com.google.protobuf.Descriptors.FieldDescriptor;
 
 import main.Pokemon.PokemonProto;
 
@@ -19,7 +21,8 @@ public class PokemonDetails
 	}
 
 	public long getId() {
-		return proto.getId();
+		return proto.getEntId();
+		
 	}
 
 	public int getPokemonId() {
@@ -46,7 +49,7 @@ public class PokemonDetails
 		return proto.getMove2();
 	}
 
-	public String getDeployedFortId() {
+	public int getDeployedFortId() {
 		return proto.getDeployedFortId();
 	}
 
@@ -106,21 +109,16 @@ public class PokemonDetails
 		return proto.getBattlesDefended();
 	}
 
-	public String getEggIncubatorId() {
+	public int getEggIncubatorId() {
 		return proto.getEggIncubatorId();
 	}
 
-	public ByteString getEggIncubatorIdBytes() {
-		return proto.getEggIncubatorIdBytes();
-	}
 
 	public long getCreationTimeMs() {
 		return proto.getCreationTimeMs();
 	}
 
-	public Descriptor getDescriptorForType() {
-		return proto.getDescriptorForType();
-	}
+
 
 	public boolean getFavorite() {
 		return proto.getFavorite();
