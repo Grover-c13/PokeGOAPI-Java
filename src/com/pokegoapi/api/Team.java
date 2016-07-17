@@ -2,7 +2,7 @@ package com.pokegoapi.api;
 
 public enum Team 
 {
-	// VALUES UNCONFIRMED for the two inferior teams (Valor and Instinct)
+	// VALUES UNCONFIRMED for the two inferior teams (Instinct and Valor)
 	TEAM_NONE (0),
 	TEAM_MYSTIC (1),	
 	TEAM_INSTINCT (2),
