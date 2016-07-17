@@ -29261,6 +29261,894 @@ public final class Pokemon {
     // @@protoc_insertion_point(class_scope:main.FortDetailsProto)
   }
 
+  public interface TransferPokemonProtoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:main.TransferPokemonProto)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>required fixed64 PokemonId = 1;</code>
+     */
+    boolean hasPokemonId();
+    /**
+     * <code>required fixed64 PokemonId = 1;</code>
+     */
+    long getPokemonId();
+  }
+  /**
+   * Protobuf type {@code main.TransferPokemonProto}
+   *
+   * <pre>
+   * POKEMON TRANSFER
+   * </pre>
+   */
+  public static final class TransferPokemonProto extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:main.TransferPokemonProto)
+      TransferPokemonProtoOrBuilder {
+    // Use TransferPokemonProto.newBuilder() to construct.
+    private TransferPokemonProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private TransferPokemonProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final TransferPokemonProto defaultInstance;
+    public static TransferPokemonProto getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public TransferPokemonProto getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private TransferPokemonProto(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 9: {
+              bitField0_ |= 0x00000001;
+              pokemonId_ = input.readFixed64();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return main.Pokemon.internal_static_main_TransferPokemonProto_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return main.Pokemon.internal_static_main_TransferPokemonProto_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              main.Pokemon.TransferPokemonProto.class, main.Pokemon.TransferPokemonProto.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<TransferPokemonProto> PARSER =
+        new com.google.protobuf.AbstractParser<TransferPokemonProto>() {
+      public TransferPokemonProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new TransferPokemonProto(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<TransferPokemonProto> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    public static final int POKEMONID_FIELD_NUMBER = 1;
+    private long pokemonId_;
+    /**
+     * <code>required fixed64 PokemonId = 1;</code>
+     */
+    public boolean hasPokemonId() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>required fixed64 PokemonId = 1;</code>
+     */
+    public long getPokemonId() {
+      return pokemonId_;
+    }
+
+    private void initFields() {
+      pokemonId_ = 0L;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      if (!hasPokemonId()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeFixed64(1, pokemonId_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFixed64Size(1, pokemonId_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static main.Pokemon.TransferPokemonProto parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static main.Pokemon.TransferPokemonProto parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static main.Pokemon.TransferPokemonProto parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static main.Pokemon.TransferPokemonProto parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static main.Pokemon.TransferPokemonProto parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static main.Pokemon.TransferPokemonProto parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static main.Pokemon.TransferPokemonProto parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static main.Pokemon.TransferPokemonProto parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static main.Pokemon.TransferPokemonProto parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static main.Pokemon.TransferPokemonProto parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(main.Pokemon.TransferPokemonProto prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code main.TransferPokemonProto}
+     *
+     * <pre>
+     * POKEMON TRANSFER
+     * </pre>
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:main.TransferPokemonProto)
+        main.Pokemon.TransferPokemonProtoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return main.Pokemon.internal_static_main_TransferPokemonProto_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return main.Pokemon.internal_static_main_TransferPokemonProto_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                main.Pokemon.TransferPokemonProto.class, main.Pokemon.TransferPokemonProto.Builder.class);
+      }
+
+      // Construct using main.Pokemon.TransferPokemonProto.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        pokemonId_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return main.Pokemon.internal_static_main_TransferPokemonProto_descriptor;
+      }
+
+      public main.Pokemon.TransferPokemonProto getDefaultInstanceForType() {
+        return main.Pokemon.TransferPokemonProto.getDefaultInstance();
+      }
+
+      public main.Pokemon.TransferPokemonProto build() {
+        main.Pokemon.TransferPokemonProto result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public main.Pokemon.TransferPokemonProto buildPartial() {
+        main.Pokemon.TransferPokemonProto result = new main.Pokemon.TransferPokemonProto(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.pokemonId_ = pokemonId_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof main.Pokemon.TransferPokemonProto) {
+          return mergeFrom((main.Pokemon.TransferPokemonProto)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(main.Pokemon.TransferPokemonProto other) {
+        if (other == main.Pokemon.TransferPokemonProto.getDefaultInstance()) return this;
+        if (other.hasPokemonId()) {
+          setPokemonId(other.getPokemonId());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        if (!hasPokemonId()) {
+          
+          return false;
+        }
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        main.Pokemon.TransferPokemonProto parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (main.Pokemon.TransferPokemonProto) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private long pokemonId_ ;
+      /**
+       * <code>required fixed64 PokemonId = 1;</code>
+       */
+      public boolean hasPokemonId() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>required fixed64 PokemonId = 1;</code>
+       */
+      public long getPokemonId() {
+        return pokemonId_;
+      }
+      /**
+       * <code>required fixed64 PokemonId = 1;</code>
+       */
+      public Builder setPokemonId(long value) {
+        bitField0_ |= 0x00000001;
+        pokemonId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required fixed64 PokemonId = 1;</code>
+       */
+      public Builder clearPokemonId() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        pokemonId_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:main.TransferPokemonProto)
+    }
+
+    static {
+      defaultInstance = new TransferPokemonProto(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:main.TransferPokemonProto)
+  }
+
+  public interface TransferPokemonOutProtoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:main.TransferPokemonOutProto)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional int32 Status = 1;</code>
+     */
+    boolean hasStatus();
+    /**
+     * <code>optional int32 Status = 1;</code>
+     */
+    int getStatus();
+
+    /**
+     * <code>optional int32 CandyAwarded = 2;</code>
+     */
+    boolean hasCandyAwarded();
+    /**
+     * <code>optional int32 CandyAwarded = 2;</code>
+     */
+    int getCandyAwarded();
+  }
+  /**
+   * Protobuf type {@code main.TransferPokemonOutProto}
+   */
+  public static final class TransferPokemonOutProto extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:main.TransferPokemonOutProto)
+      TransferPokemonOutProtoOrBuilder {
+    // Use TransferPokemonOutProto.newBuilder() to construct.
+    private TransferPokemonOutProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private TransferPokemonOutProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final TransferPokemonOutProto defaultInstance;
+    public static TransferPokemonOutProto getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public TransferPokemonOutProto getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private TransferPokemonOutProto(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              bitField0_ |= 0x00000001;
+              status_ = input.readInt32();
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              candyAwarded_ = input.readInt32();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return main.Pokemon.internal_static_main_TransferPokemonOutProto_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return main.Pokemon.internal_static_main_TransferPokemonOutProto_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              main.Pokemon.TransferPokemonOutProto.class, main.Pokemon.TransferPokemonOutProto.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<TransferPokemonOutProto> PARSER =
+        new com.google.protobuf.AbstractParser<TransferPokemonOutProto>() {
+      public TransferPokemonOutProto parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new TransferPokemonOutProto(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<TransferPokemonOutProto> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    public static final int STATUS_FIELD_NUMBER = 1;
+    private int status_;
+    /**
+     * <code>optional int32 Status = 1;</code>
+     */
+    public boolean hasStatus() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional int32 Status = 1;</code>
+     */
+    public int getStatus() {
+      return status_;
+    }
+
+    public static final int CANDYAWARDED_FIELD_NUMBER = 2;
+    private int candyAwarded_;
+    /**
+     * <code>optional int32 CandyAwarded = 2;</code>
+     */
+    public boolean hasCandyAwarded() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional int32 CandyAwarded = 2;</code>
+     */
+    public int getCandyAwarded() {
+      return candyAwarded_;
+    }
+
+    private void initFields() {
+      status_ = 0;
+      candyAwarded_ = 0;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeInt32(1, status_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeInt32(2, candyAwarded_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(1, status_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, candyAwarded_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static main.Pokemon.TransferPokemonOutProto parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static main.Pokemon.TransferPokemonOutProto parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static main.Pokemon.TransferPokemonOutProto parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static main.Pokemon.TransferPokemonOutProto parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static main.Pokemon.TransferPokemonOutProto parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static main.Pokemon.TransferPokemonOutProto parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static main.Pokemon.TransferPokemonOutProto parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static main.Pokemon.TransferPokemonOutProto parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static main.Pokemon.TransferPokemonOutProto parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static main.Pokemon.TransferPokemonOutProto parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(main.Pokemon.TransferPokemonOutProto prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code main.TransferPokemonOutProto}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:main.TransferPokemonOutProto)
+        main.Pokemon.TransferPokemonOutProtoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return main.Pokemon.internal_static_main_TransferPokemonOutProto_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return main.Pokemon.internal_static_main_TransferPokemonOutProto_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                main.Pokemon.TransferPokemonOutProto.class, main.Pokemon.TransferPokemonOutProto.Builder.class);
+      }
+
+      // Construct using main.Pokemon.TransferPokemonOutProto.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        status_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        candyAwarded_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return main.Pokemon.internal_static_main_TransferPokemonOutProto_descriptor;
+      }
+
+      public main.Pokemon.TransferPokemonOutProto getDefaultInstanceForType() {
+        return main.Pokemon.TransferPokemonOutProto.getDefaultInstance();
+      }
+
+      public main.Pokemon.TransferPokemonOutProto build() {
+        main.Pokemon.TransferPokemonOutProto result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public main.Pokemon.TransferPokemonOutProto buildPartial() {
+        main.Pokemon.TransferPokemonOutProto result = new main.Pokemon.TransferPokemonOutProto(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.status_ = status_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.candyAwarded_ = candyAwarded_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof main.Pokemon.TransferPokemonOutProto) {
+          return mergeFrom((main.Pokemon.TransferPokemonOutProto)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(main.Pokemon.TransferPokemonOutProto other) {
+        if (other == main.Pokemon.TransferPokemonOutProto.getDefaultInstance()) return this;
+        if (other.hasStatus()) {
+          setStatus(other.getStatus());
+        }
+        if (other.hasCandyAwarded()) {
+          setCandyAwarded(other.getCandyAwarded());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        main.Pokemon.TransferPokemonOutProto parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (main.Pokemon.TransferPokemonOutProto) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private int status_ ;
+      /**
+       * <code>optional int32 Status = 1;</code>
+       */
+      public boolean hasStatus() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional int32 Status = 1;</code>
+       */
+      public int getStatus() {
+        return status_;
+      }
+      /**
+       * <code>optional int32 Status = 1;</code>
+       */
+      public Builder setStatus(int value) {
+        bitField0_ |= 0x00000001;
+        status_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 Status = 1;</code>
+       */
+      public Builder clearStatus() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        status_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int candyAwarded_ ;
+      /**
+       * <code>optional int32 CandyAwarded = 2;</code>
+       */
+      public boolean hasCandyAwarded() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional int32 CandyAwarded = 2;</code>
+       */
+      public int getCandyAwarded() {
+        return candyAwarded_;
+      }
+      /**
+       * <code>optional int32 CandyAwarded = 2;</code>
+       */
+      public Builder setCandyAwarded(int value) {
+        bitField0_ |= 0x00000002;
+        candyAwarded_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 CandyAwarded = 2;</code>
+       */
+      public Builder clearCandyAwarded() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        candyAwarded_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:main.TransferPokemonOutProto)
+    }
+
+    static {
+      defaultInstance = new TransferPokemonOutProto(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:main.TransferPokemonOutProto)
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_main_RequestEnvelop_descriptor;
   private static
@@ -29431,6 +30319,16 @@ public final class Pokemon {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_main_FortDetailsProto_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_main_TransferPokemonProto_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_main_TransferPokemonProto_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_main_TransferPokemonOutProto_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_main_TransferPokemonOutProto_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -29561,7 +30459,10 @@ public final class Pokemon {
       " \001(\005\022\020\n\010Latitude\030\n \001(\003\022\021\n\tLongitude\030\013 \001(" +
       "\003\022\023\n\013Description\030\014 \001(\t\022\020\n\010Modifier\030\r \001(\001",
       "\"C\n\020FortDetailsProto\022\n\n\002Id\030\001 \002(\t\022\020\n\010Lati" +
-      "tude\030\002 \001(\003\022\021\n\tLongitude\030\003 \001(\003"
+      "tude\030\002 \001(\003\022\021\n\tLongitude\030\003 \001(\003\")\n\024Transfe" +
+      "rPokemonProto\022\021\n\tPokemonId\030\001 \002(\006\"?\n\027Tran" +
+      "sferPokemonOutProto\022\016\n\006Status\030\001 \001(\005\022\024\n\014C" +
+      "andyAwarded\030\002 \001(\005"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -29779,6 +30680,18 @@ public final class Pokemon {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_main_FortDetailsProto_descriptor,
         new java.lang.String[] { "Id", "Latitude", "Longitude", });
+    internal_static_main_TransferPokemonProto_descriptor =
+      getDescriptor().getMessageTypes().get(16);
+    internal_static_main_TransferPokemonProto_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_main_TransferPokemonProto_descriptor,
+        new java.lang.String[] { "PokemonId", });
+    internal_static_main_TransferPokemonOutProto_descriptor =
+      getDescriptor().getMessageTypes().get(17);
+    internal_static_main_TransferPokemonOutProto_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_main_TransferPokemonOutProto_descriptor,
+        new java.lang.String[] { "Status", "CandyAwarded", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

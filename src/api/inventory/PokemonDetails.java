@@ -1,16 +1,36 @@
-package api;
-
-import java.util.Map.Entry;
+package api.inventory;
 
 
-import com.google.protobuf.Descriptors.FieldDescriptor;
 
+
+import api.PokemonGo;
 import main.Pokemon.PokemonProto;
+import requests.PokemonTransferRequest;
 
 public class PokemonDetails
 {
 	private PokemonProto proto;
+	private PokemonGo pgo;
 	
+	protected void setAPIInstance(PokemonGo pgo)
+	{
+		this.pgo = pgo;
+	}
+	
+	// API METHODS //
+	
+	public int transferPokemon()
+	{
+		PokemonTransferRequest req = new PokemonTransferRequest(this.getId());
+		pgo.getRequestHandler().addRequest(req);
+		pgo.getRequestHandler().sendRequests();
+		
+		return req.getCandies();
+	}
+	
+	
+	
+	// DELEGATE METHODS BELOW //
 	public PokemonDetails(PokemonProto proto)
 	{
 		this.proto = proto;

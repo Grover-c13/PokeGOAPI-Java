@@ -1,27 +1,47 @@
 package api.inventory;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import api.PokemonDetails;
+import api.PokemonGo;
 
 public class PokeBank {
-	// class for handling pokemon
+	List<PokemonDetails> pokemons;
+	private PokemonGo instance;
+	
+	public PokeBank(PokemonGo instance)
+	{
+		this.instance = instance;
+		pokemons = new ArrayList<PokemonDetails>();
+	}
+	
+	public void addPokemon(PokemonDetails pokemon)
+	{
+		pokemon.setAPIInstance(instance);
+		pokemons.add(pokemon);
+	}
+	
 	
 	public List<PokemonDetails> getPokemonByPokemonId(int id)
 	{
-		return null;
+		List<PokemonDetails> list = new ArrayList<PokemonDetails>();
+		for (PokemonDetails details : pokemons)
+		{
+			if (details.getPokemonId() == id)
+			{
+				list.add(details);
+			}
+		}
+		
+		return list;
 	}
 	
 	
-	
-	public List<PokemonDetails> getPokemonByFamily(int family)
-	{
-		return null;
-	}
+
 	
 	public List<PokemonDetails> getPokemon()
 	{
-		return null;
+		return pokemons;
 	}
 	
 	

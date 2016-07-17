@@ -3,6 +3,8 @@ package api;
 import java.util.LinkedList;
 import java.util.List;
 
+import api.inventory.PokeBank;
+import api.inventory.PokemonDetails;
 import main.Pokemon.RequestEnvelop.AuthInfo;
 import main.RequestHandler;
 import requests.FortDetailsRequest;
@@ -14,7 +16,8 @@ public class PokemonGo
 	private AuthInfo auth;
 	private RequestHandler requestHandler;
 	private PlayerProfile playerProfile;
-	private List<PokemonDetails> pokemon;
+	private PokeBank pokebank;
+
 	private long lastInventoryUpdate;
 	
 	public PokemonGo(AuthInfo auth)
@@ -28,9 +31,10 @@ public class PokemonGo
 		requestHandler.sendRequests();
 		// should have proper end point now.
 		
-		
-		pokemon = new LinkedList<PokemonDetails>();
+		pokebank = new PokeBank(this);
+
 		lastInventoryUpdate = 0;
+		getInventory();
 	}
 	
 	
@@ -47,14 +51,19 @@ public class PokemonGo
 
 	}
 	
-	public List<PokemonDetails> getPokemon()
+
+	
+	
+	public PokeBank getPokeBank()
 	{
-		getInventory();
-		return this.pokemon;
+		return this.pokebank;
 	}
 	
 	
-	
+	public RequestHandler getRequestHandler()
+	{
+		return this.requestHandler;
+	}
 	
 	private void getInventory()
 	{
@@ -64,7 +73,7 @@ public class PokemonGo
 		requestHandler.sendRequests();
 		for (PokemonDetails newPokemon : invRequest.getPokemon())
 		{
-			this.pokemon.add(newPokemon);
+			this.pokebank.addPokemon(newPokemon);
 		}
 		
 	}
