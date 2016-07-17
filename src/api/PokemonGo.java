@@ -2,6 +2,7 @@ package api;
 
 import main.Pokemon.RequestEnvelop.AuthInfo;
 import main.RequestHandler;
+import requests.InventoryRequest;
 import requests.ProfileRequest;
 
 public class PokemonGo 
@@ -35,6 +36,13 @@ public class PokemonGo
 
 		
 
+	}
+	
+	
+	public void getInventory()
+	{
+		requestHandler.addRequest(new InventoryRequest());
+		requestHandler.sendRequests();
 	}
 	
 }

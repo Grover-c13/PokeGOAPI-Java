@@ -1,5 +1,7 @@
 package requests;
 
+import com.google.protobuf.ByteString;
+
 import main.Pokemon;
 import main.Pokemon.Payload;
 import main.Request;
@@ -37,5 +39,12 @@ public class SettingsRequest extends Request {
 
 
 	}
+	
+
+	public ByteString getInput() 
+	{
+		return null;
+	}
+
 
 }
