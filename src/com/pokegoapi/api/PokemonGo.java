@@ -1,10 +1,9 @@
 package com.pokegoapi.api;
 
-import java.util.LinkedList;
-import java.util.List;
+
 
 import com.pokegoapi.api.inventory.PokeBank;
-import com.pokegoapi.api.inventory.PokemonDetails;
+import com.pokegoapi.api.inventory.Pokemon;
 import com.pokegoapi.main.Communication.RequestEnvelop.AuthInfo;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.requests.FortDetailsRequest;
@@ -13,7 +12,7 @@ import com.pokegoapi.requests.ProfileRequest;
 
 public class PokemonGo 
 {
-	private AuthInfo auth;
+
 	private RequestHandler requestHandler;
 	private PlayerProfile playerProfile;
 	private PokeBank pokebank;
@@ -22,7 +21,6 @@ public class PokemonGo
 	
 	public PokemonGo(AuthInfo auth)
 	{
-		this.auth = auth;
 		playerProfile = null;
 		// send profile request to get the ball rolling
 		requestHandler = new RequestHandler(auth);
@@ -71,7 +69,7 @@ public class PokemonGo
 		invRequest.setTimestamp(lastInventoryUpdate);
 		requestHandler.addRequest(invRequest);
 		requestHandler.sendRequests();
-		for (PokemonDetails newPokemon : invRequest.getPokemon())
+		for (Pokemon newPokemon : invRequest.getPokemon())
 		{
 			this.pokebank.addPokemon(newPokemon);
 		}

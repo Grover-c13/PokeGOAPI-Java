@@ -142,7 +142,7 @@ message InventoryItemProto {
 	}
  }
  
-  // POKEMON TRANSFER
+// POKEMON TRANSFER
 message TransferPokemonProto {
     required fixed64 PokemonId = 1;
 }
@@ -150,5 +150,19 @@ message TransferPokemonProto {
 message TransferPokemonOutProto {
     optional int32 Status = 1;
     optional int32 CandyAwarded = 2;
+}
+
+
+// EVOLVE
+message EvolvePokemonProto {
+	required fixed64 PokemonId = 1;
+}
+ 
+ 
+message EvolvePokemonOutProto {
+	required int32 Result = 1;
+	optional PokemonProto EvolvedPokemon = 2;
+	optional int32 ExpAwarded = 3;
+	optional int32 CandyAwarded = 4;
 }
  

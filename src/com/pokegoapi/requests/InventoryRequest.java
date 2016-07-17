@@ -7,7 +7,7 @@ import java.util.List;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 
-import com.pokegoapi.api.inventory.PokemonDetails;
+import com.pokegoapi.api.inventory.Pokemon;
 import com.pokegoapi.main.Inventory.InventoryRequestProto;
 import com.pokegoapi.main.Inventory.InventoryRequestProto.Builder;
 import com.pokegoapi.main.Inventory.InventoryResponseProto;
@@ -18,7 +18,7 @@ import com.pokegoapi.main.Request;
 public class InventoryRequest extends Request {
 
 	private Builder builder;
-	private List<PokemonDetails> pokemon;
+	private List<Pokemon> pokemon;
 	
 
 	
@@ -30,7 +30,7 @@ public class InventoryRequest extends Request {
 	public InventoryRequest()
 	{
 		builder = InventoryRequestProto.newBuilder();
-		pokemon = new LinkedList<PokemonDetails>();
+		pokemon = new LinkedList<Pokemon>();
 	}
 
 	public void setTimestamp(long timestamp)
@@ -38,7 +38,7 @@ public class InventoryRequest extends Request {
 		builder.setTimestamp(timestamp);
 	}
 	
-	public List<PokemonDetails> getPokemon()
+	public List<Pokemon> getPokemon()
 	{
 		return pokemon;
 	}
@@ -53,7 +53,7 @@ public class InventoryRequest extends Request {
 			{
 				if(item.getItem().hasPokemon())
 				{
-					pokemon.add(new PokemonDetails(item.getItem().getPokemon()));
+					pokemon.add(new Pokemon(item.getItem().getPokemon()));
 				}
 			}
 			System.out.println(response);

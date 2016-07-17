@@ -5,9 +5,10 @@ package com.pokegoapi.api.inventory;
 
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.main.Inventory.PokemonProto;
+import com.pokegoapi.requests.PokemonEvolveRequest;
 import com.pokegoapi.requests.PokemonTransferRequest;
 
-public class PokemonDetails
+public class Pokemon
 {
 	private PokemonProto proto;
 	private PokemonGo pgo;
@@ -22,16 +23,33 @@ public class PokemonDetails
 	public int transferPokemon()
 	{
 		PokemonTransferRequest req = new PokemonTransferRequest(this.getId());
-		pgo.getRequestHandler().addRequest(req);
-		pgo.getRequestHandler().sendRequests();
+		pgo.getRequestHandler().doRequest(req);
 		
 		return req.getCandies();
+	}
+	
+	public EvolutionResult evolve()
+	{
+
+		PokemonEvolveRequest req = new PokemonEvolveRequest(this.getId());
+		pgo.getRequestHandler().doRequest(req);
+		EvolutionResult result = new EvolutionResult(req.getOutput());
+		
+		if (result.isSuccessful())
+		{
+			this.pgo.getPokeBank().addPokemon(result.getEvolvedPokemon());
+		}
+		
+		
+		return result;
+
+		
 	}
 	
 	
 	
 	// DELEGATE METHODS BELOW //
-	public PokemonDetails(PokemonProto proto)
+	public Pokemon(PokemonProto proto)
 	{
 		this.proto = proto;
 	}
