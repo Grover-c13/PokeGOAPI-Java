@@ -2,58 +2,35 @@ package com.pokegoapi.api.inventory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import com.pokegoapi.api.PokemonGo;
 
+import lombok.Getter;
+import lombok.Setter;
+
+
 public class PokeBank {
-	List<Pokemon> pokemons;
-	private PokemonGo instance;
+	@Getter List<Pokemon> pokemons = new ArrayList<Pokemon>();
+	@Setter PokemonGo instance;
 	
 	public PokeBank(PokemonGo instance)
 	{
 		this.instance = instance;
-		pokemons = new ArrayList<Pokemon>();
 	}
 	
 	public void addPokemon(Pokemon pokemon)
 	{
-		pokemon.setAPIInstance(instance);
+		pokemon.setPgo(instance);
 		pokemons.add(pokemon);
 	}
 	
-	
-	public List<Pokemon> getPokemonByPokemonId(int id)
-	{
-		List<Pokemon> list = new ArrayList<Pokemon>();
-		for (Pokemon details : pokemons)
-		{
-			if (details.getPokemonId() == id)
-			{
-				list.add(details);
-			}
-		}
-		
-		return list;
+	public List<Pokemon> getPokemonByPokemonId(int id) {
+		return pokemons.stream().filter(pokemon -> pokemon.getId() == id).collect(Collectors.toCollection(ArrayList::new));
 	}
 	
-	protected void removePokemon(Pokemon pokemon)
-	{
-		List<Pokemon> list = new ArrayList<Pokemon>();
-		for (Pokemon details : pokemons)
-		{
-			if (!details.equals(pokemon))
-			{
-				list.add(details);
-			}
-		}
-		
-		pokemons = list;
+	public void removePokemon(Pokemon pokemon) {
+		pokemons = pokemons.stream().filter(pokmon -> pokmon.getId() != pokemon.getId()).collect(Collectors.toCollection(ArrayList::new));
 	}
-
-	
-	public List<Pokemon> getPokemon()
-	{
-		return pokemons;
-	}
-	
 	
 }

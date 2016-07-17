@@ -16,35 +16,27 @@ import com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponse
 import com.pokegoapi.main.Communication.Payload;
 import com.pokegoapi.main.Request;
 
+import lombok.Getter;
+
 public class InventoryRequest extends Request {
 
 	private Builder builder;
-	private List<Pokemon> pokemon;
-	
-
+	@Getter List<Pokemon> pokemon = new LinkedList<Pokemon>();
 	
 	public Communication.Method getRpcId()
 	{
 		return Communication.Method.GET_INVENTORY;
 	}
 
-	public InventoryRequest()
-	{
+	public InventoryRequest() {
 		builder = InventoryRequestProto.newBuilder();
-		pokemon = new LinkedList<Pokemon>();
 	}
 
 	public void setTimestamp(long timestamp)
 	{
 		builder.setTimestamp(timestamp);
 	}
-	
-	public List<Pokemon> getPokemon()
-	{
-		return pokemon;
-	}
 
-	
 	public void handleResponse(Payload payload)
 	{
 		try
@@ -57,7 +49,6 @@ public class InventoryRequest extends Request {
 					pokemon.add(new Pokemon(item.getItem().getPokemon()));
 				}
 			}
-			System.out.println(response);
 		} 
 		catch (InvalidProtocolBufferException e) 
 		{
@@ -70,8 +61,4 @@ public class InventoryRequest extends Request {
 	{
 		return builder.build().toByteArray();
 	}
-
-
-
-
 }

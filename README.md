@@ -6,7 +6,7 @@ See this spreadsheet for RPC endpoints and progress: https://docs.google.com/spr
 
 # Usage
 Mostly everything is accessed through the PokemonGo class in the api package.
-The constructor of PokemonGo class requires a AuthInfo object which can be obtained from GoogleLogin().login method (or others in future).
+The constructor of PokemonGo class requires a AuthInfo object which can be obtained from GoogleLogin().login or PTCLogin().login.
 
 EG:
 ```java

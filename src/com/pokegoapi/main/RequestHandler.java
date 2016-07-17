@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -19,8 +18,6 @@ import com.pokegoapi.main.Communication.RequestEnvelop;
 import com.pokegoapi.main.Communication.RequestEnvelop.AuthInfo;
 import com.pokegoapi.main.Communication.RequestEnvelop.Builder;
 import com.pokegoapi.main.Communication.ResponseEnvelop;
-
-
 
 public class RequestHandler 
 {
@@ -46,7 +43,6 @@ public class RequestHandler
 	{
 		addRequest(request);
 		sendRequests();
-		
 	}
 	
 	public void sendRequests()
@@ -54,39 +50,28 @@ public class RequestHandler
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		try 
 		{
-			
 			RequestEnvelop request = builder.build();
-			System.out.println(request);
 			request.writeTo(stream);
 		} 
-		catch (IOException e1)
-		{
+		catch (IOException e1) {
 			e1.printStackTrace();
 		}
 		
-		byte[] array = stream.toByteArray();
 		
-		try 
-		{
-			
+		try  {
 			HttpPost post = new HttpPost(api_endpoint);
-			HttpEntity entity = new ByteArrayEntity(array);
-			post.setEntity(entity);
+			post.setEntity(new ByteArrayEntity(stream.toByteArray()));
 			
 			HttpResponse response = client.execute(post);
 			InputStream content = response.getEntity().getContent();
 
 			ResponseEnvelop responseEnvelop = ResponseEnvelop.parseFrom(content);
 			
-			if (responseEnvelop.getUnknown1() == 102)
-			{
+			if (responseEnvelop.getUnknown1() == 102) {
 				throw new LoginFailedException();
 			}
 	
-			
-			System.out.println(responseEnvelop);
-			if (responseEnvelop.hasApiUrl())
-			{
+			if (responseEnvelop.hasApiUrl()) {
 				api_endpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
 			}
 
@@ -96,8 +81,7 @@ public class RequestHandler
 			
 			// map each reply to the numeric response, ie first response = first request and send back to the requests to handle.
 			int count = 0;
-			for (Payload payload: responseEnvelop.getPayloadList())
-			{
+			for (Payload payload: responseEnvelop.getPayloadList()) {
 				requests.get(count).handleResponse(payload);
 				count++;
 			}
@@ -105,27 +89,19 @@ public class RequestHandler
 			content.close();
 			
 			// 53 seems to mean handshak'n so need to resend request
-			if (responseEnvelop.getUnknown1() == 53)
-			{
+			if (responseEnvelop.getUnknown1() == 53) {
 				sendRequests();
 			}
 
 		} 
-		catch (Exception e)
-		{
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		
 		resetBuilder();
-		
 	}
 	
-
-
-	
-	private void resetBuilder()
-	{
+	private void resetBuilder(){
 		builder =  RequestEnvelop.newBuilder();
 		builder.setDirection(Communication.Direction.REQUEST);
 		builder.setRpcId(8145806132888207460l);
@@ -139,19 +115,15 @@ public class RequestHandler
 		requests.clear();
 	}
 	
-	public void addRequest(Request request)
-	{
+	public void addRequest(Request request) {
 		hasRequests = true;
 		requests.add(request);
 		builder.addRequests(request.getRequest());
 	}
 	
-	public RequestEnvelop build()
-	{
-		if (!hasRequests)
-		{
+	public RequestEnvelop build() {
+		if (!hasRequests) 
 			throw new IllegalStateException("Attempting to send request envelop with no requests");
-		}
 		return builder.build();
 	}
 

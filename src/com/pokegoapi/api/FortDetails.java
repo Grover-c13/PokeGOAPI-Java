@@ -8,7 +8,6 @@ public class FortDetails
 	public FortDetails(FortDetailsOutProto proto)
 	{
 		this.proto = proto;
-		
 	}
 	public String getId() {
 		return proto.getId();
@@ -46,8 +45,4 @@ public class FortDetails
 	public double getModifier() {
 		return proto.getModifier();
 	}
-	
-	
-	
-	
 }

@@ -1,33 +1,27 @@
 package com.pokegoapi.api.inventory;
 
-
-
-
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.main.Inventory.PokemonProto;
 import com.pokegoapi.requests.PokemonEvolveRequest;
 import com.pokegoapi.requests.PokemonTransferRequest;
 
+import lombok.Setter;
+
 public class Pokemon
 {
 	private PokemonProto proto;
-	private PokemonGo pgo;
-	
-	protected void setAPIInstance(PokemonGo pgo)
-	{
-		this.pgo = pgo;
-	}
+	@Setter PokemonGo pgo;
 	
 	// API METHODS //
 	
 	public int transferPokemon()
 	{
-		PokemonTransferRequest req = new PokemonTransferRequest(this.getId());
+		PokemonTransferRequest req = new PokemonTransferRequest(getId());
 		pgo.getRequestHandler().doRequest(req);
 		
 		if (req.getStatus() == 1)
 		{
-			pgo.getPokeBank().removePokemon(this);
+			pgo.getPokebank().removePokemon(this);
 		}
 		
 		return req.getCandies();
@@ -36,27 +30,24 @@ public class Pokemon
 	public EvolutionResult evolve()
 	{
 
-		PokemonEvolveRequest req = new PokemonEvolveRequest(this.getId());
+		PokemonEvolveRequest req = new PokemonEvolveRequest(getId());
 		pgo.getRequestHandler().doRequest(req);
 		EvolutionResult result = new EvolutionResult(req.getOutput());
 		
-		if (result.isSuccessful())
+		if (result.isSuccessful()) 
 		{
-			this.pgo.getPokeBank().addPokemon(result.getEvolvedPokemon());
+			this.pgo.getPokebank().removePokemon(this);
+			this.pgo.getPokebank().addPokemon(result.getEvolvedPokemon());
 		}
 		
-		
 		return result;
-
-		
 	}
 	
 	
 	public boolean equals(Pokemon other)
 	{
-		return (other.getId() == this.getId());
+		return (other.getId() == getId());
 	}
-	
 	
 	// DELEGATE METHODS BELOW //
 	public Pokemon(PokemonProto proto)
@@ -70,7 +61,6 @@ public class Pokemon
 
 	public long getId() {
 		return proto.getEntId();
-		
 	}
 
 	public int getPokemonId() {
@@ -161,12 +151,9 @@ public class Pokemon
 		return proto.getEggIncubatorId();
 	}
 
-
 	public long getCreationTimeMs() {
 		return proto.getCreationTimeMs();
 	}
-
-
 
 	public boolean getFavorite() {
 		return proto.getFavorite();

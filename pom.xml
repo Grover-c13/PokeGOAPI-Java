@@ -1,33 +1,65 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>PokeGOAPI-Java</groupId>
-  <artifactId>PokeGOAPI-Java</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>Pokemon Go Java API</name>
-  <description>Pokemon Go API written in Java</description>
-    <dependencies>
-    <dependency>
-    <groupId>com.google.protobuf</groupId>
-        <artifactId>protobuf-java</artifactId>
-        <version>3.0.0-beta-3</version>
-    </dependency>
-    <dependency>
-        <groupId>net.sourceforge.argparse4j</groupId>
-        <artifactId>argparse4j</artifactId>
-        <version>0.7.0</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
-    <dependency>
-        <groupId>com.google.code.gson</groupId>
-        <artifactId>gson</artifactId>
-        <version>2.7</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
-    <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpclient</artifactId>
-        <version>4.5.2</version>
-    </dependency>
-    
-  </dependencies>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>PokeGOAPI-Java</groupId>
+	<artifactId>PokeGOAPI-Java</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Pokemon Go Java API</name>
+	<description>Pokemon Go API written in Java</description>
+	
+	<dependencies>
+		<!-- Protobuf is the data format used to communicate with the PokemonGo server -->
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>3.0.0-beta-3</version>
+		</dependency>
+		<!-- ???? not used ??? -->
+		<dependency>
+			<groupId>net.sourceforge.argparse4j</groupId>
+			<artifactId>argparse4j</artifactId>
+			<version>0.7.0</version>
+		</dependency>
+		<!-- gson is used to serialize/deserialize json for us-->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.7</version>
+		</dependency>
+		<!-- httpclient is used to make http request to the backend of pokemon go -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.2</version>
+		</dependency>
+		<!-- Lombok is used to generate for us some getter/setter to make the code more maintainable -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.16.6</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+	<!-- This build is just used to make a bundled jar with all the needed dependency to be used -->
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<finalName>pokemongo_api</finalName>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

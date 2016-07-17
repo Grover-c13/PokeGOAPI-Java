@@ -1,5 +1,7 @@
 package com.pokegoapi.api;
 
+import lombok.Getter;
+
 public enum Team 
 {
 	// VALUES UNCONFIRMED for the two inferior teams (Instinct and Valor)
@@ -8,16 +10,10 @@ public enum Team
 	TEAM_INSTINCT (2),
 	TEAM_VALOR (3);
 	
-	private int value;
+	@Getter private int value;
+	
 	private Team(int value)
 	{
 		this.value = value;
 	}
-	
-	public int getValue()
-	{
-		return this.value;
-	}
-	
-
 }

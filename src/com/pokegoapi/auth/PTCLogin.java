@@ -1,10 +1,5 @@
 package com.pokegoapi.auth;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -12,6 +7,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -66,7 +62,7 @@ public class PTCLogin extends Login {
 
       Gson gson = new GsonBuilder().create();
 
-      PTCAuthJson ptcAuth = gson.fromJson(getResponseBody(response), PTCAuthJson.class);
+      PTCAuthJson ptcAuth = gson.fromJson(EntityUtils.toString(response.getEntity()), PTCAuthJson.class);
 
       builder = new URIBuilder(LOGIN_URL);
       builder.addParameter("lt", ptcAuth.getLt());
@@ -78,7 +74,8 @@ public class PTCLogin extends Login {
       post.setHeader("User-Agent", USER_AGENT);
 
       response = client.execute(post);
-      String body = getResponseBody(response);
+      String body = EntityUtils.toString(response.getEntity());
+      
       if (body.length() > 0) {
         PTCError ptcError = gson.fromJson(body, PTCError.class);
         if (ptcError.getError() != null && ptcError.getError().length() > 0) {
@@ -102,7 +99,7 @@ public class PTCLogin extends Login {
       post.setHeader("User-Agent", USER_AGENT);
 
       response = client.execute(post);
-      body = getResponseBody(response);
+      body = EntityUtils.toString(response.getEntity());
 
       String token;
       try {
@@ -122,18 +119,6 @@ public class PTCLogin extends Login {
       throw new LoginFailedException();
     }
 
-  }
-
-  private String getResponseBody(HttpResponse response) throws UnsupportedOperationException, IOException {
-    BufferedReader buff = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-    String body = "";
-    String line;
-
-    while ((line = buff.readLine()) != null) {
-      body += line;
-    }
-
-    return body;
   }
 
 }
