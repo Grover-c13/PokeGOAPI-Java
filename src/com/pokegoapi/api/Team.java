@@ -1,5 +1,7 @@
 package com.pokegoapi.api;
 
+import lombok.Getter;
+
 public enum Team 
 {
 	// VALUES UNCONFIRMED (except for Team Mystic, the best team)
@@ -8,16 +10,10 @@ public enum Team
 	TEAM_MYSTIC (1),	
 	TEAM_VALOR (2);
 	
-	private int value;
+	@Getter private int value;
+	
 	private Team(int value)
 	{
 		this.value = value;
 	}
-	
-	public int getValue()
-	{
-		return this.value;
-	}
-	
-
 }

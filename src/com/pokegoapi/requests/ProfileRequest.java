@@ -1,6 +1,5 @@
 package com.pokegoapi.requests;
 
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import com.pokegoapi.api.ContactSettings;
@@ -8,23 +7,20 @@ import com.pokegoapi.api.DailyBonus;
 import com.pokegoapi.api.PlayerAvatar;
 import com.pokegoapi.api.PlayerProfile;
 import com.pokegoapi.api.Team;
+import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.main.Communication;
 import com.pokegoapi.main.Player.ClientPlayerDetails;
 import com.pokegoapi.main.Player.Currency;
 import com.pokegoapi.main.Communication.Payload;
 import com.pokegoapi.main.Request;
 
+import lombok.Getter;
 public class ProfileRequest extends Request {
-	private PlayerProfile profile;
-	public Communication.Method getRpcId()
-	{
-		profile = new PlayerProfile();
+	
+	@Getter PlayerProfile profile = new PlayerProfile();
+	
+	public Communication.Method getRpcId() {
 		return Communication.Method.GET_PLAYER_PROFILE;
-	}
-
-	public PlayerProfile getProfile()
-	{
-		return profile;
 	}
 
 	public void handleResponse(Payload payload)
@@ -36,7 +32,7 @@ public class ProfileRequest extends Request {
 			profile.setCreationTime(details.getCreationTime());
 			profile.setItemStorage(details.getItemStorage());
 			profile.setPokemonStorage(details.getPokeStorage());
-			profile.setTeam(valueOf(details.getTeam()));
+			profile.setTeam(Team.values()[details.getTeam()]);
 			profile.setUsername(details.getUsername());
 			
 
@@ -48,7 +44,6 @@ public class ProfileRequest extends Request {
 			{
 				profile.addCurrency(currency.getType(), currency.getAmount());
 			}
-			
 			
 			avatarAPI.setAvatar(details.getAvatar().getAvatar());
 			avatarAPI.setBackpack(details.getAvatar().getBackpack());
@@ -63,34 +58,19 @@ public class ProfileRequest extends Request {
 			bonusAPI.setNextCollectionTimestamp(details.getDailyBonus().getNextCollectTimestampMs());
 			bonusAPI.setNextDefenderBonusCollectTimestamp(details.getDailyBonus().getNextDefenderBonusCollectTimestampMs());
 			
-			// TODO contact settings
-			
 			profile.setAvatar(avatarAPI);
 			profile.setDailyBonus(bonusAPI);
 			
-			
 		} catch (InvalidProtocolBufferException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidCurrencyException e) {
 			e.printStackTrace();
 		}
 	}
-
-	private Team valueOf(int value)
-	{
-		if (value == 0) return Team.TEAM_INSTINCT;
-		if (value == 1) return Team.TEAM_MYSTIC;
-		if (value == 2) return Team.TEAM_VALOR;
-
-		return Team.TEAM_NONE;
-	}
-
-	
 
 	public byte[] getInput() 
 	{
 		return null;
 	}
-
-
 
 }

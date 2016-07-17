@@ -55,11 +55,8 @@ public class PokemonTransferRequest extends Request {
 	}
 
 	@Override
-	public byte[] getInput()
-	{
-		TransferPokemonProto in = builder.build();
-		System.out.println(in);
-		return in.toByteArray();
+	public byte[] getInput() {
+		return builder.build().toByteArray();
 	}
 
 }

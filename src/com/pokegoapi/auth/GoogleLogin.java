@@ -12,6 +12,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -64,13 +65,13 @@ public class GoogleLogin extends Login
 
             Gson gson = new GsonBuilder().create();
       
-            GoogleAuthJson googleAuth = gson.fromJson(getJsonFromPost(response), GoogleAuthJson.class);
+            GoogleAuthJson googleAuth = gson.fromJson(EntityUtils.toString(response.getEntity()), GoogleAuthJson.class);
             System.out.println("Get user to go to:" + googleAuth.getVerification_url() + " and enter code:" + googleAuth.getUser_code());
             
             GoogleAuthTokenJson token;
             while( (token = poll(googleAuth)) == null)
             {
-            	Thread.sleep(googleAuth.getInterval()*1000);
+            	Thread.sleep(googleAuth.getInterval() * 1000);
             }
             
             System.out.println("Got token:" + token.getId_token());
@@ -104,9 +105,8 @@ public class GoogleLogin extends Login
 		
 		HttpResponse response = client.execute(post);
 
-
         Gson gson = new GsonBuilder().create();
-        GoogleAuthTokenJson token = gson.fromJson(getJsonFromPost(response), GoogleAuthTokenJson.class);
+        GoogleAuthTokenJson token = gson.fromJson(EntityUtils.toString(response.getEntity()), GoogleAuthTokenJson.class);
         
         if (token.getError() == null)
         {
@@ -117,23 +117,6 @@ public class GoogleLogin extends Login
         	return null;
         }
         
-	}
-	
-	private String getJsonFromPost(HttpResponse response) throws UnsupportedOperationException, IOException
-	{
-		BufferedReader buff = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-		String json = "";
-	    String line = null;
-	    
-        while ( (line = buff.readLine()) != null)
-        {
-
-            json += line;
-        }
-        
-        
-        return json;
-  
 	}
 
 }

@@ -10,19 +10,22 @@ import com.pokegoapi.requests.GetMapObjectsRequest;
 import com.pokegoapi.requests.InventoryRequest;
 import com.pokegoapi.requests.ProfileRequest;
 
+import lombok.Getter;
+
 import java.util.List;
 
 public class PokemonGo {
 
-  private RequestHandler requestHandler;
+  @Getter RequestHandler requestHandler;
   private PlayerProfile playerProfile;
-  private PokeBank pokebank;
+  @Getter PokeBank pokebank;
 
   private long lastInventoryUpdate;
 
   public PokemonGo(AuthInfo auth) {
     playerProfile = null;
     // send profile request to get the ball rolling
+   
     requestHandler = new RequestHandler(auth);
     ProfileRequest pr = new ProfileRequest();
     requestHandler.addRequest(pr);
@@ -37,25 +40,13 @@ public class PokemonGo {
 
 
   public PlayerProfile getPlayerProfile() {
-
     ProfileRequest pr = new ProfileRequest();
     requestHandler.addRequest(pr);
     requestHandler.sendRequests();
 
     return pr.getProfile();
-
-
   }
 
-
-  public PokeBank getPokeBank() {
-    return this.pokebank;
-  }
-
-
-  public RequestHandler getRequestHandler() {
-    return this.requestHandler;
-  }
 
   private void getInventory() {
     InventoryRequest invRequest = new InventoryRequest();
@@ -65,19 +56,17 @@ public class PokemonGo {
     for (Pokemon newPokemon : invRequest.getPokemon()) {
       this.pokebank.addPokemon(newPokemon);
     }
-
   }
 
 
   public FortDetails getFortDetails(String id, long lon, long lat) {
-    FortDetailsRequest request = new FortDetailsRequest(id);
-    request.setLatitude(lat);
-    request.setLongitude(lon);
+    FortDetailsRequest request = new FortDetailsRequest(id, lon, lat);
     requestHandler.addRequest(request);
     requestHandler.sendRequests();
     return new FortDetails(request.getOutput());
   }
 
+  
   public void getMapObjects(List<Long> cellIds, double latitude, double longitude) {
     requestHandler.setLatitude(latitude);
     requestHandler.setLongitude(longitude);
