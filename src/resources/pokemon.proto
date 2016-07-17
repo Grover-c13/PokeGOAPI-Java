@@ -1,4 +1,4 @@
-package main; // not having package can cause issues with generated java code :(
+package com.pokegoapi.main; // not having package can cause issues with generated java code :(
 
 message RequestEnvelop {
   required int32 unknown1 = 1;
