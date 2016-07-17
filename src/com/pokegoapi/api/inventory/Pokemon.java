@@ -25,6 +25,11 @@ public class Pokemon
 		PokemonTransferRequest req = new PokemonTransferRequest(this.getId());
 		pgo.getRequestHandler().doRequest(req);
 		
+		if (req.getStatus() == 1)
+		{
+			pgo.getPokeBank().removePokemon(this);
+		}
+		
 		return req.getCandies();
 	}
 	
@@ -46,6 +51,11 @@ public class Pokemon
 		
 	}
 	
+	
+	public boolean equals(Pokemon other)
+	{
+		return (other.getId() == this.getId());
+	}
 	
 	
 	// DELEGATE METHODS BELOW //

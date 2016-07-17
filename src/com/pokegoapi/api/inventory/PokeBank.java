@@ -35,7 +35,19 @@ public class PokeBank {
 		return list;
 	}
 	
-	
+	protected void removePokemon(Pokemon pokemon)
+	{
+		List<Pokemon> list = new ArrayList<Pokemon>();
+		for (Pokemon details : pokemons)
+		{
+			if (!details.equals(pokemon))
+			{
+				list.add(details);
+			}
+		}
+		
+		pokemons = list;
+	}
 
 	
 	public List<Pokemon> getPokemon()

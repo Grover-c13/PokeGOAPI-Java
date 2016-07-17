@@ -2,7 +2,7 @@
 # PokeGOAPI-Java
 Pokemon GO Java API
 See this guide for adding functionality: https://docs.google.com/document/d/1BE8O6Z19sQ54T5T7QauXgA11GbL6D9vx9AAMCM5KlRA/edit
-
+See this spreadsheet for RPC endpoints and progress: https://docs.google.com/spreadsheets/d/1Xv0Gw5PzIRaVou2xrl6r7qySrcmOKjQWLBjJA73YnJM/edit#gid=0
 
 # Usage
 Mostly everything is accessed through the PokemonGo class in the api package.
