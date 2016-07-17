@@ -7,9 +7,11 @@ Mostly everything is accessed through the PokemonGo class in the api package.
 The constructor of PokemonGo class requires a AuthInfo object which can be obtained from GoogleLogin().login method (or others in future).
 
 EG:
-```AuthInfo auth = new GoogleLogin().login("token");           
+```java
+AuthInfo auth = new GoogleLogin().login("token");           
 PokemonGo go = new PokemonGo(auth);
-System.out.println(go.getPlayerProfile());```
+System.out.println(go.getPlayerProfile());
+```
 
 ## Contributing
 1. Fork it!
