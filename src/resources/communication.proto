@@ -91,9 +91,9 @@ message RequestEnvelop {
   optional int64 rpc_id = 3;
   repeated Request requests = 4;
   optional Unknown6 unknown6 = 6;
-  optional fixed64 latitude = 7;
-  optional fixed64 longitude = 8;
-  optional fixed64 altitude = 9;
+  optional double latitude = 7;
+  optional double longitude = 8;
+  optional double altitude = 9;
   optional AuthInfo auth = 10;
   optional UnknownAuth unknownAuth = 11;
   optional int64 unknown12 = 12;

@@ -154,6 +154,17 @@ public class RequestHandler
 		}
 		return builder.build();
 	}
-	
+
+	public void setLatitude(double latitude) {
+		builder.setLatitude(latitude);
+	}
+
+	public void setLongitude(double longitude) {
+		builder.setLongitude(longitude);
+	}
+
+	public void setAltitude(double altitude) {
+		builder.setAltitude(altitude);
+	}
 
 }

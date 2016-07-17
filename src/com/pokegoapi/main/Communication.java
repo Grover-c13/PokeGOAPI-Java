@@ -1488,31 +1488,31 @@ public final class Communication {
     com.pokegoapi.main.Communication.RequestEnvelop.Unknown6OrBuilder getUnknown6OrBuilder();
 
     /**
-     * <code>optional fixed64 latitude = 7;</code>
+     * <code>optional double latitude = 7;</code>
      */
     boolean hasLatitude();
     /**
-     * <code>optional fixed64 latitude = 7;</code>
+     * <code>optional double latitude = 7;</code>
      */
-    long getLatitude();
+    double getLatitude();
 
     /**
-     * <code>optional fixed64 longitude = 8;</code>
+     * <code>optional double longitude = 8;</code>
      */
     boolean hasLongitude();
     /**
-     * <code>optional fixed64 longitude = 8;</code>
+     * <code>optional double longitude = 8;</code>
      */
-    long getLongitude();
+    double getLongitude();
 
     /**
-     * <code>optional fixed64 altitude = 9;</code>
+     * <code>optional double altitude = 9;</code>
      */
     boolean hasAltitude();
     /**
-     * <code>optional fixed64 altitude = 9;</code>
+     * <code>optional double altitude = 9;</code>
      */
-    long getAltitude();
+    double getAltitude();
 
     /**
      * <code>optional .com.pokegoapi.main.RequestEnvelop.AuthInfo auth = 10;</code>
@@ -1564,9 +1564,9 @@ public final class Communication {
       direction_ = 0;
       rpcId_ = 0L;
       requests_ = java.util.Collections.emptyList();
-      latitude_ = 0L;
-      longitude_ = 0L;
-      altitude_ = 0L;
+      latitude_ = 0D;
+      longitude_ = 0D;
+      altitude_ = 0D;
       unknown12_ = 0L;
     }
 
@@ -1638,17 +1638,17 @@ public final class Communication {
             }
             case 57: {
               bitField0_ |= 0x00000008;
-              latitude_ = input.readFixed64();
+              latitude_ = input.readDouble();
               break;
             }
             case 65: {
               bitField0_ |= 0x00000010;
-              longitude_ = input.readFixed64();
+              longitude_ = input.readDouble();
               break;
             }
             case 73: {
               bitField0_ |= 0x00000020;
-              altitude_ = input.readFixed64();
+              altitude_ = input.readDouble();
               break;
             }
             case 82: {
@@ -4735,47 +4735,47 @@ public final class Communication {
     }
 
     public static final int LATITUDE_FIELD_NUMBER = 7;
-    private long latitude_;
+    private double latitude_;
     /**
-     * <code>optional fixed64 latitude = 7;</code>
+     * <code>optional double latitude = 7;</code>
      */
     public boolean hasLatitude() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional fixed64 latitude = 7;</code>
+     * <code>optional double latitude = 7;</code>
      */
-    public long getLatitude() {
+    public double getLatitude() {
       return latitude_;
     }
 
     public static final int LONGITUDE_FIELD_NUMBER = 8;
-    private long longitude_;
+    private double longitude_;
     /**
-     * <code>optional fixed64 longitude = 8;</code>
+     * <code>optional double longitude = 8;</code>
      */
     public boolean hasLongitude() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>optional fixed64 longitude = 8;</code>
+     * <code>optional double longitude = 8;</code>
      */
-    public long getLongitude() {
+    public double getLongitude() {
       return longitude_;
     }
 
     public static final int ALTITUDE_FIELD_NUMBER = 9;
-    private long altitude_;
+    private double altitude_;
     /**
-     * <code>optional fixed64 altitude = 9;</code>
+     * <code>optional double altitude = 9;</code>
      */
     public boolean hasAltitude() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional fixed64 altitude = 9;</code>
+     * <code>optional double altitude = 9;</code>
      */
-    public long getAltitude() {
+    public double getAltitude() {
       return altitude_;
     }
 
@@ -4883,13 +4883,13 @@ public final class Communication {
         output.writeMessage(6, getUnknown6());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeFixed64(7, latitude_);
+        output.writeDouble(7, latitude_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeFixed64(8, longitude_);
+        output.writeDouble(8, longitude_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeFixed64(9, altitude_);
+        output.writeDouble(9, altitude_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         output.writeMessage(10, getAuth());
@@ -4926,15 +4926,15 @@ public final class Communication {
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFixed64Size(7, latitude_);
+          .computeDoubleSize(7, latitude_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFixed64Size(8, longitude_);
+          .computeDoubleSize(8, longitude_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFixed64Size(9, altitude_);
+          .computeDoubleSize(9, altitude_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
@@ -4983,18 +4983,24 @@ public final class Communication {
       }
       result = result && (hasLatitude() == other.hasLatitude());
       if (hasLatitude()) {
-        result = result && (getLatitude()
-            == other.getLatitude());
+        result = result && (
+            java.lang.Double.doubleToLongBits(getLatitude())
+            == java.lang.Double.doubleToLongBits(
+                other.getLatitude()));
       }
       result = result && (hasLongitude() == other.hasLongitude());
       if (hasLongitude()) {
-        result = result && (getLongitude()
-            == other.getLongitude());
+        result = result && (
+            java.lang.Double.doubleToLongBits(getLongitude())
+            == java.lang.Double.doubleToLongBits(
+                other.getLongitude()));
       }
       result = result && (hasAltitude() == other.hasAltitude());
       if (hasAltitude()) {
-        result = result && (getAltitude()
-            == other.getAltitude());
+        result = result && (
+            java.lang.Double.doubleToLongBits(getAltitude())
+            == java.lang.Double.doubleToLongBits(
+                other.getAltitude()));
       }
       result = result && (hasAuth() == other.hasAuth());
       if (hasAuth()) {
@@ -5042,17 +5048,17 @@ public final class Communication {
       if (hasLatitude()) {
         hash = (37 * hash) + LATITUDE_FIELD_NUMBER;
         hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-            getLatitude());
+            java.lang.Double.doubleToLongBits(getLatitude()));
       }
       if (hasLongitude()) {
         hash = (37 * hash) + LONGITUDE_FIELD_NUMBER;
         hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-            getLongitude());
+            java.lang.Double.doubleToLongBits(getLongitude()));
       }
       if (hasAltitude()) {
         hash = (37 * hash) + ALTITUDE_FIELD_NUMBER;
         hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-            getAltitude());
+            java.lang.Double.doubleToLongBits(getAltitude()));
       }
       if (hasAuth()) {
         hash = (37 * hash) + AUTH_FIELD_NUMBER;
@@ -5204,11 +5210,11 @@ public final class Communication {
           unknown6Builder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000008);
-        latitude_ = 0L;
+        latitude_ = 0D;
         bitField0_ = (bitField0_ & ~0x00000010);
-        longitude_ = 0L;
+        longitude_ = 0D;
         bitField0_ = (bitField0_ & ~0x00000020);
-        altitude_ = 0L;
+        altitude_ = 0D;
         bitField0_ = (bitField0_ & ~0x00000040);
         if (authBuilder_ == null) {
           auth_ = null;
@@ -5846,98 +5852,98 @@ public final class Communication {
         return unknown6Builder_;
       }
 
-      private long latitude_ ;
+      private double latitude_ ;
       /**
-       * <code>optional fixed64 latitude = 7;</code>
+       * <code>optional double latitude = 7;</code>
        */
       public boolean hasLatitude() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>optional fixed64 latitude = 7;</code>
+       * <code>optional double latitude = 7;</code>
        */
-      public long getLatitude() {
+      public double getLatitude() {
         return latitude_;
       }
       /**
-       * <code>optional fixed64 latitude = 7;</code>
+       * <code>optional double latitude = 7;</code>
        */
-      public Builder setLatitude(long value) {
+      public Builder setLatitude(double value) {
         bitField0_ |= 0x00000010;
         latitude_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional fixed64 latitude = 7;</code>
+       * <code>optional double latitude = 7;</code>
        */
       public Builder clearLatitude() {
         bitField0_ = (bitField0_ & ~0x00000010);
-        latitude_ = 0L;
+        latitude_ = 0D;
         onChanged();
         return this;
       }
 
-      private long longitude_ ;
+      private double longitude_ ;
       /**
-       * <code>optional fixed64 longitude = 8;</code>
+       * <code>optional double longitude = 8;</code>
        */
       public boolean hasLongitude() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional fixed64 longitude = 8;</code>
+       * <code>optional double longitude = 8;</code>
        */
-      public long getLongitude() {
+      public double getLongitude() {
         return longitude_;
       }
       /**
-       * <code>optional fixed64 longitude = 8;</code>
+       * <code>optional double longitude = 8;</code>
        */
-      public Builder setLongitude(long value) {
+      public Builder setLongitude(double value) {
         bitField0_ |= 0x00000020;
         longitude_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional fixed64 longitude = 8;</code>
+       * <code>optional double longitude = 8;</code>
        */
       public Builder clearLongitude() {
         bitField0_ = (bitField0_ & ~0x00000020);
-        longitude_ = 0L;
+        longitude_ = 0D;
         onChanged();
         return this;
       }
 
-      private long altitude_ ;
+      private double altitude_ ;
       /**
-       * <code>optional fixed64 altitude = 9;</code>
+       * <code>optional double altitude = 9;</code>
        */
       public boolean hasAltitude() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
-       * <code>optional fixed64 altitude = 9;</code>
+       * <code>optional double altitude = 9;</code>
        */
-      public long getAltitude() {
+      public double getAltitude() {
         return altitude_;
       }
       /**
-       * <code>optional fixed64 altitude = 9;</code>
+       * <code>optional double altitude = 9;</code>
        */
-      public Builder setAltitude(long value) {
+      public Builder setAltitude(double value) {
         bitField0_ |= 0x00000040;
         altitude_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional fixed64 altitude = 9;</code>
+       * <code>optional double altitude = 9;</code>
        */
       public Builder clearAltitude() {
         bitField0_ = (bitField0_ & ~0x00000040);
-        altitude_ = 0L;
+        altitude_ = 0D;
         onChanged();
         return this;
       }
@@ -9932,8 +9938,8 @@ public final class Communication {
       "in.Direction\022\016\n\006rpc_id\030\003 \001(\003\022-\n\010requests" +
       "\030\004 \003(\0132\033.com.pokegoapi.main.Request\022=\n\010u" +
       "nknown6\030\006 \001(\0132+.com.pokegoapi.main.Reque" +
-      "stEnvelop.Unknown6\022\020\n\010latitude\030\007 \001(\006\022\021\n\t" +
-      "longitude\030\010 \001(\006\022\020\n\010altitude\030\t \001(\006\0229\n\004aut" +
+      "stEnvelop.Unknown6\022\020\n\010latitude\030\007 \001(\001\022\021\n\t" +
+      "longitude\030\010 \001(\001\022\020\n\010altitude\030\t \001(\001\0229\n\004aut" +
       "h\030\n \001(\0132+.com.pokegoapi.main.RequestEnve",
       "lop.AuthInfo\0224\n\013unknownAuth\030\013 \001(\0132\037.com." +
       "pokegoapi.main.UnknownAuth\022\021\n\tunknown12\030" +
