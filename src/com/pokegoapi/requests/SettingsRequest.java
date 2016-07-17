@@ -1,10 +1,10 @@
-package requests;
+package com.pokegoapi.requests;
 
 import com.google.protobuf.ByteString;
 
-import main.Pokemon;
-import main.Pokemon.Payload;
-import main.Request;
+import com.pokegoapi.main.Pokemon;
+import com.pokegoapi.main.Pokemon.Payload;
+import com.pokegoapi.main.Request;
 
 public class SettingsRequest extends Request {
 	private Pokemon.SettingsRequest.Builder settingsRequestBuilder;
@@ -41,7 +41,7 @@ public class SettingsRequest extends Request {
 	}
 	
 
-	public ByteString getInput() 
+	public byte[] getInput() 
 	{
 		return null;
 	}

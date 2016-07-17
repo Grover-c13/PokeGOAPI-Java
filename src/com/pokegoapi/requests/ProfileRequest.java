@@ -1,16 +1,16 @@
-package requests;
+package com.pokegoapi.requests;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import api.ContactSettings;
-import api.DailyBonus;
-import api.PlayerAvatar;
-import api.PlayerProfile;
-import api.Team;
-import main.Pokemon.ClientPlayerDetails;
-import main.Pokemon.Payload;
-import main.Request;
+import com.pokegoapi.api.ContactSettings;
+import com.pokegoapi.api.DailyBonus;
+import com.pokegoapi.api.PlayerAvatar;
+import com.pokegoapi.api.PlayerProfile;
+import com.pokegoapi.api.Team;
+import com.pokegoapi.main.Pokemon.ClientPlayerDetails;
+import com.pokegoapi.main.Pokemon.Payload;
+import com.pokegoapi.main.Request;
 
 public class ProfileRequest extends Request {
 	private PlayerProfile profile;
@@ -42,7 +42,7 @@ public class ProfileRequest extends Request {
 			DailyBonus bonusAPI = new DailyBonus();
 			ContactSettings contactAPI = new ContactSettings();
 			
-			for(main.Pokemon.Currency currency : details.getCurrencyList() )
+			for(com.pokegoapi.main.Pokemon.Currency currency : details.getCurrencyList() )
 			{
 				profile.addCurrency(currency.getType(), currency.getAmount());
 			}
@@ -84,7 +84,7 @@ public class ProfileRequest extends Request {
 
 	
 
-	public ByteString getInput() 
+	public byte[] getInput() 
 	{
 		return null;
 	}

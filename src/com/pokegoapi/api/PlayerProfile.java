@@ -1,4 +1,4 @@
-package api;
+package com.pokegoapi.api;
 
 import java.util.HashMap;
 import java.util.LinkedList;

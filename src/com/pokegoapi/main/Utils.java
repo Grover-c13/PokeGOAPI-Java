@@ -1,4 +1,4 @@
-package main;
+package com.pokegoapi.main;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

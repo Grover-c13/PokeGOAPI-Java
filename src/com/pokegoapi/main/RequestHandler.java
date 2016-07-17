@@ -1,5 +1,4 @@
-package main;
-
+package com.pokegoapi.main;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,12 +13,13 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClients;
 
-import exceptions.LoginFailedException;
-import main.Pokemon.Payload;
-import main.Pokemon.RequestEnvelop;
-import main.Pokemon.RequestEnvelop.Builder;
-import main.Pokemon.RequestEnvelop.AuthInfo;
-import main.Pokemon.ResponseEnvelop;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.main.Pokemon.Payload;
+import com.pokegoapi.main.Pokemon.RequestEnvelop;
+import com.pokegoapi.main.Pokemon.RequestEnvelop.AuthInfo;
+import com.pokegoapi.main.Pokemon.RequestEnvelop.Builder;
+import com.pokegoapi.main.Pokemon.ResponseEnvelop;
+
 
 
 public class RequestHandler 
@@ -52,7 +52,9 @@ public class RequestHandler
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		try 
 		{
+			
 			RequestEnvelop request = builder.build();
+			System.out.println(request);
 			request.writeTo(stream);
 		} 
 		catch (IOException e1)

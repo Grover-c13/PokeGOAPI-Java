@@ -1,4 +1,4 @@
-package api;
+package com.pokegoapi.api;
 
 public enum Team 
 {

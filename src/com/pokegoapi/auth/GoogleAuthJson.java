@@ -1,4 +1,4 @@
-package auth;
+package com.pokegoapi.auth;
 
 public class GoogleAuthJson 
 {

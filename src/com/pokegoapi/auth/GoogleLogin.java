@@ -1,4 +1,4 @@
-package auth;
+package com.pokegoapi.auth;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,9 +16,9 @@ import org.apache.http.impl.client.HttpClients;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import exceptions.LoginFailedException;
-import main.Pokemon.RequestEnvelop.AuthInfo;
-import main.Pokemon.RequestEnvelop.AuthInfo.Builder;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.main.Pokemon.RequestEnvelop.AuthInfo;
+import com.pokegoapi.main.Pokemon.RequestEnvelop.AuthInfo.Builder;
 
 public class GoogleLogin extends Login 
 {

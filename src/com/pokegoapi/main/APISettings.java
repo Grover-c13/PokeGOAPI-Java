@@ -1,4 +1,4 @@
-package main;
+package com.pokegoapi.main;
 
 public class APISettings 
 {
