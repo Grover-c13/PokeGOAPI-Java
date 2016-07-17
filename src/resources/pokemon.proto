@@ -1,3 +1,5 @@
+package main; // not having package can cause issues with generated java code :(
+
 message RequestEnvelop {
   required int32 unknown1 = 1;
   optional int64 rpc_id = 3;
@@ -83,7 +85,6 @@ message SettingsRequest
 message Payload {
 	optional int32 uknown = 1;
 	optional bytes data = 2;
-	extensions 3 to max;
 }
 
 
@@ -100,7 +101,7 @@ message ClientPlayerDetails
 	optional DailyBonus daily_bonus = 11;
 	optional string badge = 12;
 	optional ContactSettingsProto settings = 13;
-	optional Currency currency = 14;
+	repeated Currency currency = 14;
 }
 
 

@@ -2,6 +2,9 @@ package requests;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import api.ContactSettings;
+import api.DailyBonus;
+import api.PlayerAvatar;
 import api.PlayerProfile;
 import api.Team;
 import main.Pokemon.ClientPlayerDetails;
@@ -31,8 +34,38 @@ public class ProfileRequest extends Request {
 			profile.setItemStorage(details.getItemStorage());
 			profile.setPokemonStorage(details.getPokeStorage());
 			profile.setTeam(valueOf(details.getTeam()));
-			profile.setUsername(details.getUsername()); 
+			profile.setUsername(details.getUsername());
+			
 
+			PlayerAvatar avatarAPI = new PlayerAvatar();
+			DailyBonus bonusAPI = new DailyBonus();
+			ContactSettings contactAPI = new ContactSettings();
+			
+			for(main.Pokemon.Currency currency : details.getCurrencyList() )
+			{
+				profile.addCurrency(currency.getType(), currency.getAmount());
+			}
+			
+			
+			avatarAPI.setAvatar(details.getAvatar().getAvatar());
+			avatarAPI.setBackpack(details.getAvatar().getBackpack());
+			avatarAPI.setEyes(details.getAvatar().getEyes());
+			avatarAPI.setHair(details.getAvatar().getHair());
+			avatarAPI.setHat(details.getAvatar().getHat());
+			avatarAPI.setPants(details.getAvatar().getPants());
+			avatarAPI.setShirt(details.getAvatar().getShirt());
+			avatarAPI.setShoes(details.getAvatar().getShoes());
+			avatarAPI.setSkin(details.getAvatar().getSkin());
+		
+			bonusAPI.setNextCollectionTimestamp(details.getDailyBonus().getNextCollectTimestampMs());
+			bonusAPI.setNextDefenderBonusCollectTimestamp(details.getDailyBonus().getNextDefenderBonusCollectTimestampMs());
+			
+			// TODO contact settings
+			
+			profile.setAvatar(avatarAPI);
+			profile.setDailyBonus(bonusAPI);
+			
+			
 		} catch (InvalidProtocolBufferException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
