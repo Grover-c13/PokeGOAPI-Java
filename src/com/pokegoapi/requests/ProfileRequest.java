@@ -20,7 +20,7 @@ public class ProfileRequest extends Request {
 	@Getter PlayerProfile profile = new PlayerProfile();
 	
 	public Communication.Method getRpcId() {
-		return Communication.Method.GET_PLAYER_PROFILE;
+		return Communication.Method.GET_PLAYER;
 	}
 
 	public void handleResponse(Payload payload)
