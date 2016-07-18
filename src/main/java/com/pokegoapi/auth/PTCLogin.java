@@ -5,6 +5,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.pokegoapi.exceptions.LoginFailedException;
 import okhttp3.*;
+import java.net.URI;
+import java.net.URL;
 
 
 public class PTCLogin extends Login {
@@ -58,9 +60,7 @@ public class PTCLogin extends Login {
 
       PTCAuthJson ptcAuth = gson.fromJson(getResponse.body().string(), PTCAuthJson.class);
 
-
-      HttpUrl url = new HttpUrl.Builder()
-              .scheme("https")
+      HttpUrl url = HttpUrl.parse(LOGIN_URL).newBuilder()
               .addQueryParameter("lt", ptcAuth.getLt())
               .addQueryParameter("execution", ptcAuth.getExecution())
               .addQueryParameter("_eventId", ptcAuth.getExecution())
@@ -92,7 +92,6 @@ public class PTCLogin extends Login {
 			}
 
       url = HttpUrl.parse(LOGIN_OAUTH).newBuilder()
-              .scheme("https")
               .addQueryParameter("client_id", CLIENT_ID)
               .addQueryParameter("redirect_uri", REDIRECT_URI)
               .addQueryParameter("client_secret", CLIENT_SECRET)
