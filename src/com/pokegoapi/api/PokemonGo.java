@@ -67,12 +67,13 @@ public class PokemonGo {
 	}
 
 
-	public void getMapObjects(List<Long> cellIds, double latitude, double longitude) {
+	public GetMapObjectsRequest.GetMapObjectsReply getMapObjects(List<Long> cellIds, double latitude, double longitude) {
 		requestHandler.setLatitude(latitude);
 		requestHandler.setLongitude(longitude);
 		requestHandler.setAltitude(0);
 		GetMapObjectsRequest request = new GetMapObjectsRequest(cellIds, latitude, longitude);
 		requestHandler.addRequest(request);
 		requestHandler.sendRequests();
+		return request.getOutput();
 	}
 }
