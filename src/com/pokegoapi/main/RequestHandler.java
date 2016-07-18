@@ -19,7 +19,7 @@ public class RequestHandler {
 	private EnvelopesOuterClass.Envelopes.RequestEnvelope.Builder builder;
 	private boolean hasRequests;
 	private EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth;
-	private List<Request> requests;
+	private List<ServerRequest> serverRequests;
 	private String api_endpoint;
 	private HttpClient client;
 
@@ -29,16 +29,19 @@ public class RequestHandler {
 		client = HttpClients.createDefault();
 		api_endpoint = APISettings.API_ENDPOINT;
 		this.auth = auth;
-		requests = new ArrayList<>();
+		serverRequests = new ArrayList<>();
 		resetBuilder();
 	}
 
-	public void doRequest(Request request) {
-		addRequest(request);
-		sendRequests();
+	public void request(ServerRequest requestIn)
+	{
+		hasRequests = true;
+		serverRequests.add(requestIn);
+		builder.addRequests(requestIn.getRequest());
 	}
 
-	public void sendRequests() {
+	public void sendServerRequests()
+	{
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		try {
 			EnvelopesOuterClass.Envelopes.RequestEnvelope request = builder.build();
@@ -70,17 +73,20 @@ public class RequestHandler {
 			}
 
 			// map each reply to the numeric response, ie first response = first request and send back to the requests to handle.
+			System.out.println(responseEnvelop);
 			int count = 0;
 			for (ByteString payload : responseEnvelop.getReturnsList()) {
-				requests.get(count).handleResponse(payload);
+				ServerRequest serverReq = serverRequests.get(count);
+				serverReq.handleData(payload);
 				count++;
+
 			}
 
 			content.close();
 
 			// 53 seems to mean handshak'n so need to resend request
 			if (responseEnvelop.getStatusCode() == 53) {
-				sendRequests();
+				sendServerRequests();
 			}
 
 		} catch (Exception e) {
@@ -89,6 +95,8 @@ public class RequestHandler {
 
 		resetBuilder();
 	}
+
+
 
 	private void resetBuilder() {
 		builder = EnvelopesOuterClass.Envelopes.RequestEnvelope.newBuilder();
@@ -101,14 +109,9 @@ public class RequestHandler {
 		}
 		builder.setUnknown12(989);
 		hasRequests = false;
-		requests.clear();
+		serverRequests.clear();
 	}
 
-	public void addRequest(Request request) {
-		hasRequests = true;
-		requests.add(request);
-		builder.addRequests(request.getRequest());
-	}
 
 	public EnvelopesOuterClass.Envelopes.RequestEnvelope build() {
 		if (!hasRequests)
