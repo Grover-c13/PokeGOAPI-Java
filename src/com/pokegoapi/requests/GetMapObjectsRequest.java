@@ -141,8 +141,9 @@ public class GetMapObjectsRequest extends Request {
 			builder.addSinceTimestampMs(0);
 			i++;
 		}
-		builder.setLatitude(latitude);
-		builder.setLongitude(longitude);
+		// Not necessary at all, location from RequestEnvelope is used
+		/*builder.setLatitude(latitude);
+		builder.setLongitude(longitude);*/
 	}
 
 	public RequestTypeOuterClass.RequestType getRpcId() {
