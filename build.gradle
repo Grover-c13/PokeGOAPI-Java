@@ -1,0 +1,28 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+group = 'PokeGOAPI-Java'
+version = '0.0.1-SNAPSHOT'
+
+description = """Pokemon Go Java API"""
+
+sourceCompatibility = 1.5
+targetCompatibility = 1.5
+
+
+
+repositories {
+        
+     maven { url "http://repo.maven.apache.org/maven2" }
+}
+dependencies {
+    compile group: 'com.google.protobuf', name: 'protobuf-java', version:'3.0.0-beta-3'
+    compile group: 'net.sourceforge.argparse4j', name: 'argparse4j', version:'0.7.0'
+    compile group: 'com.google.code.gson', name: 'gson', version:'2.7'
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version:'4.5.2'
+    compile(group: 'org.projectlombok', name: 'lombok', version:'1.16.6') {
+       /* This dependency was originally in the Maven provided scope, but the project was not of type war.
+       This behavior is not yet supported by Gradle, so this dependency has been converted to a compile dependency.
+       Please review and delete this closure when resolved. */
+    }
+}
