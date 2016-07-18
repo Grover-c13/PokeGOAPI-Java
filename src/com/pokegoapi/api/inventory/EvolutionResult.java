@@ -9,7 +9,7 @@ public class EvolutionResult {
 
 	public EvolutionResult(EvolvePokemonResponseOuterClass.EvolvePokemonResponse proto) {
 		this.proto = proto;
-		this.pokemon = new Pokemon(proto.getEvolvedPokemon());
+		this.pokemon = new Pokemon(proto.getEvolvedPokemonData());
 	}
 
 	public EvolvePokemonResponseOuterClass.EvolvePokemonResponse.Result getResult() {

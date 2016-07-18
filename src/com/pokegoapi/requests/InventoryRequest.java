@@ -35,8 +35,8 @@ public class InventoryRequest extends Request {
 		try {
 			GetInventoryResponseOuterClass.GetInventoryResponse response = GetInventoryResponseOuterClass.GetInventoryResponse.parseFrom(payload);
 			for (InventoryItemOuterClass.InventoryItem item : response.getInventoryDelta().getInventoryItemsList()) {
-				if (item.getInventoryItemData().hasPokemon()) {
-					pokemon.add(new Pokemon(item.getInventoryItemData().getPokemon()));
+				if (item.getInventoryItemData().hasPokemonData()) {
+					pokemon.add(new Pokemon(item.getInventoryItemData().getPokemonData()));
 				}
 			}
 		} catch (InvalidProtocolBufferException e) {
