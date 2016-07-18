@@ -1,7 +1,6 @@
 package com.pokegoapi.api;
 
-public class DailyBonus
-{
+public class DailyBonus {
 	private long nextCollectionTimestamp;
 	private long nextDefenderBonusCollectTimestamp;
 

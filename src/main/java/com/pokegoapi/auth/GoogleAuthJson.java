@@ -1,7 +1,6 @@
 package com.pokegoapi.auth;
 
-public class GoogleAuthJson
-{
+public class GoogleAuthJson {
 	String device_code;
 	String user_code;
 	String verification_url;

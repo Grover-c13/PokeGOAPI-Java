@@ -3,7 +3,6 @@ package com.pokegoapi.api;
 import POGOProtos.Player.EquippedBadgeOuterClass;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,11 +79,11 @@ public class PlayerProfile {
 		this.itemStorage = itemStorage;
 	}
 
-	public String getBadge() {
+	public EquippedBadgeOuterClass.EquippedBadge getBadge() {
 		return badge;
 	}
 
-	public void setBadge(String badge) {
+	public void setBadge(EquippedBadgeOuterClass.EquippedBadge badge) {
 		this.badge = badge;
 	}
 

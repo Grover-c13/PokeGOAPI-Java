@@ -1,7 +1,6 @@
 package com.pokegoapi.auth;
 
-public class GoogleAuthTokenJson
-{
+public class GoogleAuthTokenJson {
 	private String error;
 	private String access_token;
 	private String token_type;

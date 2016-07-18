@@ -18,6 +18,7 @@ import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.requests.GetMapObjectsRequest;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass;
+
 import java.util.List;
 
 public class PokemonGo {
@@ -182,11 +183,11 @@ public class PokemonGo {
 		requestHandler.sendRequests();*/
 	}
 
-  public RequestHandler getRequestHandler() {
-    return requestHandler;
-  }
+	public RequestHandler getRequestHandler() {
+		return requestHandler;
+	}
 
-  public PokeBank getPokebank() {
-    return pokebank;
-  }
+	public PokeBank getPokebank() {
+		return pokebank;
+	}
 }

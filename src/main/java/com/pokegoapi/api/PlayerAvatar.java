@@ -1,8 +1,9 @@
 package com.pokegoapi.api;
 
-public class PlayerAvatar
-{
-	private int avatar;
+import POGOProtos.Enums.GenderOuterClass;
+
+public class PlayerAvatar {
+	private GenderOuterClass.Gender gender;
 	private int skin;
 	private int hair;
 	private int shirt;
@@ -12,12 +13,12 @@ public class PlayerAvatar
 	private int eyes;
 	private int backpack;
 
-	public int getAvatar() {
-		return avatar;
+	public GenderOuterClass.Gender getGender() {
+		return gender;
 	}
 
-	public void setAvatar(int avatar) {
-		this.avatar = avatar;
+	public void setGender(GenderOuterClass.Gender gender) {
+		this.gender = gender;
 	}
 
 	public int getSkin() {

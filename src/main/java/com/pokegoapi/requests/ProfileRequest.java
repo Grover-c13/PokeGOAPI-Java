@@ -12,7 +12,6 @@ import com.pokegoapi.main.Request;
 
 public class ProfileRequest extends Request {
 
-	@Getter
 	PlayerProfile profile = new PlayerProfile();
 
 	public RequestTypeOuterClass.RequestType getRpcId() {

@@ -5,16 +5,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.pokegoapi.exceptions.LoginFailedException;
 import okhttp3.*;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.URI;
-import java.net.URL;
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,83 +40,83 @@ public class PTCLogin extends Login {
 	/**
 	 * Starts a login flow for pokemon.com (PTC) using a username and password, this uses pokemon.com's oauth endpoint and returns a usable AuthInfo without user interaction
 	 *
-	 * @param String PTC username
-	 * @param String PTC password
+	 * @param username PTC username
+	 * @param password PTC password
 	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
 	 */
 	public AuthInfo login(String username, String password) throws LoginFailedException {
-    //TODO: stop creating an okhttp client per request
+		//TODO: stop creating an okhttp client per request
 
 		try {
 
-      /*
-        This is a temporary, in-memory cookie jar.
-        We don't require any persistence outside of the scope of the login,
-        so it being discarded is completely fine
-       */
-      CookieJar tempJar = new CookieJar() {
-        private final HashMap<String, List<Cookie>> cookieStore = new HashMap<String, List<Cookie>>();
+		  /*
+			This is a temporary, in-memory cookie jar.
+			We don't require any persistence outside of the scope of the login,
+			so it being discarded is completely fine
+		   */
+			CookieJar tempJar = new CookieJar() {
+				private final HashMap<String, List<Cookie>> cookieStore = new HashMap<String, List<Cookie>>();
 
-        @Override
-        public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-          cookieStore.put(url.host(), cookies);
-        }
+				@Override
+				public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
+					cookieStore.put(url.host(), cookies);
+				}
 
-        @Override
-        public List<Cookie> loadForRequest(HttpUrl url) {
-          List<Cookie> cookies = cookieStore.get(url.host());
-          return cookies != null ? cookies : new ArrayList<Cookie>();
-        }
-      };
+				@Override
+				public List<Cookie> loadForRequest(HttpUrl url) {
+					List<Cookie> cookies = cookieStore.get(url.host());
+					return cookies != null ? cookies : new ArrayList<Cookie>();
+				}
+			};
 
-      OkHttpClient okHttpClient = new OkHttpClient.Builder()
-              .cookieJar(tempJar)
-              .addInterceptor(new Interceptor() {
-                @Override
-                public Response intercept(Chain chain) throws IOException {
-                  // Makes sure the User-Agent is always set
-                  Request req = chain.request();
-                  req = req.newBuilder().header("User-Agent", USER_AGENT).build();
-                  return chain.proceed(req);
-                }
-              })
-              .build();
+			OkHttpClient okHttpClient = new OkHttpClient.Builder()
+					.cookieJar(tempJar)
+					.addInterceptor(new Interceptor() {
+						@Override
+						public Response intercept(Chain chain) throws IOException {
+							// Makes sure the User-Agent is always set
+							Request req = chain.request();
+							req = req.newBuilder().header("User-Agent", USER_AGENT).build();
+							return chain.proceed(req);
+						}
+					})
+					.build();
 
-      Request get = new Request.Builder()
-              .url(LOGIN_URL)
-              .get()
-              .build();
+			Request get = new Request.Builder()
+					.url(LOGIN_URL)
+					.get()
+					.build();
 
-      Response getResponse = okHttpClient.newCall(get).execute();
+			Response getResponse = okHttpClient.newCall(get).execute();
 
 			Gson gson = new GsonBuilder().create();
 
-      PTCAuthJson ptcAuth = gson.fromJson(getResponse.body().string(), PTCAuthJson.class);
+			PTCAuthJson ptcAuth = gson.fromJson(getResponse.body().string(), PTCAuthJson.class);
 
-      HttpUrl url = HttpUrl.parse(LOGIN_URL).newBuilder()
-              .addQueryParameter("lt", ptcAuth.getLt())
-              .addQueryParameter("execution", ptcAuth.getExecution())
-              .addQueryParameter("_eventId", "submit")
-              .addQueryParameter("username", username)
-              .addQueryParameter("password", password)
-              .build();
+			HttpUrl url = HttpUrl.parse(LOGIN_URL).newBuilder()
+					.addQueryParameter("lt", ptcAuth.getLt())
+					.addQueryParameter("execution", ptcAuth.getExecution())
+					.addQueryParameter("_eventId", "submit")
+					.addQueryParameter("username", username)
+					.addQueryParameter("password", password)
+					.build();
 
-      RequestBody reqBody = RequestBody.create(null, new byte[0]);
+			RequestBody reqBody = RequestBody.create(null, new byte[0]);
 
-      Request postRequest = new Request.Builder()
-              .url(url)
-              .method("POST", reqBody)
-              .build();
+			Request postRequest = new Request.Builder()
+					.url(url)
+					.method("POST", reqBody)
+					.build();
 
-      // Need a new client for this to not follow redirects
-      Response response = okHttpClient.newBuilder()
-              .followRedirects(false)
-              .followSslRedirects(false)
-              .build()
-              .newCall(postRequest)
-              .execute();
+			// Need a new client for this to not follow redirects
+			Response response = okHttpClient.newBuilder()
+					.followRedirects(false)
+					.followSslRedirects(false)
+					.build()
+					.newCall(postRequest)
+					.execute();
 
-      String body = response.body().string();
+			String body = response.body().string();
 
 			if (body.length() > 0) {
 				PTCError ptcError = gson.fromJson(body, PTCError.class);
@@ -134,26 +126,26 @@ public class PTCLogin extends Login {
 			}
 
 			String ticket = null;
-      for (String location : response.headers("location")) {
-        ticket = location.split("ticket=")[1];
+			for (String location : response.headers("location")) {
+				ticket = location.split("ticket=")[1];
 			}
 
-      url = HttpUrl.parse(LOGIN_OAUTH).newBuilder()
-              .addQueryParameter("client_id", CLIENT_ID)
-              .addQueryParameter("redirect_uri", REDIRECT_URI)
-              .addQueryParameter("client_secret", CLIENT_SECRET)
-              .addQueryParameter("grant_type", "refresh_token")
-              .addQueryParameter("code", ticket)
-              .build();
+			url = HttpUrl.parse(LOGIN_OAUTH).newBuilder()
+					.addQueryParameter("client_id", CLIENT_ID)
+					.addQueryParameter("redirect_uri", REDIRECT_URI)
+					.addQueryParameter("client_secret", CLIENT_SECRET)
+					.addQueryParameter("grant_type", "refresh_token")
+					.addQueryParameter("code", ticket)
+					.build();
 
-      postRequest = new Request.Builder()
-              .url(url)
-              .method("POST", reqBody)
-              .build();
+			postRequest = new Request.Builder()
+					.url(url)
+					.method("POST", reqBody)
+					.build();
 
-      response = okHttpClient.newCall(postRequest).execute();
+			response = okHttpClient.newCall(postRequest).execute();
 
-      body = response.body().string();
+			body = response.body().string();
 
 			String token;
 			try {

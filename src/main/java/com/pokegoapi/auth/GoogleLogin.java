@@ -59,7 +59,7 @@ public class GoogleLogin extends Login {
 
 			Gson gson = new GsonBuilder().create();
 
-            GoogleAuthJson googleAuth = gson.fromJson(response.body().string(), GoogleAuthJson.class);
+			GoogleAuthJson googleAuth = gson.fromJson(response.body().string(), GoogleAuthJson.class);
 			System.out.println("Get user to go to:" + googleAuth.getVerification_url() + " and enter code:" + googleAuth.getUser_code());
 
 			GoogleAuthTokenJson token;
@@ -82,8 +82,7 @@ public class GoogleLogin extends Login {
 	}
 
 
-	private GoogleAuthTokenJson poll(GoogleAuthJson json) throws URISyntaxException, IOException
-	{
+	private GoogleAuthTokenJson poll(GoogleAuthJson json) throws URISyntaxException, IOException {
 		OkHttpClient client = new OkHttpClient();
 
 		HttpUrl url = HttpUrl.parse(OAUTH_TOKEN_ENDPOINT).newBuilder()
@@ -104,7 +103,7 @@ public class GoogleLogin extends Login {
 		Response response = client.newCall(request).execute();
 
 		Gson gson = new GsonBuilder().create();
-        GoogleAuthTokenJson token = gson.fromJson(response.body().string(), GoogleAuthTokenJson.class);
+		GoogleAuthTokenJson token = gson.fromJson(response.body().string(), GoogleAuthTokenJson.class);
 
 		if (token.getError() == null) {
 			return token;

@@ -1,18 +1,18 @@
 package com.pokegoapi.requests;
 
-
 import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.main.Request;
+
 public class FortDetailsRequest extends Request {
-{
+
 	String id; // input for the proto
 	long latitude; // input for the proto
 	long longitude;  // input for the proto
-	
+
 	FortDetailsResponseOuterClass.FortDetailsResponse output;
 	private FortDetailsMessageOuterClass.FortDetailsMessage.Builder builder;
 
@@ -69,7 +69,7 @@ public class FortDetailsRequest extends Request {
 		return longitude;
 	}
 
-	public FortDetailsOutProto getOutput() {
+	public FortDetailsResponseOuterClass.FortDetailsResponse getOutput() {
 		return output;
 	}
 }

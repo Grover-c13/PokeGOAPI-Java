@@ -27,7 +27,7 @@ public class RequestHandler {
 		okHttpClient = new OkHttpClient();
 		api_endpoint = APISettings.API_ENDPOINT;
 		this.auth = auth;
-		serverRequests = new ArrayList<>();
+		serverRequests = new ArrayList<ServerRequest>();
 		resetBuilder();
 	}
 
@@ -48,7 +48,7 @@ public class RequestHandler {
 			e1.printStackTrace();
 		}
 
-		
+
 		try {
 
 			RequestBody body = RequestBody.create(null, stream.toByteArray());

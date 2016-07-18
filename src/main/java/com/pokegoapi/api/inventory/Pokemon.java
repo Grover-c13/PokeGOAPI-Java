@@ -9,6 +9,7 @@ import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.main.ServerRequest;
+
 public class Pokemon {
 
 	PokemonGo pgo;

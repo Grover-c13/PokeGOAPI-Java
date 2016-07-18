@@ -1,8 +1,7 @@
 package com.pokegoapi.api;
 
 
-public class ContactSettings
-{
+public class ContactSettings {
 	private boolean sendMarketingEmails;
 	private boolean sendPushNotifications;
 
