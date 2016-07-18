@@ -4,7 +4,7 @@ import lombok.Getter;
 
 public enum Team 
 {
-	// VALUES UNCONFIRMED for the two inferior teams (Instinct and Valor)
+	// VALUES UNCONFIRMED
 	TEAM_NONE (0),
 	TEAM_MYSTIC (1),	
 	TEAM_INSTINCT (2),
