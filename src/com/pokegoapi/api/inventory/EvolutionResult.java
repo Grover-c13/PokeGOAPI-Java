@@ -12,7 +12,7 @@ public class EvolutionResult {
 		this.pokemon = new Pokemon(proto.getEvolvedPokemon());
 	}
 
-	public int getResult() {
+	public EvolvePokemonResponseOuterClass.EvolvePokemonResponse.Result getResult() {
 		return proto.getResult();
 	}
 
@@ -30,7 +30,7 @@ public class EvolutionResult {
 
 
 	public boolean isSuccessful() {
-		return (this.getResult() == 1);
+		return (this.getResult().equals(EvolvePokemonResponseOuterClass.EvolvePokemonResponse.Result.SUCCESS));
 	}
 
 

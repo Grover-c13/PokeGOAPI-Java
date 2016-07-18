@@ -2,6 +2,7 @@ package com.pokegoapi.api.inventory;
 
 import POGOProtos.Data.PokemonOuterClass;
 import POGOProtos.Enums.PokemonMoveOuterClass;
+import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.requests.PokemonEvolveRequest;
 import com.pokegoapi.requests.PokemonTransferRequest;
@@ -23,7 +24,7 @@ public class Pokemon {
 		PokemonTransferRequest req = new PokemonTransferRequest(getId());
 		pgo.getRequestHandler().doRequest(req);
 
-		if (req.getStatus() == 1) {
+		if (req.getResult().equals(ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result.SUCCESS)) {
 			pgo.getPokebank().removePokemon(this);
 		}
 

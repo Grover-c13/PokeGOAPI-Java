@@ -10,11 +10,11 @@ import com.pokegoapi.main.Request;
 public class PokemonTransferRequest extends Request {
 	private ReleasePokemonMessageOuterClass.ReleasePokemonMessage.Builder builder;
 	private int candies;
-	private int status;
+	private ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result result;
 
 	public PokemonTransferRequest(long entid) {
 		candies = 0;
-		status = 0;
+		result = ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result.UNSET;
 		builder = ReleasePokemonMessageOuterClass.ReleasePokemonMessage.newBuilder();
 		builder.setPokemonId(entid);
 	}
@@ -28,8 +28,8 @@ public class PokemonTransferRequest extends Request {
 		return candies;
 	}
 
-	public int getStatus() {
-		return status;
+	public ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result getResult() {
+		return result;
 	}
 
 
@@ -38,7 +38,7 @@ public class PokemonTransferRequest extends Request {
 		try {
 			ReleasePokemonResponseOuterClass.ReleasePokemonResponse out = ReleasePokemonResponseOuterClass.ReleasePokemonResponse.parseFrom(payload);
 			candies = out.getCandyAwarded();
-			status = out.getStatus();
+			result = out.getResult();
 		} catch (InvalidProtocolBufferException e) {
 			e.printStackTrace();
 		}
