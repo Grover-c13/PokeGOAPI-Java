@@ -1,26 +1,28 @@
 package com.pokegoapi.main;
 
+import POGOProtos.Networking.Requests.RequestOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import com.google.protobuf.ByteString;
-import com.pokegoapi.main.Communication.Payload;
-import com.pokegoapi.main.Communication.Request.Builder;
 import lombok.Getter;
 
 public abstract class Request 
 {
-	@Getter Builder builder;
+	@Getter
+	RequestOuterClass.Request.Builder builder;
 	
 	/**
 	 * Get the RPC id for the call
 	 * 
 	 * @return Integer
 	 */
-	public abstract Communication.Method getRpcId();
+	public abstract RequestTypeOuterClass.RequestType getRpcId();
 	
 	/**
 	 * Handle the response of the call
 	 * @param Payload to be parsed by protobuf
+	 * @param payload
 	 */
-	public abstract void handleResponse(Payload payload);
+	public abstract void handleResponse(ByteString payload);
 	
 	/**
 	 * Get the input data that is needed to make the request
@@ -35,18 +37,18 @@ public abstract class Request
 	 * Build a new request wrapper
 	 */
 	public Request() {
-		builder = Communication.Request.newBuilder();
-		builder.setType(getRpcId());
+		builder = RequestOuterClass.Request.newBuilder();
+		builder.setRequestType(getRpcId());
 	}
 
 	/**
 	 * Get the protobuff request
 	 * @return
 	 */
-	public Communication.Request getRequest()
+	public RequestOuterClass.Request getRequest()
 	{
 		if(getInput() != null) {
-			builder.setData(ByteString.copyFrom(getInput())).build();
+			builder.setRequestMessage(ByteString.copyFrom(getInput())).build();
 		}
 		
 		return builder.build();

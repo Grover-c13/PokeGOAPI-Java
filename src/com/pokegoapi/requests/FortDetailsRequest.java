@@ -1,15 +1,13 @@
 package com.pokegoapi.requests;
 
 
+import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import com.pokegoapi.main.Communication;
 import com.pokegoapi.main.Request;
-import com.pokegoapi.main.Stops.FortDetailsOutProto;
-import com.pokegoapi.main.Stops.FortDetailsProto;
-import com.pokegoapi.main.Stops.FortDetailsProto.Builder;
-import com.pokegoapi.main.Communication.Payload;
-
 import lombok.Getter;
 
 public class FortDetailsRequest extends Request
@@ -17,9 +15,10 @@ public class FortDetailsRequest extends Request
 	@Getter String id; // input for the proto
 	@Getter long latitude; // input for the proto
 	@Getter long longitude;  // input for the proto
-	private Builder builder;
+	private FortDetailsMessageOuterClass.FortDetailsMessage.Builder builder;
 	
-	@Getter FortDetailsOutProto output;
+	@Getter
+	FortDetailsResponseOuterClass.FortDetailsResponse output;
 	
 	public FortDetailsRequest(String id) {
 		this(id, 0, 0);
@@ -27,8 +26,8 @@ public class FortDetailsRequest extends Request
 	
 	public FortDetailsRequest(String id, long lati, long longi)
 	{
-		builder = FortDetailsProto.newBuilder();
-		builder.setId(id);
+		builder = FortDetailsMessageOuterClass.FortDetailsMessage.newBuilder();
+		builder.setFortId(id);
 		setLatitude(lati);
 		setLongitude(longi);
 	}
@@ -44,17 +43,17 @@ public class FortDetailsRequest extends Request
 	}
 
 	@Override
-	public Communication.Method getRpcId()
+	public RequestTypeOuterClass.RequestType getRpcId()
 	{
-		return Communication.Method.FORT_DETAILS;
+		return RequestTypeOuterClass.RequestType.FORT_DETAILS;
 	}
 
 	@Override
-	public void handleResponse(Payload payload)
+	public void handleResponse(ByteString payload)
 	{
 		try
 		{
-			FortDetailsOutProto response = FortDetailsOutProto.parseFrom(payload.toByteArray());
+			FortDetailsResponseOuterClass.FortDetailsResponse response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(payload);
 			output = response;
 		} 
 		catch (InvalidProtocolBufferException e) 

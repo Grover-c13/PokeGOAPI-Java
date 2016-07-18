@@ -1,15 +1,14 @@
 package com.pokegoapi.requests;
 
-import com.pokegoapi.main.Communication;
-import com.pokegoapi.main.Inventory.TransferPokemonProto.Builder;
-import com.pokegoapi.main.Communication.Payload;
-import com.pokegoapi.main.Inventory.TransferPokemonOutProto;
-import com.pokegoapi.main.Inventory.TransferPokemonProto;
+import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.main.Request;
 
 public class PokemonTransferRequest extends Request {
-	private Builder builder;
+	private ReleasePokemonMessageOuterClass.ReleasePokemonMessage.Builder builder;
 	private int candies;
 	private int status;
 	
@@ -17,14 +16,14 @@ public class PokemonTransferRequest extends Request {
 	{
 		candies = 0;
 		status = 0;
-		builder = TransferPokemonProto.newBuilder();
+		builder = ReleasePokemonMessageOuterClass.ReleasePokemonMessage.newBuilder();
 		builder.setPokemonId(entid);
 	}
 	
 	@Override
-	public Communication.Method getRpcId()
+	public RequestTypeOuterClass.RequestType getRpcId()
 	{
-		return Communication.Method.RELEASE_POKEMON;
+		return RequestTypeOuterClass.RequestType.RELEASE_POKEMON;
 	}
 	
 	public int getCandies()
@@ -39,11 +38,11 @@ public class PokemonTransferRequest extends Request {
 	
 	
 	@Override
-	public void handleResponse(Payload payload)
+	public void handleResponse(ByteString payload)
 	{
 		try
 		{
-			TransferPokemonOutProto out = TransferPokemonOutProto.parseFrom(payload.toByteArray());
+			ReleasePokemonResponseOuterClass.ReleasePokemonResponse out = ReleasePokemonResponseOuterClass.ReleasePokemonResponse.parseFrom(payload);
 			candies = out.getCandyAwarded();
 			status = out.getStatus();
 		} 

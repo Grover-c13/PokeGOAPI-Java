@@ -73,10 +73,10 @@
                         <configuration>
                             <protocVersion>3.0.0</protocVersion> <!-- 2.4.1, 2.5.0, 2.6.1, 3.0.0 -->
                             <includeDirectories>
-                                <include>src/resources</include>
+                                <include>src/resources/protobuf/pogo</include>
                             </includeDirectories>
                             <inputDirectories>
-                                <include>src/resources</include>
+                                <include>src/resources/protobuf/pogo</include>
                             </inputDirectories>
                         </configuration>
                     </execution>

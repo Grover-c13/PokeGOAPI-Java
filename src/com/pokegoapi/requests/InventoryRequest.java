@@ -4,49 +4,48 @@ import java.util.LinkedList;
 import java.util.List;
 
 
+import POGOProtos.Inventory.InventoryItemOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 
 import com.pokegoapi.api.inventory.Pokemon;
-import com.pokegoapi.main.Communication;
-import com.pokegoapi.main.Inventory.InventoryRequestProto;
-import com.pokegoapi.main.Inventory.InventoryRequestProto.Builder;
-import com.pokegoapi.main.Inventory.InventoryResponseProto;
-import com.pokegoapi.main.Inventory.InventoryResponseProto.InventoryItemResponseProto;
-import com.pokegoapi.main.Communication.Payload;
 import com.pokegoapi.main.Request;
 
 import lombok.Getter;
 
 public class InventoryRequest extends Request {
 
-	private Builder builder;
+	private GetInventoryMessageOuterClass.GetInventoryMessage.Builder builder;
 	@Getter List<Pokemon> pokemon = new LinkedList<Pokemon>();
 	
-	public Communication.Method getRpcId()
+	public RequestTypeOuterClass.RequestType getRpcId()
 	{
-		return Communication.Method.GET_INVENTORY;
+		return RequestTypeOuterClass.RequestType.GET_INVENTORY;
 	}
 
 	public InventoryRequest() {
-		builder = InventoryRequestProto.newBuilder();
+		builder = GetInventoryMessageOuterClass.GetInventoryMessage.newBuilder();
 	}
 
 	public void setTimestamp(long timestamp)
 	{
-		builder.setTimestamp(timestamp);
+		builder.setLastTimestampMs(timestamp);
 	}
 
-	public void handleResponse(Payload payload)
+	public void handleResponse(ByteString payload)
 	{
 		try
 		{
-			InventoryResponseProto response = InventoryResponseProto.parseFrom(payload.getData());
-			for(InventoryItemResponseProto item : response.getItemsList())
+			GetInventoryResponseOuterClass.GetInventoryResponse response = GetInventoryResponseOuterClass.GetInventoryResponse.parseFrom(payload);
+			for(InventoryItemOuterClass.InventoryItem item : response.getInventoryDelta().getInventoryItemsList())
 			{
-				if(item.getItem().hasPokemon())
+				if(item.getInventoryItemData().hasPokemon())
 				{
-					pokemon.add(new Pokemon(item.getItem().getPokemon()));
+					pokemon.add(new Pokemon(item.getInventoryItemData().getPokemon()));
 				}
 			}
 		} 

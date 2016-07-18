@@ -1,25 +1,32 @@
 package com.pokegoapi.api;
 
-import com.pokegoapi.main.Stops.FortDetailsOutProto;
 
-public class FortDetails 
+import POGOProtos.Enums.TeamColorOuterClass;
+import POGOProtos.Map.Fort.FortModifierOuterClass;
+import POGOProtos.Map.Fort.FortTypeOuterClass;
+import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
+import com.google.protobuf.ProtocolStringList;
+
+import java.util.List;
+
+public class FortDetails
 {
-	private FortDetailsOutProto proto;
-	public FortDetails(FortDetailsOutProto proto)
+	private FortDetailsResponseOuterClass.FortDetailsResponse proto;
+	public FortDetails(FortDetailsResponseOuterClass.FortDetailsResponse proto)
 	{
 		this.proto = proto;
 	}
 	public String getId() {
-		return proto.getId();
+		return proto.getFortId();
 	}
-	public int getTeam() {
-		return proto.getTeam();
+	public TeamColorOuterClass.TeamColor getTeam() {
+		return proto.getTeamColor();
 	}
 	public String getName() {
 		return proto.getName();
 	}
-	public String getImageUrl() {
-		return proto.getImageUrl();
+	public ProtocolStringList getImageUrl() {
+		return proto.getImageUrlsList();
 	}
 	public int getFp() {
 		return proto.getFp();
@@ -30,8 +37,8 @@ public class FortDetails
 	public int getMaxStamina() {
 		return proto.getMaxStamina();
 	}
-	public int getFortType() {
-		return proto.getFortType();
+	public FortTypeOuterClass.FortType getFortType() {
+		return proto.getType();
 	}
 	public double getLatitude() {
 		return proto.getLatitude();
@@ -42,7 +49,7 @@ public class FortDetails
 	public String getDescription() {
 		return proto.getDescription();
 	}
-	public double getModifier() {
-		return proto.getModifier();
+	public List<FortModifierOuterClass.FortModifier> getModifier() {
+		return proto.getModifiersList();
 	}
 }

@@ -1,7 +1,7 @@
 package com.pokegoapi.auth;
 
 import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.main.Communication.RequestEnvelop.AuthInfo;
+import POGOProtos.Networking.EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo;
 
 
 public abstract class Login {
