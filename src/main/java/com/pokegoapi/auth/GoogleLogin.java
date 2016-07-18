@@ -43,6 +43,7 @@ public class GoogleLogin extends Login {
 			OkHttpClient okHttpClient = new OkHttpClient();
 
 			HttpUrl url = HttpUrl.parse(CLIENT_ID).newBuilder()
+					.scheme("https")
 					.addQueryParameter("client_id", CLIENT_ID)
 					.addQueryParameter("scope", "openid email https://www.googleapis.com/auth/userinfo.email")
 					.build();
@@ -87,7 +88,7 @@ public class GoogleLogin extends Login {
 		OkHttpClient client = new OkHttpClient();
 
 		HttpUrl url = HttpUrl.parse(OAUTH_TOKEN_ENDPOINT).newBuilder()
-		
+				.scheme("https")
 				.addQueryParameter("client_id", CLIENT_ID)
 				.addQueryParameter("client_secret", SECRET)
 				.addQueryParameter("code", json.getDevice_code())

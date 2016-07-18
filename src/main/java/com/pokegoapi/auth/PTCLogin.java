@@ -60,6 +60,7 @@ public class PTCLogin extends Login {
 
 
       HttpUrl url = new HttpUrl.Builder()
+              .scheme("https")
               .addQueryParameter("lt", ptcAuth.getLt())
               .addQueryParameter("execution", ptcAuth.getExecution())
               .addQueryParameter("_eventId", ptcAuth.getExecution())
@@ -91,6 +92,7 @@ public class PTCLogin extends Login {
 			}
 
       url = HttpUrl.parse(LOGIN_OAUTH).newBuilder()
+              .scheme("https")
               .addQueryParameter("client_id", CLIENT_ID)
               .addQueryParameter("redirect_uri", REDIRECT_URI)
               .addQueryParameter("client_secret", CLIENT_SECRET)
