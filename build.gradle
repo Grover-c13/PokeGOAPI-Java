@@ -1,15 +1,13 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 
-group = 'PokeGOAPI-Java'
+group = 'com.github.aphoh'
 version = '0.0.1-SNAPSHOT'
 
 description = """Pokemon Go Java API"""
 
 sourceCompatibility = 1.5
 targetCompatibility = 1.5
-
-
 
 repositories {
      maven { url "http://repo.maven.apache.org/maven2" }
