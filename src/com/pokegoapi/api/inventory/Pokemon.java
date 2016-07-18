@@ -1,6 +1,6 @@
 package com.pokegoapi.api.inventory;
 
-import POGOProtos.Data.PokemonOuterClass;
+import POGOProtos.Data.PokemonDataOuterClass;
 import POGOProtos.Enums.PokemonMoveOuterClass;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
 import com.pokegoapi.api.PokemonGo;
@@ -11,12 +11,12 @@ import lombok.Setter;
 public class Pokemon {
 	@Setter
 	PokemonGo pgo;
-	private PokemonOuterClass.Pokemon proto;
+	private PokemonDataOuterClass.PokemonData proto;
 
 	// API METHODS //
 
 	// DELEGATE METHODS BELOW //
-	public Pokemon(PokemonOuterClass.Pokemon proto) {
+	public Pokemon(PokemonDataOuterClass.PokemonData proto) {
 		this.proto = proto;
 	}
 
@@ -49,7 +49,7 @@ public class Pokemon {
 		return (other.getId() == getId());
 	}
 
-	public PokemonOuterClass.Pokemon getDefaultInstanceForType() {
+	public PokemonDataOuterClass.PokemonData getDefaultInstanceForType() {
 		return proto.getDefaultInstanceForType();
 	}
 
