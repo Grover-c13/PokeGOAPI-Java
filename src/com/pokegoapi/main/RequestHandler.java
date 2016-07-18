@@ -71,7 +71,7 @@ public class RequestHandler
 				throw new LoginFailedException();
 			}
 	
-			if (responseEnvelop.hasApiUrl()) {
+			if (responseEnvelop.getApiUrl() != null && responseEnvelop.getApiUrl().length() > 0) {
 				api_endpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
 			}
 
@@ -105,7 +105,7 @@ public class RequestHandler
 		builder =  RequestEnvelop.newBuilder();
 		builder.setDirection(Communication.Direction.REQUEST);
 		builder.setRpcId(8145806132888207460l);
-		if (lastAuth != null && lastAuth.hasTimestamp()) {
+		if (lastAuth != null && lastAuth.getTimestamp() > 0) {
 			builder.setUnknownAuth(lastAuth);
 		} else {
 			builder.setAuth(auth);
