@@ -1,7 +1,8 @@
 package com.pokegoapi.api.inventory;
 
+import POGOProtos.Data.PokemonOuterClass;
+import POGOProtos.Enums.PokemonMoveOuterClass;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.main.Inventory.PokemonProto;
 import com.pokegoapi.requests.PokemonEvolveRequest;
 import com.pokegoapi.requests.PokemonTransferRequest;
 
@@ -9,7 +10,7 @@ import lombok.Setter;
 
 public class Pokemon
 {
-	private PokemonProto proto;
+	private PokemonOuterClass.Pokemon proto;
 	@Setter PokemonGo pgo;
 	
 	// API METHODS //
@@ -50,21 +51,21 @@ public class Pokemon
 	}
 	
 	// DELEGATE METHODS BELOW //
-	public Pokemon(PokemonProto proto)
+	public Pokemon(PokemonOuterClass.Pokemon proto)
 	{
 		this.proto = proto;
 	}
 
-	public PokemonProto getDefaultInstanceForType() {
+	public PokemonOuterClass.Pokemon getDefaultInstanceForType() {
 		return proto.getDefaultInstanceForType();
 	}
 
 	public long getId() {
-		return proto.getEntId();
+		return proto.getId();
 	}
 
 	public int getPokemonId() {
-		return proto.getPokemonId();
+		return proto.getId();
 	}
 
 	public int getCp() {
@@ -76,14 +77,14 @@ public class Pokemon
 	}
 
 	public int getMaxStamina() {
-		return proto.getMaxStamina();
+		return proto.getStaminaMax();
 	}
 
-	public int getMove1() {
+	public PokemonMoveOuterClass.PokemonMove getMove1() {
 		return proto.getMove1();
 	}
 
-	public int getMove2() {
+	public PokemonMoveOuterClass.PokemonMove getMove2() {
 		return proto.getMove2();
 	}
 
@@ -136,7 +137,7 @@ public class Pokemon
 	}
 
 	public long getCapturedS2CellId() {
-		return proto.getCapturedS2CellId();
+		return proto.getCapturedCellId();
 	}
 
 	public int getBattlesAttacked() {
@@ -156,7 +157,7 @@ public class Pokemon
 	}
 
 	public boolean getFavorite() {
-		return proto.getFavorite();
+		return proto.getFavorite() > 0;
 	}
 
 	public String getNickname() {
@@ -164,7 +165,7 @@ public class Pokemon
 	}
 
 	public boolean getFromFort() {
-		return proto.getFromFort();
+		return proto.getFromFort() > 0;
 	}
 	
 	

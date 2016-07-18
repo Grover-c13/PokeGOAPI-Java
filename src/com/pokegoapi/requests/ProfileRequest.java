@@ -1,5 +1,10 @@
 package com.pokegoapi.requests;
 
+import POGOProtos.LocalPlayerOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass;
+import POGOProtos.Player.CurrencyOuterClass;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import com.pokegoapi.api.ContactSettings;
@@ -8,55 +13,52 @@ import com.pokegoapi.api.PlayerAvatar;
 import com.pokegoapi.api.PlayerProfile;
 import com.pokegoapi.api.Team;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
-import com.pokegoapi.main.Communication;
-import com.pokegoapi.main.Player.ClientPlayerDetails;
-import com.pokegoapi.main.Player.Currency;
-import com.pokegoapi.main.Communication.Payload;
 import com.pokegoapi.main.Request;
 
 import lombok.Getter;
+
 public class ProfileRequest extends Request {
 	
 	@Getter PlayerProfile profile = new PlayerProfile();
-	
-	public Communication.Method getRpcId() {
-		return Communication.Method.GET_PLAYER;
+
+	public RequestTypeOuterClass.RequestType getRpcId() {
+		return RequestTypeOuterClass.RequestType.GET_PLAYER;
 	}
 
-	public void handleResponse(Payload payload)
+	public void handleResponse(ByteString payload)
 	{
 		try {
-			ClientPlayerDetails details = ClientPlayerDetails.parseFrom(payload.getData());
+			GetPlayerResponseOuterClass.GetPlayerResponse details = GetPlayerResponseOuterClass.GetPlayerResponse.parseFrom(payload);
+			LocalPlayerOuterClass.LocalPlayer localPlayer = details.getLocalPlayer();
 
-			profile.setBadge(details.getBadge());
-			profile.setCreationTime(details.getCreationTime());
-			profile.setItemStorage(details.getItemStorage());
-			profile.setPokemonStorage(details.getPokeStorage());
-			profile.setTeam(Team.values()[details.getTeam()]);
-			profile.setUsername(details.getUsername());
-			
+			profile.setBadge(localPlayer.getEquippedBadge());
+			profile.setCreationTime(localPlayer.getCreationTimestampMs());
+			profile.setItemStorage(localPlayer.getMaxItemStorage());
+			profile.setPokemonStorage(localPlayer.getMaxPokemonStorage());
+			profile.setTeam(Team.values()[localPlayer.getTeam()]);
+			profile.setUsername(localPlayer.getUsername());
 
 			PlayerAvatar avatarAPI = new PlayerAvatar();
 			DailyBonus bonusAPI = new DailyBonus();
 			ContactSettings contactAPI = new ContactSettings();
 			
-			for(Currency currency : details.getCurrencyList() )
+			for(CurrencyOuterClass.Currency currency : localPlayer.getCurrenciesList() )
 			{
-				profile.addCurrency(currency.getType(), currency.getAmount());
+				profile.addCurrency(currency.getName(), currency.getAmount());
 			}
 			
-			avatarAPI.setAvatar(details.getAvatar().getAvatar());
-			avatarAPI.setBackpack(details.getAvatar().getBackpack());
-			avatarAPI.setEyes(details.getAvatar().getEyes());
-			avatarAPI.setHair(details.getAvatar().getHair());
-			avatarAPI.setHat(details.getAvatar().getHat());
-			avatarAPI.setPants(details.getAvatar().getPants());
-			avatarAPI.setShirt(details.getAvatar().getShirt());
-			avatarAPI.setShoes(details.getAvatar().getShoes());
-			avatarAPI.setSkin(details.getAvatar().getSkin());
+			avatarAPI.setGender(localPlayer.getAvatarDetails().getGender());
+			avatarAPI.setBackpack(localPlayer.getAvatarDetails().getBackpack());
+			avatarAPI.setEyes(localPlayer.getAvatarDetails().getEyes());
+			avatarAPI.setHair(localPlayer.getAvatarDetails().getHair());
+			avatarAPI.setHat(localPlayer.getAvatarDetails().getHat());
+			avatarAPI.setPants(localPlayer.getAvatarDetails().getPants());
+			avatarAPI.setShirt(localPlayer.getAvatarDetails().getShirt());
+			avatarAPI.setShoes(localPlayer.getAvatarDetails().getShoes());
+			avatarAPI.setSkin(localPlayer.getAvatarDetails().getSkin());
 		
-			bonusAPI.setNextCollectionTimestamp(details.getDailyBonus().getNextCollectTimestampMs());
-			bonusAPI.setNextDefenderBonusCollectTimestamp(details.getDailyBonus().getNextDefenderBonusCollectTimestampMs());
+			bonusAPI.setNextCollectionTimestamp(localPlayer.getDailyBonus().getNextCollectedTimestampMs());
+			bonusAPI.setNextDefenderBonusCollectTimestamp(localPlayer.getDailyBonus().getNextDefenderBonusCollectTimestampMs());
 			
 			profile.setAvatar(avatarAPI);
 			profile.setDailyBonus(bonusAPI);

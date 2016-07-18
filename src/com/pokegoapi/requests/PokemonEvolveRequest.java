@@ -1,41 +1,40 @@
 package com.pokegoapi.requests;
 
-import com.pokegoapi.main.Communication;
-import com.pokegoapi.main.Inventory.EvolvePokemonProto.Builder;
-import com.pokegoapi.main.Inventory.EvolvePokemonProto;
-import com.pokegoapi.main.Inventory.EvolvePokemonOutProto;
-import com.pokegoapi.main.Communication.Payload;
+import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.main.Request;
 
 public class PokemonEvolveRequest extends Request {
-	private Builder builder;
-	private EvolvePokemonOutProto out;
+	private EvolvePokemonMessageOuterClass.EvolvePokemonMessage.Builder builder;
+	private EvolvePokemonResponseOuterClass.EvolvePokemonResponse out;
 	
 	public PokemonEvolveRequest(long entid)
 	{
-		builder = EvolvePokemonProto.newBuilder();
+		builder = EvolvePokemonMessageOuterClass.EvolvePokemonMessage.newBuilder();
 		builder.setPokemonId(entid);
 	}
 	
 	@Override
-	public Communication.Method getRpcId()
+	public RequestTypeOuterClass.RequestType getRpcId()
 	{
-		return Communication.Method.EVOLVE_POKEMON;
+		return RequestTypeOuterClass.RequestType.EVOLVE_POKEMON;
 	}
 	
 
-	public EvolvePokemonOutProto getOutput()
+	public EvolvePokemonResponseOuterClass.EvolvePokemonResponse getOutput()
 	{
 		return out;
 	}
 	
 	@Override
-	public void handleResponse(Payload payload)
+	public void handleResponse(ByteString payload)
 	{
 		try
 		{
-			out = EvolvePokemonOutProto.parseFrom(payload.toByteArray());
+			out = EvolvePokemonResponseOuterClass.EvolvePokemonResponse.parseFrom(payload);
 
 		} 
 		catch (InvalidProtocolBufferException e) 
@@ -48,8 +47,7 @@ public class PokemonEvolveRequest extends Request {
 	@Override
 	public byte[] getInput()
 	{
-		EvolvePokemonProto in = builder.build();
-		return in.toByteArray();
+		return builder.build().toByteArray();
 	}
 
 }

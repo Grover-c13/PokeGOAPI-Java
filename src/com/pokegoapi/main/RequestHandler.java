@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import POGOProtos.Networking.EnvelopesOuterClass;
+import com.google.protobuf.ByteString;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -13,29 +15,24 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClients;
 
 import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.main.Communication.Payload;
-import com.pokegoapi.main.Communication.RequestEnvelop;
-import com.pokegoapi.main.Communication.RequestEnvelop.AuthInfo;
-import com.pokegoapi.main.Communication.RequestEnvelop.Builder;
-import com.pokegoapi.main.Communication.ResponseEnvelop;
 
 public class RequestHandler 
 {
-	private Builder builder;
+	private EnvelopesOuterClass.Envelopes.RequestEnvelope.Builder builder;
 	private boolean hasRequests;
-	private AuthInfo auth;
+	private EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth;
 	private List<Request> requests;
 	private String api_endpoint;
 	private HttpClient client;
 
-	private Communication.UnknownAuth lastAuth;
+	private EnvelopesOuterClass.Envelopes.AuthTicket lastAuth;
 	
-	public RequestHandler(AuthInfo auth)
+	public RequestHandler(EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth)
 	{
 		client = HttpClients.createDefault();
 		api_endpoint = APISettings.API_ENDPOINT;
 		this.auth = auth;
-		requests = new ArrayList<Request>();
+		requests = new ArrayList<>();
 		resetBuilder();
 	}
 	
@@ -50,7 +47,7 @@ public class RequestHandler
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		try 
 		{
-			RequestEnvelop request = builder.build();
+			EnvelopesOuterClass.Envelopes.RequestEnvelope request = builder.build();
 			request.writeTo(stream);
 		} 
 		catch (IOException e1) {
@@ -65,9 +62,9 @@ public class RequestHandler
 			HttpResponse response = client.execute(post);
 			InputStream content = response.getEntity().getContent();
 
-			ResponseEnvelop responseEnvelop = ResponseEnvelop.parseFrom(content);
+			EnvelopesOuterClass.Envelopes.ResponseEnvelope responseEnvelop = EnvelopesOuterClass.Envelopes.ResponseEnvelope.parseFrom(content);
 			
-			if (responseEnvelop.getUnknown1() == 102) {
+			if (responseEnvelop.getStatusCode() == 102) {
 				throw new LoginFailedException();
 			}
 	
@@ -75,13 +72,13 @@ public class RequestHandler
 				api_endpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
 			}
 
-			if (responseEnvelop.hasUnknownAuth()) {
-				lastAuth = responseEnvelop.getUnknownAuth();
+			if (responseEnvelop.hasAuthTicket()) {
+				lastAuth = responseEnvelop.getAuthTicket();
 			}
 			
 			// map each reply to the numeric response, ie first response = first request and send back to the requests to handle.
 			int count = 0;
-			for (Payload payload: responseEnvelop.getPayloadList()) {
+			for (ByteString payload: responseEnvelop.getReturnsList()) {
 				requests.get(count).handleResponse(payload);
 				count++;
 			}
@@ -89,7 +86,7 @@ public class RequestHandler
 			content.close();
 			
 			// 53 seems to mean handshak'n so need to resend request
-			if (responseEnvelop.getUnknown1() == 53) {
+			if (responseEnvelop.getStatusCode() == 53) {
 				sendRequests();
 			}
 
@@ -102,13 +99,13 @@ public class RequestHandler
 	}
 	
 	private void resetBuilder(){
-		builder =  RequestEnvelop.newBuilder();
-		builder.setDirection(Communication.Direction.REQUEST);
-		builder.setRpcId(8145806132888207460l);
-		if (lastAuth != null && lastAuth.getTimestamp() > 0) {
-			builder.setUnknownAuth(lastAuth);
+		builder =  EnvelopesOuterClass.Envelopes.RequestEnvelope.newBuilder();
+		builder.setStatusCode(2);
+		builder.setRequestId(8145806132888207460l);
+		if (lastAuth != null && lastAuth.getExpireTimestampMs() > 0) {
+			builder.setAuthTicket(lastAuth);
 		} else {
-			builder.setAuth(auth);
+			builder.setAuthInfo(auth);
 		}
 		builder.setUnknown12(989);
 		hasRequests = false;
@@ -121,7 +118,7 @@ public class RequestHandler
 		builder.addRequests(request.getRequest());
 	}
 	
-	public RequestEnvelop build() {
+	public EnvelopesOuterClass.Envelopes.RequestEnvelope build() {
 		if (!hasRequests) 
 			throw new IllegalStateException("Attempting to send request envelop with no requests");
 		return builder.build();

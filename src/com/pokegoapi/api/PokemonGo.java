@@ -1,9 +1,9 @@
 package com.pokegoapi.api;
 
 
+import POGOProtos.Networking.EnvelopesOuterClass;
 import com.pokegoapi.api.inventory.PokeBank;
 import com.pokegoapi.api.inventory.Pokemon;
-import com.pokegoapi.main.Communication.RequestEnvelop.AuthInfo;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.requests.FortDetailsRequest;
 import com.pokegoapi.requests.GetMapObjectsRequest;
@@ -22,7 +22,7 @@ public class PokemonGo {
 
   private long lastInventoryUpdate;
 
-  public PokemonGo(AuthInfo auth) {
+  public PokemonGo(EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth) {
     playerProfile = null;
     // send profile request to get the ball rolling
    

@@ -1,11 +1,9 @@
 package com.pokegoapi.auth;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URISyntaxException;
-
-
+import POGOProtos.Networking.EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.pokegoapi.exceptions.LoginFailedException;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -14,12 +12,8 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.main.Communication.RequestEnvelop.AuthInfo;
-import com.pokegoapi.main.Communication.RequestEnvelop.AuthInfo.Builder;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class GoogleLogin extends Login 
 {
@@ -36,9 +30,9 @@ public class GoogleLogin extends Login
 	 */
 	public AuthInfo login(String token)
 	{
-		Builder builder = AuthInfo.newBuilder();
+		AuthInfo.Builder builder = AuthInfo.newBuilder();
 		builder.setProvider("google");
-		builder.setToken(AuthInfo.JWT.newBuilder().setContents(token).setUnknown13(59).build());
+		builder.setToken(AuthInfo.JWT.newBuilder().setContents(token).setUnknown2(59).build());
 		return builder.build();
 	}
 	
@@ -76,9 +70,9 @@ public class GoogleLogin extends Login
             
             System.out.println("Got token:" + token.getId_token());
 			
-    		Builder authbuilder = AuthInfo.newBuilder();
+    		AuthInfo.Builder authbuilder = AuthInfo.newBuilder();
     		authbuilder.setProvider("google");
-    		authbuilder.setToken( AuthInfo.JWT.newBuilder().setContents( token.getId_token() ).setUnknown13(59).build());
+    		authbuilder.setToken( AuthInfo.JWT.newBuilder().setContents( token.getId_token() ).setUnknown2(59).build());
     		
     		return authbuilder.build();
 		} 

@@ -1,5 +1,6 @@
 package com.pokegoapi.auth;
 
+import POGOProtos.Networking.EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -12,9 +13,6 @@ import org.apache.http.util.EntityUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.main.Communication.RequestEnvelop.AuthInfo;
-import com.pokegoapi.main.Communication.RequestEnvelop.AuthInfo.Builder;
-
 
 
 public class PTCLogin extends Login {
@@ -36,9 +34,9 @@ public class PTCLogin extends Login {
    * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
    */
   public AuthInfo login(String token) {
-    Builder builder = AuthInfo.newBuilder();
+    AuthInfo.Builder builder = AuthInfo.newBuilder();
     builder.setProvider("ptc");
-    builder.setToken(AuthInfo.JWT.newBuilder().setContents(token).setUnknown13(59).build());
+    builder.setToken(AuthInfo.JWT.newBuilder().setContents(token).setUnknown2(59).build());
     return builder.build();
   }
 
@@ -109,9 +107,9 @@ public class PTCLogin extends Login {
         throw new LoginFailedException();
       }
 
-      Builder authbuilder = AuthInfo.newBuilder();
+      AuthInfo.Builder authbuilder = AuthInfo.newBuilder();
       authbuilder.setProvider("ptc");
-      authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(token).setUnknown13(59).build());
+      authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(token).setUnknown2(59).build());
 
       return authbuilder.build();
     } catch (Exception e) {

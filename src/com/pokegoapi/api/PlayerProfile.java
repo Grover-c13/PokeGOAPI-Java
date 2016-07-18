@@ -3,6 +3,7 @@ package com.pokegoapi.api;
 import java.util.HashMap;
 import java.util.Map;
 
+import POGOProtos.Player.EquippedBadgeOuterClass;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 
 import lombok.Data;
@@ -15,7 +16,7 @@ public class PlayerProfile
 	private Team team;
 	private int pokemonStorage;
 	private int itemStorage;
-	private String badge;
+	private EquippedBadgeOuterClass.EquippedBadge badge;
 	
 	private PlayerAvatar avatar;
 	private DailyBonus dailyBonus;

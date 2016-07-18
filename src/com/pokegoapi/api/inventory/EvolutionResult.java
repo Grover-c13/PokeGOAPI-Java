@@ -1,14 +1,15 @@
 package com.pokegoapi.api.inventory;
 
-import com.pokegoapi.main.Inventory.EvolvePokemonOutProto;
+import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass;
+import com.pokegoapi.requests.PokemonEvolveRequest;
 
 
 public class EvolutionResult 
 {
-	private EvolvePokemonOutProto proto;
+	private EvolvePokemonResponseOuterClass.EvolvePokemonResponse proto;
 	private Pokemon pokemon;
-	
-	public EvolutionResult(EvolvePokemonOutProto proto)
+
+	public EvolutionResult(EvolvePokemonResponseOuterClass.EvolvePokemonResponse proto)
 	{
 		this.proto = proto;
 		this.pokemon = new Pokemon(proto.getEvolvedPokemon());
@@ -23,7 +24,7 @@ public class EvolutionResult
 	} 
 
 	public int getExpAwarded() {
-		return proto.getExpAwarded();
+		return proto.getExperienceAwarded();
 	}
 
 	public int getCandyAwarded() {
