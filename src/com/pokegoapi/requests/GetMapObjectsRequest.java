@@ -20,17 +20,69 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class GetMapObjectsRequest extends Request {
+	private final List<Long> requestedCells;
 	private GetMapObjectsMessageOuterClass.GetMapObjectsMessage.Builder builder;
 	private GetMapObjectsResponseOuterClass.GetMapObjectsResponse output;
 
+	public GetMapObjectsRequest(List<Long> cellIds, double latitude, double longitude) {
+		this.requestedCells = cellIds;
+		builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder();
+		int i = 0;
+		for (Long cellId : cellIds) {
+			builder.addCellId(cellId);
+			builder.addSinceTimestampMs(0);
+			i++;
+		}
+		// Not necessary at all, location from RequestEnvelope is used
+		/*builder.setLatitude(latitude);
+		builder.setLongitude(longitude);*/
+	}
+
+	public RequestTypeOuterClass.RequestType getRpcId() {
+		return RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS;
+	}
+
+	public void handleResponse(ByteString payload) {
+		try {
+			GetMapObjectsResponseOuterClass.GetMapObjectsResponse response = GetMapObjectsResponseOuterClass.GetMapObjectsResponse.parseFrom(payload);
+			output = response;
+		} catch (InvalidProtocolBufferException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public byte[] getInput() {
+		return builder.build().toByteArray();
+	}
+
+	public GetMapObjectsReply getOutput() {
+		GetMapObjectsReply result = new GetMapObjectsReply();
+		output.getMapCellsList().forEach(mapCell -> {
+			result.addNearbyPokemons(mapCell.getNearbyPokemonsList());
+			result.addCatchablePokemons(mapCell.getCatchablePokemonsList());
+			result.addWildPokemons(mapCell.getWildPokemonsList());
+			result.addDecimatedSpawnPoints(mapCell.getDecimatedSpawnPointsList());
+			result.addSpawnPoints(mapCell.getSpawnPointsList());
+			Map<FortTypeOuterClass.FortType, List<FortDataOuterClass.FortData>> groupedForts
+					= mapCell.getFortsList().stream().collect(Collectors.groupingBy(FortDataOuterClass.FortData::getType));
+			result.addGyms(groupedForts.get(FortTypeOuterClass.FortType.GYM));
+			result.addPokestops(groupedForts.get(FortTypeOuterClass.FortType.CHECKPOINT));
+
+		});
+		List<Long> missedCells = requestedCells.stream().filter(cellId -> !output.getMapCellsList().contains(cellId)).collect(Collectors.toList());
+		result.setMissedCells(missedCells);
+		return result;
+	}
+
 	public class GetMapObjectsReply {
-		private Collection<NearbyPokemonOuterClass.NearbyPokemon> nearbyPokemons;
-		private Collection<MapPokemonOuterClass.MapPokemon> catchablePokemons;
-		private Collection<WildPokemonOuterClass.WildPokemon> wildPokemons;
-		private Collection<SpawnPointOuterClass.SpawnPoint> decimatedSpawnPoints;
-		private Collection<SpawnPointOuterClass.SpawnPoint> spawnPoints;
-		private Collection<FortDataOuterClass.FortData> gyms;
-		private Collection<FortDataOuterClass.FortData> pokestops;
+		private Collection<NearbyPokemonOuterClass.NearbyPokemon> nearbyPokemons = new ArrayList<>();
+		private Collection<MapPokemonOuterClass.MapPokemon> catchablePokemons = new ArrayList<>();
+		private Collection<WildPokemonOuterClass.WildPokemon> wildPokemons = new ArrayList<>();
+		private Collection<SpawnPointOuterClass.SpawnPoint> decimatedSpawnPoints = new ArrayList<>();
+		private Collection<SpawnPointOuterClass.SpawnPoint> spawnPoints = new ArrayList<>();
+		private Collection<FortDataOuterClass.FortData> gyms = new ArrayList<>();
+		private Collection<FortDataOuterClass.FortData> pokestops = new ArrayList<>();
+		private Collection<Long> missedCells;
 
 		public Collection<NearbyPokemonOuterClass.NearbyPokemon> getNearbyPokemons() {
 			return nearbyPokemons;
@@ -70,17 +122,9 @@ public class GetMapObjectsRequest extends Request {
 					", spawnPoints=" + spawnPoints +
 					", gyms=" + gyms +
 					", pokestops=" + pokestops +
+					", isComplete=" + isComplete() +
+					", missedCells=" + missedCells +
 					'}';
-		}
-
-		GetMapObjectsReply() {
-			nearbyPokemons = new ArrayList<>();
-			catchablePokemons = new ArrayList<>();
-			wildPokemons = new ArrayList<>();
-			decimatedSpawnPoints = new ArrayList<>();
-			spawnPoints = new ArrayList<>();
-			gyms = new ArrayList<>();
-			pokestops = new ArrayList<>();
 		}
 
 		public void addNearbyPokemons(Collection<NearbyPokemonOuterClass.NearbyPokemon> nearbyPokemons) {
@@ -131,52 +175,17 @@ public class GetMapObjectsRequest extends Request {
 			}
 			this.pokestops.addAll(pokestops);
 		}
-	}
 
-	public GetMapObjectsRequest(List<Long> cellIds, double latitude, double longitude) {
-		builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder();
-		int i = 0;
-		for (Long cellId : cellIds) {
-			builder.addCellId(cellId);
-			builder.addSinceTimestampMs(0);
-			i++;
+		public boolean isComplete() {
+			return missedCells.size() == 0;
 		}
-		// Not necessary at all, location from RequestEnvelope is used
-		/*builder.setLatitude(latitude);
-		builder.setLongitude(longitude);*/
-	}
 
-	public RequestTypeOuterClass.RequestType getRpcId() {
-		return RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS;
-	}
-
-	public void handleResponse(ByteString payload) {
-		try {
-			GetMapObjectsResponseOuterClass.GetMapObjectsResponse response = GetMapObjectsResponseOuterClass.GetMapObjectsResponse.parseFrom(payload);
-			output = response;
-		} catch (InvalidProtocolBufferException e) {
-			e.printStackTrace();
+		public Collection<Long> getMissedCells() {
+			return missedCells;
 		}
-	}
 
-	public byte[] getInput() {
-		return builder.build().toByteArray();
-	}
-
-	public GetMapObjectsReply getOutput() {
-		GetMapObjectsReply result = new GetMapObjectsReply();
-		output.getMapCellsList().forEach(mapCell -> {
-			result.addNearbyPokemons(mapCell.getNearbyPokemonsList());
-			result.addCatchablePokemons(mapCell.getCatchablePokemonsList());
-			result.addWildPokemons(mapCell.getWildPokemonsList());
-			result.addDecimatedSpawnPoints(mapCell.getDecimatedSpawnPointsList());
-			result.addSpawnPoints(mapCell.getSpawnPointsList());
-			Map<FortTypeOuterClass.FortType, List<FortDataOuterClass.FortData>> groupedForts
-					= mapCell.getFortsList().stream().collect(Collectors.groupingBy(FortDataOuterClass.FortData::getType));
-			result.addGyms(groupedForts.get(FortTypeOuterClass.FortType.GYM));
-			result.addPokestops(groupedForts.get(FortTypeOuterClass.FortType.CHECKPOINT));
-
-		});
-		return result;
+		public void setMissedCells(List<Long> missedCells) {
+			this.missedCells = missedCells;
+		}
 	}
 }
