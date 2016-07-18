@@ -3,8 +3,7 @@ package com.pokegoapi.auth;
 import lombok.Data;
 
 @Data
-public class GoogleAuthTokenJson 
-{
+public class GoogleAuthTokenJson {
 	private String error;
 	private String access_token;
 	private String token_type;

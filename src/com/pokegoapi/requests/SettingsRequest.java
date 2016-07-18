@@ -3,7 +3,6 @@ package com.pokegoapi.requests;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import com.google.protobuf.ByteString;
-
 import com.pokegoapi.main.Request;
 
 
@@ -11,26 +10,22 @@ public class SettingsRequest extends Request {
 	private DownloadSettingsMessageOuterClass.DownloadSettingsMessage.Builder settingsRequestBuilder;
 
 
-	public SettingsRequest()
-	{
+	public SettingsRequest() {
 		settingsRequestBuilder = DownloadSettingsMessageOuterClass.DownloadSettingsMessage.newBuilder();
 	}
 
 
-	public void setUUID(String uuid)
-	{
+	public void setUUID(String uuid) {
 		settingsRequestBuilder.setHash(uuid);
 	}
 
 	@Override
-	public RequestTypeOuterClass.RequestType getRpcId()
-	{
+	public RequestTypeOuterClass.RequestType getRpcId() {
 		return RequestTypeOuterClass.RequestType.DOWNLOAD_SETTINGS;
 	}
 
 	@Override
-	public void handleExtensions()
-	{
+	public void handleExtensions() {
 
 	}
 
@@ -40,10 +35,9 @@ public class SettingsRequest extends Request {
 
 
 	}
-	
 
-	public byte[] getInput() 
-	{
+
+	public byte[] getInput() {
 		return null;
 	}
 

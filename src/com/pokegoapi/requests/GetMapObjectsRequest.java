@@ -10,34 +10,34 @@ import com.pokegoapi.main.Request;
 import java.util.List;
 
 public class GetMapObjectsRequest extends Request {
-  private GetMapObjectsMessageOuterClass.GetMapObjectsMessage.Builder builder;
+	private GetMapObjectsMessageOuterClass.GetMapObjectsMessage.Builder builder;
 
-  public GetMapObjectsRequest(List<Long> cellIds, double latitude, double longitude) {
-    builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder();
-    int i = 0;
-    for (Long cellId : cellIds) {
-      builder.addCellId(cellId);
-      builder.addSinceTimestampMs(0);
-      i++;
-    }
-    builder.setLatitude(latitude);
-    builder.setLongitude(longitude);
-  }
+	public GetMapObjectsRequest(List<Long> cellIds, double latitude, double longitude) {
+		builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder();
+		int i = 0;
+		for (Long cellId : cellIds) {
+			builder.addCellId(cellId);
+			builder.addSinceTimestampMs(0);
+			i++;
+		}
+		builder.setLatitude(latitude);
+		builder.setLongitude(longitude);
+	}
 
-  public RequestTypeOuterClass.RequestType getRpcId() {
-    return RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS;
-  }
+	public RequestTypeOuterClass.RequestType getRpcId() {
+		return RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS;
+	}
 
-  public void handleResponse(ByteString payload) {
-    try {
-      GetMapObjectsResponseOuterClass.GetMapObjectsResponse response = GetMapObjectsResponseOuterClass.GetMapObjectsResponse.parseFrom(payload);
+	public void handleResponse(ByteString payload) {
+		try {
+			GetMapObjectsResponseOuterClass.GetMapObjectsResponse response = GetMapObjectsResponseOuterClass.GetMapObjectsResponse.parseFrom(payload);
 
-    } catch (InvalidProtocolBufferException e) {
-      e.printStackTrace();
-    }
-  }
+		} catch (InvalidProtocolBufferException e) {
+			e.printStackTrace();
+		}
+	}
 
-  public byte[] getInput() {
-    return builder.build().toByteArray();
-  }
+	public byte[] getInput() {
+		return builder.build().toByteArray();
+	}
 }
