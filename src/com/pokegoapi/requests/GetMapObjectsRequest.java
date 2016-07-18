@@ -11,7 +11,6 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.main.Request;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class GetMapObjectsRequest extends Request {
+public class GetMapObjectsRequest  {
 	private final List<Long> requestedCells;
 	private GetMapObjectsMessageOuterClass.GetMapObjectsMessage.Builder builder;
 	private GetMapObjectsResponseOuterClass.GetMapObjectsResponse output;
