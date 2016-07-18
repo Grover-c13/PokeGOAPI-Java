@@ -12,12 +12,11 @@ targetCompatibility = 1.5
 
 
 repositories {
-        
      maven { url "http://repo.maven.apache.org/maven2" }
 }
 dependencies {
     compile group: 'com.google.protobuf', name: 'protobuf-java', version:'3.0.0-beta-3'
     compile group: 'com.google.code.gson', name: 'gson', version:'2.7'
-    compile group: 'org.apache.httpcomponents', name: 'httpclient', version:'4.5.2'
     compile 'io.reactivex:rxjava:1.1.7'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
 }

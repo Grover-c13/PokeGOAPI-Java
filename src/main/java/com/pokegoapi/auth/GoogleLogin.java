@@ -4,13 +4,7 @@ import POGOProtos.Networking.EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthI
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.pokegoapi.exceptions.LoginFailedException;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import okhttp3.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -43,20 +37,29 @@ public class GoogleLogin extends Login {
 	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
 	 */
 	public AuthInfo login(String username, String password) throws LoginFailedException {
-		HttpClient client = HttpClients.createDefault();
-		URIBuilder builder;
 		try {
-			builder = new URIBuilder(OAUTH_ENDPOINT);
 
-			builder.addParameter("client_id", CLIENT_ID);
-			builder.addParameter("scope", "openid email https://www.googleapis.com/auth/userinfo.email");
-			HttpPost post = new HttpPost(builder.build());
+			//TODO: This needs to change. Should not be creating a new client every login
+			OkHttpClient okHttpClient = new OkHttpClient();
 
-			HttpResponse response = client.execute(post);
+			HttpUrl url = HttpUrl.parse(CLIENT_ID).newBuilder()
+					.addQueryParameter("client_id", CLIENT_ID)
+					.addQueryParameter("scope", "openid email https://www.googleapis.com/auth/userinfo.email")
+					.build();
+
+			//Create empty body
+			RequestBody reqBody = RequestBody.create(null, new byte[0]);
+
+			Request request = new Request.Builder()
+					.url(url)
+					.method("POST", reqBody)
+					.build();
+
+			Response response = okHttpClient.newCall(request).execute();
 
 			Gson gson = new GsonBuilder().create();
 
-			GoogleAuthJson googleAuth = gson.fromJson(EntityUtils.toString(response.getEntity()), GoogleAuthJson.class);
+            GoogleAuthJson googleAuth = gson.fromJson(response.body().string(), GoogleAuthJson.class);
 			System.out.println("Get user to go to:" + googleAuth.getVerification_url() + " and enter code:" + googleAuth.getUser_code());
 
 			GoogleAuthTokenJson token;
@@ -79,21 +82,30 @@ public class GoogleLogin extends Login {
 	}
 
 
-	private GoogleAuthTokenJson poll(GoogleAuthJson json) throws URISyntaxException, ClientProtocolException, IOException {
-		HttpClient client = HttpClients.createDefault();
-		URIBuilder builder = new URIBuilder(OAUTH_TOKEN_ENDPOINT);
+	private GoogleAuthTokenJson poll(GoogleAuthJson json) throws URISyntaxException, IOException
+	{
+		OkHttpClient client = new OkHttpClient();
 
-		builder.addParameter("client_id", CLIENT_ID);
-		builder.addParameter("client_secret", SECRET);
-		builder.addParameter("code", json.getDevice_code());
-		builder.addParameter("grant_type", "http://oauth.net/grant_type/device/1.0");
-		builder.addParameter("scope", "openid email https://www.googleapis.com/auth/userinfo.email");
-		HttpPost post = new HttpPost(builder.build());
+		HttpUrl url = HttpUrl.parse(OAUTH_TOKEN_ENDPOINT).newBuilder()
+		
+				.addQueryParameter("client_id", CLIENT_ID)
+				.addQueryParameter("client_secret", SECRET)
+				.addQueryParameter("code", json.getDevice_code())
+				.addQueryParameter("grant_type", "http://oauth.net/grant_type/device/1.0")
+				.addQueryParameter("scope", "openid email https://www.googleapis.com/auth/userinfo.email")
+				.build();
 
-		HttpResponse response = client.execute(post);
+		//Empty request body
+		RequestBody reqBody = RequestBody.create(null, new byte[0]);
+		Request request = new Request.Builder()
+				.url(url)
+				.method("POST", reqBody)
+				.build();
+
+		Response response = client.newCall(request).execute();
 
 		Gson gson = new GsonBuilder().create();
-		GoogleAuthTokenJson token = gson.fromJson(EntityUtils.toString(response.getEntity()), GoogleAuthTokenJson.class);
+        GoogleAuthTokenJson token = gson.fromJson(response.body().string(), GoogleAuthTokenJson.class);
 
 		if (token.getError() == null) {
 			return token;

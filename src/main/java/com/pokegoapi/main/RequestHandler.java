@@ -3,11 +3,9 @@ package com.pokegoapi.main;
 import POGOProtos.Networking.EnvelopesOuterClass;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.exceptions.LoginFailedException;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.HttpClients;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -21,12 +19,12 @@ public class RequestHandler {
 	private EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth;
 	private List<ServerRequest> serverRequests;
 	private String api_endpoint;
-	private HttpClient client;
+	private OkHttpClient okHttpClient;
 
 	private EnvelopesOuterClass.Envelopes.AuthTicket lastAuth;
 
 	public RequestHandler(EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth) {
-		client = HttpClients.createDefault();
+		okHttpClient = new OkHttpClient();
 		api_endpoint = APISettings.API_ENDPOINT;
 		this.auth = auth;
 		serverRequests = new ArrayList<>();
@@ -50,13 +48,16 @@ public class RequestHandler {
 			e1.printStackTrace();
 		}
 
-
+		
 		try {
-			HttpPost post = new HttpPost(api_endpoint);
-			post.setEntity(new ByteArrayEntity(stream.toByteArray()));
 
-			HttpResponse response = client.execute(post);
-			InputStream content = response.getEntity().getContent();
+			RequestBody body = RequestBody.create(null, stream.toByteArray());
+			okhttp3.Request request = new okhttp3.Request.Builder()
+					.url(api_endpoint)
+					.post(body)
+					.build();
+			Response response = okHttpClient.newCall(request).execute();
+			InputStream content = response.body().byteStream();
 
 			EnvelopesOuterClass.Envelopes.ResponseEnvelope responseEnvelop = EnvelopesOuterClass.Envelopes.ResponseEnvelope.parseFrom(content);
 

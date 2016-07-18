@@ -4,14 +4,7 @@ import POGOProtos.Networking.EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthI
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.pokegoapi.exceptions.LoginFailedException;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import okhttp3.*;
 
 
 public class PTCLogin extends Login {
@@ -47,31 +40,43 @@ public class PTCLogin extends Login {
 	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
 	 */
 	public AuthInfo login(String username, String password) throws LoginFailedException {
-		HttpClient client = HttpClients.createDefault();
-		URIBuilder builder;
+    //TODO: stop creating an okhttp client per request
+
+    OkHttpClient okHttpClient = new OkHttpClient();
+
 		try {
-			builder = new URIBuilder(LOGIN_URL);
 
-			HttpGet get = new HttpGet(builder.build());
-			get.setHeader("User-Agent", USER_AGENT);
+      Request get = new Request.Builder()
+              .url(LOGIN_URL)
+              .header("User-Agent", USER_AGENT)
+              .get()
+              .build();
 
-			HttpResponse response = client.execute(get);
+      Response getResponse = okHttpClient.newCall(get).execute();
 
 			Gson gson = new GsonBuilder().create();
 
-			PTCAuthJson ptcAuth = gson.fromJson(EntityUtils.toString(response.getEntity()), PTCAuthJson.class);
+      PTCAuthJson ptcAuth = gson.fromJson(getResponse.body().string(), PTCAuthJson.class);
 
-			builder = new URIBuilder(LOGIN_URL);
-			builder.addParameter("lt", ptcAuth.getLt());
-			builder.addParameter("execution", ptcAuth.getExecution());
-			builder.addParameter("_eventId", "submit");
-			builder.addParameter("username", username);
-			builder.addParameter("password", password);
-			HttpPost post = new HttpPost(builder.build());
-			post.setHeader("User-Agent", USER_AGENT);
 
-			response = client.execute(post);
-			String body = EntityUtils.toString(response.getEntity());
+      HttpUrl url = new HttpUrl.Builder()
+              .addQueryParameter("lt", ptcAuth.getLt())
+              .addQueryParameter("execution", ptcAuth.getExecution())
+              .addQueryParameter("_eventId", ptcAuth.getExecution())
+              .addQueryParameter("username", username)
+              .addQueryParameter("password", password)
+              .build();
+
+      RequestBody reqBody = RequestBody.create(null, new byte[0]);
+
+      Request postRequest = new Request.Builder()
+              .url(url)
+              .method("POST", reqBody)
+              .build();
+
+      Response response = okHttpClient.newCall(postRequest).execute();
+
+      String body = response.body().string();
 
 			if (body.length() > 0) {
 				PTCError ptcError = gson.fromJson(body, PTCError.class);
@@ -81,22 +86,27 @@ public class PTCLogin extends Login {
 			}
 
 			String ticket = null;
-			for (Header location : response.getHeaders("location")) {
-				ticket = location.getValue().split("ticket=")[1];
+      for (String location : response.headers("location")) {
+        ticket = location.split("ticket=")[1];
 			}
 
-			builder = new URIBuilder(LOGIN_OAUTH);
-			builder.addParameter("client_id", CLIENT_ID);
-			builder.addParameter("redirect_uri", REDIRECT_URI);
-			builder.addParameter("client_secret", CLIENT_SECRET);
-			builder.addParameter("grant_type", "refresh_token");
-			builder.addParameter("code", ticket);
+      url = HttpUrl.parse(LOGIN_OAUTH).newBuilder()
+              .addQueryParameter("client_id", CLIENT_ID)
+              .addQueryParameter("redirect_uri", REDIRECT_URI)
+              .addQueryParameter("client_secret", CLIENT_SECRET)
+              .addQueryParameter("grant_type", "refresh_token")
+              .addQueryParameter("code", ticket)
+              .build();
 
-			post = new HttpPost(builder.build());
-			post.setHeader("User-Agent", USER_AGENT);
+      postRequest = new Request.Builder()
+              .url(url)
+              .method("POST", reqBody)
+              .header("User-Agent", USER_AGENT)
+              .build();
 
-			response = client.execute(post);
-			body = EntityUtils.toString(response.getEntity());
+      response = okHttpClient.newCall(postRequest).execute();
+
+      body = response.body().string();
 
 			String token;
 			try {
