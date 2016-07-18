@@ -1,4 +1,3 @@
 [submodule "src/resources/protobuf"]
 	path = src/resources/protobuf
 	url = git@github.com:AeonLucid/POGOProtos.git
-	branch = master

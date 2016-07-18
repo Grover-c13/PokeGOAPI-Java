@@ -4,8 +4,7 @@ import POGOProtos.Enums.GenderOuterClass;
 import lombok.Data;
 
 @Data
-public class PlayerAvatar 
-{
+public class PlayerAvatar {
 	private GenderOuterClass.Gender gender;
 	private int skin;
 	private int hair;
@@ -15,5 +14,5 @@ public class PlayerAvatar
 	private int shoes;
 	private int eyes;
 	private int backpack;
-	
+
 }

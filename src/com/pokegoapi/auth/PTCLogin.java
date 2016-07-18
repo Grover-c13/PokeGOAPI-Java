@@ -1,6 +1,9 @@
 package com.pokegoapi.auth;
 
 import POGOProtos.Networking.EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.pokegoapi.exceptions.LoginFailedException;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -10,113 +13,109 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.pokegoapi.exceptions.LoginFailedException;
-
 
 public class PTCLogin extends Login {
-  public static final String CLIENT_SECRET = "w8ScCUXJQc6kXKw8FiOhd8Fixzht18Dq3PEVkUCP5ZPxtgyWsbTvWHFLm2wNY0JR";
-  public static final String REDIRECT_URI = "https://www.nianticlabs.com/pokemongo/error";
-  public static final String CLIENT_ID = "mobile-app_pokemon-go";
+	public static final String CLIENT_SECRET = "w8ScCUXJQc6kXKw8FiOhd8Fixzht18Dq3PEVkUCP5ZPxtgyWsbTvWHFLm2wNY0JR";
+	public static final String REDIRECT_URI = "https://www.nianticlabs.com/pokemongo/error";
+	public static final String CLIENT_ID = "mobile-app_pokemon-go";
 
-  public static final String API_URL = "https://pgorelease.nianticlabs.com/plfe/rpc";
-  public static final String LOGIN_URL = "https://sso.pokemon.com/sso/login?service=https%3A%2F%2Fsso.pokemon.com%2Fsso%2Foauth2.0%2FcallbackAuthorize";
-  public static final String LOGIN_OAUTH = "https://sso.pokemon.com/sso/oauth2.0/accessToken";
+	public static final String API_URL = "https://pgorelease.nianticlabs.com/plfe/rpc";
+	public static final String LOGIN_URL = "https://sso.pokemon.com/sso/login?service=https%3A%2F%2Fsso.pokemon.com%2Fsso%2Foauth2.0%2FcallbackAuthorize";
+	public static final String LOGIN_OAUTH = "https://sso.pokemon.com/sso/oauth2.0/accessToken";
 
-  public static final String USER_AGENT = "niantic";
+	public static final String USER_AGENT = "niantic";
 
 
-  /**
-   * Returns an AuthInfo object given a token, this should not be an access token but rather an id_token
-   *
-   * @param String the id_token stored from a previous oauth attempt.
-   * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
-   */
-  public AuthInfo login(String token) {
-    AuthInfo.Builder builder = AuthInfo.newBuilder();
-    builder.setProvider("ptc");
-    builder.setToken(AuthInfo.JWT.newBuilder().setContents(token).setUnknown2(59).build());
-    return builder.build();
-  }
+	/**
+	 * Returns an AuthInfo object given a token, this should not be an access token but rather an id_token
+	 *
+	 * @param String the id_token stored from a previous oauth attempt.
+	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
+	 */
+	public AuthInfo login(String token) {
+		AuthInfo.Builder builder = AuthInfo.newBuilder();
+		builder.setProvider("ptc");
+		builder.setToken(AuthInfo.JWT.newBuilder().setContents(token).setUnknown2(59).build());
+		return builder.build();
+	}
 
-  /**
-   * Starts a login flow for pokemon.com (PTC) using a username and password, this uses pokemon.com's oauth endpoint and returns a usable AuthInfo without user interaction
-   *
-   * @param String PTC username
-   * @param String PTC password
-   * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
-   */
-  public AuthInfo login(String username, String password) throws LoginFailedException {
-    HttpClient client = HttpClients.createDefault();
-    URIBuilder builder;
-    try {
-      builder = new URIBuilder(LOGIN_URL);
+	/**
+	 * Starts a login flow for pokemon.com (PTC) using a username and password, this uses pokemon.com's oauth endpoint and returns a usable AuthInfo without user interaction
+	 *
+	 * @param String PTC username
+	 * @param String PTC password
+	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
+	 */
+	public AuthInfo login(String username, String password) throws LoginFailedException {
+		HttpClient client = HttpClients.createDefault();
+		URIBuilder builder;
+		try {
+			builder = new URIBuilder(LOGIN_URL);
 
-      HttpGet get = new HttpGet(builder.build());
-      get.setHeader("User-Agent", USER_AGENT);
+			HttpGet get = new HttpGet(builder.build());
+			get.setHeader("User-Agent", USER_AGENT);
 
-      HttpResponse response = client.execute(get);
+			HttpResponse response = client.execute(get);
 
-      Gson gson = new GsonBuilder().create();
+			Gson gson = new GsonBuilder().create();
 
-      PTCAuthJson ptcAuth = gson.fromJson(EntityUtils.toString(response.getEntity()), PTCAuthJson.class);
+			PTCAuthJson ptcAuth = gson.fromJson(EntityUtils.toString(response.getEntity()), PTCAuthJson.class);
 
-      builder = new URIBuilder(LOGIN_URL);
-      builder.addParameter("lt", ptcAuth.getLt());
-      builder.addParameter("execution", ptcAuth.getExecution());
-      builder.addParameter("_eventId", "submit");
-      builder.addParameter("username", username);
-      builder.addParameter("password", password);
-      HttpPost post = new HttpPost(builder.build());
-      post.setHeader("User-Agent", USER_AGENT);
+			builder = new URIBuilder(LOGIN_URL);
+			builder.addParameter("lt", ptcAuth.getLt());
+			builder.addParameter("execution", ptcAuth.getExecution());
+			builder.addParameter("_eventId", "submit");
+			builder.addParameter("username", username);
+			builder.addParameter("password", password);
+			HttpPost post = new HttpPost(builder.build());
+			post.setHeader("User-Agent", USER_AGENT);
 
-      response = client.execute(post);
-      String body = EntityUtils.toString(response.getEntity());
-      
-      if (body.length() > 0) {
-        PTCError ptcError = gson.fromJson(body, PTCError.class);
-        if (ptcError.getError() != null && ptcError.getError().length() > 0) {
-          throw new LoginFailedException();
-        }
-      }
+			response = client.execute(post);
+			String body = EntityUtils.toString(response.getEntity());
 
-      String ticket = null;
-      for (Header location : response.getHeaders("location")) {
-        ticket = location.getValue().split("ticket=")[1];
-      }
+			if (body.length() > 0) {
+				PTCError ptcError = gson.fromJson(body, PTCError.class);
+				if (ptcError.getError() != null && ptcError.getError().length() > 0) {
+					throw new LoginFailedException();
+				}
+			}
 
-      builder = new URIBuilder(LOGIN_OAUTH);
-      builder.addParameter("client_id", CLIENT_ID);
-      builder.addParameter("redirect_uri", REDIRECT_URI);
-      builder.addParameter("client_secret", CLIENT_SECRET);
-      builder.addParameter("grant_type", "refresh_token");
-      builder.addParameter("code", ticket);
+			String ticket = null;
+			for (Header location : response.getHeaders("location")) {
+				ticket = location.getValue().split("ticket=")[1];
+			}
 
-      post = new HttpPost(builder.build());
-      post.setHeader("User-Agent", USER_AGENT);
+			builder = new URIBuilder(LOGIN_OAUTH);
+			builder.addParameter("client_id", CLIENT_ID);
+			builder.addParameter("redirect_uri", REDIRECT_URI);
+			builder.addParameter("client_secret", CLIENT_SECRET);
+			builder.addParameter("grant_type", "refresh_token");
+			builder.addParameter("code", ticket);
 
-      response = client.execute(post);
-      body = EntityUtils.toString(response.getEntity());
+			post = new HttpPost(builder.build());
+			post.setHeader("User-Agent", USER_AGENT);
 
-      String token;
-      try {
-        token = body.split("token=")[1];
-        token = token.split("&")[0];
-      } catch (Exception e) {
-        throw new LoginFailedException();
-      }
+			response = client.execute(post);
+			body = EntityUtils.toString(response.getEntity());
 
-      AuthInfo.Builder authbuilder = AuthInfo.newBuilder();
-      authbuilder.setProvider("ptc");
-      authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(token).setUnknown2(59).build());
+			String token;
+			try {
+				token = body.split("token=")[1];
+				token = token.split("&")[0];
+			} catch (Exception e) {
+				throw new LoginFailedException();
+			}
 
-      return authbuilder.build();
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new LoginFailedException();
-    }
+			AuthInfo.Builder authbuilder = AuthInfo.newBuilder();
+			authbuilder.setProvider("ptc");
+			authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(token).setUnknown2(59).build());
 
-  }
+			return authbuilder.build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new LoginFailedException();
+		}
+
+	}
 
 }

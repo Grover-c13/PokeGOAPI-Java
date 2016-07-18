@@ -2,58 +2,51 @@ package com.pokegoapi.api.inventory;
 
 import POGOProtos.Data.PokemonOuterClass;
 import POGOProtos.Enums.PokemonMoveOuterClass;
+import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.requests.PokemonEvolveRequest;
 import com.pokegoapi.requests.PokemonTransferRequest;
-
 import lombok.Setter;
 
-public class Pokemon
-{
+public class Pokemon {
+	@Setter
+	PokemonGo pgo;
 	private PokemonOuterClass.Pokemon proto;
-	@Setter PokemonGo pgo;
-	
+
 	// API METHODS //
-	
-	public int transferPokemon()
-	{
+
+	// DELEGATE METHODS BELOW //
+	public Pokemon(PokemonOuterClass.Pokemon proto) {
+		this.proto = proto;
+	}
+
+	public int transferPokemon() {
 		PokemonTransferRequest req = new PokemonTransferRequest(getId());
 		pgo.getRequestHandler().doRequest(req);
-		
-		if (req.getStatus() == 1)
-		{
+
+		if (req.getResult().equals(ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result.SUCCESS)) {
 			pgo.getPokebank().removePokemon(this);
 		}
-		
+
 		return req.getCandies();
 	}
-	
-	public EvolutionResult evolve()
-	{
+
+	public EvolutionResult evolve() {
 
 		PokemonEvolveRequest req = new PokemonEvolveRequest(getId());
 		pgo.getRequestHandler().doRequest(req);
 		EvolutionResult result = new EvolutionResult(req.getOutput());
-		
-		if (result.isSuccessful()) 
-		{
+
+		if (result.isSuccessful()) {
 			this.pgo.getPokebank().removePokemon(this);
 			this.pgo.getPokebank().addPokemon(result.getEvolvedPokemon());
 		}
-		
+
 		return result;
 	}
-	
-	
-	public boolean equals(Pokemon other)
-	{
+
+	public boolean equals(Pokemon other) {
 		return (other.getId() == getId());
-	}
-	
-	// DELEGATE METHODS BELOW //
-	public Pokemon(PokemonOuterClass.Pokemon proto)
-	{
-		this.proto = proto;
 	}
 
 	public PokemonOuterClass.Pokemon getDefaultInstanceForType() {
@@ -167,6 +160,6 @@ public class Pokemon
 	public boolean getFromFort() {
 		return proto.getFromFort() > 0;
 	}
-	
-	
+
+
 }
