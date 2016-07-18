@@ -23,6 +23,42 @@ public class PTCLogin extends Login {
 
 	public static final String USER_AGENT = "niantic";
 
+	private final OkHttpClient client;
+
+	public PTCLogin(OkHttpClient client) {
+		  /*
+			This is a temporary, in-memory cookie jar.
+			We don't require any persistence outside of the scope of the login,
+			so it being discarded is completely fine
+		   */
+		CookieJar tempJar = new CookieJar() {
+			private final HashMap<String, List<Cookie>> cookieStore = new HashMap<String, List<Cookie>>();
+
+			@Override
+			public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
+				cookieStore.put(url.host(), cookies);
+			}
+
+			@Override
+			public List<Cookie> loadForRequest(HttpUrl url) {
+				List<Cookie> cookies = cookieStore.get(url.host());
+				return cookies != null ? cookies : new ArrayList<Cookie>();
+			}
+		};
+
+		this.client = client.newBuilder()
+				.cookieJar(tempJar)
+				.addInterceptor(new Interceptor() {
+			        @Override
+			        public Response intercept(Chain chain) throws IOException {
+						//Makes sure the User-Agent is always set
+						Request req = chain.request();
+                        req = req.newBuilder().header("User-Agent", USER_AGENT).build();
+                        return chain.proceed(req);
+                    }
+		        })
+		        .build();
+	}
 
 	/**
 	 * Returns an AuthInfo object given a token, this should not be an access token but rather an id_token
@@ -48,46 +84,12 @@ public class PTCLogin extends Login {
 		//TODO: stop creating an okhttp client per request
 
 		try {
-
-		  /*
-			This is a temporary, in-memory cookie jar.
-			We don't require any persistence outside of the scope of the login,
-			so it being discarded is completely fine
-		   */
-			CookieJar tempJar = new CookieJar() {
-				private final HashMap<String, List<Cookie>> cookieStore = new HashMap<String, List<Cookie>>();
-
-				@Override
-				public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-					cookieStore.put(url.host(), cookies);
-				}
-
-				@Override
-				public List<Cookie> loadForRequest(HttpUrl url) {
-					List<Cookie> cookies = cookieStore.get(url.host());
-					return cookies != null ? cookies : new ArrayList<Cookie>();
-				}
-			};
-
-			OkHttpClient okHttpClient = new OkHttpClient.Builder()
-					.cookieJar(tempJar)
-					.addInterceptor(new Interceptor() {
-						@Override
-						public Response intercept(Chain chain) throws IOException {
-							// Makes sure the User-Agent is always set
-							Request req = chain.request();
-							req = req.newBuilder().header("User-Agent", USER_AGENT).build();
-							return chain.proceed(req);
-						}
-					})
-					.build();
-
 			Request get = new Request.Builder()
 					.url(LOGIN_URL)
 					.get()
 					.build();
 
-			Response getResponse = okHttpClient.newCall(get).execute();
+			Response getResponse = client.newCall(get).execute();
 
 			Gson gson = new GsonBuilder().create();
 
@@ -109,7 +111,7 @@ public class PTCLogin extends Login {
 					.build();
 
 			// Need a new client for this to not follow redirects
-			Response response = okHttpClient.newBuilder()
+			Response response = client.newBuilder()
 					.followRedirects(false)
 					.followSslRedirects(false)
 					.build()
@@ -143,7 +145,7 @@ public class PTCLogin extends Login {
 					.method("POST", reqBody)
 					.build();
 
-			response = okHttpClient.newCall(postRequest).execute();
+			response = client.newCall(postRequest).execute();
 
 			body = response.body().string();
 

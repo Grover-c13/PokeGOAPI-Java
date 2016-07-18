@@ -19,12 +19,12 @@ public class RequestHandler {
 	private EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth;
 	private List<ServerRequest> serverRequests;
 	private String api_endpoint;
-	private OkHttpClient okHttpClient;
+	private OkHttpClient client;
 
 	private EnvelopesOuterClass.Envelopes.AuthTicket lastAuth;
 
-	public RequestHandler(EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth) {
-		okHttpClient = new OkHttpClient();
+	public RequestHandler(EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth, OkHttpClient client) {
+		this.client = client;
 		api_endpoint = APISettings.API_ENDPOINT;
 		this.auth = auth;
 		serverRequests = new ArrayList<ServerRequest>();
@@ -56,7 +56,7 @@ public class RequestHandler {
 					.url(api_endpoint)
 					.post(body)
 					.build();
-			Response response = okHttpClient.newCall(request).execute();
+			Response response = client.newCall(request).execute();
 			InputStream content = response.body().byteStream();
 
 			EnvelopesOuterClass.Envelopes.ResponseEnvelope responseEnvelop = EnvelopesOuterClass.Envelopes.ResponseEnvelope.parseFrom(content);

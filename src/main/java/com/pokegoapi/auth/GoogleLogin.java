@@ -15,12 +15,21 @@ public class GoogleLogin extends Login {
 	public static final String OAUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/device/code";
 	public static final String OAUTH_TOKEN_ENDPOINT = "https://www.googleapis.com/oauth2/v4/token";
 
+	private final OkHttpClient client;
+
+	public GoogleLogin(OkHttpClient client) {
+		this.client = client;
+	}
+
 	/**
 	 * Returns an AuthInfo object given a token, this should not be an access token but rather an id_token
 	 *
 	 * @param String the id_token stored from a previous oauth attempt.
 	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
 	 */
+
+
+
 	public AuthInfo login(String token) {
 		AuthInfo.Builder builder = AuthInfo.newBuilder();
 		builder.setProvider("google");
@@ -40,8 +49,6 @@ public class GoogleLogin extends Login {
 		try {
 
 			//TODO: This needs to change. Should not be creating a new client every login
-			OkHttpClient okHttpClient = new OkHttpClient();
-
 			HttpUrl url = HttpUrl.parse(CLIENT_ID).newBuilder()
 					.addQueryParameter("client_id", CLIENT_ID)
 					.addQueryParameter("scope", "openid email https://www.googleapis.com/auth/userinfo.email")
@@ -55,7 +62,7 @@ public class GoogleLogin extends Login {
 					.method("POST", reqBody)
 					.build();
 
-			Response response = okHttpClient.newCall(request).execute();
+			Response response = client.newCall(request).execute();
 
 			Gson gson = new GsonBuilder().create();
 
@@ -83,8 +90,6 @@ public class GoogleLogin extends Login {
 
 
 	private GoogleAuthTokenJson poll(GoogleAuthJson json) throws URISyntaxException, IOException {
-		OkHttpClient client = new OkHttpClient();
-
 		HttpUrl url = HttpUrl.parse(OAUTH_TOKEN_ENDPOINT).newBuilder()
 				.addQueryParameter("client_id", CLIENT_ID)
 				.addQueryParameter("client_secret", SECRET)

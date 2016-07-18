@@ -18,6 +18,7 @@ import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.requests.GetMapObjectsRequest;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass;
+import okhttp3.OkHttpClient;
 
 import java.util.List;
 
@@ -28,11 +29,11 @@ public class PokemonGo {
 	PokeBank pokebank;
 	private long lastInventoryUpdate;
 
-	public PokemonGo(EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth) {
+	public PokemonGo(EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth, OkHttpClient client) {
 		playerProfile = null;
 
 		// send profile request to get the ball rolling
-		requestHandler = new RequestHandler(auth);
+		requestHandler = new RequestHandler(auth, client);
 		getPlayerProfile();
 		// should have proper end point now.
 
