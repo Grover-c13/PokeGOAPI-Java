@@ -8,14 +8,12 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.inventory.Pokemon;
 import com.pokegoapi.main.Request;
-import lombok.Getter;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class InventoryRequest extends Request {
 
-	@Getter
 	List<Pokemon> pokemon = new LinkedList<Pokemon>();
 	private GetInventoryMessageOuterClass.GetInventoryMessage.Builder builder;
 
@@ -47,5 +45,9 @@ public class InventoryRequest extends Request {
 
 	public byte[] getInput() {
 		return builder.build().toByteArray();
+	}
+
+	public List<Pokemon> getPokemon() {
+		return pokemon;
 	}
 }

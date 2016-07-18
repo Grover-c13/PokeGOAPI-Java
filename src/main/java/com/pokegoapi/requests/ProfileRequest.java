@@ -9,7 +9,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.*;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.main.Request;
-import lombok.Getter;
 
 public class ProfileRequest extends Request {
 
@@ -67,4 +66,7 @@ public class ProfileRequest extends Request {
 		return null;
 	}
 
+	public PlayerProfile getProfile() {
+		return profile;
+	}
 }

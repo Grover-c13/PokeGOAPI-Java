@@ -9,10 +9,8 @@ import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.main.ServerRequest;
-import lombok.Setter;
-
 public class Pokemon {
-	@Setter
+
 	PokemonGo pgo;
 	private PokemonDataOuterClass.PokemonData proto;
 
@@ -83,6 +81,11 @@ public class Pokemon {
 	public boolean equals(Pokemon other) {
 		return (other.getId() == getId());
 	}
+
+	public void setPgo(PokemonGo pgo) {
+		this.pgo = pgo;
+	}
+
 
 	public PokemonDataOuterClass.PokemonData getDefaultInstanceForType() {
 		return proto.getDefaultInstanceForType();

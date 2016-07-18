@@ -18,17 +18,13 @@ import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.requests.GetMapObjectsRequest;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass;
-import lombok.Getter;
-
 import java.util.List;
 
 public class PokemonGo {
 
-	@Getter
 	RequestHandler requestHandler;
-	@Getter
-	PokeBank pokebank;
 	private PlayerProfile playerProfile;
+	PokeBank pokebank;
 	private long lastInventoryUpdate;
 
 	public PokemonGo(EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth) {
@@ -185,4 +181,12 @@ public class PokemonGo {
 		requestHandler.addRequest(request);
 		requestHandler.sendRequests();*/
 	}
+
+  public RequestHandler getRequestHandler() {
+    return requestHandler;
+  }
+
+  public PokeBank getPokebank() {
+    return pokebank;
+  }
 }

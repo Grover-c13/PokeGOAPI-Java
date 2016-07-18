@@ -7,16 +7,12 @@ import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.main.Request;
-import lombok.Getter;
-
 public class FortDetailsRequest extends Request {
-	@Getter
+{
 	String id; // input for the proto
-	@Getter
 	long latitude; // input for the proto
-	@Getter
 	long longitude;  // input for the proto
-	@Getter
+	
 	FortDetailsResponseOuterClass.FortDetailsResponse output;
 	private FortDetailsMessageOuterClass.FortDetailsMessage.Builder builder;
 
@@ -61,4 +57,19 @@ public class FortDetailsRequest extends Request {
 		return builder.build().toByteArray();
 	}
 
+	public String getId() {
+		return id;
+	}
+
+	public long getLatitude() {
+		return latitude;
+	}
+
+	public long getLongitude() {
+		return longitude;
+	}
+
+	public FortDetailsOutProto getOutput() {
+		return output;
+	}
 }

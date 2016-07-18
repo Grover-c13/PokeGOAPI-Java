@@ -2,12 +2,11 @@ package com.pokegoapi.api;
 
 import POGOProtos.Player.EquippedBadgeOuterClass;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
-import lombok.Data;
+
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Data
 public class PlayerProfile {
 	private long creationTime;
 	private String username;
@@ -39,5 +38,85 @@ public class PlayerProfile {
 
 	public enum Currency {
 		STARDUST, POKECOIN;
+	}
+
+	public long getCreationTime() {
+		return creationTime;
+	}
+
+	public void setCreationTime(long creationTime) {
+		this.creationTime = creationTime;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public Team getTeam() {
+		return team;
+	}
+
+	public void setTeam(Team team) {
+		this.team = team;
+	}
+
+	public int getPokemonStorage() {
+		return pokemonStorage;
+	}
+
+	public void setPokemonStorage(int pokemonStorage) {
+		this.pokemonStorage = pokemonStorage;
+	}
+
+	public int getItemStorage() {
+		return itemStorage;
+	}
+
+	public void setItemStorage(int itemStorage) {
+		this.itemStorage = itemStorage;
+	}
+
+	public String getBadge() {
+		return badge;
+	}
+
+	public void setBadge(String badge) {
+		this.badge = badge;
+	}
+
+	public PlayerAvatar getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(PlayerAvatar avatar) {
+		this.avatar = avatar;
+	}
+
+	public DailyBonus getDailyBonus() {
+		return dailyBonus;
+	}
+
+	public void setDailyBonus(DailyBonus dailyBonus) {
+		this.dailyBonus = dailyBonus;
+	}
+
+	public ContactSettings getContactSettings() {
+		return contactSettings;
+	}
+
+	public void setContactSettings(ContactSettings contactSettings) {
+		this.contactSettings = contactSettings;
+	}
+
+	public Map<Currency, Integer> getCurrencies() {
+		return currencies;
+	}
+
+	public void setCurrencies(Map<Currency, Integer> currencies) {
+		this.currencies = currencies;
 	}
 }
