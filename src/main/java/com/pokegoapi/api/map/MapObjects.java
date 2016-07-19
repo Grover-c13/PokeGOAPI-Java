@@ -1,7 +1,6 @@
 package com.pokegoapi.api.map;
 
 import POGOProtos.Map.Fort.FortDataOuterClass;
-import POGOProtos.Map.MapCellOuterClass;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
@@ -9,7 +8,6 @@ import POGOProtos.Map.SpawnPointOuterClass;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 class MapObjects {
 	private Collection<NearbyPokemonOuterClass.NearbyPokemon> nearbyPokemons = new ArrayList<NearbyPokemonOuterClass.NearbyPokemon>();
@@ -19,7 +17,11 @@ class MapObjects {
 	private Collection<SpawnPointOuterClass.SpawnPoint> spawnPoints = new ArrayList<SpawnPointOuterClass.SpawnPoint>();
 	private Collection<FortDataOuterClass.FortData> gyms = new ArrayList<FortDataOuterClass.FortData>();
 	private Collection<FortDataOuterClass.FortData> pokestops = new ArrayList<FortDataOuterClass.FortData>();
-	private Collection<Long> missedCells;
+	/**
+	 * Returns whether or not the return returned any data at all; when a user requests too many cells/wrong cell level/cells too far away from the users location,
+	 * the server returns empty MapCells
+	 */
+	private boolean complete = false;
 
 	public Collection<NearbyPokemonOuterClass.NearbyPokemon> getNearbyPokemons() {
 		return nearbyPokemons;
@@ -59,69 +61,63 @@ class MapObjects {
 				", spawnPoints=" + spawnPoints +
 				", gyms=" + gyms +
 				", pokestops=" + pokestops +
-				", isComplete=" + isComplete() +
-				", missedCells=" + missedCells +
+				", isComplete=" + complete +
 				'}';
 	}
 
 	public void addNearbyPokemons(Collection<NearbyPokemonOuterClass.NearbyPokemon> nearbyPokemons) {
-		if (nearbyPokemons == null) {
+		if (nearbyPokemons == null || nearbyPokemons.isEmpty()) {
 			return;
 		}
+		complete = true;
 		this.nearbyPokemons.addAll(nearbyPokemons);
 	}
 
 	public void addCatchablePokemons(Collection<MapPokemonOuterClass.MapPokemon> catchablePokemons) {
-		if (catchablePokemons == null) {
+		if (catchablePokemons == null || catchablePokemons.isEmpty()) {
 			return;
 		}
+		complete = true;
 		this.catchablePokemons.addAll(catchablePokemons);
 	}
 
 	public void addWildPokemons(Collection<WildPokemonOuterClass.WildPokemon> wildPokemons) {
-		if (wildPokemons == null) {
+		if (wildPokemons == null || wildPokemons.isEmpty()) {
 			return;
 		}
+		complete = true;
 		this.wildPokemons.addAll(wildPokemons);
 	}
 
 	public void addDecimatedSpawnPoints(Collection<SpawnPointOuterClass.SpawnPoint> decimatedSpawnPoints) {
-		if (decimatedSpawnPoints == null) {
+		if (decimatedSpawnPoints == null || decimatedSpawnPoints.isEmpty()) {
 			return;
 		}
+		complete = true;
 		this.decimatedSpawnPoints.addAll(decimatedSpawnPoints);
 	}
 
 	public void addSpawnPoints(Collection<SpawnPointOuterClass.SpawnPoint> spawnPoints) {
-		if (spawnPoints == null) {
+		if (spawnPoints == null || spawnPoints.isEmpty()) {
 			return;
 		}
+		complete = true;
 		this.spawnPoints.addAll(spawnPoints);
 	}
 
 	public void addGyms(Collection<FortDataOuterClass.FortData> gyms) {
-		if (gyms == null) {
+		if (gyms == null || gyms.isEmpty()) {
 			return;
 		}
+		complete = true;
 		this.gyms.addAll(gyms);
 	}
 
 	public void addPokestops(Collection<FortDataOuterClass.FortData> pokestops) {
-		if (pokestops == null) {
+		if (pokestops == null || pokestops.isEmpty()) {
 			return;
 		}
+		complete = true;
 		this.pokestops.addAll(pokestops);
-	}
-
-	public boolean isComplete() {
-		return missedCells.size() == 0;
-	}
-
-	public Collection<Long> getMissedCells() {
-		return missedCells;
-	}
-
-	public void setMissedCells(List<Long> missedCells) {
-		this.missedCells = missedCells;
 	}
 }
