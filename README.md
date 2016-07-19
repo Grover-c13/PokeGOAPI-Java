@@ -11,7 +11,17 @@ See this spreadsheet for RPC endpoints and progress :
    https://docs.google.com/spreadsheets/d/1Xv0Gw5PzIRaVou2xrl6r7qySrcmOKjQWLBjJA73YnJM
 
 ___
-:exclamation: This api is unstable as the backend pogo server are, so if you just want to use it, wait some days that we get stuff working great before complaining about the api isnt working ;) :exclamation:
+:exclamation:
+
+This API may seem unstable. This is because the backend Pokemon GO servers are unstable.
+
+In case stuff is not working as expected, wait a moment to see if the problem resolves itself automatically.
+
+You may also check the status of the servers on [IsPokemonGoDownOrNot.com](http://ispokemongodownornot.com) or [MMOServerStatus.com](http://www.mmoserverstatus.com/pokemon_go).
+
+If you just want to use it, wait some days until the server issues are resolved (or if there is a problem with this library, you may fix it and send a PR this way).
+
+:exclamation:
 ___
 
 # Build
@@ -24,7 +34,10 @@ ___
   PS : To eclipse user, you may build one time and add the generated java class for proto into eclipse path : Right click on the project > Build path > New Source Folder > Type 'build/generated/source/proto/main/java' > Finish
 
 # Usage
-Mostly everything is accessed through the PokemonGo class in the api package.
+Include the API as jar from your own build, or use Maven/Gradle/SBT/Leiningen: https://jitpack.io/#Grover-c13/PokeGOAPI-Java/master-SNAPSHOT
+
+Mostly everything is accessed through the PokemonGo class in the API package.
+
 The constructor of PokemonGo class requires a AuthInfo object which can be obtained from GoogleLogin().login or PTCLogin().login.
 
 EG:
