@@ -35,6 +35,7 @@ public class PokemonGo {
 	private Map map;
 	private double latitude;
 	private double longitude;
+	private double altitude;
 
 	private long lastInventoryUpdate;
 
@@ -42,7 +43,7 @@ public class PokemonGo {
 		playerProfile = null;
 
 		// send profile request to get the ball rolling
-		requestHandler = new RequestHandler(auth, client);
+		requestHandler = new RequestHandler(this, auth, client);
 		getPlayerProfile();
 		// should have proper end point now.
 
@@ -91,8 +92,6 @@ public class PokemonGo {
 			return null;
 		}
 
-
-
 		playerProfile.setBadge(localPlayer.getEquippedBadge());
 		playerProfile.setCreationTime(localPlayer.getCreationTimestampMs());
 		playerProfile.setItemStorage(localPlayer.getMaxItemStorage());
@@ -132,9 +131,6 @@ public class PokemonGo {
 		return playerProfile;
 	}
 
-
-
-
 	private void getInventory() {
 
 		// server request
@@ -162,15 +158,11 @@ public class PokemonGo {
 		catch(Exception e) {
 			e.printStackTrace();
 		}
-
-
-
-
 	}
 
 	public void setLatitude(double latitude) { this.latitude = latitude; }
 
-	public void setLongitude(double latitude) { this.longitude = longitude; }
+	public void setLongitude(double longitude) { this.longitude = longitude; }
 
 	public double getLatitude() { return latitude; }
 
@@ -182,5 +174,13 @@ public class PokemonGo {
 
 	public PokeBank getPokebank() {
 		return pokebank;
+	}
+
+	public void setAltitude(double altitude) {
+		this.altitude = altitude;
+	}
+
+	public double getAltitude() {
+		return altitude;
 	}
 }

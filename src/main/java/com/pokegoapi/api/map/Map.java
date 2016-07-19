@@ -27,6 +27,14 @@ public class Map {
 	}
 
 	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude) {
+		return getMapObjects(cellIds, latitude, longitude, 0);
+	}
+
+	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude, double altitude) {
+		api.setLatitude(latitude);
+		api.setLongitude(longitude);
+		api.setAltitude(altitude);
+
 		MapObjects result = null;
 		try {
 			GetMapObjectsMessageOuterClass.GetMapObjectsMessage.Builder builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder()
