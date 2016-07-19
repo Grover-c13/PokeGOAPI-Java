@@ -1,8 +1,9 @@
 package com.pokegoapi.api.inventory;
 
 import com.pokegoapi.api.PokemonGo;
-import rx.Observable;
-import rx.functions.Func1;
+import java8.util.function.Predicate;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,20 +23,21 @@ public class PokeBank {
 	}
 
 	public List<Pokemon> getPokemonByPokemonId(final int id) {
-		return Observable.from(pokemons).filter(new Func1<Pokemon, Boolean>() {
-			public Boolean call(Pokemon pokemon) {
+		return StreamSupport.stream(pokemons).filter(new Predicate<Pokemon>() {
+			@Override
+			public boolean test(Pokemon pokemon) {
 				return pokemon.getId() == id;
 			}
-		}).toList().toBlocking().first();
+		}).collect(Collectors.<Pokemon>toList());
 	}
 
 	public void removePokemon(final Pokemon pokemon) {
-		pokemons = Observable.from(pokemons)
-				.filter(new Func1<Pokemon, Boolean>() {
-					public Boolean call(Pokemon pokemn) {
-						return pokemn.getId() != pokemon.getId();
-					}
-				}).toList().toBlocking().first();
+		pokemons = StreamSupport.stream(pokemons).filter(new Predicate<Pokemon>() {
+			@Override
+			public boolean test(Pokemon pokemn) {
+				return pokemn.getId() != pokemon.getId();
+			}
+		}).collect(Collectors.<Pokemon>toList());
 	}
 
 	public List<Pokemon> getPokemons() {
