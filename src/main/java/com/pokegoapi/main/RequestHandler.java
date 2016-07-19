@@ -2,6 +2,7 @@ package com.pokegoapi.main;
 
 import POGOProtos.Networking.EnvelopesOuterClass;
 import com.google.protobuf.ByteString;
+import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.LoginFailedException;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RequestHandler {
+	private final PokemonGo api;
 	private EnvelopesOuterClass.Envelopes.RequestEnvelope.Builder builder;
 	private boolean hasRequests;
 	private EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth;
@@ -23,7 +25,8 @@ public class RequestHandler {
 
 	private EnvelopesOuterClass.Envelopes.AuthTicket lastAuth;
 
-	public RequestHandler(EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth, OkHttpClient client) {
+	public RequestHandler(PokemonGo api, EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth, OkHttpClient client) {
+		this.api = api;
 		this.client = client;
 		api_endpoint = APISettings.API_ENDPOINT;
 		this.auth = auth;
@@ -40,6 +43,9 @@ public class RequestHandler {
 
 	public void sendServerRequests()
 	{
+		builder.setLatitude(api.getLatitude());
+		builder.setLongitude(api.getLongitude());
+		builder.setAltitude(api.getAltitude());
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		try {
 			EnvelopesOuterClass.Envelopes.RequestEnvelope request = builder.build();
@@ -74,7 +80,6 @@ public class RequestHandler {
 			}
 
 			// map each reply to the numeric response, ie first response = first request and send back to the requests to handle.
-			System.out.println(responseEnvelop);
 			int count = 0;
 			for (ByteString payload : responseEnvelop.getReturnsList()) {
 				ServerRequest serverReq = serverRequests.get(count);

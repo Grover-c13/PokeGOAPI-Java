@@ -9,7 +9,7 @@ import POGOProtos.Map.SpawnPointOuterClass;
 import java.util.ArrayList;
 import java.util.Collection;
 
-class MapObjects {
+public class MapObjects {
 	private Collection<NearbyPokemonOuterClass.NearbyPokemon> nearbyPokemons = new ArrayList<NearbyPokemonOuterClass.NearbyPokemon>();
 	private Collection<MapPokemonOuterClass.MapPokemon> catchablePokemons = new ArrayList<MapPokemonOuterClass.MapPokemon>();
 	private Collection<WildPokemonOuterClass.WildPokemon> wildPokemons = new ArrayList<WildPokemonOuterClass.WildPokemon>();

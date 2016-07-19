@@ -39,8 +39,7 @@ public class Pokemon {
 			pgo.getRequestHandler().sendServerRequests();
 
 			ReleasePokemonResponse response = ReleasePokemonResponse.parseFrom(serverRequest.getData());
-
-			System.out.println(response);
+			
 			if (response.getResult().equals(Result.SUCCESS)) {
 				pgo.getPokebank().removePokemon(this);
 			}
