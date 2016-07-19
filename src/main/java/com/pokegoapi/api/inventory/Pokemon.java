@@ -10,13 +10,14 @@ import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass;
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass.EvolvePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
+import lombok.Setter;
+
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.main.ServerRequest;
 
-
 public class Pokemon {
 
-	PokemonGo pgo;
+	@Setter PokemonGo pgo;
 	private PokemonData proto;
 
 	// API METHODS //
@@ -29,25 +30,22 @@ public class Pokemon {
 	public Result transferPokemon() {
 		try
 		{
-			ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder()
-					.setPokemonId(this.getId())
-					.build();
-
-
+			ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
+			
 			ServerRequest serverRequest = new ServerRequest(RequestType.RELEASE_POKEMON, reqMsg);
 			pgo.getRequestHandler().request(serverRequest);
 			pgo.getRequestHandler().sendServerRequests();
-
+			
 			ReleasePokemonResponse response = ReleasePokemonResponse.parseFrom(serverRequest.getData());
 			
 			if (response.getResult().equals(Result.SUCCESS)) {
+				pgo.getPokebank().removePokemon(this);
 				pgo.getPokebank().removePokemon(this);
 			}
 
 			return response.getResult();
 		}
-		catch(Exception e)
-		{
+		catch(Exception e) {
 			e.printStackTrace();
 		}
 
@@ -57,42 +55,32 @@ public class Pokemon {
 	public EvolutionResult evolve() {
 		try
 		{
-			EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder()
-					.setPokemonId(this.getId())
-					.build();
+			EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
+			
 			ServerRequest serverRequest = new ServerRequest(RequestType.EVOLVE_POKEMON, reqMsg);
 			pgo.getRequestHandler().request(serverRequest);
 			pgo.getRequestHandler().sendServerRequests();
+			
 			EvolvePokemonResponse response = EvolvePokemonResponseOuterClass.EvolvePokemonResponse.parseFrom(serverRequest.getData());
-
 
 			EvolutionResult result = new EvolutionResult(response);
 
 			if (result.isSuccessful()) {
-				this.pgo.getPokebank().removePokemon(this);
-				this.pgo.getPokebank().addPokemon(result.getEvolvedPokemon());
+				pgo.getPokebank().removePokemon(this);
+				pgo.getPokebank().addPokemon(result.getEvolvedPokemon());
 			}
-
-
+			
+			return result;
 		}
-		catch(Exception e)
-		{
+		catch(Exception e) {
 			e.printStackTrace();
+			return null;
 		}
-
-
-
-		return null;
 	}
 
 	public boolean equals(Pokemon other) {
 		return (other.getId() == getId());
 	}
-
-	public void setPgo(PokemonGo pgo) {
-		this.pgo = pgo;
-	}
-
 
 	public PokemonData getDefaultInstanceForType() {
 		return proto.getDefaultInstanceForType();
@@ -102,7 +90,9 @@ public class Pokemon {
 		return proto.getId();
 	}
 
-	public PokemonIdOuterClass.PokemonId getPokemonId() { return proto.getPokemonId();	}
+	public PokemonIdOuterClass.PokemonId getPokemonId() { 
+		return proto.getPokemonId();	
+	}
 
 	public int getCp() {
 		return proto.getCp();

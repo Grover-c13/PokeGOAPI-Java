@@ -2,7 +2,8 @@ package com.pokegoapi.api.inventory;
 
 import com.pokegoapi.api.PokemonGo;
 import POGOProtos.Inventory.ItemIdOuterClass.ItemId;
-import com.pokegoapi.exceptions.NoSuchitemException;
+
+import com.pokegoapi.exceptions.NoSuchItemException;
 
 import java.util.HashMap;
 
@@ -21,11 +22,11 @@ public class Bag
 		items.put(item.getItemId(), item);
 	}
 
-	public Item getItem(ItemId type) throws NoSuchitemException {
+	public Item getItem(ItemId type) throws NoSuchItemException {
 		if (items.containsKey(type)) {
 			return items.get(type);
 		}
 
-		throw new NoSuchitemException();
+		throw new NoSuchItemException();
 	}
 }

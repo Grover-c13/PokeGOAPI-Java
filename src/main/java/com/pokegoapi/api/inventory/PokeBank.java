@@ -5,14 +5,15 @@ import com.pokegoapi.api.PokemonGo;
 import java8.util.function.Predicate;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class PokeBank {
-	List<Pokemon> pokemons = new ArrayList<Pokemon>();
-	PokemonGo instance;
+	@Getter List<Pokemon> pokemons = new ArrayList<Pokemon>();
+	@Getter PokemonGo instance;
 
 	public PokeBank(PokemonGo instance) {
 		this.instance = instance;
@@ -39,13 +40,5 @@ public class PokeBank {
 				return pokemn.getId() != pokemon.getId();
 			}
 		}).collect(Collectors.<Pokemon>toList());
-	}
-
-	public List<Pokemon> getPokemons() {
-		return pokemons;
-	}
-
-	public void setInstance(PokemonGo instance) {
-		this.instance = instance;
 	}
 }

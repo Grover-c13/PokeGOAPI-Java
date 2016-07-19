@@ -43,9 +43,10 @@ public class RequestHandler {
 
 	public void sendServerRequests()
 	{
-		builder.setLatitude(api.getLatitude());
-		builder.setLongitude(api.getLongitude());
-		builder.setAltitude(api.getAltitude());
+		setLatitude(api.getLatitude());
+		setLongitude(api.getLongitude());
+		setAltitude(api.getAltitude());
+		
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		try {
 			EnvelopesOuterClass.Envelopes.RequestEnvelope request = builder.build();
@@ -53,7 +54,6 @@ public class RequestHandler {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-
 
 		try {
 
@@ -94,7 +94,6 @@ public class RequestHandler {
 			if (responseEnvelop.getStatusCode() == 53) {
 				sendServerRequests();
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -108,11 +107,10 @@ public class RequestHandler {
 		builder = EnvelopesOuterClass.Envelopes.RequestEnvelope.newBuilder();
 		builder.setStatusCode(2);
 		builder.setRequestId(8145806132888207460l);
-		if (lastAuth != null && lastAuth.getExpireTimestampMs() > 0) {
+		if (lastAuth != null && lastAuth.getExpireTimestampMs() > 0) 
 			builder.setAuthTicket(lastAuth);
-		} else {
+		 else 
 			builder.setAuthInfo(auth);
-		}
 		builder.setUnknown12(989);
 		hasRequests = false;
 		serverRequests.clear();

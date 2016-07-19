@@ -32,12 +32,19 @@ public class Map {
 		lastMapUpdate = 0;
 	}
 
+	/**
+	 * Returns 9x9 cells with the requested lattitude/longitude in the center cell
+	 * 
+	 * @param latitude
+	 * @param longitude
+	 * @return MapObjects in the given cells
+	 */
 	public MapObjects getMapObjects(double latitude, double longitude) {
 		return getMapObjects(latitude, longitude, 9);
 	}
 
 	/**
-	 * Returns `width` * `width` cells with the request latitude/longitude in the center
+	 * Returns `width` * `width` cells with the requested latitude/longitude in the center
 	 *
 	 * @param latitude
 	 * @param longitude
@@ -67,10 +74,27 @@ public class Map {
 		return getMapObjects(cells, latitude, longitude);
 	}
 
+	/**
+	 * Returns the cells requested, you should send a latitude/longitude to fake a near location
+	 * 
+	 * @param List<Long> of cellId
+	 * @param latitude
+	 * @param longitude
+	 * @return MapObjects in the given cells
+	 */
 	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude) {
 		return getMapObjects(cellIds, latitude, longitude, 0);
 	}
 
+	/**
+	 * Returns the cells requested, you should send a latitude/longitude to fake a near location
+	 * 
+	 * @param List<Long> of cellId
+	 * @param latitude
+	 * @param longitude
+	 * @param altitude
+	 * @return MapObjects in the given cells
+	 */
 	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude, double altitude) {
 		api.setLatitude(latitude);
 		api.setLongitude(longitude);
@@ -81,7 +105,6 @@ public class Map {
 			GetMapObjectsMessageOuterClass.GetMapObjectsMessage.Builder builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder()
 					.setLatitude(latitude)
 					.setLongitude(longitude);
-
 
 			int i = 0;
 			for (Long cellId : cellIds) {
@@ -103,6 +126,7 @@ public class Map {
 				result.addWildPokemons(mapCell.getWildPokemonsList());
 				result.addDecimatedSpawnPoints(mapCell.getDecimatedSpawnPointsList());
 				result.addSpawnPoints(mapCell.getSpawnPointsList());
+				
 				java.util.Map<FortTypeOuterClass.FortType, List<FortDataOuterClass.FortData>> groupedForts
 						= StreamSupport.stream(mapCell.getFortsList()).collect(Collectors.groupingBy(new Function<FortDataOuterClass.FortData, FortTypeOuterClass.FortType>() {
 					@Override
@@ -118,11 +142,9 @@ public class Map {
 		}
 
 		return result;
-
 	}
 
 	public FortDetails getFortDetails(String id, long lon, long lat) {
-
 		// server request
 		try {
 			FortDetailsMessageOuterClass.FortDetailsMessage reqMsg = FortDetailsMessageOuterClass.FortDetailsMessage.newBuilder()
@@ -138,8 +160,7 @@ public class Map {
 			return new FortDetails(response);
 		} catch (Exception e) {
 			e.printStackTrace();
+			return null;
 		}
-
-		return null;
 	}
 }

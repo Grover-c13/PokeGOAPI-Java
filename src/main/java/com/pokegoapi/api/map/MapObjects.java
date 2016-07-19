@@ -4,73 +4,30 @@ import POGOProtos.Map.Fort.FortDataOuterClass;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
+import lombok.Getter;
+import lombok.ToString;
 import POGOProtos.Map.SpawnPointOuterClass;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
+@ToString
 public class MapObjects {
-	private Collection<NearbyPokemonOuterClass.NearbyPokemon> nearbyPokemons = new ArrayList<NearbyPokemonOuterClass.NearbyPokemon>();
-	private Collection<MapPokemonOuterClass.MapPokemon> catchablePokemons = new ArrayList<MapPokemonOuterClass.MapPokemon>();
-	private Collection<WildPokemonOuterClass.WildPokemon> wildPokemons = new ArrayList<WildPokemonOuterClass.WildPokemon>();
-	private Collection<SpawnPointOuterClass.SpawnPoint> decimatedSpawnPoints = new ArrayList<SpawnPointOuterClass.SpawnPoint>();
-	private Collection<SpawnPointOuterClass.SpawnPoint> spawnPoints = new ArrayList<SpawnPointOuterClass.SpawnPoint>();
-	private Collection<FortDataOuterClass.FortData> gyms = new ArrayList<FortDataOuterClass.FortData>();
-	private Collection<FortDataOuterClass.FortData> pokestops = new ArrayList<FortDataOuterClass.FortData>();
-	/**
-	 * Returns whether or not the return returned any data at all; when a user requests too many cells/wrong cell level/cells too far away from the users location,
-	 * the server returns empty MapCells
-	 */
-	private boolean complete = false;
-
-	public Collection<NearbyPokemonOuterClass.NearbyPokemon> getNearbyPokemons() {
-		return nearbyPokemons;
-	}
-
-	public Collection<MapPokemonOuterClass.MapPokemon> getCatchablePokemons() {
-		return catchablePokemons;
-	}
-
-	public Collection<WildPokemonOuterClass.WildPokemon> getWildPokemons() {
-		return wildPokemons;
-	}
-
-	public Collection<SpawnPointOuterClass.SpawnPoint> getDecimatedSpawnPoints() {
-		return decimatedSpawnPoints;
-	}
-
-	public Collection<SpawnPointOuterClass.SpawnPoint> getSpawnPoints() {
-		return spawnPoints;
-	}
-
-	public Collection<FortDataOuterClass.FortData> getGyms() {
-		return gyms;
-	}
-
-	public Collection<FortDataOuterClass.FortData> getPokestops() {
-		return pokestops;
-	}
-
-	@Override
-	public String toString() {
-		return "GetMapObjectsReply{" +
-				"nearbyPokemons=" + nearbyPokemons +
-				", catchablePokemons=" + catchablePokemons +
-				", wildPokemons=" + wildPokemons +
-				", decimatedSpawnPoints=" + decimatedSpawnPoints +
-				", spawnPoints=" + spawnPoints +
-				", gyms=" + gyms +
-				", pokestops=" + pokestops +
-				", isComplete=" + complete +
-				'}';
-	}
-
+	@Getter Collection<NearbyPokemonOuterClass.NearbyPokemon> nearbyPokemons = new ArrayList<NearbyPokemonOuterClass.NearbyPokemon>();
+	@Getter Collection<MapPokemonOuterClass.MapPokemon> catchablePokemons = new ArrayList<MapPokemonOuterClass.MapPokemon>();
+	@Getter Collection<WildPokemonOuterClass.WildPokemon> wildPokemons = new ArrayList<WildPokemonOuterClass.WildPokemon>();
+	@Getter Collection<SpawnPointOuterClass.SpawnPoint> decimatedSpawnPoints = new ArrayList<SpawnPointOuterClass.SpawnPoint>();
+	@Getter Collection<SpawnPointOuterClass.SpawnPoint> spawnPoints = new ArrayList<SpawnPointOuterClass.SpawnPoint>();
+	@Getter Collection<FortDataOuterClass.FortData> gyms = new ArrayList<FortDataOuterClass.FortData>();
+	@Getter Collection<FortDataOuterClass.FortData> pokestops = new ArrayList<FortDataOuterClass.FortData>();
+	boolean complete = false;
+	
 	public void addNearbyPokemons(Collection<NearbyPokemonOuterClass.NearbyPokemon> nearbyPokemons) {
 		if (nearbyPokemons == null || nearbyPokemons.isEmpty()) {
 			return;
 		}
 		complete = true;
-		this.nearbyPokemons.addAll(nearbyPokemons);
+		nearbyPokemons.addAll(nearbyPokemons);
 	}
 
 	public void addCatchablePokemons(Collection<MapPokemonOuterClass.MapPokemon> catchablePokemons) {
@@ -78,7 +35,7 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		this.catchablePokemons.addAll(catchablePokemons);
+		catchablePokemons.addAll(catchablePokemons);
 	}
 
 	public void addWildPokemons(Collection<WildPokemonOuterClass.WildPokemon> wildPokemons) {
@@ -86,7 +43,7 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		this.wildPokemons.addAll(wildPokemons);
+		wildPokemons.addAll(wildPokemons);
 	}
 
 	public void addDecimatedSpawnPoints(Collection<SpawnPointOuterClass.SpawnPoint> decimatedSpawnPoints) {
@@ -94,7 +51,7 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		this.decimatedSpawnPoints.addAll(decimatedSpawnPoints);
+		decimatedSpawnPoints.addAll(decimatedSpawnPoints);
 	}
 
 	public void addSpawnPoints(Collection<SpawnPointOuterClass.SpawnPoint> spawnPoints) {
@@ -102,7 +59,7 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		this.spawnPoints.addAll(spawnPoints);
+		spawnPoints.addAll(spawnPoints);
 	}
 
 	public void addGyms(Collection<FortDataOuterClass.FortData> gyms) {
@@ -110,7 +67,7 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		this.gyms.addAll(gyms);
+		gyms.addAll(gyms);
 	}
 
 	public void addPokestops(Collection<FortDataOuterClass.FortData> pokestops) {
@@ -118,9 +75,13 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		this.pokestops.addAll(pokestops);
+		pokestops.addAll(pokestops);
 	}
 
+	/**
+	 * Returns whether or not the return returned any data at all; when a user requests too many cells/wrong cell level/cells too far away from the users location,
+	 * the server returns empty MapCells
+	 */
 	public boolean isComplete() {
 		return complete;
 	}

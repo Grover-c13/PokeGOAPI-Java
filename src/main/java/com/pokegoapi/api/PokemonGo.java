@@ -11,6 +11,8 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
 import POGOProtos.Player.CurrencyOuterClass.Currency;
+import lombok.Getter;
+import lombok.Setter;
 import POGOProtos.Inventory.ItemIdOuterClass.ItemId;
 import com.pokegoapi.api.inventory.Bag;
 import com.pokegoapi.api.inventory.Item;
@@ -28,13 +30,17 @@ import java.util.List;
 
 public class PokemonGo {
 
-	private RequestHandler requestHandler;
+	@Getter RequestHandler requestHandler;
 	private PlayerProfile playerProfile;
-	private PokeBank pokebank;
-	private Bag bag;
-	private Map map;
+	@Getter PokeBank pokebank;
+	@Getter Bag bag;
+	@Getter Map map;
+	
+	@Getter @Setter
 	private double latitude;
+	@Getter @Setter
 	private double longitude;
+	@Getter @Setter
 	private double altitude;
 
 	private long lastInventoryUpdate;
@@ -73,13 +79,8 @@ public class PokemonGo {
 		return localPlayer;
 	}
 
-	public Map getMap() {
-		return map;
-	}
-
 	public PlayerProfile getPlayerProfile() {
-		if (playerProfile != null)
-		{
+		if (playerProfile != null) {
 			return playerProfile;
 		}
 
@@ -87,8 +88,7 @@ public class PokemonGo {
 
 		LocalPlayerOuterClass.LocalPlayer localPlayer = getLocalPlayer();
 
-		if (localPlayer == null)
-		{
+		if (localPlayer == null) {
 			return null;
 		}
 
@@ -146,7 +146,7 @@ public class PokemonGo {
 			for (InventoryItemOuterClass.InventoryItem item : response.getInventoryDelta().getInventoryItemsList()) {
 
 				if (item.getInventoryItemData().getPokemonData().getPokemonId() != PokemonIdOuterClass.PokemonId.MISSINGNO) {
-					this.pokebank.addPokemon( new Pokemon( item.getInventoryItemData().getPokemonData() ) );
+					pokebank.addPokemon( new Pokemon( item.getInventoryItemData().getPokemonData() ) );
 				}
 
 				if (item.getInventoryItemData().getItem().getItemId() != ItemIdOuterClass.ItemId.ITEM_UNKNOWN) {
@@ -158,29 +158,5 @@ public class PokemonGo {
 		catch(Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	public void setLatitude(double latitude) { this.latitude = latitude; }
-
-	public void setLongitude(double longitude) { this.longitude = longitude; }
-
-	public double getLatitude() { return latitude; }
-
-	public double getLongitude() { return longitude; }
-
-	public RequestHandler getRequestHandler() {
-		return requestHandler;
-	}
-
-	public PokeBank getPokebank() {
-		return pokebank;
-	}
-
-	public void setAltitude(double altitude) {
-		this.altitude = altitude;
-	}
-
-	public double getAltitude() {
-		return altitude;
 	}
 }
