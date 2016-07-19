@@ -1,4 +1,4 @@
-package com.pokegoapi.api;
+package com.pokegoapi.api.player;
 
 public class DailyBonus {
 	private long nextCollectionTimestamp;

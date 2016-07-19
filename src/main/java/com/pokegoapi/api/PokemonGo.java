@@ -1,6 +1,7 @@
 package com.pokegoapi.api;
 
 
+import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
 import POGOProtos.LocalPlayerOuterClass;
 import POGOProtos.Networking.EnvelopesOuterClass;
@@ -13,10 +14,11 @@ import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResp
 import POGOProtos.Player.CurrencyOuterClass;
 import com.pokegoapi.api.inventory.PokeBank;
 import com.pokegoapi.api.inventory.Pokemon;
+import com.pokegoapi.api.map.Map;
+import com.pokegoapi.api.player.*;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.requests.GetMapObjectsRequest;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass;
 import okhttp3.OkHttpClient;
 
@@ -27,6 +29,7 @@ public class PokemonGo {
 	RequestHandler requestHandler;
 	private PlayerProfile playerProfile;
 	PokeBank pokebank;
+	Map map;
 	private long lastInventoryUpdate;
 
 	public PokemonGo(EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth, OkHttpClient client) {
@@ -40,7 +43,7 @@ public class PokemonGo {
 		pokebank = new PokeBank(this);
 
 		lastInventoryUpdate = 0;
-		//getInventory();
+		getInventory(); // data will be loaded on constructor and then kept, all future requests will be updates after this call
 	}
 
 	private LocalPlayerOuterClass.LocalPlayer getLocalPlayer() {
@@ -135,9 +138,10 @@ public class PokemonGo {
 
 			for (InventoryItemOuterClass.InventoryItem item : response.getInventoryDelta().getInventoryItemsList()) {
 
-				if (item.getInventoryItemData().getPokemonData() != null)
-				{
-					this.pokebank.addPokemon(new Pokemon(item.getInventoryItemData().getPokemonData()));
+				if (item.getInventoryItemData().getPokemonData().getPokemonId() != PokemonIdOuterClass.PokemonId.MISSINGNO) {
+					Pokemon p = new Pokemon(item.getInventoryItemData().getPokemonData());
+					this.pokebank.addPokemon(p);
+					System.out.println(p.getPokemonId());
 				}
 
 			}
@@ -152,37 +156,9 @@ public class PokemonGo {
 	}
 
 
-	public FortDetails getFortDetails(String id, long lon, long lat) {
 
-		// server request
-		try {
-			FortDetailsMessageOuterClass.FortDetailsMessage reqMsg = FortDetailsMessageOuterClass.FortDetailsMessage.newBuilder()
-					.setFortId(id)
-					.setLatitude(lat)
-					.setLongitude(lon)
-					.build();
 
-			ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS, reqMsg);
-			getRequestHandler().request(serverRequest);
-			getRequestHandler().sendServerRequests();
-			FortDetailsResponseOuterClass.FortDetailsResponse response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(serverRequest.getData());
-			return new FortDetails(response);
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
 
-		return null;
-	}
-
-	public void getMapObjects(List<Long> cellIds, double latitude, double longitude) {
-		/*requestHandler.setLatitude(latitude);
-		requestHandler.setLongitude(longitude);
-		requestHandler.setAltitude(0);
-		GetMapObjectsRequest request = new GetMapObjectsRequest(cellIds, latitude, longitude);
-		requestHandler.addRequest(request);
-		requestHandler.sendRequests();*/
-	}
 
 	public RequestHandler getRequestHandler() {
 		return requestHandler;

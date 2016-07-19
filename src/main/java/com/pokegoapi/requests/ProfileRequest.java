@@ -6,7 +6,7 @@ import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass;
 import POGOProtos.Player.CurrencyOuterClass;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.*;
+import com.pokegoapi.api.player.*;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.main.Request;
 

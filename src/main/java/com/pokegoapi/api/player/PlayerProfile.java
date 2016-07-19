@@ -1,4 +1,4 @@
-package com.pokegoapi.api;
+package com.pokegoapi.api.player;
 
 import POGOProtos.Player.EquippedBadgeOuterClass;
 import com.pokegoapi.exceptions.InvalidCurrencyException;

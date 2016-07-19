@@ -1,6 +1,7 @@
 package com.pokegoapi.api.inventory;
 
 import POGOProtos.Data.PokemonDataOuterClass;
+import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.PokemonMoveOuterClass;
 import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass;
@@ -26,14 +27,16 @@ public class Pokemon {
 		try
 		{
 			ReleasePokemonMessageOuterClass.ReleasePokemonMessage reqMsg = ReleasePokemonMessageOuterClass.ReleasePokemonMessage.newBuilder()
-					.setPokemonId(this.getPokemonId())
+					.setPokemonId(this.getId())
 					.build();
+
+			System.out.println("TRANSFER REQ:" + this.getId() + reqMsg);
 			ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.RELEASE_POKEMON, reqMsg);
 			pgo.getRequestHandler().request(serverRequest);
 			pgo.getRequestHandler().sendServerRequests();
 			ReleasePokemonResponseOuterClass.ReleasePokemonResponse response = ReleasePokemonResponseOuterClass.ReleasePokemonResponse.parseFrom(serverRequest.getData());
 
-
+			System.out.println(response);
 			if (response.getResult().equals(ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result.SUCCESS)) {
 				pgo.getPokebank().removePokemon(this);
 			}
@@ -52,7 +55,7 @@ public class Pokemon {
 		try
 		{
 			EvolvePokemonMessageOuterClass.EvolvePokemonMessage reqMsg = EvolvePokemonMessageOuterClass.EvolvePokemonMessage.newBuilder()
-					.setPokemonId(this.getPokemonId())
+					.setPokemonId(this.getId())
 					.build();
 			ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.EVOLVE_POKEMON, reqMsg);
 			pgo.getRequestHandler().request(serverRequest);
@@ -96,9 +99,7 @@ public class Pokemon {
 		return proto.getId();
 	}
 
-	public int getPokemonId() {
-		return proto.getId();
-	}
+	public PokemonIdOuterClass.PokemonId getPokemonId() { return proto.getPokemonId();	}
 
 	public int getCp() {
 		return proto.getCp();
@@ -200,5 +201,7 @@ public class Pokemon {
 		return proto.getFromFort() > 0;
 	}
 
-
+	public void debug()	{
+		System.out.println(proto);
+	}
 }

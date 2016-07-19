@@ -1,4 +1,4 @@
-package com.pokegoapi.api;
+package com.pokegoapi.api.player;
 
 public enum Team {
 	// VALUES UNCONFIRMED for the two inferior teams (Instinct and Valor)

@@ -27,9 +27,6 @@ public class GoogleLogin extends Login {
 	 * @param String the id_token stored from a previous oauth attempt.
 	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
 	 */
-
-
-
 	public AuthInfo login(String token) {
 		AuthInfo.Builder builder = AuthInfo.newBuilder();
 		builder.setProvider("google");
@@ -48,11 +45,13 @@ public class GoogleLogin extends Login {
 	public AuthInfo login(String username, String password) throws LoginFailedException {
 		try {
 
-			//TODO: This needs to change. Should not be creating a new client every login
-			HttpUrl url = HttpUrl.parse(CLIENT_ID).newBuilder()
+
+			HttpUrl url = HttpUrl.parse(OAUTH_ENDPOINT).newBuilder()
 					.addQueryParameter("client_id", CLIENT_ID)
 					.addQueryParameter("scope", "openid email https://www.googleapis.com/auth/userinfo.email")
 					.build();
+
+
 
 			//Create empty body
 			RequestBody reqBody = RequestBody.create(null, new byte[0]);
