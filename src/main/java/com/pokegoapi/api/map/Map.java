@@ -10,12 +10,18 @@ import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.player.FortDetails;
+import com.pokegoapi.google.common.geometry.MutableInteger;
+import com.pokegoapi.google.common.geometry.S2CellId;
+import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.ServerRequest;
 import java8.util.function.Function;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.pokegoapi.google.common.geometry.S2CellId.MAX_LEVEL;
 
 public class Map {
 	private PokemonGo api;
@@ -24,6 +30,41 @@ public class Map {
 	public Map(PokemonGo api) {
 		this.api = api;
 		lastMapUpdate = 0;
+	}
+
+	public MapObjects getMapObjects(double latitude, double longitude) {
+		return getMapObjects(latitude, longitude, 4);
+	}
+
+	/**
+	 * Returns `width` * `width` cells with the request latitude/longitude in the center
+	 *
+	 * @param latitude
+	 * @param longitude
+	 * @param width
+	 * @return MapObjects in the given cells
+	 */
+	public MapObjects getMapObjects(double latitude, double longitude, int width) {
+		S2LatLng latLng = S2LatLng.fromDegrees(latitude, longitude);
+		S2CellId cellId = S2CellId.fromLatLng(latLng).parent(15);
+
+		MutableInteger i = new MutableInteger(0);
+		MutableInteger j = new MutableInteger(0);
+
+		int level = cellId.level();
+		int size = 1 << (MAX_LEVEL - level);
+		int face = cellId.toFaceIJOrientation(i, j, null);
+
+		List<Long> cells = new ArrayList<Long>();
+
+		int halfWidth = (int) Math.floor(width);
+
+		for (int x = -halfWidth; x <= halfWidth; x++) {
+			for (int y = -halfWidth; y <= halfWidth; y++) {
+				cells.add(cellId.fromFaceIJ(face, i.intValue() + x * size, j.intValue() + y * size).parent(15).id());
+			}
+		}
+		return getMapObjects(cells, latitude, longitude);
 	}
 
 	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude) {
