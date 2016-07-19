@@ -34,6 +34,23 @@ sourceSets {
     }
 }
 
+// Remove all .proto definition from the final build
+processResources {
+    exclude('**/*')
+}
+
+// Run this task to bundle all needed dependency
+task bundle(type: Jar) {
+    baseName = project.name + '_bundle'
+    
+    from {
+    	configurations.compile.collect {
+    		it.isDirectory() && !it.isEmpty() ? it : zipTree(it)
+    	}
+    }
+    with jar
+}
+
 protobuf {
     // Configure the protoc executable
     protoc {
@@ -43,10 +60,10 @@ protobuf {
 }
 
 dependencies {
-    compile group: 'com.google.code.gson', name: 'gson', version:'2.7'
+    compile 'com.google.code.gson:gson:2.7'
     compile 'net.sourceforge.streamsupport:streamsupport:1.5'
     compile 'com.squareup.okhttp3:okhttp:3.4.0-RC1'
-    compile 'com.google.protobuf:protobuf-java:3.0.0-beta-3'
+    compileOnly 'com.google.protobuf:protobuf-java:3.0.0-beta-3'
 }
 
 idea {
