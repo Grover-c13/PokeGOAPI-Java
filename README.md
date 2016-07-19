@@ -16,11 +16,12 @@ ___
 
 # Build
   - Clone the repo and cd into the folder
-  - `` git submodule init ``
-  - `` git submodule update ``
-  - verify that you have the jdk 8 in your path
-  - `` mvn install ``
-  - you should have the api bundled in ``target/pokemongo_api-jar-with-dependencies.jar``
+  - `` git submodule update --init ``
+  - verify that you have gradle in your path
+  - `` gradle build bundle ``
+  - you should have the api bundled in ``build/libs/PokeGOAPI-Java_bundle-0.0.1-SNAPSHOT.jar``
+  
+  PS : To eclipse user, you may build one time and add the generated java class for proto into eclipse path : Right click on the project > Build path > New Source Folder > Type 'build/generated/source/proto/main/java' > Finish
 
 # Usage
 Mostly everything is accessed through the PokemonGo class in the api package.
