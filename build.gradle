@@ -1,0 +1,57 @@
+group = 'com.github.aphoh'
+version = '0.0.1-SNAPSHOT'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.7.7'
+    }
+}
+
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'com.google.protobuf'
+
+description = """Pokemon Go Java API"""
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        proto {
+            // Need to use custom dir cause Gradle doesn't like us otherwise :(
+            srcDir 'src/resources/protobuf/pogo'
+            include '**/*.proto'
+        }
+    }
+}
+
+protobuf {
+    // Configure the protoc executable
+    protoc {
+        // Download from repositories
+        artifact = 'com.google.protobuf:protoc:3.0.0-beta-3'
+    }
+}
+
+dependencies {
+    compile group: 'com.google.protobuf', name: 'protobuf-java', version:'3.0.0-beta-3'
+    compile group: 'com.google.code.gson', name: 'gson', version:'2.7'
+    compile 'io.reactivex:rxjava:1.1.7'
+    compile 'com.squareup.okhttp3:okhttp:3.4.0-RC1'
+    compile 'com.google.protobuf:protobuf-java:3.0.0-beta-3'
+}
+
+idea {
+    module {
+        sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/java");
+    }
+}
