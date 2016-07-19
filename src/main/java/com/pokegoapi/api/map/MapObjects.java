@@ -120,4 +120,8 @@ public class MapObjects {
 		complete = true;
 		this.pokestops.addAll(pokestops);
 	}
+
+	public boolean isComplete() {
+		return complete;
+	}
 }
