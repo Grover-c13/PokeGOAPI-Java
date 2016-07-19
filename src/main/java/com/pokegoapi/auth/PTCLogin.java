@@ -52,15 +52,15 @@ public class PTCLogin extends Login {
 		this.client = client.newBuilder()
 				.cookieJar(tempJar)
 				.addInterceptor(new Interceptor() {
-			        @Override
-			        public Response intercept(Chain chain) throws IOException {
+					@Override
+					public Response intercept(Chain chain) throws IOException {
 						//Makes sure the User-Agent is always set
 						Request req = chain.request();
-                        req = req.newBuilder().header("User-Agent", USER_AGENT).build();
-                        return chain.proceed(req);
-                    }
-		        })
-		        .build();
+						req = req.newBuilder().header("User-Agent", USER_AGENT).build();
+						return chain.proceed(req);
+					}
+				})
+				.build();
 	}
 
 	/**
@@ -166,7 +166,6 @@ public class PTCLogin extends Login {
 
 			return authbuilder.build();
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new LoginFailedException();
 		}
 

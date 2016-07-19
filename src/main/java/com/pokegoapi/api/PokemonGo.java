@@ -62,15 +62,13 @@ public class PokemonGo {
 		getPlayerProfile();
 		// should have proper end point now.
 
-		pokebank = new PokeBank(this);
-		bag = new Bag(this);
 		map = new Map(this);
 		candyjar = new CandyJar(this);
 		lastInventoryUpdate = 0;
 	}
 
-	private PlayerDataOuterClass.PlayerData getLocalPlayerAndInventory() throws LoginFailedException, RemoteServerException {
-		PlayerDataOuterClass.PlayerData localPlayer = null;
+	private PlayerDataOuterClass.PlayerData getPlayerAndUpdateInventory() throws LoginFailedException, RemoteServerException {
+		PlayerDataOuterClass.PlayerData localPlayer;
 
 		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
 		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
@@ -84,26 +82,18 @@ public class PokemonGo {
 
 		getRequestHandler().sendServerRequests();
 
-		GetPlayerResponse getPlayerResponse = null;
+		GetPlayerResponse getPlayerResponse;
+		GetInventoryResponse getInventoryResponse;
 		try {
 			getPlayerResponse = GetPlayerResponse.parseFrom(getPlayerServerRequest.getData());
+			getInventoryResponse = GetInventoryResponse.parseFrom(getInventoryServerRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
-			System.err.println("Should never happen");
+			throw new RemoteServerException(e);
 		}
 		localPlayer = getPlayerResponse.getPlayerData();
 
-		GetInventoryResponse getInventoryResponse = null;
-		try {
-			GetPlayerMessage reqMsg = GetPlayerMessage.newBuilder().build();
-			ServerRequest serverRequest = new ServerRequest(RequestType.GET_PLAYER, reqMsg);
-			getRequestHandler().request(serverRequest);
-			getRequestHandler().sendServerRequests();
-			GetPlayerResponse response = GetPlayerResponse.parseFrom(serverRequest.getData());
-			localPlayer = response.getPlayerData();
-			getInventoryResponse = GetInventoryResponse.parseFrom(getInventoryServerRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			System.err.println("Should never happen");
-		}
+		pokebank = new PokeBank(this);
+		bag = new Bag(this);
 
 		for (InventoryItemOuterClass.InventoryItem item : getInventoryResponse.getInventoryDelta().getInventoryItemsList()) {
 
@@ -127,7 +117,7 @@ public class PokemonGo {
 
 		PlayerDataOuterClass.PlayerData localPlayer = null;
 		try {
-			localPlayer = getLocalPlayerAndInventory();
+			localPlayer = getPlayerAndUpdateInventory();
 		} catch (LoginFailedException | RemoteServerException e) {
 		}
 
@@ -152,7 +142,7 @@ public class PokemonGo {
 			try {
 				playerProfile.addCurrency(currency.getName(), currency.getAmount());
 			} catch (InvalidCurrencyException e) {
-				e.printStackTrace();
+				// silently ignore invalid currencies
 			}
 		}
 

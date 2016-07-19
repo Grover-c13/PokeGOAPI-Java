@@ -4,7 +4,6 @@ import POGOProtos.Networking.Envelopes.AuthTicketOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -66,7 +65,7 @@ public class RequestHandler {
 		try {
 			response = client.newCall(httpRequest).execute();
 		} catch (IOException e) {
-			throw new RemoteServerException("connection blocked");
+			throw new RemoteServerException(e);
 		}
 
 		ResponseEnvelopeOuterClass.ResponseEnvelope responseEnvelop = null;
@@ -77,13 +76,6 @@ public class RequestHandler {
 			throw new RemoteServerException("Received malformed response");
 		}
 
-		if (responseEnvelop.getStatusCode() == 102) {
-			throw new LoginFailedException();
-		} else if (responseEnvelop.getStatusCode() == 53) {
-			// 53 seems to mean handshak'n so need to resend request
-			throw new RemoteServerException("Server error 53");
-		}
-
 		if (responseEnvelop.getApiUrl() != null && responseEnvelop.getApiUrl().length() > 0) {
 			api_endpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
 		}
@@ -92,25 +84,27 @@ public class RequestHandler {
 			lastAuth = responseEnvelop.getAuthTicket();
 		}
 
+		if (responseEnvelop.getStatusCode() == 102) {
+			throw new LoginFailedException();
+		} else if (responseEnvelop.getStatusCode() == 53) {
+			// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
+			sendServerRequests();
+			return;
+		}
+
 		// map each reply to the numeric response, ie first response = first request and send back to the requests to handle.
 		int count = 0;
 		for (ByteString payload : responseEnvelop.getReturnsList()) {
 			ServerRequest serverReq = serverRequests.get(count);
-			try {
-				// TODO: Probably all other payloads are garbage as well in this case, so might as well throw an exception and leave this loop
-				if (payload != null) {
-					serverReq.handleData(payload);
-				}
-			} catch (InvalidProtocolBufferException e) {
-				// should never happen as this function should throw an Exception earlier already
-				System.err.println("ServerRequest handler received garbage data");
+			// TODO: Probably all other payloads are garbage as well in this case, so might as well throw an exception and leave this loop
+			if (payload != null) {
+				serverReq.handleData(payload);
 			}
 			count++;
 		}
 
 		resetBuilder();
 	}
-
 
 	private void resetBuilder() {
 		builder = RequestEnvelopeOuterClass.RequestEnvelope.newBuilder();
