@@ -1,5 +1,6 @@
 package com.pokegoapi.api.inventory;
 
+import POGOProtos.Enums.PokemonIdOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import java8.util.function.Predicate;
 import java8.util.stream.Collectors;
@@ -22,11 +23,11 @@ public class PokeBank {
 		pokemons.add(pokemon);
 	}
 
-	public List<Pokemon> getPokemonByPokemonId(final int id) {
+	public List<Pokemon> getPokemonByPokemonId(final PokemonIdOuterClass.PokemonId id) {
 		return StreamSupport.stream(pokemons).filter(new Predicate<Pokemon>() {
 			@Override
 			public boolean test(Pokemon pokemon) {
-				return pokemon.getId() == id;
+				return pokemon.getPokemonId().equals(id);
 			}
 		}).collect(Collectors.<Pokemon>toList());
 	}
