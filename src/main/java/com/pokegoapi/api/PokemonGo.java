@@ -3,43 +3,53 @@ package com.pokegoapi.api;
 
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.PlayerDataOuterClass;
-import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
 import POGOProtos.Inventory.ItemIdOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
+import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
-import com.pokegoapi.api.inventory.CandyJar;
-import lombok.Getter;
-import lombok.Setter;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.inventory.Bag;
+import com.pokegoapi.api.inventory.CandyJar;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.PokeBank;
-import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.*;
+import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
-import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
+import lombok.Getter;
+import lombok.Setter;
 import okhttp3.OkHttpClient;
 
 public class PokemonGo {
 
-	@Getter RequestHandler requestHandler;
+	@Getter
+	RequestHandler requestHandler;
+	@Getter
+	PokeBank pokebank;
+	@Getter
+	Bag bag;
+	@Getter
+	Map map;
+	@Getter
+	CandyJar candyjar;
 	private PlayerProfile playerProfile;
-	@Getter PokeBank pokebank;
-	@Getter Bag bag;
-	@Getter Map map;
-	@Getter CandyJar candyjar;
-	@Getter @Setter
+	@Getter
+	@Setter
 	private double latitude;
-	@Getter @Setter
+	@Getter
+	@Setter
 	private double longitude;
-	@Getter @Setter
+	@Getter
+	@Setter
 	private double altitude;
 
 	private long lastInventoryUpdate;
@@ -57,13 +67,32 @@ public class PokemonGo {
 		map = new Map(this);
 		candyjar = new CandyJar(this);
 		lastInventoryUpdate = 0;
-		getInventory(); // data will be loaded on constructor and then kept, all future requests will be updates after this call
 	}
 
-	private PlayerDataOuterClass.PlayerData getLocalPlayer() {
+	private PlayerDataOuterClass.PlayerData getLocalPlayerAndInventory() throws LoginFailedException, RemoteServerException {
 		PlayerDataOuterClass.PlayerData localPlayer = null;
 
-		// server request
+		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
+		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
+		getRequestHandler().request(getPlayerServerRequest);
+
+		GetInventoryMessage invReqMsg = GetInventoryMessage.newBuilder()
+				.setLastTimestampMs(this.lastInventoryUpdate)
+				.build();
+		ServerRequest getInventoryServerRequest = new ServerRequest(RequestType.GET_INVENTORY, invReqMsg);
+		getRequestHandler().request(getInventoryServerRequest);
+
+		getRequestHandler().sendServerRequests();
+
+		GetPlayerResponse getPlayerResponse = null;
+		try {
+			getPlayerResponse = GetPlayerResponse.parseFrom(getPlayerServerRequest.getData());
+		} catch (InvalidProtocolBufferException e) {
+			System.err.println("Should never happen");
+		}
+		localPlayer = getPlayerResponse.getPlayerData();
+
+		GetInventoryResponse getInventoryResponse = null;
 		try {
 			GetPlayerMessage reqMsg = GetPlayerMessage.newBuilder().build();
 			ServerRequest serverRequest = new ServerRequest(RequestType.GET_PLAYER, reqMsg);
@@ -71,9 +100,21 @@ public class PokemonGo {
 			getRequestHandler().sendServerRequests();
 			GetPlayerResponse response = GetPlayerResponse.parseFrom(serverRequest.getData());
 			localPlayer = response.getPlayerData();
+			getInventoryResponse = GetInventoryResponse.parseFrom(getInventoryServerRequest.getData());
+		} catch (InvalidProtocolBufferException e) {
+			System.err.println("Should never happen");
 		}
-		catch(Exception e) {
-			e.printStackTrace();
+
+		for (InventoryItemOuterClass.InventoryItem item : getInventoryResponse.getInventoryDelta().getInventoryItemsList()) {
+
+			if (item.getInventoryItemData().getPokemonData().getPokemonId() != PokemonIdOuterClass.PokemonId.MISSINGNO) {
+				pokebank.addPokemon(new Pokemon(item.getInventoryItemData().getPokemonData()));
+			}
+
+			if (item.getInventoryItemData().getItem().getItemId() != ItemIdOuterClass.ItemId.ITEM_UNKNOWN) {
+				bag.addItem(new Item(item.getInventoryItemData().getItem()));
+			}
+
 		}
 
 		return localPlayer;
@@ -84,8 +125,11 @@ public class PokemonGo {
 			return playerProfile;
 		}
 
-
-		PlayerDataOuterClass.PlayerData localPlayer = getLocalPlayer();
+		PlayerDataOuterClass.PlayerData localPlayer = null;
+		try {
+			localPlayer = getLocalPlayerAndInventory();
+		} catch (LoginFailedException | RemoteServerException e) {
+		}
 
 		if (localPlayer == null) {
 			return null;
@@ -131,40 +175,7 @@ public class PokemonGo {
 		return playerProfile;
 	}
 
-	private void getInventory() {
-
-		// server request
-		try {
-			GetInventoryMessage reqMsg = GetInventoryMessage.newBuilder()
-					.setLastTimestampMs(this.lastInventoryUpdate)
-					.build();
-			ServerRequest serverRequest = new ServerRequest(RequestType.GET_INVENTORY, reqMsg);
-			getRequestHandler().request(serverRequest);
-			getRequestHandler().sendServerRequests();
-			GetInventoryResponse response = GetInventoryResponse.parseFrom(serverRequest.getData());
-
-			for (InventoryItemOuterClass.InventoryItem item : response.getInventoryDelta().getInventoryItemsList()) {
-
-				if (item.getInventoryItemData().getPokemonData().getPokemonId() != PokemonIdOuterClass.PokemonId.MISSINGNO) {
-					pokebank.addPokemon( new Pokemon( item.getInventoryItemData().getPokemonData() ) );
-				}
-
-				if (item.getInventoryItemData().getItem().getItemId() != ItemIdOuterClass.ItemId.ITEM_UNKNOWN) {
-					bag.addItem( new Item( item.getInventoryItemData().getItem() ) );
-				}
-
-				if (item.getInventoryItemData().getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED) {
-					candyjar.setCandy(item.getInventoryItemData().getPokemonFamily().getFamilyId(), item.getInventoryItemData().getPokemonFamily().getCandy());
-				}
-
-			}
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void setLocation(double latitude, double longitude, double altitude){
+	public void setLocation(double latitude, double longitude, double altitude) {
 		setLatitude(latitude);
 		setLongitude(longitude);
 		setAltitude(altitude);
