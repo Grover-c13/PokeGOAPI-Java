@@ -33,7 +33,7 @@ public class Map {
 	}
 
 	public MapObjects getMapObjects(double latitude, double longitude) {
-		return getMapObjects(latitude, longitude, 4);
+		return getMapObjects(latitude, longitude, 9);
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class Map {
 
 		List<Long> cells = new ArrayList<Long>();
 
-		int halfWidth = (int) Math.floor(width);
+		int halfWidth = (int) Math.floor(width / 2);
 
 		for (int x = -halfWidth; x <= halfWidth; x++) {
 			for (int y = -halfWidth; y <= halfWidth; y++) {
