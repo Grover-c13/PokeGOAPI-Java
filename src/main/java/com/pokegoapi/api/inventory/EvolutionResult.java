@@ -2,8 +2,8 @@ package com.pokegoapi.api.inventory;
 
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass;
 
-
 public class EvolutionResult {
+	
 	private EvolvePokemonResponseOuterClass.EvolvePokemonResponse proto;
 	private Pokemon pokemon;
 
@@ -28,10 +28,7 @@ public class EvolutionResult {
 		return proto.getCandyAwarded();
 	}
 
-
 	public boolean isSuccessful() {
-		return (this.getResult().equals(EvolvePokemonResponseOuterClass.EvolvePokemonResponse.Result.SUCCESS));
+		return (getResult().equals(EvolvePokemonResponseOuterClass.EvolvePokemonResponse.Result.SUCCESS));
 	}
-
-
 }
