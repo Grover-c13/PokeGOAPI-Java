@@ -1,8 +1,24 @@
 
 # PokeGOAPI-Java
 Pokemon GO Java API
-See this guide for adding functionality: https://docs.google.com/document/d/1BE8O6Z19sQ54T5T7QauXgA11GbL6D9vx9AAMCM5KlRA/edit
-See this spreadsheet for RPC endpoints and progress: https://docs.google.com/spreadsheets/d/1Xv0Gw5PzIRaVou2xrl6r7qySrcmOKjQWLBjJA73YnJM/edit#gid=0
+
+See this guide for adding functionality: 
+   https://docs.google.com/document/d/1BE8O6Z19sQ54T5T7QauXgA11GbL6D9vx9AAMCM5KlRA
+
+See this spreadsheet for RPC endpoints and progress :
+   https://docs.google.com/spreadsheets/d/1Xv0Gw5PzIRaVou2xrl6r7qySrcmOKjQWLBjJA73YnJM
+
+___
+:exclamation: This api is unstable as the backend pogo server are, so if you just want to use it, wait some days that we get stuff working great before complaining about the api isnt working ;) :exclamation:
+___
+
+# Build
+  - Clone the repo and cd into the folder
+  - `` git submodule init ``
+  - `` git submodule update ``
+  - verify that you have the jdk 8 in your path
+  - `` mvn install ``
+  - you should have the api bundled in ``target/pokemongo_api-jar-with-dependencies.jar``
 
 # Usage
 Mostly everything is accessed through the PokemonGo class in the api package.
@@ -16,13 +32,17 @@ System.out.println(go.getPlayerProfile());
 ```
 
 ## Contributing
-1. Fork it!
-2. Create your feature branch: `git checkout -b my-new-feature`
-3. Commit your changes: `git commit -am 'Add some feature'`
-4. Push to the branch: `git push origin my-new-feature`
-5. Submit a pull request :D
+  - Fork it!
+  - Create your feature branch: `git checkout -b my-new-feature`
+  - Commit your changes: `git commit -am 'Usefull information about your new features'`
+  - Push to the branch: `git push origin my-new-feature`
+  - Submit a pull request :D
 
-## Credits
-Grover-c13
+## Contributors
+  - Grover-c13
+  - jabbink
+  - zeladada
+  - darakath
+  - vmarchaud
 
-zeladada
+You can join us in the slack channel #javaapi on the pkre.slack.com (you should get an invite by a bot posted somewhere in the subreddit /r/pokemongodev)
