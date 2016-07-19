@@ -1,5 +1,7 @@
 package com.pokegoapi.api.map;
 
+import POGOProtos.Map.Fort.FortDataOuterClass;
+import POGOProtos.Map.Fort.FortTypeOuterClass;
 import POGOProtos.Map.MapCellOuterClass;
 import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass;
@@ -9,6 +11,10 @@ import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.player.FortDetails;
 import com.pokegoapi.main.ServerRequest;
+import java8.util.function.Function;
+import java8.util.function.Predicate;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
 
 import java.util.List;
 
@@ -40,7 +46,7 @@ public class Map {
 			ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS, builder.build());
 			api.getRequestHandler().request(serverRequest);
 			api.getRequestHandler().sendServerRequests();
-			GetMapObjectsResponseOuterClass.GetMapObjectsResponse response = GetMapObjectsResponseOuterClass.GetMapObjectsResponse.parseFrom(serverRequest.getData());
+			final GetMapObjectsResponseOuterClass.GetMapObjectsResponse response = GetMapObjectsResponseOuterClass.GetMapObjectsResponse.parseFrom(serverRequest.getData());
 
 
 
@@ -51,13 +57,26 @@ public class Map {
 				result.addWildPokemons(mapCell.getWildPokemonsList());
 				result.addDecimatedSpawnPoints(mapCell.getDecimatedSpawnPointsList());
 				result.addSpawnPoints(mapCell.getSpawnPointsList());
-				//Map<FortTypeOuterClass.FortType, List<FortDataOuterClass.FortData>> groupedForts
-				//		= mapCell.getFortsList().stream().collect(Collectors.groupingBy(FortDataOuterClass.FortData::getType));
-				//result.addGyms(groupedForts.get(FortTypeOuterClass.FortType.GYM));
-				//result.addPokestops(groupedForts.get(FortTypeOuterClass.FortType.CHECKPOINT));
+				java.util.Map<FortTypeOuterClass.FortType, List<FortDataOuterClass.FortData>> groupedForts = StreamSupport.stream(mapCell.getFortsList())
+						.collect(Collectors.groupingBy(new Function<FortDataOuterClass.FortData, FortTypeOuterClass.FortType>() {
+							@Override
+							public FortTypeOuterClass.FortType apply(FortDataOuterClass.FortData fortData) {
+								return fortData.getType();
+							}
+						}));
+
+				result.addGyms(groupedForts.get(FortTypeOuterClass.FortType.GYM));
+
+				result.addGyms(groupedForts.get(FortTypeOuterClass.FortType.GYM));
+				result.addPokestops(groupedForts.get(FortTypeOuterClass.FortType.CHECKPOINT));
 			}
-			//List<Long> missedCells = requestedCells.stream().filter(cellId -> !output.getMapCellsList().contains(cellId)).collect(Collectors.toList());
-			//result.setMissedCells(missedCells);
+			List<Long> missedCells = StreamSupport.stream(cellIds).filter(new Predicate<Long>() {
+				@Override
+				public boolean test(Long cellId) {
+					return !response.getMapCellsList().contains(cellId);
+				}
+			}).collect(Collectors.<Long>toList());
+			result.setMissedCells(missedCells);
 		}
 		catch(Exception e) {
 			e.printStackTrace();
