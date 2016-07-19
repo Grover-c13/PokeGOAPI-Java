@@ -1,6 +1,8 @@
 package com.pokegoapi.requests;
 
 import POGOProtos.Map.Fort.FortDataOuterClass;
+import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
+import POGOProtos.Map.Fort.FortTypeOuterClass;
 import POGOProtos.Map.MapCellOuterClass;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
@@ -11,12 +13,17 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.main.Request;
+import java8.util.function.Function;
+import java8.util.function.Predicate;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
-public class GetMapObjectsRequest  {
+import static POGOProtos.Map.Fort.FortTypeOuterClass.*;
+
+public class GetMapObjectsRequest extends Request{
 	private final List<Long> requestedCells;
 	private GetMapObjectsMessageOuterClass.GetMapObjectsMessage.Builder builder;
 	private GetMapObjectsResponseOuterClass.GetMapObjectsResponse output;
@@ -60,13 +67,26 @@ public class GetMapObjectsRequest  {
 			result.addWildPokemons(mapCell.getWildPokemonsList());
 			result.addDecimatedSpawnPoints(mapCell.getDecimatedSpawnPointsList());
 			result.addSpawnPoints(mapCell.getSpawnPointsList());
-			//Map<FortTypeOuterClass.FortType, List<FortDataOuterClass.FortData>> groupedForts
-			//		= mapCell.getFortsList().stream().collect(Collectors.groupingBy(FortDataOuterClass.FortData::getType));
-			//result.addGyms(groupedForts.get(FortTypeOuterClass.FortType.GYM));
-			//result.addPokestops(groupedForts.get(FortTypeOuterClass.FortType.CHECKPOINT));
+			Map<FortType, List<FortData>> groupedForts = StreamSupport.stream(mapCell.getFortsList())
+					.collect(Collectors.groupingBy(new Function<FortData, FortType>() {
+						@Override
+						public FortType apply(FortData fortData) {
+							return fortData.getType();
+						}
+					}));
+
+			result.addGyms(groupedForts.get(FortType.GYM));
+
+			result.addGyms(groupedForts.get(FortTypeOuterClass.FortType.GYM));
+			result.addPokestops(groupedForts.get(FortTypeOuterClass.FortType.CHECKPOINT));
 		}
-		//List<Long> missedCells = requestedCells.stream().filter(cellId -> !output.getMapCellsList().contains(cellId)).collect(Collectors.toList());
-		//result.setMissedCells(missedCells);
+		List<Long> missedCells = StreamSupport.stream(requestedCells).filter(new Predicate<Long>() {
+			@Override
+			public boolean test(Long cellId) {
+				return !output.getMapCellsList().contains(cellId);
+			}
+		}).collect(Collectors.<Long>toList());
+		result.setMissedCells(missedCells);
 		return result;
 	}
 
@@ -76,8 +96,8 @@ public class GetMapObjectsRequest  {
 		private Collection<WildPokemonOuterClass.WildPokemon> wildPokemons = new ArrayList<WildPokemonOuterClass.WildPokemon>();
 		private Collection<SpawnPointOuterClass.SpawnPoint> decimatedSpawnPoints = new ArrayList<SpawnPointOuterClass.SpawnPoint>();
 		private Collection<SpawnPointOuterClass.SpawnPoint> spawnPoints = new ArrayList<SpawnPointOuterClass.SpawnPoint>();
-		private Collection<FortDataOuterClass.FortData> gyms = new ArrayList<FortDataOuterClass.FortData>();
-		private Collection<FortDataOuterClass.FortData> pokestops = new ArrayList<FortDataOuterClass.FortData>();
+		private Collection<FortData> gyms = new ArrayList<FortData>();
+		private Collection<FortData> pokestops = new ArrayList<FortData>();
 		private Collection<Long> missedCells;
 
 		public Collection<NearbyPokemonOuterClass.NearbyPokemon> getNearbyPokemons() {
@@ -100,11 +120,11 @@ public class GetMapObjectsRequest  {
 			return spawnPoints;
 		}
 
-		public Collection<FortDataOuterClass.FortData> getGyms() {
+		public Collection<FortData> getGyms() {
 			return gyms;
 		}
 
-		public Collection<FortDataOuterClass.FortData> getPokestops() {
+		public Collection<FortData> getPokestops() {
 			return pokestops;
 		}
 
@@ -158,14 +178,14 @@ public class GetMapObjectsRequest  {
 			this.spawnPoints.addAll(spawnPoints);
 		}
 
-		public void addGyms(Collection<FortDataOuterClass.FortData> gyms) {
+		public void addGyms(Collection<FortData> gyms) {
 			if (gyms == null) {
 				return;
 			}
 			this.gyms.addAll(gyms);
 		}
 
-		public void addPokestops(Collection<FortDataOuterClass.FortData> pokestops) {
+		public void addPokestops(Collection<FortData> pokestops) {
 			if (pokestops == null) {
 				return;
 			}
