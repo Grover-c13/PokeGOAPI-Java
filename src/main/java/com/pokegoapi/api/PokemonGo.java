@@ -28,11 +28,14 @@ import java.util.List;
 
 public class PokemonGo {
 
-	RequestHandler requestHandler;
+	private RequestHandler requestHandler;
 	private PlayerProfile playerProfile;
-	PokeBank pokebank;
-	Bag bag;
-	Map map;
+	private PokeBank pokebank;
+	private Bag bag;
+	private Map map;
+	private double latitude;
+	private double longitude;
+
 	private long lastInventoryUpdate;
 
 	public PokemonGo(EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth, OkHttpClient client) {
@@ -45,6 +48,7 @@ public class PokemonGo {
 
 		pokebank = new PokeBank(this);
 		bag = new Bag(this);
+		map = new Map(this);
 		lastInventoryUpdate = 0;
 		getInventory(); // data will be loaded on constructor and then kept, all future requests will be updates after this call
 	}
@@ -66,6 +70,10 @@ public class PokemonGo {
 		}
 
 		return localPlayer;
+	}
+
+	public Map getMap() {
+		return map;
 	}
 
 	public PlayerProfile getPlayerProfile() {
@@ -160,10 +168,13 @@ public class PokemonGo {
 
 	}
 
+	public void setLatitude(double latitude) { this.latitude = latitude; }
 
+	public void setLongitude(double latitude) { this.longitude = longitude; }
 
+	public double getLatitude() { return latitude; }
 
-
+	public double getLongitude() { return longitude; }
 
 	public RequestHandler getRequestHandler() {
 		return requestHandler;
