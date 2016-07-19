@@ -1,4 +1,4 @@
-package com.pokegoapi.api.player;
+package com.pokegoapi.api.map.fort;
 
 import POGOProtos.Enums.TeamColorOuterClass;
 import POGOProtos.Map.Fort.FortModifierOuterClass;

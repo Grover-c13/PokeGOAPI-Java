@@ -3,13 +3,19 @@ package com.pokegoapi.api.map;
 import POGOProtos.Map.Fort.FortDataOuterClass;
 import POGOProtos.Map.Fort.FortTypeOuterClass;
 import POGOProtos.Map.MapCellOuterClass;
+import POGOProtos.Map.Pokemon.MapPokemonOuterClass;
+import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass;
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
+import POGOProtos.Networking.Responses.FortSearchResponseOuterClass;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.player.FortDetails;
+import com.pokegoapi.api.map.fort.FortDetails;
 import com.pokegoapi.google.common.geometry.MutableInteger;
 import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
@@ -162,5 +168,47 @@ public class Map {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	public FortSearchResponseOuterClass.FortSearchResponse searchFort(FortDataOuterClass.FortData fortData) {
+		FortSearchMessageOuterClass.FortSearchMessage reqMsg = FortSearchMessageOuterClass.FortSearchMessage.newBuilder()
+				.setFortId(fortData.getId())
+				.setFortLatitude(fortData.getLatitude())
+				.setFortLongitude(fortData.getLongitude())
+				.setPlayerLatitude(api.getLatitude())
+				.setPlayerLongitude(api.getLongitude())
+				.build();
+		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH, reqMsg);
+		api.getRequestHandler().request(serverRequest);
+		api.getRequestHandler().sendServerRequests();
+		FortSearchResponseOuterClass.FortSearchResponse response = null;
+		try {
+			response = FortSearchResponseOuterClass.FortSearchResponse.parseFrom(serverRequest.getData());
+		} catch (InvalidProtocolBufferException e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	public CatchPokemonResponseOuterClass.CatchPokemonResponse catchPokemon(MapPokemonOuterClass.MapPokemon catchablePokemon, double normalizedHitPosition, double normalizedReticleSize, double spinModifier, int pokeball) {
+		CatchPokemonMessageOuterClass.CatchPokemonMessage reqMsg = CatchPokemonMessageOuterClass.CatchPokemonMessage.newBuilder()
+				.setEncounterId(catchablePokemon.getEncounterId())
+				.setHitPokemon(true)
+				.setNormalizedHitPosition(normalizedHitPosition)
+				.setNormalizedReticleSize(normalizedReticleSize)
+				.setSpawnPointGuid(catchablePokemon.getSpawnpointId())
+				.setSpinModifier(spinModifier)
+				.setPokeball(pokeball)
+				.build();
+		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.CATCH_POKEMON, reqMsg);
+		api.getRequestHandler().request(serverRequest);
+		api.getRequestHandler().sendServerRequests();
+		CatchPokemonResponseOuterClass.CatchPokemonResponse response = null;
+		try {
+			response = CatchPokemonResponseOuterClass.CatchPokemonResponse.parseFrom(serverRequest.getData());
+		} catch (InvalidProtocolBufferException e) {
+			e.printStackTrace();
+		}
+		return response;
 	}
 }
