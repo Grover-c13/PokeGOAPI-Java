@@ -3,15 +3,17 @@ package com.pokegoapi.api;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
+import POGOProtos.Inventory.ItemIdOuterClass;
 import POGOProtos.LocalPlayerOuterClass;
 import POGOProtos.Networking.EnvelopesOuterClass;
-import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
-import POGOProtos.Player.CurrencyOuterClass;
+import POGOProtos.Player.CurrencyOuterClass.Currency;
+import POGOProtos.Inventory.ItemIdOuterClass.ItemId;
+import com.pokegoapi.api.inventory.Bag;
+import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.PokeBank;
 import com.pokegoapi.api.inventory.Pokemon;
 import com.pokegoapi.api.map.Map;
@@ -19,7 +21,7 @@ import com.pokegoapi.api.player.*;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
-import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
 import okhttp3.OkHttpClient;
 
 import java.util.List;
@@ -29,6 +31,7 @@ public class PokemonGo {
 	RequestHandler requestHandler;
 	private PlayerProfile playerProfile;
 	PokeBank pokebank;
+	Bag bag;
 	Map map;
 	private long lastInventoryUpdate;
 
@@ -41,7 +44,7 @@ public class PokemonGo {
 		// should have proper end point now.
 
 		pokebank = new PokeBank(this);
-
+		bag = new Bag(this);
 		lastInventoryUpdate = 0;
 		getInventory(); // data will be loaded on constructor and then kept, all future requests will be updates after this call
 	}
@@ -51,8 +54,8 @@ public class PokemonGo {
 
 		// server request
 		try {
-			GetPlayerMessageOuterClass.GetPlayerMessage reqMsg = GetPlayerMessageOuterClass.GetPlayerMessage.newBuilder().build();
-			ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.GET_PLAYER, reqMsg);
+			GetPlayerMessage reqMsg = GetPlayerMessage.newBuilder().build();
+			ServerRequest serverRequest = new ServerRequest(RequestType.GET_PLAYER, reqMsg);
 			getRequestHandler().request(serverRequest);
 			getRequestHandler().sendServerRequests();
 			GetPlayerResponse response = GetPlayerResponse.parseFrom(serverRequest.getData());
@@ -94,7 +97,7 @@ public class PokemonGo {
 		ContactSettings contactAPI = new ContactSettings();
 
 		// maybe something more graceful?
-		for (CurrencyOuterClass.Currency currency : localPlayer.getCurrenciesList()) {
+		for (Currency currency : localPlayer.getCurrenciesList()) {
 			try {
 				playerProfile.addCurrency(currency.getName(), currency.getAmount());
 			} catch (InvalidCurrencyException e) {
@@ -128,20 +131,22 @@ public class PokemonGo {
 
 		// server request
 		try {
-			GetInventoryMessageOuterClass.GetInventoryMessage reqMsg = GetInventoryMessageOuterClass.GetInventoryMessage.newBuilder()
+			GetInventoryMessage reqMsg = GetInventoryMessage.newBuilder()
 					.setLastTimestampMs(this.lastInventoryUpdate)
 					.build();
-			ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY, reqMsg);
+			ServerRequest serverRequest = new ServerRequest(RequestType.GET_INVENTORY, reqMsg);
 			getRequestHandler().request(serverRequest);
 			getRequestHandler().sendServerRequests();
-			GetInventoryResponseOuterClass.GetInventoryResponse response = GetInventoryResponseOuterClass.GetInventoryResponse.parseFrom(serverRequest.getData());
+			GetInventoryResponse response = GetInventoryResponse.parseFrom(serverRequest.getData());
 
 			for (InventoryItemOuterClass.InventoryItem item : response.getInventoryDelta().getInventoryItemsList()) {
 
 				if (item.getInventoryItemData().getPokemonData().getPokemonId() != PokemonIdOuterClass.PokemonId.MISSINGNO) {
-					Pokemon p = new Pokemon(item.getInventoryItemData().getPokemonData());
-					this.pokebank.addPokemon(p);
-					System.out.println(p.getPokemonId());
+					this.pokebank.addPokemon( new Pokemon( item.getInventoryItemData().getPokemonData() ) );
+				}
+
+				if (item.getInventoryItemData().getItem().getItemId() != ItemIdOuterClass.ItemId.ITEM_UNKNOWN) {
+					bag.addItem( new Item( item.getInventoryItemData().getItem() ) );
 				}
 
 			}

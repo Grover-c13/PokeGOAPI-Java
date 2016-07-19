@@ -1,43 +1,47 @@
 package com.pokegoapi.api.inventory;
 
-import POGOProtos.Data.PokemonDataOuterClass;
+import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.PokemonMoveOuterClass;
-import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.EvolvePokemonMessage;
+import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass;
-import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
+import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass.EvolvePokemonResponse;
+import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
+import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.main.ServerRequest;
+
 
 public class Pokemon {
 
 	PokemonGo pgo;
-	private PokemonDataOuterClass.PokemonData proto;
+	private PokemonData proto;
 
 	// API METHODS //
 
 	// DELEGATE METHODS BELOW //
-	public Pokemon(PokemonDataOuterClass.PokemonData proto) {
+	public Pokemon(PokemonData proto) {
 		this.proto = proto;
 	}
 
-	public ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result transferPokemon() {
+	public Result transferPokemon() {
 		try
 		{
-			ReleasePokemonMessageOuterClass.ReleasePokemonMessage reqMsg = ReleasePokemonMessageOuterClass.ReleasePokemonMessage.newBuilder()
+			ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder()
 					.setPokemonId(this.getId())
 					.build();
 
-			System.out.println("TRANSFER REQ:" + this.getId() + reqMsg);
-			ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.RELEASE_POKEMON, reqMsg);
+
+			ServerRequest serverRequest = new ServerRequest(RequestType.RELEASE_POKEMON, reqMsg);
 			pgo.getRequestHandler().request(serverRequest);
 			pgo.getRequestHandler().sendServerRequests();
-			ReleasePokemonResponseOuterClass.ReleasePokemonResponse response = ReleasePokemonResponseOuterClass.ReleasePokemonResponse.parseFrom(serverRequest.getData());
+
+			ReleasePokemonResponse response = ReleasePokemonResponse.parseFrom(serverRequest.getData());
 
 			System.out.println(response);
-			if (response.getResult().equals(ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result.SUCCESS)) {
+			if (response.getResult().equals(Result.SUCCESS)) {
 				pgo.getPokebank().removePokemon(this);
 			}
 
@@ -48,19 +52,19 @@ public class Pokemon {
 			e.printStackTrace();
 		}
 
-		return ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result.FAILED;
+		return ReleasePokemonResponse.Result.FAILED;
 	}
 
 	public EvolutionResult evolve() {
 		try
 		{
-			EvolvePokemonMessageOuterClass.EvolvePokemonMessage reqMsg = EvolvePokemonMessageOuterClass.EvolvePokemonMessage.newBuilder()
+			EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder()
 					.setPokemonId(this.getId())
 					.build();
-			ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.EVOLVE_POKEMON, reqMsg);
+			ServerRequest serverRequest = new ServerRequest(RequestType.EVOLVE_POKEMON, reqMsg);
 			pgo.getRequestHandler().request(serverRequest);
 			pgo.getRequestHandler().sendServerRequests();
-			EvolvePokemonResponseOuterClass.EvolvePokemonResponse response = EvolvePokemonResponseOuterClass.EvolvePokemonResponse.parseFrom(serverRequest.getData());
+			EvolvePokemonResponse response = EvolvePokemonResponseOuterClass.EvolvePokemonResponse.parseFrom(serverRequest.getData());
 
 
 			EvolutionResult result = new EvolutionResult(response);
@@ -91,7 +95,7 @@ public class Pokemon {
 	}
 
 
-	public PokemonDataOuterClass.PokemonData getDefaultInstanceForType() {
+	public PokemonData getDefaultInstanceForType() {
 		return proto.getDefaultInstanceForType();
 	}
 
