@@ -96,6 +96,7 @@ public class Map {
 	 * @param longitude
 	 * @return MapObjects in the given cells
 	 */
+	@Deprecated
 	public MapObjects getMapObjects(double latitude, double longitude) throws LoginFailedException, RemoteServerException {
 		return getMapObjects(latitude, longitude, 9);
 	}
@@ -108,6 +109,7 @@ public class Map {
 	 * @param longitude
 	 * @return MapObjects in the given cells
 	 */
+	@Deprecated
 	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude) throws LoginFailedException, RemoteServerException {
 		return getMapObjects(cellIds, latitude, longitude, 0);
 	}
@@ -120,9 +122,26 @@ public class Map {
 	 * @param width
 	 * @return MapObjects in the given cells
 	 */
+	@Deprecated
 	public MapObjects getMapObjects(double latitude, double longitude, int width) throws LoginFailedException, RemoteServerException {
 		return getMapObjects(getCellIds(latitude, longitude, width), latitude, longitude);
 	}
+
+    /**
+     * Returns the cells requested
+     *
+     * @param cellIds
+     * @param latitude
+     * @param longitude
+     * @return MapObjects in the given cells
+     */
+    @Deprecated
+    public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude, double altitude) throws LoginFailedException, RemoteServerException {
+        api.setLatitude(latitude);
+        api.setLongitude(longitude);
+        api.setAltitude(altitude);
+        return getMapObjects(cellIds);
+    }
 
 	/**
 	 * Returns the cells requested
@@ -130,10 +149,10 @@ public class Map {
 	 * @param cellIds List<Long> of cellId
 	 * @return MapObjects in the given cells
 	 */
-	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude, double altitude) throws LoginFailedException, RemoteServerException {
+	public MapObjects getMapObjects(List<Long> cellIds) throws LoginFailedException, RemoteServerException {
 		GetMapObjectsMessageOuterClass.GetMapObjectsMessage.Builder builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder()
-				.setLatitude(latitude)
-				.setLongitude(longitude);
+				.setLatitude(api.getLatitude())
+				.setLongitude(api.getLongitude());
 
 		int i = 0;
 		for (Long cellId : cellIds) {
