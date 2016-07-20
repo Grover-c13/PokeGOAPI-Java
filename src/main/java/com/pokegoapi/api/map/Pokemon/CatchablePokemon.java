@@ -60,7 +60,6 @@ public class CatchablePokemon {
 		{
 			CatchPokemonResponse result = map.catchPokemon(proto, 1.0, 1.95 + Math.random() * 0.05, 0.85 + Math.random() * 0.15, balltype.ordinal());
 			cresult = new CatchResult(result);
-			System.out.println(cresult);
 		}
 		cresult = new CatchResult();
 		cresult.setFailed(true);
