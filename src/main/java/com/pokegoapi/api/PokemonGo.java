@@ -7,19 +7,16 @@ import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
 import POGOProtos.Inventory.ItemIdOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
-import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
 import lombok.Getter;
 import lombok.Setter;
-import POGOProtos.Inventory.ItemIdOuterClass.ItemId;
 import com.pokegoapi.api.inventory.Bag;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.PokeBank;
-import com.pokegoapi.api.inventory.Pokemon;
+import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.*;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
@@ -27,8 +24,6 @@ import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
 import okhttp3.OkHttpClient;
-
-import java.util.List;
 
 public class PokemonGo {
 

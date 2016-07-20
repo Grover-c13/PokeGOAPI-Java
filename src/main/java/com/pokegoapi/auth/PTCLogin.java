@@ -4,6 +4,7 @@ import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.pokegoapi.exceptions.LoginFailedException;
+import lombok.Getter;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -24,6 +25,8 @@ public class PTCLogin extends Login {
 	public static final String USER_AGENT = "niantic";
 
 	private final OkHttpClient client;
+	@Getter
+	String token;
 
 	public PTCLogin(OkHttpClient client) {
 		  /*

@@ -1,6 +1,8 @@
-package com.pokegoapi.api.inventory;
+package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
+import POGOProtos.Enums.PokemonFamilyIdOuterClass;
+import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.PokemonMoveOuterClass;
 import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.EvolvePokemonMessage;
@@ -10,6 +12,7 @@ import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass;
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass.EvolvePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
+import com.pokegoapi.api.inventory.EvolutionResult;
 import lombok.Setter;
 
 import com.pokegoapi.api.PokemonGo;
@@ -76,6 +79,10 @@ public class Pokemon {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	public PokemonFamilyId getPokemonFamily() {
+		return PokemonFamilyMap.getFamily(this.getPokemonId());
 	}
 
 	public boolean equals(Pokemon other) {

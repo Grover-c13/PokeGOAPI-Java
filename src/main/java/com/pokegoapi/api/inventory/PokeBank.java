@@ -2,6 +2,7 @@ package com.pokegoapi.api.inventory;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.pokemon.Pokemon;
 import java8.util.function.Predicate;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
