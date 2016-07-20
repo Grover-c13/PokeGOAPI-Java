@@ -1,17 +1,19 @@
 package com.pokegoapi.api.map;
 
+import POGOProtos.Inventory.ItemIdOuterClass;
 import POGOProtos.Map.Fort.FortDataOuterClass;
 import POGOProtos.Map.Fort.FortTypeOuterClass;
 import POGOProtos.Map.MapCellOuterClass;
-import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass;
+import POGOProtos.Map.Pokemon.MapPokemonOuterClass;
+import POGOProtos.Networking.Requests.Messages.*;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
-import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
+import POGOProtos.Networking.Responses.*;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.map.fort.FortDetails;
+import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.google.common.geometry.MutableInteger;
-import com.pokegoapi.google.common.geometry.S2Cell;
 import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.ServerRequest;
@@ -33,57 +35,59 @@ public class Map {
 		lastMapUpdate = 0;
 	}
 
-    /**
-     * Returns MapObjects around your current location
-     * @return MapObjects at your current location
-     */
-    public MapObjects getMapObjects(){
-        return getMapObjects(9);
-    }
+	/**
+	 * Returns MapObjects around your current location
+	 *
+	 * @return MapObjects at your current location
+	 */
+	public MapObjects getMapObjects() {
+		return getMapObjects(9);
+	}
 
-    /**
-     * Returns MapObjects around your current location within a given width
-     * @param width
-     * @return MapObjects at your current location
-     */
-    public MapObjects getMapObjects(int width){
-        return getMapObjects(getCellIds(api.getLatitude(), api.getLongitude(), width), api.getLatitude(), api.getLongitude(), api.getAltitude());
-    }
+	/**
+	 * Returns MapObjects around your current location within a given width
+	 *
+	 * @param width
+	 * @return MapObjects at your current location
+	 */
+	public MapObjects getMapObjects(int width) {
+		return getMapObjects(getCellIds(api.getLatitude(), api.getLongitude(), width), api.getLatitude(), api.getLongitude(), api.getAltitude());
+	}
 
-    /**
-     * Returns 9x9 cells with the requested lattitude/longitude in the center cell
-     *
-     * @param latitude
-     * @param longitude
-     * @return MapObjects in the given cells
-     */
-    public MapObjects getMapObjects(double latitude, double longitude) {
-        return getMapObjects(latitude, longitude, 9);
-    }
+	/**
+	 * Returns 9x9 cells with the requested lattitude/longitude in the center cell
+	 *
+	 * @param latitude
+	 * @param longitude
+	 * @return MapObjects in the given cells
+	 */
+	public MapObjects getMapObjects(double latitude, double longitude) {
+		return getMapObjects(latitude, longitude, 9);
+	}
 
-    /**
-     * Returns the cells requested, you should send a latitude/longitude to fake a near location
-     *
-     * @param cellIds List<Long> of cellId
-     * @param latitude
-     * @param longitude
-     * @return MapObjects in the given cells
-     */
-    public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude) {
-        return getMapObjects(cellIds, latitude, longitude, 0);
-    }
+	/**
+	 * Returns the cells requested, you should send a latitude/longitude to fake a near location
+	 *
+	 * @param cellIds   List<Long> of cellId
+	 * @param latitude
+	 * @param longitude
+	 * @return MapObjects in the given cells
+	 */
+	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude) {
+		return getMapObjects(cellIds, latitude, longitude, 0);
+	}
 
-    /**
-     * Returns `width` * `width` cells with the requested latitude/longitude in the center
-     *
-     * @param latitude
-     * @param longitude
-     * @param width
-     * @return MapObjects in the given cells
-     */
-    public MapObjects getMapObjects(double latitude, double longitude, int width) {
-        return getMapObjects(getCellIds(latitude, longitude, width), latitude, longitude);
-    }
+	/**
+	 * Returns `width` * `width` cells with the requested latitude/longitude in the center
+	 *
+	 * @param latitude
+	 * @param longitude
+	 * @param width
+	 * @return MapObjects in the given cells
+	 */
+	public MapObjects getMapObjects(double latitude, double longitude, int width) {
+		return getMapObjects(getCellIds(latitude, longitude, width), latitude, longitude);
+	}
 
 	/**
 	 * Returns the cells requested
@@ -137,52 +141,114 @@ public class Map {
 		return result;
 	}
 
-    /**
-     * Get a list of all the Cell Ids
-     * @param latitude
-     * @param longitude
-     * @param width
-     * @return List of Cells
-     */
-    public List<Long> getCellIds(double latitude, double longitude, int width){
-        S2LatLng latLng = S2LatLng.fromDegrees(latitude, longitude);
-        S2CellId cellId = S2CellId.fromLatLng(latLng).parent(15);
+	/**
+	 * Get a list of all the Cell Ids
+	 *
+	 * @param latitude
+	 * @param longitude
+	 * @param width
+	 * @return List of Cells
+	 */
+	public List<Long> getCellIds(double latitude, double longitude, int width) {
+		S2LatLng latLng = S2LatLng.fromDegrees(latitude, longitude);
+		S2CellId cellId = S2CellId.fromLatLng(latLng).parent(15);
 
-        MutableInteger i = new MutableInteger(0);
-        MutableInteger j = new MutableInteger(0);
+		MutableInteger i = new MutableInteger(0);
+		MutableInteger j = new MutableInteger(0);
 
-        int level = cellId.level();
-        int size = 1 << (MAX_LEVEL - level);
-        int face = cellId.toFaceIJOrientation(i, j, null);
+		int level = cellId.level();
+		int size = 1 << (MAX_LEVEL - level);
+		int face = cellId.toFaceIJOrientation(i, j, null);
 
-        List<Long> cells = new ArrayList<Long>();
+		List<Long> cells = new ArrayList<Long>();
 
-        int halfWidth = (int) Math.floor(width / 2);
-        for (int x = -halfWidth; x <= halfWidth; x++) {
-            for (int y = -halfWidth; y <= halfWidth; y++) {
-                cells.add(cellId.fromFaceIJ(face, i.intValue() + x * size, j.intValue() + y * size).parent(15).id());
-            }
-        }
-        return cells;
-    }
+		int halfWidth = (int) Math.floor(width / 2);
+		for (int x = -halfWidth; x <= halfWidth; x++) {
+			for (int y = -halfWidth; y <= halfWidth; y++) {
+				cells.add(cellId.fromFaceIJ(face, i.intValue() + x * size, j.intValue() + y * size).parent(15).id());
+			}
+		}
+		return cells;
+	}
 
-    public FortDetails getFortDetails(String id, long lon, long lat) {
-        // server request
-        try {
-            FortDetailsMessageOuterClass.FortDetailsMessage reqMsg = FortDetailsMessageOuterClass.FortDetailsMessage.newBuilder()
-                    .setFortId(id)
-                    .setLatitude(lat)
-                    .setLongitude(lon)
-                    .build();
+	public FortDetails getFortDetails(String id, long lon, long lat) {
+		// server request
+		try {
+			FortDetailsMessageOuterClass.FortDetailsMessage reqMsg = FortDetailsMessageOuterClass.FortDetailsMessage.newBuilder()
+					.setFortId(id)
+					.setLatitude(lat)
+					.setLongitude(lon)
+					.build();
 
-            ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS, reqMsg);
-            api.getRequestHandler().request(serverRequest);
-            api.getRequestHandler().sendServerRequests();
-            FortDetailsResponseOuterClass.FortDetailsResponse response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(serverRequest.getData());
-            return new FortDetails(response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+			ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS, reqMsg);
+			api.getRequestHandler().request(serverRequest);
+			api.getRequestHandler().sendServerRequests();
+			FortDetailsResponseOuterClass.FortDetailsResponse response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(serverRequest.getData());
+			return new FortDetails(response);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public FortSearchResponseOuterClass.FortSearchResponse searchFort(FortDataOuterClass.FortData fortData) {
+		FortSearchMessageOuterClass.FortSearchMessage reqMsg = FortSearchMessageOuterClass.FortSearchMessage.newBuilder()
+				.setFortId(fortData.getId())
+				.setFortLatitude(fortData.getLatitude())
+				.setFortLongitude(fortData.getLongitude())
+				.setPlayerLatitude(api.getLatitude())
+				.setPlayerLongitude(api.getLongitude())
+				.build();
+		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH, reqMsg);
+		api.getRequestHandler().request(serverRequest);
+		api.getRequestHandler().sendServerRequests();
+		FortSearchResponseOuterClass.FortSearchResponse response = null;
+		try {
+			response = FortSearchResponseOuterClass.FortSearchResponse.parseFrom(serverRequest.getData());
+		} catch (InvalidProtocolBufferException e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	public EncounterResponseOuterClass.EncounterResponse encounterPokemon(MapPokemonOuterClass.MapPokemon catchablePokemon) {
+		EncounterMessageOuterClass.EncounterMessage reqMsg = EncounterMessageOuterClass.EncounterMessage.newBuilder()
+				.setEncounterId(catchablePokemon.getEncounterId())
+				.setPlayerLatitude(api.getLatitude())
+				.setPlayerLongitude(api.getLongitude())
+				.setSpawnpointId(catchablePokemon.getSpawnpointId())
+				.build();
+		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.ENCOUNTER, reqMsg);
+		api.getRequestHandler().request(serverRequest);
+		api.getRequestHandler().sendServerRequests();
+		EncounterResponseOuterClass.EncounterResponse response = null;
+		try {
+			response = EncounterResponseOuterClass.EncounterResponse.parseFrom(serverRequest.getData());
+		} catch (InvalidProtocolBufferException e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	public CatchPokemonResponseOuterClass.CatchPokemonResponse catchPokemon(MapPokemonOuterClass.MapPokemon catchablePokemon, double normalizedHitPosition, double normalizedReticleSize, double spinModifier, int pokeball) {
+		CatchPokemonMessageOuterClass.CatchPokemonMessage reqMsg = CatchPokemonMessageOuterClass.CatchPokemonMessage.newBuilder()
+				.setEncounterId(catchablePokemon.getEncounterId())
+				.setHitPokemon(true)
+				.setNormalizedHitPosition(normalizedHitPosition)
+				.setNormalizedReticleSize(normalizedReticleSize)
+				.setSpawnPointGuid(catchablePokemon.getSpawnpointId())
+				.setSpinModifier(spinModifier)
+				.setPokeball(pokeball)
+				.build();
+		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.CATCH_POKEMON, reqMsg);
+		api.getRequestHandler().request(serverRequest);
+		api.getRequestHandler().sendServerRequests();
+		CatchPokemonResponseOuterClass.CatchPokemonResponse response = null;
+		try {
+			response = CatchPokemonResponseOuterClass.CatchPokemonResponse.parseFrom(serverRequest.getData());
+		} catch (InvalidProtocolBufferException e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
 }
