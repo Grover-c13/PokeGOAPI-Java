@@ -1,9 +1,8 @@
 package com.pokegoapi.api.map.Pokemon;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
-import POGOProtos.Inventory.ItemIdOuterClass;
-import POGOProtos.Inventory.ItemIdOuterClass.ItemId;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
+import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -44,12 +43,13 @@ public class CatchablePokemon {
 	}
 
 
-	public void catchPokemon() throws LoginFailedException, RemoteServerException {
-		catchPokemon(Pokeball.POKEBALL);
+	public CatchResult catchPokemon() throws LoginFailedException, RemoteServerException {
+		return catchPokemon(Pokeball.POKEBALL);
 	}
 
-	public void catchPokemon(Pokeball balltype) throws LoginFailedException, RemoteServerException {
-		map.catchPokemon(proto, 1.0, 1.95 + Math.random() * 0.05, 0.85 + Math.random() * 0.15, balltype.ordinal());
+	public CatchResult catchPokemon(Pokeball balltype) throws LoginFailedException, RemoteServerException {
+		CatchPokemonResponse result = map.catchPokemon(proto, 1.0, 1.95 + Math.random() * 0.05, 0.85 + Math.random() * 0.15, balltype.ordinal());
+		return new CatchResult(result);
 	}
 
 
