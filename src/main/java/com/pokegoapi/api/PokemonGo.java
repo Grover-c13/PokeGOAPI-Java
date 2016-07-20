@@ -2,6 +2,7 @@ package com.pokegoapi.api;
 
 
 import POGOProtos.Data.Player.CurrencyOuterClass;
+import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import POGOProtos.Data.PlayerDataOuterClass;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass;
@@ -64,7 +65,6 @@ public class PokemonGo {
 		// should have proper end point now.
 
 		map = new Map(this);
-		candyjar = new CandyJar(this);
 		lastInventoryUpdate = 0;
 	}
 
@@ -95,6 +95,7 @@ public class PokemonGo {
 
 		pokebank = new PokeBank(this);
 		bag = new Bag(this);
+		candyjar = new CandyJar(this);
 
 		for (InventoryItemOuterClass.InventoryItem item : getInventoryResponse.getInventoryDelta().getInventoryItemsList()) {
 
@@ -110,6 +111,11 @@ public class PokemonGo {
 				candyjar.setCandy(item.getInventoryItemData().getPokemonFamily().getFamilyId(), item.getInventoryItemData().getPokemonFamily().getCandy());
 			}
 
+			if (item.getInventoryItemData().hasPlayerStats()) {
+				PlayerStatsOuterClass.PlayerStats stats = item.getInventoryItemData().getPlayerStats();
+				playerProfile.setStats(stats);
+			}
+
 		}
 
 		return localPlayer;
@@ -120,6 +126,8 @@ public class PokemonGo {
 			return playerProfile;
 		}
 
+		// init here so we can set the experience and level, which is somehow contained in the inventory...
+		playerProfile = new PlayerProfile();
 		PlayerDataOuterClass.PlayerData localPlayer = null;
 		try {
 			localPlayer = getPlayerAndUpdateInventory();
@@ -127,9 +135,9 @@ public class PokemonGo {
 		}
 
 		if (localPlayer == null) {
+			playerProfile = null;
 			return null;
 		}
-		playerProfile = new PlayerProfile();
 
 		playerProfile.setBadge(localPlayer.getEquippedBadge());
 		playerProfile.setCreationTime(localPlayer.getCreationTimestampMs());

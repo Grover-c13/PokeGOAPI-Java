@@ -1,8 +1,11 @@
 package com.pokegoapi.api.player;
 
 import POGOProtos.Data.Player.EquippedBadgeOuterClass;
+import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +23,9 @@ public class PlayerProfile {
 	private DailyBonus dailyBonus;
 	private ContactSettings contactSettings;
 	private Map<Currency, Integer> currencies = new HashMap<Currency, Integer>();
+	@Getter
+	@Setter
+	private PlayerStatsOuterClass.PlayerStats stats;
 
 
 	public void addCurrency(String name, int amount) throws InvalidCurrencyException {
