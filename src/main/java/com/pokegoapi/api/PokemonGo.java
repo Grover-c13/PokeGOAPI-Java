@@ -161,4 +161,10 @@ public class PokemonGo {
 			e.printStackTrace();
 		}
 	}
+
+	public void setLocation(double latitude, double longitude, double altitude){
+		setLatitude(latitude);
+		setLongitude(longitude);
+		setAltitude(altitude);
+	}
 }
