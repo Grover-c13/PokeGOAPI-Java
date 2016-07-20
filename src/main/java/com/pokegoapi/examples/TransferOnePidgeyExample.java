@@ -39,7 +39,7 @@ public class TransferOnePidgeyExample {
 
 		} catch (LoginFailedException | RemoteServerException e) {
 			// failed to login, invalid credentials, auth issue or server issue.
-			e.printStackTrace();
+			Log.e("Main", "Failed to login. Invalid credentials or server issue: ", e);
 		}
 	}
 }
