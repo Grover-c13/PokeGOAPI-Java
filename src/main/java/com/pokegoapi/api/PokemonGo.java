@@ -68,7 +68,7 @@ public class PokemonGo {
 		lastInventoryUpdate = 0;
 	}
 
-	private PlayerDataOuterClass.PlayerData getPlayerAndUpdateInventory() throws LoginFailedException, RemoteServerException {
+	private PlayerDataOuterClass.PlayerData getPlayerAndUpdateInventory(PlayerProfile playerProfile) throws LoginFailedException, RemoteServerException {
 		PlayerDataOuterClass.PlayerData localPlayer;
 
 		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
@@ -122,22 +122,26 @@ public class PokemonGo {
 	}
 
 	public PlayerProfile getPlayerProfile() {
-		if (playerProfile != null) {
+		return getPlayerProfile(false);
+	}
+
+	public PlayerProfile getPlayerProfile(boolean forceUpdate) {
+		if (!forceUpdate && playerProfile != null) {
 			return playerProfile;
 		}
 
 		// init here so we can set the experience and level, which is somehow contained in the inventory...
-		playerProfile = new PlayerProfile();
+		PlayerProfile tempProfile = new PlayerProfile();
 		PlayerDataOuterClass.PlayerData localPlayer = null;
 		try {
-			localPlayer = getPlayerAndUpdateInventory();
+			localPlayer = getPlayerAndUpdateInventory(tempProfile);
 		} catch (LoginFailedException | RemoteServerException e) {
 		}
 
 		if (localPlayer == null) {
-			playerProfile = null;
 			return null;
 		}
+		playerProfile = tempProfile;
 
 		playerProfile.setBadge(localPlayer.getEquippedBadge());
 		playerProfile.setCreationTime(localPlayer.getCreationTimestampMs());
