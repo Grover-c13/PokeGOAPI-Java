@@ -1,7 +1,7 @@
 package com.pokegoapi.examples;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
-import POGOProtos.Networking.EnvelopesOuterClass;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Pokemon;
@@ -19,7 +19,7 @@ public class TransferOnePidgeyExample
 	public static void main(String[] args)
 	{
 		OkHttpClient http = new OkHttpClient();
-		EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth = null;
+		RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth = null;
 		try {
 			//auth = new PTCLogin(http).login(ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
 			// or google
