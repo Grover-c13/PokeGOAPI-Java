@@ -21,9 +21,9 @@ public class TransferOnePidgeyExample
 		OkHttpClient http = new OkHttpClient();
 		EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth = null;
 		try {
-			//auth = new PTCLogin(http).login(ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
+			auth = new PTCLogin(http).login(ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
 			// or google
-			auth = new GoogleLogin(http).login("", ""); // currently uses oauth flow so no user or pass needed
+		//	auth = new GoogleLogin(http).login("", ""); // currently uses oauth flow so no user or pass needed
 			PokemonGo go = new PokemonGo(auth, http);
 
 			List<Pokemon> pidgeys = go.getPokebank().getPokemonByPokemonId(PokemonIdOuterClass.PokemonId.PIDGEY);

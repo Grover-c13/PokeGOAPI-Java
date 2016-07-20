@@ -5,6 +5,6 @@ package com.pokegoapi.examples;
  */
 public class ExampleLoginDetails
 {
-	public static String LOGIN = "";
-	public static String PASSWORD = "";
+	public static String LOGIN = "chicken6969";
+	public static String PASSWORD = "chicken6969";
 }

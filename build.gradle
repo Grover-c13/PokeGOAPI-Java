@@ -17,8 +17,8 @@ apply plugin: 'com.google.protobuf'
 
 description = """Pokemon Go Java API"""
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -63,8 +63,8 @@ dependencies {
     compile 'com.google.code.gson:gson:2.7'
     compile 'net.sourceforge.streamsupport:streamsupport:1.5'
     compile 'com.squareup.okhttp3:okhttp:3.4.0-RC1'
-    compileOnly 'com.google.protobuf:protobuf-java:3.0.0-beta-3'
-    compileOnly "org.projectlombok:lombok:1.16.6"
+    compile 'com.google.protobuf:protobuf-java:3.0.0-beta-3'
+    compile "org.projectlombok:lombok:1.16.6"
 }
 
 idea {

@@ -68,7 +68,7 @@ public class Map {
 
 		for (int x = -halfWidth; x <= halfWidth; x++) {
 			for (int y = -halfWidth; y <= halfWidth; y++) {
-				cells.add(cellId.fromFaceIJ(face, i.intValue() + x * size, j.intValue() + y * size).parent(15).id());
+				cells.add(S2CellId.fromFaceIJ(face, i.intValue() + x * size, j.intValue() + y * size).parent(15).id());
 			}
 		}
 		return getMapObjects(cells, latitude, longitude);
@@ -77,7 +77,7 @@ public class Map {
 	/**
 	 * Returns the cells requested, you should send a latitude/longitude to fake a near location
 	 * 
-	 * @param List<Long> of cellId
+	 * @param cellIds<Long> of cellId
 	 * @param latitude
 	 * @param longitude
 	 * @return MapObjects in the given cells
@@ -89,7 +89,7 @@ public class Map {
 	/**
 	 * Returns the cells requested, you should send a latitude/longitude to fake a near location
 	 * 
-	 * @param List<Long> of cellId
+	 * @param cellIds<Long> of cellId
 	 * @param latitude
 	 * @param longitude
 	 * @param altitude
@@ -128,12 +128,7 @@ public class Map {
 				result.addSpawnPoints(mapCell.getSpawnPointsList());
 				
 				java.util.Map<FortTypeOuterClass.FortType, List<FortDataOuterClass.FortData>> groupedForts
-						= StreamSupport.stream(mapCell.getFortsList()).collect(Collectors.groupingBy(new Function<FortDataOuterClass.FortData, FortTypeOuterClass.FortType>() {
-					@Override
-					public FortTypeOuterClass.FortType apply(FortDataOuterClass.FortData t) {
-						return t.getType();
-					}
-				}));
+						= StreamSupport.stream(mapCell.getFortsList()).collect(Collectors.groupingBy(t -> t.getType()));
 				result.addGyms(groupedForts.get(FortTypeOuterClass.FortType.GYM));
 				result.addPokestops(groupedForts.get(FortTypeOuterClass.FortType.CHECKPOINT));
 			}
