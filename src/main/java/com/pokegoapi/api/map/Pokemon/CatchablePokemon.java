@@ -9,10 +9,12 @@ import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.util.Log;
 import lombok.ToString;
 
 @ToString
 public class CatchablePokemon {
+	private static final String TAG = CatchablePokemon.class.getSimpleName();
 	private MapPokemon proto;
 	private Map map;
 
@@ -54,7 +56,7 @@ public class CatchablePokemon {
 
 		// encounter
 		EncounterResponse encounterResponse = map.encounterPokemon(proto);
-		System.out.println(encounterResponse);
+		Log.i(TAG, "Encounter Response: " + encounterResponse.toString());
 		CatchResult cresult;
 		if (encounterResponse.getStatus() == EncounterResponse.Status.ENCOUNTER_SUCCESS)
 		{

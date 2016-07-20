@@ -8,6 +8,7 @@ import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.auth.GoogleLogin;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.util.Log;
 import okhttp3.OkHttpClient;
 
 import java.util.List;
@@ -30,15 +31,15 @@ public class TransferOnePidgeyExample {
 				pest.debug();
 				ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result result = pest.transferPokemon();
 
-				System.out.println("Transfered Pidgey result:" + result);
+				Log.i("Main", "Transfered Pidgey result:" + result);
 			} else {
-				System.out.println("You have no pidgeys :O");
+				Log.i("Main", "You have no pidgeys :O");
 			}
 
 
 		} catch (LoginFailedException | RemoteServerException e) {
 			// failed to login, invalid credentials, auth issue or server issue.
-			e.printStackTrace();
+			Log.e("Main", "Failed to login. Invalid credentials or server issue: ", e);
 		}
 	}
 }

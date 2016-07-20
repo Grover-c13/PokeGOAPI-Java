@@ -7,6 +7,7 @@ import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.util.Log;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RequestHandler {
+	private static final String TAG = RequestHandler.class.getSimpleName();
 	private final PokemonGo api;
 	private RequestEnvelopeOuterClass.RequestEnvelope.Builder builder;
 	private boolean hasRequests;
@@ -53,7 +55,7 @@ public class RequestHandler {
 		try {
 			request.writeTo(stream);
 		} catch (IOException e) {
-			System.err.println("Should never happen");
+			Log.wtf(TAG, "Failed to write request to bytearray ouput stream. This should never happen", e);
 		}
 
 		RequestBody body = RequestBody.create(null, stream.toByteArray());

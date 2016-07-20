@@ -27,12 +27,14 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.Log;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
 
 public class PokemonGo {
 
+	private static final java.lang.String TAG = PokemonGo.class.getSimpleName();
 	@Getter
 	RequestHandler requestHandler;
 	@Getter
@@ -136,7 +138,7 @@ public class PokemonGo {
 		try {
 			localPlayer = getPlayerAndUpdateInventory(tempProfile);
 		} catch (LoginFailedException | RemoteServerException e) {
-			e.printStackTrace();
+			Log.e(TAG, "Failed to get profile data and update inventory", e);
 		}
 
 		if (localPlayer == null) {
@@ -159,7 +161,9 @@ public class PokemonGo {
 		for (CurrencyOuterClass.Currency currency : localPlayer.getCurrenciesList()) {
 			try {
 				playerProfile.addCurrency(currency.getName(), currency.getAmount());
-			} catch (InvalidCurrencyException e) { }
+			} catch (InvalidCurrencyException e) {
+				Log.w(TAG, "Error adding currency. You can probably ignore this.", e);
+			}
 		}
 
 		avatarAPI.setGender(localPlayer.getAvatar().getGender());
