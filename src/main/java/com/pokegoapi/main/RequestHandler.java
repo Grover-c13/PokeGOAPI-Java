@@ -1,6 +1,8 @@
 package com.pokegoapi.main;
 
-import POGOProtos.Networking.EnvelopesOuterClass;
+import POGOProtos.Networking.Envelopes.AuthTicketOuterClass;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
+import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -16,16 +18,16 @@ import java.util.List;
 
 public class RequestHandler {
 	private final PokemonGo api;
-	private EnvelopesOuterClass.Envelopes.RequestEnvelope.Builder builder;
+	private RequestEnvelopeOuterClass.RequestEnvelope.Builder builder;
 	private boolean hasRequests;
-	private EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth;
+	private RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth;
 	private List<ServerRequest> serverRequests;
 	private String api_endpoint;
 	private OkHttpClient client;
 
-	private EnvelopesOuterClass.Envelopes.AuthTicket lastAuth;
+	private AuthTicketOuterClass.AuthTicket lastAuth;
 
-	public RequestHandler(PokemonGo api, EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth, OkHttpClient client) {
+	public RequestHandler(PokemonGo api, RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth, OkHttpClient client) {
 		this.api = api;
 		this.client = client;
 		api_endpoint = APISettings.API_ENDPOINT;
@@ -49,7 +51,7 @@ public class RequestHandler {
 		
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		try {
-			EnvelopesOuterClass.Envelopes.RequestEnvelope request = builder.build();
+			RequestEnvelopeOuterClass.RequestEnvelope request = builder.build();
 			request.writeTo(stream);
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -65,7 +67,7 @@ public class RequestHandler {
 			Response response = client.newCall(request).execute();
 			InputStream content = response.body().byteStream();
 
-			EnvelopesOuterClass.Envelopes.ResponseEnvelope responseEnvelop = EnvelopesOuterClass.Envelopes.ResponseEnvelope.parseFrom(content);
+			ResponseEnvelopeOuterClass.ResponseEnvelope responseEnvelop = ResponseEnvelopeOuterClass.ResponseEnvelope.parseFrom(content);
 
 			if (responseEnvelop.getStatusCode() == 102) {
 				throw new LoginFailedException();
@@ -104,7 +106,7 @@ public class RequestHandler {
 
 
 	private void resetBuilder() {
-		builder = EnvelopesOuterClass.Envelopes.RequestEnvelope.newBuilder();
+		builder = RequestEnvelopeOuterClass.RequestEnvelope.newBuilder();
 		builder.setStatusCode(2);
 		builder.setRequestId(8145806132888207460l);
 		if (lastAuth != null && lastAuth.getExpireTimestampMs() > 0) 
@@ -117,7 +119,7 @@ public class RequestHandler {
 	}
 
 
-	public EnvelopesOuterClass.Envelopes.RequestEnvelope build() {
+	public RequestEnvelopeOuterClass.RequestEnvelope build() {
 		if (!hasRequests)
 			throw new IllegalStateException("Attempting to send request envelop with no requests");
 		return builder.build();

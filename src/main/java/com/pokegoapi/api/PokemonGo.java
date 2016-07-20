@@ -1,16 +1,18 @@
 package com.pokegoapi.api;
 
 
+import POGOProtos.Data.Player.CurrencyOuterClass;
+import POGOProtos.Data.PlayerDataOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
 import POGOProtos.Inventory.ItemIdOuterClass;
-import POGOProtos.LocalPlayerOuterClass;
-import POGOProtos.Networking.EnvelopesOuterClass;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
-import POGOProtos.Player.CurrencyOuterClass.Currency;
 import lombok.Getter;
 import lombok.Setter;
 import POGOProtos.Inventory.ItemIdOuterClass.ItemId;
@@ -45,7 +47,7 @@ public class PokemonGo {
 
 	private long lastInventoryUpdate;
 
-	public PokemonGo(EnvelopesOuterClass.Envelopes.RequestEnvelope.AuthInfo auth, OkHttpClient client) {
+	public PokemonGo(RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth, OkHttpClient client) {
 		playerProfile = null;
 
 		// send profile request to get the ball rolling
@@ -60,8 +62,8 @@ public class PokemonGo {
 		getInventory(); // data will be loaded on constructor and then kept, all future requests will be updates after this call
 	}
 
-	private LocalPlayerOuterClass.LocalPlayer getLocalPlayer() {
-		LocalPlayerOuterClass.LocalPlayer localPlayer = null;
+	private PlayerDataOuterClass.PlayerData getLocalPlayer() {
+		PlayerDataOuterClass.PlayerData localPlayer = null;
 
 		// server request
 		try {
@@ -70,7 +72,7 @@ public class PokemonGo {
 			getRequestHandler().request(serverRequest);
 			getRequestHandler().sendServerRequests();
 			GetPlayerResponse response = GetPlayerResponse.parseFrom(serverRequest.getData());
-			localPlayer = response.getLocalPlayer();
+			localPlayer = response.getPlayerData();
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -85,7 +87,7 @@ public class PokemonGo {
 		}
 
 
-		LocalPlayerOuterClass.LocalPlayer localPlayer = getLocalPlayer();
+		PlayerDataOuterClass.PlayerData localPlayer = getLocalPlayer();
 
 		if (localPlayer == null) {
 			return null;
@@ -104,7 +106,7 @@ public class PokemonGo {
 		ContactSettings contactAPI = new ContactSettings();
 
 		// maybe something more graceful?
-		for (Currency currency : localPlayer.getCurrenciesList()) {
+		for (CurrencyOuterClass.Currency currency : localPlayer.getCurrenciesList()) {
 			try {
 				playerProfile.addCurrency(currency.getName(), currency.getAmount());
 			} catch (InvalidCurrencyException e) {
@@ -112,15 +114,15 @@ public class PokemonGo {
 			}
 		}
 
-		avatarAPI.setGender(localPlayer.getAvatarDetails().getGender());
-		avatarAPI.setBackpack(localPlayer.getAvatarDetails().getBackpack());
-		avatarAPI.setEyes(localPlayer.getAvatarDetails().getEyes());
-		avatarAPI.setHair(localPlayer.getAvatarDetails().getHair());
-		avatarAPI.setHat(localPlayer.getAvatarDetails().getHat());
-		avatarAPI.setPants(localPlayer.getAvatarDetails().getPants());
-		avatarAPI.setShirt(localPlayer.getAvatarDetails().getShirt());
-		avatarAPI.setShoes(localPlayer.getAvatarDetails().getShoes());
-		avatarAPI.setSkin(localPlayer.getAvatarDetails().getSkin());
+		avatarAPI.setGender(localPlayer.getAvatar().getGender());
+		avatarAPI.setBackpack(localPlayer.getAvatar().getBackpack());
+		avatarAPI.setEyes(localPlayer.getAvatar().getEyes());
+		avatarAPI.setHair(localPlayer.getAvatar().getHair());
+		avatarAPI.setHat(localPlayer.getAvatar().getHat());
+		avatarAPI.setPants(localPlayer.getAvatar().getPants());
+		avatarAPI.setShirt(localPlayer.getAvatar().getShirt());
+		avatarAPI.setShoes(localPlayer.getAvatar().getShoes());
+		avatarAPI.setSkin(localPlayer.getAvatar().getSkin());
 
 		bonusAPI.setNextCollectionTimestamp(localPlayer.getDailyBonus().getNextCollectedTimestampMs());
 		bonusAPI.setNextDefenderBonusCollectTimestamp(localPlayer.getDailyBonus().getNextDefenderBonusCollectTimestampMs());

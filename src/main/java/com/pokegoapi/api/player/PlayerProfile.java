@@ -1,6 +1,6 @@
 package com.pokegoapi.api.player;
 
-import POGOProtos.Player.EquippedBadgeOuterClass;
+import POGOProtos.Data.Player.EquippedBadgeOuterClass;
 import lombok.Data;
 
 import com.pokegoapi.exceptions.InvalidCurrencyException;
