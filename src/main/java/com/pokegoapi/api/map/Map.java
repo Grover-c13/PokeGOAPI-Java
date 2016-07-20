@@ -11,6 +11,7 @@ import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.fort.FortDetails;
 import com.pokegoapi.google.common.geometry.MutableInteger;
+import com.pokegoapi.google.common.geometry.S2Cell;
 import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.ServerRequest;
@@ -32,73 +33,65 @@ public class Map {
 		lastMapUpdate = 0;
 	}
 
-	/**
-	 * Returns 9x9 cells with the requested lattitude/longitude in the center cell
-	 * 
-	 * @param latitude
-	 * @param longitude
-	 * @return MapObjects in the given cells
-	 */
-	public MapObjects getMapObjects(double latitude, double longitude) {
-		return getMapObjects(latitude, longitude, 9);
-	}
+    /**
+     * Returns MapObjects around your current location
+     * @return MapObjects at your current location
+     */
+    public MapObjects getMapObjects(){
+        return getMapObjects(9);
+    }
+
+    /**
+     * Returns MapObjects around your current location within a given width
+     * @param width
+     * @return MapObjects at your current location
+     */
+    public MapObjects getMapObjects(int width){
+        return getMapObjects(getCellIds(api.getLatitude(), api.getLongitude(), width), api.getLatitude(), api.getLongitude(), api.getAltitude());
+    }
+
+    /**
+     * Returns 9x9 cells with the requested lattitude/longitude in the center cell
+     *
+     * @param latitude
+     * @param longitude
+     * @return MapObjects in the given cells
+     */
+    public MapObjects getMapObjects(double latitude, double longitude) {
+        return getMapObjects(latitude, longitude, 9);
+    }
+
+    /**
+     * Returns the cells requested, you should send a latitude/longitude to fake a near location
+     *
+     * @param cellIds List<Long> of cellId
+     * @param latitude
+     * @param longitude
+     * @return MapObjects in the given cells
+     */
+    public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude) {
+        return getMapObjects(cellIds, latitude, longitude, 0);
+    }
+
+    /**
+     * Returns `width` * `width` cells with the requested latitude/longitude in the center
+     *
+     * @param latitude
+     * @param longitude
+     * @param width
+     * @return MapObjects in the given cells
+     */
+    public MapObjects getMapObjects(double latitude, double longitude, int width) {
+        return getMapObjects(getCellIds(latitude, longitude, width), latitude, longitude);
+    }
 
 	/**
-	 * Returns `width` * `width` cells with the requested latitude/longitude in the center
+	 * Returns the cells requested
 	 *
-	 * @param latitude
-	 * @param longitude
-	 * @param width
-	 * @return MapObjects in the given cells
-	 */
-	public MapObjects getMapObjects(double latitude, double longitude, int width) {
-		S2LatLng latLng = S2LatLng.fromDegrees(latitude, longitude);
-		S2CellId cellId = S2CellId.fromLatLng(latLng).parent(15);
-
-		MutableInteger i = new MutableInteger(0);
-		MutableInteger j = new MutableInteger(0);
-
-		int level = cellId.level();
-		int size = 1 << (MAX_LEVEL - level);
-		int face = cellId.toFaceIJOrientation(i, j, null);
-
-		List<Long> cells = new ArrayList<Long>();
-
-		int halfWidth = (int) Math.floor(width / 2);
-
-		for (int x = -halfWidth; x <= halfWidth; x++) {
-			for (int y = -halfWidth; y <= halfWidth; y++) {
-				cells.add(cellId.fromFaceIJ(face, i.intValue() + x * size, j.intValue() + y * size).parent(15).id());
-			}
-		}
-		return getMapObjects(cells, latitude, longitude);
-	}
-
-	/**
-	 * Returns the cells requested, you should send a latitude/longitude to fake a near location
-	 * 
-	 * @param List<Long> of cellId
-	 * @param latitude
-	 * @param longitude
-	 * @return MapObjects in the given cells
-	 */
-	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude) {
-		return getMapObjects(cellIds, latitude, longitude, 0);
-	}
-
-	/**
-	 * Returns the cells requested, you should send a latitude/longitude to fake a near location
-	 * 
-	 * @param List<Long> of cellId
-	 * @param latitude
-	 * @param longitude
-	 * @param altitude
+	 * @param cellIds List<Long> of cellId
 	 * @return MapObjects in the given cells
 	 */
 	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude, double altitude) {
-		api.setLatitude(latitude);
-		api.setLongitude(longitude);
-		api.setAltitude(altitude);
 
 		MapObjects result = null;
 		try {
@@ -126,7 +119,7 @@ public class Map {
 				result.addWildPokemons(mapCell.getWildPokemonsList());
 				result.addDecimatedSpawnPoints(mapCell.getDecimatedSpawnPointsList());
 				result.addSpawnPoints(mapCell.getSpawnPointsList());
-				
+
 				java.util.Map<FortTypeOuterClass.FortType, List<FortDataOuterClass.FortData>> groupedForts
 						= StreamSupport.stream(mapCell.getFortsList()).collect(Collectors.groupingBy(new Function<FortDataOuterClass.FortData, FortTypeOuterClass.FortType>() {
 					@Override
@@ -144,23 +137,52 @@ public class Map {
 		return result;
 	}
 
-	public FortDetails getFortDetails(String id, long lon, long lat) {
-		// server request
-		try {
-			FortDetailsMessageOuterClass.FortDetailsMessage reqMsg = FortDetailsMessageOuterClass.FortDetailsMessage.newBuilder()
-					.setFortId(id)
-					.setLatitude(lat)
-					.setLongitude(lon)
-					.build();
+    /**
+     * Get a list of all the Cell Ids
+     * @param latitude
+     * @param longitude
+     * @param width
+     * @return List of Cells
+     */
+    public List<Long> getCellIds(double latitude, double longitude, int width){
+        S2LatLng latLng = S2LatLng.fromDegrees(latitude, longitude);
+        S2CellId cellId = S2CellId.fromLatLng(latLng).parent(15);
 
-			ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS, reqMsg);
-			api.getRequestHandler().request(serverRequest);
-			api.getRequestHandler().sendServerRequests();
-			FortDetailsResponseOuterClass.FortDetailsResponse response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(serverRequest.getData());
-			return new FortDetails(response);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+        MutableInteger i = new MutableInteger(0);
+        MutableInteger j = new MutableInteger(0);
+
+        int level = cellId.level();
+        int size = 1 << (MAX_LEVEL - level);
+        int face = cellId.toFaceIJOrientation(i, j, null);
+
+        List<Long> cells = new ArrayList<Long>();
+
+        int halfWidth = (int) Math.floor(width / 2);
+        for (int x = -halfWidth; x <= halfWidth; x++) {
+            for (int y = -halfWidth; y <= halfWidth; y++) {
+                cells.add(cellId.fromFaceIJ(face, i.intValue() + x * size, j.intValue() + y * size).parent(15).id());
+            }
+        }
+        return cells;
+    }
+
+    public FortDetails getFortDetails(String id, long lon, long lat) {
+        // server request
+        try {
+            FortDetailsMessageOuterClass.FortDetailsMessage reqMsg = FortDetailsMessageOuterClass.FortDetailsMessage.newBuilder()
+                    .setFortId(id)
+                    .setLatitude(lat)
+                    .setLongitude(lon)
+                    .build();
+
+            ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS, reqMsg);
+            api.getRequestHandler().request(serverRequest);
+            api.getRequestHandler().sendServerRequests();
+            FortDetailsResponseOuterClass.FortDetailsResponse response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(serverRequest.getData());
+            return new FortDetails(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
