@@ -27,7 +27,7 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		nearbyPokemons.addAll(nearbyPokemons);
+		this.nearbyPokemons.addAll(nearbyPokemons);
 	}
 
 	public void addCatchablePokemons(Collection<MapPokemonOuterClass.MapPokemon> catchablePokemons) {
@@ -35,7 +35,7 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		catchablePokemons.addAll(catchablePokemons);
+		this.catchablePokemons.addAll(catchablePokemons);
 	}
 
 	public void addWildPokemons(Collection<WildPokemonOuterClass.WildPokemon> wildPokemons) {
@@ -43,7 +43,7 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		wildPokemons.addAll(wildPokemons);
+		this.wildPokemons.addAll(wildPokemons);
 	}
 
 	public void addDecimatedSpawnPoints(Collection<SpawnPointOuterClass.SpawnPoint> decimatedSpawnPoints) {
@@ -51,7 +51,7 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		decimatedSpawnPoints.addAll(decimatedSpawnPoints);
+		this.decimatedSpawnPoints.addAll(decimatedSpawnPoints);
 	}
 
 	public void addSpawnPoints(Collection<SpawnPointOuterClass.SpawnPoint> spawnPoints) {
@@ -59,7 +59,7 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		spawnPoints.addAll(spawnPoints);
+		this.spawnPoints.addAll(spawnPoints);
 	}
 
 	public void addGyms(Collection<FortDataOuterClass.FortData> gyms) {
@@ -67,7 +67,7 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		gyms.addAll(gyms);
+		this.gyms.addAll(gyms);
 	}
 
 	public void addPokestops(Collection<FortDataOuterClass.FortData> pokestops) {
@@ -75,7 +75,7 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		pokestops.addAll(pokestops);
+		this.pokestops.addAll(pokestops);
 	}
 
 	/**

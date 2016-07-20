@@ -84,13 +84,13 @@ public class PokemonGo {
 			return playerProfile;
 		}
 
-		playerProfile = new PlayerProfile();
 
 		LocalPlayerOuterClass.LocalPlayer localPlayer = getLocalPlayer();
 
 		if (localPlayer == null) {
 			return null;
 		}
+		playerProfile = new PlayerProfile();
 
 		playerProfile.setBadge(localPlayer.getEquippedBadge());
 		playerProfile.setCreationTime(localPlayer.getCreationTimestampMs());
