@@ -1,6 +1,7 @@
 package com.pokegoapi.api.inventory;
 
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass;
+import com.pokegoapi.api.pokemon.Pokemon;
 
 public class EvolutionResult {
 	

@@ -4,9 +4,8 @@ import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.Pokemon;
+import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.auth.GoogleLogin;
-import com.pokegoapi.auth.PTCLogin;
 import com.pokegoapi.exceptions.LoginFailedException;
 import okhttp3.OkHttpClient;
 

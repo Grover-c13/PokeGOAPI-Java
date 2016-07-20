@@ -5,7 +5,9 @@ import POGOProtos.Inventory.ItemIdOuterClass.ItemId;
 
 import com.pokegoapi.exceptions.NoSuchItemException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class Bag
 {
@@ -17,16 +19,14 @@ public class Bag
 		items = new HashMap<ItemId, Item>();
 	}
 
-	public void addItem(Item item)
-	{
+	public void addItem(Item item) {
 		items.put(item.getItemId(), item);
 	}
 
-	public Item getItem(ItemId type) throws NoSuchItemException {
-		if (items.containsKey(type)) {
-			return items.get(type);
+	public Item getItem(ItemId type) {
+		if (type == ItemId.UNRECOGNIZED) {
+			throw new IllegalArgumentException("You cannot get item for UNRECOGNIZED");
 		}
-
-		throw new NoSuchItemException();
+		return items.get(type.getNumber());
 	}
 }
