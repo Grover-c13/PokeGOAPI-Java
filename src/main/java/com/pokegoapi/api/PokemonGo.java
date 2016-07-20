@@ -3,6 +3,7 @@ package com.pokegoapi.api;
 
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.PlayerDataOuterClass;
+import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
 import POGOProtos.Inventory.ItemIdOuterClass;
@@ -11,6 +12,7 @@ import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.Get
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
+import com.pokegoapi.api.inventory.CandyJar;
 import lombok.Getter;
 import lombok.Setter;
 import com.pokegoapi.api.inventory.Bag;
@@ -32,7 +34,7 @@ public class PokemonGo {
 	@Getter PokeBank pokebank;
 	@Getter Bag bag;
 	@Getter Map map;
-	
+	@Getter CandyJar candyjar;
 	@Getter @Setter
 	private double latitude;
 	@Getter @Setter
@@ -53,6 +55,7 @@ public class PokemonGo {
 		pokebank = new PokeBank(this);
 		bag = new Bag(this);
 		map = new Map(this);
+		candyjar = new CandyJar(this);
 		lastInventoryUpdate = 0;
 		getInventory(); // data will be loaded on constructor and then kept, all future requests will be updates after this call
 	}
@@ -148,6 +151,10 @@ public class PokemonGo {
 
 				if (item.getInventoryItemData().getItem().getItemId() != ItemIdOuterClass.ItemId.ITEM_UNKNOWN) {
 					bag.addItem( new Item( item.getInventoryItemData().getItem() ) );
+				}
+
+				if (item.getInventoryItemData().getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED) {
+					candyjar.setCandy(item.getInventoryItemData().getPokemonFamily().getFamilyId(), item.getInventoryItemData().getPokemonFamily().getCandy());
 				}
 
 			}
