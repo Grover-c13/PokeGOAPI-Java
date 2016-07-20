@@ -68,6 +68,9 @@ public class RequestHandler {
 			throw new RemoteServerException(e);
 		}
 
+		if (response.code() != 200)
+			throw new RemoteServerException("Got a unexcepted http code : " + response.code());
+
 		ResponseEnvelopeOuterClass.ResponseEnvelope responseEnvelop = null;
 		try (InputStream content = response.body().byteStream()) {
 			responseEnvelop = ResponseEnvelopeOuterClass.ResponseEnvelope.parseFrom(content);

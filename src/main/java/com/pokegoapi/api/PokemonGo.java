@@ -136,6 +136,7 @@ public class PokemonGo {
 		try {
 			localPlayer = getPlayerAndUpdateInventory(tempProfile);
 		} catch (LoginFailedException | RemoteServerException e) {
+			e.printStackTrace();
 		}
 
 		if (localPlayer == null) {
