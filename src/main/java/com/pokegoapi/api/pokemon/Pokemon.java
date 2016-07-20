@@ -46,7 +46,7 @@ public class Pokemon {
 		}
 
 		if (response.getResult().equals(Result.SUCCESS)) {
-			pgo.getCandyjar().setCandy(this.getPokemonFamily(), response.getCandyAwarded());
+			pgo.getCandyjar().setCandy(this.getPokemonFamily(), pgo.getCandyjar().getCandies(this.getPokemonFamily()) + response.getCandyAwarded());
 			pgo.getPokebank().removePokemon(this);
 		}
 
