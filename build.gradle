@@ -63,8 +63,12 @@ dependencies {
     compile 'com.google.code.gson:gson:2.7'
     compile 'net.sourceforge.streamsupport:streamsupport:1.5'
     compile 'com.squareup.okhttp3:okhttp:3.4.0-RC1'
-    compile 'com.google.protobuf:protobuf-java:3.0.0-beta-3'
+    compile 'com.google.protobuf:protobuf-java:3.0.0-beta-4'
+    compile 'ch.qos.logback:logback-classic:1.1.3'
+    compile 'org.slf4j:slf4j-api:1.7.12'
+    compile 'org.apache.commons:commons-lang3:3.4'
     compileOnly 'org.projectlombok:lombok:1.16.6'
+    compile files('lib/POGOProtos-20160720.jar')
 }
 
 idea {

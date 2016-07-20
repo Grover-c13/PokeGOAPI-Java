@@ -10,6 +10,8 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 public class PokeBank {
@@ -43,5 +45,18 @@ public class PokeBank {
 				return pokemn.getId() != pokemon.getId();
 			}
 		}).collect(Collectors.<Pokemon>toList());
+	}
+
+	public String toString() {
+		Map<String, Integer> map = new TreeMap<String, Integer>();
+		for(Pokemon pokemon : pokemons) {
+			String pokemonId = pokemon.getPokemonId().toString();
+			if (map.containsKey(pokemonId)) {
+				map.put(pokemonId, map.get(pokemonId)+1);
+			} else {
+				map.put(pokemonId, 1);
+			}
+		}
+		return map.toString();
 	}
 }

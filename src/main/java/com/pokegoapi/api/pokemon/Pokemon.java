@@ -204,4 +204,6 @@ public class Pokemon {
 	public void debug() {
 		System.out.println(proto);
 	}
+
+	public String toString() { return proto.toString(); }
 }
