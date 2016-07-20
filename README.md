@@ -30,7 +30,7 @@ ___
   - verify that you have gradle in your path
   - `` gradle build bundle ``
   - you should have the api bundled in ``build/libs/PokeGOAPI-Java_bundle-0.0.1-SNAPSHOT.jar``
-  
+
   PS : To eclipse user, you may build one time and add the generated java class for proto into eclipse path : Right click on the project > Build path > New Source Folder > Type 'build/generated/source/proto/main/java' > Finish
 
 # Usage
@@ -38,12 +38,13 @@ Include the API as jar from your own build, or use Maven/Gradle/SBT/Leiningen: h
 
 Mostly everything is accessed through the PokemonGo class in the API package.
 
-The constructor of PokemonGo class requires a AuthInfo object which can be obtained from GoogleLogin().login or PTCLogin().login.
+The constructor of PokemonGo class requires a AuthInfo object which can be obtained from GoogleLogin().login or PTCLogin().login, and a OkHttpClient object.
 
 EG:
 ```java
-AuthInfo auth = new GoogleLogin().login("token");           
-PokemonGo go = new PokemonGo(auth);
+OkHttpClient httpClient = new OkHttpClient();
+AuthInfo auth = new GoogleLogin(httpClient).login("token");           
+PokemonGo go = new PokemonGo(auth,httpClient);
 System.out.println(go.getPlayerProfile());
 ```
 
