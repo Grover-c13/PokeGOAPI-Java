@@ -9,6 +9,7 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.*;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.map.Pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.fort.FortDetails;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -26,13 +27,48 @@ import java.util.List;
 import static com.pokegoapi.google.common.geometry.S2CellId.MAX_LEVEL;
 
 public class Map {
+	private static long NEW_MAP_OBJECTS_EXPIRY = 60000; // 60 seconds
 	private PokemonGo api;
 	private long lastMapUpdate;
+	private MapObjects lastMapObjects;
+	private long lastLong;
+	private long lastLat;
 
 	public Map(PokemonGo api) {
 		this.api = api;
 		lastMapUpdate = 0;
 	}
+
+	/**
+	 * Gets a new map objects if there has been a lat/long change or the last request was done greater then NEW_MAP_OBJECTS_EXPIRY
+	 *
+	 * @return List<CatchablePokemon> at your current location
+	 */
+	private MapObjects getRetainedMapObject() throws LoginFailedException, RemoteServerException {
+		// get new MapObjects or used existing one
+		if (api.getLatitude() != lastLat && api.getLongitude() != lastLong || (System.currentTimeMillis()-lastMapUpdate) > NEW_MAP_OBJECTS_EXPIRY) {
+			getMapObjects(); // should update the lastMapObjects variable
+		}
+
+		return lastMapObjects;
+	}
+
+	/**
+	 * Returns a list of catchable pokemon around the current location
+	 *
+	 * @return List<CatchablePokemon> at your current location
+	 */
+	public List<CatchablePokemon> getCatchablePokemon() throws LoginFailedException, RemoteServerException {
+		List<CatchablePokemon> catchablePokemons = new ArrayList<CatchablePokemon>();
+		MapObjects objects =  getRetainedMapObject();
+
+		for (MapPokemonOuterClass.MapPokemon mapPokemon : objects.getCatchablePokemons() ) {
+			catchablePokemons.add(new CatchablePokemon(mapPokemon, this));
+		}
+
+		return catchablePokemons;
+	}
+
 
 	/**
 	 * Returns MapObjects around your current location
@@ -135,6 +171,8 @@ public class Map {
 			result.addPokestops(groupedForts.get(FortTypeOuterClass.FortType.CHECKPOINT));
 		}
 
+		lastMapObjects = result;
+		lastMapUpdate = System.currentTimeMillis();
 		return result;
 	}
 
