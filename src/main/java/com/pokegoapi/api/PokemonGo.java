@@ -158,9 +158,7 @@ public class PokemonGo {
 		for (CurrencyOuterClass.Currency currency : localPlayer.getCurrenciesList()) {
 			try {
 				playerProfile.addCurrency(currency.getName(), currency.getAmount());
-			} catch (InvalidCurrencyException e) {
-				// silently ignore invalid currencies
-			}
+			} catch (InvalidCurrencyException e) { }
 		}
 
 		avatarAPI.setGender(localPlayer.getAvatar().getGender());

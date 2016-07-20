@@ -73,7 +73,7 @@ public class RequestHandler {
 			responseEnvelop = ResponseEnvelopeOuterClass.ResponseEnvelope.parseFrom(content);
 		} catch (IOException e) {
 			// retrieved garbage from the server
-			throw new RemoteServerException("Received malformed response");
+			throw new RemoteServerException("Received malformed response : " + e);
 		}
 
 		if (responseEnvelop.getApiUrl() != null && responseEnvelop.getApiUrl().length() > 0) {
