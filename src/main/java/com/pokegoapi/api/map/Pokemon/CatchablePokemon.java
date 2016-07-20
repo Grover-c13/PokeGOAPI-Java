@@ -3,6 +3,8 @@ package com.pokegoapi.api.map.Pokemon;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
+import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
+import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -15,6 +17,7 @@ public class CatchablePokemon {
 	private Map map;
 
 	public CatchablePokemon(MapPokemon proto, Map map) {
+		this.map = map;
 		this.proto = proto;
 	}
 
@@ -48,8 +51,20 @@ public class CatchablePokemon {
 	}
 
 	public CatchResult catchPokemon(Pokeball balltype) throws LoginFailedException, RemoteServerException {
-		CatchPokemonResponse result = map.catchPokemon(proto, 1.0, 1.95 + Math.random() * 0.05, 0.85 + Math.random() * 0.15, balltype.ordinal());
-		return new CatchResult(result);
+
+		// encounter
+		EncounterResponse encounterResponse = map.encounterPokemon(proto);
+		System.out.println(encounterResponse);
+		CatchResult cresult;
+		if (encounterResponse.getStatus() == EncounterResponse.Status.ENCOUNTER_SUCCESS)
+		{
+			CatchPokemonResponse result = map.catchPokemon(proto, 1.0, 1.95 + Math.random() * 0.05, 0.85 + Math.random() * 0.15, balltype.ordinal());
+			cresult = new CatchResult(result);
+			System.out.println(cresult);
+		}
+		cresult = new CatchResult();
+		cresult.setFailed(true);
+		return cresult;
 	}
 
 
