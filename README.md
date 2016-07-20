@@ -45,7 +45,7 @@ EG:
 OkHttpClient httpClient = new OkHttpClient();
 AuthInfo auth = new GoogleLogin(httpClient).login("token");           
 PokemonGo go = new PokemonGo(auth,httpClient);
-System.out.println(go.getPlayerProfile());
+Log.v(go.getPlayerProfile());
 ```
 
 ## Contributing

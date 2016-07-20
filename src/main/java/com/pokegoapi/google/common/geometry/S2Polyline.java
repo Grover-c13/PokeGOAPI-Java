@@ -18,9 +18,10 @@ package com.pokegoapi.google.common.geometry;
 
 
 
+import com.pokegoapi.util.Log;
+
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * An S2Polyline represents a sequence of zero or more vertices connected by
@@ -33,7 +34,7 @@ import java.util.logging.Logger;
  *
  */
 public final strictfp class S2Polyline implements S2Region {
-  private static final Logger log = Logger.getLogger(S2Polyline.class.getCanonicalName());
+  public static final String TAG = S2Polyline.class.getSimpleName();
 
   private final int numVertices;
   private final S2Point[] vertices;
@@ -67,7 +68,7 @@ public final strictfp class S2Polyline implements S2Region {
     int n = vertices.size();
     for (int i = 0; i < n; ++i) {
       if (!S2.isUnitLength(vertices.get(i))) {
-        log.info("Vertex " + i + " is not unit length");
+        Log.i(TAG, "Vertex " + i + " is not unit length");
         return false;
       }
     }
@@ -76,7 +77,7 @@ public final strictfp class S2Polyline implements S2Region {
     for (int i = 1; i < n; ++i) {
       if (vertices.get(i - 1).equals(vertices.get(i))
           || vertices.get(i - 1).equals(S2Point.neg(vertices.get(i)))) {
-        log.info("Vertices " + (i - 1) + " and " + i + " are identical or antipodal");
+        Log.i(TAG, "Vertices " + (i - 1) + " and " + i + " are identical or antipodal");
         return false;
       }
     }
