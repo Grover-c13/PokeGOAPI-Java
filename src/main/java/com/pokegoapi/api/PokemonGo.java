@@ -4,16 +4,16 @@ package com.pokegoapi.api;
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import POGOProtos.Data.PlayerDataOuterClass;
-import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
+import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
 import POGOProtos.Inventory.ItemIdOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
-import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
-import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
-import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
+import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
+import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.inventory.Bag;
 import com.pokegoapi.api.inventory.CandyJar;
@@ -29,8 +29,11 @@ import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
+@Slf4j
 public class PokemonGo {
 
 	@Getter
@@ -71,23 +74,23 @@ public class PokemonGo {
 	private PlayerDataOuterClass.PlayerData getPlayerAndUpdateInventory(PlayerProfile playerProfile) throws LoginFailedException, RemoteServerException {
 		PlayerDataOuterClass.PlayerData localPlayer;
 
-		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
-		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
+		GetPlayerMessageOuterClass.GetPlayerMessage getPlayerReqMsg = GetPlayerMessageOuterClass.GetPlayerMessage.newBuilder().build();
+		ServerRequest getPlayerServerRequest = new ServerRequest(RequestTypeOuterClass.RequestType.GET_PLAYER, getPlayerReqMsg);
 		getRequestHandler().request(getPlayerServerRequest);
 
-		GetInventoryMessage invReqMsg = GetInventoryMessage.newBuilder()
+		GetInventoryMessageOuterClass.GetInventoryMessage invReqMsg = GetInventoryMessageOuterClass.GetInventoryMessage.newBuilder()
 				.setLastTimestampMs(this.lastInventoryUpdate)
 				.build();
-		ServerRequest getInventoryServerRequest = new ServerRequest(RequestType.GET_INVENTORY, invReqMsg);
+		ServerRequest getInventoryServerRequest = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY, invReqMsg);
 		getRequestHandler().request(getInventoryServerRequest);
 
 		getRequestHandler().sendServerRequests();
 
-		GetPlayerResponse getPlayerResponse;
-		GetInventoryResponse getInventoryResponse;
+		GetPlayerResponseOuterClass.GetPlayerResponse getPlayerResponse;
+		GetInventoryResponseOuterClass.GetInventoryResponse getInventoryResponse;
 		try {
-			getPlayerResponse = GetPlayerResponse.parseFrom(getPlayerServerRequest.getData());
-			getInventoryResponse = GetInventoryResponse.parseFrom(getInventoryServerRequest.getData());
+			getPlayerResponse = GetPlayerResponseOuterClass.GetPlayerResponse.parseFrom(getPlayerServerRequest.getData());
+			getInventoryResponse = GetInventoryResponseOuterClass.GetInventoryResponse.parseFrom(getInventoryServerRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
@@ -107,7 +110,7 @@ public class PokemonGo {
 				bag.addItem(new Item(item.getInventoryItemData().getItem()));
 			}
 
-			if (item.getInventoryItemData().getPokemonFamily().getFamilyId() != PokemonFamilyId.UNRECOGNIZED) {
+			if (item.getInventoryItemData().getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED) {
 				candyjar.setCandy(item.getInventoryItemData().getPokemonFamily().getFamilyId(), item.getInventoryItemData().getPokemonFamily().getCandy());
 			}
 
@@ -136,6 +139,7 @@ public class PokemonGo {
 		try {
 			localPlayer = getPlayerAndUpdateInventory(tempProfile);
 		} catch (LoginFailedException | RemoteServerException e) {
+            log.error(ExceptionUtils.getStackTrace(e));
 		}
 
 		if (localPlayer == null) {

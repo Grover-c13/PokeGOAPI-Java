@@ -7,9 +7,11 @@ import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,6 +19,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class RequestHandler {
 	private final PokemonGo api;
 	private RequestEnvelopeOuterClass.RequestEnvelope.Builder builder;
@@ -43,6 +46,13 @@ public class RequestHandler {
 		builder.addRequests(requestIn.getRequest());
 	}
 
+	public String debugRequestResponse(final RequestEnvelopeOuterClass.RequestEnvelope requestEnvelope,
+									   final ResponseEnvelopeOuterClass.ResponseEnvelope responseEnvelope) {
+		String requestStr = requestEnvelope == null ? "null" : requestEnvelope.toString();
+		String responseStr = responseEnvelope == null ? "null" : responseEnvelope.toString();
+		return String.format("Request:\n%s\nResponse:\n%s", requestStr, responseStr);
+	}
+
 	public void sendServerRequests() throws RemoteServerException, LoginFailedException {
 		setLatitude(api.getLatitude());
 		setLongitude(api.getLongitude());
@@ -53,7 +63,7 @@ public class RequestHandler {
 		try {
 			request.writeTo(stream);
 		} catch (IOException e) {
-			System.err.println("Should never happen");
+			log.error(String.format("Error while sending server request %s", ExceptionUtils.getStackTrace(e)));
 		}
 
 		RequestBody body = RequestBody.create(null, stream.toByteArray());
@@ -62,6 +72,7 @@ public class RequestHandler {
 				.post(body)
 				.build();
 		Response response = null;
+
 		try {
 			response = client.newCall(httpRequest).execute();
 		} catch (IOException e) {
@@ -72,9 +83,10 @@ public class RequestHandler {
 		try (InputStream content = response.body().byteStream()) {
 			responseEnvelop = ResponseEnvelopeOuterClass.ResponseEnvelope.parseFrom(content);
 		} catch (IOException e) {
-			// retrieved garbage from the server
-			throw new RemoteServerException("Received malformed response");
+			throw new RemoteServerException(String.format("Received malformed response: %s", ExceptionUtils.getStackTrace(e)));
 		}
+
+		//log.info(debugRequestResponse(request, responseEnvelop));
 
 		if (responseEnvelop.getApiUrl() != null && responseEnvelop.getApiUrl().length() > 0) {
 			api_endpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
