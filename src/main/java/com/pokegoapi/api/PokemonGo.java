@@ -3,6 +3,7 @@ package com.pokegoapi.api;
 
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.PlayerDataOuterClass;
+import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
 import POGOProtos.Inventory.ItemIdOuterClass;
@@ -103,6 +104,10 @@ public class PokemonGo {
 
 			if (item.getInventoryItemData().getItem().getItemId() != ItemIdOuterClass.ItemId.ITEM_UNKNOWN) {
 				bag.addItem(new Item(item.getInventoryItemData().getItem()));
+			}
+
+			if (item.getInventoryItemData().getPokemonFamily().getFamilyId() != PokemonFamilyId.UNRECOGNIZED) {
+				candyjar.setCandy(item.getInventoryItemData().getPokemonFamily().getFamilyId(), item.getInventoryItemData().getPokemonFamily().getCandy());
 			}
 
 		}
