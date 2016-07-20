@@ -113,9 +113,7 @@ public class PokemonGo {
 
 			if (item.getInventoryItemData().hasPlayerStats()) {
 				PlayerStatsOuterClass.PlayerStats stats = item.getInventoryItemData().getPlayerStats();
-				playerProfile.setExperience(stats.getExperience());
-				playerProfile.setLevel(stats.getLevel());
-				// TODO: add all stats fields
+				playerProfile.setStats(stats);
 			}
 
 		}

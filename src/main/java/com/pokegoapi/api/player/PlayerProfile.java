@@ -1,6 +1,7 @@
 package com.pokegoapi.api.player;
 
 import POGOProtos.Data.Player.EquippedBadgeOuterClass;
+import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 import lombok.Data;
 import lombok.Getter;
@@ -24,10 +25,7 @@ public class PlayerProfile {
 	private Map<Currency, Integer> currencies = new HashMap<Currency, Integer>();
 	@Getter
 	@Setter
-	private long experience;
-	@Getter
-	@Setter
-	private int level;
+	private PlayerStatsOuterClass.PlayerStats stats;
 
 
 	public void addCurrency(String name, int amount) throws InvalidCurrencyException {
