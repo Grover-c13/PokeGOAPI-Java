@@ -81,6 +81,10 @@ public class Pokemon {
 		}
 	}
 
+	public int getCandy() {
+		return pgo.getCandyjar().getCandies(getPokemonFamily());
+	}
+
 	public PokemonFamilyId getPokemonFamily() {
 		return PokemonFamilyMap.getFamily(this.getPokemonId());
 	}
