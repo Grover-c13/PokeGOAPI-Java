@@ -122,7 +122,11 @@ public class PokemonGo {
 	}
 
 	public PlayerProfile getPlayerProfile() {
-		if (playerProfile != null) {
+		return getPlayerProfile(false);
+	}
+
+	public PlayerProfile getPlayerProfile(boolean forceUpdate) {
+		if (!forceUpdate && playerProfile != null) {
 			return playerProfile;
 		}
 
