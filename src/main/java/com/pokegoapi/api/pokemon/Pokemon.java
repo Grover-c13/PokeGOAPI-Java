@@ -16,10 +16,12 @@ import com.pokegoapi.api.inventory.EvolutionResult;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.Log;
 import lombok.Setter;
 
 public class Pokemon {
 
+	private static final String TAG = Pokemon.class.getSimpleName();
 	@Setter
 	PokemonGo pgo;
 	private PokemonData proto;
@@ -202,6 +204,6 @@ public class Pokemon {
 	}
 
 	public void debug() {
-		System.out.println(proto);
+		Log.d(TAG, proto.toString());
 	}
 }

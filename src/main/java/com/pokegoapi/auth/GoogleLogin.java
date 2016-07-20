@@ -4,6 +4,7 @@ import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.util.Log;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ public class GoogleLogin extends Login {
 	public static final String CLIENT_ID = "848232511240-73ri3t7plvk96pj4f85uj8otdat2alem.apps.googleusercontent.com";
 	public static final String OAUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/device/code";
 	public static final String OAUTH_TOKEN_ENDPOINT = "https://www.googleapis.com/oauth2/v4/token";
+	private static final String TAG = GoogleLogin.class.getSimpleName();
 
 	private final OkHttpClient client;
 
@@ -62,14 +64,15 @@ public class GoogleLogin extends Login {
 			Gson gson = new GsonBuilder().create();
 
 			GoogleAuthJson googleAuth = gson.fromJson(response.body().string(), GoogleAuthJson.class);
-			System.out.println("Get user to go to:" + googleAuth.getVerification_url() + " and enter code:" + googleAuth.getUser_code());
+			Log.d(TAG, "Get user to go to:" + googleAuth.getVerification_url() + " and enter code:" + googleAuth.getUser_code());
 
 			GoogleAuthTokenJson token;
 			while ((token = poll(googleAuth)) == null) {
 				Thread.sleep(googleAuth.getInterval() * 1000);
 			}
 
-			System.out.println("Got token:" + token.getId_token());
+
+			Log.d(TAG, "Got token: " + token.getId_token());
 
 			AuthInfo.Builder authbuilder = AuthInfo.newBuilder();
 			authbuilder.setProvider("google");
