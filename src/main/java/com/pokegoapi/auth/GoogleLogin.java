@@ -44,14 +44,10 @@ public class GoogleLogin extends Login {
 	 */
 	public AuthInfo login(String username, String password) throws LoginFailedException {
 		try {
-
-
 			HttpUrl url = HttpUrl.parse(OAUTH_ENDPOINT).newBuilder()
 					.addQueryParameter("client_id", CLIENT_ID)
 					.addQueryParameter("scope", "openid email https://www.googleapis.com/auth/userinfo.email")
 					.build();
-
-
 
 			//Create empty body
 			RequestBody reqBody = RequestBody.create(null, new byte[0]);
@@ -81,7 +77,6 @@ public class GoogleLogin extends Login {
 
 			return authbuilder.build();
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new LoginFailedException();
 		}
 

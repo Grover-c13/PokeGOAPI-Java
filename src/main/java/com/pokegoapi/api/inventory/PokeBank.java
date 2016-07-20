@@ -13,8 +13,10 @@ import java.util.List;
 
 
 public class PokeBank {
-	@Getter List<Pokemon> pokemons = new ArrayList<Pokemon>();
-	@Getter PokemonGo instance;
+	@Getter
+	List<Pokemon> pokemons = new ArrayList<Pokemon>();
+	@Getter
+	PokemonGo instance;
 
 	public PokeBank(PokemonGo instance) {
 		this.instance = instance;

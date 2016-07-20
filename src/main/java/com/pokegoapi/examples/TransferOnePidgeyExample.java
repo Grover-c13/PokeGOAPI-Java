@@ -7,16 +7,14 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.auth.GoogleLogin;
 import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
 import okhttp3.OkHttpClient;
-
 
 import java.util.List;
 
-public class TransferOnePidgeyExample
-{
+public class TransferOnePidgeyExample {
 
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
 		RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth = null;
 		try {
@@ -27,24 +25,19 @@ public class TransferOnePidgeyExample
 
 			List<Pokemon> pidgeys = go.getPokebank().getPokemonByPokemonId(PokemonIdOuterClass.PokemonId.PIDGEY);
 
-			if (pidgeys.size() > 0)
-			{
+			if (pidgeys.size() > 0) {
 				Pokemon pest = pidgeys.get(0);
 				pest.debug();
 				ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result result = pest.transferPokemon();
 
 				System.out.println("Transfered Pidgey result:" + result);
-			}
-			else
-			{
+			} else {
 				System.out.println("You have no pidgeys :O");
 			}
 
 
-
-
-		} catch (LoginFailedException e) {
-			// failed to login, invalid credentials or auth issue.
+		} catch (LoginFailedException | RemoteServerException e) {
+			// failed to login, invalid credentials, auth issue or server issue.
 			e.printStackTrace();
 		}
 	}

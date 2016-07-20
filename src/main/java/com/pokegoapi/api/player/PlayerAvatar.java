@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class PlayerAvatar {
-	
+
 	private GenderOuterClass.Gender gender;
 	private int skin;
 	private int hair;

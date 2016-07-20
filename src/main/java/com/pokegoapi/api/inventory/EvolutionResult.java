@@ -4,7 +4,7 @@ import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass;
 import com.pokegoapi.api.pokemon.Pokemon;
 
 public class EvolutionResult {
-	
+
 	private EvolvePokemonResponseOuterClass.EvolvePokemonResponse proto;
 	private Pokemon pokemon;
 

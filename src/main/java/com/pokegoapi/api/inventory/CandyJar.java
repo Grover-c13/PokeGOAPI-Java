@@ -1,18 +1,13 @@
 package com.pokegoapi.api.inventory;
 
-import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
-import POGOProtos.Inventory.PokemonFamilyOuterClass.PokemonFamily;
 import com.pokegoapi.api.PokemonGo;
 import lombok.ToString;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 @ToString
-public class CandyJar
-{
+public class CandyJar {
 	private PokemonGo pgo;
 	private HashMap<PokemonFamilyId, Integer> candies;
 

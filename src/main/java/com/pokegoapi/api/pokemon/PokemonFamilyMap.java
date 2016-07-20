@@ -1,9 +1,7 @@
 package com.pokegoapi.api.pokemon;
 
 
-import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
-import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 
 import java.util.EnumMap;
@@ -12,8 +10,7 @@ public class PokemonFamilyMap {
 	private static EnumMap<PokemonId, PokemonFamilyId> map;
 
 
-	private static void registerValues()
-	{
+	private static void registerValues() {
 		map = new EnumMap<PokemonId, PokemonFamilyId>(PokemonId.class);
 		map.put(PokemonId.BULBASAUR, PokemonFamilyId.FAMILY_BULBASAUR);
 		map.put(PokemonId.IVYSAUR, PokemonFamilyId.FAMILY_BULBASAUR);
@@ -171,8 +168,7 @@ public class PokemonFamilyMap {
 	}
 
 	public static PokemonFamilyId getFamily(PokemonId id) {
-		if (map == null)
-		{
+		if (map == null) {
 			registerValues();
 		}
 

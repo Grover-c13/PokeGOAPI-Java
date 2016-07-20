@@ -1,22 +1,18 @@
 package com.pokegoapi.api.inventory;
 
-import com.pokegoapi.api.PokemonGo;
 import POGOProtos.Inventory.ItemIdOuterClass.ItemId;
+import POGOProtos.Inventory.ItemOuterClass;
+import com.pokegoapi.api.PokemonGo;
 
-import com.pokegoapi.exceptions.NoSuchItemException;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-public class Bag
-{
+public class Bag {
 	private PokemonGo pgo;
 	private HashMap<ItemId, Item> items;
 
 	public Bag(PokemonGo pgo) {
 		this.pgo = pgo;
-		items = new HashMap<ItemId, Item>();
+		items = new HashMap<>();
 	}
 
 	public void addItem(Item item) {
@@ -27,6 +23,10 @@ public class Bag
 		if (type == ItemId.UNRECOGNIZED) {
 			throw new IllegalArgumentException("You cannot get item for UNRECOGNIZED");
 		}
-		return items.get(type.getNumber());
+		if (!items.containsKey(type)) {
+			// prevent returning null
+			return new Item(ItemOuterClass.Item.newBuilder().setCount(0).setItemId(type).build());
+		}
+		return items.get(type);
 	}
 }

@@ -6,6 +6,7 @@ import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -36,82 +37,82 @@ public class RequestHandler {
 		resetBuilder();
 	}
 
-	public void request(ServerRequest requestIn)
-	{
+	public void request(ServerRequest requestIn) {
 		hasRequests = true;
 		serverRequests.add(requestIn);
 		builder.addRequests(requestIn.getRequest());
 	}
 
-	public void sendServerRequests()
-	{
+	public void sendServerRequests() throws RemoteServerException, LoginFailedException {
 		setLatitude(api.getLatitude());
 		setLongitude(api.getLongitude());
 		setAltitude(api.getAltitude());
-		
+
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		RequestEnvelopeOuterClass.RequestEnvelope request = builder.build();
 		try {
-			RequestEnvelopeOuterClass.RequestEnvelope request = builder.build();
 			request.writeTo(stream);
-		} catch (IOException e1) {
-			e1.printStackTrace();
+		} catch (IOException e) {
+			System.err.println("Should never happen");
 		}
 
+		RequestBody body = RequestBody.create(null, stream.toByteArray());
+		okhttp3.Request httpRequest = new okhttp3.Request.Builder()
+				.url(api_endpoint)
+				.post(body)
+				.build();
+		Response response = null;
 		try {
+			response = client.newCall(httpRequest).execute();
+		} catch (IOException e) {
+			throw new RemoteServerException(e);
+		}
 
-			RequestBody body = RequestBody.create(null, stream.toByteArray());
-			okhttp3.Request request = new okhttp3.Request.Builder()
-					.url(api_endpoint)
-					.post(body)
-					.build();
-			Response response = client.newCall(request).execute();
-			InputStream content = response.body().byteStream();
+		ResponseEnvelopeOuterClass.ResponseEnvelope responseEnvelop = null;
+		try (InputStream content = response.body().byteStream()) {
+			responseEnvelop = ResponseEnvelopeOuterClass.ResponseEnvelope.parseFrom(content);
+		} catch (IOException e) {
+			// retrieved garbage from the server
+			throw new RemoteServerException("Received malformed response");
+		}
 
-			ResponseEnvelopeOuterClass.ResponseEnvelope responseEnvelop = ResponseEnvelopeOuterClass.ResponseEnvelope.parseFrom(content);
+		if (responseEnvelop.getApiUrl() != null && responseEnvelop.getApiUrl().length() > 0) {
+			api_endpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
+		}
 
-			if (responseEnvelop.getStatusCode() == 102) {
-				throw new LoginFailedException();
-			}
+		if (responseEnvelop.hasAuthTicket()) {
+			lastAuth = responseEnvelop.getAuthTicket();
+		}
 
-			if (responseEnvelop.getApiUrl() != null && responseEnvelop.getApiUrl().length() > 0) {
-				api_endpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
-			}
+		if (responseEnvelop.getStatusCode() == 102) {
+			throw new LoginFailedException();
+		} else if (responseEnvelop.getStatusCode() == 53) {
+			// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
+			sendServerRequests();
+			return;
+		}
 
-			if (responseEnvelop.hasAuthTicket()) {
-				lastAuth = responseEnvelop.getAuthTicket();
-			}
-
-			// map each reply to the numeric response, ie first response = first request and send back to the requests to handle.
-			int count = 0;
-			for (ByteString payload : responseEnvelop.getReturnsList()) {
-				ServerRequest serverReq = serverRequests.get(count);
+		// map each reply to the numeric response, ie first response = first request and send back to the requests to handle.
+		int count = 0;
+		for (ByteString payload : responseEnvelop.getReturnsList()) {
+			ServerRequest serverReq = serverRequests.get(count);
+			// TODO: Probably all other payloads are garbage as well in this case, so might as well throw an exception and leave this loop
+			if (payload != null) {
 				serverReq.handleData(payload);
-				count++;
-
 			}
-
-			content.close();
-
-			// 53 seems to mean handshak'n so need to resend request
-			if (responseEnvelop.getStatusCode() == 53) {
-				sendServerRequests();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+			count++;
 		}
 
 		resetBuilder();
 	}
 
-
-
 	private void resetBuilder() {
 		builder = RequestEnvelopeOuterClass.RequestEnvelope.newBuilder();
 		builder.setStatusCode(2);
 		builder.setRequestId(8145806132888207460l);
-		if (lastAuth != null && lastAuth.getExpireTimestampMs() > 0) 
+		if (lastAuth != null && lastAuth.getExpireTimestampMs() > 0)
 			builder.setAuthTicket(lastAuth);
-		 else 
+		else
 			builder.setAuthInfo(auth);
 		builder.setUnknown12(989);
 		hasRequests = false;
