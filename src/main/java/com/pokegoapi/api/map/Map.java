@@ -4,6 +4,7 @@ import POGOProtos.Map.Fort.FortDataOuterClass;
 import POGOProtos.Map.Fort.FortTypeOuterClass;
 import POGOProtos.Map.MapCellOuterClass;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass;
+import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
 import POGOProtos.Networking.Requests.Messages.*;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.*;
@@ -59,11 +60,14 @@ public class Map {
 	 * @return List<CatchablePokemon> at your current location
 	 */
 	public List<CatchablePokemon> getCatchablePokemon() throws LoginFailedException, RemoteServerException {
-		List<CatchablePokemon> catchablePokemons = new ArrayList<CatchablePokemon>();
+		List<CatchablePokemon> catchablePokemons = new ArrayList<>();
 		MapObjects objects = getRetainedMapObject();
 
 		for (MapPokemonOuterClass.MapPokemon mapPokemon : objects.getCatchablePokemons()) {
 			catchablePokemons.add(new CatchablePokemon(api, mapPokemon));
+		}
+		for (WildPokemonOuterClass.WildPokemon wildPokemon : objects.getWildPokemons()) {
+			catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
 		}
 
 		return catchablePokemons;
