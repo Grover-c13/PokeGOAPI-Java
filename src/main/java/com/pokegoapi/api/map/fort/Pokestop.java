@@ -12,6 +12,7 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.ServerRequest;
+import lombok.Getter;
 
 /**
  * Created by mjmfighter on 7/20/2016.
@@ -20,17 +21,25 @@ public class Pokestop {
 
 	private final PokemonGo api;
 	private final FortDataOuterClass.FortData fortData;
+	@Getter
+	private long cooldownCompleteTimestampMs;
+
 
 	public Pokestop(PokemonGo api, FortDataOuterClass.FortData fortData) {
 		this.api = api;
 		this.fortData = fortData;
+		this.cooldownCompleteTimestampMs = fortData.getCooldownCompleteTimestampMs();
 	}
 
 	public boolean canLoot() {
+		return canLoot(false);
+	}
+
+	public boolean canLoot(boolean ignoreDistance) {
 		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
 		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
 		double distance = pokestop.getEarthDistance(player);
-		return distance < 30 && fortData.getCooldownCompleteTimestampMs() < System.currentTimeMillis();
+		return (ignoreDistance || distance < 30) && cooldownCompleteTimestampMs < System.currentTimeMillis();
 	}
 
 	public String getId() {
@@ -64,12 +73,13 @@ public class Pokestop {
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH, searchMessage);
 		api.getRequestHandler().request(serverRequest);
 		api.getRequestHandler().sendServerRequests();
-		FortSearchResponseOuterClass.FortSearchResponse response = null;
+		FortSearchResponseOuterClass.FortSearchResponse response;
 		try {
 			response = FortSearchResponseOuterClass.FortSearchResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
-			e.printStackTrace();
+			throw new RemoteServerException(e);
 		}
+		cooldownCompleteTimestampMs = response.getCooldownCompleteTimestampMs();
 		return new PokestopLootResult(response);
 	}
 
