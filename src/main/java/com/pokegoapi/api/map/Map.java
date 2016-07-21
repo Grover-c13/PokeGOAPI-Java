@@ -21,6 +21,7 @@ import POGOProtos.Map.MapCellOuterClass;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
+import POGOProtos.Map.SpawnPointOuterClass;
 import POGOProtos.Networking.Requests.Messages.*;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.*;
@@ -115,6 +116,37 @@ public class Map {
 		return pokemons;
 	}
 
+	/**
+	 * Returns a list of spawn points
+	 *
+	 * @return List<Point> list of spawn points
+	 */
+	public List<Point> getSpawnPoints() throws LoginFailedException, RemoteServerException {
+		List<Point> points = new ArrayList<>();
+		MapObjects objects = getRetainedMapObject();
+
+		for (SpawnPointOuterClass.SpawnPoint point : objects.getSpawnPoints()) {
+			points.add(new Point(point));
+		}
+
+		return points;
+	}
+
+	/**
+	 * Returns a list of decimated spawn points at current location
+	 *
+	 * @return List<Point> list of spawn points
+	 */
+	public List<Point> getDecimatedSpawnPoints() throws LoginFailedException, RemoteServerException {
+		List<Point> points = new ArrayList<>();
+		MapObjects objects = getRetainedMapObject();
+
+		for (SpawnPointOuterClass.SpawnPoint point : objects.getDecimatedSpawnPoints()) {
+			points.add(new Point(point));
+		}
+
+		return points;
+	}
 
 
 	/**
