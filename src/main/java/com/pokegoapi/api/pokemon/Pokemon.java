@@ -68,7 +68,7 @@ public class Pokemon {
 		try {
 			response = NicknamePokemonResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
-			return null;
+			throw new RemoteServerException(e);
 		}
 
 		return response.getResult();
