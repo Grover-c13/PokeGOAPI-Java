@@ -2,6 +2,7 @@ package com.pokegoapi.api.map.Pokemon;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
+import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
@@ -22,39 +23,45 @@ import lombok.ToString;
 public class CatchablePokemon {
 	private static final String TAG = CatchablePokemon.class.getSimpleName();
 	private final PokemonGo api;
-	private final MapPokemon proto;
+
+	@Getter
+	private final String spawnpointId;
+	@Getter
+	private final long encounterId;
+	@Getter
+	private final PokemonIdOuterClass.PokemonId pokemonId;
+	@Getter
+	private final long expirationTimestampMs;
+	@Getter
+	private final double latitude;
+	@Getter
+	private final double longitude;
 
 	@Getter
 	private boolean encountered = false;
 
 	public CatchablePokemon(PokemonGo api, MapPokemon proto) {
 		this.api = api;
-		this.proto = proto;
+
+		this.spawnpointId = proto.getSpawnpointId();
+		this.encounterId = proto.getEncounterId();
+		this.pokemonId = proto.getPokemonId();
+		this.expirationTimestampMs = proto.getExpirationTimestampMs();
+		this.latitude = proto.getLatitude();
+		this.longitude = proto.getLongitude();
 	}
 
-	public String getSpawnpointId() {
-		return proto.getSpawnpointId();
+	public CatchablePokemon(PokemonGo api, WildPokemon proto) {
+		this.api = api;
+
+		this.spawnpointId = proto.getSpawnpointId();
+		this.encounterId = proto.getEncounterId();
+		this.pokemonId = proto.getPokemonData().getPokemonId();
+		this.expirationTimestampMs = proto.getTimeTillHiddenMs();
+		this.latitude = proto.getLatitude();
+		this.longitude = proto.getLongitude();
 	}
 
-	public long getEncounterId() {
-		return proto.getEncounterId();
-	}
-
-	public PokemonIdOuterClass.PokemonId getPokemonId() {
-		return proto.getPokemonId();
-	}
-
-	public long getExpirationTimestampMs() {
-		return proto.getExpirationTimestampMs();
-	}
-
-	public double getLatitude() {
-		return proto.getLatitude();
-	}
-
-	public double getLongitude() {
-		return proto.getLongitude();
-	}
 
 	public EncounterResult encounterPokemon() throws LoginFailedException, RemoteServerException {
 		EncounterMessageOuterClass.EncounterMessage reqMsg = EncounterMessageOuterClass.EncounterMessage.newBuilder()
