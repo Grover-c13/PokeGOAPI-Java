@@ -151,6 +151,7 @@ public class CatchablePokemon {
             if(response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_ESCAPE && response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_MISSED){
                 break;
             }
+            numThrows++;
         } while (amount < 0 || numThrows < amount);
 
         return new CatchResult(response);
