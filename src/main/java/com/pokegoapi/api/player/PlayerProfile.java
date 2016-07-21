@@ -52,10 +52,11 @@ public class PlayerProfile {
 	}
 
 	public int getCurrency(Currency currency) throws InvalidCurrencyException {
-		if (currencies.containsKey(currency))
+		if (currencies.containsKey(currency)) {
 			return currencies.get(currency);
-		else
+		} else {
 			throw new InvalidCurrencyException();
+		}
 	}
 
 	public enum Currency {

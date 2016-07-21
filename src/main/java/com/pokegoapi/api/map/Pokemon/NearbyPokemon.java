@@ -13,7 +13,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.api.map.Pokemon;
+package com.pokegoapi.api.map.pokemon;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;

@@ -41,7 +41,7 @@ public class RequestHandler {
 	private boolean hasRequests;
 	private RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth;
 	private List<ServerRequest> serverRequests;
-	private String api_endpoint;
+	private String apiEndpoint;
 	private OkHttpClient client;
 
 	private AuthTicketOuterClass.AuthTicket lastAuth;
@@ -49,7 +49,7 @@ public class RequestHandler {
 	public RequestHandler(PokemonGo api, RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth, OkHttpClient client) {
 		this.api = api;
 		this.client = client;
-		api_endpoint = ApiSettings.API_ENDPOINT;
+		apiEndpoint = ApiSettings.API_ENDPOINT;
 		this.auth = auth;
 		serverRequests = new ArrayList<ServerRequest>();
 		resetBuilder();
@@ -76,7 +76,7 @@ public class RequestHandler {
 
 		RequestBody body = RequestBody.create(null, stream.toByteArray());
 		okhttp3.Request httpRequest = new okhttp3.Request.Builder()
-				.url(api_endpoint)
+				.url(apiEndpoint)
 				.post(body)
 				.build();
 		Response response = null;
@@ -86,8 +86,9 @@ public class RequestHandler {
 			throw new RemoteServerException(e);
 		}
 
-		if (response.code() != 200)
+		if (response.code() != 200) {
 			throw new RemoteServerException("Got a unexcepted http code : " + response.code());
+		}
 
 		ResponseEnvelopeOuterClass.ResponseEnvelope responseEnvelop = null;
 		try (InputStream content = response.body().byteStream()) {
@@ -98,7 +99,7 @@ public class RequestHandler {
 		}
 
 		if (responseEnvelop.getApiUrl() != null && responseEnvelop.getApiUrl().length() > 0) {
-			api_endpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
+			apiEndpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
 		}
 
 		if (responseEnvelop.hasAuthTicket()) {
@@ -108,16 +109,17 @@ public class RequestHandler {
 		if (responseEnvelop.getStatusCode() == 102) {
 			throw new LoginFailedException();
 		} else if (responseEnvelop.getStatusCode() == 53) {
-			// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
+			// 53 means that the apiEndpoint was not correctly set, should be at this point, though, so redo the request
 			sendServerRequests();
 			return;
 		}
 
-		// map each reply to the numeric response, ie first response = first request and send back to the requests to handle.
+		// map each reply to the numeric response,
+		// ie first response = first request and send back to the requests to handle.
 		int count = 0;
 		for (ByteString payload : responseEnvelop.getReturnsList()) {
 			ServerRequest serverReq = serverRequests.get(count);
-			// TODO: Probably all other payloads are garbage as well in this case, so might as well throw an exception and leave this loop
+			// TODO: Probably all other payloads are garbage as well in this case, so might as well throw an exception
 			if (payload != null) {
 				serverReq.handleData(payload);
 			}
@@ -130,11 +132,12 @@ public class RequestHandler {
 	private void resetBuilder() {
 		builder = RequestEnvelopeOuterClass.RequestEnvelope.newBuilder();
 		builder.setStatusCode(2);
-		builder.setRequestId(8145806132888207460l);
-		if (lastAuth != null && lastAuth.getExpireTimestampMs() > 0)
+		builder.setRequestId(8145806132888207460L);
+		if (lastAuth != null && lastAuth.getExpireTimestampMs() > 0) {
 			builder.setAuthTicket(lastAuth);
-		else
+		} else {
 			builder.setAuthInfo(auth);
+		}
 		builder.setUnknown12(989);
 		hasRequests = false;
 		serverRequests.clear();
@@ -142,11 +145,12 @@ public class RequestHandler {
 
 
 	public RequestEnvelopeOuterClass.RequestEnvelope build() {
-		if (!hasRequests)
+		if (!hasRequests) {
 			throw new IllegalStateException("Attempting to send request envelop with no requests");
+		}
 		return builder.build();
 	}
-	
+
 	public void setAuthInfo(AuthInfo auth) {
 		this.auth = auth;
 		this.lastAuth = null;

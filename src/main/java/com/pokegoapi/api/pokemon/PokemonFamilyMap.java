@@ -21,9 +21,9 @@ import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import java.util.EnumMap;
 
 public class PokemonFamilyMap {
-	
-	private static EnumMap<PokemonId, PokemonFamilyId> familys = new EnumMap<PokemonId, PokemonFamilyId>(PokemonId.class);
-	private static EnumMap<PokemonFamilyId, PokemonId> highestForFamily = new EnumMap<PokemonFamilyId, PokemonId>(PokemonFamilyId.class);
+
+	private static EnumMap<PokemonId, PokemonFamilyId> familys = new EnumMap<>(PokemonId.class);
+	private static EnumMap<PokemonFamilyId, PokemonId> highestForFamily = new EnumMap<>(PokemonFamilyId.class);
 
 	static {
 		familys.put(PokemonId.BULBASAUR, PokemonFamilyId.FAMILY_BULBASAUR);
@@ -261,17 +261,18 @@ public class PokemonFamilyMap {
 
 	/**
 	 * Return the FamilyId for the given PokemonId
+	 *
 	 * @param PokemonId
 	 * @return PokemonFamilyId
 	 */
 	public static PokemonFamilyId getFamily(PokemonId id) {
 		return familys.get(id);
 	}
-	
+
 	/**
 	 * Return the highest evolution for given family ID.
 	 * !!! CARE TO EVEE THAT DOESNT HAVE BETTER EVOLUTION !!!
-	 * 
+	 *
 	 * @param PokemonFamilyId
 	 * @return PokemonId
 	 */

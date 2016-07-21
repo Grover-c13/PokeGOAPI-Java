@@ -13,15 +13,14 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.api.map.Pokemon;
+package com.pokegoapi.api.map.pokemon;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
-import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.CatchPokemonMessage;
 import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
@@ -147,14 +146,17 @@ public class CatchablePokemon {
 	 * @throws LoginFailedException
 	 * @throws RemoteServerException
 	 */
-	public CatchResult catchPokemon(double normalizedHitPosition, double normalizedReticleSize, double spinModifier, Pokeball type, int amount) throws LoginFailedException, RemoteServerException {
-		if (!isEncountered())
+	public CatchResult catchPokemon(
+			double normalizedHitPosition, double normalizedReticleSize, double spinModifier, Pokeball type, int amount)
+			throws LoginFailedException, RemoteServerException {
+		if (!isEncountered()) {
 			return new CatchResult();
+		}
 
 		int numThrows = 0;
-		CatchPokemonResponseOuterClass.CatchPokemonResponse response = null;
+		CatchPokemonResponse response = null;
 		do {
-			CatchPokemonMessageOuterClass.CatchPokemonMessage reqMsg = CatchPokemonMessageOuterClass.CatchPokemonMessage.newBuilder()
+			CatchPokemonMessage reqMsg = CatchPokemonMessage.newBuilder()
 					.setEncounterId(getEncounterId())
 					.setHitPokemon(true)
 					.setNormalizedHitPosition(normalizedHitPosition)
@@ -168,16 +170,18 @@ public class CatchablePokemon {
 			api.getRequestHandler().sendServerRequests();
 
 			try {
-				response = CatchPokemonResponseOuterClass.CatchPokemonResponse.parseFrom(serverRequest.getData());
+				response = CatchPokemonResponse.parseFrom(serverRequest.getData());
 			} catch (InvalidProtocolBufferException e) {
 				throw new RemoteServerException(e);
 			}
 
-			if (response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_ESCAPE && response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_MISSED) {
+			if (response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_ESCAPE
+					&& response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_MISSED) {
 				break;
 			}
 			numThrows++;
-		} while (amount < 0 || numThrows < amount);
+		}
+		while (amount < 0 || numThrows < amount);
 
 		return new CatchResult(response);
 	}

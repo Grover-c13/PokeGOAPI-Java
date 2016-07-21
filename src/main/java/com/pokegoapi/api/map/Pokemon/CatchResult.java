@@ -13,7 +13,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.api.map.Pokemon;
+package com.pokegoapi.api.map.pokemon;
 
 import POGOProtos.Data.Capture.CaptureAwardOuterClass.CaptureAward;
 import POGOProtos.Enums.ActivityTypeOuterClass;
@@ -70,7 +70,9 @@ public class CatchResult {
 	}
 
 	public boolean isFailed() {
-		if (response == null) return failed;
+		if (response == null) {
+			return failed;
+		}
 		return (this.getStatus() != CatchStatus.CATCH_SUCCESS || failed);
 	}
 }

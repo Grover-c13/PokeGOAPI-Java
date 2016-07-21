@@ -17,7 +17,9 @@ package com.pokegoapi.api.map.fort;
 
 import POGOProtos.Map.Fort.FortDataOuterClass;
 import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
 import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass.FortSearchMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass;
@@ -77,7 +79,7 @@ public class Pokestop {
 	 * @throws RemoteServerException
 	 */
 	public PokestopLootResult loot() throws LoginFailedException, RemoteServerException {
-		FortSearchMessageOuterClass.FortSearchMessage searchMessage = FortSearchMessageOuterClass.FortSearchMessage.newBuilder()
+		FortSearchMessage searchMessage = FortSearchMessage.newBuilder()
 				.setFortId(getId())
 				.setFortLatitude(getLatitude())
 				.setFortLongitude(getLongitude())
@@ -106,7 +108,7 @@ public class Pokestop {
 	 * @throws RemoteServerException
 	 */
 	public FortDetails getDetails() throws LoginFailedException, RemoteServerException {
-		FortDetailsMessageOuterClass.FortDetailsMessage reqMsg = FortDetailsMessageOuterClass.FortDetailsMessage.newBuilder()
+		FortDetailsMessage reqMsg = FortDetailsMessage.newBuilder()
 				.setFortId(getId())
 				.setLatitude(getLatitude())
 				.setLongitude(getLongitude())

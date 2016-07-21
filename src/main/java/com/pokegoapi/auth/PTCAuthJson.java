@@ -15,7 +15,7 @@
 
 package com.pokegoapi.auth;
 
-public class PTCAuthJson {
+public class PtcAuthJson {
 
 	private String lt;
 	private String execution;

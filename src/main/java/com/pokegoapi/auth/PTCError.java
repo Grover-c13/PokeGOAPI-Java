@@ -15,7 +15,7 @@
 
 package com.pokegoapi.auth;
 
-public class PTCError {
+public class PtcError {
 
 	private String error;
 
