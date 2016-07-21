@@ -63,7 +63,7 @@ public class Map {
 		MapObjects objects =  getRetainedMapObject();
 
 		for (MapPokemonOuterClass.MapPokemon mapPokemon : objects.getCatchablePokemons() ) {
-			catchablePokemons.add(new CatchablePokemon(mapPokemon, this));
+			catchablePokemons.add(new CatchablePokemon(api, mapPokemon));
 		}
 
 		return catchablePokemons;
@@ -264,6 +264,7 @@ public class Map {
 		return response;
 	}
 
+    @Deprecated
 	public EncounterResponseOuterClass.EncounterResponse encounterPokemon(MapPokemonOuterClass.MapPokemon catchablePokemon) throws LoginFailedException, RemoteServerException {
 		EncounterMessageOuterClass.EncounterMessage reqMsg = EncounterMessageOuterClass.EncounterMessage.newBuilder()
 				.setEncounterId(catchablePokemon.getEncounterId())
@@ -283,6 +284,7 @@ public class Map {
 		return response;
 	}
 
+	@Deprecated
 	public CatchPokemonResponseOuterClass.CatchPokemonResponse catchPokemon(MapPokemonOuterClass.MapPokemon catchablePokemon, double normalizedHitPosition, double normalizedReticleSize, double spinModifier, int pokeball) throws LoginFailedException, RemoteServerException {
 		CatchPokemonMessageOuterClass.CatchPokemonMessage reqMsg = CatchPokemonMessageOuterClass.CatchPokemonMessage.newBuilder()
 				.setEncounterId(catchablePokemon.getEncounterId())
