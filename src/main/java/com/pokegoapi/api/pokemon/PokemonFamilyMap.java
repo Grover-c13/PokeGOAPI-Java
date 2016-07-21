@@ -7,7 +7,7 @@ import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import java.util.EnumMap;
 
 public class PokemonFamilyMap {
-	
+
 	private static EnumMap<PokemonId, PokemonFamilyId> map = new EnumMap<PokemonId, PokemonFamilyId>(PokemonId.class);
 
 	static {

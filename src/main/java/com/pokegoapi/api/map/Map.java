@@ -46,7 +46,7 @@ public class Map {
 	 */
 	private MapObjects getRetainedMapObject() throws LoginFailedException, RemoteServerException {
 		// get new MapObjects or used existing one
-		if (api.getLatitude() != lastLat && api.getLongitude() != lastLong || (System.currentTimeMillis()-lastMapUpdate) > NEW_MAP_OBJECTS_EXPIRY) {
+		if (api.getLatitude() != lastLat && api.getLongitude() != lastLong || (System.currentTimeMillis() - lastMapUpdate) > NEW_MAP_OBJECTS_EXPIRY) {
 			getMapObjects(); // should update the lastMapObjects variable
 		}
 
@@ -60,9 +60,9 @@ public class Map {
 	 */
 	public List<CatchablePokemon> getCatchablePokemon() throws LoginFailedException, RemoteServerException {
 		List<CatchablePokemon> catchablePokemons = new ArrayList<CatchablePokemon>();
-		MapObjects objects =  getRetainedMapObject();
+		MapObjects objects = getRetainedMapObject();
 
-		for (MapPokemonOuterClass.MapPokemon mapPokemon : objects.getCatchablePokemons() ) {
+		for (MapPokemonOuterClass.MapPokemon mapPokemon : objects.getCatchablePokemons()) {
 			catchablePokemons.add(new CatchablePokemon(mapPokemon, this));
 		}
 
@@ -127,21 +127,21 @@ public class Map {
 		return getMapObjects(getCellIds(latitude, longitude, width), latitude, longitude);
 	}
 
-    /**
-     * Returns the cells requested
-     *
-     * @param cellIds
-     * @param latitude
-     * @param longitude
-     * @return MapObjects in the given cells
-     */
-    @Deprecated
-    public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude, double altitude) throws LoginFailedException, RemoteServerException {
-        api.setLatitude(latitude);
-        api.setLongitude(longitude);
-        api.setAltitude(altitude);
-        return getMapObjects(cellIds);
-    }
+	/**
+	 * Returns the cells requested
+	 *
+	 * @param cellIds
+	 * @param latitude
+	 * @param longitude
+	 * @return MapObjects in the given cells
+	 */
+	@Deprecated
+	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude, double altitude) throws LoginFailedException, RemoteServerException {
+		api.setLatitude(latitude);
+		api.setLongitude(longitude);
+		api.setAltitude(altitude);
+		return getMapObjects(cellIds);
+	}
 
 	/**
 	 * Returns the cells requested
@@ -171,7 +171,7 @@ public class Map {
 			throw new RemoteServerException(e);
 		}
 
-		MapObjects result = new MapObjects();
+		MapObjects result = new MapObjects(api);
 		for (MapCellOuterClass.MapCell mapCell : response.getMapCellsList()) {
 			result.addNearbyPokemons(mapCell.getNearbyPokemonsList());
 			result.addCatchablePokemons(mapCell.getCatchablePokemonsList());
@@ -244,6 +244,7 @@ public class Map {
 		return new FortDetails(response);
 	}
 
+	@Deprecated
 	public FortSearchResponseOuterClass.FortSearchResponse searchFort(FortDataOuterClass.FortData fortData) throws LoginFailedException, RemoteServerException {
 		FortSearchMessageOuterClass.FortSearchMessage reqMsg = FortSearchMessageOuterClass.FortSearchMessage.newBuilder()
 				.setFortId(fortData.getId())

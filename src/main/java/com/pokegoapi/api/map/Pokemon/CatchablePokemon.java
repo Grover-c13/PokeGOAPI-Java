@@ -3,7 +3,6 @@ package com.pokegoapi.api.map.Pokemon;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
-import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.map.Map;
@@ -58,8 +57,7 @@ public class CatchablePokemon {
 		EncounterResponse encounterResponse = map.encounterPokemon(proto);
 		Log.i(TAG, "Encounter Response: " + encounterResponse.toString());
 		CatchResult cresult;
-		if (encounterResponse.getStatus() == EncounterResponse.Status.ENCOUNTER_SUCCESS)
-		{
+		if (encounterResponse.getStatus() == EncounterResponse.Status.ENCOUNTER_SUCCESS) {
 			CatchPokemonResponse result = map.catchPokemon(proto, 1.0, 1.95 + Math.random() * 0.05, 0.85 + Math.random() * 0.15, balltype.ordinal());
 			cresult = new CatchResult(result);
 		}
