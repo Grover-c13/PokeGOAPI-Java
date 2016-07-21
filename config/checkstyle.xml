@@ -15,11 +15,16 @@
  -->
 
 <module name = "Checker">
+    <module name="SuppressionFilter">
+        <property name="file" value="config/suppressions.xml"/>
+    </module>
+
     <property name="charset" value="UTF-8"/>
 
     <property name="severity" value="warning"/>
 
     <property name="fileExtensions" value="java, properties, xml"/>
+
 
     <module name="SuppressWarningsFilter"/>
     <module name="TreeWalker">
