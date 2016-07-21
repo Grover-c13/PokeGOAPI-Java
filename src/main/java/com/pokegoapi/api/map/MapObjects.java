@@ -117,4 +117,42 @@ public class MapObjects {
 	public boolean isComplete() {
 		return complete;
 	}
+
+	public void update(MapObjects other){
+
+		nearbyPokemons.clear();
+		addNearbyPokemons(other.getNearbyPokemons());
+
+		catchablePokemons.clear();
+		addCatchablePokemons(other.getCatchablePokemons());
+
+		wildPokemons.clear();
+		addWildPokemons(other.getWildPokemons());
+
+		decimatedSpawnPoints.clear();
+		addDecimatedSpawnPoints(other.getDecimatedSpawnPoints());
+
+		spawnPoints.clear();
+		addSpawnPoints(other.getSpawnPoints());
+
+		for(FortDataOuterClass.FortData otherGym : other.getGyms()){
+			for(FortDataOuterClass.FortData gym : getGyms()){
+				if(otherGym.getId().equals(gym.getId())){
+					gyms.remove(gym);
+					break;
+				}
+			}
+			gyms.add(otherGym);
+		}
+
+		for(Pokestop otherPokestop : other.getPokestops()){
+			for(Pokestop pokestop : pokestops){
+				if(otherPokestop.getId().equals(pokestop.getId())){
+					pokestops.remove(pokestop);
+					break;
+				}
+			}
+			pokestops.add(otherPokestop);
+		}
+	}
 }

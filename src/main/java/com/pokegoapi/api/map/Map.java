@@ -1,18 +1,3 @@
-/*
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.pokegoapi.api.map;
 
 import POGOProtos.Map.Fort.FortDataOuterClass;
@@ -47,42 +32,34 @@ import java.util.List;
 
 import static com.pokegoapi.google.common.geometry.S2CellId.MAX_LEVEL;
 
+/**
+ * Created by mjmjelde on 7/21/2016.
+ */
 public class Map {
-	private static long NEW_MAP_OBJECTS_EXPIRY = 60000; // 60 seconds
-	private PokemonGo api;
-	private long lastMapUpdate;
-	private MapObjects lastMapObjects;
-	private double lastLong;
-	private double lastLat;
+
+	private final PokemonGo api;
+	private MapObjects cachedMapObjects;
 	@Getter
 	@Setter
 	private boolean useCache;
-	@Getter
+
 	@Setter
-	private boolean trackUpdate;
+	@Getter
+	private long mapObjectsExpiry;
+
+	private long lastMapUpdate;
 
 	public Map(PokemonGo api) {
 		this.api = api;
+		cachedMapObjects = new MapObjects(api);
 		lastMapUpdate = 0;
 		useCache = true;
-		trackUpdate = true;
 	}
 
-	/**
-	 * Gets a new map objects if there has been a lat/long change or the last request was done greater then NEW_MAP_OBJECTS_EXPIRY
-	 *
-	 * @return List<CatchablePokemon> at your current location
-	 */
-	private MapObjects getRetainedMapObject() throws LoginFailedException, RemoteServerException {
-		// get new MapObjects or used existing one
-		if (!useCache) return lastMapObjects;
-		if (api.getLatitude() != lastLat && api.getLongitude() != lastLong || (System.currentTimeMillis() - lastMapUpdate) > NEW_MAP_OBJECTS_EXPIRY) {
-			getMapObjects(); // should update the lastMapObjects variable
-		}
-
-		return lastMapObjects;
+	public void clearCache(){
+		this.lastMapUpdate = 0;
+		this.cachedMapObjects = new MapObjects(api);
 	}
-
 
 	/**
 	 * Returns a list of catchable pokemon around the current location
@@ -91,18 +68,18 @@ public class Map {
 	 */
 	public List<CatchablePokemon> getCatchablePokemon() throws LoginFailedException, RemoteServerException {
 		List<CatchablePokemon> catchablePokemons = new ArrayList<>();
-		MapObjects objects = getRetainedMapObject();
+		MapObjects objects = getMapObjects();
 
-		for (MapPokemonOuterClass.MapPokemon mapPokemon : objects.getCatchablePokemons()) {
+		for(MapPokemonOuterClass.MapPokemon mapPokemon : objects.getCatchablePokemons()){
 			catchablePokemons.add(new CatchablePokemon(api, mapPokemon));
 		}
-		for (WildPokemonOuterClass.WildPokemon wildPokemon : objects.getWildPokemons()) {
+
+		for(WildPokemonOuterClass.WildPokemon wildPokemon : objects.getWildPokemons()){
 			catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
 		}
 
 		return catchablePokemons;
 	}
-
 
 	/**
 	 * Returns a list of nearby pokemon (non-catchable)
@@ -111,7 +88,7 @@ public class Map {
 	 */
 	public List<NearbyPokemon> getNearbyPokemon() throws LoginFailedException, RemoteServerException {
 		List<NearbyPokemon> pokemons = new ArrayList<>();
-		MapObjects objects = getRetainedMapObject();
+		MapObjects objects = getMapObjects();
 
 		for (NearbyPokemonOuterClass.NearbyPokemon pokemon : objects.getNearbyPokemons()) {
 			pokemons.add(new NearbyPokemon(pokemon));
@@ -127,7 +104,7 @@ public class Map {
 	 */
 	public List<Point> getSpawnPoints() throws LoginFailedException, RemoteServerException {
 		List<Point> points = new ArrayList<>();
-		MapObjects objects = getRetainedMapObject();
+		MapObjects objects = getMapObjects();
 
 		for (SpawnPointOuterClass.SpawnPoint point : objects.getSpawnPoints()) {
 			points.add(new Point(point));
@@ -143,7 +120,7 @@ public class Map {
 	 */
 	public List<Point> getDecimatedSpawnPoints() throws LoginFailedException, RemoteServerException {
 		List<Point> points = new ArrayList<>();
-		MapObjects objects = getRetainedMapObject();
+		MapObjects objects = getMapObjects();
 
 		for (SpawnPointOuterClass.SpawnPoint point : objects.getDecimatedSpawnPoints()) {
 			points.add(new Point(point));
@@ -151,7 +128,6 @@ public class Map {
 
 		return points;
 	}
-
 
 	/**
 	 * Returns MapObjects around your current location
@@ -233,19 +209,20 @@ public class Map {
 	 * @return MapObjects in the given cells
 	 */
 	public MapObjects getMapObjects(List<Long> cellIds) throws LoginFailedException, RemoteServerException {
+
+		if(useCache && (System.currentTimeMillis() - lastMapUpdate > mapObjectsExpiry)){
+			lastMapUpdate = 0;
+			cachedMapObjects = new MapObjects(api);
+		}
+
 		GetMapObjectsMessageOuterClass.GetMapObjectsMessage.Builder builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder()
 				.setLatitude(api.getLatitude())
 				.setLongitude(api.getLongitude());
 
-		int i = 0;
 		for (Long cellId : cellIds) {
 			builder.addCellId(cellId);
-			long time = 0;
-			if (trackUpdate)
-				time = lastMapUpdate;
 			builder.addSinceTimestampMs(lastMapUpdate);
 
-			i++;
 		}
 
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS, builder.build());
@@ -277,8 +254,12 @@ public class Map {
 			result.addPokestops(groupedForts.get(FortTypeOuterClass.FortType.CHECKPOINT));
 		}
 
-		lastMapObjects = result;
-		lastMapUpdate = System.currentTimeMillis();
+		if(useCache){
+			cachedMapObjects.update(result);
+			result = cachedMapObjects;
+			lastMapUpdate = System.currentTimeMillis();
+		}
+		
 		return result;
 	}
 
@@ -293,10 +274,6 @@ public class Map {
 	public List<Long> getCellIds(double latitude, double longitude, int width) {
 		S2LatLng latLng = S2LatLng.fromDegrees(latitude, longitude);
 		S2CellId cellId = S2CellId.fromLatLng(latLng).parent(15);
-
-		lastLat = api.getLatitude();
-		lastLong = api.getLongitude();
-
 
 		MutableInteger i = new MutableInteger(0);
 		MutableInteger j = new MutableInteger(0);
