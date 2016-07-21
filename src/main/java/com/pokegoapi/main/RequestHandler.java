@@ -2,6 +2,7 @@ package com.pokegoapi.main;
 
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
@@ -70,12 +71,15 @@ public class RequestHandler {
 			throw new RemoteServerException(e);
 		}
 
+		if (response.code() != 200)
+			throw new RemoteServerException("Got a unexcepted http code : " + response.code());
+
 		ResponseEnvelopeOuterClass.ResponseEnvelope responseEnvelop = null;
 		try (InputStream content = response.body().byteStream()) {
 			responseEnvelop = ResponseEnvelopeOuterClass.ResponseEnvelope.parseFrom(content);
 		} catch (IOException e) {
 			// retrieved garbage from the server
-			throw new RemoteServerException("Received malformed response");
+			throw new RemoteServerException("Received malformed response : " + e);
 		}
 
 		if (responseEnvelop.getApiUrl() != null && responseEnvelop.getApiUrl().length() > 0) {
@@ -126,6 +130,11 @@ public class RequestHandler {
 		if (!hasRequests)
 			throw new IllegalStateException("Attempting to send request envelop with no requests");
 		return builder.build();
+	}
+	
+	public void setAuthInfo(AuthInfo auth) {
+		this.auth = auth;
+		this.lastAuth = null;
 	}
 
 	public void setLatitude(double latitude) {

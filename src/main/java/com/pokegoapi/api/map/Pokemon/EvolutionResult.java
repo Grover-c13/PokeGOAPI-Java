@@ -1,4 +1,4 @@
-package com.pokegoapi.api.inventory;
+package com.pokegoapi.api.map.Pokemon;
 
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass;
 import com.pokegoapi.api.pokemon.Pokemon;
