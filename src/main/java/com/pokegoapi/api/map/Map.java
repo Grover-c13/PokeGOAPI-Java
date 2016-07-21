@@ -304,7 +304,7 @@ public class Map {
 		return cells;
 	}
 
-	public FortDetails getFortDetails(String id, long lon, long lat) throws LoginFailedException, RemoteServerException {
+	public FortDetails getFortDetails(String id, double lon, double lat) throws LoginFailedException, RemoteServerException {
 		FortDetailsMessageOuterClass.FortDetailsMessage reqMsg = FortDetailsMessageOuterClass.FortDetailsMessage.newBuilder()
 				.setFortId(id)
 				.setLatitude(lat)
