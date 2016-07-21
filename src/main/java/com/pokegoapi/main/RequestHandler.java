@@ -2,6 +2,7 @@ package com.pokegoapi.main;
 
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
@@ -129,6 +130,11 @@ public class RequestHandler {
 		if (!hasRequests)
 			throw new IllegalStateException("Attempting to send request envelop with no requests");
 		return builder.build();
+	}
+	
+	public void setAuthInfo(AuthInfo auth) {
+		this.auth = auth;
+		this.lastAuth = null;
 	}
 
 	public void setLatitude(double latitude) {

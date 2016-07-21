@@ -1,6 +1,5 @@
 package com.pokegoapi.api.pokemon;
 
-
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 
@@ -10,6 +9,7 @@ public class PokemonFamilyMap {
 	
 	private static EnumMap<PokemonId, PokemonFamilyId> familys = new EnumMap<PokemonId, PokemonFamilyId>(PokemonId.class);
 	private static EnumMap<PokemonFamilyId, PokemonId> highestForFamily = new EnumMap<PokemonFamilyId, PokemonId>(PokemonFamilyId.class);
+
 	static {
 		familys.put(PokemonId.BULBASAUR, PokemonFamilyId.FAMILY_BULBASAUR);
 		familys.put(PokemonId.IVYSAUR, PokemonFamilyId.FAMILY_BULBASAUR);

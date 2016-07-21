@@ -5,6 +5,8 @@ import POGOProtos.Map.Pokemon.MapPokemonOuterClass;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
 import POGOProtos.Map.SpawnPointOuterClass;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.map.fort.Pokestop;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -13,6 +15,7 @@ import java.util.Collection;
 
 @ToString
 public class MapObjects {
+
 	@Getter
 	Collection<NearbyPokemonOuterClass.NearbyPokemon> nearbyPokemons = new ArrayList<NearbyPokemonOuterClass.NearbyPokemon>();
 	@Getter
@@ -26,8 +29,13 @@ public class MapObjects {
 	@Getter
 	Collection<FortDataOuterClass.FortData> gyms = new ArrayList<FortDataOuterClass.FortData>();
 	@Getter
-	Collection<FortDataOuterClass.FortData> pokestops = new ArrayList<FortDataOuterClass.FortData>();
+	Collection<Pokestop> pokestops = new ArrayList<>();
 	boolean complete = false;
+	private PokemonGo api;
+
+	public MapObjects(PokemonGo api) {
+		this.api = api;
+	}
 
 	public void addNearbyPokemons(Collection<NearbyPokemonOuterClass.NearbyPokemon> nearbyPokemons) {
 		if (nearbyPokemons == null || nearbyPokemons.isEmpty()) {
@@ -82,7 +90,9 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		this.pokestops.addAll(pokestops);
+		for (FortDataOuterClass.FortData pokestop : pokestops) {
+			this.pokestops.add(new Pokestop(api, pokestop));
+		}
 	}
 
 	/**
