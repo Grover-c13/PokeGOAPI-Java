@@ -16,9 +16,7 @@
 package com.pokegoapi.api.map.fort;
 
 import POGOProtos.Map.Fort.FortDataOuterClass;
-import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
-import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass.FortSearchMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
