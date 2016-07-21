@@ -99,7 +99,6 @@ public class PTCLogin extends Login {
 		AuthInfo.Builder authbuilder = AuthInfo.newBuilder();
 		authbuilder.setProvider("ptc");
 		authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(token).setUnknown2(59).build());
-
 		return authbuilder.build();
 	}
 
@@ -125,7 +124,7 @@ public class PTCLogin extends Login {
 
 		Request postRequest = new Request.Builder()
                 .url(url)
-                .method("POST", emptyRequestBody)
+                .post(emptyRequestBody)
                 .build();
 
 		// Need a new client for this to not follow redirects
@@ -153,11 +152,8 @@ public class PTCLogin extends Login {
 	}
 
 	private String generateOauthToken(String ticket) throws IOException, LoginFailedException {
-		HttpUrl url;
-		Request postRequest;
-		Response response;
-		String body;
-		url = HttpUrl.parse(LOGIN_OAUTH).newBuilder()
+
+		HttpUrl url = HttpUrl.parse(LOGIN_OAUTH).newBuilder()
 				.addQueryParameter("client_id", CLIENT_ID)
 				.addQueryParameter("redirect_uri", REDIRECT_URI)
 				.addQueryParameter("client_secret", CLIENT_SECRET)
@@ -165,14 +161,14 @@ public class PTCLogin extends Login {
 				.addQueryParameter("code", ticket)
 				.build();
 
-		postRequest = new Request.Builder()
+		Request postRequest = new Request.Builder()
 				.url(url)
-				.method("POST", emptyRequestBody)
+				.post(emptyRequestBody)
 				.build();
 
-		response = client.newCall(postRequest).execute();
+		Response response = client.newCall(postRequest).execute();
 
-		body = response.body().string();
+		String body = response.body().string();
 
 		try {
 			String token = body.split("token=")[1];
