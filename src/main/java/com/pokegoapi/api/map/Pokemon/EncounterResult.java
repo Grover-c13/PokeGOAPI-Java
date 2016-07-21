@@ -7,17 +7,17 @@ import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResp
  */
 public class EncounterResult {
 
-    private EncounterResponse response;
+	private EncounterResponse response;
 
-    public EncounterResult(EncounterResponse response){
-        this.response = response;
-    }
+	public EncounterResult(EncounterResponse response) {
+		this.response = response;
+	}
 
-    public EncounterResponse.Status getStatus(){
-        return response == null ? null : response.getStatus();
-    }
+	public EncounterResponse.Status getStatus() {
+		return response == null ? null : response.getStatus();
+	}
 
-    public boolean wasSuccessful(){
-        return response != null && getStatus() != null && getStatus().equals(EncounterResponse.Status.ENCOUNTER_SUCCESS);
-    }
+	public boolean wasSuccessful() {
+		return response != null && getStatus() != null && getStatus().equals(EncounterResponse.Status.ENCOUNTER_SUCCESS);
+	}
 }
