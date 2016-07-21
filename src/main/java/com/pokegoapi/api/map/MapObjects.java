@@ -48,10 +48,20 @@ public class MapObjects {
 	boolean complete = false;
 	private PokemonGo api;
 
+	/**
+	 * Instantiates a new Map objects.
+	 *
+	 * @param api the api
+	 */
 	public MapObjects(PokemonGo api) {
 		this.api = api;
 	}
 
+	/**
+	 * Add nearby pokemons.
+	 *
+	 * @param nearbyPokemons the nearby pokemons
+	 */
 	public void addNearbyPokemons(Collection<NearbyPokemon> nearbyPokemons) {
 		if (nearbyPokemons == null || nearbyPokemons.isEmpty()) {
 			return;
@@ -60,6 +70,11 @@ public class MapObjects {
 		this.nearbyPokemons.addAll(nearbyPokemons);
 	}
 
+	/**
+	 * Add catchable pokemons.
+	 *
+	 * @param catchablePokemons the catchable pokemons
+	 */
 	public void addCatchablePokemons(Collection<MapPokemon> catchablePokemons) {
 		if (catchablePokemons == null || catchablePokemons.isEmpty()) {
 			return;
@@ -68,6 +83,11 @@ public class MapObjects {
 		this.catchablePokemons.addAll(catchablePokemons);
 	}
 
+	/**
+	 * Add wild pokemons.
+	 *
+	 * @param wildPokemons the wild pokemons
+	 */
 	public void addWildPokemons(Collection<WildPokemon> wildPokemons) {
 		if (wildPokemons == null || wildPokemons.isEmpty()) {
 			return;
@@ -76,6 +96,11 @@ public class MapObjects {
 		this.wildPokemons.addAll(wildPokemons);
 	}
 
+	/**
+	 * Add decimated spawn points.
+	 *
+	 * @param decimatedSpawnPoints the decimated spawn points
+	 */
 	public void addDecimatedSpawnPoints(Collection<SpawnPoint> decimatedSpawnPoints) {
 		if (decimatedSpawnPoints == null || decimatedSpawnPoints.isEmpty()) {
 			return;
@@ -84,6 +109,11 @@ public class MapObjects {
 		this.decimatedSpawnPoints.addAll(decimatedSpawnPoints);
 	}
 
+	/**
+	 * Add spawn points.
+	 *
+	 * @param spawnPoints the spawn points
+	 */
 	public void addSpawnPoints(Collection<SpawnPoint> spawnPoints) {
 		if (spawnPoints == null || spawnPoints.isEmpty()) {
 			return;
@@ -92,6 +122,11 @@ public class MapObjects {
 		this.spawnPoints.addAll(spawnPoints);
 	}
 
+	/**
+	 * Add gyms.
+	 *
+	 * @param gyms the gyms
+	 */
 	public void addGyms(Collection<FortData> gyms) {
 		if (gyms == null || gyms.isEmpty()) {
 			return;
@@ -100,6 +135,11 @@ public class MapObjects {
 		this.gyms.addAll(gyms);
 	}
 
+	/**
+	 * Add pokestops.
+	 *
+	 * @param pokestops the pokestops
+	 */
 	public void addPokestops(Collection<FortData> pokestops) {
 		if (pokestops == null || pokestops.isEmpty()) {
 			return;
@@ -111,9 +151,10 @@ public class MapObjects {
 	}
 
 	/**
-	 * Returns whether or not the return returned any data at all;
-	 * when a user requests too many cells/wrong cell level/cells too far away from the users location,
-	 * the server returns empty MapCells
+	 * Returns whether any data was returned. When a user requests too many cells/wrong cell level/cells too far away
+	 * from the users location, the server returns empty MapCells.
+	 *
+	 * @return whether or not the return returned any data at all;
 	 */
 	public boolean isComplete() {
 		return complete;

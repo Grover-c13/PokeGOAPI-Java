@@ -46,6 +46,13 @@ public class RequestHandler {
 
 	private AuthTicketOuterClass.AuthTicket lastAuth;
 
+	/**
+	 * Instantiates a new Request handler.
+	 *
+	 * @param api    the api
+	 * @param auth   the auth
+	 * @param client the client
+	 */
 	public RequestHandler(PokemonGo api, RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth, OkHttpClient client) {
 		this.api = api;
 		this.client = client;
@@ -55,12 +62,23 @@ public class RequestHandler {
 		resetBuilder();
 	}
 
+	/**
+	 * Request.
+	 *
+	 * @param requestIn the request in
+	 */
 	public void request(ServerRequest requestIn) {
 		hasRequests = true;
 		serverRequests.add(requestIn);
 		builder.addRequests(requestIn.getRequest());
 	}
 
+	/**
+	 * Send server requests.
+	 *
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException  the login failed exception
+	 */
 	public void sendServerRequests() throws RemoteServerException, LoginFailedException {
 		setLatitude(api.getLatitude());
 		setLongitude(api.getLongitude());
@@ -144,6 +162,11 @@ public class RequestHandler {
 	}
 
 
+	/**
+	 * Build request envelope outer class . request envelope.
+	 *
+	 * @return the request envelope outer class . request envelope
+	 */
 	public RequestEnvelopeOuterClass.RequestEnvelope build() {
 		if (!hasRequests) {
 			throw new IllegalStateException("Attempting to send request envelop with no requests");

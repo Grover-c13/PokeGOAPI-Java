@@ -30,6 +30,9 @@ import com.pokegoapi.main.ServerRequest;
 
 import java.util.HashMap;
 
+/**
+ * The type Bag.
+ */
 public class Bag {
 	private PokemonGo pgo;
 	private HashMap<ItemId, Item> items;
@@ -43,6 +46,15 @@ public class Bag {
 		items.put(item.getItemId(), item);
 	}
 
+	/**
+	 * Remove item result.
+	 *
+	 * @param id       the id
+	 * @param quantity the quantity
+	 * @return the result
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException  the login failed exception
+	 */
 	public Result removeItem(ItemId id, int quantity) throws RemoteServerException, LoginFailedException {
 		Item item = getItem(id);
 		if (item.getCount() < quantity) {
@@ -71,6 +83,13 @@ public class Bag {
 		return response.getResult();
 	}
 
+
+	/**
+	 * Gets item.
+	 *
+	 * @param type the type
+	 * @return the item
+	 */
 	public Item getItem(ItemId type) {
 		if (type == ItemId.UNRECOGNIZED) {
 			throw new IllegalArgumentException("You cannot get item for UNRECOGNIZED");

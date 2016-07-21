@@ -260,9 +260,9 @@ public class PokemonFamilyMap {
 	}
 
 	/**
-	 * Return the FamilyId for the given PokemonId
+	 * Return the FamilyId for the given PokemonId.
 	 *
-	 * @param PokemonId
+	 * @param id the id of the pokemon
 	 * @return PokemonFamilyId
 	 */
 	public static PokemonFamilyId getFamily(PokemonId id) {
@@ -273,7 +273,7 @@ public class PokemonFamilyMap {
 	 * Return the highest evolution for given family ID.
 	 * !!! CARE TO EVEE THAT DOESNT HAVE BETTER EVOLUTION !!!
 	 *
-	 * @param PokemonFamilyId
+	 * @param family the id of the pokemon family
 	 * @return PokemonId
 	 */
 	public static PokemonId getHightestForFamily(PokemonFamilyId family) {

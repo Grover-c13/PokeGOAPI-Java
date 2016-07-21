@@ -50,6 +50,11 @@ public class PtcLogin extends Login {
 	@Getter
 	String token;
 
+	/**
+	 * Instantiates a new Ptc login.
+	 *
+	 * @param client the client
+	 */
 	public PtcLogin(OkHttpClient client) {
 		/*
 		This is a temporary, in-memory cookie jar.

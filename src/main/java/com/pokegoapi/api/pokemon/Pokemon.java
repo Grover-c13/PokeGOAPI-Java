@@ -36,6 +36,9 @@ import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 import lombok.Setter;
 
+/**
+ * The type Pokemon.
+ */
 public class Pokemon {
 
 	private static final String TAG = Pokemon.class.getSimpleName();
@@ -50,6 +53,13 @@ public class Pokemon {
 		this.proto = proto;
 	}
 
+	/**
+	 * Transfers the pokemon.
+	 *
+	 * @return the result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
 	public Result transferPokemon() throws LoginFailedException, RemoteServerException {
 		ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
@@ -74,6 +84,14 @@ public class Pokemon {
 		return response.getResult();
 	}
 
+	/**
+	 * Rename pokemon nickname pokemon response . result.
+	 *
+	 * @param nickname the nickname
+	 * @return the nickname pokemon response . result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
 	public NicknamePokemonResponse.Result renamePokemon(String nickname)
 			throws LoginFailedException, RemoteServerException {
 		NicknamePokemonMessage reqMsg = NicknamePokemonMessage.newBuilder()
@@ -95,6 +113,13 @@ public class Pokemon {
 		return response.getResult();
 	}
 
+	/**
+	 * Evolve evolution result.
+	 *
+	 * @return the evolution result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
 	public EvolutionResult evolve() throws LoginFailedException, RemoteServerException {
 		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
 

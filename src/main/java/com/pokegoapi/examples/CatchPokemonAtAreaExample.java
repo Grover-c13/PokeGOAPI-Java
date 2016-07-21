@@ -46,6 +46,9 @@ import java.util.List;
 
 public class CatchPokemonAtAreaExample {
 
+	/**
+	 * Catches a pokemon at an area.
+	 */
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
 		RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth = null;

@@ -20,6 +20,16 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class Utils {
+
+
+	/**
+	 * Converts input streams to byte arrays.
+	 *
+	 * @param input the input
+	 * @param size  the size
+	 * @return the byte [ ]
+	 * @throws IOException the io exception
+	 */
 	public static byte[] inputStreamToByteArray(InputStream input, int size) throws IOException {
 		byte[] buffer = new byte[size];
 		int bytesRead;

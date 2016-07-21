@@ -30,6 +30,10 @@ import java.util.List;
 
 public class TransferOnePidgeyExample {
 
+
+	/**
+	 * Transfers one pidgey from the player's inventory.
+	 */
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
 		RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth = null;

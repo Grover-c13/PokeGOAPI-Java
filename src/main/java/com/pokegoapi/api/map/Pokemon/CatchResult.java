@@ -69,6 +69,11 @@ public class CatchResult {
 		return captureAward.getStardustList();
 	}
 
+	/**
+	 * Returns whether the catch failed.
+	 *
+	 * @return the boolean
+	 */
 	public boolean isFailed() {
 		if (response == null) {
 			return failed;

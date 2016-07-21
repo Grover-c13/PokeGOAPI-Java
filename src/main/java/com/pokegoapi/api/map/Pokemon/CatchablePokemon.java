@@ -33,6 +33,9 @@ import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 import lombok.ToString;
 
+/**
+ * The type Catchable pokemon.
+ */
 @ToString
 public class CatchablePokemon {
 	private static final String TAG = CatchablePokemon.class.getSimpleName();
@@ -54,6 +57,12 @@ public class CatchablePokemon {
 	@Getter
 	private boolean encountered = false;
 
+	/**
+	 * Instantiates a new Catchable pokemon.
+	 *
+	 * @param api   the api
+	 * @param proto the proto
+	 */
 	public CatchablePokemon(PokemonGo api, MapPokemon proto) {
 		this.api = api;
 
@@ -65,9 +74,15 @@ public class CatchablePokemon {
 		this.longitude = proto.getLongitude();
 	}
 
+
+	/**
+	 * Instantiates a new Catchable pokemon.
+	 *
+	 * @param api   the api
+	 * @param proto the proto
+	 */
 	public CatchablePokemon(PokemonGo api, WildPokemon proto) {
 		this.api = api;
-
 		this.spawnpointId = proto.getSpawnpointId();
 		this.encounterId = proto.getEncounterId();
 		this.pokemonId = proto.getPokemonData().getPokemonId();
@@ -77,6 +92,13 @@ public class CatchablePokemon {
 	}
 
 
+	/**
+	 * Encounter pokemon encounter result.
+	 *
+	 * @return the encounter result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
 	public EncounterResult encounterPokemon() throws LoginFailedException, RemoteServerException {
 		EncounterMessageOuterClass.EncounterMessage reqMsg = EncounterMessageOuterClass.EncounterMessage.newBuilder()
 				.setEncounterId(getEncounterId())
@@ -98,11 +120,11 @@ public class CatchablePokemon {
 	}
 
 	/**
-	 * Tries to catch a pokemon with a pokeball
+	 * Tries to catch a pokemon with a pokeball.
 	 *
 	 * @return CatchResult
-	 * @throws LoginFailedException
-	 * @throws RemoteServerException
+	 * @throws LoginFailedException if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemon() throws LoginFailedException, RemoteServerException {
 		return catchPokemon(Pokeball.POKEBALL);
@@ -110,25 +132,25 @@ public class CatchablePokemon {
 
 
 	/**
-	 * Tries to catch a pokeball with the given type
+	 * Tries to catch a pokeball with the given type.
 	 *
 	 * @param pokeball Type of pokeball
 	 * @return CatchResult
-	 * @throws LoginFailedException
-	 * @throws RemoteServerException
+	 * @throws LoginFailedException if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemon(Pokeball pokeball) throws LoginFailedException, RemoteServerException {
 		return catchPokemon(pokeball, -1);
 	}
 
 	/**
-	 * Tried to catch a pokemon with given pokeball and max number of pokeballs
+	 * Tried to catch a pokemon with given pokeball and max number of pokeballs.
 	 *
 	 * @param pokeball Type of pokeball
 	 * @param amount   Max number of pokeballs to use
 	 * @return CatchResult
-	 * @throws LoginFailedException
-	 * @throws RemoteServerException
+	 * @throws LoginFailedException if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemon(Pokeball pokeball, int amount) throws LoginFailedException, RemoteServerException {
 		return catchPokemon(1.0, 1.95 + Math.random() * 0.05, 0.85 + Math.random() * 0.15, pokeball, amount);
@@ -137,14 +159,14 @@ public class CatchablePokemon {
 	/**
 	 * Tries to catch a pokemon.
 	 *
-	 * @param normalizedHitPosition
-	 * @param normalizedReticleSize
-	 * @param spinModifier
+	 * @param normalizedHitPosition the normalized hit position
+	 * @param normalizedReticleSize the normalized hit reticle
+	 * @param spinModifier 			the spin modifier
 	 * @param type                  Type of pokeball to throw
 	 * @param amount                Max number of Pokeballs to throw, negative number for unlimited
 	 * @return CatchResult of resulted try to catch pokemon
-	 * @throws LoginFailedException
-	 * @throws RemoteServerException
+	 * @throws LoginFailedException if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemon(
 			double normalizedHitPosition, double normalizedReticleSize, double spinModifier, Pokeball type, int amount)

@@ -77,6 +77,12 @@ public class PokemonGo {
 
 	private long lastInventoryUpdate;
 
+	/**
+	 * Instantiates a new Pokemon go.
+	 *
+	 * @param auth   the auth
+	 * @param client the client
+	 */
 	public PokemonGo(RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth, OkHttpClient client) {
 		playerProfile = null;
 
@@ -144,10 +150,21 @@ public class PokemonGo {
 		return getPlayerResponse.getPlayerData();
 	}
 
+	/**
+	 * Gets player profile.
+	 *
+	 * @return the player profile
+	 */
 	public PlayerProfile getPlayerProfile() {
 		return getPlayerProfile(false);
 	}
 
+	/**
+	 * Gets player profile.
+	 *
+	 * @param forceUpdate the force update
+	 * @return the player profile
+	 */
 	public PlayerProfile getPlayerProfile(boolean forceUpdate) {
 		if (!forceUpdate && playerProfile != null) {
 			return playerProfile;
@@ -206,6 +223,13 @@ public class PokemonGo {
 		return playerProfile;
 	}
 
+	/**
+	 * Sets location.
+	 *
+	 * @param latitude  the latitude
+	 * @param longitude the longitude
+	 * @param altitude  the altitude
+	 */
 	public void setLocation(double latitude, double longitude, double altitude) {
 		setLatitude(latitude);
 		setLongitude(longitude);

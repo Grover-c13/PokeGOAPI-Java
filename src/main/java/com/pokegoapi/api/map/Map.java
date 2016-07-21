@@ -69,6 +69,11 @@ public class Map {
 	@Setter
 	private boolean trackUpdate;
 
+	/**
+	 * Instantiates a new Map.
+	 *
+	 * @param api the api
+	 */
 	public Map(PokemonGo api) {
 		this.api = api;
 		lastMapUpdate = 0;
@@ -78,9 +83,9 @@ public class Map {
 
 	/**
 	 * Gets a new map objects if there has been a lat/long change or the last request was done greater then
-	 * NEW_MAP_OBJECTS_EXPIRY
+	 * NEW_MAP_OBJECTS_EXPIRY.
 	 *
-	 * @return List<CatchablePokemon> at your current location
+	 * @return a List of CatchablePokemon at your current location
 	 */
 	private MapObjects getRetainedMapObject() throws LoginFailedException, RemoteServerException {
 		// get new MapObjects or used existing one
@@ -97,9 +102,9 @@ public class Map {
 
 
 	/**
-	 * Returns a list of catchable pokemon around the current location
+	 * Returns a list of catchable pokemon around the current location.
 	 *
-	 * @return List<CatchablePokemon> at your current location
+	 * @return a List of CatchablePokemon at your current location
 	 */
 	public List<CatchablePokemon> getCatchablePokemon() throws LoginFailedException, RemoteServerException {
 		List<CatchablePokemon> catchablePokemons = new ArrayList<>();
@@ -117,9 +122,9 @@ public class Map {
 
 
 	/**
-	 * Returns a list of nearby pokemon (non-catchable)
+	 * Returns a list of nearby pokemon (non-catchable).
 	 *
-	 * @return List<NearbyPokemon> at your current location
+	 * @return a List of NearbyPokemon at your current location
 	 */
 	public List<NearbyPokemon> getNearbyPokemon() throws LoginFailedException, RemoteServerException {
 		List<NearbyPokemon> pokemons = new ArrayList<>();
@@ -165,7 +170,7 @@ public class Map {
 	}
 
 	/**
-	 * Returns MapObjects around your current location
+	 * Returns MapObjects around your current location.
 	 *
 	 * @return MapObjects at your current location
 	 */
@@ -174,9 +179,9 @@ public class Map {
 	}
 
 	/**
-	 * Returns MapObjects around your current location within a given width
+	 * Returns MapObjects around your current location within a given width.
 	 *
-	 * @param width
+	 * @param width width
 	 * @return MapObjects at your current location
 	 */
 	public MapObjects getMapObjects(int width) throws LoginFailedException, RemoteServerException {
@@ -191,10 +196,10 @@ public class Map {
 	}
 
 	/**
-	 * Returns 9x9 cells with the requested lattitude/longitude in the center cell
+	 * Returns 9x9 cells with the requested lattitude/longitude in the center cell.
 	 *
-	 * @param latitude
-	 * @param longitude
+	 * @param latitude latitude
+	 * @param longitude longitude
 	 * @return MapObjects in the given cells
 	 */
 	@Deprecated
@@ -204,11 +209,11 @@ public class Map {
 	}
 
 	/**
-	 * Returns the cells requested, you should send a latitude/longitude to fake a near location
+	 * Returns the cells requested, you should send a latitude/longitude to fake a near location.
 	 *
-	 * @param cellIds   List<Long> of cellId
-	 * @param latitude
-	 * @param longitude
+	 * @param cellIds   List of cellIds
+	 * @param latitude latitude
+	 * @param longitude longitude
 	 * @return MapObjects in the given cells
 	 */
 	@Deprecated
@@ -218,11 +223,11 @@ public class Map {
 	}
 
 	/**
-	 * Returns `width` * `width` cells with the requested latitude/longitude in the center
+	 * Returns `width` * `width` cells with the requested latitude/longitude in the center.
 	 *
-	 * @param latitude
-	 * @param longitude
-	 * @param width
+	 * @param latitude latitude
+	 * @param longitude longitude
+	 * @param width width
 	 * @return MapObjects in the given cells
 	 */
 	@Deprecated
@@ -232,11 +237,11 @@ public class Map {
 	}
 
 	/**
-	 * Returns the cells requested
+	 * Returns the cells requested.
 	 *
-	 * @param cellIds
-	 * @param latitude
-	 * @param longitude
+	 * @param cellIds cellIds
+	 * @param latitude latitude
+	 * @param longitude longitude
 	 * @return MapObjects in the given cells
 	 */
 	@Deprecated
@@ -249,9 +254,9 @@ public class Map {
 	}
 
 	/**
-	 * Returns the cells requested
+	 * Returns the cells requested.
 	 *
-	 * @param cellIds List<Long> of cellId
+	 * @param cellIds List of cellId
 	 * @return MapObjects in the given cells
 	 */
 	public MapObjects getMapObjects(List<Long> cellIds) throws LoginFailedException, RemoteServerException {
@@ -304,11 +309,11 @@ public class Map {
 	}
 
 	/**
-	 * Get a list of all the Cell Ids
+	 * Get a list of all the Cell Ids.
 	 *
-	 * @param latitude
-	 * @param longitude
-	 * @param width
+	 * @param latitude latitude
+	 * @param longitude longitude
+	 * @param width width
 	 * @return List of Cells
 	 */
 	public List<Long> getCellIds(double latitude, double longitude, int width) {
@@ -330,12 +335,22 @@ public class Map {
 		int halfWidth = (int) Math.floor(width / 2);
 		for (int x = -halfWidth; x <= halfWidth; x++) {
 			for (int y = -halfWidth; y <= halfWidth; y++) {
-				cells.add(cellId.fromFaceIJ(face, index.intValue() + x * size, jindex.intValue() + y * size).parent(15).id());
+				cells.add(S2CellId.fromFaceIJ(face, index.intValue() + x * size, jindex.intValue() + y * size).parent(15).id());
 			}
 		}
 		return cells;
 	}
 
+	/**
+	 * Gets fort details.
+	 *
+	 * @param id  the id
+	 * @param lon the lon
+	 * @param lat the lat
+	 * @return the fort details
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
 	public FortDetails getFortDetails(String id, long lon, long lat) throws LoginFailedException, RemoteServerException {
 		FortDetailsMessage reqMsg = FortDetailsMessage.newBuilder()
 				.setFortId(id)
@@ -355,6 +370,14 @@ public class Map {
 		return new FortDetails(response);
 	}
 
+	/**
+	 * Search fort fort search response.
+	 *
+	 * @param fortData the fort data
+	 * @return the fort search response
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
 	@Deprecated
 	public FortSearchResponse searchFort(FortData fortData) throws LoginFailedException, RemoteServerException {
 		FortSearchMessage reqMsg = FortSearchMessage.newBuilder()
@@ -376,6 +399,14 @@ public class Map {
 		return response;
 	}
 
+	/**
+	 * Encounter pokemon encounter response.
+	 *
+	 * @param catchablePokemon the catchable pokemon
+	 * @return the encounter response
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
 	@Deprecated
 	public EncounterResponse encounterPokemon(MapPokemon catchablePokemon)
 			throws LoginFailedException, RemoteServerException {
@@ -398,6 +429,18 @@ public class Map {
 		return response;
 	}
 
+	/**
+	 * Catch pokemon catch pokemon response.
+	 *
+	 * @param catchablePokemon      the catchable pokemon
+	 * @param normalizedHitPosition the normalized hit position
+	 * @param normalizedReticleSize the normalized reticle size
+	 * @param spinModifier          the spin modifier
+	 * @param pokeball              the pokeball
+	 * @return the catch pokemon response
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
 	@Deprecated
 	public CatchPokemonResponse catchPokemon(
 			MapPokemon catchablePokemon,

@@ -42,6 +42,12 @@ public class Pokestop {
 	private long cooldownCompleteTimestampMs;
 
 
+	/**
+	 * Instantiates a new Pokestop.
+	 *
+	 * @param api      the api
+	 * @param fortData the fort data
+	 */
 	public Pokestop(PokemonGo api, FortDataOuterClass.FortData fortData) {
 		this.api = api;
 		this.fortData = fortData;
@@ -52,6 +58,12 @@ public class Pokestop {
 		return canLoot(false);
 	}
 
+	/**
+	 * Can loot boolean.
+	 *
+	 * @param ignoreDistance the ignore distance
+	 * @return the boolean
+	 */
 	public boolean canLoot(boolean ignoreDistance) {
 		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
 		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
@@ -72,11 +84,11 @@ public class Pokestop {
 	}
 
 	/**
-	 * Loots a pokestop for pokeballs and other items
+	 * Loots a pokestop for pokeballs and other items.
 	 *
 	 * @return PokestopLootResult
-	 * @throws LoginFailedException
-	 * @throws RemoteServerException
+	 * @throws LoginFailedException if login failed
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public PokestopLootResult loot() throws LoginFailedException, RemoteServerException {
 		FortSearchMessage searchMessage = FortSearchMessage.newBuilder()
@@ -101,11 +113,11 @@ public class Pokestop {
 	}
 
 	/**
-	 * Get more detailed information about a pokestop
+	 * Get more detailed information about a pokestop.
 	 *
 	 * @return FortDetails
-	 * @throws LoginFailedException
-	 * @throws RemoteServerException
+	 * @throws LoginFailedException if login failed
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public FortDetails getDetails() throws LoginFailedException, RemoteServerException {
 		FortDetailsMessage reqMsg = FortDetailsMessage.newBuilder()

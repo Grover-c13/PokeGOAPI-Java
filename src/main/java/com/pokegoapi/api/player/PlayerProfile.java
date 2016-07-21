@@ -43,6 +43,13 @@ public class PlayerProfile {
 	private PlayerStatsOuterClass.PlayerStats stats;
 
 
+	/**
+	 * Add currency.
+	 *
+	 * @param name   the name
+	 * @param amount the amount
+	 * @throws InvalidCurrencyException the invalid currency exception
+	 */
 	public void addCurrency(String name, int amount) throws InvalidCurrencyException {
 		try {
 			currencies.put(Currency.valueOf(name), amount);
@@ -51,6 +58,13 @@ public class PlayerProfile {
 		}
 	}
 
+	/**
+	 * Gets currency.
+	 *
+	 * @param currency the currency
+	 * @return the currency
+	 * @throws InvalidCurrencyException the invalid currency exception
+	 */
 	public int getCurrency(Currency currency) throws InvalidCurrencyException {
 		if (currencies.containsKey(currency)) {
 			return currencies.get(currency);
