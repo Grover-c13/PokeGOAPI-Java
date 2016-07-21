@@ -5,9 +5,11 @@ import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.PokemonMoveOuterClass;
 import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.EvolvePokemonMessage;
+import POGOProtos.Networking.Requests.Messages.NicknamePokemonMessageOuterClass.NicknamePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass.EvolvePokemonResponse;
+import POGOProtos.Networking.Responses.NicknamePokemonResponseOuterClass.NicknamePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -55,6 +57,23 @@ public class Pokemon {
 		return response.getResult();
 	}
 
+	public NicknamePokemonResponse.Result renamePokemon(String nickname) throws LoginFailedException, RemoteServerException {
+		NicknamePokemonMessage reqMsg = NicknamePokemonMessage.newBuilder().setPokemonId(getId()).setNickname(nickname).build();
+
+		ServerRequest serverRequest = new ServerRequest(RequestType.NICKNAME_POKEMON, reqMsg);
+		pgo.getRequestHandler().request(serverRequest);
+		pgo.getRequestHandler().sendServerRequests();
+
+		NicknamePokemonResponse response;
+		try {
+			response = NicknamePokemonResponse.parseFrom(serverRequest.getData());
+		} catch (InvalidProtocolBufferException e) {
+			return null;
+		}
+
+		return response.getResult();
+	}
+
 	public EvolutionResult evolve() throws LoginFailedException, RemoteServerException {
 		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
@@ -62,7 +81,7 @@ public class Pokemon {
 		pgo.getRequestHandler().request(serverRequest);
 		pgo.getRequestHandler().sendServerRequests();
 
-		EvolvePokemonResponse response = null;
+		EvolvePokemonResponse response;
 		try {
 			response = EvolvePokemonResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
