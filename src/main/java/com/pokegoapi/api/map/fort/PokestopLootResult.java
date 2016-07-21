@@ -11,29 +11,29 @@ import java.util.List;
  */
 public class PokestopLootResult {
 
-    private FortSearchResponseOuterClass.FortSearchResponse response;
+	private FortSearchResponseOuterClass.FortSearchResponse response;
 
-    public PokestopLootResult(FortSearchResponseOuterClass.FortSearchResponse response) {
-        this.response = response;
-    }
+	public PokestopLootResult(FortSearchResponseOuterClass.FortSearchResponse response) {
+		this.response = response;
+	}
 
-    public boolean wasSuccessful(){
-        return response.getResult() == Result.SUCCESS || response.getResult() == Result.INVENTORY_FULL;
-    }
+	public boolean wasSuccessful() {
+		return response.getResult() == Result.SUCCESS || response.getResult() == Result.INVENTORY_FULL;
+	}
 
-    public Result getResult(){
-        return response.getResult();
-    }
+	public Result getResult() {
+		return response.getResult();
+	}
 
-    public List<ItemAwardOuterClass.ItemAward> getItemsAwarded(){
-        return response.getItemsAwardedList();
-    }
+	public List<ItemAwardOuterClass.ItemAward> getItemsAwarded() {
+		return response.getItemsAwardedList();
+	}
 
-    public int getExperience(){
-        return response.getExperienceAwarded();
-    }
+	public int getExperience() {
+		return response.getExperienceAwarded();
+	}
 
-    public FortSearchResponseOuterClass.FortSearchResponse toPrimitive(){
-        return response;
-    }
+	public FortSearchResponseOuterClass.FortSearchResponse toPrimitive() {
+		return response;
+	}
 }

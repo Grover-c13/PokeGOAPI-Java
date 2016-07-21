@@ -16,8 +16,6 @@ import java.util.Collection;
 @ToString
 public class MapObjects {
 
-	private PokemonGo api;
-
 	@Getter
 	Collection<NearbyPokemonOuterClass.NearbyPokemon> nearbyPokemons = new ArrayList<NearbyPokemonOuterClass.NearbyPokemon>();
 	@Getter
@@ -33,6 +31,7 @@ public class MapObjects {
 	@Getter
 	Collection<Pokestop> pokestops = new ArrayList<>();
 	boolean complete = false;
+	private PokemonGo api;
 
 	public MapObjects(PokemonGo api) {
 		this.api = api;
@@ -91,7 +90,7 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		for(FortDataOuterClass.FortData pokestop : pokestops){
+		for (FortDataOuterClass.FortData pokestop : pokestops) {
 			this.pokestops.add(new Pokestop(api, pokestop));
 		}
 	}

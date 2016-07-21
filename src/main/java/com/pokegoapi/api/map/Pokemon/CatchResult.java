@@ -4,7 +4,6 @@ import POGOProtos.Data.Capture.CaptureAwardOuterClass.CaptureAward;
 import POGOProtos.Enums.ActivityTypeOuterClass;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -22,8 +21,7 @@ public class CatchResult {
 
 	}
 
-	public CatchResult(CatchPokemonResponse response)
-	{
+	public CatchResult(CatchPokemonResponse response) {
 		this.captureAward = response.getCaptureAward();
 		this.response = response;
 	}
