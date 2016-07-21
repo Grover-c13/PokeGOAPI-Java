@@ -123,7 +123,7 @@ public class CatchablePokemon {
 	 * Tries to catch a pokemon with a pokeball.
 	 *
 	 * @return CatchResult
-	 * @throws LoginFailedException if failed to login
+	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemon() throws LoginFailedException, RemoteServerException {
@@ -136,7 +136,7 @@ public class CatchablePokemon {
 	 *
 	 * @param pokeball Type of pokeball
 	 * @return CatchResult
-	 * @throws LoginFailedException if failed to login
+	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemon(Pokeball pokeball) throws LoginFailedException, RemoteServerException {
@@ -149,7 +149,7 @@ public class CatchablePokemon {
 	 * @param pokeball Type of pokeball
 	 * @param amount   Max number of pokeballs to use
 	 * @return CatchResult
-	 * @throws LoginFailedException if failed to login
+	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemon(Pokeball pokeball, int amount) throws LoginFailedException, RemoteServerException {
@@ -161,11 +161,11 @@ public class CatchablePokemon {
 	 *
 	 * @param normalizedHitPosition the normalized hit position
 	 * @param normalizedReticleSize the normalized hit reticle
-	 * @param spinModifier 			the spin modifier
+	 * @param spinModifier          the spin modifier
 	 * @param type                  Type of pokeball to throw
 	 * @param amount                Max number of Pokeballs to throw, negative number for unlimited
 	 * @return CatchResult of resulted try to catch pokemon
-	 * @throws LoginFailedException if failed to login
+	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemon(

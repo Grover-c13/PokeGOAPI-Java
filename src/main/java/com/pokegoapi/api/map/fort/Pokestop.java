@@ -87,7 +87,7 @@ public class Pokestop {
 	 * Loots a pokestop for pokeballs and other items.
 	 *
 	 * @return PokestopLootResult
-	 * @throws LoginFailedException if login failed
+	 * @throws LoginFailedException  if login failed
 	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public PokestopLootResult loot() throws LoginFailedException, RemoteServerException {
@@ -116,7 +116,7 @@ public class Pokestop {
 	 * Get more detailed information about a pokestop.
 	 *
 	 * @return FortDetails
-	 * @throws LoginFailedException if login failed
+	 * @throws LoginFailedException  if login failed
 	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public FortDetails getDetails() throws LoginFailedException, RemoteServerException {
