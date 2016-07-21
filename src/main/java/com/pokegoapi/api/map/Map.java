@@ -54,7 +54,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 public class Map {
 	private static long NEW_MAP_OBJECTS_EXPIRY = 60000; // 60 seconds
 	private PokemonGo api;
@@ -138,9 +137,9 @@ public class Map {
 	}
 
 	/**
-	 * Returns a list of spawn points
+	 * Returns a list of spawn points.
 	 *
-	 * @return List<Point> list of spawn points
+	 * @return list of spawn points
 	 */
 	public List<Point> getSpawnPoints() throws LoginFailedException, RemoteServerException {
 		List<Point> points = new ArrayList<>();
@@ -154,9 +153,9 @@ public class Map {
 	}
 
 	/**
-	 * Returns a list of decimated spawn points at current location
+	 * Returns a list of decimated spawn points at current location.
 	 *
-	 * @return List<Point> list of spawn points
+	 * @return list of spawn points
 	 */
 	public List<Point> getDecimatedSpawnPoints() throws LoginFailedException, RemoteServerException {
 		List<Point> points = new ArrayList<>();
@@ -198,7 +197,7 @@ public class Map {
 	/**
 	 * Returns 9x9 cells with the requested lattitude/longitude in the center cell.
 	 *
-	 * @param latitude latitude
+	 * @param latitude  latitude
 	 * @param longitude longitude
 	 * @return MapObjects in the given cells
 	 */
@@ -212,7 +211,7 @@ public class Map {
 	 * Returns the cells requested, you should send a latitude/longitude to fake a near location.
 	 *
 	 * @param cellIds   List of cellIds
-	 * @param latitude latitude
+	 * @param latitude  latitude
 	 * @param longitude longitude
 	 * @return MapObjects in the given cells
 	 */
@@ -225,9 +224,9 @@ public class Map {
 	/**
 	 * Returns `width` * `width` cells with the requested latitude/longitude in the center.
 	 *
-	 * @param latitude latitude
+	 * @param latitude  latitude
 	 * @param longitude longitude
-	 * @param width width
+	 * @param width     width
 	 * @return MapObjects in the given cells
 	 */
 	@Deprecated
@@ -239,8 +238,8 @@ public class Map {
 	/**
 	 * Returns the cells requested.
 	 *
-	 * @param cellIds cellIds
-	 * @param latitude latitude
+	 * @param cellIds   cellIds
+	 * @param latitude  latitude
 	 * @param longitude longitude
 	 * @return MapObjects in the given cells
 	 */
@@ -268,8 +267,9 @@ public class Map {
 		for (Long cellId : cellIds) {
 			builder.addCellId(cellId);
 			long time = 0;
-			if (trackUpdate)
+			if (trackUpdate) {
 				time = lastMapUpdate;
+			}
 			builder.addSinceTimestampMs(lastMapUpdate);
 			index++;
 		}
@@ -311,9 +311,9 @@ public class Map {
 	/**
 	 * Get a list of all the Cell Ids.
 	 *
-	 * @param latitude latitude
+	 * @param latitude  latitude
 	 * @param longitude longitude
-	 * @param width width
+	 * @param width     width
 	 * @return List of Cells
 	 */
 	public List<Long> getCellIds(double latitude, double longitude, int width) {
