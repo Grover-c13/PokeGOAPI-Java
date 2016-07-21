@@ -18,7 +18,7 @@ public class CatchResult {
 	private boolean failed;
 
 	public CatchResult() {
-
+		setFailed(true);
 	}
 
 	public CatchResult(CatchPokemonResponse response) {
