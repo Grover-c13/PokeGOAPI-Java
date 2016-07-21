@@ -171,7 +171,7 @@ public class Map {
 			throw new RemoteServerException(e);
 		}
 
-		MapObjects result = new MapObjects();
+		MapObjects result = new MapObjects(api);
 		for (MapCellOuterClass.MapCell mapCell : response.getMapCellsList()) {
 			result.addNearbyPokemons(mapCell.getNearbyPokemonsList());
 			result.addCatchablePokemons(mapCell.getCatchablePokemonsList());
@@ -244,6 +244,7 @@ public class Map {
 		return new FortDetails(response);
 	}
 
+    @Deprecated
 	public FortSearchResponseOuterClass.FortSearchResponse searchFort(FortDataOuterClass.FortData fortData) throws LoginFailedException, RemoteServerException {
 		FortSearchMessageOuterClass.FortSearchMessage reqMsg = FortSearchMessageOuterClass.FortSearchMessage.newBuilder()
 				.setFortId(fortData.getId())
