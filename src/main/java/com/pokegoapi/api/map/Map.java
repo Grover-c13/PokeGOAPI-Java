@@ -52,16 +52,20 @@ public class Map {
 	private PokemonGo api;
 	private long lastMapUpdate;
 	private MapObjects lastMapObjects;
-	private long lastLong;
-	private long lastLat;
+	private double lastLong;
+	private double lastLat;
 	@Getter
 	@Setter
 	private boolean useCache;
+	@Getter
+	@Setter
+	private boolean trackUpdate;
 
 	public Map(PokemonGo api) {
 		this.api = api;
 		lastMapUpdate = 0;
 		useCache = true;
+		trackUpdate = true;
 	}
 
 	/**
@@ -236,7 +240,11 @@ public class Map {
 		int i = 0;
 		for (Long cellId : cellIds) {
 			builder.addCellId(cellId);
+			long time = 0;
+			if (trackUpdate)
+				time = lastMapUpdate;
 			builder.addSinceTimestampMs(lastMapUpdate);
+
 			i++;
 		}
 
@@ -285,6 +293,10 @@ public class Map {
 	public List<Long> getCellIds(double latitude, double longitude, int width) {
 		S2LatLng latLng = S2LatLng.fromDegrees(latitude, longitude);
 		S2CellId cellId = S2CellId.fromLatLng(latLng).parent(15);
+
+		lastLat = api.getLatitude();
+		lastLong = api.getLongitude();
+
 
 		MutableInteger i = new MutableInteger(0);
 		MutableInteger j = new MutableInteger(0);
