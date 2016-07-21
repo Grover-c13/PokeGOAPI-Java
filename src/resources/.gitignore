@@ -1,2 +1,4 @@
 compile.bat
 protoc.exe
+ExampleLoginDetails.java
+PlayerStateMachine.java
