@@ -13,18 +13,26 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.api.map.Pokemon;
 
-public class RemoteServerException extends Exception {
-	public RemoteServerException() {
-		super();
+import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
+
+/**
+ * Created by mjmfighter on 7/20/2016.
+ */
+public class EncounterResult {
+
+	private EncounterResponse response;
+
+	public EncounterResult(EncounterResponse response) {
+		this.response = response;
 	}
 
-	public RemoteServerException(String reason) {
-		super(reason);
+	public EncounterResponse.Status getStatus() {
+		return response == null ? null : response.getStatus();
 	}
 
-	public RemoteServerException(Exception e) {
-		super(e);
+	public boolean wasSuccessful() {
+		return response != null && getStatus() != null && getStatus().equals(EncounterResponse.Status.ENCOUNTER_SUCCESS);
 	}
 }

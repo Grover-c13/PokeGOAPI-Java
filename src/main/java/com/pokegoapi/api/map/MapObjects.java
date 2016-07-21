@@ -1,3 +1,18 @@
+/*
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.pokegoapi.api.map;
 
 import POGOProtos.Map.Fort.FortDataOuterClass;
@@ -5,6 +20,8 @@ import POGOProtos.Map.Pokemon.MapPokemonOuterClass;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
 import POGOProtos.Map.SpawnPointOuterClass;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.map.fort.Pokestop;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -13,6 +30,7 @@ import java.util.Collection;
 
 @ToString
 public class MapObjects {
+
 	@Getter
 	Collection<NearbyPokemonOuterClass.NearbyPokemon> nearbyPokemons = new ArrayList<NearbyPokemonOuterClass.NearbyPokemon>();
 	@Getter
@@ -26,8 +44,13 @@ public class MapObjects {
 	@Getter
 	Collection<FortDataOuterClass.FortData> gyms = new ArrayList<FortDataOuterClass.FortData>();
 	@Getter
-	Collection<FortDataOuterClass.FortData> pokestops = new ArrayList<FortDataOuterClass.FortData>();
+	Collection<Pokestop> pokestops = new ArrayList<>();
 	boolean complete = false;
+	private PokemonGo api;
+
+	public MapObjects(PokemonGo api) {
+		this.api = api;
+	}
 
 	public void addNearbyPokemons(Collection<NearbyPokemonOuterClass.NearbyPokemon> nearbyPokemons) {
 		if (nearbyPokemons == null || nearbyPokemons.isEmpty()) {
@@ -82,7 +105,9 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		this.pokestops.addAll(pokestops);
+		for (FortDataOuterClass.FortData pokestop : pokestops) {
+			this.pokestops.add(new Pokestop(api, pokestop));
+		}
 	}
 
 	/**

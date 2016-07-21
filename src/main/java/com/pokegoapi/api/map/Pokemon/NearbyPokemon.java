@@ -13,18 +13,27 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.api.map.Pokemon;
 
-public class RemoteServerException extends Exception {
-	public RemoteServerException() {
-		super();
+import POGOProtos.Enums.PokemonIdOuterClass;
+import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
+
+public class NearbyPokemon {
+	private NearbyPokemonOuterClass.NearbyPokemon proto;
+
+	public NearbyPokemon(NearbyPokemonOuterClass.NearbyPokemon proto) {
+		this.proto = proto;
 	}
 
-	public RemoteServerException(String reason) {
-		super(reason);
+	public PokemonIdOuterClass.PokemonId getPokemonId() {
+		return proto.getPokemonId();
 	}
 
-	public RemoteServerException(Exception e) {
-		super(e);
+	public float getDistanceInMeters() {
+		return proto.getDistanceInMeters();
+	}
+
+	public long getEncounterId() {
+		return proto.getEncounterId();
 	}
 }

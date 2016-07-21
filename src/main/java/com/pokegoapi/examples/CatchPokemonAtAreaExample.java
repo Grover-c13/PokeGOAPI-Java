@@ -13,13 +13,29 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.pokegoapi.examples;
 
-import POGOProtos.Enums.PokemonIdOuterClass;
+
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
-import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.pokemon.Pokemon;
+import com.pokegoapi.api.map.Pokemon.CatchResult;
+import com.pokegoapi.api.map.Pokemon.CatchablePokemon;
+import com.pokegoapi.api.map.Pokemon.EncounterResult;
 import com.pokegoapi.auth.GoogleLogin;
 import com.pokegoapi.auth.PTCLogin;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -29,7 +45,8 @@ import okhttp3.OkHttpClient;
 
 import java.util.List;
 
-public class TransferOnePidgeyExample {
+public class CatchPokemonAtAreaExample
+{
 
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
@@ -39,23 +56,28 @@ public class TransferOnePidgeyExample {
 			// or google
 			//auth = new GoogleLogin(http).login("", ""); // currently uses oauth flow so no user or pass needed
 			PokemonGo go = new PokemonGo(auth, http);
+			// set location
+			go.setLocation(-32.058087, 115.744325, 0);
 
-			List<Pokemon> pidgeys = go.getPokebank().getPokemonByPokemonId(PokemonIdOuterClass.PokemonId.PIDGEY);
+			List<CatchablePokemon> catchablePokemon = go.getMap().getCatchablePokemon();
+			System.out.println("Pokemon in area:" + catchablePokemon.size());
 
-			if (pidgeys.size() > 0) {
-				Pokemon pest = pidgeys.get(0);
-				pest.debug();
-				ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result result = pest.transferPokemon();
+			for (CatchablePokemon cp : catchablePokemon) {
+				// You need to Encounter first.
+				EncounterResult encResult = cp.encounterPokemon();
+				// if encounter was succesful, catch
+				if (encResult.wasSuccessful()) {
+					System.out.println("Encounted:" + cp.getPokemonId());
+					CatchResult result = cp.catchPokemon();
+					System.out.println("Attempt to catch:" + cp.getPokemonId() + " " + result.getStatus());
+				}
 
-				Log.i("Main", "Transfered Pidgey result:" + result);
-			} else {
-				Log.i("Main", "You have no pidgeys :O");
 			}
-
 
 		} catch (LoginFailedException | RemoteServerException e) {
 			// failed to login, invalid credentials, auth issue or server issue.
-			Log.e("Main", "Failed to login. Invalid credentials or server issue: ", e);
+			Log.e("Main", "Failed to login or server issue: ", e);
+
 		}
 	}
 }

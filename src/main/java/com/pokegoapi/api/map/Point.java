@@ -13,18 +13,27 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.api.map;
 
-public class RemoteServerException extends Exception {
-	public RemoteServerException() {
-		super();
+import POGOProtos.Map.SpawnPointOuterClass;
+import lombok.Getter;
+import lombok.Setter;
+
+public class Point {
+	@Getter
+	@Setter
+	private static double longitude;
+	@Getter
+	@Setter
+	private static double latitude;
+
+	public Point(double latitude, double longitude) {
+		this.latitude = latitude;
+		this.longitude = longitude;
 	}
 
-	public RemoteServerException(String reason) {
-		super(reason);
-	}
-
-	public RemoteServerException(Exception e) {
-		super(e);
+	public Point(SpawnPointOuterClass.SpawnPoint spawnpoint) {
+		this.latitude = spawnpoint.getLatitude();
+		this.longitude = spawnpoint.getLongitude();
 	}
 }
