@@ -21,9 +21,10 @@ import java.io.StringWriter;
 /**
  * Created by Will on 7/20/16.
  */
+@SuppressWarnings("checkstyle:methodname")
 public class Log {
 
-	public static Logger logger;
+	private static Logger logger;
 
 	private static Logger getInstance() {
 		if (logger == null) {
@@ -114,19 +115,19 @@ public class Log {
 	private static final class DefaultLogger extends BaseLogger {
 		@Override
 		public void log(Level level, String tag, String msg, Throwable tr) {
-			String l = level.name().substring(0, 1);
+			String prefix = level.name().substring(0, 1);
 			String body = "";
 			if (msg != null) {
 				body += msg;
 			}
 			if (tr != null) {
 				StringWriter sw = new StringWriter();
-				PrintWriter s = new PrintWriter(sw);
-				tr.printStackTrace(s);
+				PrintWriter printWriter = new PrintWriter(sw);
+				tr.printStackTrace(printWriter);
 				body += "\n" + sw.toString();
 				//No need to close. No resources taken up
 			}
-			String result = String.format("%s/%s: %s", l, tag, body);
+			String result = String.format("%s/%s: %s", prefix, tag, body);
 			System.out.println(result);
 		}
 	}
