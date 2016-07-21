@@ -19,6 +19,7 @@ import POGOProtos.Map.Fort.FortDataOuterClass;
 import POGOProtos.Map.Fort.FortTypeOuterClass;
 import POGOProtos.Map.MapCellOuterClass;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass;
+import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
 import POGOProtos.Networking.Requests.Messages.*;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
@@ -26,6 +27,7 @@ import POGOProtos.Networking.Responses.*;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.Pokemon.CatchablePokemon;
+import com.pokegoapi.api.map.Pokemon.NearbyPokemon;
 import com.pokegoapi.api.map.fort.FortDetails;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -36,6 +38,8 @@ import com.pokegoapi.main.ServerRequest;
 import java8.util.function.Function;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,10 +53,14 @@ public class Map {
 	private MapObjects lastMapObjects;
 	private long lastLong;
 	private long lastLat;
+	@Getter
+	@Setter
+	private boolean useCache;
 
 	public Map(PokemonGo api) {
 		this.api = api;
 		lastMapUpdate = 0;
+		useCache = true;
 	}
 
 	/**
@@ -62,12 +70,14 @@ public class Map {
 	 */
 	private MapObjects getRetainedMapObject() throws LoginFailedException, RemoteServerException {
 		// get new MapObjects or used existing one
+		if (!useCache) return lastMapObjects;
 		if (api.getLatitude() != lastLat && api.getLongitude() != lastLong || (System.currentTimeMillis() - lastMapUpdate) > NEW_MAP_OBJECTS_EXPIRY) {
 			getMapObjects(); // should update the lastMapObjects variable
 		}
 
 		return lastMapObjects;
 	}
+
 
 	/**
 	 * Returns a list of catchable pokemon around the current location
@@ -87,6 +97,24 @@ public class Map {
 
 		return catchablePokemons;
 	}
+
+
+	/**
+	 * Returns a list of nearby pokemon (non-catchable)
+	 *
+	 * @return List<NearbyPokemon> at your current location
+	 */
+	public List<NearbyPokemon> getNearbyPokemon() throws LoginFailedException, RemoteServerException {
+		List<NearbyPokemon> pokemons = new ArrayList<>();
+		MapObjects objects = getRetainedMapObject();
+
+		for (NearbyPokemonOuterClass.NearbyPokemon pokemon : objects.getNearbyPokemons()) {
+			pokemons.add(new NearbyPokemon(pokemon));
+		}
+
+		return pokemons;
+	}
+
 
 
 	/**
