@@ -20,13 +20,10 @@
     <property name="severity" value="warning"/>
 
     <property name="fileExtensions" value="java, properties, xml"/>
-    <!-- Checks for whitespace                               -->
-    <!-- See http://checkstyle.sf.net/config_whitespace.html -->
-    <module name="FileTabCharacter">
-        <property name="eachLine" value="false"/>
-    </module>
 
+    <module name="SuppressWarningsFilter"/>
     <module name="TreeWalker">
+        <module name="SuppressWarningsHolder"/>
         <property name="tabWidth" value="2"/>
         <module name="RegexpSinglelineJava">
             <property name="format" value="^\t* "/>
