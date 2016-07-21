@@ -12,6 +12,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.pokegoapi.api.map;
 
 import POGOProtos.Map.Fort.FortDataOuterClass;
@@ -46,6 +47,9 @@ import java.util.List;
 
 import static com.pokegoapi.google.common.geometry.S2CellId.MAX_LEVEL;
 
+/**
+ * Created by mjmjelde on 7/21/2016.
+ */
 public class Map {
 
 	private final PokemonGo api;
@@ -265,12 +269,8 @@ public class Map {
 			result.addPokestops(groupedForts.get(FortTypeOuterClass.FortType.CHECKPOINT));
 		}
 
-		if(useCache){
-			cachedMapObjects.update(result);
-			result = cachedMapObjects;
-			lastMapUpdate = System.currentTimeMillis();
-		}
-
+		lastMapObjects = result;
+		lastMapUpdate = System.currentTimeMillis();
 		return result;
 	}
 
