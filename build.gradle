@@ -14,6 +14,7 @@ apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'com.google.protobuf'
+apply plugin: 'checkstyle'
 
 description = """Pokemon Go Java API"""
 
@@ -56,6 +57,24 @@ protobuf {
     protoc {
         // Download from repositories
         artifact = 'com.google.protobuf:protoc:3.0.0-beta-3'
+    }
+}
+
+checkstyle {
+    configFile = file("${project.rootDir}/config/checkstyle.xml")
+
+    checkstyleMain {
+        source = sourceSets.main.allSource
+    }
+
+    configurations {
+        checkstyle
+    }
+
+    toolVersion = '7.0'
+
+    dependencies {
+        checkstyle "com.puppycrawl.tools:checkstyle:${toolVersion}"
     }
 }
 
