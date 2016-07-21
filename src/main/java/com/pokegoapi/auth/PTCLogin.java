@@ -22,9 +22,12 @@ public class PTCLogin extends Login {
 	public static final String LOGIN_URL = "https://sso.pokemon.com/sso/login?service=https%3A%2F%2Fsso.pokemon.com%2Fsso%2Foauth2.0%2FcallbackAuthorize";
 	public static final String LOGIN_OAUTH = "https://sso.pokemon.com/sso/oauth2.0/accessToken";
 
+	private static final RequestBody emptyRequestBody = RequestBody.create(null, new byte[0]);
+
 	public static final String USER_AGENT = "niantic";
 
 	private final OkHttpClient client;
+
 	@Getter
 	String token;
 
@@ -70,10 +73,7 @@ public class PTCLogin extends Login {
 	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
 	 */
 	public AuthInfo login(String token) {
-		AuthInfo.Builder builder = AuthInfo.newBuilder();
-		builder.setProvider("ptc");
-		builder.setToken(AuthInfo.JWT.newBuilder().setContents(token).setUnknown2(59).build());
-		return builder.build();
+		return buildAuthInfo(token);
 	}
 
 	/**
@@ -84,91 +84,103 @@ public class PTCLogin extends Login {
 	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
 	 */
 	public AuthInfo login(String username, String password) throws LoginFailedException {
-		//TODO: stop creating an okhttp client per request
 
 		try {
-			Request get = new Request.Builder()
-					.url(LOGIN_URL)
-					.get()
-					.build();
+			String ticket = requestAuthenticationTicket(username, password);
+			String token = generateOauthToken(ticket);
 
-			Response getResponse = client.newCall(get).execute();
-
-			Gson gson = new GsonBuilder().create();
-
-			PTCAuthJson ptcAuth = gson.fromJson(getResponse.body().string(), PTCAuthJson.class);
-
-			HttpUrl url = HttpUrl.parse(LOGIN_URL).newBuilder()
-					.addQueryParameter("lt", ptcAuth.getLt())
-					.addQueryParameter("execution", ptcAuth.getExecution())
-					.addQueryParameter("_eventId", "submit")
-					.addQueryParameter("username", username)
-					.addQueryParameter("password", password)
-					.build();
-
-			RequestBody reqBody = RequestBody.create(null, new byte[0]);
-
-			Request postRequest = new Request.Builder()
-					.url(url)
-					.method("POST", reqBody)
-					.build();
-
-			// Need a new client for this to not follow redirects
-			Response response = client.newBuilder()
-					.followRedirects(false)
-					.followSslRedirects(false)
-					.build()
-					.newCall(postRequest)
-					.execute();
-
-			String body = response.body().string();
-
-			if (body.length() > 0) {
-				PTCError ptcError = gson.fromJson(body, PTCError.class);
-				if (ptcError.getError() != null && ptcError.getError().length() > 0) {
-					throw new LoginFailedException();
-				}
-			}
-
-			String ticket = null;
-			for (String location : response.headers("location")) {
-				ticket = location.split("ticket=")[1];
-			}
-
-			url = HttpUrl.parse(LOGIN_OAUTH).newBuilder()
-					.addQueryParameter("client_id", CLIENT_ID)
-					.addQueryParameter("redirect_uri", REDIRECT_URI)
-					.addQueryParameter("client_secret", CLIENT_SECRET)
-					.addQueryParameter("grant_type", "refresh_token")
-					.addQueryParameter("code", ticket)
-					.build();
-
-			postRequest = new Request.Builder()
-					.url(url)
-					.method("POST", reqBody)
-					.build();
-
-			response = client.newCall(postRequest).execute();
-
-			body = response.body().string();
-
-			String token;
-			try {
-				token = body.split("token=")[1];
-				token = token.split("&")[0];
-			} catch (Exception e) {
-				throw new LoginFailedException();
-			}
-
-			AuthInfo.Builder authbuilder = AuthInfo.newBuilder();
-			authbuilder.setProvider("ptc");
-			authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(token).setUnknown2(59).build());
-
-			return authbuilder.build();
+			return buildAuthInfo(token);
 		} catch (Exception e) {
-			throw new LoginFailedException();
+			throw new LoginFailedException(e);
 		}
+	}
 
+	private AuthInfo buildAuthInfo(String token) {
+		AuthInfo.Builder authbuilder = AuthInfo.newBuilder();
+		authbuilder.setProvider("ptc");
+		authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(token).setUnknown2(59).build());
+
+		return authbuilder.build();
+	}
+
+	private String requestAuthenticationTicket(String username, String password) throws IOException, LoginFailedException {
+		Request get = new Request.Builder()
+				.url(LOGIN_URL)
+				.get()
+				.build();
+
+		Response getResponse = client.newCall(get).execute();
+
+		Gson gson = new GsonBuilder().create();
+
+		PTCAuthJson ptcAuth = gson.fromJson(getResponse.body().string(), PTCAuthJson.class);
+
+		HttpUrl url = HttpUrl.parse(LOGIN_URL).newBuilder()
+                .addQueryParameter("lt", ptcAuth.getLt())
+                .addQueryParameter("execution", ptcAuth.getExecution())
+                .addQueryParameter("_eventId", "submit")
+                .addQueryParameter("username", username)
+                .addQueryParameter("password", password)
+                .build();
+
+		Request postRequest = new Request.Builder()
+                .url(url)
+                .method("POST", emptyRequestBody)
+                .build();
+
+		// Need a new client for this to not follow redirects
+		Response response = client.newBuilder()
+                .followRedirects(false)
+                .followSslRedirects(false)
+                .build()
+                .newCall(postRequest)
+                .execute();
+
+		String body = response.body().string();
+
+		if (body.length() > 0) {
+            PTCError ptcError = gson.fromJson(body, PTCError.class);
+            if (ptcError.getError() != null && ptcError.getError().length() > 0) {
+                throw new LoginFailedException();
+            }
+        }
+
+		String ticket = null;
+		for (String location : response.headers("location")) {
+            ticket = location.split("ticket=")[1];
+        }
+		return ticket;
+	}
+
+	private String generateOauthToken(String ticket) throws IOException, LoginFailedException {
+		HttpUrl url;
+		Request postRequest;
+		Response response;
+		String body;
+		url = HttpUrl.parse(LOGIN_OAUTH).newBuilder()
+				.addQueryParameter("client_id", CLIENT_ID)
+				.addQueryParameter("redirect_uri", REDIRECT_URI)
+				.addQueryParameter("client_secret", CLIENT_SECRET)
+				.addQueryParameter("grant_type", "refresh_token")
+				.addQueryParameter("code", ticket)
+				.build();
+
+		postRequest = new Request.Builder()
+				.url(url)
+				.method("POST", emptyRequestBody)
+				.build();
+
+		response = client.newCall(postRequest).execute();
+
+		body = response.body().string();
+
+		try {
+			String token = body.split("token=")[1];
+			token = token.split("&")[0];
+			return token;
+		} catch (Exception e) {
+			throw new LoginFailedException(e);
+		}
 	}
 
 }
