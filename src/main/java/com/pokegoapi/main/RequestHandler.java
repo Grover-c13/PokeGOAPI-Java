@@ -49,7 +49,7 @@ public class RequestHandler {
 	public RequestHandler(PokemonGo api, RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth, OkHttpClient client) {
 		this.api = api;
 		this.client = client;
-		api_endpoint = APISettings.API_ENDPOINT;
+		api_endpoint = ApiSettings.API_ENDPOINT;
 		this.auth = auth;
 		serverRequests = new ArrayList<ServerRequest>();
 		resetBuilder();
