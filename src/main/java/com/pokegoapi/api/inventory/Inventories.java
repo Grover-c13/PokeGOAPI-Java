@@ -106,8 +106,8 @@ public class Inventories {
 			if (itemData.getPokemonData().getPokemonId() != PokemonIdOuterClass.PokemonId.MISSINGNO) {
 				pokebank.addPokemon(new Pokemon(inventoryItem.getInventoryItemData().getPokemonData()));
 			}
-			if (itemData.getItem().getItemId() != ItemIdOuterClass.ItemId.UNRECOGNIZED &&
-					itemData.getItem().getItemId() != ItemIdOuterClass.ItemId.ITEM_UNKNOWN) {
+			if (itemData.getItem().getItemId() != ItemIdOuterClass.ItemId.UNRECOGNIZED
+					&& itemData.getItem().getItemId() != ItemIdOuterClass.ItemId.ITEM_UNKNOWN) {
 				ItemOuterClass.Item item = inventoryItem.getInventoryItemData().getItem();
 				itemBag.addItem(new Item(item));
 			}
