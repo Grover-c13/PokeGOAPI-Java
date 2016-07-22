@@ -100,8 +100,18 @@ public class Map {
 		}
 
 		for (WildPokemonOuterClass.WildPokemon wildPokemon : objects.getWildPokemons()) {
-			catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
+			boolean alreadyInCatchablePokemons = false;
+			for (CatchablePokemon catchablePokemon : catchablePokemons) {
+				if (catchablePokemon.getEncounterId() == wildPokemon.getEncounterId()){
+					alreadyInCatchablePokemons = true;
+					break;
+				}
+			}
+			if (!alreadyInCatchablePokemons) {
+				catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
+			}
 		}
+		
 
 		return catchablePokemons;
 	}
