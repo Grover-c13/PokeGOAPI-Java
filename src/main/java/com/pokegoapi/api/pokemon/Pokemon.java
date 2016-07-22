@@ -73,6 +73,12 @@ public class Pokemon {
 			return ReleasePokemonResponse.Result.FAILED;
 		}
 
+		if(response.getResult() == Result.SUCCESS){
+			pgo.getInventories().getPokebank().removePokemon(this);
+		}
+
+		pgo.getInventories().getPokebank().removePokemon(this);
+
 		pgo.getInventories().updateInventories();
 
 		return response.getResult();
@@ -103,6 +109,7 @@ public class Pokemon {
 			throw new RemoteServerException(e);
 		}
 
+		pgo.getInventories().getPokebank().removePokemon(this);
 		pgo.getInventories().updateInventories();
 
 		return response.getResult();
@@ -129,6 +136,8 @@ public class Pokemon {
 		}
 
 		EvolutionResult result = new EvolutionResult(response);
+
+		pgo.getInventories().getPokebank().removePokemon(this);
 
 		pgo.getInventories().updateInventories();
 

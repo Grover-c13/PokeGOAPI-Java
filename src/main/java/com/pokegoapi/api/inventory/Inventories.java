@@ -31,6 +31,7 @@ import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.Log;
 import lombok.Getter;
 
 
@@ -101,37 +102,24 @@ public class Inventories {
 		for (InventoryItemOuterClass.InventoryItem inventoryItem
 				: response.getInventoryDelta().getInventoryItemsList()) {
 			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
-			if (inventoryItem.getDeletedItemKey() > 0) {
-				if (itemData.getPokemonData().getPokemonId() != PokemonIdOuterClass.PokemonId.MISSINGNO) {
-					pokebank.removePokemon(new Pokemon(inventoryItem.getInventoryItemData().getPokemonData()));
-				}
-				if (itemData.getItem().getItemId() != ItemIdOuterClass.ItemId.UNRECOGNIZED) {
-					ItemOuterClass.Item item = inventoryItem.getInventoryItemData().getItem();
-					itemBag.removeItem(inventoryItem.getInventoryItemData().getItem().getItemId(), item.getCount());
-				}
-				if (itemData.getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED) {
-					candyjar.removeCandy(
-							inventoryItem.getInventoryItemData().getPokemonFamily().getFamilyId(),
-							inventoryItem.getInventoryItemData().getPokemonFamily().getCandy()
-					);
-				}
-			} else {
-				if (itemData.getPokemonData().getPokemonId() != PokemonIdOuterClass.PokemonId.MISSINGNO) {
-					pokebank.addPokemon(new Pokemon(inventoryItem.getInventoryItemData().getPokemonData()));
-				}
-				if (itemData.getItem().getItemId() != ItemIdOuterClass.ItemId.UNRECOGNIZED) {
-					ItemOuterClass.Item item = inventoryItem.getInventoryItemData().getItem();
-					itemBag.addItem(new Item(item));
-				}
-				if (itemData.getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED) {
-					candyjar.addCandy(
-							inventoryItem.getInventoryItemData().getPokemonFamily().getFamilyId(),
-							inventoryItem.getInventoryItemData().getPokemonFamily().getCandy()
-					);
-				}
-				if (itemData.hasPlayerStats()) {
-					stats = inventoryItem.getInventoryItemData().getPlayerStats();
-				}
+
+			if (itemData.getPokemonData().getPokemonId() != PokemonIdOuterClass.PokemonId.MISSINGNO) {
+				pokebank.addPokemon(new Pokemon(inventoryItem.getInventoryItemData().getPokemonData()));
+			}
+			if (itemData.getItem().getItemId() != ItemIdOuterClass.ItemId.UNRECOGNIZED &&
+					itemData.getItem().getItemId() != ItemIdOuterClass.ItemId.ITEM_UNKNOWN) {
+				ItemOuterClass.Item item = inventoryItem.getInventoryItemData().getItem();
+				itemBag.addItem(new Item(item));
+			}
+			if (itemData.getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED
+					&& itemData.getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_UNSET) {
+				candyjar.setCandy(
+						inventoryItem.getInventoryItemData().getPokemonFamily().getFamilyId(),
+						inventoryItem.getInventoryItemData().getPokemonFamily().getCandy()
+				);
+			}
+			if (itemData.hasPlayerStats()) {
+				stats = inventoryItem.getInventoryItemData().getPlayerStats();
 			}
 
 			lastInventoryUpdate = System.currentTimeMillis();
