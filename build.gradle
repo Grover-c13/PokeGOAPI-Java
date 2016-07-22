@@ -8,12 +8,15 @@ buildscript {
     dependencies {
         classpath 'com.google.protobuf:protobuf-gradle-plugin:0.7.7'
     }
+
+
 }
 
 apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'com.google.protobuf'
+apply plugin: 'checkstyle'
 
 description = """Pokemon Go Java API"""
 
@@ -42,11 +45,11 @@ processResources {
 // Run this task to bundle all needed dependency
 task bundle(type: Jar) {
     baseName = project.name + '_bundle'
-    
+
     from {
-    	configurations.compile.collect {
-    		it.isDirectory() && !it.isEmpty() ? it : zipTree(it)
-    	}
+        configurations.compile.collect {
+            it.isDirectory() && !it.isEmpty() ? it : zipTree(it)
+        }
     }
     with jar
 }
@@ -56,6 +59,37 @@ protobuf {
     protoc {
         // Download from repositories
         artifact = 'com.google.protobuf:protoc:3.0.0-beta-3'
+    }
+}
+
+def checkstyleOutputDir = "${project.rootDir}/build/reports/checkstyle/"
+
+checkstyle {
+    toolVersion = '7.0'
+    configFile = file("${project.rootDir}/config/checkstyle.xml")
+    reportsDir = file(checkstyleOutputDir)
+
+    ignoreFailures = false
+
+    checkstyleMain {
+        source = sourceSets.main.allSource
+    }
+
+    configurations {
+        checkstyle
+    }
+
+
+    dependencies {
+        checkstyle "com.puppycrawl.tools:checkstyle:${toolVersion}"
+    }
+}
+
+//Abort if any checkstyle warnings
+checkstyleMain.doLast {
+    def outputFile = file(checkstyleOutputDir + "main.xml")
+    if (outputFile.exists() && outputFile.text.contains("<error ")) {
+        throw new GradleException("There were checkstyle warnings! For more info check $outputFile")
     }
 }
 

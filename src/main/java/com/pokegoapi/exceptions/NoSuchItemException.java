@@ -24,7 +24,7 @@ public class NoSuchItemException extends Exception {
 		super(reason);
 	}
 
-	public NoSuchItemException(Exception e) {
-		super(e);
+	public NoSuchItemException(Exception exception) {
+		super(exception);
 	}
 }

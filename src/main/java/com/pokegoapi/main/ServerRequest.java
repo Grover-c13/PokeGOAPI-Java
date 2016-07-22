@@ -22,6 +22,9 @@ import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 import lombok.Getter;
 
+/**
+ * The type Server request.
+ */
 public class ServerRequest {
 
 	@Getter
@@ -29,6 +32,12 @@ public class ServerRequest {
 	private RequestTypeOuterClass.RequestType type;
 	private ByteString data;
 
+	/**
+	 * Instantiates a new Server request.
+	 *
+	 * @param type the type
+	 * @param req  the req
+	 */
 	public ServerRequest(RequestTypeOuterClass.RequestType type, GeneratedMessage req) {
 		RequestOuterClass.Request.Builder reqBuilder = RequestOuterClass.Request.newBuilder();
 		reqBuilder.setRequestMessage(req.toByteString());
@@ -37,10 +46,21 @@ public class ServerRequest {
 		this.type = type;
 	}
 
+	/**
+	 * Handle data.
+	 *
+	 * @param bytes the bytes
+	 */
 	public void handleData(ByteString bytes) {
 		this.data = bytes;
 	}
 
+	/**
+	 * Gets data.
+	 *
+	 * @return the data
+	 * @throws InvalidProtocolBufferException the invalid protocol buffer exception
+	 */
 	public ByteString getData() throws InvalidProtocolBufferException {
 		if (data == null) {
 			throw new InvalidProtocolBufferException("Contents of buffer are null");

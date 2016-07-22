@@ -28,7 +28,7 @@ public class CandyJar {
 
 	public CandyJar(PokemonGo pgo) {
 		this.pgo = pgo;
-		candies = new HashMap<PokemonFamilyId, Integer>();
+		candies = new HashMap<>();
 	}
 
 	public void setCandy(PokemonFamilyId family, int candies) {

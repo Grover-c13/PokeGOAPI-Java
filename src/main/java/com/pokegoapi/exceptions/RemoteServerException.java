@@ -24,7 +24,7 @@ public class RemoteServerException extends Exception {
 		super(reason);
 	}
 
-	public RemoteServerException(Exception e) {
-		super(e);
+	public RemoteServerException(Exception exception) {
+		super(exception);
 	}
 }

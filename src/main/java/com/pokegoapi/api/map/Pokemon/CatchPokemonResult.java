@@ -13,7 +13,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.api.map.Pokemon;
+package com.pokegoapi.api.map.pokemon;
 
 public enum CatchPokemonResult {
 	SUCCESS(1),
@@ -23,7 +23,7 @@ public enum CatchPokemonResult {
 
 	private final int status;
 
-	CatchPokemonResult(int i) {
-		status = i;
+	CatchPokemonResult(int status) {
+		this.status = status;
 	}
 }

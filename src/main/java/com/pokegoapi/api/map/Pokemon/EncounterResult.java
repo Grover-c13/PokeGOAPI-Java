@@ -13,13 +13,13 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.api.map.Pokemon;
+package com.pokegoapi.api.map.pokemon;
 
+import POGOProtos.Data.Capture.CaptureProbabilityOuterClass;
+import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 
-/**
- * Created by mjmfighter on 7/20/2016.
- */
+
 public class EncounterResult {
 
 	private EncounterResponse response;
@@ -34,5 +34,21 @@ public class EncounterResult {
 
 	public boolean wasSuccessful() {
 		return response != null && getStatus() != null && getStatus().equals(EncounterResponse.Status.ENCOUNTER_SUCCESS);
+	}
+
+	public EncounterResponse.Background getBackground(){
+		return response.getBackground();
+	}
+
+	public CaptureProbabilityOuterClass.CaptureProbability getCaptureProbability(){
+		return response.getCaptureProbability();
+	}
+
+	public WildPokemonOuterClass.WildPokemon getWildPokemon(){
+		return response.getWildPokemon();
+	}
+
+	public EncounterResponse toPrimitive(){
+		return response;
 	}
 }

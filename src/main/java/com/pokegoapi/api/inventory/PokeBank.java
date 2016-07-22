@@ -42,6 +42,12 @@ public class PokeBank {
 		pokemons.add(pokemon);
 	}
 
+	/**
+	 * Gets pokemon by pokemon id.
+	 *
+	 * @param id the id
+	 * @return the pokemon by pokemon id
+	 */
 	public List<Pokemon> getPokemonByPokemonId(final PokemonIdOuterClass.PokemonId id) {
 		return StreamSupport.stream(pokemons).filter(new Predicate<Pokemon>() {
 			@Override
@@ -51,6 +57,11 @@ public class PokeBank {
 		}).collect(Collectors.<Pokemon>toList());
 	}
 
+	/**
+	 * Remove pokemon.
+	 *
+	 * @param pokemon the pokemon
+	 */
 	public void removePokemon(final Pokemon pokemon) {
 		pokemons = StreamSupport.stream(pokemons).filter(new Predicate<Pokemon>() {
 			@Override

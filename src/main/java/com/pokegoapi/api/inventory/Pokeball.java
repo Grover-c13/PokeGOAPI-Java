@@ -26,7 +26,7 @@ public enum Pokeball {
 	@Getter
 	private final int balltype;
 
-	Pokeball(int i) {
-		balltype = i;
+	Pokeball(int type) {
+		balltype = type;
 	}
 }

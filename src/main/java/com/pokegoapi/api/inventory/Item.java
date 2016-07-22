@@ -20,7 +20,7 @@ import POGOProtos.Inventory.ItemIdOuterClass.ItemId;
 
 public class Item {
 	private POGOProtos.Inventory.ItemOuterClass.Item proto;
-	private int	count;
+	private int count;
 
 	public Item(POGOProtos.Inventory.ItemOuterClass.Item proto) {
 		this.proto = proto;
@@ -34,7 +34,7 @@ public class Item {
 	public int getCount() {
 		return count;
 	}
-	
+
 	public void setCount(int count) {
 		this.count = count;
 	}
