@@ -12,20 +12,22 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.pokegoapi.api.map;
 
 import POGOProtos.Map.Fort.FortDataOuterClass;
 import POGOProtos.Map.Fort.FortTypeOuterClass;
 import POGOProtos.Map.MapCellOuterClass;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass;
+import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
+import POGOProtos.Map.SpawnPointOuterClass;
 import POGOProtos.Networking.Requests.Messages.*;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.*;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.Pokemon.CatchablePokemon;
+import com.pokegoapi.api.map.Pokemon.NearbyPokemon;
 import com.pokegoapi.api.map.fort.FortDetails;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -36,6 +38,8 @@ import com.pokegoapi.main.ServerRequest;
 import java8.util.function.Function;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,30 +47,29 @@ import java.util.List;
 import static com.pokegoapi.google.common.geometry.S2CellId.MAX_LEVEL;
 
 public class Map {
-	private static long NEW_MAP_OBJECTS_EXPIRY = 60000; // 60 seconds
-	private PokemonGo api;
+
+	private final PokemonGo api;
+	private MapObjects cachedMapObjects;
+	@Getter
+	@Setter
+	private boolean useCache;
+
+	@Setter
+	@Getter
+	private long mapObjectsExpiry;
+
 	private long lastMapUpdate;
-	private MapObjects lastMapObjects;
-	private long lastLong;
-	private long lastLat;
 
 	public Map(PokemonGo api) {
 		this.api = api;
+		cachedMapObjects = new MapObjects(api);
 		lastMapUpdate = 0;
+		useCache = true;
 	}
 
-	/**
-	 * Gets a new map objects if there has been a lat/long change or the last request was done greater then NEW_MAP_OBJECTS_EXPIRY
-	 *
-	 * @return List<CatchablePokemon> at your current location
-	 */
-	private MapObjects getRetainedMapObject() throws LoginFailedException, RemoteServerException {
-		// get new MapObjects or used existing one
-		if (api.getLatitude() != lastLat && api.getLongitude() != lastLong || (System.currentTimeMillis() - lastMapUpdate) > NEW_MAP_OBJECTS_EXPIRY) {
-			getMapObjects(); // should update the lastMapObjects variable
-		}
-
-		return lastMapObjects;
+	public void clearCache(){
+		this.lastMapUpdate = 0;
+		this.cachedMapObjects = new MapObjects(api);
 	}
 
 	/**
@@ -76,18 +79,66 @@ public class Map {
 	 */
 	public List<CatchablePokemon> getCatchablePokemon() throws LoginFailedException, RemoteServerException {
 		List<CatchablePokemon> catchablePokemons = new ArrayList<>();
-		MapObjects objects = getRetainedMapObject();
+		MapObjects objects = getMapObjects();
 
-		for (MapPokemonOuterClass.MapPokemon mapPokemon : objects.getCatchablePokemons()) {
+		for(MapPokemonOuterClass.MapPokemon mapPokemon : objects.getCatchablePokemons()){
 			catchablePokemons.add(new CatchablePokemon(api, mapPokemon));
 		}
-		for (WildPokemonOuterClass.WildPokemon wildPokemon : objects.getWildPokemons()) {
+
+		for(WildPokemonOuterClass.WildPokemon wildPokemon : objects.getWildPokemons()){
 			catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
 		}
 
 		return catchablePokemons;
 	}
 
+	/**
+	 * Returns a list of nearby pokemon (non-catchable)
+	 *
+	 * @return List<NearbyPokemon> at your current location
+	 */
+	public List<NearbyPokemon> getNearbyPokemon() throws LoginFailedException, RemoteServerException {
+		List<NearbyPokemon> pokemons = new ArrayList<>();
+		MapObjects objects = getMapObjects();
+
+		for (NearbyPokemonOuterClass.NearbyPokemon pokemon : objects.getNearbyPokemons()) {
+			pokemons.add(new NearbyPokemon(pokemon));
+		}
+
+		return pokemons;
+	}
+
+	/**
+	 * Returns a list of spawn points
+	 *
+	 * @return List<Point> list of spawn points
+	 */
+	public List<Point> getSpawnPoints() throws LoginFailedException, RemoteServerException {
+		List<Point> points = new ArrayList<>();
+		MapObjects objects = getMapObjects();
+
+		for (SpawnPointOuterClass.SpawnPoint point : objects.getSpawnPoints()) {
+			points.add(new Point(point));
+		}
+
+		return points;
+	}
+
+	/**
+	 * Returns a list of decimated spawn points at current location
+	 *
+	 * @return List<Point> list of spawn points
+	 */
+	public List<Point> getDecimatedSpawnPoints() throws LoginFailedException, RemoteServerException {
+		List<Point> points = new ArrayList<>();
+		MapObjects objects = getMapObjects();
+
+		for (SpawnPointOuterClass.SpawnPoint point : objects.getDecimatedSpawnPoints()) {
+			points.add(new Point(point));
+		}
+
+		return points;
+	}
 
 	/**
 	 * Returns MapObjects around your current location
@@ -169,15 +220,20 @@ public class Map {
 	 * @return MapObjects in the given cells
 	 */
 	public MapObjects getMapObjects(List<Long> cellIds) throws LoginFailedException, RemoteServerException {
+
+		if(useCache && (System.currentTimeMillis() - lastMapUpdate > mapObjectsExpiry)){
+			lastMapUpdate = 0;
+			cachedMapObjects = new MapObjects(api);
+		}
+
 		GetMapObjectsMessageOuterClass.GetMapObjectsMessage.Builder builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder()
 				.setLatitude(api.getLatitude())
 				.setLongitude(api.getLongitude());
 
-		int i = 0;
 		for (Long cellId : cellIds) {
 			builder.addCellId(cellId);
 			builder.addSinceTimestampMs(lastMapUpdate);
-			i++;
+
 		}
 
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS, builder.build());
@@ -209,8 +265,12 @@ public class Map {
 			result.addPokestops(groupedForts.get(FortTypeOuterClass.FortType.CHECKPOINT));
 		}
 
-		lastMapObjects = result;
-		lastMapUpdate = System.currentTimeMillis();
+		if(useCache){
+			cachedMapObjects.update(result);
+			result = cachedMapObjects;
+			lastMapUpdate = System.currentTimeMillis();
+		}
+
 		return result;
 	}
 
@@ -244,7 +304,7 @@ public class Map {
 		return cells;
 	}
 
-	public FortDetails getFortDetails(String id, long lon, long lat) throws LoginFailedException, RemoteServerException {
+	public FortDetails getFortDetails(String id, double lon, double lat) throws LoginFailedException, RemoteServerException {
 		FortDetailsMessageOuterClass.FortDetailsMessage reqMsg = FortDetailsMessageOuterClass.FortDetailsMessage.newBuilder()
 				.setFortId(id)
 				.setLatitude(lat)
