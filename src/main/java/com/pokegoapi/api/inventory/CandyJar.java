@@ -17,6 +17,7 @@ package com.pokegoapi.api.inventory;
 
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.pokemon.Pokemon;
 import lombok.ToString;
 
 import java.util.HashMap;
@@ -33,6 +34,26 @@ public class CandyJar {
 
 	public void setCandy(PokemonFamilyId family, int candies) {
 		this.candies.put(family, candies);
+	}
+
+	public void addCandy(PokemonFamilyId family, int amount){
+		if(candies.containsKey(family)){
+			candies.put(family, candies.get(family) + amount);
+		} else {
+			candies.put(family, amount);
+		}
+	}
+
+	public void removeCandy(PokemonFamilyId family, int amount) {
+		if(candies.containsKey(family)){
+			if(candies.get(family) - amount < 0){
+				candies.put(family, 0);
+			} else {
+				candies.put(family, candies.get(family) - amount);
+			}
+		} else {
+			candies.put(family, 0);
+		}
 	}
 
 	public int getCandies(PokemonFamilyId family) {

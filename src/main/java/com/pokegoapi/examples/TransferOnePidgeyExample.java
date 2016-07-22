@@ -43,7 +43,7 @@ public class TransferOnePidgeyExample {
 			//auth = new GoogleLogin(http).login("", ""); // currently uses oauth flow so no user or pass needed
 			PokemonGo go = new PokemonGo(auth, http);
 
-			List<Pokemon> pidgeys = go.getPokebank().getPokemonByPokemonId(PokemonIdOuterClass.PokemonId.PIDGEY);
+			List<Pokemon> pidgeys = go.getInventories().getPokebank().getPokemonByPokemonId(PokemonIdOuterClass.PokemonId.PIDGEY);
 
 			if (pidgeys.size() > 0) {
 				Pokemon pest = pidgeys.get(0);
