@@ -14,6 +14,7 @@
  */
 package com.pokegoapi.api.inventory;
 
+import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
@@ -40,6 +41,8 @@ public class Inventories {
 	private PokeBank pokebank;
 	@Getter
 	private CandyJar candyjar;
+	@Getter
+	private PlayerStatsOuterClass.PlayerStats stats;
 
 	private long lastInventoryUpdate = 0;
 
@@ -104,6 +107,9 @@ public class Inventories {
 							inventoryItem.getInventoryItemData().getPokemonFamily().getFamilyId(),
 							inventoryItem.getInventoryItemData().getPokemonFamily().getCandy()
 					);
+				}
+				if(inventoryItem.getInventoryItemData().hasPlayerStats()){
+					stats = inventoryItem.getInventoryItemData().getPlayerStats();
 				}
 			}
 
