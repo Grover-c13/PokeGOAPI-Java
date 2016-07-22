@@ -73,13 +73,6 @@ public class Pokemon {
 			return ReleasePokemonResponse.Result.FAILED;
 		}
 
-		if (response.getResult().equals(Result.SUCCESS)) {
-			pgo.getCandyjar().setCandy(
-					this.getPokemonFamily(),
-					pgo.getCandyjar().getCandies(this.getPokemonFamily()) + response.getCandyAwarded());
-			pgo.getPokebank().removePokemon(this);
-		}
-
 		return response.getResult();
 	}
 
@@ -133,16 +126,11 @@ public class Pokemon {
 
 		EvolutionResult result = new EvolutionResult(response);
 
-		if (result.isSuccessful()) {
-			pgo.getPokebank().removePokemon(this);
-			pgo.getPokebank().addPokemon(result.getEvolvedPokemon());
-		}
-
 		return result;
 	}
 
 	public int getCandy() {
-		return pgo.getCandyjar().getCandies(getPokemonFamily());
+		return pgo.getInventories().getCandyjar().getCandies(getPokemonFamily());
 	}
 
 	public PokemonFamilyId getPokemonFamily() {

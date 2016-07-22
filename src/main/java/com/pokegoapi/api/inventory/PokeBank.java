@@ -37,10 +37,24 @@ public class PokeBank {
 		this.instance = instance;
 	}
 
-	public void addPokemon(Pokemon pokemon) {
+	/**
+	 * Add a pokemon to the pokebank inventory.  Will not add duplicates (pokemon with same id).
+	 * @param pokemon Pokemon to add to the inventory
+	 */
+	public void addPokemon(final Pokemon pokemon) {
 		pokemon.setPgo(instance);
-		pokemons.add(pokemon);
+		List<Pokemon> alreadyAdded = StreamSupport.stream(pokemons).filter(new Predicate<Pokemon>() {
+			@Override
+			public boolean test(Pokemon testPokemon) {
+				return pokemon.getId() == testPokemon.getId();
+			}
+		}).collect(Collectors.<Pokemon>toList());
+		if (alreadyAdded.size() < 1) {
+			pokemons.add(pokemon);
+		}
 	}
+
+
 
 	/**
 	 * Gets pokemon by pokemon id.

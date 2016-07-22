@@ -17,6 +17,7 @@ package com.pokegoapi.api.inventory;
 
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.pokemon.Pokemon;
 import lombok.ToString;
 
 import java.util.HashMap;
@@ -31,10 +32,50 @@ public class CandyJar {
 		candies = new HashMap<>();
 	}
 
+	/**
+	 * Sets the number of candies in the jar.
+	 * @param family Pokemon family id
+	 * @param candies Amount to set it to
+	 */
 	public void setCandy(PokemonFamilyId family, int candies) {
 		this.candies.put(family, candies);
 	}
 
+	/**
+	 * Adds a candy to the candy jar.
+	 * @param family Pokemon family id
+	 * @param amount Amount of candies to add
+	 */
+	public void addCandy(PokemonFamilyId family, int amount) {
+		if (candies.containsKey(family)) {
+			candies.put(family, candies.get(family) + amount);
+		} else {
+			candies.put(family, amount);
+		}
+	}
+
+	/**
+	 * Remove a candy from the candy jar.
+	 * @param family Pokemon family id
+	 * @param amount Amount of candies to remove
+	 */
+	public void removeCandy(PokemonFamilyId family, int amount) {
+		if (candies.containsKey(family)) {
+			if (candies.get(family) - amount < 0) {
+				candies.put(family, 0);
+			} else {
+				candies.put(family, candies.get(family) - amount);
+			}
+		} else {
+			candies.put(family, 0);
+		}
+	}
+
+	/**
+	 * Get number of candies from the candyjar.
+	 * @param family Pokemon family id
+	 * @return number of candies in jar
+	 */
 	public int getCandies(PokemonFamilyId family) {
 		return this.candies.get(family);
 	}
