@@ -31,6 +31,8 @@ ___
   - `` gradle build bundle ``
   - you should have the api bundled in ``build/libs/PokeGOAPI-Java_bundle-0.0.1-SNAPSHOT.jar``
 
+  Confirmed working with Java 8 and Gradle 2.14.1   
+
   PS : To eclipse user, you may build one time and add the generated java class for proto into eclipse path : Right click on the project > Build path > New Source Folder > Type 'build/generated/source/proto/main/java' > Finish
 
 # Usage
