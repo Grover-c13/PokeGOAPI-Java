@@ -37,9 +37,17 @@ public class PokeBank {
 		this.instance = instance;
 	}
 
-	public void addPokemon(Pokemon pokemon) {
+	public void addPokemon(final Pokemon pokemon) {
 		pokemon.setPgo(instance);
-		pokemons.add(pokemon);
+		List<Pokemon> alreadyAdded = StreamSupport.stream(pokemons).filter(new Predicate<Pokemon>() {
+			@Override
+			public boolean test(Pokemon p) {
+				return pokemon.getId() == p.getId();
+			}
+		}).collect(Collectors.<Pokemon>toList());
+		if(alreadyAdded.size() < 1) {
+			pokemons.add(pokemon);
+		}
 	}
 
 
