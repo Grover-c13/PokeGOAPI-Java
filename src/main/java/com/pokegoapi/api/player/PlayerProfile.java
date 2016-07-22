@@ -28,7 +28,6 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
