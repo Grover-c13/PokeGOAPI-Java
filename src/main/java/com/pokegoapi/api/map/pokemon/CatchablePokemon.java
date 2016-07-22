@@ -128,13 +128,13 @@ public class CatchablePokemon {
 	 */
 	public CatchResult catchPokemon() throws LoginFailedException, RemoteServerException {
 		Pokeball ball = Pokeball.POKEBALL;
-		if (api.getBag().getItem(ItemIdOuterClass.ItemId.ITEM_POKE_BALL).getCount() == 0) {
+		if (api.getInventories().getItemBag().getItem(ItemIdOuterClass.ItemId.ITEM_POKE_BALL).getCount() == 0) {
 			ball = Pokeball.GREATBALL;
 		}
-		if (api.getBag().getItem(ItemIdOuterClass.ItemId.ITEM_GREAT_BALL).getCount() == 0) {
+		if (api.getInventories().getItemBag().getItem(ItemIdOuterClass.ItemId.ITEM_GREAT_BALL).getCount() == 0) {
 			ball = Pokeball.ULTRABALL;
 		}
-		if (api.getBag().getItem(ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL).getCount() == 0) {
+		if (api.getInventories().getItemBag().getItem(ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL).getCount() == 0) {
 			ball = Pokeball.MASTERBALL;
 		}
 		return catchPokemon(ball);

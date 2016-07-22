@@ -18,8 +18,8 @@ package com.pokegoapi.api.player;
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.Player.EquippedBadgeOuterClass;
 import POGOProtos.Data.Player.PlayerStatsOuterClass;
-import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -58,14 +58,19 @@ public class PlayerProfile {
 		updateProfile();
 	}
 
+	/**
+	 * Updates the player profile with the latest data.
+	 * @throws LoginFailedException the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
 	public void updateProfile() throws LoginFailedException, RemoteServerException {
-		GetPlayerMessageOuterClass.GetPlayerMessage getPlayerReqMsg = GetPlayerMessageOuterClass.GetPlayerMessage.newBuilder().build();
-		ServerRequest getPlayerServerRequest = new ServerRequest(RequestTypeOuterClass.RequestType.GET_PLAYER, getPlayerReqMsg);
+		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
+		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
 		api.getRequestHandler().request(getPlayerServerRequest);
 		api.getRequestHandler().sendServerRequests();
 
 		GetPlayerResponseOuterClass.GetPlayerResponse playerResponse = null;
-		try{
+		try {
 			playerResponse = GetPlayerResponseOuterClass.GetPlayerResponse.parseFrom(getPlayerServerRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
 			e.printStackTrace();
@@ -101,8 +106,12 @@ public class PlayerProfile {
 		avatarApi.setShoes(playerResponse.getPlayerData().getAvatar().getShoes());
 		avatarApi.setSkin(playerResponse.getPlayerData().getAvatar().getSkin());
 
-		bonusApi.setNextCollectionTimestamp(playerResponse.getPlayerData().getDailyBonus().getNextCollectedTimestampMs());
-		bonusApi.setNextDefenderBonusCollectTimestamp(playerResponse.getPlayerData().getDailyBonus().getNextDefenderBonusCollectTimestampMs());
+		bonusApi.setNextCollectionTimestamp(
+				playerResponse.getPlayerData().getDailyBonus().getNextCollectedTimestampMs()
+		);
+		bonusApi.setNextDefenderBonusCollectTimestamp(
+				playerResponse.getPlayerData().getDailyBonus().getNextDefenderBonusCollectTimestampMs()
+		);
 
 		avatar = avatarApi;
 		dailyBonus = bonusApi;

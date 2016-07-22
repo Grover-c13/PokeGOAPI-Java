@@ -15,33 +15,13 @@
 
 package com.pokegoapi.api;
 
-import POGOProtos.Data.Player.CurrencyOuterClass;
-import POGOProtos.Data.Player.PlayerStatsOuterClass;
-import POGOProtos.Data.PlayerDataOuterClass;
-import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
-import POGOProtos.Enums.PokemonIdOuterClass;
-import POGOProtos.Inventory.InventoryItemOuterClass;
-import POGOProtos.Inventory.ItemIdOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
-import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
-import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
-import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.inventory.*;
+import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
-import com.pokegoapi.api.player.ContactSettings;
-import com.pokegoapi.api.player.DailyBonus;
-import com.pokegoapi.api.player.PlayerAvatar;
 import com.pokegoapi.api.player.PlayerProfile;
-import com.pokegoapi.api.player.Team;
-import com.pokegoapi.api.pokemon.Pokemon;
-import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.RequestHandler;
-import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 import lombok.Getter;
 import lombok.Setter;
@@ -76,7 +56,8 @@ public class PokemonGo {
 	 * @param auth   the auth
 	 * @param client the client
 	 */
-	public PokemonGo(RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth, OkHttpClient client) throws LoginFailedException, RemoteServerException {
+	public PokemonGo(RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth, OkHttpClient client)
+			throws LoginFailedException, RemoteServerException {
 		playerProfile = null;
 
 		// send profile request to get the ball rolling
@@ -104,7 +85,7 @@ public class PokemonGo {
 		if (!forceUpdate && playerProfile != null) {
 			try {
 				playerProfile.updateProfile();
-			} catch (Exception e){
+			} catch (Exception e) {
 				Log.e(TAG, "Error updating Player Profile", e);
 			}
 		}
