@@ -15,21 +15,29 @@
 
 package com.pokegoapi.api.map;
 
-import POGOProtos.Map.Fort.FortDataOuterClass;
-import POGOProtos.Map.Fort.FortTypeOuterClass;
+import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
+import POGOProtos.Map.Fort.FortTypeOuterClass.FortType;
 import POGOProtos.Map.MapCellOuterClass;
-import POGOProtos.Map.Pokemon.MapPokemonOuterClass;
+import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
 import POGOProtos.Map.SpawnPointOuterClass;
-import POGOProtos.Networking.Requests.Messages.*;
+import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.CatchPokemonMessage;
+import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
+import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass.FortSearchMessage;
+import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Responses.*;
+import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
+import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
+import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
+import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
+import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.map.Pokemon.CatchablePokemon;
-import com.pokegoapi.api.map.Pokemon.NearbyPokemon;
 import com.pokegoapi.api.map.fort.FortDetails;
+import com.pokegoapi.api.map.pokemon.CatchablePokemon;
+import com.pokegoapi.api.map.pokemon.NearbyPokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.MutableInteger;
@@ -45,7 +53,6 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.pokegoapi.google.common.geometry.S2CellId.MAX_LEVEL;
 
 public class Map {
 	private static long NEW_MAP_OBJECTS_EXPIRY = 60000; // 60 seconds
@@ -61,6 +68,11 @@ public class Map {
 	@Setter
 	private boolean trackUpdate;
 
+	/**
+	 * Instantiates a new Map.
+	 *
+	 * @param api the api
+	 */
 	public Map(PokemonGo api) {
 		this.api = api;
 		lastMapUpdate = 0;
@@ -69,14 +81,18 @@ public class Map {
 	}
 
 	/**
-	 * Gets a new map objects if there has been a lat/long change or the last request was done greater then NEW_MAP_OBJECTS_EXPIRY
+	 * Gets a new map objects if there has been a lat/long change or the last request was done greater then
+	 * NEW_MAP_OBJECTS_EXPIRY.
 	 *
-	 * @return List<CatchablePokemon> at your current location
+	 * @return a List of CatchablePokemon at your current location
 	 */
 	private MapObjects getRetainedMapObject() throws LoginFailedException, RemoteServerException {
 		// get new MapObjects or used existing one
-		if (!useCache) return lastMapObjects;
-		if (api.getLatitude() != lastLat && api.getLongitude() != lastLong || (System.currentTimeMillis() - lastMapUpdate) > NEW_MAP_OBJECTS_EXPIRY) {
+		if (!useCache) {
+			return lastMapObjects;
+		}
+		if (api.getLatitude() != lastLat && api.getLongitude() != lastLong
+				|| (System.currentTimeMillis() - lastMapUpdate) > NEW_MAP_OBJECTS_EXPIRY) {
 			getMapObjects(); // should update the lastMapObjects variable
 		}
 
@@ -85,15 +101,15 @@ public class Map {
 
 
 	/**
-	 * Returns a list of catchable pokemon around the current location
+	 * Returns a list of catchable pokemon around the current location.
 	 *
-	 * @return List<CatchablePokemon> at your current location
+	 * @return a List of CatchablePokemon at your current location
 	 */
 	public List<CatchablePokemon> getCatchablePokemon() throws LoginFailedException, RemoteServerException {
 		List<CatchablePokemon> catchablePokemons = new ArrayList<>();
 		MapObjects objects = getRetainedMapObject();
 
-		for (MapPokemonOuterClass.MapPokemon mapPokemon : objects.getCatchablePokemons()) {
+		for (MapPokemon mapPokemon : objects.getCatchablePokemons()) {
 			catchablePokemons.add(new CatchablePokemon(api, mapPokemon));
 		}
 		for (WildPokemonOuterClass.WildPokemon wildPokemon : objects.getWildPokemons()) {
@@ -105,9 +121,9 @@ public class Map {
 
 
 	/**
-	 * Returns a list of nearby pokemon (non-catchable)
+	 * Returns a list of nearby pokemon (non-catchable).
 	 *
-	 * @return List<NearbyPokemon> at your current location
+	 * @return a List of NearbyPokemon at your current location
 	 */
 	public List<NearbyPokemon> getNearbyPokemon() throws LoginFailedException, RemoteServerException {
 		List<NearbyPokemon> pokemons = new ArrayList<>();
@@ -121,9 +137,9 @@ public class Map {
 	}
 
 	/**
-	 * Returns a list of spawn points
+	 * Returns a list of spawn points.
 	 *
-	 * @return List<Point> list of spawn points
+	 * @return list of spawn points
 	 */
 	public List<Point> getSpawnPoints() throws LoginFailedException, RemoteServerException {
 		List<Point> points = new ArrayList<>();
@@ -137,9 +153,9 @@ public class Map {
 	}
 
 	/**
-	 * Returns a list of decimated spawn points at current location
+	 * Returns a list of decimated spawn points at current location.
 	 *
-	 * @return List<Point> list of spawn points
+	 * @return list of spawn points
 	 */
 	public List<Point> getDecimatedSpawnPoints() throws LoginFailedException, RemoteServerException {
 		List<Point> points = new ArrayList<>();
@@ -152,9 +168,8 @@ public class Map {
 		return points;
 	}
 
-
 	/**
-	 * Returns MapObjects around your current location
+	 * Returns MapObjects around your current location.
 	 *
 	 * @return MapObjects at your current location
 	 */
@@ -163,63 +178,74 @@ public class Map {
 	}
 
 	/**
-	 * Returns MapObjects around your current location within a given width
+	 * Returns MapObjects around your current location within a given width.
 	 *
-	 * @param width
+	 * @param width width
 	 * @return MapObjects at your current location
 	 */
 	public MapObjects getMapObjects(int width) throws LoginFailedException, RemoteServerException {
-		return getMapObjects(getCellIds(api.getLatitude(), api.getLongitude(), width), api.getLatitude(), api.getLongitude(), api.getAltitude());
+		return getMapObjects(
+				getCellIds(
+						api.getLatitude(),
+						api.getLongitude(),
+						width),
+				api.getLatitude(),
+				api.getLongitude(),
+				api.getAltitude());
 	}
 
 	/**
-	 * Returns 9x9 cells with the requested lattitude/longitude in the center cell
+	 * Returns 9x9 cells with the requested lattitude/longitude in the center cell.
 	 *
-	 * @param latitude
-	 * @param longitude
+	 * @param latitude  latitude
+	 * @param longitude longitude
 	 * @return MapObjects in the given cells
 	 */
 	@Deprecated
-	public MapObjects getMapObjects(double latitude, double longitude) throws LoginFailedException, RemoteServerException {
+	public MapObjects getMapObjects(double latitude, double longitude)
+			throws LoginFailedException, RemoteServerException {
 		return getMapObjects(latitude, longitude, 9);
 	}
 
 	/**
-	 * Returns the cells requested, you should send a latitude/longitude to fake a near location
+	 * Returns the cells requested, you should send a latitude/longitude to fake a near location.
 	 *
-	 * @param cellIds   List<Long> of cellId
-	 * @param latitude
-	 * @param longitude
+	 * @param cellIds   List of cellIds
+	 * @param latitude  latitude
+	 * @param longitude longitude
 	 * @return MapObjects in the given cells
 	 */
 	@Deprecated
-	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude) throws LoginFailedException, RemoteServerException {
+	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude)
+			throws LoginFailedException, RemoteServerException {
 		return getMapObjects(cellIds, latitude, longitude, 0);
 	}
 
 	/**
-	 * Returns `width` * `width` cells with the requested latitude/longitude in the center
+	 * Returns `width` * `width` cells with the requested latitude/longitude in the center.
 	 *
-	 * @param latitude
-	 * @param longitude
-	 * @param width
+	 * @param latitude  latitude
+	 * @param longitude longitude
+	 * @param width     width
 	 * @return MapObjects in the given cells
 	 */
 	@Deprecated
-	public MapObjects getMapObjects(double latitude, double longitude, int width) throws LoginFailedException, RemoteServerException {
+	public MapObjects getMapObjects(double latitude, double longitude, int width)
+			throws LoginFailedException, RemoteServerException {
 		return getMapObjects(getCellIds(latitude, longitude, width), latitude, longitude);
 	}
 
 	/**
-	 * Returns the cells requested
+	 * Returns the cells requested.
 	 *
-	 * @param cellIds
-	 * @param latitude
-	 * @param longitude
+	 * @param cellIds   cellIds
+	 * @param latitude  latitude
+	 * @param longitude longitude
 	 * @return MapObjects in the given cells
 	 */
 	@Deprecated
-	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude, double altitude) throws LoginFailedException, RemoteServerException {
+	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude, double altitude)
+			throws LoginFailedException, RemoteServerException {
 		api.setLatitude(latitude);
 		api.setLongitude(longitude);
 		api.setAltitude(altitude);
@@ -227,25 +253,25 @@ public class Map {
 	}
 
 	/**
-	 * Returns the cells requested
+	 * Returns the cells requested.
 	 *
-	 * @param cellIds List<Long> of cellId
+	 * @param cellIds List of cellId
 	 * @return MapObjects in the given cells
 	 */
 	public MapObjects getMapObjects(List<Long> cellIds) throws LoginFailedException, RemoteServerException {
-		GetMapObjectsMessageOuterClass.GetMapObjectsMessage.Builder builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder()
+		GetMapObjectsMessage.Builder builder = GetMapObjectsMessage.newBuilder()
 				.setLatitude(api.getLatitude())
 				.setLongitude(api.getLongitude());
 
-		int i = 0;
+		int index = 0;
 		for (Long cellId : cellIds) {
 			builder.addCellId(cellId);
 			long time = 0;
-			if (trackUpdate)
+			if (trackUpdate) {
 				time = lastMapUpdate;
+			}
 			builder.addSinceTimestampMs(lastMapUpdate);
-
-			i++;
+			index++;
 		}
 
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS, builder.build());
@@ -266,15 +292,15 @@ public class Map {
 			result.addDecimatedSpawnPoints(mapCell.getDecimatedSpawnPointsList());
 			result.addSpawnPoints(mapCell.getSpawnPointsList());
 
-			java.util.Map<FortTypeOuterClass.FortType, List<FortDataOuterClass.FortData>> groupedForts
-					= StreamSupport.stream(mapCell.getFortsList()).collect(Collectors.groupingBy(new Function<FortDataOuterClass.FortData, FortTypeOuterClass.FortType>() {
-				@Override
-				public FortTypeOuterClass.FortType apply(FortDataOuterClass.FortData t) {
-					return t.getType();
-				}
-			}));
-			result.addGyms(groupedForts.get(FortTypeOuterClass.FortType.GYM));
-			result.addPokestops(groupedForts.get(FortTypeOuterClass.FortType.CHECKPOINT));
+			java.util.Map<FortType, List<FortData>> groupedForts = StreamSupport.stream(mapCell.getFortsList())
+					.collect(Collectors.groupingBy(new Function<FortData, FortType>() {
+						@Override
+						public FortType apply(FortData fortData) {
+							return fortData.getType();
+						}
+					}));
+			result.addGyms(groupedForts.get(FortType.GYM));
+			result.addPokestops(groupedForts.get(FortType.CHECKPOINT));
 		}
 
 		lastMapObjects = result;
@@ -283,11 +309,11 @@ public class Map {
 	}
 
 	/**
-	 * Get a list of all the Cell Ids
+	 * Get a list of all the Cell Ids.
 	 *
-	 * @param latitude
-	 * @param longitude
-	 * @param width
+	 * @param latitude  latitude
+	 * @param longitude longitude
+	 * @param width     width
 	 * @return List of Cells
 	 */
 	public List<Long> getCellIds(double latitude, double longitude, int width) {
@@ -297,27 +323,36 @@ public class Map {
 		lastLat = api.getLatitude();
 		lastLong = api.getLongitude();
 
-
-		MutableInteger i = new MutableInteger(0);
-		MutableInteger j = new MutableInteger(0);
+		MutableInteger index = new MutableInteger(0);
+		MutableInteger jindex = new MutableInteger(0);
 
 		int level = cellId.level();
-		int size = 1 << (MAX_LEVEL - level);
-		int face = cellId.toFaceIJOrientation(i, j, null);
+		int size = 1 << (S2CellId.MAX_LEVEL - level);
+		int face = cellId.toFaceIJOrientation(index, jindex, null);
 
 		List<Long> cells = new ArrayList<Long>();
 
 		int halfWidth = (int) Math.floor(width / 2);
 		for (int x = -halfWidth; x <= halfWidth; x++) {
 			for (int y = -halfWidth; y <= halfWidth; y++) {
-				cells.add(cellId.fromFaceIJ(face, i.intValue() + x * size, j.intValue() + y * size).parent(15).id());
+				cells.add(S2CellId.fromFaceIJ(face, index.intValue() + x * size, jindex.intValue() + y * size).parent(15).id());
 			}
 		}
 		return cells;
 	}
 
-	public FortDetails getFortDetails(String id, double lon, double lat) throws LoginFailedException, RemoteServerException {
-		FortDetailsMessageOuterClass.FortDetailsMessage reqMsg = FortDetailsMessageOuterClass.FortDetailsMessage.newBuilder()
+	/**
+	 * Gets fort details.
+	 *
+	 * @param id  the id
+	 * @param lon the lon
+	 * @param lat the lat
+	 * @return the fort details
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public FortDetails getFortDetails(String id, long lon, long lat) throws LoginFailedException, RemoteServerException {
+		FortDetailsMessage reqMsg = FortDetailsMessage.newBuilder()
 				.setFortId(id)
 				.setLatitude(lat)
 				.setLongitude(lon)
@@ -335,9 +370,17 @@ public class Map {
 		return new FortDetails(response);
 	}
 
+	/**
+	 * Search fort fort search response.
+	 *
+	 * @param fortData the fort data
+	 * @return the fort search response
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
 	@Deprecated
-	public FortSearchResponseOuterClass.FortSearchResponse searchFort(FortDataOuterClass.FortData fortData) throws LoginFailedException, RemoteServerException {
-		FortSearchMessageOuterClass.FortSearchMessage reqMsg = FortSearchMessageOuterClass.FortSearchMessage.newBuilder()
+	public FortSearchResponse searchFort(FortData fortData) throws LoginFailedException, RemoteServerException {
+		FortSearchMessage reqMsg = FortSearchMessage.newBuilder()
 				.setFortId(fortData.getId())
 				.setFortLatitude(fortData.getLatitude())
 				.setFortLongitude(fortData.getLongitude())
@@ -347,17 +390,27 @@ public class Map {
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH, reqMsg);
 		api.getRequestHandler().request(serverRequest);
 		api.getRequestHandler().sendServerRequests();
-		FortSearchResponseOuterClass.FortSearchResponse response = null;
+		FortSearchResponse response = null;
 		try {
-			response = FortSearchResponseOuterClass.FortSearchResponse.parseFrom(serverRequest.getData());
+			response = FortSearchResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
 		return response;
 	}
 
+	/**
+	 * Encounter pokemon encounter response.
+	 *
+	 * @param catchablePokemon the catchable pokemon
+	 * @return the encounter response
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
 	@Deprecated
-	public EncounterResponseOuterClass.EncounterResponse encounterPokemon(MapPokemonOuterClass.MapPokemon catchablePokemon) throws LoginFailedException, RemoteServerException {
+	public EncounterResponse encounterPokemon(MapPokemon catchablePokemon)
+			throws LoginFailedException, RemoteServerException {
+
 		EncounterMessageOuterClass.EncounterMessage reqMsg = EncounterMessageOuterClass.EncounterMessage.newBuilder()
 				.setEncounterId(catchablePokemon.getEncounterId())
 				.setPlayerLatitude(api.getLatitude())
@@ -367,18 +420,37 @@ public class Map {
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.ENCOUNTER, reqMsg);
 		api.getRequestHandler().request(serverRequest);
 		api.getRequestHandler().sendServerRequests();
-		EncounterResponseOuterClass.EncounterResponse response = null;
+		EncounterResponse response = null;
 		try {
-			response = EncounterResponseOuterClass.EncounterResponse.parseFrom(serverRequest.getData());
+			response = EncounterResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
 		return response;
 	}
 
+	/**
+	 * Catch pokemon catch pokemon response.
+	 *
+	 * @param catchablePokemon      the catchable pokemon
+	 * @param normalizedHitPosition the normalized hit position
+	 * @param normalizedReticleSize the normalized reticle size
+	 * @param spinModifier          the spin modifier
+	 * @param pokeball              the pokeball
+	 * @return the catch pokemon response
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
 	@Deprecated
-	public CatchPokemonResponseOuterClass.CatchPokemonResponse catchPokemon(MapPokemonOuterClass.MapPokemon catchablePokemon, double normalizedHitPosition, double normalizedReticleSize, double spinModifier, int pokeball) throws LoginFailedException, RemoteServerException {
-		CatchPokemonMessageOuterClass.CatchPokemonMessage reqMsg = CatchPokemonMessageOuterClass.CatchPokemonMessage.newBuilder()
+	public CatchPokemonResponse catchPokemon(
+			MapPokemon catchablePokemon,
+			double normalizedHitPosition,
+			double normalizedReticleSize,
+			double spinModifier,
+			int pokeball)
+			throws LoginFailedException, RemoteServerException {
+
+		CatchPokemonMessage reqMsg = CatchPokemonMessage.newBuilder()
 				.setEncounterId(catchablePokemon.getEncounterId())
 				.setHitPokemon(true)
 				.setNormalizedHitPosition(normalizedHitPosition)
@@ -390,9 +462,9 @@ public class Map {
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.CATCH_POKEMON, reqMsg);
 		api.getRequestHandler().request(serverRequest);
 		api.getRequestHandler().sendServerRequests();
-		CatchPokemonResponseOuterClass.CatchPokemonResponse response = null;
+		CatchPokemonResponse response = null;
 		try {
-			response = CatchPokemonResponseOuterClass.CatchPokemonResponse.parseFrom(serverRequest.getData());
+			response = CatchPokemonResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}

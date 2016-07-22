@@ -24,7 +24,7 @@ public class LoginFailedException extends Exception {
 		super(reason);
 	}
 
-	public LoginFailedException(Exception e) {
-		super(e);
+	public LoginFailedException(Exception exception) {
+		super(exception);
 	}
 }

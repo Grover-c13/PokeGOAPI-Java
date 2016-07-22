@@ -15,43 +15,50 @@
 
 package com.pokegoapi.auth;
 
+import com.google.gson.annotations.SerializedName;
+
 public class GoogleAuthJson {
-	String device_code;
-	String user_code;
-	String verification_url;
-	int expires_in;
+	@SerializedName("device_code")
+	String deviceCode;
+	@SerializedName("user_code")
+	String userCode;
+	@SerializedName("verification_url")
+	String verificationUrl;
+	@SerializedName("expires_in")
+	int expiresIn;
+	@SerializedName("interval")
 	int interval;
 
-	public String getDevice_code() {
-		return device_code;
+	public String getDeviceCode() {
+		return deviceCode;
 	}
 
-	public void setDevice_code(String device_code) {
-		this.device_code = device_code;
+	public void setDeviceCode(String deviceCode) {
+		this.deviceCode = deviceCode;
 	}
 
-	public String getUser_code() {
-		return user_code;
+	public String getUserCode() {
+		return userCode;
 	}
 
-	public void setUser_code(String user_code) {
-		this.user_code = user_code;
+	public void setUserCode(String userCode) {
+		this.userCode = userCode;
 	}
 
-	public String getVerification_url() {
-		return verification_url;
+	public String getVerificationUrl() {
+		return verificationUrl;
 	}
 
-	public void setVerification_url(String verification_url) {
-		this.verification_url = verification_url;
+	public void setVerificationUrl(String verificationUrl) {
+		this.verificationUrl = verificationUrl;
 	}
 
-	public int getExpires_in() {
-		return expires_in;
+	public int getExpiresIn() {
+		return expiresIn;
 	}
 
-	public void setExpires_in(int expires_in) {
-		this.expires_in = expires_in;
+	public void setExpiresIn(int expiresIn) {
+		this.expiresIn = expiresIn;
 	}
 
 	public int getInterval() {

@@ -20,7 +20,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.pokegoapi.exceptions.LoginFailedException;
 import lombok.Getter;
-import okhttp3.*;
+import okhttp3.Cookie;
+import okhttp3.CookieJar;
+import okhttp3.HttpUrl;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,7 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class PTCLogin extends Login {
+public class PtcLogin extends Login {
 	public static final String CLIENT_SECRET = "w8ScCUXJQc6kXKw8FiOhd8Fixzht18Dq3PEVkUCP5ZPxtgyWsbTvWHFLm2wNY0JR";
 	public static final String REDIRECT_URI = "https://www.nianticlabs.com/pokemongo/error";
 	public static final String CLIENT_ID = "mobile-app_pokemon-go";
@@ -43,12 +50,17 @@ public class PTCLogin extends Login {
 	@Getter
 	String token;
 
-	public PTCLogin(OkHttpClient client) {
-		  /*
-			This is a temporary, in-memory cookie jar.
-			We don't require any persistence outside of the scope of the login,
-			so it being discarded is completely fine
-		   */
+	/**
+	 * Instantiates a new Ptc login.
+	 *
+	 * @param client the client
+	 */
+	public PtcLogin(OkHttpClient client) {
+		/*
+		This is a temporary, in-memory cookie jar.
+		We don't require any persistence outside of the scope of the login,
+		so it being discarded is completely fine
+		*/
 		CookieJar tempJar = new CookieJar() {
 			private final HashMap<String, List<Cookie>> cookieStore = new HashMap<String, List<Cookie>>();
 
@@ -92,7 +104,8 @@ public class PTCLogin extends Login {
 	}
 
 	/**
-	 * Starts a login flow for pokemon.com (PTC) using a username and password, this uses pokemon.com's oauth endpoint and returns a usable AuthInfo without user interaction
+	 * Starts a login flow for pokemon.com (PTC) using a username and password,
+	 * this uses pokemon.com's oauth endpoint and returns a usable AuthInfo without user interaction
 	 *
 	 * @param username PTC username
 	 * @param password PTC password
@@ -111,7 +124,7 @@ public class PTCLogin extends Login {
 
 			Gson gson = new GsonBuilder().create();
 
-			PTCAuthJson ptcAuth = gson.fromJson(getResponse.body().string(), PTCAuthJson.class);
+			PtcAuthJson ptcAuth = gson.fromJson(getResponse.body().string(), PtcAuthJson.class);
 
 			HttpUrl url = HttpUrl.parse(LOGIN_URL).newBuilder()
 					.addQueryParameter("lt", ptcAuth.getLt())
@@ -139,7 +152,7 @@ public class PTCLogin extends Login {
 			String body = response.body().string();
 
 			if (body.length() > 0) {
-				PTCError ptcError = gson.fromJson(body, PTCError.class);
+				PtcError ptcError = gson.fromJson(body, PtcError.class);
 				if (ptcError.getError() != null && ptcError.getError().length() > 0) {
 					throw new LoginFailedException();
 				}

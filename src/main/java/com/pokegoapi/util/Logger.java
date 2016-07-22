@@ -18,11 +18,12 @@ package com.pokegoapi.util;
 /**
  * Created by Will on 7/20/16.
  */
+@SuppressWarnings("checkstyle:methodname")
 public interface Logger {
 
 	void v(String tag, String msg);
 
-	void v(String tag, String msg, Throwable t);
+	void v(String tag, String msg, Throwable tr);
 
 	void d(String tag, String msg);
 

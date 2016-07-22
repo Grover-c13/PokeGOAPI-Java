@@ -24,7 +24,7 @@ public class InvalidCurrencyException extends Exception {
 		super(reason);
 	}
 
-	public InvalidCurrencyException(Exception e) {
-		super(e);
+	public InvalidCurrencyException(Exception exception) {
+		super(exception);
 	}
 }

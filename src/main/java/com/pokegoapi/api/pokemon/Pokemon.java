@@ -29,13 +29,16 @@ import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleaseP
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.map.Pokemon.EvolutionResult;
+import com.pokegoapi.api.map.pokemon.EvolutionResult;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 import lombok.Setter;
 
+/**
+ * The type Pokemon.
+ */
 public class Pokemon {
 
 	private static final String TAG = Pokemon.class.getSimpleName();
@@ -50,6 +53,13 @@ public class Pokemon {
 		this.proto = proto;
 	}
 
+	/**
+	 * Transfers the pokemon.
+	 *
+	 * @return the result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
 	public Result transferPokemon() throws LoginFailedException, RemoteServerException {
 		ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
@@ -65,15 +75,29 @@ public class Pokemon {
 		}
 
 		if (response.getResult().equals(Result.SUCCESS)) {
-			pgo.getCandyjar().setCandy(this.getPokemonFamily(), pgo.getCandyjar().getCandies(this.getPokemonFamily()) + response.getCandyAwarded());
+			pgo.getCandyjar().setCandy(
+					this.getPokemonFamily(),
+					pgo.getCandyjar().getCandies(this.getPokemonFamily()) + response.getCandyAwarded());
 			pgo.getPokebank().removePokemon(this);
 		}
 
 		return response.getResult();
 	}
 
-	public NicknamePokemonResponse.Result renamePokemon(String nickname) throws LoginFailedException, RemoteServerException {
-		NicknamePokemonMessage reqMsg = NicknamePokemonMessage.newBuilder().setPokemonId(getId()).setNickname(nickname).build();
+	/**
+	 * Rename pokemon nickname pokemon response . result.
+	 *
+	 * @param nickname the nickname
+	 * @return the nickname pokemon response . result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public NicknamePokemonResponse.Result renamePokemon(String nickname)
+			throws LoginFailedException, RemoteServerException {
+		NicknamePokemonMessage reqMsg = NicknamePokemonMessage.newBuilder()
+				.setPokemonId(getId())
+				.setNickname(nickname)
+				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.NICKNAME_POKEMON, reqMsg);
 		pgo.getRequestHandler().request(serverRequest);
@@ -89,6 +113,13 @@ public class Pokemon {
 		return response.getResult();
 	}
 
+	/**
+	 * Evolve evolution result.
+	 *
+	 * @return the evolution result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
 	public EvolutionResult evolve() throws LoginFailedException, RemoteServerException {
 		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
