@@ -71,8 +71,7 @@ public class CatchablePokemon {
 				.setSpawnpointId(getSpawnpointId())
 				.build();
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.ENCOUNTER, reqMsg);
-		api.getRequestHandler().request(serverRequest);
-		api.getRequestHandler().sendServerRequests();
+		api.getRequestHandler().sendServerRequests(serverRequest);
 		EncounterResponseOuterClass.EncounterResponse response = null;
 		try {
 			response = EncounterResponseOuterClass.EncounterResponse.parseFrom(serverRequest.getData());
@@ -149,8 +148,7 @@ public class CatchablePokemon {
 					.setPokeball(type.getBalltype())
 					.build();
 			ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.CATCH_POKEMON, reqMsg);
-			api.getRequestHandler().request(serverRequest);
-			api.getRequestHandler().sendServerRequests();
+			api.getRequestHandler().sendServerRequests(serverRequest);
 
 			try {
 				response = CatchPokemonResponseOuterClass.CatchPokemonResponse.parseFrom(serverRequest.getData());

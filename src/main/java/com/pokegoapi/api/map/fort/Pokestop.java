@@ -71,8 +71,7 @@ public class Pokestop {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH, searchMessage);
-		api.getRequestHandler().request(serverRequest);
-		api.getRequestHandler().sendServerRequests();
+		api.getRequestHandler().sendServerRequests(serverRequest);
 		FortSearchResponseOuterClass.FortSearchResponse response;
 		try {
 			response = FortSearchResponseOuterClass.FortSearchResponse.parseFrom(serverRequest.getData());
@@ -98,8 +97,7 @@ public class Pokestop {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS, reqMsg);
-		api.getRequestHandler().request(serverRequest);
-		api.getRequestHandler().sendServerRequests();
+		api.getRequestHandler().sendServerRequests(serverRequest);
 		FortDetailsResponseOuterClass.FortDetailsResponse response = null;
 		try {
 			response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(serverRequest.getData());

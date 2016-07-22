@@ -75,15 +75,13 @@ public class PokemonGo {
 
 		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
 		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
-		getRequestHandler().request(getPlayerServerRequest);
 
 		GetInventoryMessage invReqMsg = GetInventoryMessage.newBuilder()
 				.setLastTimestampMs(this.lastInventoryUpdate)
 				.build();
 		ServerRequest getInventoryServerRequest = new ServerRequest(RequestType.GET_INVENTORY, invReqMsg);
-		getRequestHandler().request(getInventoryServerRequest);
 
-		getRequestHandler().sendServerRequests();
+		getRequestHandler().sendServerRequests(getPlayerServerRequest, getInventoryServerRequest);
 
 		GetPlayerResponse getPlayerResponse;
 		GetInventoryResponse getInventoryResponse;
