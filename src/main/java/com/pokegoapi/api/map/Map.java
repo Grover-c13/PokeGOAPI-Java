@@ -12,6 +12,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.pokegoapi.api.map;
 
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
@@ -25,6 +26,7 @@ import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.Cat
 import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
 import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass.FortSearchMessage;
+import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
@@ -97,7 +99,7 @@ public class Map {
 			catchablePokemons.add(new CatchablePokemon(api, mapPokemon));
 		}
 
-		for(WildPokemonOuterClass.WildPokemon wildPokemon : objects.getWildPokemons()){
+		for (WildPokemonOuterClass.WildPokemon wildPokemon : objects.getWildPokemons()) {
 			catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
 		}
 
@@ -243,14 +245,14 @@ public class Map {
 	 * @return MapObjects in the given cells
 	 */
 	public MapObjects getMapObjects(List<Long> cellIds) throws LoginFailedException, RemoteServerException {
-		GetMapObjectsMessage.Builder builder = GetMapObjectsMessage.newBuilder()
+		GetMapObjectsMessage.Builder builder = GetMapObjectsMessage.newBuilder();
 
-		if(useCache && (System.currentTimeMillis() - lastMapUpdate > mapObjectsExpiry)){
+		if (useCache && (System.currentTimeMillis() - lastMapUpdate > mapObjectsExpiry)) {
 			lastMapUpdate = 0;
 			cachedMapObjects = new MapObjects(api);
 		}
 
-		GetMapObjectsMessageOuterClass.GetMapObjectsMessage.Builder builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder()
+		builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder()
 				.setLatitude(api.getLatitude())
 				.setLongitude(api.getLongitude());
 
@@ -258,9 +260,7 @@ public class Map {
 		for (Long cellId : cellIds) {
 			builder.addCellId(cellId);
 			long time = 0;
-			if (trackUpdate) {
-				time = lastMapUpdate;
-			}
+
 			builder.addSinceTimestampMs(lastMapUpdate);
 			index++;
 
@@ -295,7 +295,7 @@ public class Map {
 			result.addPokestops(groupedForts.get(FortType.CHECKPOINT));
 		}
 
-		if(useCache){
+		if (useCache) {
 			cachedMapObjects.update(result);
 			result = cachedMapObjects;
 			lastMapUpdate = System.currentTimeMillis();
@@ -318,8 +318,7 @@ public class Map {
 
 		MutableInteger index = new MutableInteger(0);
 		MutableInteger jindex = new MutableInteger(0);
-		MutableInteger i = new MutableInteger(0);
-		MutableInteger j = new MutableInteger(0);
+
 
 		int level = cellId.level();
 		int size = 1 << (S2CellId.MAX_LEVEL - level);

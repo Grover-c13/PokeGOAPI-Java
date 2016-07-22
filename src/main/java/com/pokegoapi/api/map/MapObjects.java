@@ -15,6 +15,7 @@
 
 package com.pokegoapi.api.map;
 
+import POGOProtos.Map.Fort.FortDataOuterClass;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass.NearbyPokemon;
@@ -160,7 +161,13 @@ public class MapObjects {
 		return complete;
 	}
 
-	public void update(MapObjects other){
+
+	/**
+	 * updates the object.
+	 *
+	 *
+	 */
+	public void update(MapObjects other) {
 
 		nearbyPokemons.clear();
 		addNearbyPokemons(other.getNearbyPokemons());
@@ -177,9 +184,9 @@ public class MapObjects {
 		spawnPoints.clear();
 		addSpawnPoints(other.getSpawnPoints());
 
-		for(FortDataOuterClass.FortData otherGym : other.getGyms()){
-			for(FortDataOuterClass.FortData gym : getGyms()){
-				if(otherGym.getId().equals(gym.getId())){
+		for (FortData otherGym : other.getGyms()) {
+			for (FortData gym : getGyms()) {
+				if (otherGym.getId().equals(gym.getId())) {
 					gyms.remove(gym);
 					break;
 				}
@@ -187,9 +194,9 @@ public class MapObjects {
 			gyms.add(otherGym);
 		}
 
-		for(Pokestop otherPokestop : other.getPokestops()){
-			for(Pokestop pokestop : pokestops){
-				if(otherPokestop.getId().equals(pokestop.getId())){
+		for (Pokestop otherPokestop : other.getPokestops()) {
+			for (Pokestop pokestop : pokestops) {
+				if (otherPokestop.getId().equals(pokestop.getId())) {
 					pokestops.remove(pokestop);
 					break;
 				}
