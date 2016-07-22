@@ -33,11 +33,11 @@ import java.util.HashMap;
 /**
  * The type Bag.
  */
-public class Bag {
+public class ItemBag {
 	private PokemonGo pgo;
 	private HashMap<ItemId, Item> items;
 
-	public Bag(PokemonGo pgo) {
+	public ItemBag(PokemonGo pgo) {
 		this.pgo = pgo;
 		items = new HashMap<>();
 	}
