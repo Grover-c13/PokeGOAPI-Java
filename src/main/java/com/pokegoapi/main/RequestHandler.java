@@ -81,7 +81,7 @@ public class RequestHandler {
 	 *
 	 * @param serverRequests list of ServerRequests to be sent
 	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException the login failed exception
+	 * @throws LoginFailedException  the login failed exception
 	 */
 	public void sendServerRequests(ServerRequest... serverRequests) throws RemoteServerException, LoginFailedException {
 		if (serverRequests.length == 0) {
@@ -107,52 +107,56 @@ public class RequestHandler {
 				.url(apiEndpoint)
 				.post(body)
 				.build();
-		Response response;
-		try {
-			response = client.newCall(httpRequest).execute();
+
+		try (Response response = client.newCall(httpRequest).execute()) {
+			if (response.code() != 200) {
+				throw new RemoteServerException("Got a unexpected http code : " + response.code());
+			}
+
+			ResponseEnvelopeOuterClass.ResponseEnvelope responseEnvelop;
+			try (InputStream content = response.body().byteStream()) {
+				responseEnvelop = ResponseEnvelopeOuterClass.ResponseEnvelope.parseFrom(content);
+			} catch (IOException e) {
+				// retrieved garbage from the server
+				throw new RemoteServerException("Received malformed response : " + e);
+			}
+
+			if (responseEnvelop.getApiUrl() != null && responseEnvelop.getApiUrl().length() > 0) {
+				apiEndpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
+			}
+
+			if (responseEnvelop.hasAuthTicket()) {
+				lastAuth = responseEnvelop.getAuthTicket();
+			}
+
+			if (responseEnvelop.getStatusCode() == 102) {
+				throw new LoginFailedException();
+			} else if (responseEnvelop.getStatusCode() == 53) {
+				// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
+				sendServerRequests(serverRequests);
+				return;
+			}
+
+			/**
+			 * map each reply to the numeric response,
+			 * ie first response = first request and send back to the requests to handle.
+			 * */
+			int count = 0;
+			for (ByteString payload : responseEnvelop.getReturnsList()) {
+				ServerRequest serverReq = serverRequests[count];
+				/**
+				 * TODO: Probably all other payloads are garbage as well in this case,
+				 * so might as well throw an exception and leave this loop */
+				if (payload != null) {
+					serverReq.handleData(payload);
+				}
+				count++;
+			}
 		} catch (IOException e) {
 			throw new RemoteServerException(e);
-		}
-
-		if (response.code() != 200) {
-			throw new RemoteServerException("Got a unexcepted http code : " + response.code());
-		}
-
-		ResponseEnvelopeOuterClass.ResponseEnvelope responseEnvelop;
-		try (InputStream content = response.body().byteStream()) {
-			responseEnvelop = ResponseEnvelopeOuterClass.ResponseEnvelope.parseFrom(content);
-		} catch (IOException e) {
-			// retrieved garbage from the server
-			throw new RemoteServerException("Received malformed response : " + e);
-		}
-
-		if (responseEnvelop.getApiUrl() != null && responseEnvelop.getApiUrl().length() > 0) {
-			apiEndpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
-		}
-
-		if (responseEnvelop.hasAuthTicket()) {
-			lastAuth = responseEnvelop.getAuthTicket();
-		}
-
-		if (responseEnvelop.getStatusCode() == 102) {
-			throw new LoginFailedException();
-		} else if (responseEnvelop.getStatusCode() == 53) {
-			// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
-			sendServerRequests(serverRequests);
-			return;
-		}
-
-		/* map each reply to the numeric response,
-		   ie first response = first request and send back to the requests to handle. */
-		int count = 0;
-		for (ByteString payload : responseEnvelop.getReturnsList()) {
-			ServerRequest serverReq = serverRequests[count];
-			/* TODO: Probably all other payloads are garbage as well in this case,
-			   so might as well throw an exception and leave this loop */
-			if (payload != null) {
-				serverReq.handleData(payload);
-			}
-			count++;
+		} catch (RemoteServerException e) {
+			// catch it, so the auto-close of resources triggers, but don't wrap it in yet another RemoteServer Exception
+			throw e;
 		}
 	}
 
