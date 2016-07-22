@@ -19,6 +19,8 @@ import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.PokemonMoveOuterClass;
+import POGOProtos.Inventory.Item.ItemIdOuterClass;
+import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.EvolvePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.NicknamePokemonMessageOuterClass.NicknamePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
@@ -73,6 +75,12 @@ public class Pokemon {
 			return ReleasePokemonResponse.Result.FAILED;
 		}
 
+		if (response.getResult() == Result.SUCCESS) {
+			pgo.getInventories().getPokebank().removePokemon(this);
+		}
+
+		pgo.getInventories().getPokebank().removePokemon(this);
+
 		pgo.getInventories().updateInventories();
 
 		return response.getResult();
@@ -103,6 +111,7 @@ public class Pokemon {
 			throw new RemoteServerException(e);
 		}
 
+		pgo.getInventories().getPokebank().removePokemon(this);
 		pgo.getInventories().updateInventories();
 
 		return response.getResult();
@@ -129,6 +138,8 @@ public class Pokemon {
 		}
 
 		EvolutionResult result = new EvolutionResult(response);
+
+		pgo.getInventories().getPokebank().removePokemon(this);
 
 		pgo.getInventories().updateInventories();
 
@@ -223,7 +234,7 @@ public class Pokemon {
 		return proto.getCpMultiplier();
 	}
 
-	public int getPokeball() {
+	public ItemId getPokeball() {
 		return proto.getPokeball();
 	}
 
@@ -239,7 +250,7 @@ public class Pokemon {
 		return proto.getBattlesDefended();
 	}
 
-	public int getEggIncubatorId() {
+	public String getEggIncubatorId() {
 		return proto.getEggIncubatorId();
 	}
 
