@@ -83,7 +83,8 @@ public class PokemonGo {
 	 * @param auth   the auth
 	 * @param client the client
 	 */
-	public PokemonGo(RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth, OkHttpClient client) {
+	public PokemonGo(RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth, OkHttpClient client) 
+			throws RemoteServerException, LoginFailedException {
 		playerProfile = null;
 
 		// send profile request to get the ball rolling
@@ -153,7 +154,7 @@ public class PokemonGo {
 	 *
 	 * @return the player profile
 	 */
-	public PlayerProfile getPlayerProfile() {
+	public PlayerProfile getPlayerProfile() throws RemoteServerException, LoginFailedException {
 		return getPlayerProfile(false);
 	}
 
@@ -163,7 +164,7 @@ public class PokemonGo {
 	 * @param forceUpdate the force update
 	 * @return the player profile
 	 */
-	public PlayerProfile getPlayerProfile(boolean forceUpdate) {
+	public PlayerProfile getPlayerProfile(boolean forceUpdate) throws RemoteServerException, LoginFailedException {
 		if (!forceUpdate && playerProfile != null) {
 			return playerProfile;
 		}
@@ -175,6 +176,7 @@ public class PokemonGo {
 			localPlayer = getPlayerAndUpdateInventory(tempProfile);
 		} catch (LoginFailedException | RemoteServerException e) {
 			Log.e(TAG, "Failed to get profile data and update inventory", e);
+			throw e;
 		}
 
 		if (localPlayer == null) {
