@@ -26,6 +26,7 @@ import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.Cat
 import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
 import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass.FortSearchMessage;
+import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
@@ -33,6 +34,7 @@ import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResp
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
+
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
@@ -47,11 +49,14 @@ import com.pokegoapi.google.common.geometry.MutableInteger;
 import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.ServerRequest;
+
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class Map {
@@ -91,7 +96,7 @@ public class Map {
 	 * @return a List of CatchablePokemon at your current location
 	 */
 	public List<CatchablePokemon> getCatchablePokemon() throws LoginFailedException, RemoteServerException {
-		List<CatchablePokemon> catchablePokemons = new ArrayList<>();
+		Set<CatchablePokemon> catchablePokemons = new HashSet<CatchablePokemon>();
 		MapObjects objects = getMapObjects();
 
 		for (MapPokemon mapPokemon : objects.getCatchablePokemons()) {
@@ -101,6 +106,7 @@ public class Map {
 		for(WildPokemonOuterClass.WildPokemon wildPokemon : objects.getWildPokemons()){
 			catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
 		}
+		
 
 		// TODO: Check if this code is correct; merged because this contains many other fixes
 		/*for (Pokestop pokestop : objects.getPokestops()) {
@@ -109,7 +115,7 @@ public class Map {
 			}
 		}*/
 
-		return catchablePokemons;
+		return new ArrayList<>(catchablePokemons);
 	}
 
 	/**
