@@ -42,6 +42,8 @@ public class PokeBank {
 		pokemons.add(pokemon);
 	}
 
+
+
 	/**
 	 * Gets pokemon by pokemon id.
 	 *

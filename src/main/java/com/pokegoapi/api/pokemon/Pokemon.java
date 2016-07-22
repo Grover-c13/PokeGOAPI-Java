@@ -75,10 +75,10 @@ public class Pokemon {
 		}
 
 		if (response.getResult().equals(Result.SUCCESS)) {
-			pgo.getCandyjar().setCandy(
+			pgo.getInventories().getCandyjar().setCandy(
 					this.getPokemonFamily(),
-					pgo.getCandyjar().getCandies(this.getPokemonFamily()) + response.getCandyAwarded());
-			pgo.getPokebank().removePokemon(this);
+					pgo.getInventories().getCandyjar().getCandies(this.getPokemonFamily()) + response.getCandyAwarded());
+			pgo.getInventories().getPokebank().removePokemon(this);
 		}
 
 		return response.getResult();
@@ -137,15 +137,15 @@ public class Pokemon {
 		EvolutionResult result = new EvolutionResult(response);
 
 		if (result.isSuccessful()) {
-			pgo.getPokebank().removePokemon(this);
-			pgo.getPokebank().addPokemon(result.getEvolvedPokemon());
+			pgo.getInventories().getPokebank().removePokemon(this);
+			pgo.getInventories().getPokebank().addPokemon(result.getEvolvedPokemon());
 		}
 
 		return result;
 	}
 
 	public int getCandy() {
-		return pgo.getCandyjar().getCandies(getPokemonFamily());
+		return pgo.getInventories().getCandyjar().getCandies(getPokemonFamily());
 	}
 
 	public PokemonFamilyId getPokemonFamily() {
