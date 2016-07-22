@@ -246,9 +246,12 @@ public class RequestHandler {
 	private void resetBuilder(RequestEnvelopeOuterClass.RequestEnvelope.Builder builder) {
 		builder.setStatusCode(2);
 		builder.setRequestId(8145806132888207460L);
-		if (lastAuth != null && lastAuth.getExpireTimestampMs() > 0) {
+		if (lastAuth != null &&
+				lastAuth.getExpireTimestampMs() > 0 &&
+				lastAuth.getExpireTimestampMs() > System.currentTimeMillis()) {
 			builder.setAuthTicket(lastAuth);
 		} else {
+			Log.d(TAG, "Authenticated with static token");
 			builder.setAuthInfo(auth);
 		}
 		builder.setUnknown12(989);
