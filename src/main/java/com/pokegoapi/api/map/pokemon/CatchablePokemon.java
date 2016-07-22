@@ -17,6 +17,10 @@ package com.pokegoapi.api.map.pokemon;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Inventory.ItemIdOuterClass;
+import POGOProtos.Map.Fort.FortDataOuterClass;
+import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
+import POGOProtos.Map.Fort.FortLureInfoOuterClass;
+import POGOProtos.Map.Fort.FortLureInfoOuterClass.FortLureInfo;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.CatchPokemonMessage;
@@ -29,9 +33,11 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Pokeball;
+import com.pokegoapi.api.map.fort.Pokestop;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.Log;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -44,7 +50,7 @@ public class CatchablePokemon {
 	private final PokemonGo api;
 
 	@Getter
-	private final String spawnpointId;
+	private final String spawnPointId;
 	@Getter
 	private final long encounterId;
 	@Getter
@@ -68,7 +74,7 @@ public class CatchablePokemon {
 	public CatchablePokemon(PokemonGo api, MapPokemon proto) {
 		this.api = api;
 
-		this.spawnpointId = proto.getSpawnpointId();
+		this.spawnPointId = proto.getSpawnPointId();
 		this.encounterId = proto.getEncounterId();
 		this.pokemonId = proto.getPokemonId();
 		this.expirationTimestampMs = proto.getExpirationTimestampMs();
@@ -85,7 +91,7 @@ public class CatchablePokemon {
 	 */
 	public CatchablePokemon(PokemonGo api, WildPokemon proto) {
 		this.api = api;
-		this.spawnpointId = proto.getSpawnpointId();
+		this.spawnPointId = proto.getSpawnPointId();
 		this.encounterId = proto.getEncounterId();
 		this.pokemonId = proto.getPokemonData().getPokemonId();
 		this.expirationTimestampMs = proto.getTimeTillHiddenMs();
@@ -93,6 +99,25 @@ public class CatchablePokemon {
 		this.longitude = proto.getLongitude();
 	}
 
+	/**
+	 * Instantiates a new Catchable pokemon.
+	 *
+	 * @param api   the api
+	 * @param proto the proto
+	 */
+	public CatchablePokemon(PokemonGo api, FortData proto) {
+		if (!proto.hasLureInfo()) {
+			throw new IllegalArgumentException("Fort does not have lure");
+		}
+		this.api = api;
+		// TODO: does this work?
+		this.spawnPointId = null;
+		this.encounterId = proto.getLureInfo().getEncounterId();
+		this.pokemonId = proto.getLureInfo().getActivePokemonId();
+		this.expirationTimestampMs = proto.getLureInfo().getLureExpiresTimestampMs();
+		this.latitude = proto.getLatitude();
+		this.longitude = proto.getLongitude();
+	}
 
 	/**
 	 * Encounter pokemon encounter result.
@@ -106,7 +131,7 @@ public class CatchablePokemon {
 				.setEncounterId(getEncounterId())
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
-				.setSpawnpointId(getSpawnpointId())
+				.setSpawnPointId(getSpawnPointId())
 				.build();
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.ENCOUNTER, reqMsg);
 		api.getRequestHandler().sendServerRequests(serverRequest);
@@ -197,7 +222,7 @@ public class CatchablePokemon {
 					.setHitPokemon(true)
 					.setNormalizedHitPosition(normalizedHitPosition)
 					.setNormalizedReticleSize(normalizedReticleSize)
-					.setSpawnPointGuid(getSpawnpointId())
+					.setSpawnPointGuid(getSpawnPointId())
 					.setSpinModifier(spinModifier)
 					.setPokeball(type.getBalltype())
 					.build();
@@ -222,6 +247,5 @@ public class CatchablePokemon {
 
 		return new CatchResult(response);
 	}
-
 
 }

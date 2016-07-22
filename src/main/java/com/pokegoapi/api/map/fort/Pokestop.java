@@ -35,6 +35,7 @@ import lombok.Getter;
 public class Pokestop {
 
 	private final PokemonGo api;
+	@Getter
 	private final FortDataOuterClass.FortData fortData;
 	@Getter
 	private long cooldownCompleteTimestampMs;
@@ -52,6 +53,21 @@ public class Pokestop {
 		this.cooldownCompleteTimestampMs = fortData.getCooldownCompleteTimestampMs();
 	}
 
+	/**
+	 * Returns whether or not a pokestop is in range.
+	 * @return true when in range of player
+	 */
+	public boolean inRange() {
+		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
+		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
+		double distance = pokestop.getEarthDistance(player);
+		return distance < 30;
+	}
+
+	/**
+	 * can user loot this from current position.
+	 * @return true when lootable
+	 */
 	public boolean canLoot() {
 		return canLoot(false);
 	}
@@ -63,10 +79,11 @@ public class Pokestop {
 	 * @return the boolean
 	 */
 	public boolean canLoot(boolean ignoreDistance) {
-		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
-		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
-		double distance = pokestop.getEarthDistance(player);
-		return (ignoreDistance || distance < 30) && cooldownCompleteTimestampMs < System.currentTimeMillis();
+		boolean active = cooldownCompleteTimestampMs < System.currentTimeMillis();
+		if (!ignoreDistance) {
+			return active && inRange();
+		}
+		return active;
 	}
 
 	public String getId() {
@@ -134,5 +151,11 @@ public class Pokestop {
 		return new FortDetails(response);
 	}
 
-
+	/**
+	 * Returns whether this pokestop has an active lure.
+	 * @return lure status
+	 */
+	public boolean hasLurePokemon() {
+		return fortData.hasLureInfo() && fortData.getLureInfo().getLureExpiresTimestampMs() < System.currentTimeMillis();
+	}
 }

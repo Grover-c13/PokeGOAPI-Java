@@ -37,6 +37,7 @@ import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.fort.FortDetails;
+import com.pokegoapi.api.map.fort.Pokestop;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.NearbyPokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -101,6 +102,12 @@ public class Map {
 
 		for (WildPokemonOuterClass.WildPokemon wildPokemon : objects.getWildPokemons()) {
 			catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
+		}
+
+		for (Pokestop pokestop : objects.getPokestops()) {
+			if (pokestop.inRange() && pokestop.hasLurePokemon()) {
+				catchablePokemons.add(new CatchablePokemon(api, pokestop.getFortData()));
+			}
 		}
 
 		return catchablePokemons;
@@ -408,7 +415,7 @@ public class Map {
 				.setEncounterId(catchablePokemon.getEncounterId())
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
-				.setSpawnpointId(catchablePokemon.getSpawnpointId())
+				.setSpawnPointId(catchablePokemon.getSpawnPointId())
 				.build();
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.ENCOUNTER, reqMsg);
 		api.getRequestHandler().sendServerRequests(serverRequest);
@@ -448,7 +455,7 @@ public class Map {
 				.setHitPokemon(true)
 				.setNormalizedHitPosition(normalizedHitPosition)
 				.setNormalizedReticleSize(normalizedReticleSize)
-				.setSpawnPointGuid(catchablePokemon.getSpawnpointId())
+				.setSpawnPointGuid(catchablePokemon.getSpawnPointId())
 				.setSpinModifier(spinModifier)
 				.setPokeball(pokeball)
 				.build();
