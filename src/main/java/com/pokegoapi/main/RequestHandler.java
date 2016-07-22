@@ -59,22 +59,30 @@ public class RequestHandler {
 		apiEndpoint = ApiSettings.API_ENDPOINT;
 		this.auth = auth;
 		serverRequests = new ArrayList<>();
-		// TODO: somehow fix it so people using the deprecated functions will still work, while not calling this deprecated stuff ourselves
+		/* TODO: somehow fix it so people using the deprecated functions will still work,
+		   while not calling this deprecated stuff ourselves */
 		resetBuilder();
 	}
 
-	@Deprecated
 	/**
 	 * Request.
 	 *
 	 * @param requestIn the request in
 	 */
+	@Deprecated
 	public void request(ServerRequest requestIn) {
 		hasRequests = true;
 		serverRequests.add(requestIn);
 		builder.addRequests(requestIn.getRequest());
 	}
 
+	/**
+	 * Sends multiple ServerRequests in a thread safe manner.
+	 *
+	 * @param serverRequests list of ServerRequests to be sent
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException the login failed exception
+	 */
 	public void sendServerRequests(ServerRequest... serverRequests) throws RemoteServerException, LoginFailedException {
 		if (serverRequests.length == 0) {
 			return;
@@ -106,8 +114,9 @@ public class RequestHandler {
 			throw new RemoteServerException(e);
 		}
 
-		if (response.code() != 200)
+		if (response.code() != 200) {
 			throw new RemoteServerException("Got a unexcepted http code : " + response.code());
+		}
 
 		ResponseEnvelopeOuterClass.ResponseEnvelope responseEnvelop;
 		try (InputStream content = response.body().byteStream()) {
@@ -133,11 +142,13 @@ public class RequestHandler {
 			return;
 		}
 
-		// map each reply to the numeric response, ie first response = first request and send back to the requests to handle.
+		/* map each reply to the numeric response,
+		   ie first response = first request and send back to the requests to handle. */
 		int count = 0;
 		for (ByteString payload : responseEnvelop.getReturnsList()) {
 			ServerRequest serverReq = serverRequests[count];
-			// TODO: Probably all other payloads are garbage as well in this case, so might as well throw an exception and leave this loop
+			/* TODO: Probably all other payloads are garbage as well in this case,
+			   so might as well throw an exception and leave this loop */
 			if (payload != null) {
 				serverReq.handleData(payload);
 			}
@@ -145,13 +156,13 @@ public class RequestHandler {
 		}
 	}
 
-	@Deprecated
 	/**
 	 * Send server requests.
 	 *
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
+	@Deprecated
 	public void sendServerRequests() throws RemoteServerException, LoginFailedException {
 		setLatitude(api.getLatitude());
 		setLongitude(api.getLongitude());

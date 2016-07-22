@@ -120,7 +120,7 @@ public class CatchablePokemon {
 	}
 
 	/**
-	 * Tries to catch a pokemon (will attempt to use a pokeball, if you have none will use greatball etc)
+	 * Tries to catch a pokemon (will attempt to use a pokeball, if you have none will use greatball etc).
 	 *
 	 * @return CatchResult
 	 * @throws LoginFailedException  if failed to login
@@ -128,9 +128,15 @@ public class CatchablePokemon {
 	 */
 	public CatchResult catchPokemon() throws LoginFailedException, RemoteServerException {
 		Pokeball ball = Pokeball.POKEBALL;
-		if (api.getBag().getItem(ItemIdOuterClass.ItemId.ITEM_POKE_BALL).getCount() == 0) ball = Pokeball.GREATBALL;
-		if (api.getBag().getItem(ItemIdOuterClass.ItemId.ITEM_GREAT_BALL).getCount() == 0) ball = Pokeball.ULTRABALL;
-		if (api.getBag().getItem(ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL).getCount() == 0) ball = Pokeball.MASTERBALL;
+		if (api.getBag().getItem(ItemIdOuterClass.ItemId.ITEM_POKE_BALL).getCount() == 0) {
+			ball = Pokeball.GREATBALL;
+		}
+		if (api.getBag().getItem(ItemIdOuterClass.ItemId.ITEM_GREAT_BALL).getCount() == 0) {
+			ball = Pokeball.ULTRABALL;
+		}
+		if (api.getBag().getItem(ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL).getCount() == 0) {
+			ball = Pokeball.MASTERBALL;
+		}
 		return catchPokemon(ball);
 	}
 
