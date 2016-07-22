@@ -245,7 +245,7 @@ public class Pokemon {
 		return proto.getBattlesDefended();
 	}
 
-	public int getEggIncubatorId() {
+	public String getEggIncubatorId() {
 		return proto.getEggIncubatorId();
 	}
 
