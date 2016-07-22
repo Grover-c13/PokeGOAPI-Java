@@ -1,3 +1,18 @@
+/*
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
@@ -14,13 +29,16 @@ import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleaseP
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.map.Pokemon.EvolutionResult;
+import com.pokegoapi.api.map.pokemon.EvolutionResult;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 import lombok.Setter;
 
+/**
+ * The type Pokemon.
+ */
 public class Pokemon {
 
 	private static final String TAG = Pokemon.class.getSimpleName();
@@ -35,6 +53,13 @@ public class Pokemon {
 		this.proto = proto;
 	}
 
+	/**
+	 * Transfers the pokemon.
+	 *
+	 * @return the result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
 	public Result transferPokemon() throws LoginFailedException, RemoteServerException {
 		ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
@@ -49,15 +74,29 @@ public class Pokemon {
 		}
 
 		if (response.getResult().equals(Result.SUCCESS)) {
-			pgo.getCandyjar().setCandy(this.getPokemonFamily(), pgo.getCandyjar().getCandies(this.getPokemonFamily()) + response.getCandyAwarded());
+			pgo.getCandyjar().setCandy(
+					this.getPokemonFamily(),
+					pgo.getCandyjar().getCandies(this.getPokemonFamily()) + response.getCandyAwarded());
 			pgo.getPokebank().removePokemon(this);
 		}
 
 		return response.getResult();
 	}
 
-	public NicknamePokemonResponse.Result renamePokemon(String nickname) throws LoginFailedException, RemoteServerException {
-		NicknamePokemonMessage reqMsg = NicknamePokemonMessage.newBuilder().setPokemonId(getId()).setNickname(nickname).build();
+	/**
+	 * Rename pokemon nickname pokemon response . result.
+	 *
+	 * @param nickname the nickname
+	 * @return the nickname pokemon response . result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public NicknamePokemonResponse.Result renamePokemon(String nickname)
+			throws LoginFailedException, RemoteServerException {
+		NicknamePokemonMessage reqMsg = NicknamePokemonMessage.newBuilder()
+				.setPokemonId(getId())
+				.setNickname(nickname)
+				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.NICKNAME_POKEMON, reqMsg);
 		pgo.getRequestHandler().sendServerRequests(serverRequest);
@@ -72,6 +111,13 @@ public class Pokemon {
 		return response.getResult();
 	}
 
+	/**
+	 * Evolve evolution result.
+	 *
+	 * @return the evolution result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
 	public EvolutionResult evolve() throws LoginFailedException, RemoteServerException {
 		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
 

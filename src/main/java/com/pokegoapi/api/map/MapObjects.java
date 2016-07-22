@@ -1,10 +1,26 @@
+/*
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.pokegoapi.api.map;
 
 import POGOProtos.Map.Fort.FortDataOuterClass;
-import POGOProtos.Map.Pokemon.MapPokemonOuterClass;
-import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
-import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
-import POGOProtos.Map.SpawnPointOuterClass;
+import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
+import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
+import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass.NearbyPokemon;
+import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
+import POGOProtos.Map.SpawnPointOuterClass.SpawnPoint;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.fort.Pokestop;
 import lombok.Getter;
@@ -17,27 +33,37 @@ import java.util.Collection;
 public class MapObjects {
 
 	@Getter
-	Collection<NearbyPokemonOuterClass.NearbyPokemon> nearbyPokemons = new ArrayList<NearbyPokemonOuterClass.NearbyPokemon>();
+	Collection<NearbyPokemon> nearbyPokemons = new ArrayList<NearbyPokemon>();
 	@Getter
-	Collection<MapPokemonOuterClass.MapPokemon> catchablePokemons = new ArrayList<MapPokemonOuterClass.MapPokemon>();
+	Collection<MapPokemon> catchablePokemons = new ArrayList<MapPokemon>();
 	@Getter
-	Collection<WildPokemonOuterClass.WildPokemon> wildPokemons = new ArrayList<WildPokemonOuterClass.WildPokemon>();
+	Collection<WildPokemon> wildPokemons = new ArrayList<WildPokemon>();
 	@Getter
-	Collection<SpawnPointOuterClass.SpawnPoint> decimatedSpawnPoints = new ArrayList<SpawnPointOuterClass.SpawnPoint>();
+	Collection<SpawnPoint> decimatedSpawnPoints = new ArrayList<SpawnPoint>();
 	@Getter
-	Collection<SpawnPointOuterClass.SpawnPoint> spawnPoints = new ArrayList<SpawnPointOuterClass.SpawnPoint>();
+	Collection<SpawnPoint> spawnPoints = new ArrayList<SpawnPoint>();
 	@Getter
-	Collection<FortDataOuterClass.FortData> gyms = new ArrayList<FortDataOuterClass.FortData>();
+	Collection<FortData> gyms = new ArrayList<FortData>();
 	@Getter
 	Collection<Pokestop> pokestops = new ArrayList<>();
 	boolean complete = false;
 	private PokemonGo api;
 
+	/**
+	 * Instantiates a new Map objects.
+	 *
+	 * @param api the api
+	 */
 	public MapObjects(PokemonGo api) {
 		this.api = api;
 	}
 
-	public void addNearbyPokemons(Collection<NearbyPokemonOuterClass.NearbyPokemon> nearbyPokemons) {
+	/**
+	 * Add nearby pokemons.
+	 *
+	 * @param nearbyPokemons the nearby pokemons
+	 */
+	public void addNearbyPokemons(Collection<NearbyPokemon> nearbyPokemons) {
 		if (nearbyPokemons == null || nearbyPokemons.isEmpty()) {
 			return;
 		}
@@ -45,7 +71,12 @@ public class MapObjects {
 		this.nearbyPokemons.addAll(nearbyPokemons);
 	}
 
-	public void addCatchablePokemons(Collection<MapPokemonOuterClass.MapPokemon> catchablePokemons) {
+	/**
+	 * Add catchable pokemons.
+	 *
+	 * @param catchablePokemons the catchable pokemons
+	 */
+	public void addCatchablePokemons(Collection<MapPokemon> catchablePokemons) {
 		if (catchablePokemons == null || catchablePokemons.isEmpty()) {
 			return;
 		}
@@ -53,7 +84,12 @@ public class MapObjects {
 		this.catchablePokemons.addAll(catchablePokemons);
 	}
 
-	public void addWildPokemons(Collection<WildPokemonOuterClass.WildPokemon> wildPokemons) {
+	/**
+	 * Add wild pokemons.
+	 *
+	 * @param wildPokemons the wild pokemons
+	 */
+	public void addWildPokemons(Collection<WildPokemon> wildPokemons) {
 		if (wildPokemons == null || wildPokemons.isEmpty()) {
 			return;
 		}
@@ -61,7 +97,12 @@ public class MapObjects {
 		this.wildPokemons.addAll(wildPokemons);
 	}
 
-	public void addDecimatedSpawnPoints(Collection<SpawnPointOuterClass.SpawnPoint> decimatedSpawnPoints) {
+	/**
+	 * Add decimated spawn points.
+	 *
+	 * @param decimatedSpawnPoints the decimated spawn points
+	 */
+	public void addDecimatedSpawnPoints(Collection<SpawnPoint> decimatedSpawnPoints) {
 		if (decimatedSpawnPoints == null || decimatedSpawnPoints.isEmpty()) {
 			return;
 		}
@@ -69,7 +110,12 @@ public class MapObjects {
 		this.decimatedSpawnPoints.addAll(decimatedSpawnPoints);
 	}
 
-	public void addSpawnPoints(Collection<SpawnPointOuterClass.SpawnPoint> spawnPoints) {
+	/**
+	 * Add spawn points.
+	 *
+	 * @param spawnPoints the spawn points
+	 */
+	public void addSpawnPoints(Collection<SpawnPoint> spawnPoints) {
 		if (spawnPoints == null || spawnPoints.isEmpty()) {
 			return;
 		}
@@ -77,7 +123,12 @@ public class MapObjects {
 		this.spawnPoints.addAll(spawnPoints);
 	}
 
-	public void addGyms(Collection<FortDataOuterClass.FortData> gyms) {
+	/**
+	 * Add gyms.
+	 *
+	 * @param gyms the gyms
+	 */
+	public void addGyms(Collection<FortData> gyms) {
 		if (gyms == null || gyms.isEmpty()) {
 			return;
 		}
@@ -85,21 +136,72 @@ public class MapObjects {
 		this.gyms.addAll(gyms);
 	}
 
-	public void addPokestops(Collection<FortDataOuterClass.FortData> pokestops) {
+	/**
+	 * Add pokestops.
+	 *
+	 * @param pokestops the pokestops
+	 */
+	public void addPokestops(Collection<FortData> pokestops) {
 		if (pokestops == null || pokestops.isEmpty()) {
 			return;
 		}
 		complete = true;
-		for (FortDataOuterClass.FortData pokestop : pokestops) {
+		for (FortData pokestop : pokestops) {
 			this.pokestops.add(new Pokestop(api, pokestop));
 		}
 	}
 
 	/**
-	 * Returns whether or not the return returned any data at all; when a user requests too many cells/wrong cell level/cells too far away from the users location,
-	 * the server returns empty MapCells
+	 * Returns whether any data was returned. When a user requests too many cells/wrong cell level/cells too far away
+	 * from the users location, the server returns empty MapCells.
+	 *
+	 * @return whether or not the return returned any data at all;
 	 */
 	public boolean isComplete() {
 		return complete;
+	}
+
+
+	/**
+	 * updates the object.
+	 *
+	 *
+	 */
+	public void update(MapObjects other) {
+
+		nearbyPokemons.clear();
+		addNearbyPokemons(other.getNearbyPokemons());
+
+		catchablePokemons.clear();
+		addCatchablePokemons(other.getCatchablePokemons());
+
+		wildPokemons.clear();
+		addWildPokemons(other.getWildPokemons());
+
+		decimatedSpawnPoints.clear();
+		addDecimatedSpawnPoints(other.getDecimatedSpawnPoints());
+
+		spawnPoints.clear();
+		addSpawnPoints(other.getSpawnPoints());
+
+		for (FortData otherGym : other.getGyms()) {
+			for (FortData gym : getGyms()) {
+				if (otherGym.getId().equals(gym.getId())) {
+					gyms.remove(gym);
+					break;
+				}
+			}
+			gyms.add(otherGym);
+		}
+
+		for (Pokestop otherPokestop : other.getPokestops()) {
+			for (Pokestop pokestop : pokestops) {
+				if (otherPokestop.getId().equals(pokestop.getId())) {
+					pokestops.remove(pokestop);
+					break;
+				}
+			}
+			pokestops.add(otherPokestop);
+		}
 	}
 }

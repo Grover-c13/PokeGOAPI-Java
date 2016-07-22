@@ -47,6 +47,16 @@ AuthInfo auth = new GoogleLogin(httpClient).login("token");
 PokemonGo go = new PokemonGo(auth,httpClient);
 Log.v(go.getPlayerProfile());
 ```
+##Android Dev FAQ
+
+  - I can't use the sample code! It just throws a login exception!
+
+You're running the sample code on the UI thread. Strict mode policy will throw an exception in that case and its being caught by the network client and treating it as a login failed exception. Run the sample code on a background thread in AsyncTask or RXJava and it will work.
+
+  - I want to submit a refactor so that this library will use Google Volley
+
+This library is meant to be a Java implementation of the API. Google Volley is specific to Android and should not be introduced in this library. However, if you still want to refactor it, you should create it as a separate project.
+
 
 ## Contributing
   - Fork it!

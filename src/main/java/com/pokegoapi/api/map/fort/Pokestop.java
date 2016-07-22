@@ -1,8 +1,23 @@
+/*
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.pokegoapi.api.map.fort;
 
 import POGOProtos.Map.Fort.FortDataOuterClass;
-import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
+import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass.FortSearchMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass;
@@ -25,6 +40,12 @@ public class Pokestop {
 	private long cooldownCompleteTimestampMs;
 
 
+	/**
+	 * Instantiates a new Pokestop.
+	 *
+	 * @param api      the api
+	 * @param fortData the fort data
+	 */
 	public Pokestop(PokemonGo api, FortDataOuterClass.FortData fortData) {
 		this.api = api;
 		this.fortData = fortData;
@@ -35,6 +56,12 @@ public class Pokestop {
 		return canLoot(false);
 	}
 
+	/**
+	 * Can loot boolean.
+	 *
+	 * @param ignoreDistance the ignore distance
+	 * @return the boolean
+	 */
 	public boolean canLoot(boolean ignoreDistance) {
 		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
 		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
@@ -55,14 +82,14 @@ public class Pokestop {
 	}
 
 	/**
-	 * Loots a pokestop for pokeballs and other items
+	 * Loots a pokestop for pokeballs and other items.
 	 *
 	 * @return PokestopLootResult
-	 * @throws LoginFailedException
-	 * @throws RemoteServerException
+	 * @throws LoginFailedException  if login failed
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public PokestopLootResult loot() throws LoginFailedException, RemoteServerException {
-		FortSearchMessageOuterClass.FortSearchMessage searchMessage = FortSearchMessageOuterClass.FortSearchMessage.newBuilder()
+		FortSearchMessage searchMessage = FortSearchMessage.newBuilder()
 				.setFortId(getId())
 				.setFortLatitude(getLatitude())
 				.setFortLongitude(getLongitude())
@@ -83,14 +110,14 @@ public class Pokestop {
 	}
 
 	/**
-	 * Get more detailed information about a pokestop
+	 * Get more detailed information about a pokestop.
 	 *
 	 * @return FortDetails
-	 * @throws LoginFailedException
-	 * @throws RemoteServerException
+	 * @throws LoginFailedException  if login failed
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public FortDetails getDetails() throws LoginFailedException, RemoteServerException {
-		FortDetailsMessageOuterClass.FortDetailsMessage reqMsg = FortDetailsMessageOuterClass.FortDetailsMessage.newBuilder()
+		FortDetailsMessage reqMsg = FortDetailsMessage.newBuilder()
 				.setFortId(getId())
 				.setLatitude(getLatitude())
 				.setLongitude(getLongitude())

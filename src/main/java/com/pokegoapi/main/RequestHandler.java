@@ -1,3 +1,18 @@
+/*
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.pokegoapi.main;
 
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass;
@@ -26,15 +41,22 @@ public class RequestHandler {
 	private boolean hasRequests;
 	private RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth;
 	private List<ServerRequest> serverRequests;
-	private String api_endpoint;
+	private String apiEndpoint;
 	private OkHttpClient client;
 
 	private AuthTicketOuterClass.AuthTicket lastAuth;
 
+	/**
+	 * Instantiates a new Request handler.
+	 *
+	 * @param api    the api
+	 * @param auth   the auth
+	 * @param client the client
+	 */
 	public RequestHandler(PokemonGo api, RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth, OkHttpClient client) {
 		this.api = api;
 		this.client = client;
-		api_endpoint = APISettings.API_ENDPOINT;
+		apiEndpoint = ApiSettings.API_ENDPOINT;
 		this.auth = auth;
 		serverRequests = new ArrayList<>();
 		// TODO: somehow fix it so people using the deprecated functions will still work, while not calling this deprecated stuff ourselves
@@ -42,6 +64,11 @@ public class RequestHandler {
 	}
 
 	@Deprecated
+	/**
+	 * Request.
+	 *
+	 * @param requestIn the request in
+	 */
 	public void request(ServerRequest requestIn) {
 		hasRequests = true;
 		serverRequests.add(requestIn);
@@ -69,7 +96,7 @@ public class RequestHandler {
 
 		RequestBody body = RequestBody.create(null, stream.toByteArray());
 		okhttp3.Request httpRequest = new okhttp3.Request.Builder()
-				.url(api_endpoint)
+				.url(apiEndpoint)
 				.post(body)
 				.build();
 		Response response;
@@ -91,7 +118,7 @@ public class RequestHandler {
 		}
 
 		if (responseEnvelop.getApiUrl() != null && responseEnvelop.getApiUrl().length() > 0) {
-			api_endpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
+			apiEndpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
 		}
 
 		if (responseEnvelop.hasAuthTicket()) {
@@ -119,6 +146,12 @@ public class RequestHandler {
 	}
 
 	@Deprecated
+	/**
+	 * Send server requests.
+	 *
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException  the login failed exception
+	 */
 	public void sendServerRequests() throws RemoteServerException, LoginFailedException {
 		setLatitude(api.getLatitude());
 		setLongitude(api.getLongitude());
@@ -134,7 +167,7 @@ public class RequestHandler {
 
 		RequestBody body = RequestBody.create(null, stream.toByteArray());
 		okhttp3.Request httpRequest = new okhttp3.Request.Builder()
-				.url(api_endpoint)
+				.url(apiEndpoint)
 				.post(body)
 				.build();
 		Response response;
@@ -144,8 +177,9 @@ public class RequestHandler {
 			throw new RemoteServerException(e);
 		}
 
-		if (response.code() != 200)
+		if (response.code() != 200) {
 			throw new RemoteServerException("Got a unexcepted http code : " + response.code());
+		}
 
 		ResponseEnvelopeOuterClass.ResponseEnvelope responseEnvelop = null;
 		try (InputStream content = response.body().byteStream()) {
@@ -156,7 +190,7 @@ public class RequestHandler {
 		}
 
 		if (responseEnvelop.getApiUrl() != null && responseEnvelop.getApiUrl().length() > 0) {
-			api_endpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
+			apiEndpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
 		}
 
 		if (responseEnvelop.hasAuthTicket()) {
@@ -166,16 +200,17 @@ public class RequestHandler {
 		if (responseEnvelop.getStatusCode() == 102) {
 			throw new LoginFailedException();
 		} else if (responseEnvelop.getStatusCode() == 53) {
-			// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
+			// 53 means that the apiEndpoint was not correctly set, should be at this point, though, so redo the request
 			sendServerRequests();
 			return;
 		}
 
-		// map each reply to the numeric response, ie first response = first request and send back to the requests to handle.
+		// map each reply to the numeric response,
+		// ie first response = first request and send back to the requests to handle.
 		int count = 0;
 		for (ByteString payload : responseEnvelop.getReturnsList()) {
 			ServerRequest serverReq = serverRequests.get(count);
-			// TODO: Probably all other payloads are garbage as well in this case, so might as well throw an exception and leave this loop
+			// TODO: Probably all other payloads are garbage as well in this case, so might as well throw an exception
 			if (payload != null) {
 				serverReq.handleData(payload);
 			}
@@ -195,11 +230,12 @@ public class RequestHandler {
 
 	private void resetBuilder(RequestEnvelopeOuterClass.RequestEnvelope.Builder builder) {
 		builder.setStatusCode(2);
-		builder.setRequestId(8145806132888207460l);
-		if (lastAuth != null && lastAuth.getExpireTimestampMs() > 0)
+		builder.setRequestId(8145806132888207460L);
+		if (lastAuth != null && lastAuth.getExpireTimestampMs() > 0) {
 			builder.setAuthTicket(lastAuth);
-		else
+		} else {
 			builder.setAuthInfo(auth);
+		}
 		builder.setUnknown12(989);
 		builder.setLatitude(api.getLatitude());
 		builder.setLongitude(api.getLongitude());
@@ -207,12 +243,18 @@ public class RequestHandler {
 	}
 
 
+	/**
+	 * Build request envelope outer class . request envelope.
+	 *
+	 * @return the request envelope outer class . request envelope
+	 */
 	public RequestEnvelopeOuterClass.RequestEnvelope build() {
-		if (!hasRequests)
+		if (!hasRequests) {
 			throw new IllegalStateException("Attempting to send request envelop with no requests");
+		}
 		return builder.build();
 	}
-	
+
 	public void setAuthInfo(AuthInfo auth) {
 		this.auth = auth;
 		this.lastAuth = null;

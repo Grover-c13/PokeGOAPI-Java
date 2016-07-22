@@ -1,3 +1,18 @@
+/*
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
@@ -6,9 +21,9 @@ import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import java.util.EnumMap;
 
 public class PokemonFamilyMap {
-	
-	private static EnumMap<PokemonId, PokemonFamilyId> familys = new EnumMap<PokemonId, PokemonFamilyId>(PokemonId.class);
-	private static EnumMap<PokemonFamilyId, PokemonId> highestForFamily = new EnumMap<PokemonFamilyId, PokemonId>(PokemonFamilyId.class);
+
+	private static EnumMap<PokemonId, PokemonFamilyId> familys = new EnumMap<>(PokemonId.class);
+	private static EnumMap<PokemonFamilyId, PokemonId> highestForFamily = new EnumMap<>(PokemonFamilyId.class);
 
 	static {
 		familys.put(PokemonId.BULBASAUR, PokemonFamilyId.FAMILY_BULBASAUR);
@@ -245,19 +260,20 @@ public class PokemonFamilyMap {
 	}
 
 	/**
-	 * Return the FamilyId for the given PokemonId
-	 * @param PokemonId
+	 * Return the FamilyId for the given PokemonId.
+	 *
+	 * @param id the id of the pokemon
 	 * @return PokemonFamilyId
 	 */
 	public static PokemonFamilyId getFamily(PokemonId id) {
 		return familys.get(id);
 	}
-	
+
 	/**
 	 * Return the highest evolution for given family ID.
 	 * !!! CARE TO EVEE THAT DOESNT HAVE BETTER EVOLUTION !!!
-	 * 
-	 * @param PokemonFamilyId
+	 *
+	 * @param family the id of the pokemon family
 	 * @return PokemonId
 	 */
 	public static PokemonId getHightestForFamily(PokemonFamilyId family) {

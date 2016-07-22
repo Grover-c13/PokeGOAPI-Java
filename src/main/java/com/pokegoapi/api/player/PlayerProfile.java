@@ -1,3 +1,18 @@
+/*
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.pokegoapi.api.player;
 
 import POGOProtos.Data.Player.EquippedBadgeOuterClass;
@@ -28,6 +43,13 @@ public class PlayerProfile {
 	private PlayerStatsOuterClass.PlayerStats stats;
 
 
+	/**
+	 * Add currency.
+	 *
+	 * @param name   the name
+	 * @param amount the amount
+	 * @throws InvalidCurrencyException the invalid currency exception
+	 */
 	public void addCurrency(String name, int amount) throws InvalidCurrencyException {
 		try {
 			currencies.put(Currency.valueOf(name), amount);
@@ -36,11 +58,19 @@ public class PlayerProfile {
 		}
 	}
 
+	/**
+	 * Gets currency.
+	 *
+	 * @param currency the currency
+	 * @return the currency
+	 * @throws InvalidCurrencyException the invalid currency exception
+	 */
 	public int getCurrency(Currency currency) throws InvalidCurrencyException {
-		if (currencies.containsKey(currency))
+		if (currencies.containsKey(currency)) {
 			return currencies.get(currency);
-		else
+		} else {
 			throw new InvalidCurrencyException();
+		}
 	}
 
 	public enum Currency {

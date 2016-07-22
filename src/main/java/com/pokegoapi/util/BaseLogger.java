@@ -1,12 +1,34 @@
+/*
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.pokegoapi.util;
+
+import static com.pokegoapi.util.Log.Level.ASSERT;
+import static com.pokegoapi.util.Log.Level.DEBUG;
+import static com.pokegoapi.util.Log.Level.ERROR;
+import static com.pokegoapi.util.Log.Level.INFO;
+import static com.pokegoapi.util.Log.Level.VERBOSE;
+import static com.pokegoapi.util.Log.Level.WARN;
 
 import com.pokegoapi.util.Log.Level;
 
-import static com.pokegoapi.util.Log.Level.*;
 
 /**
  * Created by Will on 7/20/16.
  */
+@SuppressWarnings("checkstyle:methodname")
 public abstract class BaseLogger implements Logger {
 
 	@Override
@@ -15,8 +37,8 @@ public abstract class BaseLogger implements Logger {
 	}
 
 	@Override
-	public void v(String tag, String msg, Throwable t) {
-		log(VERBOSE, tag, msg, t);
+	public void v(String tag, String msg, Throwable tr) {
+		log(VERBOSE, tag, msg, tr);
 	}
 
 	@Override

@@ -1,5 +1,19 @@
-package com.pokegoapi.api;
+/*
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
+package com.pokegoapi.api;
 
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.Player.PlayerStatsOuterClass;
@@ -20,7 +34,11 @@ import com.pokegoapi.api.inventory.CandyJar;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.PokeBank;
 import com.pokegoapi.api.map.Map;
-import com.pokegoapi.api.player.*;
+import com.pokegoapi.api.player.ContactSettings;
+import com.pokegoapi.api.player.DailyBonus;
+import com.pokegoapi.api.player.PlayerAvatar;
+import com.pokegoapi.api.player.PlayerProfile;
+import com.pokegoapi.api.player.Team;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -31,6 +49,7 @@ import com.pokegoapi.util.Log;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
+
 
 public class PokemonGo {
 
@@ -58,6 +77,12 @@ public class PokemonGo {
 
 	private long lastInventoryUpdate;
 
+	/**
+	 * Instantiates a new Pokemon go.
+	 *
+	 * @param auth   the auth
+	 * @param client the client
+	 */
 	public PokemonGo(RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth, OkHttpClient client) {
 		playerProfile = null;
 
@@ -70,8 +95,8 @@ public class PokemonGo {
 		lastInventoryUpdate = 0;
 	}
 
-	private PlayerDataOuterClass.PlayerData getPlayerAndUpdateInventory(PlayerProfile playerProfile) throws LoginFailedException, RemoteServerException {
-		PlayerDataOuterClass.PlayerData localPlayer;
+	private PlayerDataOuterClass.PlayerData getPlayerAndUpdateInventory(PlayerProfile playerProfile)
+			throws LoginFailedException, RemoteServerException {
 
 		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
 		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
@@ -91,13 +116,13 @@ public class PokemonGo {
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
-		localPlayer = getPlayerResponse.getPlayerData();
 
 		pokebank = new PokeBank(this);
 		bag = new Bag(this);
 		candyjar = new CandyJar(this);
 
-		for (InventoryItemOuterClass.InventoryItem item : getInventoryResponse.getInventoryDelta().getInventoryItemsList()) {
+		for (InventoryItemOuterClass.InventoryItem item :
+				getInventoryResponse.getInventoryDelta().getInventoryItemsList()) {
 
 			if (item.getInventoryItemData().getPokemonData().getPokemonId() != PokemonIdOuterClass.PokemonId.MISSINGNO) {
 				pokebank.addPokemon(new Pokemon(item.getInventoryItemData().getPokemonData()));
@@ -108,7 +133,9 @@ public class PokemonGo {
 			}
 
 			if (item.getInventoryItemData().getPokemonFamily().getFamilyId() != PokemonFamilyId.UNRECOGNIZED) {
-				candyjar.setCandy(item.getInventoryItemData().getPokemonFamily().getFamilyId(), item.getInventoryItemData().getPokemonFamily().getCandy());
+				candyjar.setCandy(
+						item.getInventoryItemData().getPokemonFamily().getFamilyId(),
+						item.getInventoryItemData().getPokemonFamily().getCandy());
 			}
 
 			if (item.getInventoryItemData().hasPlayerStats()) {
@@ -118,13 +145,24 @@ public class PokemonGo {
 
 		}
 
-		return localPlayer;
+		return getPlayerResponse.getPlayerData();
 	}
 
+	/**
+	 * Gets player profile.
+	 *
+	 * @return the player profile
+	 */
 	public PlayerProfile getPlayerProfile() {
 		return getPlayerProfile(false);
 	}
 
+	/**
+	 * Gets player profile.
+	 *
+	 * @param forceUpdate the force update
+	 * @return the player profile
+	 */
 	public PlayerProfile getPlayerProfile(boolean forceUpdate) {
 		if (!forceUpdate && playerProfile != null) {
 			return playerProfile;
@@ -151,9 +189,9 @@ public class PokemonGo {
 		playerProfile.setTeam(Team.values()[localPlayer.getTeam()]);
 		playerProfile.setUsername(localPlayer.getUsername());
 
-		PlayerAvatar avatarAPI = new PlayerAvatar();
-		DailyBonus bonusAPI = new DailyBonus();
-		ContactSettings contactAPI = new ContactSettings();
+		final PlayerAvatar avatarApi = new PlayerAvatar();
+		final DailyBonus bonusApi = new DailyBonus();
+		final ContactSettings contactApi = new ContactSettings();
 
 		// maybe something more graceful?
 		for (CurrencyOuterClass.Currency currency : localPlayer.getCurrenciesList()) {
@@ -164,25 +202,32 @@ public class PokemonGo {
 			}
 		}
 
-		avatarAPI.setGender(localPlayer.getAvatar().getGender());
-		avatarAPI.setBackpack(localPlayer.getAvatar().getBackpack());
-		avatarAPI.setEyes(localPlayer.getAvatar().getEyes());
-		avatarAPI.setHair(localPlayer.getAvatar().getHair());
-		avatarAPI.setHat(localPlayer.getAvatar().getHat());
-		avatarAPI.setPants(localPlayer.getAvatar().getPants());
-		avatarAPI.setShirt(localPlayer.getAvatar().getShirt());
-		avatarAPI.setShoes(localPlayer.getAvatar().getShoes());
-		avatarAPI.setSkin(localPlayer.getAvatar().getSkin());
+		avatarApi.setGender(localPlayer.getAvatar().getGender());
+		avatarApi.setBackpack(localPlayer.getAvatar().getBackpack());
+		avatarApi.setEyes(localPlayer.getAvatar().getEyes());
+		avatarApi.setHair(localPlayer.getAvatar().getHair());
+		avatarApi.setHat(localPlayer.getAvatar().getHat());
+		avatarApi.setPants(localPlayer.getAvatar().getPants());
+		avatarApi.setShirt(localPlayer.getAvatar().getShirt());
+		avatarApi.setShoes(localPlayer.getAvatar().getShoes());
+		avatarApi.setSkin(localPlayer.getAvatar().getSkin());
 
-		bonusAPI.setNextCollectionTimestamp(localPlayer.getDailyBonus().getNextCollectedTimestampMs());
-		bonusAPI.setNextDefenderBonusCollectTimestamp(localPlayer.getDailyBonus().getNextDefenderBonusCollectTimestampMs());
+		bonusApi.setNextCollectionTimestamp(localPlayer.getDailyBonus().getNextCollectedTimestampMs());
+		bonusApi.setNextDefenderBonusCollectTimestamp(localPlayer.getDailyBonus().getNextDefenderBonusCollectTimestampMs());
 
-		playerProfile.setAvatar(avatarAPI);
-		playerProfile.setDailyBonus(bonusAPI);
+		playerProfile.setAvatar(avatarApi);
+		playerProfile.setDailyBonus(bonusApi);
 
 		return playerProfile;
 	}
 
+	/**
+	 * Sets location.
+	 *
+	 * @param latitude  the latitude
+	 * @param longitude the longitude
+	 * @param altitude  the altitude
+	 */
 	public void setLocation(double latitude, double longitude, double altitude) {
 		setLatitude(latitude);
 		setLongitude(longitude);

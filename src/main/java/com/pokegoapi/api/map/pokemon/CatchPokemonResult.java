@@ -13,18 +13,17 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.api.map.pokemon;
 
-public class NoSuchItemException extends Exception {
-	public NoSuchItemException() {
-		super();
-	}
+public enum CatchPokemonResult {
+	SUCCESS(1),
+	ESCAPE(2),
+	FLEE(3),
+	MISSED(4);
 
-	public NoSuchItemException(String reason) {
-		super(reason);
-	}
+	private final int status;
 
-	public NoSuchItemException(Exception exception) {
-		super(exception);
+	CatchPokemonResult(int status) {
+		this.status = status;
 	}
 }

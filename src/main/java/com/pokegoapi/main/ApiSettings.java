@@ -13,18 +13,9 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.main;
 
-public class NoSuchItemException extends Exception {
-	public NoSuchItemException() {
-		super();
-	}
-
-	public NoSuchItemException(String reason) {
-		super(reason);
-	}
-
-	public NoSuchItemException(Exception exception) {
-		super(exception);
-	}
+public class ApiSettings {
+	public static final String API_ENDPOINT = "https://pgorelease.nianticlabs.com/plfe/rpc";
+	public static final String USER_AGENT = "Niantic App";
 }

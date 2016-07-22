@@ -13,18 +13,26 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.auth;
 
-public class NoSuchItemException extends Exception {
-	public NoSuchItemException() {
-		super();
+public class PtcAuthJson {
+
+	private String lt;
+	private String execution;
+
+	public String getLt() {
+		return lt;
 	}
 
-	public NoSuchItemException(String reason) {
-		super(reason);
+	public void setLt(String lt) {
+		this.lt = lt;
 	}
 
-	public NoSuchItemException(Exception exception) {
-		super(exception);
+	public String getExecution() {
+		return execution;
+	}
+
+	public void setExecution(String execution) {
+		this.execution = execution;
 	}
 }
