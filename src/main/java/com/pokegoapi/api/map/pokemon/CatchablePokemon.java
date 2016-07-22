@@ -27,6 +27,7 @@ import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -127,15 +128,20 @@ public class CatchablePokemon {
 	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemon() throws LoginFailedException, RemoteServerException {
-		Pokeball ball = Pokeball.POKEBALL;
-		if (api.getInventories().getItemBag().getItem(ItemIdOuterClass.ItemId.ITEM_POKE_BALL).getCount() == 0) {
-			ball = Pokeball.GREATBALL;
-		} else if (api.getInventories().getItemBag().getItem(ItemIdOuterClass.ItemId.ITEM_GREAT_BALL).getCount() == 0) {
-			ball = Pokeball.ULTRABALL;
-		} else if (api.getInventories().getItemBag().getItem(ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL).getCount() == 0) {
-			ball = Pokeball.MASTERBALL;
+		Pokeball pokeball;
+
+		ItemBag bag = api.getInventories().getItemBag();
+		if (bag.getItem(ItemIdOuterClass.ItemId.ITEM_POKE_BALL).getCount() > 0) {
+			pokeball = Pokeball.POKEBALL;
+		} else if (bag.getItem(ItemIdOuterClass.ItemId.ITEM_GREAT_BALL).getCount() > 0) {
+			pokeball = Pokeball.GREATBALL;
+		} else if (bag.getItem(ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL).getCount() > 0) {
+			pokeball = Pokeball.ULTRABALL;
+		} else {
+			pokeball = Pokeball.MASTERBALL;
 		}
-		return catchPokemon(ball);
+
+		return catchPokemon(pokeball);
 	}
 
 
