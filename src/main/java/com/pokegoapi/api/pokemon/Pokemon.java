@@ -73,7 +73,7 @@ public class Pokemon {
 			return ReleasePokemonResponse.Result.FAILED;
 		}
 
-		if(response.getResult() == Result.SUCCESS){
+		if (response.getResult() == Result.SUCCESS) {
 			pgo.getInventories().getPokebank().removePokemon(this);
 		}
 
