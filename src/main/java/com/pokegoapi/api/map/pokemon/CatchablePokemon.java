@@ -108,8 +108,7 @@ public class CatchablePokemon {
 				.setSpawnpointId(getSpawnpointId())
 				.build();
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.ENCOUNTER, reqMsg);
-		api.getRequestHandler().request(serverRequest);
-		api.getRequestHandler().sendServerRequests();
+		api.getRequestHandler().sendServerRequests(serverRequest);
 		EncounterResponseOuterClass.EncounterResponse response = null;
 		try {
 			response = EncounterResponseOuterClass.EncounterResponse.parseFrom(serverRequest.getData());
@@ -121,7 +120,7 @@ public class CatchablePokemon {
 	}
 
 	/**
-	 * Tries to catch a pokemon (will attempt to use a pokeball, if you have none will use greatball etc)
+	 * Tries to catch a pokemon (will attempt to use a pokeball, if you have none will use greatball etc).
 	 *
 	 * @return CatchResult
 	 * @throws LoginFailedException  if failed to login
@@ -129,9 +128,15 @@ public class CatchablePokemon {
 	 */
 	public CatchResult catchPokemon() throws LoginFailedException, RemoteServerException {
 		Pokeball ball = Pokeball.POKEBALL;
-		if (api.getBag().getItem(ItemIdOuterClass.ItemId.ITEM_POKE_BALL).getCount() == 0) ball = Pokeball.GREATBALL;
-		if (api.getBag().getItem(ItemIdOuterClass.ItemId.ITEM_GREAT_BALL).getCount() == 0) ball = Pokeball.ULTRABALL;
-		if (api.getBag().getItem(ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL).getCount() == 0) ball = Pokeball.MASTERBALL;
+		if (api.getBag().getItem(ItemIdOuterClass.ItemId.ITEM_POKE_BALL).getCount() == 0) {
+			ball = Pokeball.GREATBALL;
+		}
+		if (api.getBag().getItem(ItemIdOuterClass.ItemId.ITEM_GREAT_BALL).getCount() == 0) {
+			ball = Pokeball.ULTRABALL;
+		}
+		if (api.getBag().getItem(ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL).getCount() == 0) {
+			ball = Pokeball.MASTERBALL;
+		}
 		return catchPokemon(ball);
 	}
 
@@ -193,8 +198,7 @@ public class CatchablePokemon {
 					.setPokeball(type.getBalltype())
 					.build();
 			ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.CATCH_POKEMON, reqMsg);
-			api.getRequestHandler().request(serverRequest);
-			api.getRequestHandler().sendServerRequests();
+			api.getRequestHandler().sendServerRequests(serverRequest);
 
 			try {
 				response = CatchPokemonResponse.parseFrom(serverRequest.getData());

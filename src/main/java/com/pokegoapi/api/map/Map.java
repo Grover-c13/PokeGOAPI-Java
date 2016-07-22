@@ -267,8 +267,7 @@ public class Map {
 		}
 
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS, builder.build());
-		api.getRequestHandler().request(serverRequest);
-		api.getRequestHandler().sendServerRequests();
+		api.getRequestHandler().sendServerRequests(serverRequest);
 		GetMapObjectsResponseOuterClass.GetMapObjectsResponse response = null;
 		try {
 			response = GetMapObjectsResponseOuterClass.GetMapObjectsResponse.parseFrom(serverRequest.getData());
@@ -353,8 +352,7 @@ public class Map {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS, reqMsg);
-		api.getRequestHandler().request(serverRequest);
-		api.getRequestHandler().sendServerRequests();
+		api.getRequestHandler().sendServerRequests(serverRequest);
 		FortDetailsResponseOuterClass.FortDetailsResponse response = null;
 		try {
 			response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(serverRequest.getData());
@@ -382,9 +380,10 @@ public class Map {
 				.setPlayerLongitude(api.getLongitude())
 				.build();
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH, reqMsg);
-		api.getRequestHandler().request(serverRequest);
-		api.getRequestHandler().sendServerRequests();
-		FortSearchResponse response = null;
+
+		api.getRequestHandler().sendServerRequests(serverRequest);
+
+		FortSearchResponse response;
 		try {
 			response = FortSearchResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
@@ -412,9 +411,9 @@ public class Map {
 				.setSpawnpointId(catchablePokemon.getSpawnpointId())
 				.build();
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.ENCOUNTER, reqMsg);
-		api.getRequestHandler().request(serverRequest);
-		api.getRequestHandler().sendServerRequests();
-		EncounterResponse response = null;
+		api.getRequestHandler().sendServerRequests(serverRequest);
+
+		EncounterResponse response;
 		try {
 			response = EncounterResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
@@ -454,9 +453,9 @@ public class Map {
 				.setPokeball(pokeball)
 				.build();
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.CATCH_POKEMON, reqMsg);
-		api.getRequestHandler().request(serverRequest);
-		api.getRequestHandler().sendServerRequests();
-		CatchPokemonResponse response = null;
+		api.getRequestHandler().sendServerRequests(serverRequest);
+
+		CatchPokemonResponse response;
 		try {
 			response = CatchPokemonResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {

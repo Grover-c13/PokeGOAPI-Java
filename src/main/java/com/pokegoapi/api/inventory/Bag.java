@@ -67,10 +67,9 @@ public class Bag {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.RECYCLE_INVENTORY_ITEM, msg);
-		pgo.getRequestHandler().request(serverRequest);
-		pgo.getRequestHandler().sendServerRequests();
+		pgo.getRequestHandler().sendServerRequests(serverRequest);
 
-		RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse response = null;
+		RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse response;
 		try {
 			response = RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {

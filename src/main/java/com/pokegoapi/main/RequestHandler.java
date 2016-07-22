@@ -58,7 +58,9 @@ public class RequestHandler {
 		this.client = client;
 		apiEndpoint = ApiSettings.API_ENDPOINT;
 		this.auth = auth;
-		serverRequests = new ArrayList<ServerRequest>();
+		serverRequests = new ArrayList<>();
+		/* TODO: somehow fix it so people using the deprecated functions will still work,
+		   while not calling this deprecated stuff ourselves */
 		resetBuilder();
 	}
 
@@ -67,10 +69,91 @@ public class RequestHandler {
 	 *
 	 * @param requestIn the request in
 	 */
+	@Deprecated
 	public void request(ServerRequest requestIn) {
 		hasRequests = true;
 		serverRequests.add(requestIn);
 		builder.addRequests(requestIn.getRequest());
+	}
+
+	/**
+	 * Sends multiple ServerRequests in a thread safe manner.
+	 *
+	 * @param serverRequests list of ServerRequests to be sent
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException the login failed exception
+	 */
+	public void sendServerRequests(ServerRequest... serverRequests) throws RemoteServerException, LoginFailedException {
+		if (serverRequests.length == 0) {
+			return;
+		}
+		RequestEnvelopeOuterClass.RequestEnvelope.Builder builder = RequestEnvelopeOuterClass.RequestEnvelope.newBuilder();
+		resetBuilder(builder);
+
+		for (ServerRequest serverRequest : serverRequests) {
+			builder.addRequests(serverRequest.getRequest());
+		}
+
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		RequestEnvelopeOuterClass.RequestEnvelope request = builder.build();
+		try {
+			request.writeTo(stream);
+		} catch (IOException e) {
+			Log.wtf(TAG, "Failed to write request to bytearray ouput stream. This should never happen", e);
+		}
+
+		RequestBody body = RequestBody.create(null, stream.toByteArray());
+		okhttp3.Request httpRequest = new okhttp3.Request.Builder()
+				.url(apiEndpoint)
+				.post(body)
+				.build();
+		Response response;
+		try {
+			response = client.newCall(httpRequest).execute();
+		} catch (IOException e) {
+			throw new RemoteServerException(e);
+		}
+
+		if (response.code() != 200) {
+			throw new RemoteServerException("Got a unexcepted http code : " + response.code());
+		}
+
+		ResponseEnvelopeOuterClass.ResponseEnvelope responseEnvelop;
+		try (InputStream content = response.body().byteStream()) {
+			responseEnvelop = ResponseEnvelopeOuterClass.ResponseEnvelope.parseFrom(content);
+		} catch (IOException e) {
+			// retrieved garbage from the server
+			throw new RemoteServerException("Received malformed response : " + e);
+		}
+
+		if (responseEnvelop.getApiUrl() != null && responseEnvelop.getApiUrl().length() > 0) {
+			apiEndpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
+		}
+
+		if (responseEnvelop.hasAuthTicket()) {
+			lastAuth = responseEnvelop.getAuthTicket();
+		}
+
+		if (responseEnvelop.getStatusCode() == 102) {
+			throw new LoginFailedException();
+		} else if (responseEnvelop.getStatusCode() == 53) {
+			// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
+			sendServerRequests(serverRequests);
+			return;
+		}
+
+		/* map each reply to the numeric response,
+		   ie first response = first request and send back to the requests to handle. */
+		int count = 0;
+		for (ByteString payload : responseEnvelop.getReturnsList()) {
+			ServerRequest serverReq = serverRequests[count];
+			/* TODO: Probably all other payloads are garbage as well in this case,
+			   so might as well throw an exception and leave this loop */
+			if (payload != null) {
+				serverReq.handleData(payload);
+			}
+			count++;
+		}
 	}
 
 	/**
@@ -79,6 +162,7 @@ public class RequestHandler {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
+	@Deprecated
 	public void sendServerRequests() throws RemoteServerException, LoginFailedException {
 		setLatitude(api.getLatitude());
 		setLongitude(api.getLongitude());
@@ -97,7 +181,7 @@ public class RequestHandler {
 				.url(apiEndpoint)
 				.post(body)
 				.build();
-		Response response = null;
+		Response response;
 		try {
 			response = client.newCall(httpRequest).execute();
 		} catch (IOException e) {
@@ -147,8 +231,15 @@ public class RequestHandler {
 		resetBuilder();
 	}
 
+	@Deprecated
 	private void resetBuilder() {
 		builder = RequestEnvelopeOuterClass.RequestEnvelope.newBuilder();
+		resetBuilder(builder);
+		hasRequests = false;
+		serverRequests.clear();
+	}
+
+	private void resetBuilder(RequestEnvelopeOuterClass.RequestEnvelope.Builder builder) {
 		builder.setStatusCode(2);
 		builder.setRequestId(8145806132888207460L);
 		if (lastAuth != null && lastAuth.getExpireTimestampMs() > 0) {
@@ -157,8 +248,9 @@ public class RequestHandler {
 			builder.setAuthInfo(auth);
 		}
 		builder.setUnknown12(989);
-		hasRequests = false;
-		serverRequests.clear();
+		builder.setLatitude(api.getLatitude());
+		builder.setLongitude(api.getLongitude());
+		builder.setAltitude(api.getAltitude());
 	}
 
 

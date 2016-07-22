@@ -64,8 +64,7 @@ public class Pokemon {
 		ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.RELEASE_POKEMON, reqMsg);
-		pgo.getRequestHandler().request(serverRequest);
-		pgo.getRequestHandler().sendServerRequests();
+		pgo.getRequestHandler().sendServerRequests(serverRequest);
 
 		ReleasePokemonResponse response;
 		try {
@@ -100,8 +99,7 @@ public class Pokemon {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.NICKNAME_POKEMON, reqMsg);
-		pgo.getRequestHandler().request(serverRequest);
-		pgo.getRequestHandler().sendServerRequests();
+		pgo.getRequestHandler().sendServerRequests(serverRequest);
 
 		NicknamePokemonResponse response;
 		try {
@@ -124,8 +122,7 @@ public class Pokemon {
 		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.EVOLVE_POKEMON, reqMsg);
-		pgo.getRequestHandler().request(serverRequest);
-		pgo.getRequestHandler().sendServerRequests();
+		pgo.getRequestHandler().sendServerRequests(serverRequest);
 
 		EvolvePokemonResponse response;
 		try {
