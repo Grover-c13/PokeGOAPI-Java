@@ -44,6 +44,8 @@ public class Inventories {
 	private PokeBank pokebank;
 	@Getter
 	private CandyJar candyjar;
+	@Getter
+	private Pokedex pokedex;
 
 	private long lastInventoryUpdate = 0;
 
@@ -58,6 +60,7 @@ public class Inventories {
 		itemBag = new ItemBag(api);
 		pokebank = new PokeBank(api);
 		candyjar = new CandyJar(api);
+		pokedex = new Pokedex(api);
 		updateInventories();
 	}
 
@@ -82,6 +85,7 @@ public class Inventories {
 			itemBag = new ItemBag(api);
 			pokebank = new PokeBank(api);
 			candyjar = new CandyJar(api);
+			pokedex = new Pokedex(api);
 		}
 		GetInventoryMessage invReqMsg = GetInventoryMessage.newBuilder()
 				.setLastTimestampMs(lastInventoryUpdate)
@@ -118,6 +122,10 @@ public class Inventories {
 			}
 			if (itemData.hasPlayerStats()) {
 				api.getPlayerProfile().setStats(inventoryItem.getInventoryItemData().getPlayerStats());
+			}
+
+			if (itemData.hasPokedexEntry()) {
+				pokedex.add(itemData.getPokedexEntry());
 			}
 
 			lastInventoryUpdate = System.currentTimeMillis();
