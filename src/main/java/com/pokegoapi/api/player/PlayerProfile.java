@@ -37,16 +37,26 @@ import java.util.Map;
 public class PlayerProfile {
 	private static final String TAG = PlayerProfile.class.getSimpleName();
 	private final PokemonGo api;
+	@Getter
 	private long creationTime;
+	@Getter
 	private String username;
+	@Getter
 	private Team team;
+	@Getter
 	private int pokemonStorage;
+	@Getter
 	private int itemStorage;
+	@Getter
 	private EquippedBadgeOuterClass.EquippedBadge badge;
 
+	@Getter
 	private PlayerAvatar avatar;
+	@Getter
 	private DailyBonus dailyBonus;
+	@Getter
 	private ContactSettings contactSettings;
+	@Getter
 	private Map<Currency, Integer> currencies = new HashMap<Currency, Integer>();
 	@Getter
 	@Setter

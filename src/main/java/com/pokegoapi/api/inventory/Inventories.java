@@ -44,8 +44,6 @@ public class Inventories {
 	private PokeBank pokebank;
 	@Getter
 	private CandyJar candyjar;
-	@Getter
-	private PlayerStatsOuterClass.PlayerStats stats;
 
 	private long lastInventoryUpdate = 0;
 
@@ -119,7 +117,7 @@ public class Inventories {
 				);
 			}
 			if (itemData.hasPlayerStats()) {
-				stats = inventoryItem.getInventoryItemData().getPlayerStats();
+				api.getPlayerProfile().setStats(inventoryItem.getInventoryItemData().getPlayerStats());
 			}
 
 			lastInventoryUpdate = System.currentTimeMillis();
