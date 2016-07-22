@@ -73,6 +73,8 @@ public class Pokemon {
 			return ReleasePokemonResponse.Result.FAILED;
 		}
 
+		pgo.getInventories().updateInventories();
+
 		return response.getResult();
 	}
 
@@ -101,6 +103,8 @@ public class Pokemon {
 			throw new RemoteServerException(e);
 		}
 
+		pgo.getInventories().updateInventories();
+
 		return response.getResult();
 	}
 
@@ -125,6 +129,8 @@ public class Pokemon {
 		}
 
 		EvolutionResult result = new EvolutionResult(response);
+
+		pgo.getInventories().updateInventories();
 
 		return result;
 	}
