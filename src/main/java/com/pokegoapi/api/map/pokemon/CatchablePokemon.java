@@ -16,6 +16,7 @@
 package com.pokegoapi.api.map.pokemon;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
+import POGOProtos.Inventory.ItemIdOuterClass;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.CatchPokemonMessage;
@@ -120,14 +121,18 @@ public class CatchablePokemon {
 	}
 
 	/**
-	 * Tries to catch a pokemon with a pokeball.
+	 * Tries to catch a pokemon (will attempt to use a pokeball, if you have none will use greatball etc)
 	 *
 	 * @return CatchResult
 	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemon() throws LoginFailedException, RemoteServerException {
-		return catchPokemon(Pokeball.POKEBALL);
+		Pokeball ball = Pokeball.POKEBALL;
+		if (api.getBag().getItem(ItemIdOuterClass.ItemId.ITEM_POKE_BALL).getCount() == 0) ball = Pokeball.GREATBALL;
+		if (api.getBag().getItem(ItemIdOuterClass.ItemId.ITEM_GREAT_BALL).getCount() == 0) ball = Pokeball.ULTRABALL;
+		if (api.getBag().getItem(ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL).getCount() == 0) ball = Pokeball.MASTERBALL;
+		return catchPokemon(ball);
 	}
 
 
