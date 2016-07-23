@@ -15,6 +15,28 @@
 
 package com.pokegoapi.api.inventory;
 
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.pokemon.EggPokemon;
+import com.pokegoapi.api.pokemon.Pokemon;
+import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class Hatchery {
+	@Getter
+	Set<EggPokemon> eggs = new HashSet<EggPokemon>();
+	@Getter
+	PokemonGo instance;
+
+	public Hatchery(PokemonGo instance) {
+		this.instance = instance;
+	}
+
+	public void addEgg(EggPokemon egg) {
+		eggs.add(egg);
+	}
 
 }

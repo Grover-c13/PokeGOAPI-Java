@@ -17,6 +17,7 @@ package com.pokegoapi.api.inventory;
 
 import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass;
+import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Inventory.InventoryItemDataOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
 import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
@@ -26,6 +27,7 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -44,6 +46,8 @@ public class Inventories {
 	private CandyJar candyjar;
 	@Getter
 	private Pokedex pokedex;
+	@Getter
+	private Hatchery hatchery;
 
 	private long lastInventoryUpdate = 0;
 
@@ -60,6 +64,7 @@ public class Inventories {
 		pokebank = new PokeBank(api);
 		candyjar = new CandyJar(api);
 		pokedex = new Pokedex(api);
+		hatchery = new Hatchery(api);
 		updateInventories();
 	}
 
@@ -105,14 +110,24 @@ public class Inventories {
 				: response.getInventoryDelta().getInventoryItemsList()) {
 			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
 
-			if (itemData.getPokemonData().getPokemonId() != PokemonIdOuterClass.PokemonId.MISSINGNO) {
+			// hatchery
+			if (itemData.getPokemonData().getPokemonId() == PokemonId.MISSINGNO && itemData.getPokemonData().getIsEgg()) {
+				hatchery.addEgg(new EggPokemon(itemData.getPokemonData()));
+			}
+
+			// pokebank
+			if (itemData.getPokemonData().getPokemonId() != PokemonId.MISSINGNO) {
 				pokebank.addPokemon(new Pokemon(inventoryItem.getInventoryItemData().getPokemonData()));
 			}
+
+			// items
 			if (itemData.getItem().getItemId() != ItemId.UNRECOGNIZED
 					&& itemData.getItem().getItemId() != ItemId.ITEM_UNKNOWN) {
 				ItemData item = inventoryItem.getInventoryItemData().getItem();
 				itemBag.addItem(new Item(item));
 			}
+
+			// candyjar
 			if (itemData.getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED
 					&& itemData.getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_UNSET) {
 				candyjar.setCandy(
@@ -120,10 +135,12 @@ public class Inventories {
 						inventoryItem.getInventoryItemData().getPokemonFamily().getCandy()
 				);
 			}
+			// player stats
 			if (itemData.hasPlayerStats()) {
 				api.getPlayerProfile().setStats(inventoryItem.getInventoryItemData().getPlayerStats());
 			}
 
+			// pokedex
 			if (itemData.hasPokedexEntry()) {
 				pokedex.add(itemData.getPokedexEntry());
 			}
