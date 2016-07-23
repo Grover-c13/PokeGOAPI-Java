@@ -21,7 +21,7 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.pokemon.Pokemon;
+import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
@@ -33,23 +33,43 @@ public class EggIncubator {
 	@Getter
 	private boolean inUse = false;
 
+	/**
+	 * Create new EggIncubator with given proto.
+	 *
+	 * @param pgo   the api
+	 * @param proto the proto
+	 */
 	public EggIncubator(PokemonGo pgo, EggIncubatorOuterClass.EggIncubator proto) {
 		this.pgo = pgo;
 		this.proto = proto;
 		this.inUse = proto.getPokemonId() != 0;
 	}
 
+	/**
+	 * Returns the remaining uses.
+	 *
+	 * @return uses remaining
+	 */
 	public int getUsesRemaining() {
 		return proto.getUsesRemaining();
 	}
 
-	public UseItemEggIncubatorResponse.Result hatchEgg(Pokemon pokemon) throws LoginFailedException, RemoteServerException {
-		if (!pokemon.getIsEgg()) {
+	/**
+	 * Hatch an egg.
+	 *
+	 * @param egg the egg
+	 * @return status of putting egg in incubator
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException  the login failed exception
+	 */
+	public UseItemEggIncubatorResponse.Result hatchEgg(EggPokemon egg)
+			throws LoginFailedException, RemoteServerException {
+		if (!egg.getIsEgg()) {
 			return null;
 		}
 		UseItemEggIncubatorMessage reqMsg = UseItemEggIncubatorMessage.newBuilder()
 				.setItemId(proto.getId())
-				.setPokemonId(pokemon.getId())
+				.setPokemonId(egg.getId())
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR, reqMsg);
@@ -62,7 +82,6 @@ public class EggIncubator {
 			throw new RemoteServerException(e);
 		}
 
-		pgo.getInventories().getEggs().remove(pokemon);
 		pgo.getInventories().updateInventories(true);
 
 		this.inUse = true;
