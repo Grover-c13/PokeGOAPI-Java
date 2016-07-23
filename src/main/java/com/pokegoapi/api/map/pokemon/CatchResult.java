@@ -43,7 +43,7 @@ public class CatchResult {
 
 	public CatchStatus getStatus() {
 		return response.getStatus();
-	}
+	}  
 
 	public double getMissPercent() {
 		return response.getMissPercent();
@@ -75,9 +75,6 @@ public class CatchResult {
 	 * @return the boolean
 	 */
 	public boolean isFailed() {
-		if (response == null) {
-			return failed;
-		}
-		return (this.getStatus() != CatchStatus.CATCH_SUCCESS || failed);
+		return (response == null);
 	}
 }
