@@ -33,6 +33,9 @@ import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResp
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
+import com.annimon.stream.function.Function;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.fort.FortDetails;
@@ -44,9 +47,6 @@ import com.pokegoapi.google.common.geometry.MutableInteger;
 import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.ServerRequest;
-import java8.util.function.Function;
-import java8.util.stream.Collectors;
-import java8.util.stream.StreamSupport;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -291,7 +291,9 @@ public class Map {
 			result.addDecimatedSpawnPoints(mapCell.getDecimatedSpawnPointsList());
 			result.addSpawnPoints(mapCell.getSpawnPointsList());
 
-			java.util.Map<FortType, List<FortData>> groupedForts = StreamSupport.stream(mapCell.getFortsList())
+
+
+			java.util.Map<FortType, List<FortData>> groupedForts = Stream.of(mapCell.getFortsList())
 					.collect(Collectors.groupingBy(new Function<FortData, FortType>() {
 						@Override
 						public FortType apply(FortData fortData) {
