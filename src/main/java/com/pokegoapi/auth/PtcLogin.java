@@ -166,7 +166,7 @@ public class PtcLogin extends Login {
 					.addQueryParameter("client_id", CLIENT_ID)
 					.addQueryParameter("redirect_uri", REDIRECT_URI)
 					.addQueryParameter("client_secret", CLIENT_SECRET)
-					.addQueryParameter("grant_type", "refresh_token")
+					.addQueryParameter("grant_type", "refreshToken")
 					.addQueryParameter("code", ticket)
 					.build();
 

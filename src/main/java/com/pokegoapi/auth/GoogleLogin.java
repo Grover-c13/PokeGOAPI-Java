@@ -29,16 +29,47 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class GoogleLogin extends Login {
-	public static final String SECRET = "NCjF1TLi2CcY6t5mt0ZveuL7";
-	public static final String CLIENT_ID = "848232511240-73ri3t7plvk96pj4f85uj8otdat2alem.apps.googleusercontent.com";
-	public static final String OAUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/device/code";
-	public static final String OAUTH_TOKEN_ENDPOINT = "https://www.googleapis.com/oauth2/v4/token";
+
 	private static final String TAG = GoogleLogin.class.getSimpleName();
 
 	private final OkHttpClient client;
 
 	public GoogleLogin(OkHttpClient client) {
 		this.client = client;
+	}
+
+	/**
+	 * Given the refresh token fetches a new access token and returns AuthInfo.
+	 * @param refreshToken Refresh token returned during initial login
+	 * @return Refreshed AuthInfo object
+	 * @throws IOException If the network call fails
+	 */
+	public AuthInfo refreshToken(String refreshToken) throws IOException {
+		HttpUrl url = HttpUrl.parse(GoogleLoginSecrets.OAUTH_TOKEN_ENDPOINT).newBuilder()
+				.addQueryParameter("client_id", GoogleLoginSecrets.CLIENT_ID)
+				.addQueryParameter("client_secret", GoogleLoginSecrets.SECRET)
+				.addQueryParameter("refreshToken", refreshToken)
+				.addQueryParameter("grant_type", "refreshToken")
+				.build();
+		//Empty request body
+		RequestBody reqBody = RequestBody.create(null, new byte[0]);
+		Request request = new Request.Builder()
+				.url(url)
+				.method("POST", reqBody)
+				.build();
+
+		Response response = client.newCall(request).execute();
+
+		Moshi moshi = new Moshi.Builder().build();
+		GoogleAuthTokenJson token = moshi.adapter(GoogleAuthTokenJson.class).fromJson(response.body().string());
+		if (token.getError() == null) {
+			return null;
+		} else {
+			AuthInfo.Builder builder = AuthInfo.newBuilder();
+			builder.setProvider("google");
+			builder.setToken(AuthInfo.JWT.newBuilder().setContents(token.getIdToken()).setUnknown2(59).build());
+			return builder.build();
+		}
 	}
 
 	/**
@@ -64,8 +95,8 @@ public class GoogleLogin extends Login {
 	 */
 	public AuthInfo login(String username, String password) throws LoginFailedException {
 		try {
-			HttpUrl url = HttpUrl.parse(OAUTH_ENDPOINT).newBuilder()
-					.addQueryParameter("client_id", CLIENT_ID)
+			HttpUrl url = HttpUrl.parse(GoogleLoginSecrets.OAUTH_ENDPOINT).newBuilder()
+					.addQueryParameter("client_id", GoogleLoginSecrets.CLIENT_ID)
 					.addQueryParameter("scope", "openid email https://www.googleapis.com/auth/userinfo.email")
 					.build();
 
@@ -91,9 +122,8 @@ public class GoogleLogin extends Login {
 				Thread.sleep(googleAuth.getInterval() * 1000);
 			}
 
-
 			Log.d(TAG, "Got token: " + token.getIdToken());
-
+			GoogleLoginSecrets.refresh_token = token.getRefreshToken();
 			AuthInfo.Builder authbuilder = AuthInfo.newBuilder();
 			authbuilder.setProvider("google");
 			authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(token.getIdToken()).setUnknown2(59).build());
@@ -107,9 +137,9 @@ public class GoogleLogin extends Login {
 
 
 	private GoogleAuthTokenJson poll(GoogleAuthJson json) throws URISyntaxException, IOException {
-		HttpUrl url = HttpUrl.parse(OAUTH_TOKEN_ENDPOINT).newBuilder()
-				.addQueryParameter("client_id", CLIENT_ID)
-				.addQueryParameter("client_secret", SECRET)
+		HttpUrl url = HttpUrl.parse(GoogleLoginSecrets.OAUTH_TOKEN_ENDPOINT).newBuilder()
+				.addQueryParameter("client_id", GoogleLoginSecrets.CLIENT_ID)
+				.addQueryParameter("client_secret", GoogleLoginSecrets.SECRET)
 				.addQueryParameter("code", json.getDeviceCode())
 				.addQueryParameter("grant_type", "http://oauth.net/grant_type/device/1.0")
 				.addQueryParameter("scope", "openid email https://www.googleapis.com/auth/userinfo.email")
