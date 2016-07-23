@@ -19,6 +19,8 @@ import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.PokemonMoveOuterClass;
+import POGOProtos.Inventory.Item.ItemIdOuterClass;
+import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.EvolvePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.NicknamePokemonMessageOuterClass.NicknamePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
@@ -73,12 +75,13 @@ public class Pokemon {
 			return ReleasePokemonResponse.Result.FAILED;
 		}
 
-		if (response.getResult().equals(Result.SUCCESS)) {
-			pgo.getCandyjar().setCandy(
-					this.getPokemonFamily(),
-					pgo.getCandyjar().getCandies(this.getPokemonFamily()) + response.getCandyAwarded());
-			pgo.getPokebank().removePokemon(this);
+		if (response.getResult() == Result.SUCCESS) {
+			pgo.getInventories().getPokebank().removePokemon(this);
 		}
+
+		pgo.getInventories().getPokebank().removePokemon(this);
+
+		pgo.getInventories().updateInventories();
 
 		return response.getResult();
 	}
@@ -108,6 +111,9 @@ public class Pokemon {
 			throw new RemoteServerException(e);
 		}
 
+		pgo.getInventories().getPokebank().removePokemon(this);
+		pgo.getInventories().updateInventories();
+
 		return response.getResult();
 	}
 
@@ -133,16 +139,15 @@ public class Pokemon {
 
 		EvolutionResult result = new EvolutionResult(response);
 
-		if (result.isSuccessful()) {
-			pgo.getPokebank().removePokemon(this);
-			pgo.getPokebank().addPokemon(result.getEvolvedPokemon());
-		}
+		pgo.getInventories().getPokebank().removePokemon(this);
+
+		pgo.getInventories().updateInventories();
 
 		return result;
 	}
 
 	public int getCandy() {
-		return pgo.getCandyjar().getCandies(getPokemonFamily());
+		return pgo.getInventories().getCandyjar().getCandies(getPokemonFamily());
 	}
 
 	public PokemonFamilyId getPokemonFamily() {
@@ -229,7 +234,7 @@ public class Pokemon {
 		return proto.getCpMultiplier();
 	}
 
-	public int getPokeball() {
+	public ItemId getPokeball() {
 		return proto.getPokeball();
 	}
 
@@ -245,7 +250,7 @@ public class Pokemon {
 		return proto.getBattlesDefended();
 	}
 
-	public int getEggIncubatorId() {
+	public String getEggIncubatorId() {
 		return proto.getEggIncubatorId();
 	}
 

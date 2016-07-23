@@ -15,7 +15,7 @@
 
 package com.pokegoapi.api.map.fort;
 
-import POGOProtos.Inventory.ItemAwardOuterClass;
+import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse.Result;
 
@@ -40,7 +40,7 @@ public class PokestopLootResult {
 		return response.getResult();
 	}
 
-	public List<ItemAwardOuterClass.ItemAward> getItemsAwarded() {
+	public List<ItemAward> getItemsAwarded() {
 		return response.getItemsAwardedList();
 	}
 

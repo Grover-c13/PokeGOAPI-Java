@@ -16,8 +16,9 @@
 
 package com.pokegoapi.api.inventory;
 
-import POGOProtos.Inventory.ItemIdOuterClass.ItemId;
-import POGOProtos.Inventory.ItemOuterClass;
+import POGOProtos.Inventory.Item.ItemDataOuterClass;
+import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
+import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.RecycleInventoryItemMessageOuterClass.RecycleInventoryItemMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass;
@@ -33,11 +34,11 @@ import java.util.HashMap;
 /**
  * The type Bag.
  */
-public class Bag {
+public class ItemBag {
 	private PokemonGo pgo;
 	private HashMap<ItemId, Item> items;
 
-	public Bag(PokemonGo pgo) {
+	public ItemBag(PokemonGo pgo) {
 		this.pgo = pgo;
 		items = new HashMap<>();
 	}
@@ -96,7 +97,7 @@ public class Bag {
 
 		// prevent returning null
 		if (!items.containsKey(type)) {
-			return new Item(ItemOuterClass.Item.newBuilder().setCount(0).setItemId(type).build());
+			return new Item(ItemData.newBuilder().setCount(0).setItemId(type).build());
 		}
 
 		return items.get(type);

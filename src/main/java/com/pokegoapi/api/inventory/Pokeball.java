@@ -15,18 +15,19 @@
 
 package com.pokegoapi.api.inventory;
 
+import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import lombok.Getter;
 
 public enum Pokeball {
-	POKEBALL(1),
-	GREATBALL(2),
-	ULTRABALL(3),
-	MASTERBALL(4);
+	POKEBALL(ItemId.ITEM_POKE_BALL),
+	GREATBALL(ItemId.ITEM_GREAT_BALL),
+	ULTRABALL(ItemId.ITEM_ULTRA_BALL),
+	MASTERBALL(ItemId.ITEM_MASTER_BALL);
 
 	@Getter
-	private final int balltype;
+	private final ItemId ballType;
 
-	Pokeball(int type) {
-		balltype = type;
+	Pokeball(ItemId type) {
+		ballType = type;
 	}
 }

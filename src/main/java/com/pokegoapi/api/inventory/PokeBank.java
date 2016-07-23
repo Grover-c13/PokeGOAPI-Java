@@ -16,11 +16,11 @@
 package com.pokegoapi.api.inventory;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
+import com.annimon.stream.function.Predicate;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
-import java8.util.function.Predicate;
-import java8.util.stream.Collectors;
-import java8.util.stream.StreamSupport;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -37,9 +37,21 @@ public class PokeBank {
 		this.instance = instance;
 	}
 
-	public void addPokemon(Pokemon pokemon) {
+	/**
+	 * Add a pokemon to the pokebank inventory.  Will not add duplicates (pokemon with same id).
+	 * @param pokemon Pokemon to add to the inventory
+	 */
+	public void addPokemon(final Pokemon pokemon) {
 		pokemon.setPgo(instance);
-		pokemons.add(pokemon);
+		List<Pokemon> alreadyAdded = Stream.of(pokemons).filter(new Predicate<Pokemon>() {
+			@Override
+			public boolean test(Pokemon testPokemon) {
+				return pokemon.getId() == testPokemon.getId();
+			}
+		}).collect(Collectors.<Pokemon>toList());
+		if (alreadyAdded.size() < 1) {
+			pokemons.add(pokemon);
+		}
 	}
 
 	/**
@@ -49,7 +61,7 @@ public class PokeBank {
 	 * @return the pokemon by pokemon id
 	 */
 	public List<Pokemon> getPokemonByPokemonId(final PokemonIdOuterClass.PokemonId id) {
-		return StreamSupport.stream(pokemons).filter(new Predicate<Pokemon>() {
+		return Stream.of(pokemons).filter(new Predicate<Pokemon>() {
 			@Override
 			public boolean test(Pokemon pokemon) {
 				return pokemon.getPokemonId().equals(id);
@@ -63,7 +75,7 @@ public class PokeBank {
 	 * @param pokemon the pokemon
 	 */
 	public void removePokemon(final Pokemon pokemon) {
-		pokemons = StreamSupport.stream(pokemons).filter(new Predicate<Pokemon>() {
+		pokemons = Stream.of(pokemons).filter(new Predicate<Pokemon>() {
 			@Override
 			public boolean test(Pokemon pokemn) {
 				return pokemn.getId() != pokemon.getId();
