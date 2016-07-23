@@ -43,7 +43,7 @@ public class CatchResult {
 
 	public CatchStatus getStatus() {
 		return response.getStatus();
-	}  
+	}
 
 	public double getMissPercent() {
 		return response.getMissPercent();
