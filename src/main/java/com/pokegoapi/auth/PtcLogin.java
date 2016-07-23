@@ -16,9 +16,8 @@
 package com.pokegoapi.auth;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.pokegoapi.exceptions.LoginFailedException;
+import com.squareup.moshi.Moshi;
 import lombok.Getter;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
@@ -122,9 +121,9 @@ public class PtcLogin extends Login {
 
 			Response getResponse = client.newCall(get).execute();
 
-			Gson gson = new GsonBuilder().create();
+			Moshi moshi = new Moshi.Builder().build();
 
-			PtcAuthJson ptcAuth = gson.fromJson(getResponse.body().string(), PtcAuthJson.class);
+			PtcAuthJson ptcAuth = moshi.adapter(PtcAuthJson.class).fromJson(getResponse.body().string());
 
 			HttpUrl url = HttpUrl.parse(LOGIN_URL).newBuilder()
 					.addQueryParameter("lt", ptcAuth.getLt())
@@ -152,7 +151,7 @@ public class PtcLogin extends Login {
 			String body = response.body().string();
 
 			if (body.length() > 0) {
-				PtcError ptcError = gson.fromJson(body, PtcError.class);
+				PtcError ptcError = moshi.adapter(PtcError.class).fromJson(body);
 				if (ptcError.getError() != null && ptcError.getError().length() > 0) {
 					throw new LoginFailedException();
 				}

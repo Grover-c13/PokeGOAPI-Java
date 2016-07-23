@@ -16,10 +16,9 @@
 package com.pokegoapi.auth;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.util.Log;
+import com.squareup.moshi.Moshi;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -80,9 +79,9 @@ public class GoogleLogin extends Login {
 
 			Response response = client.newCall(request).execute();
 
-			Gson gson = new GsonBuilder().create();
+			Moshi moshi = new Moshi.Builder().build();
 
-			GoogleAuthJson googleAuth = gson.fromJson(response.body().string(), GoogleAuthJson.class);
+			GoogleAuthJson googleAuth = moshi.adapter(GoogleAuthJson.class).fromJson(response.body().string());
 			Log.d(TAG, "Get user to go to:"
 					+ googleAuth.getVerificationUrl()
 					+ " and enter code:" + googleAuth.getUserCode());
@@ -125,8 +124,8 @@ public class GoogleLogin extends Login {
 
 		Response response = client.newCall(request).execute();
 
-		Gson gson = new GsonBuilder().create();
-		GoogleAuthTokenJson token = gson.fromJson(response.body().string(), GoogleAuthTokenJson.class);
+		Moshi moshi = new Moshi.Builder().build();
+		GoogleAuthTokenJson token = moshi.adapter(GoogleAuthTokenJson.class).fromJson(response.body().string());
 
 		if (token.getError() == null) {
 			return token;
