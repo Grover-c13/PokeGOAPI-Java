@@ -266,7 +266,8 @@ public class CatchablePokemon {
 				break;
 			}
 			numThrows++;
-		} while (amount < 0 || numThrows < amount);
+		}
+		while (amount < 0 || numThrows < amount);
 
 		api.getInventories().updateInventories();
 
