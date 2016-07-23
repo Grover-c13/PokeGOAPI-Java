@@ -13,7 +13,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.api.map;
+package nl.sadye.bot;
 
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
@@ -35,6 +35,7 @@ import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResp
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
+
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
@@ -49,11 +50,14 @@ import com.pokegoapi.google.common.geometry.MutableInteger;
 import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.ServerRequest;
+
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class Map {

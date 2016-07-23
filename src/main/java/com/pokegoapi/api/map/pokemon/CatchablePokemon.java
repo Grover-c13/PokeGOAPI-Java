@@ -13,7 +13,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.api.map.pokemon;
+package nl.sadye.bot;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
@@ -275,15 +275,13 @@ public class CatchablePokemon {
 
 	@Override
 	public boolean equals(Object o) {
-		if (!(o instanceof CatchablePokemon)) {
-			return false;
-		}
 		if (o == this) {
 			return true;
-		} else {
+		} else if (o instanceof CatchablePokemon){
 			return this.getEncounterId() == ((CatchablePokemon) o)
 					.getEncounterId();
 		}
+		return false;
 	}
 
 	@Override
