@@ -44,14 +44,14 @@ import lombok.Setter;
 public class Pokemon {
 
 	private static final String TAG = Pokemon.class.getSimpleName();
-	@Setter
-	PokemonGo pgo;
+	private final PokemonGo pgo;
 	private PokemonData proto;
 
 	// API METHODS //
 
 	// DELEGATE METHODS BELOW //
-	public Pokemon(PokemonData proto) {
+	public Pokemon(PokemonGo api, PokemonData proto) {
+		this.pgo = api;
 		this.proto = proto;
 	}
 
