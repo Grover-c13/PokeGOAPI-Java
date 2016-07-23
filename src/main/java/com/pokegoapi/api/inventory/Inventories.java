@@ -17,6 +17,7 @@ package com.pokegoapi.api.inventory;
 
 import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass;
+import POGOProtos.Inventory.EggIncubatorOuterClass;
 import POGOProtos.Inventory.InventoryItemDataOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
 import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
@@ -32,6 +33,9 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class Inventories {
 
@@ -44,6 +48,10 @@ public class Inventories {
 	private CandyJar candyjar;
 	@Getter
 	private Pokedex pokedex;
+	@Getter
+	private List<EggIncubator> incubators;
+	@Getter
+	private List<Pokemon> eggs;
 
 	private long lastInventoryUpdate = 0;
 
@@ -60,6 +68,8 @@ public class Inventories {
 		pokebank = new PokeBank(api);
 		candyjar = new CandyJar(api);
 		pokedex = new Pokedex(api);
+		incubators = new ArrayList<>();
+		eggs = new ArrayList<>();
 		updateInventories();
 	}
 
@@ -87,6 +97,8 @@ public class Inventories {
 			pokebank = new PokeBank(api);
 			candyjar = new CandyJar(api);
 			pokedex = new Pokedex(api);
+			incubators = new ArrayList<>();
+			eggs = new ArrayList<>();
 		}
 		GetInventoryMessage invReqMsg = GetInventoryMessage.newBuilder()
 				.setLastTimestampMs(lastInventoryUpdate)
@@ -98,7 +110,7 @@ public class Inventories {
 		try {
 			response = GetInventoryResponse.parseFrom(inventoryRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
-			e.printStackTrace();
+			throw new RemoteServerException(e);
 		}
 
 		for (InventoryItemOuterClass.InventoryItem inventoryItem
@@ -106,26 +118,35 @@ public class Inventories {
 			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
 
 			if (itemData.getPokemonData().getPokemonId() != PokemonIdOuterClass.PokemonId.MISSINGNO) {
-				pokebank.addPokemon(new Pokemon(inventoryItem.getInventoryItemData().getPokemonData()));
+				pokebank.addPokemon(new Pokemon(itemData.getPokemonData()));
+			} else if (itemData.getPokemonData().getIsEgg()) {
+				eggs.add(new Pokemon(itemData.getPokemonData()));
 			}
+
 			if (itemData.getItem().getItemId() != ItemId.UNRECOGNIZED
 					&& itemData.getItem().getItemId() != ItemId.ITEM_UNKNOWN) {
-				ItemData item = inventoryItem.getInventoryItemData().getItem();
+				ItemData item = itemData.getItem();
 				itemBag.addItem(new Item(item));
 			}
 			if (itemData.getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED
 					&& itemData.getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_UNSET) {
 				candyjar.setCandy(
-						inventoryItem.getInventoryItemData().getPokemonFamily().getFamilyId(),
-						inventoryItem.getInventoryItemData().getPokemonFamily().getCandy()
+						itemData.getPokemonFamily().getFamilyId(),
+						itemData.getPokemonFamily().getCandy()
 				);
 			}
 			if (itemData.hasPlayerStats()) {
-				api.getPlayerProfile().setStats(inventoryItem.getInventoryItemData().getPlayerStats());
+				api.getPlayerProfile().setStats(itemData.getPlayerStats());
 			}
 
 			if (itemData.hasPokedexEntry()) {
 				pokedex.add(itemData.getPokedexEntry());
+			}
+
+			if (itemData.hasEggIncubators()) {
+				for (EggIncubatorOuterClass.EggIncubator incubator : itemData.getEggIncubators().getEggIncubatorList()) {
+					incubators.add(new EggIncubator(api, incubator));
+				}
 			}
 
 			lastInventoryUpdate = System.currentTimeMillis();
