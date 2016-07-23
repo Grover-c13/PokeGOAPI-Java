@@ -25,12 +25,14 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
+
 import lombok.Getter;
 import lombok.ToString;
 
@@ -217,5 +219,22 @@ public class CatchablePokemon {
 		return new CatchResult(response);
 	}
 
-
+	@Override
+	public boolean equals(Object o){
+		if (!(o instanceof CatchablePokemon)){
+			return false;
+		}
+		if (o == this){
+			return true;
+		}
+		else {
+			return this.getEncounterId() == ((CatchablePokemon) o).getEncounterId();
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return (int) this.getEncounterId();
+	}
+ 
 }

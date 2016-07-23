@@ -34,6 +34,7 @@ import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResp
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.fort.FortDetails;
@@ -45,6 +46,7 @@ import com.pokegoapi.google.common.geometry.MutableInteger;
 import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.ServerRequest;
+
 import java8.util.function.Function;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
@@ -52,7 +54,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class Map {
@@ -91,8 +95,8 @@ public class Map {
 	 *
 	 * @return a List of CatchablePokemon at your current location
 	 */
-	public List<CatchablePokemon> getCatchablePokemon() throws LoginFailedException, RemoteServerException {
-		List<CatchablePokemon> catchablePokemons = new ArrayList<>();
+	public Set<CatchablePokemon> getCatchablePokemon() throws LoginFailedException, RemoteServerException {
+		Set<CatchablePokemon> catchablePokemons = new HashSet<CatchablePokemon>();
 		MapObjects objects = getMapObjects();
 
 		for (MapPokemon mapPokemon : objects.getCatchablePokemons()) {
@@ -100,19 +104,9 @@ public class Map {
 		}
 
 		for (WildPokemonOuterClass.WildPokemon wildPokemon : objects.getWildPokemons()) {
-			boolean alreadyInCatchablePokemons = false;
-			for (CatchablePokemon catchablePokemon : catchablePokemons) {
-				if (catchablePokemon.getEncounterId() == wildPokemon.getEncounterId()){
-					alreadyInCatchablePokemons = true;
-					break;
-				}
-			}
-			if (!alreadyInCatchablePokemons) {
 				catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
-			}
 		}
 		
-
 		return catchablePokemons;
 	}
 
