@@ -15,19 +15,19 @@
 
 package com.pokegoapi.auth;
 
-import com.google.gson.annotations.SerializedName;
+import com.squareup.moshi.Json;
 
 public class GoogleAuthTokenJson {
 	private String error;
-	@SerializedName("access_token")
+	@Json(name = "access_token")
 	private String accessToken;
-	@SerializedName("token_type")
+	@Json(name = "token_type")
 	private String tokenType;
-	@SerializedName("expires_in")
+	@Json(name = "expires_in")
 	private int expiresIn;
-	@SerializedName("refresh_token")
+	@Json(name = "refresh_token")
 	private String refreshToken;
-	@SerializedName("id_token")
+	@Json(name = "id_token")
 	private String idToken;
 
 	public String getError() {
