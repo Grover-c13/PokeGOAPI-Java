@@ -24,6 +24,11 @@ public class EvolutionResult {
 	private EvolvePokemonResponseOuterClass.EvolvePokemonResponse proto;
 	private Pokemon pokemon;
 
+	/**
+	 * The evolution result.
+	 * @param api PokemonGo api
+	 * @param proto Pokemon proto
+	 */
 	public EvolutionResult(PokemonGo api, EvolvePokemonResponseOuterClass.EvolvePokemonResponse proto) {
 		this.proto = proto;
 		this.pokemon = new Pokemon(api, proto.getEvolvedPokemonData());
