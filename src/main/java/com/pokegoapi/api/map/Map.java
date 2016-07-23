@@ -12,7 +12,6 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.pokegoapi.api.map;
 
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
@@ -35,6 +34,7 @@ import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResp
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
+
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
@@ -49,11 +49,17 @@ import com.pokegoapi.google.common.geometry.MutableInteger;
 import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.ServerRequest;
+
+import java8.util.function.Function;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class Map {
@@ -93,16 +99,17 @@ public class Map {
 	 * @return a List of CatchablePokemon at your current location
 	 */
 	public List<CatchablePokemon> getCatchablePokemon() throws LoginFailedException, RemoteServerException {
-		List<CatchablePokemon> catchablePokemons = new ArrayList<>();
+		Set<CatchablePokemon> catchablePokemons = new HashSet<CatchablePokemon>();
 		MapObjects objects = getMapObjects();
 
 		for (MapPokemon mapPokemon : objects.getCatchablePokemons()) {
 			catchablePokemons.add(new CatchablePokemon(api, mapPokemon));
 		}
 
-		for (WildPokemonOuterClass.WildPokemon wildPokemon : objects.getWildPokemons()) {
+		for(WildPokemonOuterClass.WildPokemon wildPokemon : objects.getWildPokemons()){
 			catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
 		}
+		
 
 		// TODO: Check if this code is correct; merged because this contains many other fixes
 		/*for (Pokestop pokestop : objects.getPokestops()) {
@@ -111,7 +118,7 @@ public class Map {
 			}
 		}*/
 
-		return catchablePokemons;
+		return new ArrayList<>(catchablePokemons);
 	}
 
 	/**
@@ -253,14 +260,14 @@ public class Map {
 	 * @return MapObjects in the given cells
 	 */
 	public MapObjects getMapObjects(List<Long> cellIds) throws LoginFailedException, RemoteServerException {
-		GetMapObjectsMessage.Builder builder = GetMapObjectsMessage.newBuilder();
+		GetMapObjectsMessage.Builder builder = GetMapObjectsMessage.newBuilder()
 
-		if (useCache && (System.currentTimeMillis() - lastMapUpdate > mapObjectsExpiry)) {
+		if(useCache && (System.currentTimeMillis() - lastMapUpdate > mapObjectsExpiry)){
 			lastMapUpdate = 0;
 			cachedMapObjects = new MapObjects(api);
 		}
 
-		builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder()
+		GetMapObjectsMessageOuterClass.GetMapObjectsMessage.Builder builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder()
 				.setLatitude(api.getLatitude())
 				.setLongitude(api.getLongitude());
 
@@ -268,7 +275,9 @@ public class Map {
 		for (Long cellId : cellIds) {
 			builder.addCellId(cellId);
 			long time = 0;
-
+			if (trackUpdate) {
+				time = lastMapUpdate;
+			}
 			builder.addSinceTimestampMs(lastMapUpdate);
 			index++;
 
@@ -304,7 +313,7 @@ public class Map {
 			result.addPokestops(groupedForts.get(FortType.CHECKPOINT));
 		}
 
-		if (useCache) {
+		if(useCache){
 			cachedMapObjects.update(result);
 			result = cachedMapObjects;
 			lastMapUpdate = System.currentTimeMillis();
@@ -327,7 +336,8 @@ public class Map {
 
 		MutableInteger index = new MutableInteger(0);
 		MutableInteger jindex = new MutableInteger(0);
-
+		MutableInteger i = new MutableInteger(0);
+		MutableInteger j = new MutableInteger(0);
 
 		int level = cellId.level();
 		int size = 1 << (S2CellId.MAX_LEVEL - level);
