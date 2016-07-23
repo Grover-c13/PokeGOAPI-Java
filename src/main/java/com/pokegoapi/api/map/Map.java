@@ -93,7 +93,7 @@ public class Map {
 	 * @return a List of CatchablePokemon at your current location
 	 */
 	public List<CatchablePokemon> getCatchablePokemon() throws LoginFailedException, RemoteServerException {
-		List<CatchablePokemon> catchablePokemons = new ArrayList<>();
+		Set<CatchablePokemon> catchablePokemons = new HashSet<>();
 		MapObjects objects = getMapObjects();
 
 		for (MapPokemon mapPokemon : objects.getCatchablePokemons()) {
@@ -111,7 +111,7 @@ public class Map {
 			}
 		}*/
 
-		return catchablePokemons;
+		return new ArrayList<>(catchablePokemons);
 	}
 
 	/**
