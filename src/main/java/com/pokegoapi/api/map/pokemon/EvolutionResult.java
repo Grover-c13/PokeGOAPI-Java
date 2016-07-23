@@ -16,6 +16,7 @@
 package com.pokegoapi.api.map.pokemon;
 
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass;
+import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
 
 public class EvolutionResult {
@@ -23,9 +24,9 @@ public class EvolutionResult {
 	private EvolvePokemonResponseOuterClass.EvolvePokemonResponse proto;
 	private Pokemon pokemon;
 
-	public EvolutionResult(EvolvePokemonResponseOuterClass.EvolvePokemonResponse proto) {
+	public EvolutionResult(PokemonGo api, EvolvePokemonResponseOuterClass.EvolvePokemonResponse proto) {
 		this.proto = proto;
-		this.pokemon = new Pokemon(proto.getEvolvedPokemonData());
+		this.pokemon = new Pokemon(api, proto.getEvolvedPokemonData());
 	}
 
 	public EvolvePokemonResponseOuterClass.EvolvePokemonResponse.Result getResult() {
