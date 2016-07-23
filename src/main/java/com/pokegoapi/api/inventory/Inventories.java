@@ -106,7 +106,7 @@ public class Inventories {
 			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
 
 			if (itemData.getPokemonData().getPokemonId() != PokemonIdOuterClass.PokemonId.MISSINGNO) {
-				pokebank.addPokemon(new Pokemon(inventoryItem.getInventoryItemData().getPokemonData()));
+				pokebank.addPokemon(new Pokemon(api, inventoryItem.getInventoryItemData().getPokemonData()));
 			}
 			if (itemData.getItem().getItemId() != ItemId.UNRECOGNIZED
 					&& itemData.getItem().getItemId() != ItemId.ITEM_UNKNOWN) {
