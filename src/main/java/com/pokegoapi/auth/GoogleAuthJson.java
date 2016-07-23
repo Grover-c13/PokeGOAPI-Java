@@ -15,18 +15,18 @@
 
 package com.pokegoapi.auth;
 
-import com.google.gson.annotations.SerializedName;
+import com.squareup.moshi.Json;
 
 public class GoogleAuthJson {
-	@SerializedName("device_code")
+	@Json(name = "device_code")
 	String deviceCode;
-	@SerializedName("user_code")
+	@Json(name = "user_code")
 	String userCode;
-	@SerializedName("verification_url")
+	@Json(name = "verification_url")
 	String verificationUrl;
-	@SerializedName("expires_in")
+	@Json(name = "expires_in")
 	int expiresIn;
-	@SerializedName("interval")
+	@Json(name = "interval")
 	int interval;
 
 	public String getDeviceCode() {
