@@ -277,7 +277,7 @@ public class CatchablePokemon {
 	public boolean equals(Object o) {
 		if (o == this) {
 			return true;
-		} else if (o instanceof CatchablePokemon){
+		} else if (o instanceof CatchablePokemon) {
 			return this.getEncounterId() == ((CatchablePokemon) o)
 					.getEncounterId();
 		}
