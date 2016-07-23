@@ -137,7 +137,7 @@ public class Pokemon {
 			return null;
 		}
 
-		EvolutionResult result = new EvolutionResult(response);
+		EvolutionResult result = new EvolutionResult(pgo, response);
 
 		pgo.getInventories().getPokebank().removePokemon(this);
 
