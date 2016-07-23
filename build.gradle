@@ -30,7 +30,7 @@ sourceSets {
     main {
         proto {
             // Need to use custom dir cause Gradle doesn't like us otherwise :(
-            srcDir 'src/resources/protobuf/pogo'
+            srcDir 'src/resources/protobuf/src'
             include '**/*.proto'
         }
     }

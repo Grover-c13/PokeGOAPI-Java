@@ -14,6 +14,7 @@
  */
 package com.pokegoapi.api.map;
 
+import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Map.Fort.FortTypeOuterClass.FortType;
 import POGOProtos.Map.MapCellOuterClass;
@@ -100,6 +101,13 @@ public class Map {
 		for(WildPokemonOuterClass.WildPokemon wildPokemon : objects.getWildPokemons()){
 			catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
 		}
+
+		// TODO: Check if this code is correct; merged because this contains many other fixes
+		/*for (Pokestop pokestop : objects.getPokestops()) {
+			if (pokestop.inRange() && pokestop.hasLurePokemon()) {
+				catchablePokemons.add(new CatchablePokemon(api, pokestop.getFortData()));
+			}
+		}*/
 
 		return catchablePokemons;
 	}
@@ -409,7 +417,7 @@ public class Map {
 				.setEncounterId(catchablePokemon.getEncounterId())
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
-				.setSpawnpointId(catchablePokemon.getSpawnpointId())
+				.setSpawnPointId(catchablePokemon.getSpawnPointId())
 				.build();
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.ENCOUNTER, reqMsg);
 		api.getRequestHandler().sendServerRequests(serverRequest);
@@ -441,7 +449,7 @@ public class Map {
 			double normalizedHitPosition,
 			double normalizedReticleSize,
 			double spinModifier,
-			int pokeball)
+			ItemId pokeball)
 			throws LoginFailedException, RemoteServerException {
 
 		CatchPokemonMessage reqMsg = CatchPokemonMessage.newBuilder()
@@ -449,7 +457,7 @@ public class Map {
 				.setHitPokemon(true)
 				.setNormalizedHitPosition(normalizedHitPosition)
 				.setNormalizedReticleSize(normalizedReticleSize)
-				.setSpawnPointGuid(catchablePokemon.getSpawnpointId())
+				.setSpawnPointGuid(catchablePokemon.getSpawnPointId())
 				.setSpinModifier(spinModifier)
 				.setPokeball(pokeball)
 				.build();

@@ -15,13 +15,12 @@
 
 package com.pokegoapi.api.inventory;
 
-import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Inventory.InventoryItemDataOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
-import POGOProtos.Inventory.ItemIdOuterClass;
-import POGOProtos.Inventory.ItemOuterClass;
+import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
+import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
@@ -44,14 +43,15 @@ public class Inventories {
 	@Getter
 	private CandyJar candyjar;
 	@Getter
-	private PlayerStatsOuterClass.PlayerStats stats;
+	private Pokedex pokedex;
 
 	private long lastInventoryUpdate = 0;
 
 	/**
 	 * Creates Inventories and initializes content.
+	 *
 	 * @param api PokemonGo api
-	 * @throws LoginFailedException the login failed exception
+	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 */
 	public Inventories(PokemonGo api) throws LoginFailedException, RemoteServerException {
@@ -59,12 +59,14 @@ public class Inventories {
 		itemBag = new ItemBag(api);
 		pokebank = new PokeBank(api);
 		candyjar = new CandyJar(api);
+		pokedex = new Pokedex(api);
 		updateInventories();
 	}
 
 	/**
 	 * Updates the inventories with latest data.
-	 * @throws LoginFailedException the login failed exception
+	 *
+	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 */
 	public void updateInventories() throws LoginFailedException, RemoteServerException {
@@ -73,8 +75,9 @@ public class Inventories {
 
 	/**
 	 * Updates the inventories with the latest data.
+	 *
 	 * @param forceUpdate For a full update if true
-	 * @throws LoginFailedException the login failed exception
+	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 */
 	public void updateInventories(boolean forceUpdate) throws LoginFailedException, RemoteServerException {
@@ -83,13 +86,13 @@ public class Inventories {
 			itemBag = new ItemBag(api);
 			pokebank = new PokeBank(api);
 			candyjar = new CandyJar(api);
+			pokedex = new Pokedex(api);
 		}
 		GetInventoryMessage invReqMsg = GetInventoryMessage.newBuilder()
 				.setLastTimestampMs(lastInventoryUpdate)
 				.build();
 		ServerRequest inventoryRequest = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY, invReqMsg);
-		api.getRequestHandler().request(inventoryRequest);
-		api.getRequestHandler().sendServerRequests();
+		api.getRequestHandler().sendServerRequests(inventoryRequest);
 
 		GetInventoryResponse response = null;
 		try {
@@ -101,37 +104,28 @@ public class Inventories {
 		for (InventoryItemOuterClass.InventoryItem inventoryItem
 				: response.getInventoryDelta().getInventoryItemsList()) {
 			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
-			if (inventoryItem.getDeletedItemKey() > 0) {
-				if (itemData.getPokemonData().getPokemonId() != PokemonIdOuterClass.PokemonId.MISSINGNO) {
-					pokebank.removePokemon(new Pokemon(inventoryItem.getInventoryItemData().getPokemonData()));
-				}
-				if (itemData.getItem().getItemId() != ItemIdOuterClass.ItemId.UNRECOGNIZED) {
-					ItemOuterClass.Item item = inventoryItem.getInventoryItemData().getItem();
-					itemBag.removeItem(inventoryItem.getInventoryItemData().getItem().getItemId(), item.getCount());
-				}
-				if (itemData.getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED) {
-					candyjar.removeCandy(
-							inventoryItem.getInventoryItemData().getPokemonFamily().getFamilyId(),
-							inventoryItem.getInventoryItemData().getPokemonFamily().getCandy()
-					);
-				}
-			} else {
-				if (itemData.getPokemonData().getPokemonId() != PokemonIdOuterClass.PokemonId.MISSINGNO) {
-					pokebank.addPokemon(new Pokemon(inventoryItem.getInventoryItemData().getPokemonData()));
-				}
-				if (itemData.getItem().getItemId() != ItemIdOuterClass.ItemId.UNRECOGNIZED) {
-					ItemOuterClass.Item item = inventoryItem.getInventoryItemData().getItem();
-					itemBag.addItem(new Item(item));
-				}
-				if (itemData.getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED) {
-					candyjar.addCandy(
-							inventoryItem.getInventoryItemData().getPokemonFamily().getFamilyId(),
-							inventoryItem.getInventoryItemData().getPokemonFamily().getCandy()
-					);
-				}
-				if (itemData.hasPlayerStats()) {
-					stats = inventoryItem.getInventoryItemData().getPlayerStats();
-				}
+
+			if (itemData.getPokemonData().getPokemonId() != PokemonIdOuterClass.PokemonId.MISSINGNO) {
+				pokebank.addPokemon(new Pokemon(inventoryItem.getInventoryItemData().getPokemonData()));
+			}
+			if (itemData.getItem().getItemId() != ItemId.UNRECOGNIZED
+					&& itemData.getItem().getItemId() != ItemId.ITEM_UNKNOWN) {
+				ItemData item = inventoryItem.getInventoryItemData().getItem();
+				itemBag.addItem(new Item(item));
+			}
+			if (itemData.getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED
+					&& itemData.getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_UNSET) {
+				candyjar.setCandy(
+						inventoryItem.getInventoryItemData().getPokemonFamily().getFamilyId(),
+						inventoryItem.getInventoryItemData().getPokemonFamily().getCandy()
+				);
+			}
+			if (itemData.hasPlayerStats()) {
+				api.getPlayerProfile().setStats(inventoryItem.getInventoryItemData().getPlayerStats());
+			}
+
+			if (itemData.hasPokedexEntry()) {
+				pokedex.add(itemData.getPokedexEntry());
 			}
 
 			lastInventoryUpdate = System.currentTimeMillis();
