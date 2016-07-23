@@ -29,6 +29,7 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 /**
@@ -101,5 +102,10 @@ public class ItemBag {
 		}
 
 		return items.get(type);
+	}
+
+
+	public Collection<Item> getItems() {
+		return items.values();
 	}
 }
