@@ -36,19 +36,19 @@ public class EncounterResult {
 		return response != null && getStatus() != null && getStatus().equals(EncounterResponse.Status.ENCOUNTER_SUCCESS);
 	}
 
-	public EncounterResponse.Background getBackground() {
+	public EncounterResponse.Background getBackground(){
 		return response.getBackground();
 	}
 
-	public CaptureProbabilityOuterClass.CaptureProbability getCaptureProbability() {
+	public CaptureProbabilityOuterClass.CaptureProbability getCaptureProbability(){
 		return response.getCaptureProbability();
 	}
 
-	public WildPokemonOuterClass.WildPokemon getWildPokemon() {
+	public WildPokemonOuterClass.WildPokemon getWildPokemon(){
 		return response.getWildPokemon();
 	}
 
-	public EncounterResponse toPrimitive() {
+	public EncounterResponse toPrimitive(){
 		return response;
 	}
 }
