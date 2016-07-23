@@ -50,6 +50,9 @@ import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.ServerRequest;
 
+import java8.util.function.Function;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
 import lombok.Getter;
 import lombok.Setter;
 
