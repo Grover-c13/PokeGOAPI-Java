@@ -42,7 +42,6 @@ public class PokeBank {
 	 * @param pokemon Pokemon to add to the inventory
 	 */
 	public void addPokemon(final Pokemon pokemon) {
-		pokemon.setPgo(instance);
 		List<Pokemon> alreadyAdded = Stream.of(pokemons).filter(new Predicate<Pokemon>() {
 			@Override
 			public boolean test(Pokemon testPokemon) {
