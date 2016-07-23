@@ -35,9 +35,12 @@ import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
 
+<<<<<<< HEAD
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
+=======
+>>>>>>> ab032b37a83e48c17c857f3c2c2ed7f6e802a767
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.fort.FortDetails;
