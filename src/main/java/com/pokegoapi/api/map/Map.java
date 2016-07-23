@@ -104,9 +104,9 @@ public class Map {
 		}
 
 		for (WildPokemonOuterClass.WildPokemon wildPokemon : objects.getWildPokemons()) {
-				catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
+			catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
 		}
-		
+
 		return catchablePokemons;
 	}
 
