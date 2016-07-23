@@ -54,8 +54,6 @@ public class PokeBank {
 		}
 	}
 
-
-
 	/**
 	 * Gets pokemon by pokemon id.
 	 *
