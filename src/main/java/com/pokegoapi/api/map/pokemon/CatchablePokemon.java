@@ -274,11 +274,11 @@ public class CatchablePokemon {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (o == this) {
+	public boolean equals(Object obj) {
+		if (obj == this) {
 			return true;
-		} else if (o instanceof CatchablePokemon) {
-			return this.getEncounterId() == ((CatchablePokemon) o)
+		} else if (obj instanceof CatchablePokemon) {
+			return this.getEncounterId() == ((CatchablePokemon) obj)
 					.getEncounterId();
 		}
 		return false;
