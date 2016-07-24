@@ -39,6 +39,7 @@ public class PokeBank {
 
 	public void reset(PokemonGo pgo) {
 		this.instance = pgo;
+		pokemons = new ArrayList<>();
 	}
 
 	/**
