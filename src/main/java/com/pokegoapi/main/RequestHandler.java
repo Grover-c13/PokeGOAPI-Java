@@ -19,11 +19,15 @@ import POGOProtos.Networking.Envelopes.AuthTicketOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass;
+
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.auth.GoogleLogin;
+import com.pokegoapi.auth.GoogleLoginSecrets;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
+
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -129,8 +133,21 @@ public class RequestHandler {
 				lastAuth = responseEnvelop.getAuthTicket();
 			}
 
-			if (responseEnvelop.getStatusCode() == 102) {
-				throw new LoginFailedException();
+			if (responseEnvelop.getStatusCode() == 102 && GoogleLoginSecrets.refresh_token != null) {
+				Log.d(TAG,"Refreshing Token");
+				GoogleLogin login = new GoogleLogin(client);
+				final AuthInfo refreshedAuth = login.refreshToken(GoogleLoginSecrets.refresh_token);
+				if (refreshedAuth == null) {
+					throw new LoginFailedException(String.format("Refreshing token failed Error %s in API Url %s",
+							responseEnvelop.getApiUrl(), responseEnvelop.getError()));
+				} else {
+					this.auth = refreshedAuth;
+					sendServerRequests(serverRequests);
+					return;
+				}
+			} else if (responseEnvelop.getStatusCode() == 102) {
+				throw new LoginFailedException(String.format("Error %s in API Url %s",
+						responseEnvelop.getApiUrl(), responseEnvelop.getError()));
 			} else if (responseEnvelop.getStatusCode() == 53) {
 				// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
 				sendServerRequests(serverRequests);
