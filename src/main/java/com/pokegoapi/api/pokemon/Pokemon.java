@@ -46,6 +46,7 @@ public class Pokemon {
 	@Setter
 	PokemonGo pgo;
 	private PokemonData proto;
+	private PokemonMeta meta;
 
 	// API METHODS //
 
@@ -145,12 +146,20 @@ public class Pokemon {
 		return result;
 	}
 
+	private PokemonMeta getMeta() {
+		if (meta == null) {
+			meta = PokemonMetaRegistry.getMeta(this.getPokemonId());
+		}
+
+		return meta;
+	}
+
 	public int getCandy() {
 		return pgo.getInventories().getCandyjar().getCandies(getPokemonFamily());
 	}
 
 	public PokemonFamilyId getPokemonFamily() {
-		return PokemonFamilyMap.getFamily(this.getPokemonId());
+		return PokemonMetaRegistry.getFamily(this.getPokemonId());
 	}
 
 	public boolean equals(Pokemon other) {
@@ -271,5 +280,26 @@ public class Pokemon {
 
 	public void debug() {
 		Log.d(TAG, proto.toString());
+	}
+
+
+	public int getBaseStam() {
+		return getMeta().getBaseStam();
+	}
+
+	public double getBaseCaptureRate() {
+		return getMeta().getBaseCaptureRate();
+	}
+
+	public int getCandiesToEvolve() {
+		return getMeta().getCandiesToEvolve();
+	}
+
+	public double getBaseFleeRate() {
+		return getMeta().getBaseFleeRate();
+	}
+
+	public PokemonIdOuterClass.PokemonId getParent() {
+		return getMeta().getParent();
 	}
 }

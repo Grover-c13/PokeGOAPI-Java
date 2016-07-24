@@ -20,10 +20,11 @@ import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 
 import java.util.EnumMap;
 
-public class PokemonFamilyMap {
+public class PokemonMetaRegistry {
 
 	private static EnumMap<PokemonId, PokemonFamilyId> familys = new EnumMap<>(PokemonId.class);
 	private static EnumMap<PokemonFamilyId, PokemonId> highestForFamily = new EnumMap<>(PokemonFamilyId.class);
+	private static EnumMap<PokemonId, PokemonMeta> meta = new EnumMap<>(PokemonId.class);
 
 	static {
 		familys.put(PokemonId.BULBASAUR, PokemonFamilyId.FAMILY_BULBASAUR);
@@ -257,6 +258,153 @@ public class PokemonFamilyMap {
 		highestForFamily.put(PokemonFamilyId.FAMILY_MEWTWO, PokemonId.MEWTWO);
 		familys.put(PokemonId.MEW, PokemonFamilyId.FAMILY_MEW);
 		highestForFamily.put(PokemonFamilyId.FAMILY_MEW, PokemonId.MEW);
+
+		meta.put(PokemonId.BULBASAUR, new PokemonMeta(90,0.16,25,0.1,0.7,null));
+		meta.put(PokemonId.IVYSAUR, new PokemonMeta(120,0.08,100,0.07,1,PokemonId.BULBASAUR));
+		meta.put(PokemonId.VENUSAUR, new PokemonMeta(160,0.04,0,0.05,2,PokemonId.IVYSAUR));
+		meta.put(PokemonId.CHARMANDER, new PokemonMeta(78,0.16,25,0.1,0.6,null));
+		meta.put(PokemonId.CHARMELEON, new PokemonMeta(116,0.08,100,0.07,1.1,PokemonId.CHARMANDER));
+		meta.put(PokemonId.CHARIZARD, new PokemonMeta(156,0.04,0,0.05,1.7,PokemonId.CHARMELEON));
+		meta.put(PokemonId.SQUIRTLE, new PokemonMeta(88,0.16,25,0.1,0.5,null));
+		meta.put(PokemonId.WARTORTLE, new PokemonMeta(118,0.08,100,0.07,1,PokemonId.SQUIRTLE));
+		meta.put(PokemonId.BLASTOISE, new PokemonMeta(158,0.04,0,0.05,1.6,PokemonId.WARTORTLE));
+		meta.put(PokemonId.CATERPIE, new PokemonMeta(90,0.4,12,0.2,0.3,null));
+		meta.put(PokemonId.METAPOD, new PokemonMeta(100,0.2,50,0.09,0.7,PokemonId.CATERPIE));
+		meta.put(PokemonId.BUTTERFREE, new PokemonMeta(120,0.1,0,0.06,1.1,PokemonId.METAPOD));
+		meta.put(PokemonId.WEEDLE, new PokemonMeta(80,0.4,12,0.2,0.3,null));
+		meta.put(PokemonId.KAKUNA, new PokemonMeta(90,0.2,50,0.09,0.6,PokemonId.WEEDLE));
+		meta.put(PokemonId.BEEDRILL, new PokemonMeta(130,0.1,0,0.06,1,PokemonId.KAKUNA));
+		meta.put(PokemonId.PIDGEY, new PokemonMeta(80,0.4,12,0.2,0.3,null));
+		meta.put(PokemonId.PIDGEOTTO, new PokemonMeta(126,0.2,50,0.09,1.1,PokemonId.PIDGEY));
+		meta.put(PokemonId.PIDGEOT, new PokemonMeta(166,0.1,0,0.06,1.5,PokemonId.PIDGEOTTO));
+		meta.put(PokemonId.RATTATA, new PokemonMeta(60,0.4,25,0.2,0.3,null));
+		meta.put(PokemonId.RATICATE, new PokemonMeta(110,0.16,0,0.07,0.7,PokemonId.RATTATA));
+		meta.put(PokemonId.SPEAROW, new PokemonMeta(80,0.4,50,0.15,0.3,null));
+		meta.put(PokemonId.FEAROW, new PokemonMeta(130,0.16,0,0.07,1.2,PokemonId.SPEAROW));
+		meta.put(PokemonId.EKANS, new PokemonMeta(70,0.4,50,0.15,2,null));
+		meta.put(PokemonId.ARBOK, new PokemonMeta(120,0.16,0,0.07,3.5,PokemonId.EKANS));
+		meta.put(PokemonId.PIKACHU, new PokemonMeta(70,0.16,50,0.1,0.4,null));
+		meta.put(PokemonId.SANDSHREW, new PokemonMeta(100,0.4,50,0.1,0.6,null));
+		meta.put(PokemonId.SANDSLASH, new PokemonMeta(150,0.16,0,0.06,1,PokemonId.SANDSHREW));
+		meta.put(PokemonId.NIDORAN_FEMALE, new PokemonMeta(110,0.4,25,0.15,0.4,null));
+		meta.put(PokemonId.NIDORINA, new PokemonMeta(140,0.2,100,0.07,0.8,PokemonId.NIDORAN_FEMALE));
+		meta.put(PokemonId.NIDOQUEEN, new PokemonMeta(180,0.1,0,0.05,1.3,PokemonId.NIDORINA));
+		meta.put(PokemonId.NIDORAN_MALE, new PokemonMeta(92,0.4,25,0.15,0.5,null));
+		meta.put(PokemonId.NIDORINO, new PokemonMeta(122,0.2,100,0.07,0.9,PokemonId.NIDORAN_MALE));
+		meta.put(PokemonId.NIDOKING, new PokemonMeta(162,0.1,0,0.05,1.4,PokemonId.NIDORINO));
+		meta.put(PokemonId.CLEFAIRY, new PokemonMeta(140,0.24,50,0.1,0.6,null));
+		meta.put(PokemonId.CLEFABLE, new PokemonMeta(190,0.08,0,0.06,1.3,PokemonId.CLEFAIRY));
+		meta.put(PokemonId.VULPIX, new PokemonMeta(76,0.24,50,0.1,0.6,null));
+		meta.put(PokemonId.NINETALES, new PokemonMeta(146,0.08,0,0.06,1.1,PokemonId.VULPIX));
+		meta.put(PokemonId.JIGGLYPUFF, new PokemonMeta(230,0.4,50,0.1,0.5,null));
+		meta.put(PokemonId.WIGGLYTUFF, new PokemonMeta(280,0.16,0,0.06,1,PokemonId.JIGGLYPUFF));
+		meta.put(PokemonId.ZUBAT, new PokemonMeta(80,0.4,50,0.2,0.8,null));
+		meta.put(PokemonId.GOLBAT, new PokemonMeta(150,0.16,0,0.07,1.6,PokemonId.ZUBAT));
+		meta.put(PokemonId.GLOOM, new PokemonMeta(120,0.24,100,0.07,0.8,PokemonId.ODDISH));
+		meta.put(PokemonId.VILEPLUME, new PokemonMeta(150,0.12,0,0.05,1.2,PokemonId.GLOOM));
+		meta.put(PokemonId.PARAS, new PokemonMeta(70,0.32,50,0.15,0.3,null));
+		meta.put(PokemonId.PARASECT, new PokemonMeta(120,0.16,0,0.07,1,PokemonId.PARAS));
+		meta.put(PokemonId.VENONAT, new PokemonMeta(120,0.4,50,0.15,1,null));
+		meta.put(PokemonId.VENOMOTH, new PokemonMeta(140,0.16,0,0.07,1.5,PokemonId.VENONAT));
+		meta.put(PokemonId.DIGLETT, new PokemonMeta(20,0.4,50,0.1,0.2,null));
+		meta.put(PokemonId.DUGTRIO, new PokemonMeta(70,0.16,0,0.06,0.7,PokemonId.DIGLETT));
+		meta.put(PokemonId.MEOWTH, new PokemonMeta(80,0.4,50,0.15,0.4,null));
+		meta.put(PokemonId.PERSIAN, new PokemonMeta(130,0.16,0,0.07,1,PokemonId.MEOWTH));
+		meta.put(PokemonId.PSYDUCK, new PokemonMeta(100,0.4,50,0.1,0.8,null));
+		meta.put(PokemonId.GOLDUCK, new PokemonMeta(160,0.16,0,0.06,1.7,PokemonId.PSYDUCK));
+		meta.put(PokemonId.PRIMEAPE, new PokemonMeta(130,0.16,0,0.06,1,null));
+		meta.put(PokemonId.GROWLITHE, new PokemonMeta(110,0.24,50,0.1,0.7,null));
+		meta.put(PokemonId.ARCANINE, new PokemonMeta(180,0.08,0,0.06,1.9,PokemonId.GROWLITHE));
+		meta.put(PokemonId.POLIWAG, new PokemonMeta(80,0.4,25,0.15,0.6,null));
+		meta.put(PokemonId.POLIWHIRL, new PokemonMeta(130,0.2,100,0.07,1,PokemonId.POLIWAG));
+		meta.put(PokemonId.POLIWRATH, new PokemonMeta(180,0.1,0,0.05,1.3,PokemonId.POLIWHIRL));
+		meta.put(PokemonId.ABRA, new PokemonMeta(50,0.4,25,0.99,0.9,null));
+		meta.put(PokemonId.KADABRA, new PokemonMeta(80,0.2,100,0.07,1.3,PokemonId.ABRA));
+		meta.put(PokemonId.ALAKAZAM, new PokemonMeta(110,0.1,0,0.05,1.5,PokemonId.KADABRA));
+		meta.put(PokemonId.MACHAMP, new PokemonMeta(180,0.1,0,0.05,1.6,PokemonId.MACHOKE));
+		meta.put(PokemonId.BELLSPROUT, new PokemonMeta(100,0.4,25,0.15,0.7,null));
+		meta.put(PokemonId.WEEPINBELL, new PokemonMeta(130,0.2,100,0.07,1,PokemonId.BELLSPROUT));
+		meta.put(PokemonId.VICTREEBEL, new PokemonMeta(160,0.1,0,0.05,1.7,PokemonId.WEEPINBELL));
+		meta.put(PokemonId.TENTACOOL, new PokemonMeta(80,0.4,50,0.15,0.9,null));
+		meta.put(PokemonId.TENTACRUEL, new PokemonMeta(160,0.16,0,0.07,1.6,PokemonId.TENTACOOL));
+		meta.put(PokemonId.GEODUDE, new PokemonMeta(80,0.4,25,0.1,0.4,null));
+		meta.put(PokemonId.GRAVELER, new PokemonMeta(110,0.2,100,0.07,1,PokemonId.GEODUDE));
+		meta.put(PokemonId.GOLEM, new PokemonMeta(160,0.1,0,0.05,1.4,PokemonId.GRAVELER));
+		meta.put(PokemonId.PONYTA, new PokemonMeta(100,0.32,50,0.1,1,null));
+		meta.put(PokemonId.RAPIDASH, new PokemonMeta(130,0.12,0,0.06,1.7,PokemonId.PONYTA));
+		meta.put(PokemonId.SLOWPOKE, new PokemonMeta(180,0.4,50,0.1,1.2,null));
+		meta.put(PokemonId.SLOWBRO, new PokemonMeta(190,0.16,0,0.06,1.6,PokemonId.SLOWPOKE));
+		meta.put(PokemonId.MAGNEMITE, new PokemonMeta(50,0.4,50,0.1,0.3,null));
+		meta.put(PokemonId.MAGNETON, new PokemonMeta(100,0.16,0,0.06,1,PokemonId.MAGNEMITE));
+		meta.put(PokemonId.FARFETCHD, new PokemonMeta(104,0.24,0,0.09,0.8,null));
+		meta.put(PokemonId.DODUO, new PokemonMeta(70,0.4,50,0.1,1.4,null));
+		meta.put(PokemonId.DODRIO, new PokemonMeta(120,0.16,0,0.06,1.8,PokemonId.DODUO));
+		meta.put(PokemonId.SEEL, new PokemonMeta(130,0.4,50,0.09,1.1,null));
+		meta.put(PokemonId.DEWGONG, new PokemonMeta(180,0.16,0,0.06,1.7,PokemonId.SEEL));
+		meta.put(PokemonId.GRIMER, new PokemonMeta(160,0.4,50,0.1,0.9,null));
+		meta.put(PokemonId.MUK, new PokemonMeta(210,0.16,0,0.06,1.2,PokemonId.GRIMER));
+		meta.put(PokemonId.SHELLDER, new PokemonMeta(60,0.4,50,0.1,0.3,null));
+		meta.put(PokemonId.CLOYSTER, new PokemonMeta(100,0.16,0,0.06,1.5,PokemonId.SHELLDER));
+		meta.put(PokemonId.GASTLY, new PokemonMeta(60,0.32,25,0.1,1.3,null));
+		meta.put(PokemonId.HAUNTER, new PokemonMeta(90,0.16,100,0.07,1.6,PokemonId.GASTLY));
+		meta.put(PokemonId.GENGAR, new PokemonMeta(120,0.08,0,0.05,1.5,PokemonId.HAUNTER));
+		meta.put(PokemonId.ONIX, new PokemonMeta(70,0.16,0,0.09,8.8,null));
+		meta.put(PokemonId.DROWZEE, new PokemonMeta(120,0.4,50,0.1,1,null));
+		meta.put(PokemonId.HYPNO, new PokemonMeta(170,0.16,0,0.06,1.6,PokemonId.DROWZEE));
+		meta.put(PokemonId.KRABBY, new PokemonMeta(60,0.4,50,0.15,0.4,null));
+		meta.put(PokemonId.KINGLER, new PokemonMeta(110,0.16,0,0.07,1.3,PokemonId.KRABBY));
+		meta.put(PokemonId.VOLTORB, new PokemonMeta(80,0.4,50,0.1,0.5,null));
+		meta.put(PokemonId.ELECTRODE, new PokemonMeta(120,0.16,0,0.06,1.2,PokemonId.VOLTORB));
+		meta.put(PokemonId.EXEGGCUTE, new PokemonMeta(120,0.4,50,0.1,0.4,null));
+		meta.put(PokemonId.EXEGGUTOR, new PokemonMeta(190,0.16,0,0.06,2,PokemonId.EXEGGCUTE));
+		meta.put(PokemonId.CUBONE, new PokemonMeta(100,0.32,50,0.1,0.4,null));
+		meta.put(PokemonId.MAROWAK, new PokemonMeta(120,0.12,0,0.06,1,PokemonId.CUBONE));
+		meta.put(PokemonId.HITMONLEE, new PokemonMeta(100,0.16,0,0.09,1.5,null));
+		meta.put(PokemonId.LICKITUNG, new PokemonMeta(180,0.16,0,0.09,1.2,null));
+		meta.put(PokemonId.KOFFING, new PokemonMeta(80,0.4,50,0.1,0.6,null));
+		meta.put(PokemonId.WEEZING, new PokemonMeta(130,0.16,0,0.06,1.2,PokemonId.KOFFING));
+		meta.put(PokemonId.RHYHORN, new PokemonMeta(160,0.4,50,0.1,1,null));
+		meta.put(PokemonId.RHYDON, new PokemonMeta(210,0.16,0,0.06,1.9,PokemonId.RHYHORN));
+		meta.put(PokemonId.CHANSEY, new PokemonMeta(500,0.16,0,0.09,1.1,null));
+		meta.put(PokemonId.TANGELA, new PokemonMeta(130,0.32,0,0.09,1,null));
+		meta.put(PokemonId.HORSEA, new PokemonMeta(60,0.4,50,0.1,0.4,null));
+		meta.put(PokemonId.SEADRA, new PokemonMeta(110,0.16,0,0.06,1.2,PokemonId.HORSEA));
+		meta.put(PokemonId.GOLDEEN, new PokemonMeta(90,0.4,50,0.15,0.6,null));
+		meta.put(PokemonId.SEAKING, new PokemonMeta(160,0.16,0,0.07,1.3,PokemonId.GOLDEEN));
+		meta.put(PokemonId.STARYU, new PokemonMeta(60,0.4,50,0.15,0.8,null));
+		meta.put(PokemonId.STARMIE, new PokemonMeta(120,0.16,0,0.06,1.1,PokemonId.STARYU));
+		meta.put(PokemonId.MR_MIME, new PokemonMeta(80,0.24,0,0.09,1.3,null));
+		meta.put(PokemonId.SCYTHER, new PokemonMeta(140,0.24,0,0.09,1.5,null));
+		meta.put(PokemonId.JYNX, new PokemonMeta(130,0.24,0,0.09,1.4,null));
+		meta.put(PokemonId.ELECTABUZZ, new PokemonMeta(130,0.24,0,0.09,1.1,null));
+		meta.put(PokemonId.MAGMAR, new PokemonMeta(130,0.24,0,0.09,1.3,null));
+		meta.put(PokemonId.PINSIR, new PokemonMeta(130,0.24,0,0.09,1.5,null));
+		meta.put(PokemonId.TAUROS, new PokemonMeta(150,0.24,0,0.09,1.4,null));
+		meta.put(PokemonId.MAGIKARP, new PokemonMeta(40,0.56,400,0.15,0.9,null));
+		meta.put(PokemonId.GYARADOS, new PokemonMeta(190,0.08,0,0.07,6.5,PokemonId.MAGIKARP));
+		meta.put(PokemonId.LAPRAS, new PokemonMeta(260,0.16,0,0.09,2.5,null));
+		meta.put(PokemonId.DITTO, new PokemonMeta(96,0.16,0,0.1,0.3,null));
+		meta.put(PokemonId.EEVEE, new PokemonMeta(110,0.32,25,0.1,0.3,null));
+		meta.put(PokemonId.VAPOREON, new PokemonMeta(260,0.12,0,0.06,1,PokemonId.EEVEE));
+		meta.put(PokemonId.JOLTEON, new PokemonMeta(130,0.12,0,0.06,0.8,PokemonId.EEVEE));
+		meta.put(PokemonId.FLAREON, new PokemonMeta(130,0.12,0,0.06,0.9,PokemonId.EEVEE));
+		meta.put(PokemonId.PORYGON, new PokemonMeta(130,0.32,0,0.09,0.8,null));
+		meta.put(PokemonId.OMANYTE, new PokemonMeta(70,0.32,50,0.09,0.4,null));
+		meta.put(PokemonId.OMASTAR, new PokemonMeta(140,0.12,0,0.05,1,PokemonId.OMANYTE));
+		meta.put(PokemonId.KABUTO, new PokemonMeta(60,0.32,50,0.09,0.5,null));
+		meta.put(PokemonId.KABUTOPS, new PokemonMeta(120,0.12,0,0.05,1.3,PokemonId.KABUTO));
+		meta.put(PokemonId.AERODACTYL, new PokemonMeta(160,0.16,0,0.09,1.8,null));
+		meta.put(PokemonId.SNORLAX, new PokemonMeta(320,0.16,0,0.09,2.1,null));
+		meta.put(PokemonId.ARTICUNO, new PokemonMeta(180,0,0,0.1,1.7,null));
+		meta.put(PokemonId.ZAPDOS, new PokemonMeta(180,0,0,0.1,1.6,null));
+		meta.put(PokemonId.MOLTRES, new PokemonMeta(180,0,0,0.1,2,null));
+		meta.put(PokemonId.DRATINI, new PokemonMeta(82,0.32,25,0.09,1.8,null));
+		meta.put(PokemonId.DRAGONAIR, new PokemonMeta(122,0.08,100,0.06,4,PokemonId.DRATINI));
+		meta.put(PokemonId.DRAGONITE, new PokemonMeta(182,0.04,0,0.05,2.2,PokemonId.DRAGONAIR));
+		meta.put(PokemonId.MEWTWO, new PokemonMeta(212,0,0,0.1,2,null));
+		meta.put(PokemonId.MEW, new PokemonMeta(200,0,0,0.1,0.4,null));
+
+
 	}
 
 	/**
@@ -267,6 +415,16 @@ public class PokemonFamilyMap {
 	 */
 	public static PokemonFamilyId getFamily(PokemonId id) {
 		return familys.get(id);
+	}
+
+	/**
+	 * Return PokemonMeta object containing meta info about a pokemon.
+	 *
+	 * @param id the id of the pokemon
+	 * @return PokemonMeta
+	 */
+	public static PokemonMeta getMeta(PokemonId id) {
+		return meta.get(id);
 	}
 
 	/**
