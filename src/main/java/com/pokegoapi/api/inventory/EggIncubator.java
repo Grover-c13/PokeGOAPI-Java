@@ -16,6 +16,7 @@
 package com.pokegoapi.api.inventory;
 
 import POGOProtos.Inventory.EggIncubatorOuterClass;
+import POGOProtos.Inventory.EggIncubatorTypeOuterClass.EggIncubatorType;
 import POGOProtos.Networking.Requests.Messages.UseItemEggIncubatorMessageOuterClass.UseItemEggIncubatorMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
@@ -85,5 +86,41 @@ public class EggIncubator {
 		this.inUse = true;
 
 		return response.getResult();
+	}
+	
+	/**
+	 * Get incubator id.
+	 * 
+	 * @return the id
+	 */
+	public String getId() {
+		return proto.getId();
+	}
+	
+	/**
+	 * Get incubator type.
+	 * 
+	 * @return EggIncubatorType
+	 */
+	public EggIncubatorType getType() {
+		return proto.getIncubatorType();
+	}
+	
+	/**
+	 * Get the target distance for egg to hatch.
+	 * 
+	 * @return km distance to hatch the egg
+	 */
+	public double getKmTaget() {
+		return proto.getTargetKmWalked();
+	}
+	
+	/**
+	 * Get the current distance walked with this incubator.
+	 * 
+	 * @return km walked with an egg
+	 */
+	public double getKmWalked() {
+		return proto.getStartKmWalked();
 	}
 }
