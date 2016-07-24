@@ -23,11 +23,15 @@ import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.EvolvePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.NicknamePokemonMessageOuterClass.NicknamePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
+import POGOProtos.Networking.Requests.Messages.UpgradePokemonMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.UpgradePokemonMessageOuterClass.UpgradePokemonMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass.EvolvePokemonResponse;
 import POGOProtos.Networking.Responses.NicknamePokemonResponseOuterClass.NicknamePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
+import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass;
+import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass.UpgradePokemonResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.pokemon.EvolutionResult;
@@ -115,6 +119,32 @@ public class Pokemon {
 		pgo.getInventories().updateInventories();
 
 		return response.getResult();
+	}
+
+	/**
+	 * Powers up a pokemon with candy and stardust.
+	 * After powering up this pokemon object will reflect the new changes.
+	 *
+	 * @return The result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public UpgradePokemonResponse.Result powerUp() throws LoginFailedException, RemoteServerException {
+		UpgradePokemonMessage reqMsg = UpgradePokemonMessage.newBuilder()
+				.setPokemonId(this.getId())
+				.build();
+
+		ServerRequest serverRequest = new ServerRequest(RequestType.UPGRADE_POKEMON, reqMsg);
+		pgo.getRequestHandler().sendServerRequests(serverRequest);
+
+		UpgradePokemonResponse response;
+		try {
+			response = UpgradePokemonResponse.parseFrom(serverRequest.getData());
+			this.proto = response.getUpgradedPokemon();
+			return response.getResult();
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
 	}
 
 	/**
