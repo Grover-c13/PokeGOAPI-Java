@@ -462,7 +462,7 @@ public class Map {
 				.setHitPokemon(true)
 				.setNormalizedHitPosition(normalizedHitPosition)
 				.setNormalizedReticleSize(normalizedReticleSize)
-				.setSpawnPointGuid(catchablePokemon.getSpawnPointId())
+				.setSpawnPointId(catchablePokemon.getSpawnPointId())
 				.setSpinModifier(spinModifier)
 				.setPokeball(pokeball)
 				.build();

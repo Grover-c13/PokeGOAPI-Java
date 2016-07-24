@@ -340,7 +340,7 @@ public class CatchablePokemon {
 					.setEncounterId(getEncounterId()).setHitPokemon(true)
 					.setNormalizedHitPosition(normalizedHitPosition)
 					.setNormalizedReticleSize(normalizedReticleSize)
-					.setSpawnPointGuid(getSpawnPointId())
+					.setSpawnPointId(getSpawnPointId())
 					.setSpinModifier(spinModifier)
 					.setPokeball(type.getBallType()).build();
 			ServerRequest serverRequest = new ServerRequest(

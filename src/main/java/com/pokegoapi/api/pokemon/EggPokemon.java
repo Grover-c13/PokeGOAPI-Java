@@ -16,7 +16,13 @@
 package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
+import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
+
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.EggIncubator;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+
 import lombok.Setter;
 
 /**
@@ -30,20 +36,39 @@ public class EggPokemon {
 	private PokemonData proto;
 
 	// API METHODS //
+	/**
+	 * Incubate this egg.
+	 * 
+	 * @param incubator : the incubator
+	 * @return status of putting egg in incubator
+	 * @throws LoginFailedException e
+	 * @throws RemoteServerException e
+	 */
+	public UseItemEggIncubatorResponse.Result incubate(EggIncubator incubator) 
+			throws LoginFailedException, RemoteServerException {
+		if (incubator.isInUse()) {
+			throw new IllegalArgumentException("Incubator already used");
+		}
+		return incubator.hatchEgg(this);
+	}
 
 	// DELEGATE METHODS BELOW //
+	/**
+	 * Build a EggPokemon wrapper from the proto.
+	 * 
+	 * @param proto : the prototype
+	 */
 	public EggPokemon(PokemonData proto) {
+		if (!proto.getIsEgg()) {
+			throw new IllegalArgumentException("You cant build a EggPokemon without a valid PokemonData.");
+		}
 		this.proto = proto;
 	}
 
 	public long getId() {
 		return proto.getId();
 	}
-
-	public boolean getIsEgg() {
-		return proto.getIsEgg();
-	}
-
+	
 	public double getEggKmWalkedTarget() {
 		return proto.getEggKmWalkedTarget();
 	}
@@ -62,6 +87,10 @@ public class EggPokemon {
 
 	public String getEggIncubatorId() {
 		return proto.getEggIncubatorId();
+	}
+	
+	public boolean isIncubate() {
+		return proto.getEggIncubatorId().length() > 0;
 	}
 
 	@Override

@@ -64,9 +64,7 @@ public class EggIncubator {
 	 */
 	public UseItemEggIncubatorResponse.Result hatchEgg(EggPokemon egg)
 			throws LoginFailedException, RemoteServerException {
-		if (!egg.getIsEgg()) {
-			return null;
-		}
+		
 		UseItemEggIncubatorMessage reqMsg = UseItemEggIncubatorMessage.newBuilder()
 				.setItemId(proto.getId())
 				.setPokemonId(egg.getId())
