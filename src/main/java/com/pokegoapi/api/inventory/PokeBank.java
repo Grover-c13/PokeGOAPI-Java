@@ -82,4 +82,19 @@ public class PokeBank {
 			}
 		}).collect(Collectors.<Pokemon>toList());
 	}
+
+	/**
+	 * Get a pokemon by id.
+	 *
+	 * @param id the id
+	 * @return the pokemon
+	 */
+	public Pokemon getPokemonById(final Long id) {
+		for (Pokemon pokemon : pokemons) {
+			if (pokemon.getId() == id) {
+				return pokemon;
+			}
+		}
+		return null;
+	}
 }

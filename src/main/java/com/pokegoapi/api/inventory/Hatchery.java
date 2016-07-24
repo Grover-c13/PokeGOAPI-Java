@@ -66,6 +66,7 @@ public class Hatchery {
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
+		instance.getInventories().updateInventories();
 		List<HatchedEgg> eggs = new ArrayList<HatchedEgg>();
 		for (int i = 0; i < response.getPokemonIdCount(); i++) {
 			eggs.add(new HatchedEgg(response.getPokemonId(i), 
