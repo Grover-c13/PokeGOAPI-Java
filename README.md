@@ -65,7 +65,7 @@ You can't. The Google Indentity Platform uses the SHA1 fingerprint and package n
 ## Contributing
   - Fork it!
   - Create your feature branch: `git checkout -b my-new-feature`
-  - Commit your changes: `git commit -am 'Usefull information about your new features'`
+  - Commit your changes: `git commit -am 'Useful information about your new features'`
   - Push to the branch: `git push origin my-new-feature`
   - Submit a pull request on the `Development` branch :D
 
