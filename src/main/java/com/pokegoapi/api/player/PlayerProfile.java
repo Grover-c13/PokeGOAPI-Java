@@ -89,7 +89,7 @@ public class PlayerProfile {
 		creationTime = playerResponse.getPlayerData().getCreationTimestampMs();
 		itemStorage = playerResponse.getPlayerData().getMaxItemStorage();
 		pokemonStorage = playerResponse.getPlayerData().getMaxPokemonStorage();
-		team = Team.values()[playerResponse.getPlayerData().getTeam()];
+		team = Team.values()[playerResponse.getPlayerData().getTeamValue()];
 		username = playerResponse.getPlayerData().getUsername();
 
 		final PlayerAvatar avatarApi = new PlayerAvatar();
