@@ -62,11 +62,12 @@ protobuf {
     }
 }
 
-def checkstyleOutputDir = "${project.rootDir}/build/reports/checkstyle/"
+def checkstyleOutputDir = "${project.projectDir}/build/reports/checkstyle/"
 
 checkstyle {
     toolVersion = '7.0'
-    configFile = file("${project.rootDir}/config/checkstyle.xml")
+    configFile = file("${project.projectDir}/config/checkstyle.xml")
+    configProperties = [ "suppressionFile" : file("${project.projectDir}/config/suppressions.xml")]
     reportsDir = file(checkstyleOutputDir)
 
     ignoreFailures = false
