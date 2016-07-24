@@ -39,6 +39,7 @@ public class PokeBank {
 
 	/**
 	 * Add a pokemon to the pokebank inventory.  Will not add duplicates (pokemon with same id).
+	 *
 	 * @param pokemon Pokemon to add to the inventory
 	 */
 	public void addPokemon(final Pokemon pokemon) {
@@ -81,5 +82,25 @@ public class PokeBank {
 				return pokemn.getId() != pokemon.getId();
 			}
 		}).collect(Collectors.<Pokemon>toList());
+	}
+
+	/**
+	 * Get a pokemon by id.
+	 *
+	 * @param id the id
+	 * @return the pokemon
+	 */
+	public Pokemon getPokemonById(final Long id) {
+		List<Pokemon> pokemon = Stream.of(pokemons).filter(new Predicate<Pokemon>() {
+			@Override
+			public boolean test(Pokemon pokemon) {
+				return pokemon.getId() == id;
+			}
+		}).collect(Collectors.<Pokemon>toList());
+		if (pokemon.size() > 0) {
+			return pokemon.get(0);
+		} else {
+			return null;
+		}
 	}
 }
