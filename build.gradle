@@ -17,6 +17,7 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'com.google.protobuf'
 apply plugin: 'checkstyle'
+apply plugin: 'maven-publish'
 
 description = """Pokemon Go Java API"""
 
@@ -115,4 +116,15 @@ task sourcesJar(type: Jar) {
 
 artifacts {
     archives sourcesJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact sourcesJar {
+                classifier "sources"
+            }
+        }
+    }
 }
