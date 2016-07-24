@@ -107,3 +107,12 @@ idea {
         sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/java");
     }
 }
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+artifacts {
+    archives sourcesJar
+}
