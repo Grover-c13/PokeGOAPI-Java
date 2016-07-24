@@ -38,7 +38,7 @@ Include the API as jar from your own build, or use Maven/Gradle/SBT/Leiningen: h
 
 Mostly everything is accessed through the PokemonGo class in the API package.
 
-The constructor of PokemonGo class requires a AuthInfo object which can be obtained from GoogleLogin().login or PTCLogin().login, and a OkHttpClient object.
+The constructor of PokemonGo class requires a AuthInfo object which can be obtained from GoogleLogin().login or PtcLogin().login, and a OkHttpClient object.
 
 EG:
 ```java
