@@ -111,7 +111,7 @@ public class EggIncubator {
 	 * 
 	 * @return km distance to hatch the egg
 	 */
-	public double getKmTaget() {
+	public double getKmTarget() {
 		return proto.getTargetKmWalked();
 	}
 	
