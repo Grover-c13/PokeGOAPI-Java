@@ -36,8 +36,16 @@ public class GoogleLogin extends Login {
 
 	private final OkHttpClient client;
 
+	private final OnGoogleLoginOAuthCompleteListener onGoogleLoginOAuthCompleteListener;
+
 	public GoogleLogin(OkHttpClient client) {
 		this.client = client;
+		onGoogleLoginOAuthCompleteListener = null;
+	}
+
+	public GoogleLogin(OkHttpClient client, OnGoogleLoginOAuthCompleteListener onGoogleLoginOAuthCompleteListener) {
+		this.client = client;
+		this.onGoogleLoginOAuthCompleteListener = onGoogleLoginOAuthCompleteListener;
 	}
 
 	/**
@@ -132,6 +140,9 @@ public class GoogleLogin extends Login {
 			Log.d(TAG, "Get user to go to:"
 					+ googleAuth.getVerificationUrl()
 					+ " and enter code:" + googleAuth.getUserCode());
+			if (onGoogleLoginOAuthCompleteListener != null) {
+				onGoogleLoginOAuthCompleteListener.onInitialOAuthComplete(googleAuth);
+			}
 
 			GoogleAuthTokenJson token;
 			while ((token = poll(googleAuth)) == null) {
@@ -178,7 +189,15 @@ public class GoogleLogin extends Login {
 		} else {
 			return null;
 		}
-
 	}
 
+	/**
+	 * This callback will be called when we get the
+	 * verification url and device code.
+	 * This will allow applications to
+	 * programmatically redirect user to redirect user.
+	 */
+	public interface OnGoogleLoginOAuthCompleteListener {
+		void onInitialOAuthComplete(GoogleAuthJson googleAuthJson);
+	}
 }
