@@ -45,6 +45,7 @@ public class Hatchery {
 
 	public void reset(PokemonGo pgo) {
 		this.instance = pgo;
+		eggs = new HashSet<>();
 	}
 
 	public void addEgg(EggPokemon egg) {
