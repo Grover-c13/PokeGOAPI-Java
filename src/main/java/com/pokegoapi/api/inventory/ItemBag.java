@@ -40,6 +40,10 @@ public class ItemBag {
 	private HashMap<ItemId, Item> items;
 
 	public ItemBag(PokemonGo pgo) {
+		reset(pgo);
+	}
+
+	public void reset(PokemonGo pgo) {
 		this.pgo = pgo;
 		items = new HashMap<>();
 	}

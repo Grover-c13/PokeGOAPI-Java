@@ -33,8 +33,12 @@ public class PokeBank {
 	@Getter
 	PokemonGo instance;
 
-	public PokeBank(PokemonGo instance) {
-		this.instance = instance;
+	public PokeBank(PokemonGo pgo) {
+		reset(pgo);
+	}
+
+	public void reset(PokemonGo pgo) {
+		this.instance = pgo;
 	}
 
 	/**
