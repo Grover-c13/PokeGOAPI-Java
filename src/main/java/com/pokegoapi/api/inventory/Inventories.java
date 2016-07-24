@@ -94,12 +94,12 @@ public class Inventories {
 	public void updateInventories(boolean forceUpdate) throws LoginFailedException, RemoteServerException {
 		if (forceUpdate) {
 			lastInventoryUpdate = 0;
-			itemBag = new ItemBag(api);
-			pokebank = new PokeBank(api);
-			candyjar = new CandyJar(api);
-			pokedex = new Pokedex(api);
+			itemBag.reset(api);
+			pokebank.reset(api);
+			candyjar.reset(api);
+			pokedex.reset(api);
 			incubators = new ArrayList<>();
-			hatchery = new Hatchery(api);
+			hatchery.reset(api);
 		}
 		GetInventoryMessage invReqMsg = GetInventoryMessage.newBuilder()
 				.setLastTimestampMs(lastInventoryUpdate)
@@ -125,7 +125,7 @@ public class Inventories {
 
 			// pokebank
 			if (itemData.getPokemonData().getPokemonId() != PokemonId.MISSINGNO) {
-				pokebank.addPokemon(new Pokemon(inventoryItem.getInventoryItemData().getPokemonData()));
+				pokebank.addPokemon(new Pokemon(api, inventoryItem.getInventoryItemData().getPokemonData()));
 			}
 
 			// items

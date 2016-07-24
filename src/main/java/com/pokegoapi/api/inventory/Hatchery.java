@@ -39,8 +39,12 @@ public class Hatchery {
 	@Getter
 	PokemonGo instance;
 
-	public Hatchery(PokemonGo instance) {
-		this.instance = instance;
+	public Hatchery(PokemonGo pgo) {
+		reset(pgo);
+	}
+
+	public void reset(PokemonGo pgo) {
+		this.instance = pgo;
 	}
 
 	public void addEgg(EggPokemon egg) {
