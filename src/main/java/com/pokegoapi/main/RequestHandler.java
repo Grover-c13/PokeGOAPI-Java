@@ -22,6 +22,7 @@ import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.auth.GoogleLogin;
+import com.pokegoapi.auth.GoogleLoginSecrets;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
@@ -34,8 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.pokegoapi.auth.GoogleLoginSecrets.REFRESH_TOKEN_MAP;
 
 public class RequestHandler {
 	private static final String TAG = RequestHandler.class.getSimpleName();
@@ -134,10 +133,10 @@ public class RequestHandler {
 
 			String idToken = request.getAuthInfo().getToken().getContents();
 
-			if (responseEnvelop.getStatusCode() == 102 && REFRESH_TOKEN_MAP.containsKey(idToken)) {
+			if (responseEnvelop.getStatusCode() == 102 && GoogleLoginSecrets.REFRESH_TOKEN_MAP.containsKey(idToken)) {
 				Log.d(TAG,"Refreshing Token");
 				GoogleLogin login = new GoogleLogin(client);
-				final AuthInfo refreshedAuth = login.refreshToken(REFRESH_TOKEN_MAP.get(idToken));
+				final AuthInfo refreshedAuth = login.refreshToken(GoogleLoginSecrets.REFRESH_TOKEN_MAP.get(idToken));
 				if (refreshedAuth == null) {
 					throw new LoginFailedException(String.format("Refreshing token failed Error %s in API Url %s",
 							responseEnvelop.getApiUrl(), responseEnvelop.getError()));
