@@ -82,7 +82,7 @@ public class PlayerProfile {
 		try {
 			playerResponse = GetPlayerResponseOuterClass.GetPlayerResponse.parseFrom(getPlayerServerRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
-			e.printStackTrace();
+			throw new RemoteServerException(e);
 		}
 
 		badge = playerResponse.getPlayerData().getEquippedBadge();
