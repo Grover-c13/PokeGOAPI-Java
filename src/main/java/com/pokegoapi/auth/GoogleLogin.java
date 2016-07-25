@@ -111,6 +111,12 @@ public class GoogleLogin extends Login {
 		return builder.build();
 	}
 
+	/**
+	 * Starts a login flow for google using a username and password, this uses googles device oauth endpoint,
+	 * a URL and code is displayed, not really ideal right now.
+	 *
+	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
+	 */
 	public AuthInfo login() throws LoginFailedException {
 		return login(new GoogleAuthCallback() {
 			@Override
@@ -126,6 +132,7 @@ public class GoogleLogin extends Login {
 	 * Starts a login flow for google using a username and password, this uses googles device oauth endpoint,
 	 * a URL and code is displayed, not really ideal right now.
 	 *
+	 * @param callback A callback which will be triggered if an action is required, like go to website and verify
 	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
 	 */
 	public AuthInfo login(GoogleAuthCallback callback) throws LoginFailedException {
