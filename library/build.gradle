@@ -55,7 +55,7 @@ checkstyle {
     configFile = file("${project.rootDir}/config/checkstyle.xml")
     reportsDir = file(checkstyleOutputDir)
 
-    ignoreFailures = true
+    ignoreFailures = false
 
     checkstyleMain {
         source = sourceSets.main.allSource
