@@ -69,7 +69,7 @@ public class CatchPokemonAtAreaExample {
 				// if encounter was succesful, catch
 				if (encResult.wasSuccessful()) {
 					System.out.println("Encounted:" + cp.getPokemonId());
-					CatchResult result = cp.catchPokemon();
+					CatchResult result = cp.catchPokemonWithRazzBerry();
 					System.out.println("Attempt to catch:" + cp.getPokemonId() + " " + result.getStatus());
 				}
 
