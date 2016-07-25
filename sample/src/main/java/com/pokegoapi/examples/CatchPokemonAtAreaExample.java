@@ -36,7 +36,6 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.pokemon.CatchResult;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.EncounterResult;
-import com.pokegoapi.auth.GoogleLogin;
 import com.pokegoapi.auth.PtcLogin;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
