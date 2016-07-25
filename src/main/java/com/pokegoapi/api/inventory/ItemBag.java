@@ -36,80 +36,88 @@ import java.util.HashMap;
  * The type Bag.
  */
 public class ItemBag {
-	private PokemonGo pgo;
-	private HashMap<ItemId, Item> items;
+    private PokemonGo pgo;
+    private HashMap<ItemId, Item> items;
 
-	public ItemBag(PokemonGo pgo) {
-		reset(pgo);
-	}
+    public ItemBag(PokemonGo pgo) {
+        reset(pgo);
+    }
 
-	public void reset(PokemonGo pgo) {
-		this.pgo = pgo;
-		items = new HashMap<>();
-	}
+    public void reset(PokemonGo pgo) {
+        this.pgo = pgo;
+        items = new HashMap<>();
+    }
 
-	public void addItem(Item item) {
-		items.put(item.getItemId(), item);
-	}
+    public void addItem(Item item) {
+        items.put(item.getItemId(), item);
+    }
 
-	/**
-	 * Remove item result.
-	 *
-	 * @param id       the id
-	 * @param quantity the quantity
-	 * @return the result
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
-	 */
-	public Result removeItem(ItemId id, int quantity) throws RemoteServerException, LoginFailedException {
-		Item item = getItem(id);
-		if (item.getCount() < quantity) {
-			throw new IllegalArgumentException("You cannont remove more quantity than you have");
-		}
+    /**
+     * Remove item result.
+     *
+     * @param id       the id
+     * @param quantity the quantity
+     * @return the result
+     * @throws RemoteServerException the remote server exception
+     * @throws LoginFailedException  the login failed exception
+     */
+    public Result removeItem(ItemId id, int quantity) throws RemoteServerException, LoginFailedException {
+        Item item = getItem(id);
+        if (item.getCount() < quantity) {
+            throw new IllegalArgumentException("You cannont remove more quantity than you have");
+        }
 
-		RecycleInventoryItemMessage msg = RecycleInventoryItemMessage.newBuilder()
-				.setItemId(id)
-				.setCount(quantity)
-				.build();
+        RecycleInventoryItemMessage msg = RecycleInventoryItemMessage.newBuilder()
+                .setItemId(id)
+                .setCount(quantity)
+                .build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.RECYCLE_INVENTORY_ITEM, msg);
-		pgo.getRequestHandler().sendServerRequests(serverRequest);
+        ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.RECYCLE_INVENTORY_ITEM, msg);
+        pgo.getRequestHandler().sendServerRequests(serverRequest);
 
-		RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse response;
-		try {
-			response = RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+        RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse response;
+        try {
+            response = RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.parseFrom(serverRequest.getData());
+        } catch (InvalidProtocolBufferException e) {
+            throw new RemoteServerException(e);
+        }
 
-		if (response.getResult() == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
-			item.setCount(response.getNewCount());
-		}
-		return response.getResult();
-	}
-
-
-	/**
-	 * Gets item.
-	 *
-	 * @param type the type
-	 * @return the item
-	 */
-	public Item getItem(ItemId type) {
-		if (type == ItemId.UNRECOGNIZED) {
-			throw new IllegalArgumentException("You cannot get item for UNRECOGNIZED");
-		}
-
-		// prevent returning null
-		if (!items.containsKey(type)) {
-			return new Item(ItemData.newBuilder().setCount(0).setItemId(type).build());
-		}
-
-		return items.get(type);
-	}
+        if (response.getResult() == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
+            item.setCount(response.getNewCount());
+        }
+        return response.getResult();
+    }
 
 
-	public Collection<Item> getItems() {
-		return items.values();
-	}
+    /**
+     * Gets item.
+     *
+     * @param type the type
+     * @return the item
+     */
+    public Item getItem(ItemId type) {
+        if (type == ItemId.UNRECOGNIZED) {
+            throw new IllegalArgumentException("You cannot get item for UNRECOGNIZED");
+        }
+
+        // prevent returning null
+        if (!items.containsKey(type)) {
+            return new Item(ItemData.newBuilder().setCount(0).setItemId(type).build());
+        }
+
+        return items.get(type);
+    }
+
+
+    public Collection<Item> getItems() {
+        return items.values();
+    }
+
+    public int getItemsCount() {
+        int ct = 0;
+        for (Item i : items.values()) {
+            ct += i.getCount();
+        }
+        return ct;
+    }
 }
