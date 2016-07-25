@@ -1,0 +1,14 @@
+apply plugin: 'java'
+
+description = """Pokemon Go Java API"""
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':library')
+}
