@@ -15,24 +15,15 @@
 
 package com.pokegoapi.auth;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class PtcAuthJson {
 
-	private String lt;
-	private String execution;
-
-	public String getLt() {
-		return lt;
-	}
-
-	public void setLt(String lt) {
-		this.lt = lt;
-	}
-
-	public String getExecution() {
-		return execution;
-	}
-
-	public void setExecution(String execution) {
-		this.execution = execution;
-	}
+    @Getter
+    @Setter
+    private String lt;
+    @Getter
+    @Setter
+    private String execution;
 }
