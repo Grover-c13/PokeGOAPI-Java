@@ -267,6 +267,14 @@ public class Pokemon {
 	public int getIndividualStamina() {
 		return proto.getIndividualStamina();
 	}
+	
+	/**
+	 * Calculates the pokemons IV ratio.
+	 * @return the pokemons IV ratio as a double between 0 and 1.0, 1.0 being perfect IVs
+	 */
+	public double getIVRatio() {
+		return (this.getIndividualAttack() + this.getIndividualDefense() + this.getIndividualStamina()) / 45.0;
+	}
 
 	public float getCpMultiplier() {
 		return proto.getCpMultiplier();
