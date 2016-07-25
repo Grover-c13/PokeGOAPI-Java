@@ -28,7 +28,7 @@ ___
   - Clone the repo and cd into the folder
   - `` git submodule update --init ``
   - verify that you have gradle in your path
-  - `` gradle build bundle ``
+  - `` ./gradlew build bundle ``
   - you should have the api bundled in ``build/libs/PokeGOAPI-Java_bundle-0.0.1-SNAPSHOT.jar``
 
   PS : To Eclipse user, you must build once : `` gradle build `` and add the generated java class for proto into eclipse source path : Right click on the project > Build path > Configure Build Path > Source > Add Folder > Select `build/generated/source/proto/main/java` > Finish
