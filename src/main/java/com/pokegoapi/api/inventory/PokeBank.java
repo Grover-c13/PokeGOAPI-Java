@@ -33,8 +33,12 @@ public class PokeBank {
 	@Getter
 	PokemonGo instance;
 
-	public PokeBank(PokemonGo instance) {
-		this.instance = instance;
+	public PokeBank(PokemonGo pgo) {
+		reset(pgo);
+	}
+
+	public void reset(PokemonGo pgo) {
+		this.instance = pgo;
 	}
 
 	/**
@@ -42,7 +46,6 @@ public class PokeBank {
 	 * @param pokemon Pokemon to add to the inventory
 	 */
 	public void addPokemon(final Pokemon pokemon) {
-		pokemon.setPgo(instance);
 		List<Pokemon> alreadyAdded = Stream.of(pokemons).filter(new Predicate<Pokemon>() {
 			@Override
 			public boolean test(Pokemon testPokemon) {
@@ -81,5 +84,20 @@ public class PokeBank {
 				return pokemn.getId() != pokemon.getId();
 			}
 		}).collect(Collectors.<Pokemon>toList());
+	}
+
+	/**
+	 * Get a pokemon by id.
+	 *
+	 * @param id the id
+	 * @return the pokemon
+	 */
+	public Pokemon getPokemonById(final Long id) {
+		for (Pokemon pokemon : pokemons) {
+			if (pokemon.getId() == id) {
+				return pokemon;
+			}
+		}
+		return null;
 	}
 }

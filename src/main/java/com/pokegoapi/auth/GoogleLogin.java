@@ -16,9 +16,11 @@
 package com.pokegoapi.auth;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.util.Log;
 import com.squareup.moshi.Moshi;
+
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -29,16 +31,56 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class GoogleLogin extends Login {
-	public static final String SECRET = "NCjF1TLi2CcY6t5mt0ZveuL7";
-	public static final String CLIENT_ID = "848232511240-73ri3t7plvk96pj4f85uj8otdat2alem.apps.googleusercontent.com";
-	public static final String OAUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/device/code";
-	public static final String OAUTH_TOKEN_ENDPOINT = "https://www.googleapis.com/oauth2/v4/token";
+
 	private static final String TAG = GoogleLogin.class.getSimpleName();
 
 	private final OkHttpClient client;
 
+	private final OnGoogleLoginOAuthCompleteListener onGoogleLoginOAuthCompleteListener;
+
 	public GoogleLogin(OkHttpClient client) {
 		this.client = client;
+		onGoogleLoginOAuthCompleteListener = null;
+	}
+
+	public GoogleLogin(OkHttpClient client, OnGoogleLoginOAuthCompleteListener onGoogleLoginOAuthCompleteListener) {
+		this.client = client;
+		this.onGoogleLoginOAuthCompleteListener = onGoogleLoginOAuthCompleteListener;
+	}
+
+	/**
+	 * Given the refresh token fetches a new access token and returns AuthInfo.
+	 *
+	 * @param refreshToken Refresh token returned during initial login
+	 * @return Refreshed AuthInfo object
+	 * @throws IOException If the network call fails
+	 */
+	public AuthInfo refreshToken(String refreshToken) throws IOException {
+		HttpUrl url = HttpUrl.parse(GoogleLoginSecrets.OAUTH_TOKEN_ENDPOINT).newBuilder()
+				.addQueryParameter("client_id", GoogleLoginSecrets.CLIENT_ID)
+				.addQueryParameter("client_secret", GoogleLoginSecrets.SECRET)
+				.addQueryParameter("refresh_token", refreshToken)
+				.addQueryParameter("grant_type", "refresh_token")
+				.build();
+		//Empty request body
+		RequestBody reqBody = RequestBody.create(null, new byte[0]);
+		Request request = new Request.Builder()
+				.url(url)
+				.method("POST", reqBody)
+				.build();
+
+		Response response = client.newCall(request).execute();
+		Moshi moshi = new Moshi.Builder().build();
+		GoogleAuthTokenJson token = moshi.adapter(GoogleAuthTokenJson.class).fromJson(response.body().string());
+		if (token.getError() != null) {
+			return null;
+		} else {
+			Log.d(TAG, "Refreshed Token " + token.getIdToken());
+			AuthInfo.Builder builder = AuthInfo.newBuilder();
+			builder.setProvider("google");
+			builder.setToken(AuthInfo.JWT.newBuilder().setContents(token.getIdToken()).setUnknown2(59).build());
+			return builder.build();
+		}
 	}
 
 	/**
@@ -55,17 +97,30 @@ public class GoogleLogin extends Login {
 	}
 
 	/**
+	 * Returns an AuthInfo object given a token, this should not be an access token but rather an id_token.
+	 *
+	 * @param token        the id_token stored from a previous oauth attempt.
+	 * @param refreshToken Let app provide refresh token if they have persisted it
+	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
+	 */
+	public AuthInfo login(String token, String refreshToken) {
+		GoogleLoginSecrets.refresh_token = refreshToken;
+		AuthInfo.Builder builder = AuthInfo.newBuilder();
+		builder.setProvider("google");
+		builder.setToken(AuthInfo.JWT.newBuilder().setContents(token).setUnknown2(59).build());
+		return builder.build();
+	}
+
+	/**
 	 * Starts a login flow for google using a username and password, this uses googles device oauth endpoint,
 	 * a URL and code is displayed, not really ideal right now.
 	 *
-	 * @param username Google username
-	 * @param password Google password
 	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
 	 */
-	public AuthInfo login(String username, String password) throws LoginFailedException {
+	public AuthInfo login() throws LoginFailedException {
 		try {
-			HttpUrl url = HttpUrl.parse(OAUTH_ENDPOINT).newBuilder()
-					.addQueryParameter("client_id", CLIENT_ID)
+			HttpUrl url = HttpUrl.parse(GoogleLoginSecrets.OAUTH_ENDPOINT).newBuilder()
+					.addQueryParameter("client_id", GoogleLoginSecrets.CLIENT_ID)
 					.addQueryParameter("scope", "openid email https://www.googleapis.com/auth/userinfo.email")
 					.build();
 
@@ -85,15 +140,17 @@ public class GoogleLogin extends Login {
 			Log.d(TAG, "Get user to go to:"
 					+ googleAuth.getVerificationUrl()
 					+ " and enter code:" + googleAuth.getUserCode());
+			if (onGoogleLoginOAuthCompleteListener != null) {
+				onGoogleLoginOAuthCompleteListener.onInitialOAuthComplete(googleAuth);
+			}
 
 			GoogleAuthTokenJson token;
 			while ((token = poll(googleAuth)) == null) {
 				Thread.sleep(googleAuth.getInterval() * 1000);
 			}
 
-
 			Log.d(TAG, "Got token: " + token.getIdToken());
-
+			GoogleLoginSecrets.refresh_token = token.getRefreshToken();
 			AuthInfo.Builder authbuilder = AuthInfo.newBuilder();
 			authbuilder.setProvider("google");
 			authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(token.getIdToken()).setUnknown2(59).build());
@@ -107,9 +164,9 @@ public class GoogleLogin extends Login {
 
 
 	private GoogleAuthTokenJson poll(GoogleAuthJson json) throws URISyntaxException, IOException {
-		HttpUrl url = HttpUrl.parse(OAUTH_TOKEN_ENDPOINT).newBuilder()
-				.addQueryParameter("client_id", CLIENT_ID)
-				.addQueryParameter("client_secret", SECRET)
+		HttpUrl url = HttpUrl.parse(GoogleLoginSecrets.OAUTH_TOKEN_ENDPOINT).newBuilder()
+				.addQueryParameter("client_id", GoogleLoginSecrets.CLIENT_ID)
+				.addQueryParameter("client_secret", GoogleLoginSecrets.SECRET)
 				.addQueryParameter("code", json.getDeviceCode())
 				.addQueryParameter("grant_type", "http://oauth.net/grant_type/device/1.0")
 				.addQueryParameter("scope", "openid email https://www.googleapis.com/auth/userinfo.email")
@@ -132,7 +189,15 @@ public class GoogleLogin extends Login {
 		} else {
 			return null;
 		}
-
 	}
 
+	/**
+	 * This callback will be called when we get the
+	 * verification url and device code.
+	 * This will allow applications to
+	 * programmatically redirect user to redirect user.
+	 */
+	public interface OnGoogleLoginOAuthCompleteListener {
+		void onInitialOAuthComplete(GoogleAuthJson googleAuthJson);
+	}
 }

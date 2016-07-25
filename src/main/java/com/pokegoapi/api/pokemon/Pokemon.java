@@ -19,16 +19,19 @@ import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.PokemonMoveOuterClass;
-import POGOProtos.Inventory.Item.ItemIdOuterClass;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.EvolvePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.NicknamePokemonMessageOuterClass.NicknamePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
+import POGOProtos.Networking.Requests.Messages.UpgradePokemonMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.UpgradePokemonMessageOuterClass.UpgradePokemonMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass.EvolvePokemonResponse;
 import POGOProtos.Networking.Responses.NicknamePokemonResponseOuterClass.NicknamePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
+import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass;
+import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass.UpgradePokemonResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.pokemon.EvolutionResult;
@@ -44,14 +47,15 @@ import lombok.Setter;
 public class Pokemon {
 
 	private static final String TAG = Pokemon.class.getSimpleName();
-	@Setter
-	PokemonGo pgo;
+	private final PokemonGo pgo;
 	private PokemonData proto;
+	private PokemonMeta meta;
 
 	// API METHODS //
 
 	// DELEGATE METHODS BELOW //
-	public Pokemon(PokemonData proto) {
+	public Pokemon(PokemonGo api, PokemonData proto) {
+		this.pgo = api;
 		this.proto = proto;
 	}
 
@@ -118,6 +122,32 @@ public class Pokemon {
 	}
 
 	/**
+	 * Powers up a pokemon with candy and stardust.
+	 * After powering up this pokemon object will reflect the new changes.
+	 *
+	 * @return The result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public UpgradePokemonResponse.Result powerUp() throws LoginFailedException, RemoteServerException {
+		UpgradePokemonMessage reqMsg = UpgradePokemonMessage.newBuilder()
+				.setPokemonId(this.getId())
+				.build();
+
+		ServerRequest serverRequest = new ServerRequest(RequestType.UPGRADE_POKEMON, reqMsg);
+		pgo.getRequestHandler().sendServerRequests(serverRequest);
+
+		UpgradePokemonResponse response;
+		try {
+			response = UpgradePokemonResponse.parseFrom(serverRequest.getData());
+			this.proto = response.getUpgradedPokemon();
+			return response.getResult();
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
+	}
+
+	/**
 	 * Evolve evolution result.
 	 *
 	 * @return the evolution result
@@ -137,7 +167,7 @@ public class Pokemon {
 			return null;
 		}
 
-		EvolutionResult result = new EvolutionResult(response);
+		EvolutionResult result = new EvolutionResult(pgo, response);
 
 		pgo.getInventories().getPokebank().removePokemon(this);
 
@@ -146,12 +176,20 @@ public class Pokemon {
 		return result;
 	}
 
+	private PokemonMeta getMeta() {
+		if (meta == null) {
+			meta = PokemonMetaRegistry.getMeta(this.getPokemonId());
+		}
+
+		return meta;
+	}
+
 	public int getCandy() {
 		return pgo.getInventories().getCandyjar().getCandies(getPokemonFamily());
 	}
 
 	public PokemonFamilyId getPokemonFamily() {
-		return PokemonFamilyMap.getFamily(this.getPokemonId());
+		return PokemonMetaRegistry.getFamily(this.getPokemonId());
 	}
 
 	public boolean equals(Pokemon other) {
@@ -190,7 +228,7 @@ public class Pokemon {
 		return proto.getMove2();
 	}
 
-	public int getDeployedFortId() {
+	public String getDeployedFortId() {
 		return proto.getDeployedFortId();
 	}
 
@@ -272,5 +310,26 @@ public class Pokemon {
 
 	public void debug() {
 		Log.d(TAG, proto.toString());
+	}
+
+
+	public int getBaseStam() {
+		return getMeta().getBaseStam();
+	}
+
+	public double getBaseCaptureRate() {
+		return getMeta().getBaseCaptureRate();
+	}
+
+	public int getCandiesToEvolve() {
+		return getMeta().getCandiesToEvolve();
+	}
+
+	public double getBaseFleeRate() {
+		return getMeta().getBaseFleeRate();
+	}
+
+	public PokemonIdOuterClass.PokemonId getParent() {
+		return getMeta().getParent();
 	}
 }
