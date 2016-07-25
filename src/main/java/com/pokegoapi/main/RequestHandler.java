@@ -25,12 +25,8 @@ import com.pokegoapi.auth.GoogleLogin;
 import com.pokegoapi.auth.GoogleLoginSecrets;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-<<<<<<< HEAD
 
 import lombok.extern.slf4j.Slf4j;
-=======
-import com.pokegoapi.util.Log;
->>>>>>> staticauth
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
