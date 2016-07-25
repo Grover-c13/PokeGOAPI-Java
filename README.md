@@ -2,6 +2,9 @@
 # PokeGOAPI-Java
 Pokemon GO Java API
 
+The original https://github.com/Grover-c13/PokeGOAPI-Java is more aimed at Android where this is aimed at writing a bot. 
+This means different design choices are made. I will try to keep it up to date with the original repo as much as possible. 
+
 [![Build Status](https://travis-ci.org/Grover-c13/PokeGOAPI-Java.svg?branch=master)](https://travis-ci.org/Grover-c13/PokeGOAPI-Java)
 
 See this guide for adding functionality:
@@ -28,7 +31,7 @@ ___
   - Clone the repo and cd into the folder
   - `` git submodule update --init ``
   - verify that you have gradle in your path
-  - `` gradle build bundle ``
+  - `` ./gradlew build bundle ``
   - you should have the api bundled in ``build/libs/PokeGOAPI-Java_bundle-0.0.1-SNAPSHOT.jar``
 
   PS : To Eclipse user, you must build once : `` gradle build `` and add the generated java class for proto into eclipse source path : Right click on the project > Build path > Configure Build Path > Source > Add Folder > Select `build/generated/source/proto/main/java` > Finish

@@ -36,15 +36,15 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.pokemon.CatchResult;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.EncounterResult;
-import com.pokegoapi.auth.GoogleLogin;
 import com.pokegoapi.auth.PtcLogin;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.util.Log;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 
 import java.util.List;
 
+@Slf4j
 public class CatchPokemonAtAreaExample {
 
 	/**
@@ -78,7 +78,7 @@ public class CatchPokemonAtAreaExample {
 
 		} catch (LoginFailedException | RemoteServerException e) {
 			// failed to login, invalid credentials, auth issue or server issue.
-			Log.e("Main", "Failed to login or server issue: ", e);
+			log.error("Main", "Failed to login or server issue: ", e);
 
 		}
 	}

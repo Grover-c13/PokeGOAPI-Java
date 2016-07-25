@@ -26,8 +26,8 @@ import com.pokegoapi.auth.GoogleLogin;
 import com.pokegoapi.auth.GoogleLoginSecrets;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.util.Log;
 
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -38,8 +38,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class RequestHandler {
-	private static final String TAG = RequestHandler.class.getSimpleName();
 	private final PokemonGo api;
 	private RequestEnvelopeOuterClass.RequestEnvelope.Builder builder;
 	private boolean hasRequests;
@@ -103,7 +103,7 @@ public class RequestHandler {
 		try {
 			request.writeTo(stream);
 		} catch (IOException e) {
-			Log.wtf(TAG, "Failed to write request to bytearray ouput stream. This should never happen", e);
+			log.error("Failed to write request to bytearray ouput stream. This should never happen", e);
 		}
 
 		RequestBody body = RequestBody.create(null, stream.toByteArray());
@@ -134,7 +134,7 @@ public class RequestHandler {
 			}
 
 			if (responseEnvelop.getStatusCode() == 102 && GoogleLoginSecrets.refresh_token != null) {
-				Log.d(TAG,"Refreshing Token");
+				log.debug("Refreshing Token");
 				GoogleLogin login = new GoogleLogin(client);
 				final AuthInfo refreshedAuth = login.refreshToken(GoogleLoginSecrets.refresh_token);
 				if (refreshedAuth == null) {
@@ -194,7 +194,7 @@ public class RequestHandler {
 		try {
 			request.writeTo(stream);
 		} catch (IOException e) {
-			Log.wtf(TAG, "Failed to write request to bytearray ouput stream. This should never happen", e);
+			log.error("Failed to write request to bytearray ouput stream. This should never happen", e);
 		}
 
 		RequestBody body = RequestBody.create(null, stream.toByteArray());
@@ -268,7 +268,7 @@ public class RequestHandler {
 				&& lastAuth.getExpireTimestampMs() > System.currentTimeMillis()) {
 			builder.setAuthTicket(lastAuth);
 		} else {
-			Log.d(TAG, "Authenticated with static token");
+			log.debug("Authenticated with static token");
 			builder.setAuthInfo(auth);
 		}
 		builder.setUnknown12(989);
