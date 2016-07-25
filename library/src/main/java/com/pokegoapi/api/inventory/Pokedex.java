@@ -25,7 +25,7 @@ import java.util.Map;
 public class Pokedex {
 
 	private PokemonGo api;
-	private Map<PokemonId, PokedexEntry> pokedexMap = new HashMap();
+	private Map<PokemonId, PokedexEntry> pokedexMap = new HashMap<>();
 
 	public Pokedex(PokemonGo pgo) {
 		reset(pgo);
@@ -33,6 +33,7 @@ public class Pokedex {
 
 	public void reset(PokemonGo pgo) {
 		this.api = pgo;
+		pokedexMap = new HashMap<>();
 	}
 
 	/**

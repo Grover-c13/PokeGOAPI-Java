@@ -38,7 +38,7 @@ Include the API as jar from your own build, or use Maven/Gradle/SBT/Leiningen: h
 
 Mostly everything is accessed through the PokemonGo class in the API package.
 
-The constructor of PokemonGo class requires a AuthInfo object which can be obtained from GoogleLogin().login or PTCLogin().login, and a OkHttpClient object.
+The constructor of PokemonGo class requires a AuthInfo object which can be obtained from GoogleLogin().login or PtcLogin().login, and a OkHttpClient object.
 
 EG:
 ```java
@@ -65,7 +65,7 @@ You can't. The Google Indentity Platform uses the SHA1 fingerprint and package n
 ## Contributing
   - Fork it!
   - Create your feature branch: `git checkout -b my-new-feature`
-  - Commit your changes: `git commit -am 'Usefull information about your new features'`
+  - Commit your changes: `git commit -am 'Useful information about your new features'`
   - Push to the branch: `git push origin my-new-feature`
   - Submit a pull request on the `Development` branch :D
 
