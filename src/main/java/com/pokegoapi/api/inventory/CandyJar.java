@@ -83,10 +83,8 @@ public class CandyJar {
 	public int getCandies(PokemonFamilyId family) {
 		if (candies.containsKey(family)) {
 			return this.candies.get(family);
-		}
-		else {
+		} else {
 			return 0;
 		}
-		
 	}
 }
