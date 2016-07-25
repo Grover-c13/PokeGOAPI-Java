@@ -81,6 +81,7 @@ public class GoogleLogin extends Login {
 			AuthInfo.Builder builder = AuthInfo.newBuilder();
 			builder.setProvider("google");
 			builder.setToken(AuthInfo.JWT.newBuilder().setContents(token.getIdToken()).setUnknown2(59).build());
+			REFRESH_TOKEN_MAP.put(token.getIdToken(), token.getRefreshToken());
 			return builder.build();
 		}
 	}
