@@ -1,4 +1,4 @@
-group = 'com.github.aphoh'
+group = 'com.github.pvanassen'
 version = '0.0.1-SNAPSHOT'
 
 buildscript {
