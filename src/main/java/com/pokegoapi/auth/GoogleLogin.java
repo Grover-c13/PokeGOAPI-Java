@@ -115,7 +115,7 @@ public class GoogleLogin extends Login {
 	 *
 	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
 	 */
-	public AuthInfo login() throws LoginFailedException {
+	public AuthInfo login(TokenCallback tokenCallback) throws LoginFailedException {
 		try {
 			HttpUrl url = HttpUrl.parse(GoogleLoginSecrets.OAUTH_ENDPOINT).newBuilder()
 					.addQueryParameter("client_id", GoogleLoginSecrets.CLIENT_ID)
@@ -135,9 +135,7 @@ public class GoogleLogin extends Login {
 			Moshi moshi = new Moshi.Builder().build();
 
 			GoogleAuthJson googleAuth = moshi.adapter(GoogleAuthJson.class).fromJson(response.body().string());
-			log.debug("Get user to go to:"
-					+ googleAuth.getVerificationUrl()
-					+ " and enter code:" + googleAuth.getUserCode());
+			tokenCallback.tokenRequired(googleAuth.getUserCode());
 			if (onGoogleLoginOAuthCompleteListener != null) {
 				onGoogleLoginOAuthCompleteListener.onInitialOAuthComplete(googleAuth);
 			}
