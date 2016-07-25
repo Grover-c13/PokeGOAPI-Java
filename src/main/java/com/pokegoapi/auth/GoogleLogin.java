@@ -18,9 +18,9 @@ package com.pokegoapi.auth;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 
 import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.util.Log;
 import com.squareup.moshi.Moshi;
 
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -30,10 +30,8 @@ import okhttp3.Response;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+@Slf4j
 public class GoogleLogin extends Login {
-
-	private static final String TAG = GoogleLogin.class.getSimpleName();
-
 	private final OkHttpClient client;
 
 	private final OnGoogleLoginOAuthCompleteListener onGoogleLoginOAuthCompleteListener;
@@ -75,7 +73,7 @@ public class GoogleLogin extends Login {
 		if (token.getError() != null) {
 			return null;
 		} else {
-			Log.d(TAG, "Refreshed Token " + token.getIdToken());
+			log.debug("Refreshed Token " + token.getIdToken());
 			AuthInfo.Builder builder = AuthInfo.newBuilder();
 			builder.setProvider("google");
 			builder.setToken(AuthInfo.JWT.newBuilder().setContents(token.getIdToken()).setUnknown2(59).build());
@@ -137,7 +135,7 @@ public class GoogleLogin extends Login {
 			Moshi moshi = new Moshi.Builder().build();
 
 			GoogleAuthJson googleAuth = moshi.adapter(GoogleAuthJson.class).fromJson(response.body().string());
-			Log.d(TAG, "Get user to go to:"
+			log.debug("Get user to go to:"
 					+ googleAuth.getVerificationUrl()
 					+ " and enter code:" + googleAuth.getUserCode());
 			if (onGoogleLoginOAuthCompleteListener != null) {
@@ -149,7 +147,7 @@ public class GoogleLogin extends Login {
 				Thread.sleep(googleAuth.getInterval() * 1000);
 			}
 
-			Log.d(TAG, "Got token: " + token.getIdToken());
+			log.debug("Got token: " + token.getIdToken());
 			GoogleLoginSecrets.refresh_token = token.getRefreshToken();
 			AuthInfo.Builder authbuilder = AuthInfo.newBuilder();
 			authbuilder.setProvider("google");
