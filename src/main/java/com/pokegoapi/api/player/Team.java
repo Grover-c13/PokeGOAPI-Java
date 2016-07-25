@@ -15,6 +15,8 @@
 
 package com.pokegoapi.api.player;
 
+import lombok.Getter;
+
 public enum Team {
 	// VALUES CONFIRMED
 	TEAM_NONE(0),
@@ -22,13 +24,10 @@ public enum Team {
 	TEAM_VALOR(2),
 	TEAM_INSTINCT(3);
 
+	@Getter
 	private int value;
 
 	private Team(int value) {
 		this.value = value;
-	}
-
-	public int getValue() {
-		return value;
 	}
 }
