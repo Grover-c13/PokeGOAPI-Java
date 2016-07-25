@@ -15,66 +15,33 @@
 
 package com.pokegoapi.auth;
 
-import com.google.gson.annotations.SerializedName;
+import com.squareup.moshi.Json;
+
+import lombok.Getter;
+import lombok.Setter;
 
 public class GoogleAuthTokenJson {
+	@Getter
+	@Setter
 	private String error;
-	@SerializedName("access_token")
+	@Getter
+	@Setter
+	@Json(name = "access_token")
 	private String accessToken;
-	@SerializedName("token_type")
+	@Getter
+	@Setter
+	@Json(name = "token_type")
 	private String tokenType;
-	@SerializedName("expires_in")
+	@Getter
+	@Setter
+	@Json(name = "expires_in")
 	private int expiresIn;
-	@SerializedName("refresh_token")
+	@Getter
+	@Setter
+	@Json(name = "refresh_token")
 	private String refreshToken;
-	@SerializedName("id_token")
+	@Getter
+	@Setter
+	@Json(name = "id_token")
 	private String idToken;
-
-	public String getError() {
-		return error;
-	}
-
-	public void setError(String error) {
-		this.error = error;
-	}
-
-	public String getAccessToken() {
-		return accessToken;
-	}
-
-	public void setAccessToken(String accessToken) {
-		this.accessToken = accessToken;
-	}
-
-	public String getTokenType() {
-		return tokenType;
-	}
-
-	public void setTokenType(String tokenType) {
-		this.tokenType = tokenType;
-	}
-
-	public int getExpiresIn() {
-		return expiresIn;
-	}
-
-	public void setExpiresIn(int expiresIn) {
-		this.expiresIn = expiresIn;
-	}
-
-	public String getRefreshToken() {
-		return refreshToken;
-	}
-
-	public void setRefreshToken(String refreshToken) {
-		this.refreshToken = refreshToken;
-	}
-
-	public String getIdToken() {
-		return idToken;
-	}
-
-	public void setIdToken(String idToken) {
-		this.idToken = idToken;
-	}
 }
