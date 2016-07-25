@@ -39,9 +39,11 @@ import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
+import com.annimon.stream.function.Predicate;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.fort.FortDetails;
+import com.pokegoapi.api.gym.Gym;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.NearbyPokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -149,6 +151,20 @@ public class Map {
 
 		return points;
 	}
+
+
+	public List<Gym> getGyms() throws LoginFailedException, RemoteServerException {
+		List<Gym> gyms = new ArrayList<>();
+		MapObjects objects = getMapObjects();
+
+		for (FortData fortdata : objects.getGyms()) {
+			gyms.add(new Gym(api, fortdata));
+		}
+
+		return gyms;
+	}
+
+
 
 	/**
 	 * Returns a list of decimated spawn points at current location.
