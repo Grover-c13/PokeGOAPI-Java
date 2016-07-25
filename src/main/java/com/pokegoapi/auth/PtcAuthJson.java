@@ -20,10 +20,10 @@ import lombok.Setter;
 
 public class PtcAuthJson {
 
-	@Getter
-    @Setter
-	private String lt;
     @Getter
     @Setter
-	private String execution;
+    private String lt;
+    @Getter
+    @Setter
+    private String execution;
 }
