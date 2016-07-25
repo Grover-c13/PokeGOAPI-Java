@@ -16,7 +16,6 @@
 
 package com.pokegoapi.api.inventory;
 
-import POGOProtos.Inventory.Item.ItemDataOuterClass;
 import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.RecycleInventoryItemMessageOuterClass.RecycleInventoryItemMessage;

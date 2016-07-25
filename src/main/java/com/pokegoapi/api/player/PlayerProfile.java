@@ -27,15 +27,15 @@ import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.Log;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 public class PlayerProfile {
-	private static final String TAG = PlayerProfile.class.getSimpleName();
 	private final PokemonGo api;
 	@Getter
 	private long creationTime;
@@ -101,7 +101,7 @@ public class PlayerProfile {
 			try {
 				addCurrency(currency.getName(), currency.getAmount());
 			} catch (InvalidCurrencyException e) {
-				Log.w(TAG, "Error adding currency. You can probably ignore this.", e);
+				log.warn("Error adding currency. You can probably ignore this.", e);
 			}
 		}
 

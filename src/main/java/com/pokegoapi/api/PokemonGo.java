@@ -22,15 +22,13 @@ import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.RequestHandler;
-import com.pokegoapi.util.Log;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 
-
+@Slf4j
 public class PokemonGo {
-
-	private static final java.lang.String TAG = PokemonGo.class.getSimpleName();
 	@Getter
 	RequestHandler requestHandler;
 	@Getter
@@ -86,7 +84,7 @@ public class PokemonGo {
 			try {
 				playerProfile.updateProfile();
 			} catch (Exception e) {
-				Log.e(TAG, "Error updating Player Profile", e);
+				log.error("Error updating Player Profile", e);
 			}
 		}
 		return playerProfile;

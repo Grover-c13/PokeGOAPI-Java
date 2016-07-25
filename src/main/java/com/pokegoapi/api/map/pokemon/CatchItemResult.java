@@ -15,7 +15,6 @@
 
 package com.pokegoapi.api.map.pokemon;
 
-import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass;
 import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass.UseItemCaptureResponse;
 
 public class CatchItemResult {

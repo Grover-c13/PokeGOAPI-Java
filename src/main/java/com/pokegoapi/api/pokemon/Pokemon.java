@@ -19,7 +19,6 @@ import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.PokemonMoveOuterClass;
-import POGOProtos.Inventory.Item.ItemIdOuterClass;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.EvolvePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.NicknamePokemonMessageOuterClass.NicknamePokemonMessage;
@@ -35,15 +34,14 @@ import com.pokegoapi.api.map.pokemon.EvolutionResult;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.Log;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The type Pokemon.
  */
+@Slf4j
 public class Pokemon {
-
-	private static final String TAG = Pokemon.class.getSimpleName();
 	@Setter
 	PokemonGo pgo;
 	private PokemonData proto;
@@ -271,6 +269,6 @@ public class Pokemon {
 	}
 
 	public void debug() {
-		Log.d(TAG, proto.toString());
+		log.debug(proto.toString());
 	}
 }
