@@ -118,6 +118,24 @@ public class GoogleLogin extends Login {
 	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
 	 */
 	public AuthInfo login() throws LoginFailedException {
+		return login(new GoogleAuthCallback() {
+			@Override
+			public void onCodeRequired(String userCode, String verificationUrl) {
+				Log.d(TAG, "Get user to go to:"
+						+ verificationUrl
+						+ " and enter code:" + userCode);
+			}
+		});
+	}
+
+	/**
+	 * Starts a login flow for google using a username and password, this uses googles device oauth endpoint,
+	 * a URL and code is displayed, not really ideal right now.
+	 *
+	 * @param callback A callback which will be triggered if an action is required, like go to website and verify
+	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
+	 */
+	public AuthInfo login(GoogleAuthCallback callback) throws LoginFailedException {
 		try {
 			HttpUrl url = HttpUrl.parse(GoogleLoginSecrets.OAUTH_ENDPOINT).newBuilder()
 					.addQueryParameter("client_id", GoogleLoginSecrets.CLIENT_ID)
@@ -137,9 +155,7 @@ public class GoogleLogin extends Login {
 			Moshi moshi = new Moshi.Builder().build();
 
 			GoogleAuthJson googleAuth = moshi.adapter(GoogleAuthJson.class).fromJson(response.body().string());
-			Log.d(TAG, "Get user to go to:"
-					+ googleAuth.getVerificationUrl()
-					+ " and enter code:" + googleAuth.getUserCode());
+			callback.onCodeRequired(googleAuth.getUserCode(), googleAuth.getVerificationUrl());
 			if (onGoogleLoginOAuthCompleteListener != null) {
 				onGoogleLoginOAuthCompleteListener.onInitialOAuthComplete(googleAuth);
 			}
