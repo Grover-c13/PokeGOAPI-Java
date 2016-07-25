@@ -133,6 +133,8 @@ public class Pokestop {
 	 * Adds a modifier to this pokestop. (i.e. add a lure module)
 	 *
 	 * @param item the modifier to add to this pokestop
+	 * @throws LoginFailedException if login failed
+	 * @throws RemoteServerException if the server failed to respond or the modifier could not be added to this pokestop
 	 */
 	public void addModifier(ItemIdOuterClass.ItemId item) throws LoginFailedException, RemoteServerException {
 		AddFortModifierMessage msg = AddFortModifierMessage.newBuilder()
