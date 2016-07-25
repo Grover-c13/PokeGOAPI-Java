@@ -19,15 +19,18 @@ import POGOProtos.Networking.Envelopes.AuthTicketOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass;
-
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.auth.GoogleLogin;
 import com.pokegoapi.auth.GoogleLoginSecrets;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+<<<<<<< HEAD
 
 import lombok.extern.slf4j.Slf4j;
+=======
+import com.pokegoapi.util.Log;
+>>>>>>> staticauth
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -133,10 +136,12 @@ public class RequestHandler {
 				lastAuth = responseEnvelop.getAuthTicket();
 			}
 
-			if (responseEnvelop.getStatusCode() == 102 && GoogleLoginSecrets.refresh_token != null) {
+			String idToken = request.getAuthInfo().getToken().getContents();
+
+			if (responseEnvelop.getStatusCode() == 102 && GoogleLoginSecrets.REFRESH_TOKEN_MAP.containsKey(idToken)) {
 				log.debug("Refreshing Token");
 				GoogleLogin login = new GoogleLogin(client);
-				final AuthInfo refreshedAuth = login.refreshToken(GoogleLoginSecrets.refresh_token);
+				final AuthInfo refreshedAuth = login.refreshToken(GoogleLoginSecrets.REFRESH_TOKEN_MAP.get(idToken));
 				if (refreshedAuth == null) {
 					throw new LoginFailedException(String.format("Refreshing token failed Error %s in API Url %s",
 							responseEnvelop.getApiUrl(), responseEnvelop.getError()));
