@@ -81,6 +81,10 @@ public class CandyJar {
 	 * @return number of candies in jar
 	 */
 	public int getCandies(PokemonFamilyId family) {
-		return this.candies.get(family);
+		if (candies.containsKey(family)) {
+			return this.candies.get(family);
+		} else {
+			return 0;
+		}
 	}
 }

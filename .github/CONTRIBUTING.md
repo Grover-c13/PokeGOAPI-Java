@@ -11,7 +11,7 @@ You may open an issue also to request new features. Make sure you describe what 
 If you consider submitting a pull request, please note the following:
 
 1. All pull requests **must** be submitted to the `Development` branch. The `master` branch is exclusively mutable by release. PRs against `master` will not be merged.
-2. Pleae make sure you follow the projects code style. To make sure you did, you can use `./gradlew checkstyleMain`.
+2. Please make sure you follow the projects code style. To make sure you did, you can use `./gradlew checkstyleMain`.
 3. The project is licensed under [GNU GPLv3](../LICENSE.txt) thus all code you submit will be subject to this license.
 
 ## Contact

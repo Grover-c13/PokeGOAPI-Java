@@ -23,6 +23,7 @@ import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.EvolvePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.NicknamePokemonMessageOuterClass.NicknamePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
+import POGOProtos.Networking.Requests.Messages.SetFavoritePokemonMessageOuterClass.SetFavoritePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.UpgradePokemonMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.UpgradePokemonMessageOuterClass.UpgradePokemonMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
@@ -30,6 +31,7 @@ import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass.EvolvePok
 import POGOProtos.Networking.Responses.NicknamePokemonResponseOuterClass.NicknamePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
+import POGOProtos.Networking.Responses.SetFavoritePokemonResponseOuterClass.SetFavoritePokemonResponse;
 import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass;
 import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass.UpgradePokemonResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -122,6 +124,37 @@ public class Pokemon {
 	}
 
 	/**
+	* Function to mark the pokemon as favorite or not.
+	*
+	* @param markFavorite Mark Pokemon as Favorite?
+	* @return the SetFavoritePokemonResponse.Result
+	* @throws LoginFailedException  the login failed exception
+	* @throws RemoteServerException the remote server exception
+	*/
+	public SetFavoritePokemonResponse.Result setFavoritePokemon(boolean markFavorite) 
+			throws LoginFailedException, RemoteServerException {
+		SetFavoritePokemonMessage reqMsg = SetFavoritePokemonMessage.newBuilder()
+				.setPokemonId(getId())
+				.setIsFavorite(markFavorite)
+				.build();
+
+		ServerRequest serverRequest = new ServerRequest(RequestType.SET_FAVORITE_POKEMON, reqMsg);
+		pgo.getRequestHandler().sendServerRequests(serverRequest);
+
+		SetFavoritePokemonResponse response;
+		try {
+			response = SetFavoritePokemonResponse.parseFrom(serverRequest.getData());
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
+
+		pgo.getInventories().getPokebank().removePokemon(this);
+		pgo.getInventories().updateInventories();
+
+		return response.getResult();
+	}
+
+	/**
 	 * Powers up a pokemon with candy and stardust.
 	 * After powering up this pokemon object will reflect the new changes.
 	 *
@@ -176,7 +209,12 @@ public class Pokemon {
 		return result;
 	}
 
-	private PokemonMeta getMeta() {
+	/**
+	 * Get the meta info for a pokemon.
+	 *
+	 * @return PokemonMeta
+	 */
+	public PokemonMeta getMeta() {
 		if (meta == null) {
 			meta = PokemonMetaRegistry.getMeta(this.getPokemonId());
 		}
@@ -189,7 +227,7 @@ public class Pokemon {
 	}
 
 	public PokemonFamilyId getPokemonFamily() {
-		return PokemonMetaRegistry.getFamily(this.getPokemonId());
+		return getMeta().getFamily();
 	}
 
 	public boolean equals(Pokemon other) {
@@ -267,6 +305,14 @@ public class Pokemon {
 	public int getIndividualStamina() {
 		return proto.getIndividualStamina();
 	}
+	
+	/**
+	 * Calculates the pokemons IV ratio.
+	 * @return the pokemons IV ratio as a double between 0 and 1.0, 1.0 being perfect IVs
+	 */
+	public double getIvRatio() {
+		return (this.getIndividualAttack() + this.getIndividualDefense() + this.getIndividualStamina()) / 45.0;
+	}
 
 	public float getCpMultiplier() {
 		return proto.getCpMultiplier();
@@ -295,7 +341,16 @@ public class Pokemon {
 	public long getCreationTimeMs() {
 		return proto.getCreationTimeMs();
 	}
+	
+	/**
+	 * Checks whether the Pokémon is set as favorite.
+	 * @return true if the Pokémon is set as favorite
+	 */
+	public boolean isFavorite() {
+		return proto.getFavorite() > 0;
+	}
 
+	@Deprecated
 	public boolean getFavorite() {
 		return proto.getFavorite() > 0;
 	}
@@ -314,7 +369,7 @@ public class Pokemon {
 
 
 	public int getBaseStam() {
-		return getMeta().getBaseStam();
+		return getMeta().getBaseStamina();
 	}
 
 	public double getBaseCaptureRate() {
@@ -322,7 +377,7 @@ public class Pokemon {
 	}
 
 	public int getCandiesToEvolve() {
-		return getMeta().getCandiesToEvolve();
+		return getMeta().getCandyToEvolve();
 	}
 
 	public double getBaseFleeRate() {
@@ -330,6 +385,6 @@ public class Pokemon {
 	}
 
 	public PokemonIdOuterClass.PokemonId getParent() {
-		return getMeta().getParent();
+		return getMeta().getParentId();
 	}
 }

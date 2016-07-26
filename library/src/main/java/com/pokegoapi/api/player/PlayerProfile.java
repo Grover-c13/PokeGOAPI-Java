@@ -73,7 +73,7 @@ public class PlayerProfile {
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 */
-	public void updateProfile() throws LoginFailedException, RemoteServerException {
+	public void updateProfile() throws RemoteServerException, LoginFailedException {
 		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
 		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
 		api.getRequestHandler().sendServerRequests(getPlayerServerRequest);
@@ -82,7 +82,7 @@ public class PlayerProfile {
 		try {
 			playerResponse = GetPlayerResponseOuterClass.GetPlayerResponse.parseFrom(getPlayerServerRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
-			e.printStackTrace();
+			throw new RemoteServerException(e);
 		}
 
 		badge = playerResponse.getPlayerData().getEquippedBadge();

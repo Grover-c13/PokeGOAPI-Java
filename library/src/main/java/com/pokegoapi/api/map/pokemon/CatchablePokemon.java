@@ -66,7 +66,7 @@ public class CatchablePokemon {
 
 	/**
 	 * Instantiates a new Catchable pokemon.
-	 * 
+	 *
 	 * @param api
 	 *            the api
 	 * @param proto
@@ -85,7 +85,7 @@ public class CatchablePokemon {
 
 	/**
 	 * Instantiates a new Catchable pokemon.
-	 * 
+	 *
 	 * @param api
 	 *            the api
 	 * @param proto
@@ -103,7 +103,7 @@ public class CatchablePokemon {
 
 	/**
 	 * Instantiates a new Catchable pokemon.
-	 * 
+	 *
 	 * @param api
 	 *            the api
 	 * @param proto
@@ -126,7 +126,7 @@ public class CatchablePokemon {
 
 	/**
 	 * Encounter pokemon encounter result.
-	 * 
+	 *
 	 * @return the encounter result
 	 * @throws LoginFailedException
 	 *             the login failed exception
@@ -187,7 +187,7 @@ public class CatchablePokemon {
 	/**
 	 * Tries to catch a pokemon (will attempt to use a pokeball, if you have
 	 * none will use greatball etc).
-	 * 
+	 *
 	 * @return CatchResult
 	 * @throws LoginFailedException
 	 *             if failed to login
@@ -216,7 +216,7 @@ public class CatchablePokemon {
 
 	/**
 	 * Tries to catch a pokeball with the given type.
-	 * 
+	 *
 	 * @param pokeball
 	 *            Type of pokeball
 	 * @return CatchResult
@@ -232,7 +232,7 @@ public class CatchablePokemon {
 
 	/**
 	 * Tried to catch a pokemon with given pokeball and max number of pokeballs.
-	 * 
+	 *
 	 * @param pokeball
 	 *            Type of pokeball
 	 * @param amount
@@ -299,7 +299,7 @@ public class CatchablePokemon {
 
 	/**
 	 * Tries to catch a pokemon.
-	 * 
+	 *
 	 * @param normalizedHitPosition
 	 *            the normalized hit position
 	 * @param normalizedReticleSize
@@ -320,8 +320,8 @@ public class CatchablePokemon {
 	 *             if the server failed to respond
 	 */
 	public CatchResult catchPokemon(double normalizedHitPosition,
-			double normalizedReticleSize, double spinModifier, Pokeball type,
-			int amount, int razberriesLimit) throws LoginFailedException, RemoteServerException {
+									double normalizedReticleSize, double spinModifier, Pokeball type,
+									int amount, int razberriesLimit) throws LoginFailedException, RemoteServerException {
 		if (!isEncountered()) {
 			return new CatchResult();
 		}
@@ -383,7 +383,7 @@ public class CatchablePokemon {
 		UseItemCaptureMessage reqMsg = UseItemCaptureMessage
 				.newBuilder()
 				.setEncounterId(this.getEncounterId())
-				.setSpawnPointGuid(this.getSpawnPointId())
+				.setSpawnPointId(this.getSpawnPointId())
 				.setItemId(item)
 				.build();
 
