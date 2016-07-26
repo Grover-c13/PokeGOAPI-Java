@@ -67,7 +67,7 @@ public class PokemonMetaRegistry {
 		highestForFamily.put(PokemonFamilyId.FAMILY_SHELLDER, PokemonId.CLOYSTER);
 		highestForFamily.put(PokemonFamilyId.FAMILY_GASTLY, PokemonId.GENGAR);
 		highestForFamily.put(PokemonFamilyId.FAMILY_ONIX, PokemonId.ONIX);
-		highestForFamily.put(PokemonFamilyId.FAMILY_DROWZEE, PokemonId.DROWZEE);
+		highestForFamily.put(PokemonFamilyId.FAMILY_DROWZEE, PokemonId.HYPNO);
 		highestForFamily.put(PokemonFamilyId.FAMILY_KRABBY, PokemonId.KINGLER);
 		highestForFamily.put(PokemonFamilyId.FAMILY_VOLTORB, PokemonId.ELECTRODE);
 		highestForFamily.put(PokemonFamilyId.FAMILY_EXEGGCUTE, PokemonId.EXEGGUTOR);
@@ -105,7 +105,6 @@ public class PokemonMetaRegistry {
 		highestForFamily.put(PokemonFamilyId.FAMILY_DRATINI, PokemonId.DRAGONITE);
 		highestForFamily.put(PokemonFamilyId.FAMILY_MEWTWO, PokemonId.MEWTWO);
 		highestForFamily.put(PokemonFamilyId.FAMILY_MEW, PokemonId.MEW);
-		highestForFamily.put(PokemonFamilyId.FAMILY_HYPNO, PokemonId.HYPNO);
 
 		PokemonMeta metap;
 		metap = new PokemonMeta();
@@ -3566,7 +3565,7 @@ public class PokemonMetaRegistry {
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0097_POKEMON_HYPNO");
-		metap.setFamily(PokemonFamilyId.FAMILY_HYPNO);
+		metap.setFamily(PokemonFamilyId.FAMILY_DROWZEE);
 		metap.setPokemonClass(PokemonClass.UNCOMMON);
 		metap.setType2(PokemonType.NONE);
 		metap.setPokedexHeightM(1.6);
