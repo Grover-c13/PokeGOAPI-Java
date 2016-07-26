@@ -39,6 +39,11 @@ public class Item {
 		return proto.getUnseen();
 	}
 
+	/**
+	 * Check if the item it's a potion
+	 *
+	 * @return true if the item it's a potion
+	 */
 	public boolean isPotion() {
 		return getItemId() == ItemId.ITEM_POTION
 				|| getItemId() == ItemId.ITEM_SUPER_POTION
@@ -47,6 +52,11 @@ public class Item {
 				;
 	}
 
+	/**
+	 * Check if the item it's a revive
+	 *
+	 * @return true if the item it's a revive
+	 */
 	public boolean isRevive() {
 		return getItemId() == ItemId.ITEM_REVIVE
 				|| getItemId() == ItemId.ITEM_MAX_REVIVE

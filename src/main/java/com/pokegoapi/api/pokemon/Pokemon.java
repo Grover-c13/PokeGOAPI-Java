@@ -26,6 +26,7 @@ import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.R
 import POGOProtos.Networking.Requests.Messages.SetFavoritePokemonMessageOuterClass.SetFavoritePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.UpgradePokemonMessageOuterClass.UpgradePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.UseItemPotionMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.UseItemReviveMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass.EvolvePokemonResponse;
 import POGOProtos.Networking.Responses.NicknamePokemonResponseOuterClass.NicknamePokemonResponse;
@@ -43,8 +44,6 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
-
-import static POGOProtos.Networking.Requests.Messages.UseItemReviveMessageOuterClass.*;
 
 /**
  * The type Pokemon.
@@ -379,7 +378,7 @@ public class Pokemon {
 	}
 
 	/**
-	 * check if pokemon its injured but not fainted. need potions to heal
+	 * Check if pokemon its injured but not fainted. need potions to heal
 	 *
 	 * @return true if pokemon is injured
 	 */
@@ -397,11 +396,13 @@ public class Pokemon {
 	}
 
 	/**
-	 * Heal a pokemon, using various fallback for potion
+	 * Heal a pokemon, using various fallbacks for potions
 	 *
 	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
 	 */
-	public UseItemPotionResponseOuterClass.UseItemPotionResponse.Result heal() throws LoginFailedException, RemoteServerException {
+	public UseItemPotionResponseOuterClass.UseItemPotionResponse.Result heal()
+			throws LoginFailedException, RemoteServerException {
+
 		if (!isInjured())
 			return UseItemPotionResponseOuterClass.UseItemPotionResponse.Result.ERROR_CANNOT_USE;
 
@@ -426,13 +427,16 @@ public class Pokemon {
 	 *
 	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
 	 */
-	public UseItemPotionResponseOuterClass.UseItemPotionResponse.Result usePotion(ItemId itemId) throws LoginFailedException, RemoteServerException {
-		Item i = pgo.getInventories().getItemBag().getItem(itemId);
+	public UseItemPotionResponseOuterClass.UseItemPotionResponse.Result usePotion(ItemId itemId)
+			throws LoginFailedException, RemoteServerException {
+
+		Item potion = pgo.getInventories().getItemBag().getItem(itemId);
 		//some sanity check, to prevent wrong use of this call
-		if (!i.isPotion() || i.getCount() < 1 || !isInjured())
+		if (!potion.isPotion() || potion.getCount() < 1 || !isInjured())
 			return UseItemPotionResponseOuterClass.UseItemPotionResponse.Result.ERROR_CANNOT_USE;
 
-		UseItemPotionMessageOuterClass.UseItemPotionMessage reqMsg = UseItemPotionMessageOuterClass.UseItemPotionMessage.newBuilder()
+		UseItemPotionMessageOuterClass.UseItemPotionMessage reqMsg = UseItemPotionMessageOuterClass.UseItemPotionMessage
+				.newBuilder()
 				.setItemId(itemId)
 				.setPokemonId(getId())
 				.build();
@@ -450,11 +454,13 @@ public class Pokemon {
 	}
 
 	/**
-	 * Heal a pokemon, using various fallback for potion
+	 * Revive a pokemon, using various fallbacks for revive items
 	 *
 	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
 	 */
-	public UseItemReviveResponseOuterClass.UseItemReviveResponse.Result revive() throws LoginFailedException, RemoteServerException {
+	public UseItemReviveResponseOuterClass.UseItemReviveResponse.Result revive()
+			throws LoginFailedException, RemoteServerException {
+
 		if (!isFainted())
 			return UseItemReviveResponseOuterClass.UseItemReviveResponse.Result.ERROR_CANNOT_USE;
 
@@ -468,17 +474,20 @@ public class Pokemon {
 	}
 
 	/**
-	 * use a revive item on the pokemon. Will check if there is enough revive & if the pokemon need
+	 * Use a revive item on the pokemon. Will check if there is enough revive & if the pokemon need
 	 * to be revived.
 	 *
 	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
 	 */
-	public UseItemReviveResponseOuterClass.UseItemReviveResponse.Result useRevive(ItemId itemId) throws LoginFailedException, RemoteServerException {
-		Item i = pgo.getInventories().getItemBag().getItem(itemId);
-		if (!i.isRevive() || i.getCount() < 1 || !isFainted())
+	public UseItemReviveResponseOuterClass.UseItemReviveResponse.Result useRevive(ItemId itemId)
+			throws LoginFailedException, RemoteServerException {
+
+		Item item = pgo.getInventories().getItemBag().getItem(itemId);
+		if (!item.isRevive() || item.getCount() < 1 || !isFainted())
 			return UseItemReviveResponseOuterClass.UseItemReviveResponse.Result.ERROR_CANNOT_USE;
 
-		UseItemReviveMessage reqMsg = UseItemReviveMessage.newBuilder()
+		UseItemReviveMessageOuterClass.UseItemReviveMessage reqMsg = UseItemReviveMessageOuterClass.UseItemReviveMessage
+				.newBuilder()
 				.setItemId(itemId)
 				.setPokemonId(getId())
 				.build();
