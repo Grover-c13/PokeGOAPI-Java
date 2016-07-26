@@ -43,8 +43,13 @@ The constructor of PokemonGo class requires a AuthInfo object which can be obtai
 EG:
 ```java
 OkHttpClient httpClient = new OkHttpClient();
-AuthInfo auth = new GoogleLogin(httpClient).login("token");           
-PokemonGo go = new PokemonGo(auth,httpClient);
+//Use Google
+//First Ever Login. Persist info when you recieve callback
+PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient,listner),httpClient);
+//Subsequently
+PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient,refreshToken),httpClient);
+//Or use PTC
+PokemonGo go = new PokemonGo(new PtcCredentialProvider(httpClient,username,password),httpClient);
 Log.v(go.getPlayerProfile());
 ```
 ##Android Dev FAQ
