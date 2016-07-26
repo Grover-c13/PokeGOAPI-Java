@@ -164,9 +164,8 @@ public class PokemonMetaRegistry {
 		familys.put(PokemonId.ONIX, PokemonFamilyId.FAMILY_ONIX);
 		highestForFamily.put(PokemonFamilyId.FAMILY_ONIX, PokemonId.ONIX);
 		familys.put(PokemonId.DROWZEE, PokemonFamilyId.FAMILY_DROWZEE);
-		highestForFamily.put(PokemonFamilyId.FAMILY_DROWZEE, PokemonId.DROWZEE);
-		// MISSING ENUM IN PROTO
-		//familys.put(PokemonId.HYPNO,PokemonFamilyId.FAMILY_HYPNO);
+		familys.put(PokemonId.HYPNO, PokemonFamilyId.FAMILY_DROWZEE);
+		highestForFamily.put(PokemonFamilyId.FAMILY_DROWZEE, PokemonId.HYPNO);
 		familys.put(PokemonId.KRABBY, PokemonFamilyId.FAMILY_KRABBY);
 		familys.put(PokemonId.KINGLER, PokemonFamilyId.FAMILY_KRABBY);
 		highestForFamily.put(PokemonFamilyId.FAMILY_KRABBY, PokemonId.KINGLER);
