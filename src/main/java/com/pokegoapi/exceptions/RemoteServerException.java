@@ -27,4 +27,8 @@ public class RemoteServerException extends PokemonGoApiException {
 	public RemoteServerException(Exception exception) {
 		super(exception);
 	}
+
+	public RemoteServerException(String reason, Exception exception) {
+		super(reason, exception);
+	}
 }

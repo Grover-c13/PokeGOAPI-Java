@@ -27,4 +27,8 @@ public class LoginFailedException extends PokemonGoApiException {
 	public LoginFailedException(Exception exception) {
 		super(exception);
 	}
+
+	public LoginFailedException(String reason, Exception exception) {
+		super(reason, exception);
+	}
 }

@@ -32,11 +32,12 @@ package com.pokegoapi.examples;
 
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
+
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.pokemon.CatchResult;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.EncounterResult;
-import com.pokegoapi.auth.PtcLogin;
+import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import lombok.extern.slf4j.Slf4j;
@@ -54,10 +55,12 @@ public class CatchPokemonAtAreaExample {
 		OkHttpClient http = new OkHttpClient();
 		RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth = null;
 		try {
-			auth = new PtcLogin(http).login(ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
-			// or google
-			//auth = new GoogleLogin(http).login("", ""); // currently uses oauth flow so no user or pass needed
-			PokemonGo go = new PokemonGo(auth, http);
+			//or google
+			//new PokemonGo(GoogleCredentialProvider(http,listner));
+			//Subsiquently
+			//new PokemonGo(GoogleCredentialProvider(http,refreshtoken));
+			PokemonGo go = new PokemonGo(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN,
+					ExampleLoginDetails.PASSWORD), http);
 			// set location
 			go.setLocation(-32.058087, 115.744325, 0);
 

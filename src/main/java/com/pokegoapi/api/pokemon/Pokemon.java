@@ -205,7 +205,12 @@ public class Pokemon {
 		return result;
 	}
 
-	private PokemonMeta getMeta() {
+	/**
+	 * Get the meta info for a pokemon.
+	 *
+	 * @return PokemonMeta
+	 */
+	public PokemonMeta getMeta() {
 		if (meta == null) {
 			meta = PokemonMetaRegistry.getMeta(this.getPokemonId());
 		}
@@ -218,7 +223,7 @@ public class Pokemon {
 	}
 
 	public PokemonFamilyId getPokemonFamily() {
-		return PokemonMetaRegistry.getFamily(this.getPokemonId());
+		return getMeta().getFamily();
 	}
 
 	public boolean equals(Pokemon other) {
@@ -334,8 +339,8 @@ public class Pokemon {
 	}
 	
 	/**
-	 * Checks whether the Pokémon is set as favorite.
-	 * @return true if the Pokémon is set as favorite
+	 * Checks whether the PokÃ©mon is set as favorite.
+	 * @return true if the PokÃ©mon is set as favorite
 	 */
 	public boolean isFavorite() {
 		return proto.getFavorite() > 0;
@@ -360,7 +365,7 @@ public class Pokemon {
 
 
 	public int getBaseStam() {
-		return getMeta().getBaseStam();
+		return getMeta().getBaseStamina();
 	}
 
 	public double getBaseCaptureRate() {
@@ -368,7 +373,7 @@ public class Pokemon {
 	}
 
 	public int getCandiesToEvolve() {
-		return getMeta().getCandiesToEvolve();
+		return getMeta().getCandyToEvolve();
 	}
 
 	public double getBaseFleeRate() {
@@ -376,6 +381,6 @@ public class Pokemon {
 	}
 
 	public PokemonIdOuterClass.PokemonId getParent() {
-		return getMeta().getParent();
+		return getMeta().getParentId();
 	}
 }

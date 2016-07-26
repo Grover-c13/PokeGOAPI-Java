@@ -17,12 +17,9 @@ package com.pokegoapi.main;
 
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.auth.GoogleLogin;
-import com.pokegoapi.auth.GoogleLoginSecrets;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 
@@ -42,7 +39,6 @@ public class RequestHandler {
 	private final PokemonGo api;
 	private RequestEnvelopeOuterClass.RequestEnvelope.Builder builder;
 	private boolean hasRequests;
-	private RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth;
 	private List<ServerRequest> serverRequests;
 	private String apiEndpoint;
 	private OkHttpClient client;
@@ -53,14 +49,12 @@ public class RequestHandler {
 	 * Instantiates a new Request handler.
 	 *
 	 * @param api    the api
-	 * @param auth   the auth
 	 * @param client the client
 	 */
-	public RequestHandler(PokemonGo api, RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth, OkHttpClient client) {
+	public RequestHandler(PokemonGo api, OkHttpClient client) throws LoginFailedException, RemoteServerException {
 		this.api = api;
 		this.client = client;
 		apiEndpoint = ApiSettings.API_ENDPOINT;
-		this.auth = auth;
 		serverRequests = new ArrayList<>();
 		/* TODO: somehow fix it so people using the deprecated functions will still work,
 		   while not calling this deprecated stuff ourselves */
@@ -132,21 +126,7 @@ public class RequestHandler {
 				lastAuth = responseEnvelop.getAuthTicket();
 			}
 
-			String idToken = request.getAuthInfo().getToken().getContents();
-
-			if (responseEnvelop.getStatusCode() == 102 && GoogleLoginSecrets.REFRESH_TOKEN_MAP.containsKey(idToken)) {
-				log.debug("Refreshing Token");
-				GoogleLogin login = new GoogleLogin(client);
-				final AuthInfo refreshedAuth = login.refreshToken(GoogleLoginSecrets.REFRESH_TOKEN_MAP.get(idToken));
-				if (refreshedAuth == null) {
-					throw new LoginFailedException(String.format("Refreshing token failed Error %s in API Url %s",
-							responseEnvelop.getApiUrl(), responseEnvelop.getError()));
-				} else {
-					this.auth = refreshedAuth;
-					sendServerRequests(serverRequests);
-					return;
-				}
-			} else if (responseEnvelop.getStatusCode() == 102) {
+			if (responseEnvelop.getStatusCode() == 102) {
 				throw new LoginFailedException(String.format("Error %s in API Url %s",
 						responseEnvelop.getApiUrl(), responseEnvelop.getError()));
 			} else if (responseEnvelop.getStatusCode() == 53) {
@@ -211,7 +191,7 @@ public class RequestHandler {
 		}
 
 		if (response.code() != 200) {
-			throw new RemoteServerException("Got a unexcepted http code : " + response.code());
+			throw new RemoteServerException("Got a unexpected http code : " + response.code());
 		}
 
 		ResponseEnvelopeOuterClass.ResponseEnvelope responseEnvelop = null;
@@ -254,14 +234,15 @@ public class RequestHandler {
 	}
 
 	@Deprecated
-	private void resetBuilder() {
+	private void resetBuilder() throws LoginFailedException, RemoteServerException {
 		builder = RequestEnvelopeOuterClass.RequestEnvelope.newBuilder();
 		resetBuilder(builder);
 		hasRequests = false;
 		serverRequests.clear();
 	}
 
-	private void resetBuilder(RequestEnvelopeOuterClass.RequestEnvelope.Builder builder) {
+	private void resetBuilder(RequestEnvelopeOuterClass.RequestEnvelope.Builder builder)
+			throws LoginFailedException, RemoteServerException {
 		builder.setStatusCode(2);
 		builder.setRequestId(8145806132888207460L);
 		if (lastAuth != null
@@ -270,7 +251,7 @@ public class RequestHandler {
 			builder.setAuthTicket(lastAuth);
 		} else {
 			log.debug("Authenticated with static token");
-			builder.setAuthInfo(auth);
+            builder.setAuthInfo(api.getAuthInfo());
 		}
 		builder.setUnknown12(989);
 		builder.setLatitude(api.getLatitude());
@@ -289,11 +270,6 @@ public class RequestHandler {
 			throw new IllegalStateException("Attempting to send request envelop with no requests");
 		}
 		return builder.build();
-	}
-
-	public void setAuthInfo(AuthInfo auth) {
-		this.auth = auth;
-		this.lastAuth = null;
 	}
 
 	public void setLatitude(double latitude) {
