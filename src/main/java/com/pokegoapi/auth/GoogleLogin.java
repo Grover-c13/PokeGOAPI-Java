@@ -79,6 +79,7 @@ public class GoogleLogin extends Login {
 			AuthInfo.Builder builder = AuthInfo.newBuilder();
 			builder.setProvider("google");
 			builder.setToken(AuthInfo.JWT.newBuilder().setContents(token.getIdToken()).setUnknown2(59).build());
+			GoogleLoginSecrets.REFRESH_TOKEN_MAP.put(token.getIdToken(), token.getRefreshToken());
 			return builder.build();
 		}
 	}
@@ -104,7 +105,7 @@ public class GoogleLogin extends Login {
 	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
 	 */
 	public AuthInfo login(String token, String refreshToken) {
-		GoogleLoginSecrets.refresh_token = refreshToken;
+		GoogleLoginSecrets.REFRESH_TOKEN_MAP.put(token, refreshToken);
 		AuthInfo.Builder builder = AuthInfo.newBuilder();
 		builder.setProvider("google");
 		builder.setToken(AuthInfo.JWT.newBuilder().setContents(token).setUnknown2(59).build());
@@ -150,7 +151,7 @@ public class GoogleLogin extends Login {
 			}
 
 			Log.d(TAG, "Got token: " + token.getIdToken());
-			GoogleLoginSecrets.refresh_token = token.getRefreshToken();
+			GoogleLoginSecrets.REFRESH_TOKEN_MAP.put(token.getIdToken(), token.getRefreshToken());
 			AuthInfo.Builder authbuilder = AuthInfo.newBuilder();
 			authbuilder.setProvider("google");
 			authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(token.getIdToken()).setUnknown2(59).build());
