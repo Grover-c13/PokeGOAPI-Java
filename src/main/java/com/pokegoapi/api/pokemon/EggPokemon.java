@@ -18,6 +18,8 @@ package com.pokegoapi.api.pokemon;
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
 
+import com.annimon.stream.Stream;
+import com.annimon.stream.function.Predicate;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.EggIncubator;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -51,6 +53,28 @@ public class EggPokemon {
 		}
 		return incubator.hatchEgg(this);
 	}
+	
+	/**
+	 * Get the current distance that has been done with this egg
+	 * @return get distance already walked
+	 */
+	public double getEggKmWalked() {
+		if (!isIncubate())
+			return 0;
+		EggIncubator incubator = Stream.of(pgo.getInventories().getIncubators())
+				.filter(new Predicate<EggIncubator>() {
+					@Override
+					public boolean test(EggIncubator incub) {
+						return incub.getId().equals(proto.getEggIncubatorId());
+					}
+				}).findFirst().orElse(null);
+		// incubator should not be null but why not eh
+		if (incubator == null)
+			return 0;
+		else
+			return proto.getEggKmWalkedTarget()
+					- (incubator.getKmTarget() - pgo.getPlayerProfile().getStats().getKmWalked());
+	}
 
 	// DELEGATE METHODS BELOW //
 	/**
@@ -71,10 +95,6 @@ public class EggPokemon {
 	
 	public double getEggKmWalkedTarget() {
 		return proto.getEggKmWalkedTarget();
-	}
-
-	public double getEggKmWalkedStart() {
-		return proto.getEggKmWalkedStart();
 	}
 
 	public long getCapturedCellId() {
