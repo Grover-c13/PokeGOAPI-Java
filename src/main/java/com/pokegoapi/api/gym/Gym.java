@@ -80,6 +80,10 @@ public class Gym {
 		return proto.getGuardPokemonCp();
 	}
 
+	public long getPoints() {
+		return proto.getGymPoints();
+	}
+
 	public boolean getIsInBattle() {
 		return proto.getIsInBattle();
 	}
