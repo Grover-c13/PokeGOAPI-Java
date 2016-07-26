@@ -18,15 +18,16 @@ package com.pokegoapi.auth;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 
 import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
 
 /**
  * Any Credential Provider can extend this.
  */
 public abstract class CredentialProvider {
 
-	public abstract String getTokenId() throws LoginFailedException;
+	public abstract String getTokenId() throws LoginFailedException, RemoteServerException;
 
-	public abstract AuthInfo getAuthInfo() throws LoginFailedException;
+	public abstract AuthInfo getAuthInfo() throws LoginFailedException, RemoteServerException;
 
 	public abstract boolean isTokenIdExpired();
 }

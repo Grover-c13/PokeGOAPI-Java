@@ -15,14 +15,10 @@
 
 package com.pokegoapi.auth;
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-
 import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.util.Log;
+import com.pokegoapi.exceptions.RemoteServerException;
 import com.squareup.moshi.Moshi;
-
-import lombok.Getter;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
@@ -39,40 +35,33 @@ import java.util.List;
 
 
 public class PtcCredentialProvider extends CredentialProvider {
-	private static final String TAG = PtcCredentialProvider.class.getSimpleName();
-
 	public static final String CLIENT_SECRET = "w8ScCUXJQc6kXKw8FiOhd8Fixzht18Dq3PEVkUCP5ZPxtgyWsbTvWHFLm2wNY0JR";
 	public static final String REDIRECT_URI = "https://www.nianticlabs.com/pokemongo/error";
 	public static final String CLIENT_ID = "mobile-app_pokemon-go";
-
 	public static final String API_URL = "https://pgorelease.nianticlabs.com/plfe/rpc";
 	public static final String LOGIN_URL = "https://sso.pokemon.com/sso/login?service=https%3A%2F%2Fsso.pokemon.com%2Fsso%2Foauth2.0%2FcallbackAuthorize";
 	public static final String LOGIN_OAUTH = "https://sso.pokemon.com/sso/oauth2.0/accessToken";
-
 	public static final String USER_AGENT = "niantic";
-
+	private static final String TAG = PtcCredentialProvider.class.getSimpleName();
 	//We try and refresh token 5 minutes before it actually expires
 	private static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
 
 	private final OkHttpClient client;
-
-	private String tokenId;
-
-	private long expiresTimestamp;
-
-	private AuthInfo.Builder authbuilder;
-
 	private final String username;
 	private final String password;
+	private String tokenId;
+	private long expiresTimestamp;
+	private AuthInfo.Builder authbuilder;
 
 	/**
 	 * Instantiates a new Ptc login.
 	 *
-	 * @param client the client
+	 * @param client   the client
 	 * @param username Username
 	 * @param password password
 	 */
-	public PtcCredentialProvider(OkHttpClient client, String username, String password) throws LoginFailedException {
+	public PtcCredentialProvider(OkHttpClient client, String username, String password)
+			throws LoginFailedException, RemoteServerException {
 		this.username = username;
 		this.password = password;
 		/*
@@ -119,7 +108,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 * @param username PTC username
 	 * @param password PTC password
 	 */
-	private void login(String username, String password) throws LoginFailedException {
+	private void login(String username, String password) throws LoginFailedException, RemoteServerException {
 		//TODO: stop creating an okhttp client per request
 		Request get = new Request.Builder()
 				.url(LOGIN_URL)
@@ -130,7 +119,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 		try {
 			getResponse = client.newCall(get).execute();
 		} catch (IOException e) {
-			throw new LoginFailedException(e);
+			throw new RemoteServerException("Failed to receive contents from server", e);
 		}
 
 		Moshi moshi = new Moshi.Builder().build();
@@ -140,7 +129,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 			String response = getResponse.body().string();
 			ptcAuth = moshi.adapter(PtcAuthJson.class).fromJson(response);
 		} catch (IOException e) {
-			throw new LoginFailedException("Looks like the servers are down", e);
+			throw new RemoteServerException("Looks like the servers are down", e);
 		}
 
 		HttpUrl url = HttpUrl.parse(LOGIN_URL).newBuilder()
@@ -168,14 +157,14 @@ public class PtcCredentialProvider extends CredentialProvider {
 					.newCall(postRequest)
 					.execute();
 		} catch (IOException e) {
-			throw new LoginFailedException("Network failure", e);
+			throw new RemoteServerException("Network failure", e);
 		}
 
 		String body = null;
 		try {
 			body = response.body().string();
 		} catch (IOException e) {
-			throw new LoginFailedException("Response body fetching failed", e);
+			throw new RemoteServerException("Response body fetching failed", e);
 		}
 
 		if (body.length() > 0) {
@@ -183,7 +172,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 			try {
 				ptcError = moshi.adapter(PtcError.class).fromJson(body);
 			} catch (IOException e) {
-				throw new LoginFailedException("Unmarshling failure", e);
+				throw new RemoteServerException("Unmarshalling failure", e);
 			}
 			if (ptcError.getError() != null && ptcError.getError().length() > 0) {
 				throw new LoginFailedException(ptcError.getError());
@@ -211,13 +200,13 @@ public class PtcCredentialProvider extends CredentialProvider {
 		try {
 			response = client.newCall(postRequest).execute();
 		} catch (IOException e) {
-			throw new LoginFailedException("Network Failure ", e);
+			throw new RemoteServerException("Network Failure ", e);
 		}
 
 		try {
 			body = response.body().string();
 		} catch (IOException e) {
-			throw new LoginFailedException(e);
+			throw new RemoteServerException("Network failure", e);
 		}
 
 		String[] params;
@@ -232,7 +221,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 	}
 
 	@Override
-	public String getTokenId() throws LoginFailedException {
+	public String getTokenId() throws LoginFailedException, RemoteServerException {
 		if (isTokenIdExpired()) {
 			login(username, password);
 		}
@@ -246,7 +235,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 * @throws LoginFailedException when refreshing fails
 	 */
 	@Override
-	public AuthInfo getAuthInfo() throws LoginFailedException {
+	public AuthInfo getAuthInfo() throws LoginFailedException, RemoteServerException {
 		if (isTokenIdExpired()) {
 			login(username, password);
 		}

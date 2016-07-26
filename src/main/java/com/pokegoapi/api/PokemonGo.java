@@ -16,7 +16,6 @@
 package com.pokegoapi.api;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
-
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
@@ -25,7 +24,6 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.util.Log;
-
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
@@ -86,10 +84,12 @@ public class PokemonGo {
 
 	/**
 	 * Fetches valid AuthInfo
+	 *
 	 * @return AuthInfo object
 	 * @throws LoginFailedException when login fails
 	 */
-	public RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo getAuthInfo() throws LoginFailedException {
+	public RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo getAuthInfo()
+			throws LoginFailedException, RemoteServerException {
 		return credentialProvider.getAuthInfo();
 	}
 
