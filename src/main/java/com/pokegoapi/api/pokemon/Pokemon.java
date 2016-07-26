@@ -23,6 +23,7 @@ import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.EvolvePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.NicknamePokemonMessageOuterClass.NicknamePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
+import POGOProtos.Networking.Requests.Messages.SetFavoritePokemonMessageOuterClass.SetFavoritePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.UpgradePokemonMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.UpgradePokemonMessageOuterClass.UpgradePokemonMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
@@ -30,6 +31,7 @@ import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass.EvolvePok
 import POGOProtos.Networking.Responses.NicknamePokemonResponseOuterClass.NicknamePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
+import POGOProtos.Networking.Responses.SetFavoritePokemonResponseOuterClass.SetFavoritePokemonResponse;
 import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass;
 import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass.UpgradePokemonResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -111,6 +113,37 @@ public class Pokemon {
 		NicknamePokemonResponse response;
 		try {
 			response = NicknamePokemonResponse.parseFrom(serverRequest.getData());
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
+
+		pgo.getInventories().getPokebank().removePokemon(this);
+		pgo.getInventories().updateInventories();
+
+		return response.getResult();
+	}
+
+	/**
+	* Function to mark the pokemon as favorite or not.
+	*
+	* @param markFavorite Mark Pokemon as Favorite?
+	* @return the SetFavoritePokemonResponse.Result
+	* @throws LoginFailedException  the login failed exception
+	* @throws RemoteServerException the remote server exception
+	*/
+	public SetFavoritePokemonResponse.Result setFavoritePokemon(boolean markFavorite) 
+			throws LoginFailedException, RemoteServerException {
+		SetFavoritePokemonMessage reqMsg = SetFavoritePokemonMessage.newBuilder()
+				.setPokemonId(getId())
+				.setIsFavorite(markFavorite)
+				.build();
+
+		ServerRequest serverRequest = new ServerRequest(RequestType.SET_FAVORITE_POKEMON, reqMsg);
+		pgo.getRequestHandler().sendServerRequests(serverRequest);
+
+		SetFavoritePokemonResponse response;
+		try {
+			response = SetFavoritePokemonResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
