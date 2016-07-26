@@ -152,7 +152,11 @@ public class Map {
 		return points;
 	}
 
-
+	/**
+	 * Get a list of gyms near the current location.
+	 *
+	 * @return List of gyms
+	 */
 	public List<Gym> getGyms() throws LoginFailedException, RemoteServerException {
 		List<Gym> gyms = new ArrayList<>();
 		MapObjects objects = getMapObjects();

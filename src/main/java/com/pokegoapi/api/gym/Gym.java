@@ -43,9 +43,8 @@ public class Gym {
 	private PokemonGo api;
 
 	/**
-	 * .
+	 * Gym object.
 	 *
-	 * @return
 	 */
 	public Gym(PokemonGo api, FortData proto) {
 		this.api = api;
@@ -85,6 +84,13 @@ public class Gym {
 		return proto.getIsInBattle();
 	}
 
+	public boolean isAttackable() throws LoginFailedException, RemoteServerException {
+		return this.getGymMembers().size() != 0;
+	}
+
+	public Battle battle(Pokemon[] team) {
+		return new Battle(api, team, this);
+	}
 
 
 	private GetGymDetailsResponse details() throws LoginFailedException, RemoteServerException {
@@ -127,8 +133,6 @@ public class Gym {
 
 	public boolean inRange() throws LoginFailedException, RemoteServerException {
 		GetGymDetailsResponse.Result result = getResult();
-		System.out.println(result + " != " + GetGymDetailsResponse.Result.ERROR_NOT_IN_RANGE);
-		System.out.println(result != GetGymDetailsResponse.Result.ERROR_NOT_IN_RANGE);
 		return ( result != GetGymDetailsResponse.Result.ERROR_NOT_IN_RANGE);
 	}
 
@@ -141,6 +145,11 @@ public class Gym {
 		return details().getGymState().getMembershipsList();
 	}
 
+	/**
+	 * Get a list of pokemon defending this gym.
+	 *
+	 * @return List of pokemon
+	 */
 	public List<PokemonData> getDefendingPokemon() throws LoginFailedException, RemoteServerException {
 		List<PokemonData> data = new ArrayList<PokemonData>();
 
