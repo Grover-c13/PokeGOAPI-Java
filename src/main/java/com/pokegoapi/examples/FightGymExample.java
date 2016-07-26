@@ -37,7 +37,8 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.gym.Battle;
 import com.pokegoapi.api.gym.Gym;
 import com.pokegoapi.api.pokemon.Pokemon;
-import com.pokegoapi.auth.PtcLogin;
+import com.pokegoapi.auth.CredentialProvider;
+import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
@@ -45,18 +46,18 @@ import okhttp3.OkHttpClient;
 
 import java.util.List;
 
-public class FightGymExample  {
+public class FightGymExample {
 
 	/**
 	 * Catches a pokemon at an area.
 	 */
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
-		RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth = null;
+		CredentialProvider auth = null;
 		try {
-			auth = new PtcLogin(http).login(ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
+			auth = new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
 			// or google
-			//auth = new GoogleLogin(http).login("", ""); // currently uses oauth flow so no user or pass needed
+			//auth = new GoogleCredentialProvider(http, token); // currently uses oauth flow so no user or pass needed
 			PokemonGo go = new PokemonGo(auth, http);
 			// set location
 			go.setLocation(-32.011011, 115.932831, 0);
