@@ -21,35 +21,35 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class Item {
-    private ItemDataOuterClass.ItemData proto;
-    @Getter
-    @Setter
-    private int count;
+	private ItemDataOuterClass.ItemData proto;
+	@Getter
+	@Setter
+	private int count;
 
-    public Item(ItemDataOuterClass.ItemData proto) {
-        this.proto = proto;
-        this.count = proto.getCount();
-    }
+	public Item(ItemDataOuterClass.ItemData proto) {
+		this.proto = proto;
+		this.count = proto.getCount();
+	}
 
-    public ItemId getItemId() {
-        return proto.getItemId();
-    }
+	public ItemId getItemId() {
+		return proto.getItemId();
+	}
 
-    public boolean isUnseen() {
-        return proto.getUnseen();
-    }
+	public boolean isUnseen() {
+		return proto.getUnseen();
+	}
 
-    public boolean isPotion() {
-        return getItemId() == ItemId.ITEM_POTION
-                || getItemId() == ItemId.ITEM_SUPER_POTION
-                || getItemId() == ItemId.ITEM_HYPER_POTION
-                || getItemId() == ItemId.ITEM_MAX_POTION
-                ;
-    }
+	public boolean isPotion() {
+		return getItemId() == ItemId.ITEM_POTION
+				|| getItemId() == ItemId.ITEM_SUPER_POTION
+				|| getItemId() == ItemId.ITEM_HYPER_POTION
+				|| getItemId() == ItemId.ITEM_MAX_POTION
+				;
+	}
 
-    public boolean isRevive() {
-        return getItemId() == ItemId.ITEM_REVIVE
-                || getItemId() == ItemId.ITEM_MAX_REVIVE
-                ;
-    }
+	public boolean isRevive() {
+		return getItemId() == ItemId.ITEM_REVIVE
+				|| getItemId() == ItemId.ITEM_MAX_REVIVE
+				;
+	}
 }
