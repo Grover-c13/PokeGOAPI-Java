@@ -30,6 +30,7 @@ import POGOProtos.Networking.Requests.Messages.UseItemReviveMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass.EvolvePokemonResponse;
 import POGOProtos.Networking.Responses.NicknamePokemonResponseOuterClass.NicknamePokemonResponse;
+import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
 import POGOProtos.Networking.Responses.SetFavoritePokemonResponseOuterClass.SetFavoritePokemonResponse;
@@ -44,6 +45,8 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * The type Pokemon.
@@ -54,6 +57,9 @@ public class Pokemon {
 	private final PokemonGo pgo;
 	private PokemonData proto;
 	private PokemonMeta meta;
+	@Getter
+	@Setter
+	private int stamina;
 
 	// API METHODS //
 
@@ -61,6 +67,7 @@ public class Pokemon {
 	public Pokemon(PokemonGo api, PokemonData proto) {
 		this.pgo = api;
 		this.proto = proto;
+		this.stamina = proto.getStamina();
 	}
 
 	/**
@@ -245,10 +252,6 @@ public class Pokemon {
 
 	public int getCp() {
 		return proto.getCp();
-	}
-
-	public int getStamina() {
-		return proto.getStamina();
 	}
 
 	public int getMaxStamina() {
@@ -447,6 +450,9 @@ public class Pokemon {
 		UseItemPotionResponseOuterClass.UseItemPotionResponse response;
 		try {
 			response = UseItemPotionResponseOuterClass.UseItemPotionResponse.parseFrom(serverRequest.getData());
+			if (response.getResult() == UseItemPotionResponseOuterClass.UseItemPotionResponse.Result.SUCCESS) {
+				setStamina(response.getStamina());
+			}
 			return response.getResult();
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
@@ -498,6 +504,9 @@ public class Pokemon {
 		UseItemReviveResponseOuterClass.UseItemReviveResponse response;
 		try {
 			response = UseItemReviveResponseOuterClass.UseItemReviveResponse.parseFrom(serverRequest.getData());
+			if (response.getResult() == UseItemReviveResponseOuterClass.UseItemReviveResponse.Result.SUCCESS) {
+				setStamina(response.getStamina());
+			}
 			return response.getResult();
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
