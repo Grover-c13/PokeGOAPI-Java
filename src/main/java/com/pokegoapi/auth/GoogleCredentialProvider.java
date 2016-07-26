@@ -15,7 +15,6 @@
 
 package com.pokegoapi.auth;
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -30,9 +29,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.io.IOException;
-import java.io.InvalidObjectException;
 import java.net.URISyntaxException;
-import java.util.concurrent.TimeUnit;
 
 public class GoogleCredentialProvider extends CredentialProvider {
 
@@ -190,7 +187,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 		}
 
 		Log.d(TAG, "Got token: " + googleAuthTokenJson.getIdToken());
-		onGoogleLoginOAuthCompleteListener.onTokenIdRecieved(googleAuthTokenJson);
+		onGoogleLoginOAuthCompleteListener.onTokenIdReceived(googleAuthTokenJson);
 		expiresTimestamp = System.currentTimeMillis()
 				+ (googleAuthTokenJson.getExpiresIn() * 1000 - REFRESH_TOKEN_BUFFER_TIME);
 		tokenId = googleAuthTokenJson.getIdToken();
@@ -278,6 +275,6 @@ public class GoogleCredentialProvider extends CredentialProvider {
 		 *
 		 * @param googleAuthTokenJson GoogleAuthToken object
 		 */
-		void onTokenIdRecieved(GoogleAuthTokenJson googleAuthTokenJson);
+		void onTokenIdReceived(GoogleAuthTokenJson googleAuthTokenJson);
 	}
 }
