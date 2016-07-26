@@ -22,7 +22,6 @@ import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
@@ -251,7 +250,7 @@ public class RequestHandler {
 			builder.setAuthTicket(lastAuth);
 		} else {
 			log.debug("Authenticated with static token");
-            builder.setAuthInfo(api.getAuthInfo());
+			builder.setAuthInfo(api.getAuthInfo());
 		}
 		builder.setUnknown12(989);
 		builder.setLatitude(api.getLatitude());

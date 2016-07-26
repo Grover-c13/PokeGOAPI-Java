@@ -11,4 +11,8 @@ public class PokemonGoApiException extends RuntimeException {
 	public PokemonGoApiException(Throwable cause) {
 		super(cause);
 	}
+
+	public PokemonGoApiException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

@@ -31,7 +31,6 @@
 package com.pokegoapi.examples;
 
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse.Result;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.gym.Battle;
@@ -41,11 +40,12 @@ import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.util.Log;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 
 import java.util.List;
 
+@Slf4j
 public class FightGymExample {
 
 	/**
@@ -96,7 +96,7 @@ public class FightGymExample {
 
 		} catch (LoginFailedException | RemoteServerException | InterruptedException e) {
 			// failed to login, invalid credentials, auth issue or server issue.
-			Log.e("Main", "Failed to login or server issue: ", e);
+			log.error("Main", "Failed to login or server issue: ", e);
 
 		}
 	}

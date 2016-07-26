@@ -22,13 +22,11 @@ import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.CatchPokemonMessage;
 import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.UseItemCaptureMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.UseItemCaptureMessageOuterClass.UseItemCaptureMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
-import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass;
 import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass.UseItemCaptureResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -383,7 +381,7 @@ public class CatchablePokemon {
 		UseItemCaptureMessage reqMsg = UseItemCaptureMessage
 				.newBuilder()
 				.setEncounterId(this.getEncounterId())
-				.setSpawnPointId(this.getSpawnPointId())
+				.setSpawnPointGuid(this.getSpawnPointId())
 				.setItemId(item)
 				.build();
 
