@@ -15,11 +15,18 @@
 
 package com.pokegoapi.auth;
 
-public class GoogleLoginSecrets {
-	public static final String SECRET = "NCjF1TLi2CcY6t5mt0ZveuL7";
-	public static final String CLIENT_ID = "848232511240-73ri3t7plvk96pj4f85uj8otdat2alem.apps.googleusercontent.com";
-	public static final String OAUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/device/code";
-	public static final String OAUTH_TOKEN_ENDPOINT = "https://www.googleapis.com/oauth2/v4/token";
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 
-	public static String refresh_token = null;
+import com.pokegoapi.exceptions.LoginFailedException;
+
+/**
+ * Any Credential Provider can extend this.
+ */
+public abstract class CredentialProvider {
+
+	public abstract String getTokenId() throws LoginFailedException;
+
+	public abstract AuthInfo getAuthInfo() throws LoginFailedException;
+
+	public abstract boolean isTokenIdExpired();
 }
