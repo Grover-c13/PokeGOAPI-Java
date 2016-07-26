@@ -49,6 +49,7 @@ public class Hatchery {
 	}
 
 	public void addEgg(EggPokemon egg) {
+		egg.setPgo(instance);
 		eggs.add(egg);
 	}
 	
