@@ -112,4 +112,17 @@ public class ItemBag {
 	public Collection<Item> getItems() {
 		return items.values();
 	}
+
+	/**
+	 * Get used space inside of player inventory.
+	 *
+	 * @return used space
+	 */
+	public int getItemsCount() {
+		int ct = 0;
+		for (Item item : items.values()) {
+			ct += item.getCount();
+		}
+		return ct;
+	}
 }

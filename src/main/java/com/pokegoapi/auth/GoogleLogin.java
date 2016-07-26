@@ -157,7 +157,7 @@ public class GoogleLogin extends Login {
 
 			return authbuilder.build();
 		} catch (Exception e) {
-			throw new LoginFailedException();
+			throw new LoginFailedException(e);
 		}
 
 	}
