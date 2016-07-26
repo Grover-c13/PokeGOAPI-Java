@@ -13,16 +13,17 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.auth;
+package com.pokegoapi.api.pokemon;
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-import com.pokegoapi.exceptions.LoginFailedException;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-
-public abstract class Login {
-
-	public abstract AuthInfo login(String username, String password) throws LoginFailedException;
-
-	public abstract AuthInfo login(String token) throws LoginFailedException;
-
+@Data 
+@AllArgsConstructor
+public class HatchedEgg {
+	
+	private Long id;
+	private int	experience;
+	private int	candy;
+	private int stardust;
 }

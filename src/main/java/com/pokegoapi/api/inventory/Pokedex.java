@@ -24,11 +24,16 @@ import java.util.Map;
 
 public class Pokedex {
 
-	private final PokemonGo api;
-	private Map<PokemonId, PokedexEntry> pokedexMap = new HashMap();
+	private PokemonGo api;
+	private Map<PokemonId, PokedexEntry> pokedexMap = new HashMap<>();
 
-	public Pokedex(PokemonGo api) {
-		this.api = api;
+	public Pokedex(PokemonGo pgo) {
+		reset(pgo);
+	}
+
+	public void reset(PokemonGo pgo) {
+		this.api = pgo;
+		pokedexMap = new HashMap<>();
 	}
 
 	/**

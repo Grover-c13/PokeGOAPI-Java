@@ -40,6 +40,10 @@ public class ItemBag {
 	private HashMap<ItemId, Item> items;
 
 	public ItemBag(PokemonGo pgo) {
+		reset(pgo);
+	}
+
+	public void reset(PokemonGo pgo) {
 		this.pgo = pgo;
 		items = new HashMap<>();
 	}
@@ -107,5 +111,18 @@ public class ItemBag {
 
 	public Collection<Item> getItems() {
 		return items.values();
+	}
+
+	/**
+	 * Get used space inside of player inventory.
+	 *
+	 * @return used space
+	 */
+	public int getItemsCount() {
+		int ct = 0;
+		for (Item item : items.values()) {
+			ct += item.getCount();
+		}
+		return ct;
 	}
 }

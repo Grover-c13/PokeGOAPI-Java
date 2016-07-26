@@ -22,10 +22,10 @@ import lombok.Setter;
 public class Point {
 	@Getter
 	@Setter
-	private static double longitude;
+	private double longitude;
 	@Getter
 	@Setter
-	private static double latitude;
+	private double latitude;
 
 	public Point(double latitude, double longitude) {
 		this.latitude = latitude;

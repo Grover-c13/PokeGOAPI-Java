@@ -27,24 +27,29 @@ ___
 # Build
   - Clone the repo and cd into the folder
   - `` git submodule update --init ``
-  - verify that you have gradle in your path
-  - `` gradle build bundle ``
+  - compile and package
+  - `` ./gradlew build bundle ``
   - you should have the api bundled in ``build/libs/PokeGOAPI-Java_bundle-0.0.1-SNAPSHOT.jar``
 
-  PS : To eclipse user, you may build one time and add the generated java class for proto into eclipse path : Right click on the project > Build path > New Source Folder > Type 'build/generated/source/proto/main/java' > Finish
+  PS : To Eclipse user, you must build once : `` ./gradlew build `` and add the generated java class for proto into eclipse source path : Right click on the project > Build path > Configure Build Path > Source > Add Folder > Select `build/generated/source/proto/main/java` > Finish
 
 # Usage
 Include the API as jar from your own build, or use Maven/Gradle/SBT/Leiningen: https://jitpack.io/#Grover-c13/PokeGOAPI-Java/master-SNAPSHOT
 
 Mostly everything is accessed through the PokemonGo class in the API package.
 
-The constructor of PokemonGo class requires a AuthInfo object which can be obtained from GoogleLogin().login or PTCLogin().login, and a OkHttpClient object.
+The constructor of PokemonGo class requires a AuthInfo object which can be obtained from GoogleLogin().login or PtcLogin().login, and a OkHttpClient object.
 
 EG:
 ```java
 OkHttpClient httpClient = new OkHttpClient();
-AuthInfo auth = new GoogleLogin(httpClient).login("token");           
-PokemonGo go = new PokemonGo(auth,httpClient);
+//Use Google
+//First Ever Login. Persist info when you recieve callback
+PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient,listner),httpClient);
+//Subsequently
+PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient,refreshToken),httpClient);
+//Or use PTC
+PokemonGo go = new PokemonGo(new PtcCredentialProvider(httpClient,username,password),httpClient);
 Log.v(go.getPlayerProfile());
 ```
 ##Android Dev FAQ
@@ -57,13 +62,17 @@ You're running the sample code on the UI thread. Strict mode policy will throw a
 
 This library is meant to be a Java implementation of the API. Google Volley is specific to Android and should not be introduced in this library. However, if you still want to refactor it, you should create it as a separate project.
 
+   - How can I use Android's native Google sign in with this library?
+
+You can't. The Google Identity Platform uses the SHA1 fingerprint and package name to authenticate the caller of all sign in requests. This means that Niantic would need to add your app's SHA1 fingerprint and package name to their Google API Console. If you ever requested a Google Maps API key, you went through the same process. An alternative would be using a WebView to access the web based OAuth flow. This will work with the client ID and secret provided by this library.
+
 
 ## Contributing
   - Fork it!
   - Create your feature branch: `git checkout -b my-new-feature`
-  - Commit your changes: `git commit -am 'Usefull information about your new features'`
+  - Commit your changes: `git commit -am 'Useful information about your new features'`
   - Push to the branch: `git push origin my-new-feature`
-  - Submit a pull request :D
+  - Submit a pull request on the `Development` branch :D
 
 ## Contributors
   - Grover-c13

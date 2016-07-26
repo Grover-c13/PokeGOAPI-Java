@@ -33,8 +33,13 @@ public class PokeBank {
 	@Getter
 	PokemonGo instance;
 
-	public PokeBank(PokemonGo instance) {
-		this.instance = instance;
+	public PokeBank(PokemonGo pgo) {
+		reset(pgo);
+	}
+
+	public void reset(PokemonGo pgo) {
+		this.instance = pgo;
+		pokemons = new ArrayList<>();
 	}
 
 	/**
@@ -80,5 +85,20 @@ public class PokeBank {
 				return pokemn.getId() != pokemon.getId();
 			}
 		}).collect(Collectors.<Pokemon>toList());
+	}
+
+	/**
+	 * Get a pokemon by id.
+	 *
+	 * @param id the id
+	 * @return the pokemon
+	 */
+	public Pokemon getPokemonById(final Long id) {
+		for (Pokemon pokemon : pokemons) {
+			if (pokemon.getId() == id) {
+				return pokemon;
+			}
+		}
+		return null;
 	}
 }

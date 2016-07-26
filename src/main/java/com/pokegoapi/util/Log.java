@@ -95,7 +95,7 @@ public class Log {
 		getInstance().wtf(tag, msg, tr);
 	}
 
-	enum Level {
+	public enum Level {
 
 		VERBOSE(2),
 		DEBUG(3),

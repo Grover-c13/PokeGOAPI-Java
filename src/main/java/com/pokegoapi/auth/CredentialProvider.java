@@ -13,21 +13,21 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.api.player;
+package com.pokegoapi.auth;
 
-import lombok.Getter;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 
-public enum Team {
-	// VALUES CONFIRMED
-	TEAM_NONE(0),
-	TEAM_MYSTIC(1),
-	TEAM_VALOR(2),
-	TEAM_INSTINCT(3);
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
 
-	@Getter
-	private int value;
+/**
+ * Any Credential Provider can extend this.
+ */
+public abstract class CredentialProvider {
 
-	private Team(int value) {
-		this.value = value;
-	}
+	public abstract String getTokenId() throws LoginFailedException, RemoteServerException;
+
+	public abstract AuthInfo getAuthInfo() throws LoginFailedException, RemoteServerException;
+
+	public abstract boolean isTokenIdExpired();
 }

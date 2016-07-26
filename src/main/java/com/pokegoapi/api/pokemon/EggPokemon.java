@@ -16,7 +16,15 @@
 package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
+import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
+
+import com.annimon.stream.Stream;
+import com.annimon.stream.function.Predicate;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.EggIncubator;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+
 import lombok.Setter;
 
 /**
@@ -30,26 +38,63 @@ public class EggPokemon {
 	private PokemonData proto;
 
 	// API METHODS //
+	/**
+	 * Incubate this egg.
+	 * 
+	 * @param incubator : the incubator
+	 * @return status of putting egg in incubator
+	 * @throws LoginFailedException e
+	 * @throws RemoteServerException e
+	 */
+	public UseItemEggIncubatorResponse.Result incubate(EggIncubator incubator) 
+			throws LoginFailedException, RemoteServerException {
+		if (incubator.isInUse()) {
+			throw new IllegalArgumentException("Incubator already used");
+		}
+		return incubator.hatchEgg(this);
+	}
+	
+	/**
+	 * Get the current distance that has been done with this egg
+	 * @return get distance already walked
+	 */
+	public double getEggKmWalked() {
+		if (!isIncubate())
+			return 0;
+		EggIncubator incubator = Stream.of(pgo.getInventories().getIncubators())
+				.filter(new Predicate<EggIncubator>() {
+					@Override
+					public boolean test(EggIncubator incub) {
+						return incub.getId().equals(proto.getEggIncubatorId());
+					}
+				}).findFirst().orElse(null);
+		// incubator should not be null but why not eh
+		if (incubator == null)
+			return 0;
+		else
+			return proto.getEggKmWalkedTarget()
+					- (incubator.getKmTarget() - pgo.getPlayerProfile().getStats().getKmWalked());
+	}
 
 	// DELEGATE METHODS BELOW //
+	/**
+	 * Build a EggPokemon wrapper from the proto.
+	 * 
+	 * @param proto : the prototype
+	 */
 	public EggPokemon(PokemonData proto) {
+		if (!proto.getIsEgg()) {
+			throw new IllegalArgumentException("You cant build a EggPokemon without a valid PokemonData.");
+		}
 		this.proto = proto;
 	}
 
 	public long getId() {
 		return proto.getId();
 	}
-
-	public boolean getIsEgg() {
-		return proto.getIsEgg();
-	}
-
+	
 	public double getEggKmWalkedTarget() {
 		return proto.getEggKmWalkedTarget();
-	}
-
-	public double getEggKmWalkedStart() {
-		return proto.getEggKmWalkedStart();
 	}
 
 	public long getCapturedCellId() {
@@ -62,6 +107,10 @@ public class EggPokemon {
 
 	public String getEggIncubatorId() {
 		return proto.getEggIncubatorId();
+	}
+	
+	public boolean isIncubate() {
+		return proto.getEggIncubatorId().length() > 0;
 	}
 
 	@Override

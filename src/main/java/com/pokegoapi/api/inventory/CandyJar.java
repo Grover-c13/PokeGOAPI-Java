@@ -28,6 +28,10 @@ public class CandyJar {
 	private HashMap<PokemonFamilyId, Integer> candies;
 
 	public CandyJar(PokemonGo pgo) {
+		reset(pgo);
+	}
+
+	public void reset(PokemonGo pgo) {
 		this.pgo = pgo;
 		candies = new HashMap<>();
 	}
@@ -77,6 +81,10 @@ public class CandyJar {
 	 * @return number of candies in jar
 	 */
 	public int getCandies(PokemonFamilyId family) {
-		return this.candies.get(family);
+		if (candies.containsKey(family)) {
+			return this.candies.get(family);
+		} else {
+			return 0;
+		}
 	}
 }
