@@ -16,13 +16,16 @@
 package com.pokegoapi.api;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
+
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
+import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.util.Log;
+
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
@@ -49,20 +52,28 @@ public class PokemonGo {
 	@Setter
 	private double altitude;
 
+	private CredentialProvider credentialProvider;
+
+	private RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo authInfo;
 
 	/**
 	 * Instantiates a new Pokemon go.
 	 *
-	 * @param auth   the auth
 	 * @param client the client
 	 */
-	public PokemonGo(RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth, OkHttpClient client)
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client)
 			throws LoginFailedException, RemoteServerException {
+
+		if (credentialProvider == null) {
+			throw new LoginFailedException("Credential Provider is null");
+		} else {
+			this.credentialProvider = credentialProvider;
+		}
+
 		playerProfile = null;
 
 		// send profile request to get the ball rolling
-		requestHandler = new RequestHandler(this, auth, client);
-
+		requestHandler = new RequestHandler(this, client);
 		playerProfile = new PlayerProfile(this);
 		inventories = new Inventories(this);
 
@@ -70,9 +81,18 @@ public class PokemonGo {
 		inventories.updateInventories();
 
 		// should have proper end point now.
-
 		map = new Map(this);
 	}
+
+	/**
+	 * Fetches valid AuthInfo
+	 * @return AuthInfo object
+	 * @throws LoginFailedException when login fails
+	 */
+	public RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo getAuthInfo() throws LoginFailedException {
+		return credentialProvider.getAuthInfo();
+	}
+
 
 	/**
 	 * Gets player profile.
