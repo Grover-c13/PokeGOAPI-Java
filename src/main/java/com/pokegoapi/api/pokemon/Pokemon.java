@@ -19,23 +19,22 @@ import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.PokemonMoveOuterClass;
-import POGOProtos.Inventory.Item.ItemIdOuterClass;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.EvolvePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.NicknamePokemonMessageOuterClass.NicknamePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.SetFavoritePokemonMessageOuterClass.SetFavoritePokemonMessage;
-import POGOProtos.Networking.Requests.Messages.UpgradePokemonMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.UpgradePokemonMessageOuterClass.UpgradePokemonMessage;
+import POGOProtos.Networking.Requests.Messages.UseItemPotionMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass.EvolvePokemonResponse;
 import POGOProtos.Networking.Responses.NicknamePokemonResponseOuterClass.NicknamePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
 import POGOProtos.Networking.Responses.SetFavoritePokemonResponseOuterClass.SetFavoritePokemonResponse;
-import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass;
 import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass.UpgradePokemonResponse;
 import POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass;
+import POGOProtos.Networking.Responses.UseItemReviveResponseOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
@@ -44,7 +43,8 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
-import lombok.Setter;
+
+import static POGOProtos.Networking.Requests.Messages.UseItemReviveMessageOuterClass.*;
 
 /**
  * The type Pokemon.
@@ -396,15 +396,103 @@ public class Pokemon {
         return getStamina() == 0;
     }
 
-    public UseItemPotionResponseOuterClass.UseItemPotionResponse.Result usePotion(ItemId itemId) {
-        Item i = pgo.getInventories().getItemBag().getItem(itemId);
-        if (!i.isPotion())
+    /**
+     * Heal a pokemon, using various fallback for potion
+     *
+     * @return Result, ERROR_CANNOT_USE if the requirements arent met
+     */
+    public UseItemPotionResponseOuterClass.UseItemPotionResponse.Result heal() throws LoginFailedException, RemoteServerException {
+        if (!isInjured())
             return UseItemPotionResponseOuterClass.UseItemPotionResponse.Result.ERROR_CANNOT_USE;
 
-        return null;
+        if (pgo.getInventories().getItemBag().getItem(ItemId.ITEM_POTION).getCount() > 0)
+            return usePotion(ItemId.ITEM_POTION);
+
+        if (pgo.getInventories().getItemBag().getItem(ItemId.ITEM_SUPER_POTION).getCount() > 0)
+            return usePotion(ItemId.ITEM_SUPER_POTION);
+
+        if (pgo.getInventories().getItemBag().getItem(ItemId.ITEM_HYPER_POTION).getCount() > 0)
+            return usePotion(ItemId.ITEM_HYPER_POTION);
+
+        if (pgo.getInventories().getItemBag().getItem(ItemId.ITEM_MAX_POTION).getCount() > 0)
+            return usePotion(ItemId.ITEM_MAX_POTION);
+
+        return UseItemPotionResponseOuterClass.UseItemPotionResponse.Result.ERROR_CANNOT_USE;
     }
 
-    public UseItemPotionResponseOuterClass.UseItemPotionResponse.Result useRevive(ItemId itemId) {
-        return null;
+    /**
+     * use a potion on that pokemon. Will check if there is enough potions & if the pokemon need
+     * to be healed.
+     *
+     * @return Result, ERROR_CANNOT_USE if the requirements arent met
+     */
+    public UseItemPotionResponseOuterClass.UseItemPotionResponse.Result usePotion(ItemId itemId) throws LoginFailedException, RemoteServerException {
+        Item i = pgo.getInventories().getItemBag().getItem(itemId);
+        //some sanity check, to prevent wrong use of this call
+        if (!i.isPotion() || i.getCount() < 1 || !isInjured())
+            return UseItemPotionResponseOuterClass.UseItemPotionResponse.Result.ERROR_CANNOT_USE;
+
+        UseItemPotionMessageOuterClass.UseItemPotionMessage reqMsg = UseItemPotionMessageOuterClass.UseItemPotionMessage.newBuilder()
+                .setItemId(itemId)
+                .setPokemonId(getId())
+                .build();
+
+        ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_POTION, reqMsg);
+        pgo.getRequestHandler().sendServerRequests(serverRequest);
+
+        UseItemPotionResponseOuterClass.UseItemPotionResponse response;
+        try {
+            response = UseItemPotionResponseOuterClass.UseItemPotionResponse.parseFrom(serverRequest.getData());
+            return response.getResult();
+        } catch (InvalidProtocolBufferException e) {
+            throw new RemoteServerException(e);
+        }
     }
+
+    /**
+     * Heal a pokemon, using various fallback for potion
+     *
+     * @return Result, ERROR_CANNOT_USE if the requirements arent met
+     */
+    public UseItemReviveResponseOuterClass.UseItemReviveResponse.Result revive() throws LoginFailedException, RemoteServerException {
+        if (!isFainted())
+            return UseItemReviveResponseOuterClass.UseItemReviveResponse.Result.ERROR_CANNOT_USE;
+
+        if (pgo.getInventories().getItemBag().getItem(ItemId.ITEM_REVIVE).getCount() > 0)
+            return useRevive(ItemId.ITEM_REVIVE);
+
+        if (pgo.getInventories().getItemBag().getItem(ItemId.ITEM_MAX_REVIVE).getCount() > 0)
+            return useRevive(ItemId.ITEM_MAX_REVIVE);
+
+        return UseItemReviveResponseOuterClass.UseItemReviveResponse.Result.ERROR_CANNOT_USE;
+    }
+
+    /**
+     * use a revive item on the pokemon. Will check if there is enough revive & if the pokemon need
+     * to be revived.
+     *
+     * @return Result, ERROR_CANNOT_USE if the requirements arent met
+     */
+    public UseItemReviveResponseOuterClass.UseItemReviveResponse.Result useRevive(ItemId itemId) throws LoginFailedException, RemoteServerException {
+        Item i = pgo.getInventories().getItemBag().getItem(itemId);
+        if (!i.isRevive() || i.getCount() < 1 || !isFainted())
+            return UseItemReviveResponseOuterClass.UseItemReviveResponse.Result.ERROR_CANNOT_USE;
+
+        UseItemReviveMessage reqMsg = UseItemReviveMessage.newBuilder()
+                .setItemId(itemId)
+                .setPokemonId(getId())
+                .build();
+
+        ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_REVIVE, reqMsg);
+        pgo.getRequestHandler().sendServerRequests(serverRequest);
+
+        UseItemReviveResponseOuterClass.UseItemReviveResponse response;
+        try {
+            response = UseItemReviveResponseOuterClass.UseItemReviveResponse.parseFrom(serverRequest.getData());
+            return response.getResult();
+        } catch (InvalidProtocolBufferException e) {
+            throw new RemoteServerException(e);
+        }
+    }
+
 }
