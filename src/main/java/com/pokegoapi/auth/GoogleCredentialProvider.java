@@ -16,11 +16,10 @@
 package com.pokegoapi.auth;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-
 import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
 import com.squareup.moshi.Moshi;
-
 import lombok.Getter;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -33,16 +32,13 @@ import java.net.URISyntaxException;
 
 public class GoogleCredentialProvider extends CredentialProvider {
 
-	private static final String TAG = GoogleCredentialProvider.class.getSimpleName();
-
-	//We try and refresh token 5 minutes before it actually expires
-	private static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
-
 	public static final String SECRET = "NCjF1TLi2CcY6t5mt0ZveuL7";
 	public static final String CLIENT_ID = "848232511240-73ri3t7plvk96pj4f85uj8otdat2alem.apps.googleusercontent.com";
 	public static final String OAUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/device/code";
 	public static final String OAUTH_TOKEN_ENDPOINT = "https://www.googleapis.com/oauth2/v4/token";
-
+	private static final String TAG = GoogleCredentialProvider.class.getSimpleName();
+	//We try and refresh token 5 minutes before it actually expires
+	private static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
 	private final OkHttpClient client;
 
 	private final OnGoogleLoginOAuthCompleteListener onGoogleLoginOAuthCompleteListener;
@@ -63,7 +59,8 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	 * @param refreshToken Refresh Token Persisted by user
 	 * @throws LoginFailedException When login fails
 	 */
-	public GoogleCredentialProvider(OkHttpClient client, String refreshToken) throws LoginFailedException {
+	public GoogleCredentialProvider(OkHttpClient client, String refreshToken)
+			throws LoginFailedException, RemoteServerException {
 		this.client = client;
 		this.refreshToken = refreshToken;
 		onGoogleLoginOAuthCompleteListener = null;
@@ -97,7 +94,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	 * @param refreshToken Refresh token persisted by the user after initial login
 	 * @throws LoginFailedException If we fail to get tokenId
 	 */
-	public void refreshToken(String refreshToken) throws LoginFailedException {
+	public void refreshToken(String refreshToken) throws LoginFailedException, RemoteServerException {
 		HttpUrl url = HttpUrl.parse(OAUTH_TOKEN_ENDPOINT).newBuilder()
 				.addQueryParameter("client_id", CLIENT_ID)
 				.addQueryParameter("client_secret", SECRET)
@@ -115,7 +112,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 		try {
 			response = client.newCall(request).execute();
 		} catch (IOException e) {
-			throw new LoginFailedException("Network Request failed to fetch refreshed tokenId", e);
+			throw new RemoteServerException("Network Request failed to fetch refreshed tokenId", e);
 		}
 		Moshi moshi = new Moshi.Builder().build();
 		GoogleAuthTokenJson googleAuthTokenJson = null;
@@ -123,7 +120,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 			googleAuthTokenJson = moshi.adapter(GoogleAuthTokenJson.class).fromJson(response.body().string());
 			Log.d(TAG, "" + googleAuthTokenJson.getExpiresIn());
 		} catch (IOException e) {
-			throw new LoginFailedException("Failed to unmarshell the Json response to fetch refreshed tokenId", e);
+			throw new RemoteServerException("Failed to unmarshal the Json response to fetch refreshed tokenId", e);
 		}
 		if (googleAuthTokenJson.getError() != null) {
 			throw new LoginFailedException(googleAuthTokenJson.getError());
@@ -224,7 +221,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	}
 
 	@Override
-	public String getTokenId() throws LoginFailedException {
+	public String getTokenId() throws LoginFailedException, RemoteServerException {
 		if (isTokenIdExpired()) {
 			refreshToken(refreshToken);
 		}
@@ -238,7 +235,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	 * @throws LoginFailedException When login fails
 	 */
 	@Override
-	public AuthInfo getAuthInfo() throws LoginFailedException {
+	public AuthInfo getAuthInfo() throws LoginFailedException, RemoteServerException {
 		if (isTokenIdExpired()) {
 			refreshToken(refreshToken);
 		}

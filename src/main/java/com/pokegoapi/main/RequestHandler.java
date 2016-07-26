@@ -17,16 +17,12 @@ package com.pokegoapi.main;
 
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass;
-
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.auth.GoogleCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
-
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -54,7 +50,7 @@ public class RequestHandler {
 	 * @param api    the api
 	 * @param client the client
 	 */
-	public RequestHandler(PokemonGo api, OkHttpClient client) throws LoginFailedException {
+	public RequestHandler(PokemonGo api, OkHttpClient client) throws LoginFailedException, RemoteServerException {
 		this.api = api;
 		this.client = client;
 		apiEndpoint = ApiSettings.API_ENDPOINT;
@@ -178,7 +174,7 @@ public class RequestHandler {
 		try {
 			request.writeTo(stream);
 		} catch (IOException e) {
-			Log.wtf(TAG, "Failed to write request to bytearray ouput stream. This should never happen", e);
+			Log.wtf(TAG, "Failed to write request to bytearray output stream. This should never happen", e);
 		}
 
 		RequestBody body = RequestBody.create(null, stream.toByteArray());
@@ -194,7 +190,7 @@ public class RequestHandler {
 		}
 
 		if (response.code() != 200) {
-			throw new RemoteServerException("Got a unexcepted http code : " + response.code());
+			throw new RemoteServerException("Got a unexpected http code : " + response.code());
 		}
 
 		ResponseEnvelopeOuterClass.ResponseEnvelope responseEnvelop = null;
@@ -237,14 +233,15 @@ public class RequestHandler {
 	}
 
 	@Deprecated
-	private void resetBuilder() throws LoginFailedException {
+	private void resetBuilder() throws LoginFailedException, RemoteServerException {
 		builder = RequestEnvelopeOuterClass.RequestEnvelope.newBuilder();
 		resetBuilder(builder);
 		hasRequests = false;
 		serverRequests.clear();
 	}
 
-	private void resetBuilder(RequestEnvelopeOuterClass.RequestEnvelope.Builder builder) throws LoginFailedException {
+	private void resetBuilder(RequestEnvelopeOuterClass.RequestEnvelope.Builder builder)
+			throws LoginFailedException, RemoteServerException {
 		builder.setStatusCode(2);
 		builder.setRequestId(8145806132888207460L);
 		if (lastAuth != null

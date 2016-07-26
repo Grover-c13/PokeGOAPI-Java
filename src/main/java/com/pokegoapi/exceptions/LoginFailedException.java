@@ -29,6 +29,6 @@ public class LoginFailedException extends Exception {
 	}
 
 	public LoginFailedException(String reason, Exception exception) {
-		super(reason,exception);
+		super(reason, exception);
 	}
 }
