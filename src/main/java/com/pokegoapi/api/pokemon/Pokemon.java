@@ -19,6 +19,7 @@ import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.PokemonMoveOuterClass;
+import POGOProtos.Inventory.Item.ItemIdOuterClass;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.EvolvePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.NicknamePokemonMessageOuterClass.NicknamePokemonMessage;
@@ -34,8 +35,10 @@ import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleaseP
 import POGOProtos.Networking.Responses.SetFavoritePokemonResponseOuterClass.SetFavoritePokemonResponse;
 import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass;
 import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass.UpgradePokemonResponse;
+import POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.map.pokemon.EvolutionResult;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -48,329 +51,360 @@ import lombok.Setter;
  */
 public class Pokemon {
 
-	private static final String TAG = Pokemon.class.getSimpleName();
-	private final PokemonGo pgo;
-	private PokemonData proto;
-	private PokemonMeta meta;
-
-	// API METHODS //
-
-	// DELEGATE METHODS BELOW //
-	public Pokemon(PokemonGo api, PokemonData proto) {
-		this.pgo = api;
-		this.proto = proto;
-	}
-
-	/**
-	 * Transfers the pokemon.
-	 *
-	 * @return the result
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	public Result transferPokemon() throws LoginFailedException, RemoteServerException {
-		ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
-
-		ServerRequest serverRequest = new ServerRequest(RequestType.RELEASE_POKEMON, reqMsg);
-		pgo.getRequestHandler().sendServerRequests(serverRequest);
-
-		ReleasePokemonResponse response;
-		try {
-			response = ReleasePokemonResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			return ReleasePokemonResponse.Result.FAILED;
-		}
-
-		if (response.getResult() == Result.SUCCESS) {
-			pgo.getInventories().getPokebank().removePokemon(this);
-		}
-
-		pgo.getInventories().getPokebank().removePokemon(this);
-
-		pgo.getInventories().updateInventories();
-
-		return response.getResult();
-	}
-
-	/**
-	 * Rename pokemon nickname pokemon response . result.
-	 *
-	 * @param nickname the nickname
-	 * @return the nickname pokemon response . result
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	public NicknamePokemonResponse.Result renamePokemon(String nickname)
-			throws LoginFailedException, RemoteServerException {
-		NicknamePokemonMessage reqMsg = NicknamePokemonMessage.newBuilder()
-				.setPokemonId(getId())
-				.setNickname(nickname)
-				.build();
-
-		ServerRequest serverRequest = new ServerRequest(RequestType.NICKNAME_POKEMON, reqMsg);
-		pgo.getRequestHandler().sendServerRequests(serverRequest);
-
-		NicknamePokemonResponse response;
-		try {
-			response = NicknamePokemonResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-
-		pgo.getInventories().getPokebank().removePokemon(this);
-		pgo.getInventories().updateInventories();
-
-		return response.getResult();
-	}
-
-	/**
-	* Function to mark the pokemon as favorite or not.
-	*
-	* @param markFavorite Mark Pokemon as Favorite?
-	* @return the SetFavoritePokemonResponse.Result
-	* @throws LoginFailedException  the login failed exception
-	* @throws RemoteServerException the remote server exception
-	*/
-	public SetFavoritePokemonResponse.Result setFavoritePokemon(boolean markFavorite) 
-			throws LoginFailedException, RemoteServerException {
-		SetFavoritePokemonMessage reqMsg = SetFavoritePokemonMessage.newBuilder()
-				.setPokemonId(getId())
-				.setIsFavorite(markFavorite)
-				.build();
-
-		ServerRequest serverRequest = new ServerRequest(RequestType.SET_FAVORITE_POKEMON, reqMsg);
-		pgo.getRequestHandler().sendServerRequests(serverRequest);
-
-		SetFavoritePokemonResponse response;
-		try {
-			response = SetFavoritePokemonResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-
-		pgo.getInventories().getPokebank().removePokemon(this);
-		pgo.getInventories().updateInventories();
-
-		return response.getResult();
-	}
-
-	/**
-	 * Powers up a pokemon with candy and stardust.
-	 * After powering up this pokemon object will reflect the new changes.
-	 *
-	 * @return The result
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	public UpgradePokemonResponse.Result powerUp() throws LoginFailedException, RemoteServerException {
-		UpgradePokemonMessage reqMsg = UpgradePokemonMessage.newBuilder()
-				.setPokemonId(this.getId())
-				.build();
-
-		ServerRequest serverRequest = new ServerRequest(RequestType.UPGRADE_POKEMON, reqMsg);
-		pgo.getRequestHandler().sendServerRequests(serverRequest);
-
-		UpgradePokemonResponse response;
-		try {
-			response = UpgradePokemonResponse.parseFrom(serverRequest.getData());
-			this.proto = response.getUpgradedPokemon();
-			return response.getResult();
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-	}
-
-	/**
-	 * Evolve evolution result.
-	 *
-	 * @return the evolution result
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	public EvolutionResult evolve() throws LoginFailedException, RemoteServerException {
-		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
-
-		ServerRequest serverRequest = new ServerRequest(RequestType.EVOLVE_POKEMON, reqMsg);
-		pgo.getRequestHandler().sendServerRequests(serverRequest);
-
-		EvolvePokemonResponse response;
-		try {
-			response = EvolvePokemonResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			return null;
-		}
-
-		EvolutionResult result = new EvolutionResult(pgo, response);
-
-		pgo.getInventories().getPokebank().removePokemon(this);
-
-		pgo.getInventories().updateInventories();
-
-		return result;
-	}
-
-	private PokemonMeta getMeta() {
-		if (meta == null) {
-			meta = PokemonMetaRegistry.getMeta(this.getPokemonId());
-		}
-
-		return meta;
-	}
-
-	public int getCandy() {
-		return pgo.getInventories().getCandyjar().getCandies(getPokemonFamily());
-	}
-
-	public PokemonFamilyId getPokemonFamily() {
-		return PokemonMetaRegistry.getFamily(this.getPokemonId());
-	}
-
-	public boolean equals(Pokemon other) {
-		return (other.getId() == getId());
-	}
-
-	public PokemonData getDefaultInstanceForType() {
-		return proto.getDefaultInstanceForType();
-	}
-
-	public long getId() {
-		return proto.getId();
-	}
-
-	public PokemonIdOuterClass.PokemonId getPokemonId() {
-		return proto.getPokemonId();
-	}
-
-	public int getCp() {
-		return proto.getCp();
-	}
-
-	public int getStamina() {
-		return proto.getStamina();
-	}
-
-	public int getMaxStamina() {
-		return proto.getStaminaMax();
-	}
-
-	public PokemonMoveOuterClass.PokemonMove getMove1() {
-		return proto.getMove1();
-	}
-
-	public PokemonMoveOuterClass.PokemonMove getMove2() {
-		return proto.getMove2();
-	}
-
-	public String getDeployedFortId() {
-		return proto.getDeployedFortId();
-	}
-
-	public String getOwnerName() {
-		return proto.getOwnerName();
-	}
-
-	public boolean getIsEgg() {
-		return proto.getIsEgg();
-	}
-
-	public double getEggKmWalkedTarget() {
-		return proto.getEggKmWalkedTarget();
-	}
-
-	public double getEggKmWalkedStart() {
-		return proto.getEggKmWalkedStart();
-	}
-
-	public int getOrigin() {
-		return proto.getOrigin();
-	}
-
-	public float getHeightM() {
-		return proto.getHeightM();
-	}
-
-	public int getIndividualAttack() {
-		return proto.getIndividualAttack();
-	}
-
-	public int getIndividualDefense() {
-		return proto.getIndividualDefense();
-	}
-
-	public int getIndividualStamina() {
-		return proto.getIndividualStamina();
-	}
-	
-	/**
-	 * Calculates the pokemons IV ratio.
-	 * @return the pokemons IV ratio as a double between 0 and 1.0, 1.0 being perfect IVs
-	 */
-	public double getIvRatio() {
-		return (this.getIndividualAttack() + this.getIndividualDefense() + this.getIndividualStamina()) / 45.0;
-	}
-
-	public float getCpMultiplier() {
-		return proto.getCpMultiplier();
-	}
-
-	public ItemId getPokeball() {
-		return proto.getPokeball();
-	}
-
-	public long getCapturedS2CellId() {
-		return proto.getCapturedCellId();
-	}
-
-	public int getBattlesAttacked() {
-		return proto.getBattlesAttacked();
-	}
-
-	public int getBattlesDefended() {
-		return proto.getBattlesDefended();
-	}
-
-	public String getEggIncubatorId() {
-		return proto.getEggIncubatorId();
-	}
-
-	public long getCreationTimeMs() {
-		return proto.getCreationTimeMs();
-	}
-
-	public boolean getFavorite() {
-		return proto.getFavorite() > 0;
-	}
-
-	public String getNickname() {
-		return proto.getNickname();
-	}
-
-	public boolean getFromFort() {
-		return proto.getFromFort() > 0;
-	}
-
-	public void debug() {
-		Log.d(TAG, proto.toString());
-	}
-
-
-	public int getBaseStam() {
-		return getMeta().getBaseStam();
-	}
-
-	public double getBaseCaptureRate() {
-		return getMeta().getBaseCaptureRate();
-	}
-
-	public int getCandiesToEvolve() {
-		return getMeta().getCandiesToEvolve();
-	}
-
-	public double getBaseFleeRate() {
-		return getMeta().getBaseFleeRate();
-	}
-
-	public PokemonIdOuterClass.PokemonId getParent() {
-		return getMeta().getParent();
-	}
+    private static final String TAG = Pokemon.class.getSimpleName();
+    private final PokemonGo pgo;
+    private PokemonData proto;
+    private PokemonMeta meta;
+
+    // API METHODS //
+
+    // DELEGATE METHODS BELOW //
+    public Pokemon(PokemonGo api, PokemonData proto) {
+        this.pgo = api;
+        this.proto = proto;
+    }
+
+    /**
+     * Transfers the pokemon.
+     *
+     * @return the result
+     * @throws LoginFailedException  the login failed exception
+     * @throws RemoteServerException the remote server exception
+     */
+    public Result transferPokemon() throws LoginFailedException, RemoteServerException {
+        ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
+
+        ServerRequest serverRequest = new ServerRequest(RequestType.RELEASE_POKEMON, reqMsg);
+        pgo.getRequestHandler().sendServerRequests(serverRequest);
+
+        ReleasePokemonResponse response;
+        try {
+            response = ReleasePokemonResponse.parseFrom(serverRequest.getData());
+        } catch (InvalidProtocolBufferException e) {
+            return ReleasePokemonResponse.Result.FAILED;
+        }
+
+        if (response.getResult() == Result.SUCCESS) {
+            pgo.getInventories().getPokebank().removePokemon(this);
+        }
+
+        pgo.getInventories().getPokebank().removePokemon(this);
+
+        pgo.getInventories().updateInventories();
+
+        return response.getResult();
+    }
+
+    /**
+     * Rename pokemon nickname pokemon response . result.
+     *
+     * @param nickname the nickname
+     * @return the nickname pokemon response . result
+     * @throws LoginFailedException  the login failed exception
+     * @throws RemoteServerException the remote server exception
+     */
+    public NicknamePokemonResponse.Result renamePokemon(String nickname)
+            throws LoginFailedException, RemoteServerException {
+        NicknamePokemonMessage reqMsg = NicknamePokemonMessage.newBuilder()
+                .setPokemonId(getId())
+                .setNickname(nickname)
+                .build();
+
+        ServerRequest serverRequest = new ServerRequest(RequestType.NICKNAME_POKEMON, reqMsg);
+        pgo.getRequestHandler().sendServerRequests(serverRequest);
+
+        NicknamePokemonResponse response;
+        try {
+            response = NicknamePokemonResponse.parseFrom(serverRequest.getData());
+        } catch (InvalidProtocolBufferException e) {
+            throw new RemoteServerException(e);
+        }
+
+        pgo.getInventories().getPokebank().removePokemon(this);
+        pgo.getInventories().updateInventories();
+
+        return response.getResult();
+    }
+
+    /**
+     * Function to mark the pokemon as favorite or not.
+     *
+     * @param markFavorite Mark Pokemon as Favorite?
+     * @return the SetFavoritePokemonResponse.Result
+     * @throws LoginFailedException  the login failed exception
+     * @throws RemoteServerException the remote server exception
+     */
+    public SetFavoritePokemonResponse.Result setFavoritePokemon(boolean markFavorite)
+            throws LoginFailedException, RemoteServerException {
+        SetFavoritePokemonMessage reqMsg = SetFavoritePokemonMessage.newBuilder()
+                .setPokemonId(getId())
+                .setIsFavorite(markFavorite)
+                .build();
+
+        ServerRequest serverRequest = new ServerRequest(RequestType.SET_FAVORITE_POKEMON, reqMsg);
+        pgo.getRequestHandler().sendServerRequests(serverRequest);
+
+        SetFavoritePokemonResponse response;
+        try {
+            response = SetFavoritePokemonResponse.parseFrom(serverRequest.getData());
+        } catch (InvalidProtocolBufferException e) {
+            throw new RemoteServerException(e);
+        }
+
+        pgo.getInventories().getPokebank().removePokemon(this);
+        pgo.getInventories().updateInventories();
+
+        return response.getResult();
+    }
+
+    /**
+     * Powers up a pokemon with candy and stardust.
+     * After powering up this pokemon object will reflect the new changes.
+     *
+     * @return The result
+     * @throws LoginFailedException  the login failed exception
+     * @throws RemoteServerException the remote server exception
+     */
+    public UpgradePokemonResponse.Result powerUp() throws LoginFailedException, RemoteServerException {
+        UpgradePokemonMessage reqMsg = UpgradePokemonMessage.newBuilder()
+                .setPokemonId(this.getId())
+                .build();
+
+        ServerRequest serverRequest = new ServerRequest(RequestType.UPGRADE_POKEMON, reqMsg);
+        pgo.getRequestHandler().sendServerRequests(serverRequest);
+
+        UpgradePokemonResponse response;
+        try {
+            response = UpgradePokemonResponse.parseFrom(serverRequest.getData());
+            this.proto = response.getUpgradedPokemon();
+            return response.getResult();
+        } catch (InvalidProtocolBufferException e) {
+            throw new RemoteServerException(e);
+        }
+    }
+
+    /**
+     * Evolve evolution result.
+     *
+     * @return the evolution result
+     * @throws LoginFailedException  the login failed exception
+     * @throws RemoteServerException the remote server exception
+     */
+    public EvolutionResult evolve() throws LoginFailedException, RemoteServerException {
+        EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
+
+        ServerRequest serverRequest = new ServerRequest(RequestType.EVOLVE_POKEMON, reqMsg);
+        pgo.getRequestHandler().sendServerRequests(serverRequest);
+
+        EvolvePokemonResponse response;
+        try {
+            response = EvolvePokemonResponse.parseFrom(serverRequest.getData());
+        } catch (InvalidProtocolBufferException e) {
+            return null;
+        }
+
+        EvolutionResult result = new EvolutionResult(pgo, response);
+
+        pgo.getInventories().getPokebank().removePokemon(this);
+
+        pgo.getInventories().updateInventories();
+
+        return result;
+    }
+
+    private PokemonMeta getMeta() {
+        if (meta == null) {
+            meta = PokemonMetaRegistry.getMeta(this.getPokemonId());
+        }
+
+        return meta;
+    }
+
+    public int getCandy() {
+        return pgo.getInventories().getCandyjar().getCandies(getPokemonFamily());
+    }
+
+    public PokemonFamilyId getPokemonFamily() {
+        return PokemonMetaRegistry.getFamily(this.getPokemonId());
+    }
+
+    public boolean equals(Pokemon other) {
+        return (other.getId() == getId());
+    }
+
+    public PokemonData getDefaultInstanceForType() {
+        return proto.getDefaultInstanceForType();
+    }
+
+    public long getId() {
+        return proto.getId();
+    }
+
+    public PokemonIdOuterClass.PokemonId getPokemonId() {
+        return proto.getPokemonId();
+    }
+
+    public int getCp() {
+        return proto.getCp();
+    }
+
+    public int getStamina() {
+        return proto.getStamina();
+    }
+
+    public int getMaxStamina() {
+        return proto.getStaminaMax();
+    }
+
+    public PokemonMoveOuterClass.PokemonMove getMove1() {
+        return proto.getMove1();
+    }
+
+    public PokemonMoveOuterClass.PokemonMove getMove2() {
+        return proto.getMove2();
+    }
+
+    public String getDeployedFortId() {
+        return proto.getDeployedFortId();
+    }
+
+    public String getOwnerName() {
+        return proto.getOwnerName();
+    }
+
+    public boolean getIsEgg() {
+        return proto.getIsEgg();
+    }
+
+    public double getEggKmWalkedTarget() {
+        return proto.getEggKmWalkedTarget();
+    }
+
+    public double getEggKmWalkedStart() {
+        return proto.getEggKmWalkedStart();
+    }
+
+    public int getOrigin() {
+        return proto.getOrigin();
+    }
+
+    public float getHeightM() {
+        return proto.getHeightM();
+    }
+
+    public int getIndividualAttack() {
+        return proto.getIndividualAttack();
+    }
+
+    public int getIndividualDefense() {
+        return proto.getIndividualDefense();
+    }
+
+    public int getIndividualStamina() {
+        return proto.getIndividualStamina();
+    }
+
+    /**
+     * Calculates the pokemons IV ratio.
+     *
+     * @return the pokemons IV ratio as a double between 0 and 1.0, 1.0 being perfect IVs
+     */
+    public double getIvRatio() {
+        return (this.getIndividualAttack() + this.getIndividualDefense() + this.getIndividualStamina()) / 45.0;
+    }
+
+    public float getCpMultiplier() {
+        return proto.getCpMultiplier();
+    }
+
+    public ItemId getPokeball() {
+        return proto.getPokeball();
+    }
+
+    public long getCapturedS2CellId() {
+        return proto.getCapturedCellId();
+    }
+
+    public int getBattlesAttacked() {
+        return proto.getBattlesAttacked();
+    }
+
+    public int getBattlesDefended() {
+        return proto.getBattlesDefended();
+    }
+
+    public String getEggIncubatorId() {
+        return proto.getEggIncubatorId();
+    }
+
+    public long getCreationTimeMs() {
+        return proto.getCreationTimeMs();
+    }
+
+    public boolean getFavorite() {
+        return proto.getFavorite() > 0;
+    }
+
+    public String getNickname() {
+        return proto.getNickname();
+    }
+
+    public boolean getFromFort() {
+        return proto.getFromFort() > 0;
+    }
+
+    public void debug() {
+        Log.d(TAG, proto.toString());
+    }
+
+
+    public int getBaseStam() {
+        return getMeta().getBaseStam();
+    }
+
+    public double getBaseCaptureRate() {
+        return getMeta().getBaseCaptureRate();
+    }
+
+    public int getCandiesToEvolve() {
+        return getMeta().getCandiesToEvolve();
+    }
+
+    public double getBaseFleeRate() {
+        return getMeta().getBaseFleeRate();
+    }
+
+    public PokemonIdOuterClass.PokemonId getParent() {
+        return getMeta().getParent();
+    }
+
+    /**
+     * check if pokemon its injured but not fainted. need potions to heal
+     *
+     * @return true if pokemon is injured
+     */
+    public boolean isInjured() {
+        return !isFainted() && getStamina() < getMaxStamina();
+    }
+
+    /**
+     * check if a pokemon it's died (fainted). need a revive to resurrect
+     *
+     * @return true if a pokemon is fainted
+     */
+    public boolean isFainted() {
+        return getStamina() == 0;
+    }
+
+    public UseItemPotionResponseOuterClass.UseItemPotionResponse.Result usePotion(ItemId itemId) {
+        Item i = pgo.getInventories().getItemBag().getItem(itemId);
+        if (!i.isPotion())
+            return UseItemPotionResponseOuterClass.UseItemPotionResponse.Result.ERROR_CANNOT_USE;
+
+        return null;
+    }
+
+    public UseItemPotionResponseOuterClass.UseItemPotionResponse.Result useRevive(ItemId itemId) {
+        return null;
+    }
 }
