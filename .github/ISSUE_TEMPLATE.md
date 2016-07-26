@@ -1,5 +1,5 @@
 **Description:**
-[Short description of the issue observed. If this ia feature request you can modify the template as required.]
+[Short description of the issue observed. If this is a feature request you can modify the template as required.]
 
 **Steps to reproduce:**
 
