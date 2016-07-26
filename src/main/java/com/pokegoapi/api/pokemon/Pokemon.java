@@ -341,7 +341,7 @@ public class Pokemon {
 	 * Checks whether the Pokémon is set as favorite.
 	 * @return true if the Pokémon is set as favorite
 	 */
-	public boolean isFavorite(){
+	public boolean isFavorite() {
 		return proto.getFavorite() > 0;
 	}
 
