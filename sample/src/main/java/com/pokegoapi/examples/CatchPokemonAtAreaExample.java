@@ -37,11 +37,7 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.pokemon.CatchResult;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.EncounterResult;
-<<<<<<< HEAD:sample/src/main/java/com/pokegoapi/examples/CatchPokemonAtAreaExample.java
-import com.pokegoapi.auth.PtcLogin;
-=======
 import com.pokegoapi.auth.PtcCredentialProvider;
->>>>>>> Grover-c13/Development:src/main/java/com/pokegoapi/examples/CatchPokemonAtAreaExample.java
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
