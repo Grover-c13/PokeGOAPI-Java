@@ -336,7 +336,16 @@ public class Pokemon {
 	public long getCreationTimeMs() {
 		return proto.getCreationTimeMs();
 	}
+	
+	/**
+	 * Checks whether the Pokémon is set as favorite.
+	 * @return true if the Pokémon is set as favorite
+	 */
+	public boolean isFavorite() {
+		return proto.getFavorite() > 0;
+	}
 
+	@Deprecated
 	public boolean getFavorite() {
 		return proto.getFavorite() > 0;
 	}
