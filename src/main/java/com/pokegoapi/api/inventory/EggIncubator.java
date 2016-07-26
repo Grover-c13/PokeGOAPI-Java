@@ -41,7 +41,6 @@ public class EggIncubator {
 	public EggIncubator(PokemonGo pgo, EggIncubatorOuterClass.EggIncubator proto) {
 		this.pgo = pgo;
 		this.proto = proto;
-		this.inUse = proto.getPokemonId() != 0;
 	}
 
 	/**
@@ -80,8 +79,6 @@ public class EggIncubator {
 		}
 
 		pgo.getInventories().updateInventories(true);
-
-		this.inUse = true;
 
 		return response.getResult();
 	}
