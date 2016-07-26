@@ -31,8 +31,6 @@ import lombok.Getter;
 public class EggIncubator {
 	private final EggIncubatorOuterClass.EggIncubator proto;
 	private final PokemonGo pgo;
-	@Getter
-	private boolean inUse = false;
 
 	/**
 	 * Create new EggIncubator with given proto.
@@ -43,7 +41,6 @@ public class EggIncubator {
 	public EggIncubator(PokemonGo pgo, EggIncubatorOuterClass.EggIncubator proto) {
 		this.pgo = pgo;
 		this.proto = proto;
-		this.inUse = proto.getPokemonId() != 0;
 	}
 
 	/**
@@ -83,8 +80,6 @@ public class EggIncubator {
 
 		pgo.getInventories().updateInventories(true);
 
-		this.inUse = true;
-
 		return response.getResult();
 	}
 	
@@ -122,5 +117,14 @@ public class EggIncubator {
 	 */
 	public double getKmWalked() {
 		return proto.getStartKmWalked();
+	}
+	
+	/**
+	 * Returns whether this incubator is hatching an egg.
+	 * 
+	 * @return true if it is currently hatching an egg
+	 */
+	public boolean isInUse() {
+		return getKmTarget() > pgo.getPlayerProfile().getStats().getKmWalked();
 	}
 }
