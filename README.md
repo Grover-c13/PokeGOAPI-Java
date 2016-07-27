@@ -3,6 +3,7 @@
 Pokemon GO Java API
 
 [![Build Status](https://travis-ci.org/Grover-c13/PokeGOAPI-Java.svg?branch=master)](https://travis-ci.org/Grover-c13/PokeGOAPI-Java)
+[![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
 
 See this guide for adding functionality:
    https://docs.google.com/document/d/1BE8O6Z19sQ54T5T7QauXgA11GbL6D9vx9AAMCM5KlRA
@@ -11,17 +12,15 @@ See this spreadsheet for RPC endpoints and progress :
    https://docs.google.com/spreadsheets/d/1Xv0Gw5PzIRaVou2xrl6r7qySrcmOKjQWLBjJA73YnJM
 
 ___
-:exclamation:
+:exclamation: :exclamation: :exclamation:
 
-This API may seem unstable. This is because the backend Pokemon GO servers are unstable.
+This API may have issues when the PokemonGO servers are under high load or down, in this case please wait for the official to get back up. You can check the official servers status on [IsPokemonGoDownOrNot.com](http://ispokemongodownornot.com) or [MMOServerStatus.com](http://www.mmoserverstatus.com/pokemon_go).
 
-In case stuff is not working as expected, wait a moment to see if the problem resolves itself automatically.
+This API doesnt fake the official client perfectly, niantic may know that you arent using the official app, we encourage you to use a alternate account to play with this API.
 
-You may also check the status of the servers on [IsPokemonGoDownOrNot.com](http://ispokemongodownornot.com) or [MMOServerStatus.com](http://www.mmoserverstatus.com/pokemon_go).
+If you are using this lib to catch pokemon and loot pokestop, take care that you arent teleporting, the servers may issue a softban against your client (its temporary, between 10 and 30 minutes in general).
 
-If you just want to use it, wait some days until the server issues are resolved (or if there is a problem with this library, you may fix it and send a PR this way).
-
-:exclamation:
+:exclamation: :exclamation: :exclamation:
 ___
 
 # Build
@@ -34,26 +33,73 @@ ___
   PS : To Eclipse user, you must build once : `` ./gradlew build `` and add the generated java class for proto into eclipse source path : Right click on the project > Build path > Configure Build Path > Source > Add Folder > Select `build/generated/source/proto/main/java` > Finish
 
 # Usage
-Include the API as jar from your own build, or use Maven/Gradle/SBT/Leiningen: https://jitpack.io/#Grover-c13/PokeGOAPI-Java/master-SNAPSHOT
+You can import the lib directly from the jar OR with Maven/Gradle/SBT/Leiningen using JitPack : [![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
 
 Mostly everything is accessed through the PokemonGo class in the API package.
+The constructor of PokemonGo class requires a CredentialsProvider object (which can be obtained from GoogleCredentialsProvider or PtcCredentialsProvider) and a OkHttpClient object.
 
-The constructor of PokemonGo class requires a AuthInfo object which can be obtained from GoogleLogin().login or PtcLogin().login, and a OkHttpClient object.
-
-EG:
+How to use example:
 ```java
 OkHttpClient httpClient = new OkHttpClient();
-//Use Google
-//First Ever Login. Persist info when you recieve callback
-//This is the code that will be used when you first login. This step will prompt you to register your device with Google (check your console or logcat) via a URL and to enter in a code. Once the device is registered by you, the httpClient will then issue you an oAuth token.
-PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient,listener),httpClient);
-//Subsequently.
-//This is what you will use to refresh your oAuth Token. Since your device is already registered with Google, you will not need to register it again.
-PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient,refreshToken),httpClient);
-//Or use PTC
+
+/** 
+* Google work like this : the provider will get you a simple to enter to a url with the google account that you want to logged with.
+* After that, you will get tokens (access_token that will be used to access niantic servers and a refresh_token that will be used to 
+* ask for a new access_token when it will expire (every 15min).
+*/
+PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient, new GoogleLoginListener()), httpClient);
+
+public class GoogleLoginListener implements OnGoogleLoginOAuthCompleteListener {
+ 
+        @Override
+        public void onInitialOAuthComplete(GoogleAuthJson auth) {
+            logger.log("Waiting for the code " + auth.getUserCode() + " to be put in " + auth.getVerificationUrl());
+        }
+ 
+        @Override
+        public void onTokenIdReceived(GoogleAuthTokenJson tokens) {
+            // refresh_token is accessible here if you want to store it.
+        }
+}
+
+/**
+* After this, if you dont want to re-authorize the google account everytime, you will need to store the refresh token somewhere (our 
+* lib doesnt store it for you) and loggin with it like this :
+*/
+PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient, refreshToken), httpClient);
+
+/**
+* PTC is much more simplier and at the same time less secure, you will need the username and password to relog the user since 
+* these accounts doesnt support currently a refresh_token. A exemple to login :
+*/
 PokemonGo go = new PokemonGo(new PtcCredentialProvider(httpClient,username,password),httpClient);
-Log.v(go.getPlayerProfile());
+
+// After this you can access the api from the PokemonGo instance :
+go.getPlayerProfile(); // to get the user profile
+go.getInventories(); // to get all his inventories (pokemon, backpack, egg, incubator)
+go.setLocation(lat, long, alt); // set your position to get stuff around (altitude is not needed, you can use 1 for exemple)
+go.getMap().getCatchablePokemon(); // get all currently catchables pokemons around you
+
+// If you want to go deeper, you can directly send your request with our RequestHandler
+// here we are sending a request to get the award for our level, just an exemple, you can send 
+// whatever you want that are defined in the protos file as Request/Response)
+
+LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder().setLevel(yourLVL).build(); 
+ServerRequest serverRequest = new ServerRequest(RequestType.LEVEL_UP_REWARDS, msg);
+go.getRequestHandler().sendServerRequests(serverRequest);
+
+// and get the response like this :
+
+LevelUpRewardsResponse response = null;
+try {
+		response = LevelUpRewardsResponse.parseFrom(serverRequest.getData());
+	} catch (InvalidProtocolBufferException e) {
+	   throw new RemoteServerException(e);
+}
+
+// its possible that the parsing fail when servers are in high load for example.
 ```
+
 ##Android Dev FAQ
 
   - I can't use the sample code! It just throws a login exception!
@@ -77,10 +123,11 @@ You can't. The Google Identity Platform uses the SHA1 fingerprint and package na
   - Submit a pull request on the `Development` branch :D
 
 ## Contributors
-  - Grover-c13
-  - jabbink
-  - zeladada
-  - darakath
-  - vmarchaud
+  - @Grover-c13
+  - @jabbink
+  - @Aphoh
+  - @mjmfighter
+  - @vmarchaud
+  - @langerhans
 
 You can join us in the slack channel #javaapi on the pkre.slack.com (you should get an invite by a bot posted somewhere in the subreddit /r/pokemongodev)
