@@ -39,7 +39,7 @@ sourceSets {
 
 // Remove all .proto definition from the final build
 processResources {
-    exclude('**/*')
+    exclude('POGOProtos/')
 }
 
 // Run this task to bundle all needed dependency
