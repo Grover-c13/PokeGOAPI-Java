@@ -159,7 +159,7 @@ public class Inventories {
 				}
 			}
 
-			lastInventoryUpdate = System.currentTimeMillis();
+			lastInventoryUpdate = api.currentTimeMillis();
 		}
 	}
 }

@@ -19,6 +19,8 @@ import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
+import com.pokegoapi.util.Time;
+import com.pokegoapi.util.SystemTimeImpl;
 import com.squareup.moshi.Moshi;
 import lombok.Getter;
 import okhttp3.HttpUrl;
@@ -42,6 +44,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	private final OkHttpClient client;
 
 	private final OnGoogleLoginOAuthCompleteListener onGoogleLoginOAuthCompleteListener;
+	private final Time time;
 
 	private long expiresTimestamp;
 
@@ -54,18 +57,37 @@ public class GoogleCredentialProvider extends CredentialProvider {
 
 	/**
 	 * Used for logging in when one has a persisted refreshToken.
+	 * Deprecated: specify a Time implementation
 	 *
 	 * @param client       OkHttp client
 	 * @param refreshToken Refresh Token Persisted by user
-	 * @throws LoginFailedException When login fails
+	 * @param time         a Time implementation
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
 	 */
-	public GoogleCredentialProvider(OkHttpClient client, String refreshToken)
+	public GoogleCredentialProvider(OkHttpClient client, String refreshToken, Time time)
 			throws LoginFailedException, RemoteServerException {
 		this.client = client;
 		this.refreshToken = refreshToken;
 		onGoogleLoginOAuthCompleteListener = null;
 		refreshToken(refreshToken);
 		authbuilder = AuthInfo.newBuilder();
+		this.time = time;
+	}
+
+	/**
+	 * Used for logging in when one has a persisted refreshToken.
+	 * Deprecated: specify a Time implementation
+	 *
+	 * @param client       OkHttp client
+	 * @param refreshToken Refresh Token Persisted by user
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+	 */
+	@Deprecated
+	public GoogleCredentialProvider(OkHttpClient client, String refreshToken)
+			throws LoginFailedException, RemoteServerException {
+		this(client, refreshToken, new SystemTimeImpl());
 	}
 
 	/**
@@ -73,11 +95,13 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	 *
 	 * @param client                             OkHttp client
 	 * @param onGoogleLoginOAuthCompleteListener Callback to know verification url and also persist refresh token
-	 * @throws LoginFailedException When login fails
+	 * @param time                               a Time implementation
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
 	 */
 	public GoogleCredentialProvider(OkHttpClient client,
-									OnGoogleLoginOAuthCompleteListener onGoogleLoginOAuthCompleteListener)
-			throws LoginFailedException {
+									OnGoogleLoginOAuthCompleteListener onGoogleLoginOAuthCompleteListener, Time time)
+			throws LoginFailedException, RemoteServerException {
 		this.client = client;
 		if (onGoogleLoginOAuthCompleteListener != null) {
 			this.onGoogleLoginOAuthCompleteListener = onGoogleLoginOAuthCompleteListener;
@@ -86,6 +110,23 @@ public class GoogleCredentialProvider extends CredentialProvider {
 		}
 		login();
 		authbuilder = AuthInfo.newBuilder();
+		this.time = time;
+	}
+
+	/**
+	 * Used for logging in when you dont have a persisted refresh token.
+	 * Deprecated: specify a Time implementation
+	 *
+	 * @param client                             OkHttp client
+	 * @param onGoogleLoginOAuthCompleteListener Callback to know verification url and also persist refresh token
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+	 */
+	@Deprecated
+	public GoogleCredentialProvider(OkHttpClient client,
+									OnGoogleLoginOAuthCompleteListener onGoogleLoginOAuthCompleteListener)
+			throws LoginFailedException, RemoteServerException {
+		this(client, onGoogleLoginOAuthCompleteListener, new SystemTimeImpl());
 	}
 
 	/**
@@ -126,7 +167,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 			throw new LoginFailedException(googleAuthTokenJson.getError());
 		} else {
 			Log.d(TAG, "Refreshed Token " + googleAuthTokenJson.getIdToken());
-			expiresTimestamp = System.currentTimeMillis()
+			expiresTimestamp = time.currentTimeMillis()
 					+ (googleAuthTokenJson.getExpiresIn() * 1000 - REFRESH_TOKEN_BUFFER_TIME);
 			tokenId = googleAuthTokenJson.getIdToken();
 		}
@@ -135,7 +176,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	/**
 	 * Starts a login flow for google using googles device oauth endpoint.
 	 */
-	public void login() throws LoginFailedException {
+	public void login() throws LoginFailedException, RemoteServerException {
 
 		HttpUrl url = HttpUrl.parse(OAUTH_ENDPOINT).newBuilder()
 				.addQueryParameter("client_id", CLIENT_ID)
@@ -153,7 +194,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 		try {
 			response = client.newCall(request).execute();
 		} catch (IOException e) {
-			throw new LoginFailedException("Network Request failed to fetch tokenId", e);
+			throw new RemoteServerException("Network Request failed to fetch tokenId", e);
 		}
 
 		Moshi moshi = new Moshi.Builder().build();
@@ -163,7 +204,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 			googleAuth = moshi.adapter(GoogleAuthJson.class).fromJson(response.body().string());
 			Log.d(TAG, "" + googleAuth.getExpiresIn());
 		} catch (IOException e) {
-			throw new LoginFailedException("Failed to unmarshell the Json response to fetch tokenId", e);
+			throw new RemoteServerException("Failed to unmarshell the Json response to fetch tokenId", e);
 		}
 		Log.d(TAG, "Get user to go to:"
 				+ googleAuth.getVerificationUrl()
@@ -176,16 +217,16 @@ public class GoogleCredentialProvider extends CredentialProvider {
 				Thread.sleep(googleAuth.getInterval() * 1000);
 			}
 		} catch (InterruptedException e) {
-			throw new LoginFailedException("Sleeping was interrupted", e);
+			throw new RemoteServerException("Sleeping was interrupted", e);
 		} catch (IOException e) {
-			throw new LoginFailedException(e);
+			throw new RemoteServerException(e);
 		} catch (URISyntaxException e) {
-			throw new LoginFailedException(e);
+			throw new RemoteServerException(e);
 		}
 
 		Log.d(TAG, "Got token: " + googleAuthTokenJson.getIdToken());
 		onGoogleLoginOAuthCompleteListener.onTokenIdReceived(googleAuthTokenJson);
-		expiresTimestamp = System.currentTimeMillis()
+		expiresTimestamp = time.currentTimeMillis()
 				+ (googleAuthTokenJson.getExpiresIn() * 1000 - REFRESH_TOKEN_BUFFER_TIME);
 		tokenId = googleAuthTokenJson.getIdToken();
 		refreshToken = googleAuthTokenJson.getRefreshToken();
@@ -246,7 +287,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 
 	@Override
 	public boolean isTokenIdExpired() {
-		if (System.currentTimeMillis() > expiresTimestamp) {
+		if (time.currentTimeMillis() > expiresTimestamp) {
 			return true;
 		} else {
 			return false;

@@ -279,7 +279,7 @@ public class Map {
 	public MapObjects getMapObjects(List<Long> cellIds) throws LoginFailedException, RemoteServerException {
 		GetMapObjectsMessage.Builder builder = GetMapObjectsMessage.newBuilder();
 
-		if (useCache && (System.currentTimeMillis() - lastMapUpdate > mapObjectsExpiry)) {
+		if (useCache && (api.currentTimeMillis() - lastMapUpdate > mapObjectsExpiry)) {
 			lastMapUpdate = 0;
 			cachedMapObjects = new MapObjects(api);
 		}
@@ -331,7 +331,7 @@ public class Map {
 		if (useCache) {
 			cachedMapObjects.update(result);
 			result = cachedMapObjects;
-			lastMapUpdate = System.currentTimeMillis();
+			lastMapUpdate = api.currentTimeMillis();
 		}
 
 		return result;
