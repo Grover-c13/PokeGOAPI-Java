@@ -48,8 +48,10 @@ EG:
 OkHttpClient httpClient = new OkHttpClient();
 //Use Google
 //First Ever Login. Persist info when you recieve callback
-PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient,listner),httpClient);
-//Subsequently
+//This is the code that will be used when you first login. This step will prompt you to register your device with Google (check your console or logcat) via a URL and to enter in a code. Once the device is registered by you, the httpClient will then issue you an oAuth token.
+PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient,listener),httpClient);
+//Subsequently.
+//This is what you will use to refresh your oAuth Token. Since your device is already registered with Google, you will not need to register it again.
 PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient,refreshToken),httpClient);
 //Or use PTC
 PokemonGo go = new PokemonGo(new PtcCredentialProvider(httpClient,username,password),httpClient);
