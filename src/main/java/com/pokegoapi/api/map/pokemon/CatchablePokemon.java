@@ -381,7 +381,7 @@ public class CatchablePokemon {
 		UseItemCaptureMessage reqMsg = UseItemCaptureMessage
 				.newBuilder()
 				.setEncounterId(this.getEncounterId())
-				.setSpawnPointGuid(this.getSpawnPointId())
+				.setSpawnPointId(this.getSpawnPointId())
 				.setItemId(item)
 				.build();
 
