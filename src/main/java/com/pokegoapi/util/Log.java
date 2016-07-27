@@ -25,7 +25,7 @@ import java.io.StringWriter;
 public class Log {
 
 	private static Logger logger;
-	private static Level level;
+	private static Level level = Level.VERBOSE;
 
 	private static Logger getInstance() {
 		if (logger == null) {
