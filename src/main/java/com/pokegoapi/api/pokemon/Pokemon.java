@@ -189,7 +189,7 @@ public class Pokemon {
 		}
 	}
 
-	/**
+	/**dus
 	 * Evolve evolution result.
 	 *
 	 * @return the evolution result
@@ -428,7 +428,7 @@ public class Pokemon {
 	 * @return Cost of stardust for a powerup
 	 */
 	public int getStardustCostsForPowerup() {
-		return PokemonCpUtils.getCandyCostsForPowerup(proto.getCpMultiplier() + proto.getAdditionalCpMultiplier(),
+		return PokemonCpUtils.getStartdustCostsForPowerup(proto.getCpMultiplier() + proto.getAdditionalCpMultiplier(),
 				proto.getNumUpgrades());
 	}
 
