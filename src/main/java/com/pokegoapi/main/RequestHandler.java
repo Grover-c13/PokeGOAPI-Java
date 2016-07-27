@@ -246,7 +246,7 @@ public class RequestHandler {
 		builder.setRequestId(8145806132888207460L);
 		if (lastAuth != null
 				&& lastAuth.getExpireTimestampMs() > 0
-				&& lastAuth.getExpireTimestampMs() > System.currentTimeMillis()) {
+				&& lastAuth.getExpireTimestampMs() > api.currentTimeMillis()) {
 			builder.setAuthTicket(lastAuth);
 		} else {
 			Log.d(TAG, "Authenticated with static token");

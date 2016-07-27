@@ -129,7 +129,7 @@ public class Battle {
 			BattleAction action = BattleAction
 					.newBuilder()
 					.setType(BattleActionTypeOuterClass.BattleActionType.ACTION_ATTACK)
-					.setActionStartMs(System.currentTimeMillis() + (100 * times))
+					.setActionStartMs(api.currentTimeMillis() + (100 * times))
 					.setDurationMs(500)
 					.setTargetIndex(-1)
 					.build();

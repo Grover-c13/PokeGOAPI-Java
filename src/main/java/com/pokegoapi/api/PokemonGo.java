@@ -24,6 +24,8 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.util.Log;
+import com.pokegoapi.util.SystemTimeImpl;
+import com.pokegoapi.util.Time;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
@@ -32,6 +34,7 @@ import okhttp3.OkHttpClient;
 public class PokemonGo {
 
 	private static final java.lang.String TAG = PokemonGo.class.getSimpleName();
+	private final Time time;
 	@Getter
 	RequestHandler requestHandler;
 	@Getter
@@ -49,7 +52,6 @@ public class PokemonGo {
 	@Getter
 	@Setter
 	private double altitude;
-
 	private CredentialProvider credentialProvider;
 
 	private RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo authInfo;
@@ -57,9 +59,13 @@ public class PokemonGo {
 	/**
 	 * Instantiates a new Pokemon go.
 	 *
-	 * @param client the client
+	 * @param credentialProvider the credential provider
+	 * @param client             the http client
+	 * @param time               a time implementation
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
 	 */
-	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client)
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time)
 			throws LoginFailedException, RemoteServerException {
 
 		if (credentialProvider == null) {
@@ -67,6 +73,7 @@ public class PokemonGo {
 		} else {
 			this.credentialProvider = credentialProvider;
 		}
+		this.time = time;
 
 		playerProfile = null;
 
@@ -80,6 +87,21 @@ public class PokemonGo {
 
 		// should have proper end point now.
 		map = new Map(this);
+	}
+
+	/**
+	 * Instantiates a new Pokemon go.
+	 * Deprecated: specify a time implementation
+	 *
+	 * @param credentialProvider the credential provider
+	 * @param client             the http client
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+	 */
+	@Deprecated
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client)
+			throws LoginFailedException, RemoteServerException {
+		this(credentialProvider, client, new SystemTimeImpl());
 	}
 
 	/**
@@ -123,5 +145,9 @@ public class PokemonGo {
 		setLatitude(latitude);
 		setLongitude(longitude);
 		setAltitude(altitude);
+	}
+
+	public long currentTimeMillis() {
+		return time.currentTimeMillis();
 	}
 }

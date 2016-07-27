@@ -30,7 +30,6 @@ import POGOProtos.Networking.Requests.Messages.UseItemReviveMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass.EvolvePokemonResponse;
 import POGOProtos.Networking.Responses.NicknamePokemonResponseOuterClass.NicknamePokemonResponse;
-import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
 import POGOProtos.Networking.Responses.SetFavoritePokemonResponseOuterClass.SetFavoritePokemonResponse;
@@ -64,6 +63,13 @@ public class Pokemon {
 	// API METHODS //
 
 	// DELEGATE METHODS BELOW //
+
+	/**
+	 * Creates a Pokemon object with helper functions around the proto.
+	 *
+	 * @param api   the api to use
+	 * @param proto the proto from the server
+	 */
 	public Pokemon(PokemonGo api, PokemonData proto) {
 		this.pgo = api;
 		this.proto = proto;
@@ -347,9 +353,10 @@ public class Pokemon {
 	public long getCreationTimeMs() {
 		return proto.getCreationTimeMs();
 	}
-	
+
 	/**
 	 * Checks whether the Pokémon is set as favorite.
+	 *
 	 * @return true if the Pokémon is set as favorite
 	 */
 	public boolean isFavorite() {

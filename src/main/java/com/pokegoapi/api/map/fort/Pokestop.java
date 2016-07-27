@@ -82,7 +82,7 @@ public class Pokestop {
 	 * @return the boolean
 	 */
 	public boolean canLoot(boolean ignoreDistance) {
-		boolean active = cooldownCompleteTimestampMs < System.currentTimeMillis();
+		boolean active = cooldownCompleteTimestampMs < api.currentTimeMillis();
 		if (!ignoreDistance) {
 			return active && inRange();
 		}
@@ -184,6 +184,6 @@ public class Pokestop {
 	 * @return lure status
 	 */
 	public boolean hasLurePokemon() {
-		return fortData.hasLureInfo() && fortData.getLureInfo().getLureExpiresTimestampMs() < System.currentTimeMillis();
+		return fortData.hasLureInfo() && fortData.getLureInfo().getLureExpiresTimestampMs() < api.currentTimeMillis();
 	}
 }
