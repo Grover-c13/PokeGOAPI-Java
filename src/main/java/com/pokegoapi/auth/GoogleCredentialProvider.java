@@ -67,12 +67,12 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	 */
 	public GoogleCredentialProvider(OkHttpClient client, String refreshToken, Time time)
 			throws LoginFailedException, RemoteServerException {
+		this.time = time;
 		this.client = client;
 		this.refreshToken = refreshToken;
 		onGoogleLoginOAuthCompleteListener = null;
 		refreshToken(refreshToken);
 		authbuilder = AuthInfo.newBuilder();
-		this.time = time;
 	}
 
 	/**
@@ -102,6 +102,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	public GoogleCredentialProvider(OkHttpClient client,
 									OnGoogleLoginOAuthCompleteListener onGoogleLoginOAuthCompleteListener, Time time)
 			throws LoginFailedException, RemoteServerException {
+		this.time = time;
 		this.client = client;
 		if (onGoogleLoginOAuthCompleteListener != null) {
 			this.onGoogleLoginOAuthCompleteListener = onGoogleLoginOAuthCompleteListener;
@@ -110,7 +111,6 @@ public class GoogleCredentialProvider extends CredentialProvider {
 		}
 		login();
 		authbuilder = AuthInfo.newBuilder();
-		this.time = time;
 	}
 
 	/**
