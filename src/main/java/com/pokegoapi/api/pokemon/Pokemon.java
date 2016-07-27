@@ -41,6 +41,7 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.map.pokemon.EvolutionResult;
 import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
@@ -396,8 +397,11 @@ public class Pokemon {
 	/**
 	 * @return The maximum CP for this pokemon
 	 */
-	public int getMaxCp() {
+	public int getMaxCp() throws NoSuchItemException {
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
+		if (pokemonMeta == null) {
+			throw new NoSuchItemException("Cannot find meta data for " + proto.getPokemonId().name());
+		}
 		int attack = proto.getIndividualAttack() + pokemonMeta.getBaseAttack();
 		int defense = proto.getIndividualDefense() + pokemonMeta.getBaseDefense();
 		int stamina = proto.getIndividualStamina() + pokemonMeta.getBaseStamina();
