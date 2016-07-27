@@ -12,6 +12,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.pokegoapi.api.pokemon;
 
 import java.util.HashMap;
@@ -23,9 +24,10 @@ import java.util.Map;
  * and
  * http://pokemongo.gamepress.gg/pokemon-stats-advanced
  */
-public class PokemonCpUtils {
+class PokemonCpUtils {
 	private static final Map<Float,Float> CPMULTIPLIER_LEVEL = new HashMap<>();
 	private static final Map<Float,Float> LEVEL_CPMULTIPLIER = new HashMap<>();
+
 	static {
 		CPMULTIPLIER_LEVEL.put(0.094f, 1f);
 		CPMULTIPLIER_LEVEL.put(0.135137432f, 1.5f);
@@ -111,16 +113,34 @@ public class PokemonCpUtils {
 		}
 	}
 
-	public static float getLevelFromCpMultiplier(float cpMultiplier) {
+	/**
+	 * Get the level from the cp multiplier
+	 * @param cpMultiplier All CP multiplier values combined
+	 * @return Level
+	 */
+	static float getLevelFromCpMultiplier(float cpMultiplier) {
 		return CPMULTIPLIER_LEVEL.get(cpMultiplier);
 	}
 
-	public static int getMaxCp(int attack, int defense, int stamina) {
+	/**
+	 * Get the maximum CP from the values
+	 * @param attack All attack values combined
+	 * @param defense All defense values combined
+	 * @param stamina All stamina values combined
+	 * @return Maximum CP for these levels
+	 */
+	static int getMaxCp(int attack, int defense, int stamina) {
 		float maxCpMultplier = LEVEL_CPMULTIPLIER.get(40f);
 		return (int)(attack * Math.pow(defense, 0.5) * Math.pow(stamina, 0.5) * Math.pow(maxCpMultplier,2) / 10f);
 	}
 
-	public static int getCpAfterPowerup(float cp, float cpMultiplier) {
+	/**
+	 * Get the CP after powerup
+	 * @param cp Current CP level
+	 * @param cpMultiplier All CP multiplier values combined
+	 * @return New CP level
+	 */
+	static int getCpAfterPowerup(float cp, float cpMultiplier) {
 		// Based on http://pokemongo.gamepress.gg/power-up-costs
 		float level = getLevelFromCpMultiplier(cpMultiplier);
 		if (level <= 10) {
@@ -135,7 +155,13 @@ public class PokemonCpUtils {
 		return (int)((cp * 0.00445946079) / Math.pow(cpMultiplier, 2));
 	}
 
-	public static int getStartdustCostsForPowerup(float cpMultiplier, int powerups) {
+	/**
+	 * Get the amount of stardust required to do a powerup
+	 * @param cpMultiplier All CP multiplier values combined
+	 * @param powerups Number of previous powerups
+	 * @return Amount of stardust
+	 */
+	static int getStartdustCostsForPowerup(float cpMultiplier, int powerups) {
 		// Based on http://pokemongo.gamepress.gg/power-up-costs
 		float level = getLevelFromCpMultiplier(cpMultiplier);
 		if (level <= 3 && powerups <= 4) {
@@ -198,7 +224,13 @@ public class PokemonCpUtils {
 		return 10000;
 	}
 
-	public static int getCandyCostsForPowerup(float cpMultiplier, int powerups) {
+	/**
+	 * Get the amount of candy required to do a powerup
+	 * @param cpMultiplier All CP multiplier values combined
+	 * @param powerups Number of previous powerups
+	 * @return Amount of candy
+	 */
+	static int getCandyCostsForPowerup(float cpMultiplier, int powerups) {
 		// Based on http://pokemongo.gamepress.gg/power-up-costs
 		float level = getLevelFromCpMultiplier(cpMultiplier);
 		if (level <= 13 && powerups <= 20 ) {

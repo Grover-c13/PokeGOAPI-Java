@@ -393,6 +393,9 @@ public class Pokemon {
 		return PokemonCpUtils.getLevelFromCpMultiplier(proto.getCpMultiplier() + proto.getAdditionalCpMultiplier());
 	}
 
+	/**
+	 * @return The maximum CP for this pokemon
+	 */
 	public int getMaxCp() {
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
 		int attack = proto.getIndividualAttack() + pokemonMeta.getBaseAttack();
@@ -401,16 +404,28 @@ public class Pokemon {
 		return PokemonCpUtils.getMaxCp(attack, defense, stamina);
 	}
 
+	/**
+	 * @return The CP for this pokemon after powerup
+	 */
 	public int getCpAfterPowerup() {
-		return PokemonCpUtils.getCpAfterPowerup(proto.getCp(), proto.getCpMultiplier() + proto.getAdditionalCpMultiplier());
+		return PokemonCpUtils.getCpAfterPowerup(proto.getCp(),
+				proto.getCpMultiplier() + proto.getAdditionalCpMultiplier());
 	}
 
+	/**
+	 * @return Cost of candy for a powerup
+	 */
 	public int getCandyCostsForPowerup() {
-		return PokemonCpUtils.getCandyCostsForPowerup(proto.getCpMultiplier() + proto.getAdditionalCpMultiplier(), proto.getNumUpgrades());
+		return PokemonCpUtils.getCandyCostsForPowerup(proto.getCpMultiplier() + proto.getAdditionalCpMultiplier(),
+				proto.getNumUpgrades());
 	}
 
+	/**
+	 * @return Cost of stardust for a powerup
+	 */
 	public int getStardustCostsForPowerup() {
-		return PokemonCpUtils.getCandyCostsForPowerup(proto.getCpMultiplier() + proto.getAdditionalCpMultiplier(), proto.getNumUpgrades());
+		return PokemonCpUtils.getCandyCostsForPowerup(proto.getCpMultiplier() + proto.getAdditionalCpMultiplier(),
+				proto.getNumUpgrades());
 	}
 
 	public PokemonIdOuterClass.PokemonId getParent() {
