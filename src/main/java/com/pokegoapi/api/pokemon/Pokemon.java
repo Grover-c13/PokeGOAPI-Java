@@ -30,7 +30,6 @@ import POGOProtos.Networking.Requests.Messages.UseItemReviveMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass.EvolvePokemonResponse;
 import POGOProtos.Networking.Responses.NicknamePokemonResponseOuterClass.NicknamePokemonResponse;
-import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
 import POGOProtos.Networking.Responses.SetFavoritePokemonResponseOuterClass.SetFavoritePokemonResponse;
@@ -388,6 +387,45 @@ public class Pokemon {
 
 	public double getBaseFleeRate() {
 		return getMeta().getBaseFleeRate();
+	}
+
+	public float getLevel() {
+		return PokemonCpUtils.getLevelFromCpMultiplier(proto.getCpMultiplier() + proto.getAdditionalCpMultiplier());
+	}
+
+	/**
+	 * @return The maximum CP for this pokemon
+	 */
+	public int getMaxCp() {
+		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
+		int attack = proto.getIndividualAttack() + pokemonMeta.getBaseAttack();
+		int defense = proto.getIndividualDefense() + pokemonMeta.getBaseDefense();
+		int stamina = proto.getIndividualStamina() + pokemonMeta.getBaseStamina();
+		return PokemonCpUtils.getMaxCp(attack, defense, stamina);
+	}
+
+	/**
+	 * @return The CP for this pokemon after powerup
+	 */
+	public int getCpAfterPowerup() {
+		return PokemonCpUtils.getCpAfterPowerup(proto.getCp(),
+				proto.getCpMultiplier() + proto.getAdditionalCpMultiplier());
+	}
+
+	/**
+	 * @return Cost of candy for a powerup
+	 */
+	public int getCandyCostsForPowerup() {
+		return PokemonCpUtils.getCandyCostsForPowerup(proto.getCpMultiplier() + proto.getAdditionalCpMultiplier(),
+				proto.getNumUpgrades());
+	}
+
+	/**
+	 * @return Cost of stardust for a powerup
+	 */
+	public int getStardustCostsForPowerup() {
+		return PokemonCpUtils.getCandyCostsForPowerup(proto.getCpMultiplier() + proto.getAdditionalCpMultiplier(),
+				proto.getNumUpgrades());
 	}
 
 	public PokemonIdOuterClass.PokemonId getParent() {
