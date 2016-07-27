@@ -113,13 +113,26 @@ class PokemonCpUtils {
 		}
 	}
 
+	private static float getLevel(float cpMuliplier) {
+		float level;
+		if (cpMuliplier < 0.734f) {
+			// compute polynomial approximation obtained by regression
+			level = 58.35178527f * cpMuliplier * cpMuliplier - 2.838007664f * cpMuliplier + 0.8539209906f;
+		} else {
+			// compute linear approximation obtained by regression
+			level = 171.0112688f * cpMuliplier - 95.20425243f;
+		}
+		// round to nearest .5 value and return
+		return Math.round((level) * 2) / 2.0f;
+	}
+
 	/**
 	 * Get the level from the cp multiplier
 	 * @param cpMultiplier All CP multiplier values combined
 	 * @return Level
 	 */
 	static float getLevelFromCpMultiplier(float cpMultiplier) {
-		return CPMULTIPLIER_LEVEL.get(cpMultiplier);
+		return getLevel(cpMultiplier);
 	}
 
 	/**
