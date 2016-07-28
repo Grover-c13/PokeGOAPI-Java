@@ -25,19 +25,18 @@ If you are using this lib to catch pokemon and loot pokestop, take care that you
 :exclamation: :exclamation: :exclamation:
 ___
 
-# Build
+# Build from source
   - Clone the repo and cd into the folder
   - `` git submodule update --init ``
-  - compile and package
-  - `` ./gradlew build bundle ``
-  - you should have the api bundled in ``build/libs/PokeGOAPI-Java_bundle-0.0.1-SNAPSHOT.jar``
+  - `` ./gradlew build ``
+  - you should have the api jar in ``build/libs/PokeGOAPI-Java-0.0.1-SNAPSHOT.jar``
 
   PS : To Eclipse user, you must build once : `` ./gradlew build `` and add the generated java class for proto into eclipse source path : Right click on the project > Build path > Configure Build Path > Source > Add Folder > Select `build/generated/source/proto/main/java` > Finish
 
 # Usage
 You can import the lib directly from the jar OR with Maven/Gradle/SBT/Leiningen using JitPack : [![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
 
-  PS : To Eclipse user, add the generated jar into the eclipse build path : Right click on the project > Build path > Java Build Path > Select Libraries tab > Add External JARs… > Select `PokeGOAPI-Java/build/libs/PokeGOAPI-Java_bundle-0.0.1-SNAPSHOT.jar` > Finish
+  PS : To Eclipse user who just want to add the jar to classpath : Right click on the project > Build path > Java Build Path > Select Libraries tab > Add External JARs… > Select `PokeGOAPI-Java/build/libs/PokeGOAPI-Java-0.0.1-SNAPSHOT.jar` > Finish
 
 Mostly everything is accessed through the PokemonGo class in the API package.
 The constructor of PokemonGo class requires a CredentialsProvider object (which can be obtained from GoogleCredentialsProvider or PtcCredentialsProvider) and a OkHttpClient object.
