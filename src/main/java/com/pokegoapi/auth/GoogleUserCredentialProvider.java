@@ -38,7 +38,6 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 	private static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
 	private final OkHttpClient client;
 
-
 	private final Time time;
 
 	private long expiresTimestamp;
@@ -147,8 +146,6 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 	}
 
 
-
-
 	/**
 	 * Uses an access code to login and get tokens
 	 */
@@ -186,12 +183,6 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 		} catch (IOException e) {
 			throw new RemoteServerException("Failed to unmarshell the Json response to fetch tokenId", e);
 		}
-;
-
-
-
-
-
 
 		Log.d(TAG, "Got token: " + googleAuth.getAccessToken());
 
@@ -200,10 +191,7 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 		tokenId = googleAuth.getIdToken();
 		refreshToken = googleAuth.getRefreshToken();
 	}
-
-
-
-
+	
 	@Override
 	public String getTokenId() throws LoginFailedException, RemoteServerException {
 		if (isTokenIdExpired()) {
@@ -236,6 +224,4 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 			return false;
 		}
 	}
-
-
 }
