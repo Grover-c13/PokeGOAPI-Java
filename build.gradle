@@ -25,6 +25,7 @@ targetCompatibility = 1.7
 
 repositories {
     mavenCentral()
+    maven { url "https://jitpack.io" }
 }
 
 sourceSets {
@@ -90,11 +91,15 @@ checkstyle {
 checkstyleMain.doLast {
     def outputFile = file(checkstyleOutputDir + "main.xml")
     if (outputFile.exists() && outputFile.text.contains("<error ")) {
-        throw new GradleException("There were checkstyle warnings! For more info check $outputFile")
+        logger.warn("!!!!-----------------------------------!!!!")
+        logger.warn("There were checkstyle warnings! For more info check $outputFile")
+        logger.warn("PLEASE CORRECT BEFORE SUBMITTING A PULLREQUEST")
+        logger.warn("!!!!-----------------------------------!!!!")
     }
 }
 
 dependencies {
+    compile 'com.github.svarzee:gpsoauth-java:v0.2.0'
     compile 'com.squareup.okio:okio:1.9.0'
     compile 'com.squareup.moshi:moshi:1.2.0'
     compile 'com.annimon:stream:1.1.1'
