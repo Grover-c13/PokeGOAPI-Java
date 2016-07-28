@@ -46,12 +46,12 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	}
 
 	/**
-	 * Constructs credential provider using username and password
-	 *
-	 * @param username - google username
-	 * @param password - google password
-	 * @param Time - time object
-	 * @throws LoginFailedException  - login failed possibly due to invalid credentials
+	 * 
+	 * @param httpClient : the client that will make http call
+	 * @param username : google username
+	 * @param password : google pwd
+	 * @param time : time instance used to refresh token
+	 * @throws LoginFailedException -  login failed possibly due to invalid credentials
 	 * @throws RemoteServerException - some server/network failure
 	 */
 	public GoogleAutoCredentialProvider(OkHttpClient httpClient, String username, String password, Time time)
