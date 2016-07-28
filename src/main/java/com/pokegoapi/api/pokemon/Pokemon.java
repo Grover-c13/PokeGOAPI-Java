@@ -41,6 +41,7 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.map.pokemon.EvolutionResult;
 import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
@@ -195,7 +196,7 @@ public class Pokemon {
 		}
 	}
 
-	/**
+	/**dus
 	 * Evolve evolution result.
 	 *
 	 * @return the evolution result
@@ -395,6 +396,48 @@ public class Pokemon {
 
 	public double getBaseFleeRate() {
 		return getMeta().getBaseFleeRate();
+	}
+
+	public float getLevel() {
+		return PokemonCpUtils.getLevelFromCpMultiplier(proto.getCpMultiplier() + proto.getAdditionalCpMultiplier());
+	}
+
+	/**
+	 * @return The maximum CP for this pokemon
+	 */
+	public int getMaxCp() throws NoSuchItemException {
+		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
+		if (pokemonMeta == null) {
+			throw new NoSuchItemException("Cannot find meta data for " + proto.getPokemonId().name());
+		}
+		int attack = proto.getIndividualAttack() + pokemonMeta.getBaseAttack();
+		int defense = proto.getIndividualDefense() + pokemonMeta.getBaseDefense();
+		int stamina = proto.getIndividualStamina() + pokemonMeta.getBaseStamina();
+		return PokemonCpUtils.getMaxCp(attack, defense, stamina);
+	}
+
+	/**
+	 * @return The CP for this pokemon after powerup
+	 */
+	public int getCpAfterPowerup() {
+		return PokemonCpUtils.getCpAfterPowerup(proto.getCp(),
+				proto.getCpMultiplier() + proto.getAdditionalCpMultiplier());
+	}
+
+	/**
+	 * @return Cost of candy for a powerup
+	 */
+	public int getCandyCostsForPowerup() {
+		return PokemonCpUtils.getCandyCostsForPowerup(proto.getCpMultiplier() + proto.getAdditionalCpMultiplier(),
+				proto.getNumUpgrades());
+	}
+
+	/**
+	 * @return Cost of stardust for a powerup
+	 */
+	public int getStardustCostsForPowerup() {
+		return PokemonCpUtils.getStartdustCostsForPowerup(proto.getCpMultiplier() + proto.getAdditionalCpMultiplier(),
+				proto.getNumUpgrades());
 	}
 
 	public PokemonIdOuterClass.PokemonId getParent() {
