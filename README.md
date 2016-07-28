@@ -25,22 +25,12 @@ If you are using this lib to catch pokemon and loot pokestop, take care that you
 :exclamation: :exclamation: :exclamation:
 ___
 
-# Build from source
-  - Clone the repo and cd into the folder
-  - `` git submodule update --init ``
-  - `` ./gradlew build ``
-  - you should have the api jar in ``build/libs/PokeGOAPI-Java-0.0.1-SNAPSHOT.jar``
-
-# Eclipse users:
-  - build once : `` ./gradlew build ``
-  - Right click on the project
-  - Select Build path > Configure Build Path > Source > Add Folder
-  - Select `build/generated/source/proto/main/java`
-  - Finish
-
-# Usage
+# How to import
 
   Import from Maven/Gradle/SBT/Leiningen using JitPack : [![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
+  
+  After you clicked on this link, jitpack will show you multiple build (try use the latest one since the api grow everyday).
+  JitPack will show an example for each dependency manager to include our API into your project.
 
 OR
 
@@ -49,45 +39,53 @@ OR
     - Select Build path > Java Build Path
     - Select Libraries tab
     - Select Add External JARs…
-    - Select `PokeGOAPI-Java/build/libs/PokeGOAPI-Java_bundle-0.0.1-SNAPSHOT.jar`
+    - Select `PokeGOAPI-Java/build/libs/PokeGOAPI-Java-0.0.1-SNAPSHOT.jar`
     - Finish
 
-Mostly everything is accessed through the PokemonGo class in the API package.
-The constructor of PokemonGo class requires a CredentialsProvider object (which can be obtained from GoogleCredentialsProvider or PtcCredentialsProvider) and a OkHttpClient object.
+# Build from source
+  - Clone the repo and cd into the folder
+  - `` git submodule update --init ``
+  - `` ./gradlew build ``
+  - you should have the api jar in ``build/libs/PokeGOAPI-Java-0.0.1-SNAPSHOT.jar``
 
-# Usage Example:
+PS : for users who want to import the api into Eclipse IDE, you'll need to :
+  - build once : `` ./gradlew build ``
+  - Right click on the project
+  - Select Build path > Configure Build Path > Source > Add Folder
+  - Select `build/generated/source/proto/main/java`
+  - Finish
+
+# Usage exemple (mostly how to login) :
 ```java
 OkHttpClient httpClient = new OkHttpClient();
 
 /** 
 * Google: 
-* The provider will return URL for the device, along with a code for the chosen account. 
-* The user must enter the code into the webpage provided by that URL to obtain a token.
-* This token is the access_token that will be used to access Niantic servers.
-* You will also receive a refresh_token to request a new access_token.
-* A new access_token should be requested when it will expire (every 15min).
+* You will need to redirect your user to GoogleUserCredentialProvider.LOGIN_URL
+* Afer this, the user must signin on google and get the token that will be show to him.
+* This token will need to be put as argument to login.
 */
-PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient, new GoogleLoginListener()), httpClient);
+GoogleUserCredentialProvider provider = new GoogleUserCredentialProvider(http);
 
-public class GoogleLoginListener implements OnGoogleLoginOAuthCompleteListener {
- 
-        @Override
-        public void onInitialOAuthComplete(GoogleAuthJson auth) {
-            logger.log("Waiting for the code " + auth.getUserCode() + " to be put in " + auth.getVerificationUrl());
-        }
- 
-        @Override
-        public void onTokenIdReceived(GoogleAuthTokenJson tokens) {
-            // refresh_token is accessible here if you want to store it.
-        }
-}
+// in this url, you will get a code for the google account that is logged
+System.out.println("Please go to " + GoogleUserCredentialProvider.LOGIN_URL);
+System.out.println("Enter authorisation code:");
+			
+// Ask the user to enter it in the standart input
+Scanner sc = new Scanner(System.in);
+String access = sc.nextLine();
+			
+// we should be able to login with this token
+provider.login(access);
+PokemonGo go = new PokemonGo(provider, httpClient);
 
 /**
-* After this, if you do not want to re-authorize the google account every time, you will need to store the refresh token
-* The API does not store the refresh token for you
+* After this, if you do not want to re-authorize the google account every time, 
+* you will need to store the refresh_token that you can get the first time with provider.getRefreshToken()
+* ! The API does not store the refresh token for you !
 * log in using the refresh token like this :
 */
-PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient, refreshToken), httpClient);
+PokemonGo go = new PokemonGo(new GoogleUserCredentialProvider(httpClient, refreshToken), httpClient);
 
 /**
 * PTC is much simpler, but less secure.
@@ -115,12 +113,11 @@ go.getRequestHandler().sendServerRequests(serverRequest);
 
 LevelUpRewardsResponse response = null;
 try {
-		response = LevelUpRewardsResponse.parseFrom(serverRequest.getData());
-	} catch (InvalidProtocolBufferException e) {
-	   throw new RemoteServerException(e);
+	response = LevelUpRewardsResponse.parseFrom(serverRequest.getData());
+} catch (InvalidProtocolBufferException e) {
+	// its possible that the parsing fail when servers are in high load for example.
+	throw new RemoteServerException(e);
 }
-
-// its possible that the parsing fail when servers are in high load for example.
 ```
 
 ##Android Dev FAQ
