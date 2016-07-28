@@ -3,6 +3,7 @@ package com.pokegoapi.auth;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import okhttp3.OkHttpClient;
 import svarzee.gps.gpsoauth.AuthToken;
@@ -27,12 +28,29 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	private Time time;
 	private TokenInfo tokenInfo;
 
+	/**
+	 * Constructs credential provider using username and password
+	 *
+	 * @param username - google username
+	 * @param password - google password
+	 * @throws LoginFailedException  - login failed possibly due to invalid credentials
+	 * @throws RemoteServerException - some server/network failure
+	 */
+	@Deprecated
+	public GoogleAutoCredentialProvider(OkHttpClient httpClient, String username, String password)
+			throws LoginFailedException, RemoteServerException {
+		this.gpsoauth = new Gpsoauth(httpClient);
+		this.username = username;
+		this.tokenInfo = login(username, password);
+		this.time = new SystemTimeImpl();
+	}
 
 	/**
 	 * Constructs credential provider using username and password
 	 *
 	 * @param username - google username
 	 * @param password - google password
+	 * @param Time - time object
 	 * @throws LoginFailedException  - login failed possibly due to invalid credentials
 	 * @throws RemoteServerException - some server/network failure
 	 */
