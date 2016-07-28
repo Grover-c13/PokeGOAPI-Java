@@ -218,6 +218,7 @@ public class PlayerProfile {
 				EquipBadgeResponseOuterClass.EquipBadgeResponse response1;
 				try {
 					response1 = EquipBadgeResponseOuterClass.EquipBadgeResponse.parseFrom(serverRequest1.getData());
+					badge = response1.getEquipped();
 				} catch (InvalidProtocolBufferException e) {
 					throw new RemoteServerException(e);
 				}
