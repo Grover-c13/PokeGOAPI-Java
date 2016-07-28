@@ -19,6 +19,7 @@ import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
+import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -53,6 +54,8 @@ public class PokemonGo {
 	@Setter
 	private double altitude;
 	private CredentialProvider credentialProvider;
+	@Getter
+	private Settings settings;
 
 	private RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo authInfo;
 
@@ -81,6 +84,7 @@ public class PokemonGo {
 		requestHandler = new RequestHandler(this, client);
 		playerProfile = new PlayerProfile(this);
 		inventories = new Inventories(this);
+		settings = new Settings(this);
 
 		playerProfile.updateProfile();
 		inventories.updateInventories();
