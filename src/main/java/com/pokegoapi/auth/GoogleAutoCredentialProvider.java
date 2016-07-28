@@ -1,6 +1,8 @@
 package com.pokegoapi.auth;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+import lombok.Getter;
+
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.SystemTimeImpl;
@@ -26,6 +28,8 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	private final Gpsoauth gpsoauth;
 	private final String username;
 	private Time time;
+	
+	@Getter
 	private TokenInfo tokenInfo;
 
 	/**
