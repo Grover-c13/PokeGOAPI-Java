@@ -267,7 +267,7 @@ public class CatchablePokemon {
 	public CatchResult catchPokemon(Pokeball pokeball, int amount, int razberryLimit)
 			throws LoginFailedException, RemoteServerException {
 		return catchPokemon(1.0, 1.95 + Math.random() * 0.05,
-				0.85 + Math.random() * 0.15, pokeball, razberryLimit);
+				0.85 + Math.random() * 0.15, pokeball,amount, razberryLimit);
 	}
 
 	/**
