@@ -28,6 +28,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 @ToString
 public class MapObjects {
@@ -195,13 +196,15 @@ public class MapObjects {
 		}
 
 		for (Pokestop otherPokestop : other.getPokestops()) {
-			for (Pokestop pokestop : pokestops) {
-				if (otherPokestop.getId().equals(pokestop.getId())) {
-					pokestops.remove(pokestop);
-					break;
-				}
+                    Iterator<Pokestop> iterator = pokestops.iterator();
+                    while(iterator.hasNext()){
+                        Pokestop pokestop = iterator.next();
+                        if (otherPokestop.getId().equals(pokestop.getId())) {
+                                pokestops.remove(pokestop);
+				break;
 			}
-			pokestops.add(otherPokestop);
+                    }
+                    pokestops.add(otherPokestop);
 		}
-	}
+	}   
 }
