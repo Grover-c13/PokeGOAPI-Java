@@ -19,11 +19,15 @@ import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.Player.EquippedBadgeOuterClass;
 import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import POGOProtos.Inventory.Item.ItemAwardOuterClass;
+import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.EquipBadgeMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass;
+import POGOProtos.Networking.Responses.EquipBadgeResponseOuterClass;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -184,6 +188,40 @@ public class PlayerProfile {
 			currencies.put(Currency.valueOf(name), amount);
 		} catch (Exception e) {
 			throw new InvalidCurrencyException();
+		}
+	}
+
+	/**
+	 * Check and equip badges.
+	 *
+	 * @throws InvalidCurrencyException the invalid currency exception
+	 */
+
+	public void checkAndEquipBadges() throws LoginFailedException, RemoteServerException {
+		CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage msg =
+				CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage.newBuilder().build();
+		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES, msg);
+		api.getRequestHandler().sendServerRequests(serverRequest);
+		CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse response;
+		try {
+			response = CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse.parseFrom(serverRequest.getData());
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
+		if (response.getSuccess()) {
+			for (int i = 0; i < response.getAwardedBadgesCount(); i++) {
+				EquipBadgeMessageOuterClass.EquipBadgeMessage msg1 = EquipBadgeMessageOuterClass.EquipBadgeMessage.newBuilder()
+						.setBadgeType(response.getAwardedBadges(i))
+						.setBadgeTypeValue(response.getAwardedBadgeLevels(i)).build();
+				ServerRequest serverRequest1 = new ServerRequest(RequestTypeOuterClass.RequestType.EQUIP_BADGE, msg1);
+				api.getRequestHandler().sendServerRequests(serverRequest1);
+				EquipBadgeResponseOuterClass.EquipBadgeResponse response1;
+				try {
+					response1 = EquipBadgeResponseOuterClass.EquipBadgeResponse.parseFrom(serverRequest1.getData());
+				} catch (InvalidProtocolBufferException e) {
+					throw new RemoteServerException(e);
+				}
+			}
 		}
 	}
 
