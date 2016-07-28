@@ -116,7 +116,6 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 * @param username Username
 	 * @param password password
 	 */
-	@Deprecated
 	public PtcCredentialProvider(OkHttpClient client, String username, String password)
 			throws LoginFailedException, RemoteServerException {
 		this(client, username, password, new SystemTimeImpl());

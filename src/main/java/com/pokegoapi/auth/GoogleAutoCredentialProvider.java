@@ -36,7 +36,6 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	 * @throws LoginFailedException  - login failed possibly due to invalid credentials
 	 * @throws RemoteServerException - some server/network failure
 	 */
-	@Deprecated
 	public GoogleAutoCredentialProvider(OkHttpClient httpClient, String username, String password)
 			throws LoginFailedException, RemoteServerException {
 		this.gpsoauth = new Gpsoauth(httpClient);

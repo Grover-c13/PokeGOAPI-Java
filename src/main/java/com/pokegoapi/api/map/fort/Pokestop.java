@@ -17,6 +17,7 @@ package com.pokegoapi.api.map.fort;
 
 import POGOProtos.Inventory.Item.ItemIdOuterClass;
 import POGOProtos.Map.Fort.FortDataOuterClass;
+import POGOProtos.Map.Fort.FortModifierOuterClass;
 import POGOProtos.Networking.Requests.Messages.AddFortModifierMessageOuterClass.AddFortModifierMessage;
 import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
 import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass.FortSearchMessage;
@@ -31,6 +32,8 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
+
+import java.util.List;
 
 /**
  * Created by mjmfighter on 7/20/2016.
@@ -183,7 +186,25 @@ public class Pokestop {
 	 * Returns whether this pokestop has an active lure.
 	 * @return lure status
 	 */
+	@Deprecated
 	public boolean hasLurePokemon() {
 		return fortData.hasLureInfo() && fortData.getLureInfo().getLureExpiresTimestampMs() < api.currentTimeMillis();
+	}
+
+	/**
+	 * Returns whether this pokestop has an active lure.
+	 * @return lure status
+	 */
+	public boolean hasLure() throws LoginFailedException, RemoteServerException {
+
+
+		List<FortModifierOuterClass.FortModifier> modifiers = getDetails().getModifier();
+		for (FortModifierOuterClass.FortModifier mod : modifiers) {
+			if (mod.getItemId() == ItemIdOuterClass.ItemId.ITEM_TROY_DISK) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
