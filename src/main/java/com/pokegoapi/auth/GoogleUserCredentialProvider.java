@@ -71,7 +71,25 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 		refreshToken(refreshToken);
 		authbuilder = AuthInfo.newBuilder();
 	}
+	
+	/**
+	 * Used for logging in when one has a persisted refreshToken.
+	 *
+	 * @param client       OkHttp client
+	 * @param refreshToken Refresh Token Persisted by user
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+	 */
+	public GoogleUserCredentialProvider(OkHttpClient client, String refreshToken)
+			throws LoginFailedException, RemoteServerException {
+		this.time = new SystemTimeImpl();
+		this.client = client;
+		this.refreshToken = refreshToken;
 
+		refreshToken(refreshToken);
+		authbuilder = AuthInfo.newBuilder();
+	}
+	
 	/**
 	 * Used for logging in when you dont have a persisted refresh token.
 	 *
