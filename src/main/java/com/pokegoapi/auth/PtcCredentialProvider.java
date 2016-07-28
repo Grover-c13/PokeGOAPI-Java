@@ -18,6 +18,8 @@ package com.pokegoapi.auth;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.util.Time;
+import com.pokegoapi.util.SystemTimeImpl;
 import com.squareup.moshi.Moshi;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
@@ -49,6 +51,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 	private final OkHttpClient client;
 	private final String username;
 	private final String password;
+	private final Time time;
 	private String tokenId;
 	private long expiresTimestamp;
 	private AuthInfo.Builder authbuilder;
@@ -59,9 +62,13 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 * @param client   the client
 	 * @param username Username
 	 * @param password password
+	 * @param time     a Time implementation
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
 	 */
-	public PtcCredentialProvider(OkHttpClient client, String username, String password)
+	public PtcCredentialProvider(OkHttpClient client, String username, String password, Time time)
 			throws LoginFailedException, RemoteServerException {
+		this.time = time;
 		this.username = username;
 		this.password = password;
 		/*
@@ -99,6 +106,20 @@ public class PtcCredentialProvider extends CredentialProvider {
 
 		authbuilder = AuthInfo.newBuilder();
 		login(username, password);
+	}
+
+	/**
+	 * Instantiates a new Ptc login.
+	 * Deprecated: specify a Time implementation
+	 *
+	 * @param client   the client
+	 * @param username Username
+	 * @param password password
+	 */
+	@Deprecated
+	public PtcCredentialProvider(OkHttpClient client, String username, String password)
+			throws LoginFailedException, RemoteServerException {
+		this(client, username, password, new SystemTimeImpl());
 	}
 
 	/**
@@ -213,7 +234,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 		try {
 			params = body.split("&");
 			this.tokenId = params[0].split("=")[1];
-			this.expiresTimestamp = System.currentTimeMillis()
+			this.expiresTimestamp = time.currentTimeMillis()
 					+ (Integer.valueOf(params[1].split("=")[1]) * 1000 - REFRESH_TOKEN_BUFFER_TIME);
 		} catch (Exception e) {
 			throw new LoginFailedException("Failed to fetch token");
@@ -248,7 +269,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 
 	@Override
 	public boolean isTokenIdExpired() {
-		if (System.currentTimeMillis() > expiresTimestamp) {
+		if (time.currentTimeMillis() > expiresTimestamp) {
 			return true;
 		} else {
 			return false;

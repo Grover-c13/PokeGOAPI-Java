@@ -19,10 +19,13 @@ import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
+import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.RequestHandler;
+import com.pokegoapi.util.SystemTimeImpl;
+import com.pokegoapi.util.Time;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +33,8 @@ import okhttp3.OkHttpClient;
 
 @Slf4j
 public class PokemonGo {
+
+	private final Time time;
 	@Getter
 	RequestHandler requestHandler;
 	@Getter
@@ -47,17 +52,22 @@ public class PokemonGo {
 	@Getter
 	@Setter
 	private double altitude;
-
 	private CredentialProvider credentialProvider;
+	@Getter
+	private Settings settings;
 
 	private RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo authInfo;
 
 	/**
 	 * Instantiates a new Pokemon go.
 	 *
-	 * @param client the client
+	 * @param credentialProvider the credential provider
+	 * @param client             the http client
+	 * @param time               a time implementation
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
 	 */
-	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client)
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time)
 			throws LoginFailedException, RemoteServerException {
 
 		if (credentialProvider == null) {
@@ -65,6 +75,7 @@ public class PokemonGo {
 		} else {
 			this.credentialProvider = credentialProvider;
 		}
+		this.time = time;
 
 		playerProfile = null;
 
@@ -72,12 +83,28 @@ public class PokemonGo {
 		requestHandler = new RequestHandler(this, client);
 		playerProfile = new PlayerProfile(this);
 		inventories = new Inventories(this);
+		settings = new Settings(this);
 
 		playerProfile.updateProfile();
 		inventories.updateInventories();
 
 		// should have proper end point now.
 		map = new Map(this);
+	}
+
+	/**
+	 * Instantiates a new Pokemon go.
+	 * Deprecated: specify a time implementation
+	 *
+	 * @param credentialProvider the credential provider
+	 * @param client             the http client
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+	 */
+	@Deprecated
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client)
+			throws LoginFailedException, RemoteServerException {
+		this(credentialProvider, client, new SystemTimeImpl());
 	}
 
 	/**
@@ -121,5 +148,9 @@ public class PokemonGo {
 		setLatitude(latitude);
 		setLongitude(longitude);
 		setAltitude(altitude);
+	}
+
+	public long currentTimeMillis() {
+		return time.currentTimeMillis();
 	}
 }
