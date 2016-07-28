@@ -26,7 +26,10 @@ import java.util.Scanner;
 
 public class GoogleUserInteractionExample {
 
-
+	/**
+	 * Example on how to login with Google by asking a token from the user
+	 * @param args stuff
+	 */
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
 		try {
