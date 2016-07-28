@@ -41,7 +41,8 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 		this.tokenInfo = login(username, password);
 	}
 
-	private TokenInfo login(String username, String password) throws RemoteServerException, LoginFailedException {
+	private TokenInfo login(String username, String password)
+			throws RemoteServerException, LoginFailedException {
 		try {
 			String masterToken = gpsoauth.performMasterLoginForToken(username, password, GOOGLE_LOGIN_ANDROID_ID);
 			AuthToken authToken = gpsoauth.performOAuthForToken(username, masterToken, GOOGLE_LOGIN_ANDROID_ID,
@@ -54,7 +55,8 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 		}
 	}
 
-	private TokenInfo refreshToken(String username, String refreshToken) throws RemoteServerException, LoginFailedException {
+	private TokenInfo refreshToken(String username, String refreshToken)
+			throws RemoteServerException, LoginFailedException {
 		try {
 			AuthToken authToken = gpsoauth.performOAuthForToken(username, refreshToken, GOOGLE_LOGIN_ANDROID_ID,
 					GOOGLE_LOGIN_SERVICE, GOOGLE_LOGIN_APP, GOOGLE_LOGIN_CLIENT_SIG);
