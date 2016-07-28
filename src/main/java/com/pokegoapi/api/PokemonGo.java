@@ -24,7 +24,6 @@ import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.RequestHandler;
-import com.pokegoapi.util.Log;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import lombok.Getter;
@@ -57,8 +56,6 @@ public class PokemonGo {
 	@Getter
 	private Settings settings;
 
-	private RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo authInfo;
-
 	/**
 	 * Instantiates a new Pokemon go.
 	 *
@@ -78,16 +75,20 @@ public class PokemonGo {
 		}
 		this.time = time;
 
-		playerProfile = null;
-
 		// send profile request to get the ball rolling
 		requestHandler = new RequestHandler(this, client);
-		playerProfile = new PlayerProfile(this);
-		inventories = new Inventories(this);
-		settings = new Settings(this);
-
-		playerProfile.updateProfile();
-		inventories.updateInventories();
+		
+		try {
+			playerProfile = new PlayerProfile(this);
+			Thread.sleep(300);
+			inventories = new Inventories(this);
+			Thread.sleep(300);
+			settings = new Settings(this);
+			Thread.sleep(300);
+		} catch (InterruptedException e) {
+			// should not happen but why not
+			e.printStackTrace();
+		}
 
 		// should have proper end point now.
 		map = new Map(this);
@@ -116,25 +117,6 @@ public class PokemonGo {
 	public RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo getAuthInfo()
 			throws LoginFailedException, RemoteServerException {
 		return credentialProvider.getAuthInfo();
-	}
-
-
-	/**
-	 * Gets player profile.
-	 *
-	 * @param forceUpdate the force update
-	 * @return the player profile
-	 */
-	@Deprecated
-	public PlayerProfile getPlayerProfile(boolean forceUpdate) {
-		if (!forceUpdate && playerProfile != null) {
-			try {
-				playerProfile.updateProfile();
-			} catch (Exception e) {
-				Log.e(TAG, "Error updating Player Profile", e);
-			}
-		}
-		return playerProfile;
 	}
 
 	/**

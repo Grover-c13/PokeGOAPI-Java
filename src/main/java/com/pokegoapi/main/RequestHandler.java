@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class RequestHandler {
 	private static final String TAG = RequestHandler.class.getSimpleName();
@@ -41,6 +42,7 @@ public class RequestHandler {
 	private List<ServerRequest> serverRequests;
 	private String apiEndpoint;
 	private OkHttpClient client;
+	private Long requestId = new Random().nextLong();
 
 	private AuthTicketOuterClass.AuthTicket lastAuth;
 
@@ -243,7 +245,7 @@ public class RequestHandler {
 	private void resetBuilder(RequestEnvelopeOuterClass.RequestEnvelope.Builder builder)
 			throws LoginFailedException, RemoteServerException {
 		builder.setStatusCode(2);
-		builder.setRequestId(8145806132888207460L);
+		builder.setRequestId(getRequestId());
 		if (lastAuth != null
 				&& lastAuth.getExpireTimestampMs() > 0
 				&& lastAuth.getExpireTimestampMs() > api.currentTimeMillis()) {
@@ -282,5 +284,8 @@ public class RequestHandler {
 	public void setAltitude(double altitude) {
 		builder.setAltitude(altitude);
 	}
-
+	
+	public Long getRequestId() {
+		return ++requestId;
+	}
 }
