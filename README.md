@@ -35,6 +35,8 @@ ___
 # Usage
 You can import the lib directly from the jar OR with Maven/Gradle/SBT/Leiningen using JitPack : [![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
 
+  PS : To Eclipse user, add the generated jar into the eclipse build path : Right click on the project > Build path > Java Build Path > Select Libraries tab > Add External JARs… > Select `PokeGOAPI-Java/build/libs/PokeGOAPI-Java_bundle-0.0.1-SNAPSHOT.jar` > Finish
+
 Mostly everything is accessed through the PokemonGo class in the API package.
 The constructor of PokemonGo class requires a CredentialsProvider object (which can be obtained from GoogleCredentialsProvider or PtcCredentialsProvider) and a OkHttpClient object.
 
