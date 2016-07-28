@@ -31,24 +31,41 @@ ___
   - `` ./gradlew build ``
   - you should have the api jar in ``build/libs/PokeGOAPI-Java-0.0.1-SNAPSHOT.jar``
 
-  PS : To Eclipse user, you must build once : `` ./gradlew build `` and add the generated java class for proto into eclipse source path : Right click on the project > Build path > Configure Build Path > Source > Add Folder > Select `build/generated/source/proto/main/java` > Finish
+# Eclipse users:
+  - build once : `` ./gradlew build ``
+  - Right click on the project
+  - Select Build path > Configure Build Path > Source > Add Folder
+  - Select `build/generated/source/proto/main/java`
+  - Finish
 
 # Usage
-You can import the lib directly from the jar OR with Maven/Gradle/SBT/Leiningen using JitPack : [![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
 
-  PS : To Eclipse user who just want to add the jar to classpath : Right click on the project > Build path > Java Build Path > Select Libraries tab > Add External JARs… > Select `PokeGOAPI-Java/build/libs/PokeGOAPI-Java-0.0.1-SNAPSHOT.jar` > Finish
+  Import from Maven/Gradle/SBT/Leiningen using JitPack : [![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
+
+OR
+
+  Import JAR in Eclipse
+    - Right click on the project
+    - Select Build path > Java Build Path
+    - Select Libraries tab
+    - Select Add External JARs…
+    - Select `PokeGOAPI-Java/build/libs/PokeGOAPI-Java_bundle-0.0.1-SNAPSHOT.jar`
+    - Finish
 
 Mostly everything is accessed through the PokemonGo class in the API package.
 The constructor of PokemonGo class requires a CredentialsProvider object (which can be obtained from GoogleCredentialsProvider or PtcCredentialsProvider) and a OkHttpClient object.
 
-How to use example:
+# Usage Example:
 ```java
 OkHttpClient httpClient = new OkHttpClient();
 
 /** 
-* Google work like this : the provider will get you a simple to enter to a url with the google account that you want to logged with.
-* After that, you will get tokens (access_token that will be used to access niantic servers and a refresh_token that will be used to 
-* ask for a new access_token when it will expire (every 15min).
+* Google: 
+* The provider will return URL for the device, along with a code for the chosen account. 
+* The user must enter the code into the webpage provided by that URL to obtain a token.
+* This token is the access_token that will be used to access Niantic servers.
+* You will also receive a refresh_token to request a new access_token.
+* A new access_token should be requested when it will expire (every 15min).
 */
 PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient, new GoogleLoginListener()), httpClient);
 
@@ -66,26 +83,29 @@ public class GoogleLoginListener implements OnGoogleLoginOAuthCompleteListener {
 }
 
 /**
-* After this, if you dont want to re-authorize the google account everytime, you will need to store the refresh token somewhere (our 
-* lib doesnt store it for you) and loggin with it like this :
+* After this, if you do not want to re-authorize the google account every time, you will need to store the refresh token
+* The API does not store the refresh token for you
+* log in using the refresh token like this :
 */
 PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient, refreshToken), httpClient);
 
 /**
-* PTC is much more simplier and at the same time less secure, you will need the username and password to relog the user since 
-* these accounts doesnt support currently a refresh_token. A exemple to login :
+* PTC is much simpler, but less secure.
+* You will need the username and password for each user log in
+* This account does not currently support a refresh_token. 
+* Example log in :
 */
 PokemonGo go = new PokemonGo(new PtcCredentialProvider(httpClient,username,password),httpClient);
 
 // After this you can access the api from the PokemonGo instance :
 go.getPlayerProfile(); // to get the user profile
-go.getInventories(); // to get all his inventories (pokemon, backpack, egg, incubator)
-go.setLocation(lat, long, alt); // set your position to get stuff around (altitude is not needed, you can use 1 for exemple)
-go.getMap().getCatchablePokemon(); // get all currently catchables pokemons around you
+go.getInventories(); // to get all his inventories (Pokemon, backpack, egg, incubator)
+go.setLocation(lat, long, alt); // set your position to get stuff around (altitude is not needed, you can use 1 for example)
+go.getMap().getCatchablePokemon(); // get all currently Catchable Pokemon around you
 
 // If you want to go deeper, you can directly send your request with our RequestHandler
-// here we are sending a request to get the award for our level, just an exemple, you can send 
-// whatever you want that are defined in the protos file as Request/Response)
+// For example, here we are sending a request to get the award for our level
+// This applies to any method defined in the protos file as Request/Response)
 
 LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder().setLevel(yourLVL).build(); 
 ServerRequest serverRequest = new ServerRequest(RequestType.LEVEL_UP_REWARDS, msg);
