@@ -51,7 +51,7 @@ task bundle(type: Jar) {
     with jar
 }
 
-build.finalizedBy(bundle)
+jar.finalizedBy(bundle)
 
 protobuf {
     // Configure the protoc executable
