@@ -57,7 +57,6 @@ public class GoogleCredentialProvider extends CredentialProvider {
 
 	/**
 	 * Used for logging in when one has a persisted refreshToken.
-	 * Deprecated: specify a Time implementation
 	 *
 	 * @param client       OkHttp client
 	 * @param refreshToken Refresh Token Persisted by user

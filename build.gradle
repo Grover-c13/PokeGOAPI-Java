@@ -8,8 +8,6 @@ buildscript {
     dependencies {
         classpath 'com.google.protobuf:protobuf-gradle-plugin:0.7.7'
     }
-
-
 }
 
 apply plugin: 'idea'
@@ -45,8 +43,6 @@ processResources {
 
 // Run this task to bundle all needed dependency
 task bundle(type: Jar) {
-    baseName = project.name + '_bundle'
-
     from {
         configurations.compile.collect {
             it.isDirectory() && !it.isEmpty() ? it : zipTree(it)
@@ -54,6 +50,8 @@ task bundle(type: Jar) {
     }
     with jar
 }
+
+build.finalizedBy(bundle)
 
 protobuf {
     // Configure the protoc executable
@@ -114,11 +112,19 @@ idea {
     }
 }
 
-task sourcesJar(type: Jar) {
-    from sourceSets.main.java.srcDirs
+task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    javadoc.failOnError(false);
+    javadoc.source = sourceSets.main.allJava
+    from javadoc.destinationDir
 }
 
 artifacts {
     archives sourcesJar
+    archives javadocJar
 }
