@@ -3,6 +3,8 @@ package com.pokegoapi.auth;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.util.SystemTimeImpl;
+import com.pokegoapi.util.Time;
 import okhttp3.OkHttpClient;
 import svarzee.gps.gpsoauth.AuthToken;
 import svarzee.gps.gpsoauth.Gpsoauth;
@@ -23,8 +25,8 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 
 	private final Gpsoauth gpsoauth;
 	private final String username;
+	private Time time;
 	private TokenInfo tokenInfo;
-
 
 	/**
 	 * Constructs credential provider using username and password
@@ -39,6 +41,24 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 		this.gpsoauth = new Gpsoauth(httpClient);
 		this.username = username;
 		this.tokenInfo = login(username, password);
+		this.time = new SystemTimeImpl();
+	}
+
+	/**
+	 * 
+	 * @param httpClient : the client that will make http call
+	 * @param username : google username
+	 * @param password : google pwd
+	 * @param time : time instance used to refresh token
+	 * @throws LoginFailedException -  login failed possibly due to invalid credentials
+	 * @throws RemoteServerException - some server/network failure
+	 */
+	public GoogleAutoCredentialProvider(OkHttpClient httpClient, String username, String password, Time time)
+			throws LoginFailedException, RemoteServerException {
+		this.gpsoauth = new Gpsoauth(httpClient);
+		this.username = username;
+		this.tokenInfo = login(username, password);
+		this.time = time;
 	}
 
 	private TokenInfo login(String username, String password)
@@ -86,7 +106,7 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 
 	@Override
 	public boolean isTokenIdExpired() {
-		return tokenInfo.authToken.getExpiry() > System.currentTimeMillis() / 1000 - 60;
+		return tokenInfo.authToken.getExpiry() > time.currentTimeMillis() / 1000 - 60;
 	}
 
 	private static class TokenInfo {

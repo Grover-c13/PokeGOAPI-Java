@@ -8,6 +8,8 @@ This means different design choices are made. I will try to keep it up to date w
 [![Build Status](https://travis-ci.org/Grover-c13/PokeGOAPI-Java.svg?branch=master)](https://travis-ci.org/Grover-c13/PokeGOAPI-Java)
 [![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
 
+Javadocs : [CLICK ME](https://jitpack.io/com/github/Grover-c13/PokeGOAPI-Java/a2828da60d/javadoc/) 
+
 See this guide for adding functionality:
    https://docs.google.com/document/d/1BE8O6Z19sQ54T5T7QauXgA11GbL6D9vx9AAMCM5KlRA
 
@@ -26,68 +28,85 @@ If you are using this lib to catch pokemon and loot pokestop, take care that you
 :exclamation: :exclamation: :exclamation:
 ___
 
-# Build
+# How to import
+
+  Import from Maven/Gradle/SBT/Leiningen using JitPack : [![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
+  
+  After you clicked on this link, jitpack will show you multiple build (try use the latest one since the api grow everyday).
+  JitPack will show an example for each dependency manager to include our API into your project.
+
+OR
+
+  Import JAR in Eclipse
+    - Right click on the project
+    - Select Build path > Java Build Path
+    - Select Libraries tab
+    - Select Add External JARs…
+    - Select `PokeGOAPI-Java/build/libs/PokeGOAPI-Java-0.0.1-SNAPSHOT.jar`
+    - Finish
+
+# Build from source
   - Clone the repo and cd into the folder
   - `` git submodule update --init ``
-  - compile and package
-  - `` ./gradlew build bundle ``
-  - you should have the api bundled in ``build/libs/PokeGOAPI-Java_bundle-0.0.1-SNAPSHOT.jar``
+  - `` ./gradlew build ``
+  - you should have the api jar in ``build/libs/PokeGOAPI-Java-0.0.1-SNAPSHOT.jar``
 
-  PS : To Eclipse user, you must build once : `` ./gradlew build `` and add the generated java class for proto into eclipse source path : Right click on the project > Build path > Configure Build Path > Source > Add Folder > Select `build/generated/source/proto/main/java` > Finish
+PS : for users who want to import the api into Eclipse IDE, you'll need to :
+  - build once : `` ./gradlew build ``
+  - Right click on the project
+  - Select Build path > Configure Build Path > Source > Add Folder
+  - Select `build/generated/source/proto/main/java`
+  - Finish
 
-# Usage
-You can import the lib directly from the jar OR with Maven/Gradle/SBT/Leiningen using JitPack : [![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
-
-  PS : To Eclipse user, add the generated jar into the eclipse build path : Right click on the project > Build path > Java Build Path > Select Libraries tab > Add External JARs… > Select `PokeGOAPI-Java/build/libs/PokeGOAPI-Java_bundle-0.0.1-SNAPSHOT.jar` > Finish
-
-Mostly everything is accessed through the PokemonGo class in the API package.
-The constructor of PokemonGo class requires a CredentialsProvider object (which can be obtained from GoogleCredentialsProvider or PtcCredentialsProvider) and a OkHttpClient object.
-
-How to use example:
+# Usage exemple (mostly how to login) :
 ```java
 OkHttpClient httpClient = new OkHttpClient();
 
 /** 
-* Google work like this : the provider will get you a simple to enter to a url with the google account that you want to logged with.
-* After that, you will get tokens (access_token that will be used to access niantic servers and a refresh_token that will be used to 
-* ask for a new access_token when it will expire (every 15min).
+* Google: 
+* You will need to redirect your user to GoogleUserCredentialProvider.LOGIN_URL
+* Afer this, the user must signin on google and get the token that will be show to him.
+* This token will need to be put as argument to login.
 */
-PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient, new GoogleLoginListener()), httpClient);
+GoogleUserCredentialProvider provider = new GoogleUserCredentialProvider(http);
 
-public class GoogleLoginListener implements OnGoogleLoginOAuthCompleteListener {
- 
-        @Override
-        public void onInitialOAuthComplete(GoogleAuthJson auth) {
-            logger.log("Waiting for the code " + auth.getUserCode() + " to be put in " + auth.getVerificationUrl());
-        }
- 
-        @Override
-        public void onTokenIdReceived(GoogleAuthTokenJson tokens) {
-            // refresh_token is accessible here if you want to store it.
-        }
-}
+// in this url, you will get a code for the google account that is logged
+System.out.println("Please go to " + GoogleUserCredentialProvider.LOGIN_URL);
+System.out.println("Enter authorisation code:");
+			
+// Ask the user to enter it in the standart input
+Scanner sc = new Scanner(System.in);
+String access = sc.nextLine();
+			
+// we should be able to login with this token
+provider.login(access);
+PokemonGo go = new PokemonGo(provider, httpClient);
 
 /**
-* After this, if you dont want to re-authorize the google account everytime, you will need to store the refresh token somewhere (our 
-* lib doesnt store it for you) and loggin with it like this :
+* After this, if you do not want to re-authorize the google account every time, 
+* you will need to store the refresh_token that you can get the first time with provider.getRefreshToken()
+* ! The API does not store the refresh token for you !
+* log in using the refresh token like this :
 */
-PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient, refreshToken), httpClient);
+PokemonGo go = new PokemonGo(new GoogleUserCredentialProvider(httpClient, refreshToken), httpClient);
 
 /**
-* PTC is much more simplier and at the same time less secure, you will need the username and password to relog the user since 
-* these accounts doesnt support currently a refresh_token. A exemple to login :
+* PTC is much simpler, but less secure.
+* You will need the username and password for each user log in
+* This account does not currently support a refresh_token. 
+* Example log in :
 */
 PokemonGo go = new PokemonGo(new PtcCredentialProvider(httpClient,username,password),httpClient);
 
 // After this you can access the api from the PokemonGo instance :
 go.getPlayerProfile(); // to get the user profile
-go.getInventories(); // to get all his inventories (pokemon, backpack, egg, incubator)
-go.setLocation(lat, long, alt); // set your position to get stuff around (altitude is not needed, you can use 1 for exemple)
-go.getMap().getCatchablePokemon(); // get all currently catchables pokemons around you
+go.getInventories(); // to get all his inventories (Pokemon, backpack, egg, incubator)
+go.setLocation(lat, long, alt); // set your position to get stuff around (altitude is not needed, you can use 1 for example)
+go.getMap().getCatchablePokemon(); // get all currently Catchable Pokemon around you
 
 // If you want to go deeper, you can directly send your request with our RequestHandler
-// here we are sending a request to get the award for our level, just an exemple, you can send 
-// whatever you want that are defined in the protos file as Request/Response)
+// For example, here we are sending a request to get the award for our level
+// This applies to any method defined in the protos file as Request/Response)
 
 LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder().setLevel(yourLVL).build(); 
 ServerRequest serverRequest = new ServerRequest(RequestType.LEVEL_UP_REWARDS, msg);
@@ -97,12 +116,11 @@ go.getRequestHandler().sendServerRequests(serverRequest);
 
 LevelUpRewardsResponse response = null;
 try {
-		response = LevelUpRewardsResponse.parseFrom(serverRequest.getData());
-	} catch (InvalidProtocolBufferException e) {
-	   throw new RemoteServerException(e);
+	response = LevelUpRewardsResponse.parseFrom(serverRequest.getData());
+} catch (InvalidProtocolBufferException e) {
+	// its possible that the parsing fail when servers are in high load for example.
+	throw new RemoteServerException(e);
 }
-
-// its possible that the parsing fail when servers are in high load for example.
 ```
 
 ##Android Dev FAQ

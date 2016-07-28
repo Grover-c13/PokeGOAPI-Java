@@ -305,6 +305,10 @@ public class Pokemon {
 		return proto.getHeightM();
 	}
 
+	public float getWeightKg() {
+		return proto.getWeightKg();
+	}
+
 	public int getIndividualAttack() {
 		return proto.getIndividualAttack();
 	}

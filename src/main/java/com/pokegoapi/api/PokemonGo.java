@@ -101,7 +101,6 @@ public class PokemonGo {
 	 * @throws LoginFailedException  When login fails
 	 * @throws RemoteServerException When server fails
 	 */
-	@Deprecated
 	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client)
 			throws LoginFailedException, RemoteServerException {
 		this(credentialProvider, client, new SystemTimeImpl());
