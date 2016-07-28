@@ -194,6 +194,7 @@ public class PlayerProfile {
 	/**
 	 * Check and equip badges.
 	 *
+	 * @throws LoginFailedException  if the login failed
 	 * @throws InvalidCurrencyException the invalid currency exception
 	 */
 
