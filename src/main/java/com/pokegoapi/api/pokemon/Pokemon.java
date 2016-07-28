@@ -407,6 +407,7 @@ public class Pokemon {
 	}
 
 	/**
+	 * Calculate the maximum CP for this individual pokemon
 	 * @return The maximum CP for this pokemon
 	 */
 	public int getMaxCp() throws NoSuchItemException {
@@ -417,6 +418,21 @@ public class Pokemon {
 		int attack = proto.getIndividualAttack() + pokemonMeta.getBaseAttack();
 		int defense = proto.getIndividualDefense() + pokemonMeta.getBaseDefense();
 		int stamina = proto.getIndividualStamina() + pokemonMeta.getBaseStamina();
+		return PokemonCpUtils.getMaxCp(attack, defense, stamina);
+	}
+
+	/**
+	 * Calculates the absolute maximum CP for all pokemons with this PokemonId
+	 * @return The absolute maximum CP
+	 */
+	public int getAbsoluteMaxCp() throws NoSuchItemException {
+		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
+		if (pokemonMeta == null) {
+			throw new NoSuchItemException("Cannot find meta data for " + proto.getPokemonId().name());
+		}
+		int attack = 15 + pokemonMeta.getBaseAttack();
+		int defense = 15 + pokemonMeta.getBaseDefense();
+		int stamina = 15 + pokemonMeta.getBaseStamina();
 		return PokemonCpUtils.getMaxCp(attack, defense, stamina);
 	}
 
