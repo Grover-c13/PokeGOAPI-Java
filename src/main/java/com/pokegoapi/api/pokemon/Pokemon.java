@@ -196,7 +196,8 @@ public class Pokemon {
 		}
 	}
 
-	/**dus
+	/**
+	 * dus
 	 * Evolve evolution result.
 	 *
 	 * @return the evolution result
@@ -408,6 +409,7 @@ public class Pokemon {
 
 	/**
 	 * Calculate the maximum CP for this individual pokemon
+	 *
 	 * @return The maximum CP for this pokemon
 	 */
 	public int getMaxCp() throws NoSuchItemException {
@@ -423,18 +425,30 @@ public class Pokemon {
 
 	/**
 	 * Calculates the absolute maximum CP for all pokemons with this PokemonId
+	 *
 	 * @return The absolute maximum CP
 	 */
 	public int getAbsoluteMaxCp() throws NoSuchItemException {
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
+		return getAbsoluteMaxCp(proto.getPokemonId());
+	}
+
+
+	/**
+	 * Static helper to get the absolute maximum CP for pokemons with their PokemonId.
+	 * +	 * @return The absolute maximum CP
+	 */
+	public static int getAbsoluteMaxCp(PokemonIdOuterClass.PokemonId id) throws NoSuchItemException {
+		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(id);
 		if (pokemonMeta == null) {
-			throw new NoSuchItemException("Cannot find meta data for " + proto.getPokemonId().name());
+			throw new NoSuchItemException("Cannot find meta data for " + id);
 		}
 		int attack = 15 + pokemonMeta.getBaseAttack();
 		int defense = 15 + pokemonMeta.getBaseDefense();
 		int stamina = 15 + pokemonMeta.getBaseStamina();
 		return PokemonCpUtils.getMaxCp(attack, defense, stamina);
 	}
+
 
 	/**
 	 * @return The CP for this pokemon after powerup
