@@ -111,7 +111,10 @@ public class Map {
 			catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
 		}
 
-		// TODO: i have more success checking if encounterId > 0
+		/*
+		TODO: i have more success checking if encounterId > 0
+		i don't want to use the hasLure because it do a request every call
+		*/
 		for (Pokestop pokestop : objects.getPokestops()) {
 			if (pokestop.inRange()
 					&& pokestop.getFortData().hasLureInfo()
@@ -194,6 +197,7 @@ public class Map {
 	 *
 	 * @return MapObjects at your current location
 	 */
+
 	public MapObjects getMapObjects() throws LoginFailedException, RemoteServerException {
 		return getMapObjects(9);
 	}
