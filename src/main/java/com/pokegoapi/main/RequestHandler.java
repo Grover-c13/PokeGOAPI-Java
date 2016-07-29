@@ -18,6 +18,7 @@ package com.pokegoapi.main;
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass;
+import com.google.common.util.concurrent.RateLimiter;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -33,6 +34,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class RequestHandler {
@@ -43,6 +45,7 @@ public class RequestHandler {
 	private String apiEndpoint;
 	private OkHttpClient client;
 	private Long requestId = new Random().nextLong();
+	private final RateLimiter rateLimiter = RateLimiter.create(2.7, 10, TimeUnit.SECONDS);
 
 	private AuthTicketOuterClass.AuthTicket lastAuth;
 
@@ -85,6 +88,7 @@ public class RequestHandler {
 		if (serverRequests.length == 0) {
 			return;
 		}
+		rateLimiter.acquire();
 		RequestEnvelopeOuterClass.RequestEnvelope.Builder builder = RequestEnvelopeOuterClass.RequestEnvelope.newBuilder();
 		resetBuilder(builder);
 
