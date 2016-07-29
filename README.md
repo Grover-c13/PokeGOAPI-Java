@@ -153,4 +153,4 @@ You can't. The Google Identity Platform uses the SHA1 fingerprint and package na
   - @vmarchaud
   - @langerhans
 
-You can join us in the slack channel #javaapi on the pkre.slack.com (you should get an invite by a bot posted somewhere in the subreddit /r/pokemongodev)
+You can join us in the slack channel #javaapi on the pkre.slack.com ([you can get invited here](https://shielded-earth-81203.herokuapp.com/))
