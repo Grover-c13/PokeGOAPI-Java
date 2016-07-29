@@ -114,7 +114,7 @@ public class Map {
 		// TODO: i have more success checking if encounterId > 0
 		for (Pokestop pokestop : objects.getPokestops()) {
 			if (pokestop.inRange()
-					&& pokestop.hasLure()
+					&& pokestop.getFortData().hasLureInfo()
 					&& pokestop.getFortData().getLureInfo().getEncounterId() > 0) {
 				//if (pokestop.inRange() && pokestop.hasLurePokemon()) {
 				catchablePokemons.add(new CatchablePokemon(api, pokestop.getFortData()));
