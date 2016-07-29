@@ -429,7 +429,6 @@ public class Pokemon {
 	 * @return The absolute maximum CP
 	 */
 	public int getAbsoluteMaxCp() throws NoSuchItemException {
-		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
 		return getAbsoluteMaxCp(proto.getPokemonId());
 	}
 
