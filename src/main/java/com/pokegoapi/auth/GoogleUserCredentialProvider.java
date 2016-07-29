@@ -39,19 +39,19 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 	public static final String LOGIN_URL = "https://accounts.google.com/o/oauth2/auth?client_id=848232511240-73ri3t7plvk96pj4f85uj8otdat2alem.apps.googleusercontent.com&redirect_uri=urn%3Aietf%3Awg%3Aoauth%3A2.0%3Aoob&response_type=code&scope=openid%20email%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email";
 	private static final String TAG = GoogleUserCredentialProvider.class.getSimpleName();
 	//We try and refresh token 5 minutes before it actually expires
-	private static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
-	private final OkHttpClient client;
+	protected static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
+	protected final OkHttpClient client;
 
-	private final Time time;
+	protected final Time time;
 
-	private long expiresTimestamp;
+	protected long expiresTimestamp;
 
-	private String tokenId;
+	protected String tokenId;
 
 	@Getter
-	private String refreshToken;
+	protected String refreshToken;
 
-	private AuthInfo.Builder authbuilder;
+	protected AuthInfo.Builder authbuilder;
 
 	/**
 	 * Used for logging in when one has a persisted refreshToken.
