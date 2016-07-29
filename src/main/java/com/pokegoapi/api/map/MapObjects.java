@@ -184,15 +184,18 @@ public class MapObjects {
 
 		spawnPoints.clear();
 		addSpawnPoints(other.getSpawnPoints());
-
-		for (FortData otherGym : other.getGyms()) {
-			for (FortData gym : getGyms()) {
-				if (otherGym.getId().equals(gym.getId())) {
-					gyms.remove(gym);
-					break;
-				}
+                
+                
+                for (FortData otherGym : other.getGyms()) {
+                    Iterator<FortData> iterator = gyms.iterator();
+                    while(iterator.hasNext()){
+                        FortData gym = iterator.next();
+                        if (otherGym.getId().equals(gym.getId())) {
+                                gyms.remove(gym);
+				break;
 			}
-			gyms.add(otherGym);
+                    }
+                    gyms.add(otherGym);
 		}
 
 		for (Pokestop otherPokestop : other.getPokestops()) {
