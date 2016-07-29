@@ -44,6 +44,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.fort.FortDetails;
 import com.pokegoapi.api.gym.Gym;
+import com.pokegoapi.api.map.fort.Pokestop;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.NearbyPokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -110,12 +111,13 @@ public class Map {
 			catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
 		}
 
-		// TODO: Check if this code is correct; merged because this contains many other fixes
-		/*for (Pokestop pokestop : objects.getPokestops()) {
-			if (pokestop.inRange() && pokestop.hasLurePokemon()) {
+		// TODO: i have more success checking if encounterId > 0
+		for (Pokestop pokestop : objects.getPokestops()) {
+			if (pokestop.inRange() && pokestop.getFortData().getLureInfo().getEncounterId() > 0) {
+				//if (pokestop.inRange() && pokestop.hasLurePokemon()) {
 				catchablePokemons.add(new CatchablePokemon(api, pokestop.getFortData()));
 			}
-		}*/
+		}
 
 		return new ArrayList<>(catchablePokemons);
 	}
@@ -167,7 +169,6 @@ public class Map {
 
 		return gyms;
 	}
-
 
 
 	/**
@@ -314,7 +315,6 @@ public class Map {
 			result.addWildPokemons(mapCell.getWildPokemonsList());
 			result.addDecimatedSpawnPoints(mapCell.getDecimatedSpawnPointsList());
 			result.addSpawnPoints(mapCell.getSpawnPointsList());
-
 
 
 			java.util.Map<FortType, List<FortData>> groupedForts = Stream.of(mapCell.getFortsList())
