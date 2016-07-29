@@ -30,6 +30,7 @@ import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass;
 import POGOProtos.Networking.Responses.EquipBadgeResponseOuterClass;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass;
+import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
@@ -38,7 +39,9 @@ import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.main.Task;
 import com.pokegoapi.util.Log;
+import com.pokegoapi.util.TaskUtil;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -75,8 +78,65 @@ public class PlayerProfile {
 
 	public PlayerProfile(PokemonGo api) throws LoginFailedException, RemoteServerException {
 		this.api = api;
-		updateProfile();
 	}
+
+	public void updateProfile(final Task<Void> task) {
+
+		Task<ServerRequest> stask = new Task<ServerRequest>() {
+
+			@Override
+			public void onComplete(ServerRequest req) throws RemoteServerException, InvalidProtocolBufferException {
+
+				GetPlayerResponseOuterClass.GetPlayerResponse playerResponse = null;
+				playerResponse = GetPlayerResponseOuterClass.GetPlayerResponse.parseFrom(req.getData());
+
+
+				badge = playerResponse.getPlayerData().getEquippedBadge();
+				creationTime = playerResponse.getPlayerData().getCreationTimestampMs();
+				itemStorage = playerResponse.getPlayerData().getMaxItemStorage();
+				pokemonStorage = playerResponse.getPlayerData().getMaxPokemonStorage();
+				team = Team.values()[playerResponse.getPlayerData().getTeamValue()];
+				username = playerResponse.getPlayerData().getUsername();
+
+				final PlayerAvatar avatarApi = new PlayerAvatar(playerResponse.getPlayerData().getAvatar());
+				final DailyBonus bonusApi = new DailyBonus();
+				final ContactSettings contactApi = new ContactSettings();
+
+				// maybe something more graceful?
+				for (CurrencyOuterClass.Currency currency : playerResponse.getPlayerData().getCurrenciesList()) {
+					try {
+						addCurrency(currency.getName(), currency.getAmount());
+					} catch (InvalidCurrencyException e) {
+						Log.w(TAG, "Error adding currency. You can probably ignore this.", e);
+					}
+				}
+
+
+
+				bonusApi.setNextCollectionTimestamp(
+						playerResponse.getPlayerData().getDailyBonus().getNextCollectedTimestampMs()
+				);
+				bonusApi.setNextDefenderBonusCollectTimestamp(
+						playerResponse.getPlayerData().getDailyBonus().getNextDefenderBonusCollectTimestampMs()
+				);
+
+				avatar = avatarApi;
+				dailyBonus = bonusApi;
+				task.onComplete(null);
+				task.setDone(true);
+				System.out.println("TASK COMPLETE");
+
+			}
+		};
+
+		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
+		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg, stask);
+
+		api.getRequestHandler().request(getPlayerServerRequest);
+
+	}
+
+
 
 	/**
 	 * Updates the player profile with the latest data.
@@ -85,57 +145,15 @@ public class PlayerProfile {
 	 * @throws RemoteServerException the remote server exception
 	 */
 	public void updateProfile() throws RemoteServerException, LoginFailedException {
-		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
-		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
-		api.getRequestHandler().sendServerRequests(getPlayerServerRequest);
+		Task task = new Task<Void>() {
 
-		GetPlayerResponseOuterClass.GetPlayerResponse playerResponse = null;
-		try {
-			playerResponse = GetPlayerResponseOuterClass.GetPlayerResponse.parseFrom(getPlayerServerRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-
-		badge = playerResponse.getPlayerData().getEquippedBadge();
-		creationTime = playerResponse.getPlayerData().getCreationTimestampMs();
-		itemStorage = playerResponse.getPlayerData().getMaxItemStorage();
-		pokemonStorage = playerResponse.getPlayerData().getMaxPokemonStorage();
-		team = Team.values()[playerResponse.getPlayerData().getTeamValue()];
-		username = playerResponse.getPlayerData().getUsername();
-
-		final PlayerAvatar avatarApi = new PlayerAvatar();
-		final DailyBonus bonusApi = new DailyBonus();
-		final ContactSettings contactApi = new ContactSettings();
-
-		// maybe something more graceful?
-		for (CurrencyOuterClass.Currency currency : playerResponse.getPlayerData().getCurrenciesList()) {
-			try {
-				addCurrency(currency.getName(), currency.getAmount());
-			} catch (InvalidCurrencyException e) {
-				Log.w(TAG, "Error adding currency. You can probably ignore this.", e);
+			public void onComplete(Void v) throws RemoteServerException, InvalidProtocolBufferException {
+				return;
 			}
-		}
+		};
 
-		avatarApi.setGender(playerResponse.getPlayerData().getAvatar().getGender());
-		avatarApi.setBackpack(playerResponse.getPlayerData().getAvatar().getBackpack());
-		avatarApi.setEyes(playerResponse.getPlayerData().getAvatar().getEyes());
-		avatarApi.setHair(playerResponse.getPlayerData().getAvatar().getHair());
-		avatarApi.setHat(playerResponse.getPlayerData().getAvatar().getHat());
-		avatarApi.setPants(playerResponse.getPlayerData().getAvatar().getPants());
-		avatarApi.setShirt(playerResponse.getPlayerData().getAvatar().getShirt());
-		avatarApi.setShoes(playerResponse.getPlayerData().getAvatar().getShoes());
-		avatarApi.setSkin(playerResponse.getPlayerData().getAvatar().getSkin());
-
-		bonusApi.setNextCollectionTimestamp(
-				playerResponse.getPlayerData().getDailyBonus().getNextCollectedTimestampMs()
-		);
-		bonusApi.setNextDefenderBonusCollectTimestamp(
-				playerResponse.getPlayerData().getDailyBonus().getNextDefenderBonusCollectTimestampMs()
-		);
-
-		avatar = avatarApi;
-		dailyBonus = bonusApi;
-
+		updateProfile(task);
+		TaskUtil.waitForTask(task);
 
 	}
 
@@ -150,30 +168,69 @@ public class PlayerProfile {
 	 * @throws LoginFailedException  if the login failed
 	 * @throws RemoteServerException if the server failed to respond
 	 */
-	public PlayerLevelUpRewards acceptLevelUpRewards(int level) throws RemoteServerException, LoginFailedException {
-		// Check if we even have achieved this level yet
-		if (level > stats.getLevel()) {
-			return new PlayerLevelUpRewards(PlayerLevelUpRewards.Status.NOT_UNLOCKED_YET);
-		}
+	public void acceptLevelUpRewards(final int level, final Task<PlayerLevelUpRewards> task) throws RemoteServerException, LoginFailedException {
+		Task<ServerRequest> stask = new Task<ServerRequest>()
+		{
+			@Override
+			public void onComplete(ServerRequest input) throws RemoteServerException, InvalidProtocolBufferException {
+				PlayerLevelUpRewards out;
+				// Check if we even have achieved this level yet
+				if (level > stats.getLevel()) {
+					out = new PlayerLevelUpRewards(PlayerLevelUpRewards.Status.NOT_UNLOCKED_YET);
+				} else {
+					LevelUpRewardsResponse response = LevelUpRewardsResponse.parseFrom(input.getData());
+
+					// Add the awarded items to our bag
+					ItemBag bag = api.getInventories().getItemBag();
+					for (ItemAwardOuterClass.ItemAward itemAward : response.getItemsAwardedList()) {
+						Item item = bag.getItem(itemAward.getItemId());
+						item.setCount(item.getCount() + itemAward.getItemCount());
+					}
+					// Build a new rewards object and return it
+					out = new PlayerLevelUpRewards(response);
+				}
+
+				task.onComplete(out);
+				task.setDone(true);
+
+			}
+		};
+
 		LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder()
 				.setLevel(level)
 				.build();
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.LEVEL_UP_REWARDS, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-		LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse response;
-		try {
-			response = LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-		// Add the awarded items to our bag
-		ItemBag bag = api.getInventories().getItemBag();
-		for (ItemAwardOuterClass.ItemAward itemAward : response.getItemsAwardedList()) {
-			Item item = bag.getItem(itemAward.getItemId());
-			item.setCount(item.getCount() + itemAward.getItemCount());
-		}
-		// Build a new rewards object and return it
-		return new PlayerLevelUpRewards(response);
+
+		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.LEVEL_UP_REWARDS, msg, stask);
+		api.getRequestHandler().request(serverRequest);
+
+	}
+
+
+	/**
+	 * Accept the rewards granted and the items unlocked by gaining a trainer level up. Rewards are retained by the
+	 * server until a player actively accepts them.
+	 * The rewarded items are automatically inserted into the players item bag.
+	 *
+	 * @see PlayerLevelUpRewards
+	 * @param level the trainer level that you want to accept the rewards for
+	 * @return a PlayerLevelUpRewards object containing information about the items rewarded and unlocked for this level
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException if the server failed to respond
+	 */
+	public PlayerLevelUpRewards acceptLevelUpRewards(final int level) throws RemoteServerException, LoginFailedException {
+		final PlayerLevelUpRewards[] out = new PlayerLevelUpRewards[1];
+		Task<PlayerLevelUpRewards> task = new Task<PlayerLevelUpRewards>()
+		{
+			@Override
+			public void onComplete(PlayerLevelUpRewards input) throws RemoteServerException, InvalidProtocolBufferException {
+				out[0] = input;
+			}
+		};
+
+		acceptLevelUpRewards(level, task);
+		TaskUtil.waitForTask(task);
+
+		return out[0];
 	}
 
 	/**

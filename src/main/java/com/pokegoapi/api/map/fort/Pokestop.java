@@ -24,6 +24,7 @@ import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass.FortS
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.AddFortModifierResponseOuterClass;
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
+import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass.FortDetailsResponse;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -31,6 +32,8 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.main.Task;
+import com.pokegoapi.util.TaskUtil;
 import lombok.Getter;
 
 import java.util.List;
@@ -111,7 +114,18 @@ public class Pokestop {
 	 * @throws LoginFailedException  if login failed
 	 * @throws RemoteServerException if the server failed to respond
 	 */
-	public PokestopLootResult loot() throws LoginFailedException, RemoteServerException {
+	public void loot(final Task<PokestopLootResult> task) throws LoginFailedException, RemoteServerException {
+		Task<ServerRequest> stask = new Task<ServerRequest>()
+		{
+			@Override
+			public void onComplete(ServerRequest input) throws RemoteServerException, InvalidProtocolBufferException {
+				FortSearchResponseOuterClass.FortSearchResponse response = FortSearchResponseOuterClass.FortSearchResponse.parseFrom(input.getData());
+				cooldownCompleteTimestampMs = response.getCooldownCompleteTimestampMs();
+				task.setDone(true);
+				task.onComplete(new PokestopLootResult(response));
+			}
+		};
+
 		FortSearchMessage searchMessage = FortSearchMessage.newBuilder()
 				.setFortId(getId())
 				.setFortLatitude(getLatitude())
@@ -120,16 +134,30 @@ public class Pokestop {
 				.setPlayerLongitude(api.getLongitude())
 				.build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH, searchMessage);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-		FortSearchResponseOuterClass.FortSearchResponse response;
-		try {
-			response = FortSearchResponseOuterClass.FortSearchResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-		cooldownCompleteTimestampMs = response.getCooldownCompleteTimestampMs();
-		return new PokestopLootResult(response);
+		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH, searchMessage, stask);
+		api.getRequestHandler().request(serverRequest);
+
+	}
+
+
+	/**
+	 * Loots a pokestop for pokeballs and other items.
+	 *
+	 * @return PokestopLootResult
+	 * @throws LoginFailedException  if login failed
+	 * @throws RemoteServerException if the server failed to respond
+	 */
+	public PokestopLootResult loot() throws LoginFailedException, RemoteServerException {
+		final PokestopLootResult[] result = new PokestopLootResult[1];
+		loot(new Task<PokestopLootResult>()
+		{
+			@Override
+			public void onComplete(PokestopLootResult input) throws RemoteServerException, InvalidProtocolBufferException {
+				result[0] = input;
+			}
+		});
+
+		return result[0];
 	}
 
 	/**
@@ -139,22 +167,50 @@ public class Pokestop {
 	 * @throws LoginFailedException if login failed
 	 * @throws RemoteServerException if the server failed to respond or the modifier could not be added to this pokestop
 	 */
-	public void addModifier(ItemIdOuterClass.ItemId item) throws LoginFailedException, RemoteServerException {
+	public void addModifier(ItemIdOuterClass.ItemId item,final Task<Void> task) throws LoginFailedException, RemoteServerException {
+		final Task<ServerRequest> stask = new Task<ServerRequest>()
+		{
+			@Override
+			public void onComplete(ServerRequest input) throws RemoteServerException, InvalidProtocolBufferException {
+				AddFortModifierResponseOuterClass.AddFortModifierResponse response;
+				//sadly the server response does not contain any information to verify if the request was successful
+				//response = AddFortModifierResponseOuterClass.AddFortModifierResponse.parseFrom(serverRequest.getData());
+				task.onComplete(null);
+				task.setDone(true);
+			}
+		};
+
+
 		AddFortModifierMessage msg = AddFortModifierMessage.newBuilder()
 				.setModifierType(item)
 				.setFortId(getId())
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
 				.build();
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.ADD_FORT_MODIFIER, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-		AddFortModifierResponseOuterClass.AddFortModifierResponse response;
-		try {
-			//sadly the server response does not contain any information to verify if the request was successful
-			response = AddFortModifierResponseOuterClass.AddFortModifierResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.ADD_FORT_MODIFIER, msg, stask);
+		api.getRequestHandler().request(serverRequest);
+
+	}
+
+
+	/**
+	 * Adds a modifier to this pokestop. (i.e. add a lure module)
+	 *
+	 * @param item the modifier to add to this pokestop
+	 * @throws LoginFailedException if login failed
+	 * @throws RemoteServerException if the server failed to respond or the modifier could not be added to this pokestop
+	 */
+	public void addModifier(ItemIdOuterClass.ItemId item) throws LoginFailedException, RemoteServerException {
+		final Task<Void> task = new Task<Void>()
+		{
+			@Override
+			public void onComplete(Void input) throws RemoteServerException, InvalidProtocolBufferException {
+				// nothing to do atm
+			}
+		};
+
+		addModifier(item, task);
+
 	}
 
 	/**
@@ -164,22 +220,51 @@ public class Pokestop {
 	 * @throws LoginFailedException  if login failed
 	 * @throws RemoteServerException if the server failed to respond
 	 */
-	public FortDetails getDetails() throws LoginFailedException, RemoteServerException {
+	public void getDetails(final Task<FortDetails> task) throws LoginFailedException, RemoteServerException {
+		final Task<ServerRequest> stask = new Task<ServerRequest>()
+		{
+			@Override
+			public void onComplete(ServerRequest input) throws RemoteServerException, InvalidProtocolBufferException {
+				FortDetailsResponse response = FortDetailsResponse.parseFrom(input.getData());
+				task.onComplete(new FortDetails(response));
+				task.setDone(true);
+			}
+		};
+
+
 		FortDetailsMessage reqMsg = FortDetailsMessage.newBuilder()
 				.setFortId(getId())
 				.setLatitude(getLatitude())
 				.setLongitude(getLongitude())
 				.build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-		FortDetailsResponseOuterClass.FortDetailsResponse response = null;
-		try {
-			response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-		return new FortDetails(response);
+		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS, reqMsg, stask);
+		api.getRequestHandler().request(serverRequest);
+
+	}
+
+
+	/**
+	 * Get more detailed information about a pokestop.
+	 *
+	 * @return FortDetails
+	 * @throws LoginFailedException  if login failed
+	 * @throws RemoteServerException if the server failed to respond
+	 */
+	public FortDetails getDetails() throws LoginFailedException, RemoteServerException {
+		final FortDetails[] out = new FortDetails[1];
+		final Task<FortDetails> task = new Task<FortDetails>()
+		{
+			@Override
+			public void onComplete(FortDetails input) throws RemoteServerException, InvalidProtocolBufferException {
+				out[0] = input;
+			}
+		};
+
+		getDetails(task);
+		TaskUtil.waitForTask(task);
+
+		return out[0];
 	}
 
 	/**

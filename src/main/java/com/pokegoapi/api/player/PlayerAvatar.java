@@ -15,19 +15,51 @@
 
 package com.pokegoapi.api.player;
 
+import POGOProtos.Data.Player.PlayerAvatarOuterClass;
 import POGOProtos.Enums.GenderOuterClass;
 import lombok.Data;
 
 @Data
 public class PlayerAvatar {
+	private PlayerAvatarOuterClass.PlayerAvatar proto;
 
-	private GenderOuterClass.Gender gender;
-	private int skin;
-	private int hair;
-	private int shirt;
-	private int pants;
-	private int hat;
-	private int shoes;
-	private int eyes;
-	private int backpack;
+	public PlayerAvatar(PlayerAvatarOuterClass.PlayerAvatar proto) {
+		this.proto = proto;
+	}
+
+	public int getSkin() {
+		return proto.getSkin();
+	}
+
+	public int getHair() {
+		return proto.getHair();
+	}
+
+	public int getShirt() {
+		return proto.getShirt();
+	}
+
+	public int getPants() {
+		return proto.getPants();
+	}
+
+	public int getHat() {
+		return proto.getHat();
+	}
+
+	public int getShoes() {
+		return proto.getShoes();
+	}
+
+	public GenderOuterClass.Gender getGender() {
+		return proto.getGender();
+	}
+
+	public int getEyes() {
+		return proto.getEyes();
+	}
+
+	public int getBackpack() {
+		return proto.getBackpack();
+	}
 }

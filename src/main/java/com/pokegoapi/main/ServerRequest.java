@@ -21,6 +21,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * The type Server request.
@@ -31,6 +32,12 @@ public class ServerRequest {
 	RequestOuterClass.Request request;
 	private RequestTypeOuterClass.RequestType type;
 	private ByteString data;
+	@Getter
+	@Setter
+	private boolean ready;
+	@Getter
+	@Setter
+	private Task callback;
 
 	/**
 	 * Instantiates a new Server request.
@@ -38,12 +45,13 @@ public class ServerRequest {
 	 * @param type the type
 	 * @param req  the req
 	 */
-	public ServerRequest(RequestTypeOuterClass.RequestType type, GeneratedMessage req) {
+	public ServerRequest(RequestTypeOuterClass.RequestType type, GeneratedMessage req, Task callback) {
 		RequestOuterClass.Request.Builder reqBuilder = RequestOuterClass.Request.newBuilder();
 		reqBuilder.setRequestMessage(req.toByteString());
 		reqBuilder.setRequestType(type);
 		this.request = reqBuilder.build();
 		this.type = type;
+		this.callback = callback;
 	}
 
 	/**
