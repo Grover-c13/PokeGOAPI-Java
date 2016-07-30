@@ -19,23 +19,23 @@ import POGOProtos.Networking.Envelopes.AuthTicketOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.exceptions.AsyncPokemonGoException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import rx.Observable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.*;
 
-public class RequestHandler {
+public class RequestHandler implements Runnable {
 	private static final String TAG = RequestHandler.class.getSimpleName();
 	private final PokemonGo api;
 	private RequestEnvelopeOuterClass.RequestEnvelope.Builder builder;
@@ -46,6 +46,9 @@ public class RequestHandler {
 	private Long requestId = new Random().nextLong();
 
 	private AuthTicketOuterClass.AuthTicket lastAuth;
+	private final ExecutorService executorService = Executors.newFixedThreadPool(1);
+	private final BlockingQueue<AsyncServerRequest> workQueue = new LinkedBlockingQueue<>();
+	private final Map<Long,ResultOrException> resultMap = new HashMap<>();
 
 	/**
 	 * Instantiates a new Request handler.
@@ -61,6 +64,7 @@ public class RequestHandler {
 		/* TODO: somehow fix it so people using the deprecated functions will still work,
 		   while not calling this deprecated stuff ourselves */
 		resetBuilder();
+		executorService.submit(this);
 	}
 
 	/**
@@ -75,8 +79,60 @@ public class RequestHandler {
 		builder.addRequests(requestIn.getRequest());
 	}
 
-	public Observable<ByteString> sendAsyncServerRequests(AsyncServerRequest serverRequest) {
-		return Observable.empty();
+	public Future<ByteString> sendAsyncServerRequests(final AsyncServerRequest serverRequest) {
+		workQueue.offer(serverRequest);
+		return new Future<ByteString>() {
+			@Override
+			public boolean cancel(boolean mayInterruptIfRunning) {
+				return false;
+			}
+
+			@Override
+			public boolean isCancelled() {
+				return false;
+			}
+
+			@Override
+			public boolean isDone() {
+				return resultMap.containsKey(serverRequest.getId());
+			}
+
+			@Override
+			public ByteString get() throws InterruptedException, ExecutionException {
+				ResultOrException resultOrException = getResult(1, TimeUnit.MINUTES);
+				while (resultOrException == null) {
+					resultOrException = getResult(1, TimeUnit.MINUTES);
+				}
+				if (resultOrException.getException() != null) {
+					throw new ExecutionException(resultOrException.getException());
+				}
+				return resultOrException.getResult();
+			}
+
+			@Override
+			public ByteString get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+				ResultOrException resultOrException = getResult(timeout, unit);
+				if (resultOrException == null) {
+					throw new TimeoutException("No result found");
+				}
+				if (resultOrException.getException() != null) {
+					throw new ExecutionException(resultOrException.getException());
+				}
+				return resultOrException.getResult();
+
+			}
+
+			private ResultOrException getResult(long timeouut, TimeUnit timeUnit) throws InterruptedException {
+				long wait = System.currentTimeMillis() + timeUnit.toMillis(timeouut);
+				while (!isDone()) {
+					Thread.sleep(10);
+					if (wait < System.currentTimeMillis()) {
+						return null;
+					}
+				}
+				return resultMap.remove(serverRequest.getId());
+			}
+		};
 	}
 
 	/**
@@ -292,5 +348,40 @@ public class RequestHandler {
 	
 	public Long getRequestId() {
 		return ++requestId;
+	}
+
+	@Override
+	public void run() {
+		List<AsyncServerRequest> requests = new LinkedList<>();
+		while (true) {
+			try {
+				Thread.sleep(300);
+			} catch (InterruptedException e) {
+				throw new AsyncPokemonGoException("System shutdown", e);
+			}
+			workQueue.drainTo(requests);
+			ServerRequest[] serverRequests = new ServerRequest[requests.size()];
+			for (int i=0;i!=requests.size();i++) {
+				serverRequests[i] = new ServerRequest(requests.get(i).getType(), requests.get(i).getRequest());
+			}
+			try {
+				sendServerRequests(serverRequests);
+				for (int i=0;i!=requests.size();i++) {
+					try {
+						resultMap.put(requests.get(i).getId(), ResultOrException.getResult(serverRequests[i].getData()));
+					}
+					catch (InvalidProtocolBufferException e) {
+						resultMap.put(requests.get(i).getId(), ResultOrException.getError(e));
+					}
+				}
+				continue;
+			}
+			catch (RemoteServerException | LoginFailedException e) {
+				for (AsyncServerRequest request : requests) {
+					resultMap.put(request.getId(), ResultOrException.getError(e));
+				}
+				continue;
+			}
+		}
 	}
 }

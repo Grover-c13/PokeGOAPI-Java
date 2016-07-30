@@ -26,10 +26,10 @@ import lombok.Getter;
  * The type Server request.
  */
 public class AsyncServerRequest {
-
+	@Getter
+	private final long id = System.nanoTime();
 	@Getter
 	private final RequestOuterClass.Request request;
-
 	@Getter
 	private final RequestTypeOuterClass.RequestType type;
 
