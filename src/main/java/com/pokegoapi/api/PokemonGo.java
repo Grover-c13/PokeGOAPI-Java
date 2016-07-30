@@ -76,22 +76,25 @@ public class PokemonGo {
 		this.time = time;
 
 		// send profile request to get the ball rolling
-		requestHandler = new RequestHandler(this, client);
+		createRequestHandler(client);
 		
 		try {
 			playerProfile = new PlayerProfile(this);
-			Thread.sleep(300);
-			inventories = new Inventories(this);
-			Thread.sleep(300);
-			settings = new Settings(this);
-			Thread.sleep(300);
-		} catch (InterruptedException e) {
+			//inventories = new Inventories(this);
+			//settings = new Settings(this);
+		} catch (Exception e) {
 			// should not happen but why not
 			e.printStackTrace();
 		}
 
 		// should have proper end point now.
 		map = new Map(this);
+	}
+
+	private void createRequestHandler(OkHttpClient client) throws LoginFailedException, RemoteServerException {
+		requestHandler = new RequestHandler(this, client);
+		Thread thread = new Thread(requestHandler);
+		thread.start();
 	}
 
 	/**

@@ -24,6 +24,7 @@ import POGOProtos.Networking.Requests.Messages.GetGymDetailsMessageOuterClass.Ge
 import POGOProtos.Networking.Requests.Messages.StartGymBattleMessageOuterClass.StartGymBattleMessage;
 import POGOProtos.Networking.Requests.Messages.StartGymBattleMessageOuterClass.StartGymBattleMessage.Builder;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.GetGymDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.GetGymDetailsResponseOuterClass.GetGymDetailsResponse;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -33,6 +34,8 @@ import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.main.Task;
+import com.pokegoapi.util.TaskUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,27 +100,43 @@ public class Gym {
 		return new Battle(api, team, this);
 	}
 
+	private void details(final Task<GetGymDetailsResponse> task) {
+		Task<ServerRequest> stask = new Task<ServerRequest>()
+		{
+			@Override
+			public void onComplete(ServerRequest input) throws RemoteServerException, InvalidProtocolBufferException {
+				task.onComplete(GetGymDetailsResponse.parseFrom(input.getData()));
+				task.setDone(true);
+			}
+		};
+
+		GetGymDetailsMessage reqMsg = GetGymDetailsMessage
+				.newBuilder()
+				.setGymId(this.getId())
+				.setGymLatitude(this.getLatitude())
+				.setGymLongitude(this.getLongitude())
+				.setPlayerLatitude(api.getLatitude())
+				.setPlayerLongitude(api.getLongitude())
+				.build();
+
+		ServerRequest serverRequest = new ServerRequest(RequestType.GET_GYM_DETAILS, reqMsg);
+		api.getRequestHandler().request(serverRequest);
+	}
+
 
 	private GetGymDetailsResponse details() throws LoginFailedException, RemoteServerException {
 		if (details == null) {
-			GetGymDetailsMessage reqMsg = GetGymDetailsMessage
-											.newBuilder()
-											.setGymId(this.getId())
-											.setGymLatitude(this.getLatitude())
-											.setGymLongitude(this.getLongitude())
-											.setPlayerLatitude(api.getLatitude())
-											.setPlayerLongitude(api.getLongitude())
-											.build();
 
+			Task<GetGymDetailsResponse> task = new Task<GetGymDetailsResponse>()
+			{
+				@Override
+				public void onComplete(GetGymDetailsResponse input) throws RemoteServerException, InvalidProtocolBufferException {
+					details = input;
+				}
+			};
 
-			ServerRequest serverRequest = new ServerRequest(RequestType.GET_GYM_DETAILS, reqMsg);
-			api.getRequestHandler().sendServerRequests(serverRequest);
-
-			try {
-				details = GetGymDetailsResponse.parseFrom(serverRequest.getData());
-			} catch (InvalidProtocolBufferException e) {
-				throw new RemoteServerException();
-			}
+			details(task);
+			TaskUtil.waitForTask(task);
 
 		}
 
