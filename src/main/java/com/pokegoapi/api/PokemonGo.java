@@ -78,17 +78,9 @@ public class PokemonGo {
 		// send profile request to get the ball rolling
 		requestHandler = new RequestHandler(this, client);
 		
-		try {
-			playerProfile = new PlayerProfile(this);
-			Thread.sleep(300);
-			inventories = new Inventories(this);
-			Thread.sleep(300);
-			settings = new Settings(this);
-			Thread.sleep(300);
-		} catch (InterruptedException e) {
-			// should not happen but why not
-			e.printStackTrace();
-		}
+		playerProfile = new PlayerProfile(this);
+		inventories = new Inventories(this);
+		settings = new Settings(this);
 
 		// should have proper end point now.
 		map = new Map(this);

@@ -39,14 +39,10 @@ import java.util.concurrent.*;
 public class RequestHandler implements Runnable {
 	private static final String TAG = RequestHandler.class.getSimpleName();
 	private final PokemonGo api;
-	private RequestEnvelopeOuterClass.RequestEnvelope.Builder builder;
-	private boolean hasRequests;
-	private List<ServerRequest> serverRequests;
 	private String apiEndpoint;
 	private OkHttpClient client;
 	private Long requestId = new Random().nextLong();
 
-	private AuthTicketOuterClass.AuthTicket lastAuth;
 	private final ExecutorService executorService = Executors.newFixedThreadPool(1);
 	private final BlockingQueue<AsyncServerRequest> workQueue = new LinkedBlockingQueue<>();
 	private final Map<Long,ResultOrException> resultMap = new HashMap<>();
@@ -61,23 +57,7 @@ public class RequestHandler implements Runnable {
 		this.api = api;
 		this.client = client;
 		apiEndpoint = ApiSettings.API_ENDPOINT;
-		serverRequests = new ArrayList<>();
-		/* TODO: somehow fix it so people using the deprecated functions will still work,
-		   while not calling this deprecated stuff ourselves */
-		resetBuilder();
 		executorService.submit(this);
-	}
-
-	/**
-	 * Request.
-	 *
-	 * @param requestIn the request in
-	 */
-	@Deprecated
-	public void request(ServerRequest requestIn) {
-		hasRequests = true;
-		serverRequests.add(requestIn);
-		builder.addRequests(requestIn.getRequest());
 	}
 
 	public Future<ByteString> sendAsyncServerRequests(final AsyncServerRequest serverRequest) {
@@ -154,12 +134,13 @@ public class RequestHandler implements Runnable {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
-	private void internalSendServerRequests(ServerRequest... serverRequests) throws RemoteServerException, LoginFailedException {
+	private AuthTicketOuterClass.AuthTicket internalSendServerRequests(AuthTicketOuterClass.AuthTicket authTicket, ServerRequest... serverRequests) throws RemoteServerException, LoginFailedException {
+		AuthTicketOuterClass.AuthTicket newAuthTicket = authTicket;
 		if (serverRequests.length == 0) {
-			return;
+			return authTicket;
 		}
 		RequestEnvelopeOuterClass.RequestEnvelope.Builder builder = RequestEnvelopeOuterClass.RequestEnvelope.newBuilder();
-		resetBuilder(builder);
+		resetBuilder(builder, authTicket);
 
 		for (ServerRequest serverRequest : serverRequests) {
 			builder.addRequests(serverRequest.getRequest());
@@ -197,7 +178,7 @@ public class RequestHandler implements Runnable {
 			}
 
 			if (responseEnvelop.hasAuthTicket()) {
-				lastAuth = responseEnvelop.getAuthTicket();
+				newAuthTicket = responseEnvelop.getAuthTicket();
 			}
 
 			if (responseEnvelop.getStatusCode() == 102) {
@@ -205,8 +186,7 @@ public class RequestHandler implements Runnable {
 						responseEnvelop.getApiUrl(), responseEnvelop.getError()));
 			} else if (responseEnvelop.getStatusCode() == 53) {
 				// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
-				internalSendServerRequests(serverRequests);
-				return;
+				return internalSendServerRequests(newAuthTicket, serverRequests);
 			}
 
 			/**
@@ -230,99 +210,17 @@ public class RequestHandler implements Runnable {
 			// catch it, so the auto-close of resources triggers, but don't wrap it in yet another RemoteServer Exception
 			throw e;
 		}
+		return newAuthTicket;
 	}
 
-	/**
-	 * Send server requests.
-	 *
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
-	 */
-	@Deprecated
-	public void sendServerRequests() throws RemoteServerException, LoginFailedException {
-		setLatitude(api.getLatitude());
-		setLongitude(api.getLongitude());
-		setAltitude(api.getAltitude());
-
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		RequestEnvelopeOuterClass.RequestEnvelope request = builder.build();
-		try {
-			request.writeTo(stream);
-		} catch (IOException e) {
-			Log.wtf(TAG, "Failed to write request to bytearray output stream. This should never happen", e);
-		}
-
-		RequestBody body = RequestBody.create(null, stream.toByteArray());
-		okhttp3.Request httpRequest = new okhttp3.Request.Builder()
-				.url(apiEndpoint)
-				.post(body)
-				.build();
-		Response response;
-		try {
-			response = client.newCall(httpRequest).execute();
-		} catch (IOException e) {
-			throw new RemoteServerException(e);
-		}
-
-		if (response.code() != 200) {
-			throw new RemoteServerException("Got a unexpected http code : " + response.code());
-		}
-
-		ResponseEnvelopeOuterClass.ResponseEnvelope responseEnvelop = null;
-		try (InputStream content = response.body().byteStream()) {
-			responseEnvelop = ResponseEnvelopeOuterClass.ResponseEnvelope.parseFrom(content);
-		} catch (IOException e) {
-			// retrieved garbage from the server
-			throw new RemoteServerException("Received malformed response : " + e);
-		}
-
-		if (responseEnvelop.getApiUrl() != null && responseEnvelop.getApiUrl().length() > 0) {
-			apiEndpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
-		}
-
-		if (responseEnvelop.hasAuthTicket()) {
-			lastAuth = responseEnvelop.getAuthTicket();
-		}
-
-		if (responseEnvelop.getStatusCode() == 102) {
-			throw new LoginFailedException();
-		} else if (responseEnvelop.getStatusCode() == 53) {
-			// 53 means that the apiEndpoint was not correctly set, should be at this point, though, so redo the request
-			sendServerRequests();
-			return;
-		}
-
-		// map each reply to the numeric response,
-		// ie first response = first request and send back to the requests to toBlocking.
-		int count = 0;
-		for (ByteString payload : responseEnvelop.getReturnsList()) {
-			ServerRequest serverReq = serverRequests.get(count);
-			// TODO: Probably all other payloads are garbage as well in this case, so might as well throw an exception
-			if (payload != null) {
-				serverReq.handleData(payload);
-			}
-			count++;
-		}
-
-		resetBuilder();
-	}
-
-	@Deprecated
-	private void resetBuilder() throws LoginFailedException, RemoteServerException {
-		builder = RequestEnvelopeOuterClass.RequestEnvelope.newBuilder();
-		resetBuilder(builder);
-		hasRequests = false;
-		serverRequests.clear();
-	}
-
-	private void resetBuilder(RequestEnvelopeOuterClass.RequestEnvelope.Builder builder)
+	private void resetBuilder(RequestEnvelopeOuterClass.RequestEnvelope.Builder builder, AuthTicketOuterClass.AuthTicket authTicket)
 			throws LoginFailedException, RemoteServerException {
 		builder.setStatusCode(2);
 		builder.setRequestId(getRequestId());
-		if (lastAuth != null
-				&& lastAuth.getExpireTimestampMs() > 0
-				&& lastAuth.getExpireTimestampMs() > api.currentTimeMillis()) {
-			builder.setAuthTicket(lastAuth);
+		if (authTicket != null
+				&& authTicket.getExpireTimestampMs() > 0
+				&& authTicket.getExpireTimestampMs() > api.currentTimeMillis()) {
+			builder.setAuthTicket(authTicket);
 		} else {
 			Log.d(TAG, "Authenticated with static token");
 			builder.setAuthInfo(api.getAuthInfo());
@@ -333,38 +231,14 @@ public class RequestHandler implements Runnable {
 		builder.setAltitude(api.getAltitude());
 	}
 
-
-	/**
-	 * Build request envelope outer class . request envelope.
-	 *
-	 * @return the request envelope outer class . request envelope
-	 */
-	public RequestEnvelopeOuterClass.RequestEnvelope build() {
-		if (!hasRequests) {
-			throw new IllegalStateException("Attempting to send request envelop with no requests");
-		}
-		return builder.build();
-	}
-
-	public void setLatitude(double latitude) {
-		builder.setLatitude(latitude);
-	}
-
-	public void setLongitude(double longitude) {
-		builder.setLongitude(longitude);
-	}
-
-	public void setAltitude(double altitude) {
-		builder.setAltitude(altitude);
-	}
-	
-	public Long getRequestId() {
+	private Long getRequestId() {
 		return ++requestId;
 	}
 
 	@Override
 	public void run() {
 		List<AsyncServerRequest> requests = new LinkedList<>();
+		AuthTicketOuterClass.AuthTicket authTicket = null;
 		while (true) {
 			try {
 				Thread.sleep(300);
@@ -380,7 +254,7 @@ public class RequestHandler implements Runnable {
 				serverRequests[i] = new ServerRequest(requests.get(i).getType(), requests.get(i).getRequest());
 			}
 			try {
-				internalSendServerRequests(serverRequests);
+				authTicket = internalSendServerRequests(authTicket, serverRequests);
 				for (int i=0;i!=requests.size();i++) {
 					try {
 						resultMap.put(requests.get(i).getId(), ResultOrException.getResult(serverRequests[i].getData()));
