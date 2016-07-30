@@ -26,34 +26,19 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
-import lombok.Getter;
-import lombok.Setter;
 import okhttp3.OkHttpClient;
 
-
 public class PokemonGo {
-
-	private static final java.lang.String TAG = PokemonGo.class.getSimpleName();
+	private static final String TAG = PokemonGo.class.getSimpleName();
 	private final Time time;
-	@Getter
-	RequestHandler requestHandler;
-	@Getter
-	Map map;
-	@Getter
+	private RequestHandler requestHandler;
+	private Map map;
 	private PlayerProfile playerProfile;
-	@Getter
 	private Inventories inventories;
-	@Getter
-	@Setter
 	private double latitude;
-	@Getter
-	@Setter
 	private double longitude;
-	@Getter
-	@Setter
 	private double altitude;
 	private CredentialProvider credentialProvider;
-	@Getter
 	private Settings settings;
 
 	/**
@@ -73,25 +58,20 @@ public class PokemonGo {
 		} else {
 			this.credentialProvider = credentialProvider;
 		}
+
 		this.time = time;
 
-		// send profile request to get the ball rolling
 		requestHandler = new RequestHandler(this, client);
-		
-		try {
-			playerProfile = new PlayerProfile(this);
-			Thread.sleep(300);
-			inventories = new Inventories(this);
-			Thread.sleep(300);
-			settings = new Settings(this);
-			Thread.sleep(300);
-		} catch (InterruptedException e) {
-			// should not happen but why not
-			e.printStackTrace();
-		}
+		playerProfile = new PlayerProfile(this);
+		inventories = new Inventories(this);
 
-		// should have proper end point now.
-		map = new Map(this);
+		// FIXME: These aren't converted yet
+		// settings = new Settings(this);
+		// map = new Map(this);
+
+		// TODO: Make a data pull method instead of instantly firing requests in the constructor?
+		playerProfile.refreshDataSync();
+		inventories.refreshDataSync(true);
 	}
 
 	/**
@@ -134,5 +114,83 @@ public class PokemonGo {
 
 	public long currentTimeMillis() {
 		return time.currentTimeMillis();
+	}
+
+	public Time getTime() {
+		return time;
+	}
+
+	public RequestHandler getRequestHandler() {
+		return requestHandler;
+	}
+
+	public void setRequestHandler(RequestHandler requestHandler) {
+		this.requestHandler = requestHandler;
+	}
+
+	// TODO: These will all need to be async
+
+	public Map getMap() {
+		return map;
+	}
+
+	private void setMap(Map map) {
+		this.map = map;
+	}
+
+	public PlayerProfile getPlayerProfile() {
+		return playerProfile;
+	}
+
+	private void setPlayerProfile(PlayerProfile playerProfile) {
+		this.playerProfile = playerProfile;
+	}
+
+	public Inventories getInventories() {
+		return inventories;
+	}
+
+	private void setInventories(Inventories inventories) {
+		this.inventories = inventories;
+	}
+
+	public double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+
+	public double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
+
+	public double getAltitude() {
+		return altitude;
+	}
+
+	public void setAltitude(double altitude) {
+		this.altitude = altitude;
+	}
+
+	public CredentialProvider getCredentialProvider() {
+		return credentialProvider;
+	}
+
+	public void setCredentialProvider(CredentialProvider credentialProvider) {
+		this.credentialProvider = credentialProvider;
+	}
+
+	public Settings getSettings() {
+		return settings;
+	}
+
+	public void setSettings(Settings settings) {
+		this.settings = settings;
 	}
 }

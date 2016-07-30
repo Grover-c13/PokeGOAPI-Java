@@ -22,7 +22,6 @@ import POGOProtos.Inventory.Item.ItemAwardOuterClass;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.EquipBadgeMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
-import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
@@ -32,6 +31,7 @@ import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.async.ExceptionBox;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
@@ -41,6 +41,10 @@ import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 import lombok.Getter;
 import lombok.Setter;
+import okhttp3.Response;
+import rx.Observable;
+import rx.functions.Action1;
+import rx.functions.Func0;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,6 +54,7 @@ public class PlayerProfile {
 	private final PokemonGo api;
 	@Getter
 	private long creationTime;
+
 	@Getter
 	private String username;
 	@Getter
@@ -73,26 +78,89 @@ public class PlayerProfile {
 	@Setter
 	private PlayerStatsOuterClass.PlayerStats stats;
 
-	public PlayerProfile(PokemonGo api) throws LoginFailedException, RemoteServerException {
+	public PlayerProfile(PokemonGo api) {
 		this.api = api;
-		updateProfile();
 	}
 
 	/**
-	 * Updates the player profile with the latest data.
+	 * Refresh PlayerProfile data asynchronously.
 	 *
+	 * @return An Observable PlayerProfile object.
+	 */
+	public Observable<PlayerProfile> refreshData() {
+		return Observable.defer(new Func0<Observable<PlayerProfile>>() {
+			@Override
+			public Observable<PlayerProfile> call() {
+				try {
+					return Observable.just(refreshDataSync());
+				} catch (Exception ex) {
+					return Observable.error(ex);
+				}
+			}
+		});
+	}
+
+	/**
+	 * Updates the player profile with the latest data synchronously.
+	 *
+	 * @return The latest data from the servers.
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 */
-	public void updateProfile() throws RemoteServerException, LoginFailedException {
+	public PlayerProfile refreshDataSync() throws LoginFailedException, RemoteServerException {
 		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
-		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
-		api.getRequestHandler().sendServerRequests(getPlayerServerRequest);
+		final ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
+		final ExceptionBox exceptionBox = new ExceptionBox();
+
+		api.getRequestHandler().sendServerRequests(getPlayerServerRequest).subscribe(new Action1<Response>() {
+			@Override
+			public void call(Response response) {
+				try {
+					updateInstanceData(getPlayerServerRequest, response);
+				} catch (RemoteServerException ex) {
+					exceptionBox.setException(ex);
+				}
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				exceptionBox.setException(throwable);
+			}
+		});
+
+		if (exceptionBox.hasException()) {
+			if (exceptionBox.getException() instanceof RemoteServerException) {
+				throw (RemoteServerException) exceptionBox.getException();
+			}
+
+			if (exceptionBox.getException() instanceof LoginFailedException) {
+				throw (LoginFailedException) exceptionBox.getException();
+			}
+
+			throw new RuntimeException("Unhandled exception", exceptionBox.getException());
+		}
+
+		return this;
+	}
+
+	/**
+	 * Updates this instance data with the request/response data.
+	 *
+	 * @param request  The server request.
+	 * @param response The server response data.
+	 * @throws RemoteServerException If the server response was empty or invalid.
+	 */
+	private synchronized void updateInstanceData(final ServerRequest request, final Response response)
+			throws RemoteServerException {
+		if (response == null || !response.isSuccessful()) {
+			throw new RemoteServerException("Invalid or unsuccessful response");
+		}
 
 		GetPlayerResponseOuterClass.GetPlayerResponse playerResponse = null;
 		try {
-			playerResponse = GetPlayerResponseOuterClass.GetPlayerResponse.parseFrom(getPlayerServerRequest.getData());
+			playerResponse = GetPlayerResponseOuterClass.GetPlayerResponse.parseFrom(request.getData());
 		} catch (InvalidProtocolBufferException e) {
+			Log.e(TAG, "Could not parse GetPlayerResponse data");
 			throw new RemoteServerException(e);
 		}
 
@@ -127,16 +195,13 @@ public class PlayerProfile {
 		avatarApi.setSkin(playerResponse.getPlayerData().getAvatar().getSkin());
 
 		bonusApi.setNextCollectionTimestamp(
-				playerResponse.getPlayerData().getDailyBonus().getNextCollectedTimestampMs()
-		);
+				playerResponse.getPlayerData().getDailyBonus().getNextCollectedTimestampMs());
+
 		bonusApi.setNextDefenderBonusCollectTimestamp(
-				playerResponse.getPlayerData().getDailyBonus().getNextDefenderBonusCollectTimestampMs()
-		);
+				playerResponse.getPlayerData().getDailyBonus().getNextDefenderBonusCollectTimestampMs());
 
 		avatar = avatarApi;
 		dailyBonus = bonusApi;
-
-
 	}
 
 	/**
@@ -144,20 +209,18 @@ public class PlayerProfile {
 	 * server until a player actively accepts them.
 	 * The rewarded items are automatically inserted into the players item bag.
 	 *
-	 * @see PlayerLevelUpRewards
 	 * @param level the trainer level that you want to accept the rewards for
 	 * @return a PlayerLevelUpRewards object containing information about the items rewarded and unlocked for this level
 	 * @throws LoginFailedException  if the login failed
 	 * @throws RemoteServerException if the server failed to respond
+	 * @see PlayerLevelUpRewards
 	 */
 	public PlayerLevelUpRewards acceptLevelUpRewards(int level) throws RemoteServerException, LoginFailedException {
 		// Check if we even have achieved this level yet
 		if (level > stats.getLevel()) {
 			return new PlayerLevelUpRewards(PlayerLevelUpRewards.Status.NOT_UNLOCKED_YET);
 		}
-		LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder()
-				.setLevel(level)
-				.build();
+		LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder().setLevel(level).build();
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.LEVEL_UP_REWARDS, msg);
 		api.getRequestHandler().sendServerRequests(serverRequest);
 		LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse response;
@@ -205,15 +268,18 @@ public class PlayerProfile {
 		api.getRequestHandler().sendServerRequests(serverRequest);
 		CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse response;
 		try {
-			response = CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse.parseFrom(serverRequest.getData());
+			response =
+					CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
 		if (response.getSuccess()) {
 			for (int i = 0; i < response.getAwardedBadgesCount(); i++) {
-				EquipBadgeMessageOuterClass.EquipBadgeMessage msg1 = EquipBadgeMessageOuterClass.EquipBadgeMessage.newBuilder()
-						.setBadgeType(response.getAwardedBadges(i))
-						.setBadgeTypeValue(response.getAwardedBadgeLevels(i)).build();
+				EquipBadgeMessageOuterClass.EquipBadgeMessage msg1 =
+						EquipBadgeMessageOuterClass.EquipBadgeMessage.newBuilder()
+								.setBadgeType(response.getAwardedBadges(i))
+								.setBadgeTypeValue(response.getAwardedBadgeLevels(i))
+								.build();
 				ServerRequest serverRequest1 = new ServerRequest(RequestTypeOuterClass.RequestType.EQUIP_BADGE, msg1);
 				api.getRequestHandler().sendServerRequests(serverRequest1);
 				EquipBadgeResponseOuterClass.EquipBadgeResponse response1;

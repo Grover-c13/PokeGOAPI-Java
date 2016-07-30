@@ -103,6 +103,7 @@ dependencies {
     compile 'com.annimon:stream:1.1.1'
     compile 'com.squareup.okhttp3:okhttp:3.4.0-RC1'
     compile 'com.google.protobuf:protobuf-java:3.0.0-beta-3'
+    compile 'io.reactivex:rxjava:1.1.6'
     compileOnly 'org.projectlombok:lombok:1.16.6'
 }
 

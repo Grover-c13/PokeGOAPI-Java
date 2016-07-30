@@ -24,21 +24,30 @@ import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.async.ExceptionBox;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.Log;
 import lombok.Getter;
+import okhttp3.Response;
+import rx.Observable;
+import rx.functions.Action1;
+import rx.functions.Func0;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class Inventories {
+
+	private static final String TAG = Inventories.class.getSimpleName();
 
 	private final PokemonGo api;
 	@Getter
@@ -63,7 +72,7 @@ public class Inventories {
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 */
-	public Inventories(PokemonGo api) throws LoginFailedException, RemoteServerException {
+	public Inventories(PokemonGo api) {
 		this.api = api;
 		itemBag = new ItemBag(api);
 		pokebank = new PokeBank(api);
@@ -71,27 +80,77 @@ public class Inventories {
 		pokedex = new Pokedex(api);
 		incubators = new ArrayList<>();
 		hatchery = new Hatchery(api);
-		updateInventories();
+	}
+
+
+	/**
+	 * Update Inventories from server data.
+	 *
+	 * @return The updated Inventories data.
+	 * @see #refreshData(boolean)
+	 * @see #refreshDataSync(boolean)
+	 * @deprecated Use one of the refreshData methods instead.
+	 */
+	public Inventories updateInventories() {
+		try {
+			return refreshDataSync(false);
+		} catch (Exception ex) {
+			Log.e(TAG, "Error refreshing Inventories synchronously: " + ex.getMessage());
+		}
+
+		return this;
 	}
 
 	/**
-	 * Updates the inventories with latest data.
+	 * Update Inventories from server data.
 	 *
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
+	 * @return The updated Inventories data.
+	 * @see #refreshData(boolean)
+	 * @see #refreshDataSync(boolean)
+	 * @deprecated Use one of the refreshData methods instead.
 	 */
-	public void updateInventories() throws LoginFailedException, RemoteServerException {
-		updateInventories(false);
+	public Inventories updateInventories(boolean forceRefresh) {
+		try {
+			return refreshDataSync(forceRefresh);
+		} catch (Exception ex) {
+			Log.e(TAG, "Error refreshing Inventories synchronously: " + ex.getMessage());
+		}
+
+		return this;
 	}
 
 	/**
-	 * Updates the inventories with the latest data.
+	 * Updates the inventories with latest data asynchronously.
 	 *
-	 * @param forceUpdate For a full update if true
+	 * @param forceUpdate force update if true.
+	 * @return An {@link Observable} Inventories.
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 */
-	public void updateInventories(boolean forceUpdate) throws LoginFailedException, RemoteServerException {
+	public Observable<Inventories> refreshData(final boolean forceUpdate)
+			throws LoginFailedException, RemoteServerException {
+		return Observable.defer(new Func0<Observable<Inventories>>() {
+			@Override
+			public Observable<Inventories> call() {
+				try {
+					return Observable.just(refreshDataSync(forceUpdate));
+				} catch (Exception ex) {
+					return Observable.error(ex);
+				}
+			}
+		});
+	}
+
+	/**
+	 * Updates the inventories with latest data synchronously.
+	 *
+	 * @param forceUpdate force update if true.
+	 * @return An {@link Observable} Inventories.
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public Inventories refreshDataSync(boolean forceUpdate) throws LoginFailedException, RemoteServerException {
+
 		if (forceUpdate) {
 			lastInventoryUpdate = 0;
 			itemBag.reset(api);
@@ -101,25 +160,74 @@ public class Inventories {
 			incubators = new ArrayList<>();
 			hatchery.reset(api);
 		}
-		GetInventoryMessage invReqMsg = GetInventoryMessage.newBuilder()
-				.setLastTimestampMs(lastInventoryUpdate)
-				.build();
-		ServerRequest inventoryRequest = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY, invReqMsg);
-		api.getRequestHandler().sendServerRequests(inventoryRequest);
 
-		GetInventoryResponse response = null;
-		try {
-			response = GetInventoryResponse.parseFrom(inventoryRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+		GetInventoryMessage invReqMsg =
+				GetInventoryMessage.newBuilder().setLastTimestampMs(lastInventoryUpdate).build();
+		final ServerRequest inventoryRequest =
+				new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY, invReqMsg);
+		final ExceptionBox exceptionBox = new ExceptionBox();
+
+		api.getRequestHandler().sendServerRequests(inventoryRequest).subscribe(new Action1<Response>() {
+			@Override
+			public void call(Response response) {
+				try {
+					updateInstanceData(inventoryRequest, response);
+				} catch (Exception e) {
+					exceptionBox.setException(e);
+				}
+			}
+		}, new Action1<Throwable>() {
+			@Override
+			public void call(Throwable throwable) {
+				exceptionBox.setException(throwable);
+			}
+		});
+
+		if (exceptionBox.hasException()) {
+			if (exceptionBox.getException() instanceof RemoteServerException) {
+				throw (RemoteServerException) exceptionBox.getException();
+			}
+
+			if (exceptionBox.getException() instanceof LoginFailedException) {
+				throw (LoginFailedException) exceptionBox.getException();
+			}
+
+			throw new RuntimeException("Unhandled exception", exceptionBox.getException());
 		}
 
-		for (InventoryItemOuterClass.InventoryItem inventoryItem
-				: response.getInventoryDelta().getInventoryItemsList()) {
+		return this;
+	}
+
+	/**
+	 * Update this instance data with the ServerRequest and Response data.
+	 *
+	 * @param request  The server request data.
+	 * @param response The server response.
+	 * @throws RemoteServerException If server errors occured.
+	 */
+	private synchronized void updateInstanceData(final ServerRequest request, final Response response)
+			throws RemoteServerException {
+
+		if (response == null || !response.isSuccessful()) {
+			throw new RemoteServerException("Invalid or unsuccessful response");
+		}
+
+		GetInventoryResponse inventoryResponse = null;
+		try {
+			inventoryResponse = GetInventoryResponseOuterClass.GetInventoryResponse.parseFrom(request.getData());
+		} catch (InvalidProtocolBufferException ex) {
+			Log.e(TAG, "Could not parse GetInventoryResponse data");
+			throw new RemoteServerException(ex);
+		}
+
+		for (InventoryItemOuterClass.InventoryItem inventoryItem : inventoryResponse.getInventoryDelta()
+				.getInventoryItemsList()) {
+
 			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
 
 			// hatchery
-			if (itemData.getPokemonData().getPokemonId() == PokemonId.MISSINGNO && itemData.getPokemonData().getIsEgg()) {
+			if (itemData.getPokemonData().getPokemonId() == PokemonId.MISSINGNO
+					&& itemData.getPokemonData().getIsEgg()) {
 				hatchery.addEgg(new EggPokemon(itemData.getPokemonData()));
 			}
 
@@ -138,10 +246,7 @@ public class Inventories {
 			// candyjar
 			if (itemData.getCandy().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED
 					&& itemData.getCandy().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_UNSET) {
-				candyjar.setCandy(
-						itemData.getCandy().getFamilyId(),
-						itemData.getCandy().getCandy()
-				);
+				candyjar.setCandy(itemData.getCandy().getFamilyId(), itemData.getCandy().getCandy());
 			}
 			// player stats
 			if (itemData.hasPlayerStats()) {
@@ -154,7 +259,8 @@ public class Inventories {
 			}
 
 			if (itemData.hasEggIncubators()) {
-				for (EggIncubatorOuterClass.EggIncubator incubator : itemData.getEggIncubators().getEggIncubatorList()) {
+				for (EggIncubatorOuterClass.EggIncubator incubator : itemData.getEggIncubators()
+						.getEggIncubatorList()) {
 					incubators.add(new EggIncubator(api, incubator));
 				}
 			}
