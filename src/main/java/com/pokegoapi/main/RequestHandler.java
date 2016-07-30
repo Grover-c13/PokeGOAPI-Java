@@ -251,7 +251,7 @@ public class RequestHandler implements Runnable {
 			workQueue.drainTo(requests);
 			ServerRequest[] serverRequests = new ServerRequest[requests.size()];
 			for (int i=0;i!=requests.size();i++) {
-				serverRequests[i] = new ServerRequest(requests.get(i).getType(), requests.get(i).getReq());
+				serverRequests[i] = new ServerRequest(requests.get(i).getType(), requests.get(i).getRequest());
 			}
 			try {
 				authTicket = internalSendServerRequests(authTicket, serverRequests);

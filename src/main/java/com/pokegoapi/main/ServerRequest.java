@@ -48,6 +48,17 @@ public class ServerRequest {
 	}
 
 	/**
+	 * Instantiates a new Server request.
+	 *
+	 * @param type the type
+	 * @param request  the req
+	 */
+	ServerRequest(RequestTypeOuterClass.RequestType type, RequestOuterClass.Request request) {
+		this.request = request;
+		this.type = type;
+	}
+
+	/**
 	 * Handle data.
 	 *
 	 * @param bytes the bytes

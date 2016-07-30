@@ -31,7 +31,7 @@ public class AsyncServerRequest {
 	@Getter
 	private final RequestTypeOuterClass.RequestType type;
 	@Getter
-	private final GeneratedMessage req;
+	private final RequestOuterClass.Request request;
 
 	/**
 	 * Instantiates a new Server request.
@@ -40,7 +40,21 @@ public class AsyncServerRequest {
 	 * @param req  the req
 	 */
 	public AsyncServerRequest(RequestTypeOuterClass.RequestType type, GeneratedMessage req) {
+		RequestOuterClass.Request.Builder reqBuilder = RequestOuterClass.Request.newBuilder();
+		reqBuilder.setRequestMessage(req.toByteString());
+		reqBuilder.setRequestType(type);
 		this.type = type;
-		this.req = req;
+		this.request = reqBuilder.build();
+	}
+
+	/**
+	 * Instantiates a new Server request.
+	 *
+	 * @param type the type
+	 * @param req  the req
+	 */
+	AsyncServerRequest(RequestTypeOuterClass.RequestType type, RequestOuterClass.Request req) {
+		this.type = type;
+		this.request = req;
 	}
 }
