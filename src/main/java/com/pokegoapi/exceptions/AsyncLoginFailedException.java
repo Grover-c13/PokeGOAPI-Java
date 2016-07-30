@@ -15,16 +15,16 @@
 
 package com.pokegoapi.exceptions;
 
-public class InvalidCurrencyException extends Exception {
-	public InvalidCurrencyException() {
-		super();
-	}
-
-	public InvalidCurrencyException(String reason) {
+public class AsyncLoginFailedException extends AsyncPokemonGoException {
+	public AsyncLoginFailedException(String reason) {
 		super(reason);
 	}
 
-	public InvalidCurrencyException(Throwable exception) {
+	public AsyncLoginFailedException(Exception exception) {
 		super(exception);
+	}
+
+	public AsyncLoginFailedException(String reason, Exception exception) {
+		super(reason, exception);
 	}
 }

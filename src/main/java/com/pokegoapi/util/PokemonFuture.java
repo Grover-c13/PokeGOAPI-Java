@@ -13,18 +13,13 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.util;
 
-public class InvalidCurrencyException extends Exception {
-	public InvalidCurrencyException() {
-		super();
-	}
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
 
-	public InvalidCurrencyException(String reason) {
-		super(reason);
-	}
+import java.util.concurrent.Future;
 
-	public InvalidCurrencyException(Throwable exception) {
-		super(exception);
-	}
+public interface PokemonFuture<T> extends Future<T> {
+	T toBlocking() throws LoginFailedException, RemoteServerException;
 }

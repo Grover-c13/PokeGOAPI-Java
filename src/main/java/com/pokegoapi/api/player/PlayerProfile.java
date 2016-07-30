@@ -85,6 +85,7 @@ public class PlayerProfile {
 	 * @throws RemoteServerException the remote server exception
 	 */
 	public void updateProfile() throws RemoteServerException, LoginFailedException {
+
 		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
 		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
 		api.getRequestHandler().sendServerRequests(getPlayerServerRequest);

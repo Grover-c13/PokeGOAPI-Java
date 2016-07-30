@@ -30,15 +30,23 @@ import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass;
 import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass.UseItemCaptureResponse;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.FutureWrapper;
+import com.pokegoapi.util.NestedFutureWrapper;
+import com.pokegoapi.util.PokemonFuture;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * The type Catchable pokemon.
@@ -61,16 +69,13 @@ public class CatchablePokemon {
 	@Getter
 	private final double longitude;
 
-	@Getter
-	private boolean encountered = false;
+	private Boolean encountered = null;
 
 	/**
 	 * Instantiates a new Catchable pokemon.
 	 *
-	 * @param api
-	 *            the api
-	 * @param proto
-	 *            the proto
+	 * @param api   the api
+	 * @param proto the proto
 	 */
 	public CatchablePokemon(PokemonGo api, MapPokemon proto) {
 		this.api = api;
@@ -86,10 +91,8 @@ public class CatchablePokemon {
 	/**
 	 * Instantiates a new Catchable pokemon.
 	 *
-	 * @param api
-	 *            the api
-	 * @param proto
-	 *            the proto
+	 * @param api   the api
+	 * @param proto the proto
 	 */
 	public CatchablePokemon(PokemonGo api, WildPokemon proto) {
 		this.api = api;
@@ -104,10 +107,8 @@ public class CatchablePokemon {
 	/**
 	 * Instantiates a new Catchable pokemon.
 	 *
-	 * @param api
-	 *            the api
-	 * @param proto
-	 *            the proto
+	 * @param api   the api
+	 * @param proto the proto
 	 */
 	public CatchablePokemon(PokemonGo api, FortData proto) {
 		if (!proto.hasLureInfo()) {
@@ -128,30 +129,42 @@ public class CatchablePokemon {
 	 * Encounter pokemon encounter result.
 	 *
 	 * @return the encounter result
-	 * @throws LoginFailedException
-	 *             the login failed exception
-	 * @throws RemoteServerException
-	 *             the remote server exception
 	 */
-	public EncounterResult encounterPokemon() throws LoginFailedException,
-			RemoteServerException {
+	public PokemonFuture<EncounterResult> encounterPokemonAsync() {
 		EncounterMessageOuterClass.EncounterMessage reqMsg = EncounterMessageOuterClass.EncounterMessage
 				.newBuilder().setEncounterId(getEncounterId())
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
 				.setSpawnPointId(getSpawnPointId()).build();
-		ServerRequest serverRequest = new ServerRequest(
+		AsyncServerRequest serverRequest = new AsyncServerRequest(
 				RequestTypeOuterClass.RequestType.ENCOUNTER, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-		EncounterResponseOuterClass.EncounterResponse response = null;
-		try {
-			response = EncounterResponseOuterClass.EncounterResponse
-					.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-		encountered = response.getStatus() == EncounterResponse.Status.ENCOUNTER_SUCCESS;
-		return new EncounterResult(response);
+		return new FutureWrapper<ByteString, EncounterResult>(api.getRequestHandler()
+				.sendAsyncServerRequests(serverRequest)) {
+			@Override
+			protected EncounterResult handle(ByteString result) throws RemoteServerException {
+				EncounterResponseOuterClass.EncounterResponse response;
+				try {
+					response = EncounterResponseOuterClass.EncounterResponse
+							.parseFrom(result);
+				} catch (InvalidProtocolBufferException e) {
+					throw new RemoteServerException(e);
+				}
+				encountered = response.getStatus() == EncounterResponse.Status.ENCOUNTER_SUCCESS;
+				return new EncounterResult(response);
+			}
+		};
+	}
+
+	/**
+	 * Encounter pokemon encounter result.
+	 *
+	 * @return the encounter result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public EncounterResult encounterPokemon() throws LoginFailedException,
+			RemoteServerException {
+		return encounterPokemonAsync().toBlocking();
 	}
 
 	/**
@@ -159,10 +172,40 @@ public class CatchablePokemon {
 	 * none will use greatball etc) and uwill use a single razz berry if available.
 	 *
 	 * @return CatchResult
-	 * @throws LoginFailedException
-	 *             if failed to login
-	 * @throws RemoteServerException
-	 *             if the server failed to respond
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
+	 */
+	public PokemonFuture<CatchResult> catchPokemonWithRazzBerryAsync() {
+		final Pokeball pokeball;
+
+		ItemBag bag = api.getInventories().getItemBag();
+		if (bag.getItem(ItemId.ITEM_POKE_BALL).getCount() > 0) {
+			pokeball = Pokeball.POKEBALL;
+		} else if (bag.getItem(ItemId.ITEM_GREAT_BALL).getCount() > 0) {
+			pokeball = Pokeball.GREATBALL;
+		} else if (bag.getItem(ItemId.ITEM_ULTRA_BALL).getCount() > 0) {
+			pokeball = Pokeball.ULTRABALL;
+		} else {
+			pokeball = Pokeball.MASTERBALL;
+		}
+		return new NestedFutureWrapper<CatchItemResult, CatchResult>(useItemAsync(ItemId.ITEM_RAZZ_BERRY)) {
+			@Override
+			protected Future<CatchResult> handleFuture(CatchItemResult result) {
+				if (!result.getSuccess()) {
+					return FutureWrapper.just(new CatchResult());
+				}
+				return catchPokemonAsync(pokeball);
+			}
+		};
+	}
+
+	/**
+	 * Tries to catch a pokemon (will attempt to use a pokeball, if you have
+	 * none will use greatball etc) and uwill use a single razz berry if available.
+	 *
+	 * @return CatchResult
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemonWithRazzBerry() throws LoginFailedException,
 			RemoteServerException {
@@ -183,16 +226,13 @@ public class CatchablePokemon {
 		return catchPokemon(pokeball, -1, -1);
 	}
 
-
 	/**
 	 * Tries to catch a pokemon (will attempt to use a pokeball, if you have
 	 * none will use greatball etc).
 	 *
 	 * @return CatchResult
-	 * @throws LoginFailedException
-	 *             if failed to login
-	 * @throws RemoteServerException
-	 *             if the server failed to respond
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemon() throws LoginFailedException,
 			RemoteServerException {
@@ -212,18 +252,13 @@ public class CatchablePokemon {
 		return catchPokemon(pokeball);
 	}
 
-
-
 	/**
 	 * Tries to catch a pokeball with the given type.
 	 *
-	 * @param pokeball
-	 *            Type of pokeball
+	 * @param pokeball Type of pokeball
 	 * @return CatchResult
-	 * @throws LoginFailedException
-	 *             if failed to login
-	 * @throws RemoteServerException
-	 *             if the server failed to respond
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemon(Pokeball pokeball)
 			throws LoginFailedException, RemoteServerException {
@@ -233,15 +268,11 @@ public class CatchablePokemon {
 	/**
 	 * Tried to catch a pokemon with given pokeball and max number of pokeballs.
 	 *
-	 * @param pokeball
-	 *            Type of pokeball
-	 * @param amount
-	 *            Max number of pokeballs to use
+	 * @param pokeball Type of pokeball
+	 * @param amount   Max number of pokeballs to use
 	 * @return CatchResult
-	 * @throws LoginFailedException
-	 *             if failed to login
-	 * @throws RemoteServerException
-	 *             if the server failed to respond
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemon(Pokeball pokeball, int amount)
 			throws LoginFailedException, RemoteServerException {
@@ -252,43 +283,31 @@ public class CatchablePokemon {
 	/**
 	 * Tried to catch a pokemon with given pokeball and max number of pokeballs.
 	 *
-	 * @param pokeball
-	 *            Type of pokeball
-	 * @param amount
-	 *            Max number of pokeballs to use
-	 * @param razberryLimit
-	 *            Max number of razberrys to use
+	 * @param pokeball      Type of pokeball
+	 * @param amount        Max number of pokeballs to use
+	 * @param razberryLimit Max number of razberrys to use
 	 * @return CatchResult
-	 * @throws LoginFailedException
-	 *             if failed to login
-	 * @throws RemoteServerException
-	 *             if the server failed to respond
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemon(Pokeball pokeball, int amount, int razberryLimit)
 			throws LoginFailedException, RemoteServerException {
 		return catchPokemon(1.0, 1.95 + Math.random() * 0.05,
-				0.85 + Math.random() * 0.15, pokeball,amount, razberryLimit);
+				0.85 + Math.random() * 0.15, pokeball, amount, razberryLimit);
 	}
 
 	/**
 	 * Tries to catch a pokemon.
 	 *
-	 * @param normalizedHitPosition
-	 *            the normalized hit position
-	 * @param normalizedReticleSize
-	 *            the normalized hit reticle
-	 * @param spinModifier
-	 *            the spin modifier
-	 * @param type
-	 *            Type of pokeball to throw
-	 * @param amount
-	 *            Max number of Pokeballs to throw, negative number for
-	 *            unlimited
+	 * @param normalizedHitPosition the normalized hit position
+	 * @param normalizedReticleSize the normalized hit reticle
+	 * @param spinModifier          the spin modifier
+	 * @param type                  Type of pokeball to throw
+	 * @param amount                Max number of Pokeballs to throw, negative number for
+	 *                              unlimited
 	 * @return CatchResult of resulted try to catch pokemon
-	 * @throws LoginFailedException
-	 *             if failed to login
-	 * @throws RemoteServerException
-	 *             if the server failed to respond
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemon(double normalizedHitPosition,
 									double normalizedReticleSize, double spinModifier, Pokeball type,
@@ -297,88 +316,113 @@ public class CatchablePokemon {
 		return catchPokemon(normalizedHitPosition, normalizedReticleSize, spinModifier, type, amount, -1);
 	}
 
+
 	/**
 	 * Tries to catch a pokemon.
 	 *
-	 * @param normalizedHitPosition
-	 *            the normalized hit position
-	 * @param normalizedReticleSize
-	 *            the normalized hit reticle
-	 * @param spinModifier
-	 *            the spin modifier
-	 * @param type
-	 *            Type of pokeball to throw
-	 * @param amount
-	 *            Max number of Pokeballs to throw, negative number for
-	 *            unlimited
-	 * @param razberriesLimit
-	 *            The maximum amount of razberries to use, -1 for unlimited
+	 * @param normalizedHitPosition the normalized hit position
+	 * @param normalizedReticleSize the normalized hit reticle
+	 * @param spinModifier          the spin modifier
+	 * @param type                  Type of pokeball to throw
+	 * @param amount                Max number of Pokeballs to throw, negative number for
+	 *                              unlimited
+	 * @param razberriesLimit       The maximum amount of razberries to use, -1 for unlimited
 	 * @return CatchResult of resulted try to catch pokemon
-	 * @throws LoginFailedException
-	 *             if failed to login
-	 * @throws RemoteServerException
-	 *             if the server failed to respond
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemon(double normalizedHitPosition,
 									double normalizedReticleSize, double spinModifier, Pokeball type,
-									int amount, int razberriesLimit) throws LoginFailedException, RemoteServerException {
-		if (!isEncountered()) {
-			return new CatchResult();
-		}
-
+									int amount, int razberriesLimit)
+			throws LoginFailedException, RemoteServerException {
 		int razberries = 0;
 		int numThrows = 0;
-		CatchPokemonResponse response = null;
+		CatchResult result;
 		do {
 
 			if (razberries < razberriesLimit || razberriesLimit == -1) {
 				useItem(ItemId.ITEM_RAZZ_BERRY);
 				razberries++;
 			}
-
-			CatchPokemonMessage reqMsg = CatchPokemonMessage.newBuilder()
-					.setEncounterId(getEncounterId()).setHitPokemon(true)
-					.setNormalizedHitPosition(normalizedHitPosition)
-					.setNormalizedReticleSize(normalizedReticleSize)
-					.setSpawnPointId(getSpawnPointId())
-					.setSpinModifier(spinModifier)
-					.setPokeball(type.getBallType()).build();
-			ServerRequest serverRequest = new ServerRequest(
-					RequestTypeOuterClass.RequestType.CATCH_POKEMON, reqMsg);
-			api.getRequestHandler().sendServerRequests(serverRequest);
-
-			try {
-				response = CatchPokemonResponse.parseFrom(serverRequest
-						.getData());
-			} catch (InvalidProtocolBufferException e) {
-				throw new RemoteServerException(e);
-			}
-
-			if (response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_ESCAPE
-					&& response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_MISSED) {
+			result = catchPokemonAsync(normalizedHitPosition, normalizedReticleSize, spinModifier, type).toBlocking();
+			if (!result.isFailed() && result.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_ESCAPE
+					&& result.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_MISSED) {
 				break;
 			}
 			numThrows++;
 		}
 		while (amount < 0 || numThrows < amount);
 
-		api.getInventories().updateInventories();
+		return result;
+	}
 
-		return new CatchResult(response);
+
+	/**
+	 * Tries to catch a pokemon.
+	 *
+	 * @param type Type of pokeball to throw
+	 * @return CatchResult of resulted try to catch pokemon
+	 */
+	public PokemonFuture<CatchResult> catchPokemonAsync(Pokeball type) {
+		return catchPokemonAsync(1.0, 1.95 + Math.random() * 0.05,
+				0.85 + Math.random() * 0.15, type);
+	}
+
+	/**
+	 * Tries to catch a pokemon.
+	 *
+	 * @param normalizedHitPosition the normalized hit position
+	 * @param normalizedReticleSize the normalized hit reticle
+	 * @param spinModifier          the spin modifier
+	 * @param type                  Type of pokeball to throw
+	 * @return CatchResult of resulted try to catch pokemon
+	 */
+	public PokemonFuture<CatchResult> catchPokemonAsync(double normalizedHitPosition, double normalizedReticleSize,
+														double spinModifier, Pokeball type) {
+		if (!isEncountered()) {
+			return FutureWrapper.just(new CatchResult());
+		}
+
+		CatchPokemonMessage reqMsg = CatchPokemonMessage.newBuilder()
+				.setEncounterId(getEncounterId()).setHitPokemon(true)
+				.setNormalizedHitPosition(normalizedHitPosition)
+				.setNormalizedReticleSize(normalizedReticleSize)
+				.setSpawnPointId(getSpawnPointId())
+				.setSpinModifier(spinModifier)
+				.setPokeball(type.getBallType()).build();
+		AsyncServerRequest serverRequest = new AsyncServerRequest(
+				RequestTypeOuterClass.RequestType.CATCH_POKEMON, reqMsg);
+		return new FutureWrapper<ByteString, CatchResult>(api.getRequestHandler()
+				.sendAsyncServerRequests(serverRequest)) {
+			@Override
+			protected CatchResult handle(ByteString result) throws RemoteServerException, LoginFailedException {
+				CatchPokemonResponse response;
+				try {
+					response = CatchPokemonResponse.parseFrom(result);
+				} catch (InvalidProtocolBufferException e) {
+					throw new RemoteServerException(e);
+				}
+
+				if (response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_ESCAPE
+						&& response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_MISSED) {
+					api.getInventories().updateInventories();
+					return new CatchResult(response);
+				} else {
+					return new CatchResult();
+				}
+			}
+		};
 	}
 
 	/**
 	 * Tries to use an item on a catchable pokemon (ie razzberry).
 	 *
-	 * @param item
-	 *            the item ID
+	 * @param item the item ID
 	 * @return CatchItemResult info about the new modifiers about the pokemon (can move, item capture multi) eg
-	 * @throws LoginFailedException
-	 *             if failed to login
-	 * @throws RemoteServerException
-	 *             if the server failed to respond
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
-	public CatchItemResult useItem(ItemId item) throws LoginFailedException, RemoteServerException {
+	public PokemonFuture<CatchItemResult> useItemAsync(ItemId item) {
 
 		UseItemCaptureMessage reqMsg = UseItemCaptureMessage
 				.newBuilder()
@@ -387,16 +431,33 @@ public class CatchablePokemon {
 				.setItemId(item)
 				.build();
 
-		ServerRequest serverRequest = new ServerRequest(
+		AsyncServerRequest serverRequest = new AsyncServerRequest(
 				RequestTypeOuterClass.RequestType.USE_ITEM_CAPTURE, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-		UseItemCaptureResponse response = null;
-		try {
-			response = UseItemCaptureResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-		return new CatchItemResult(response);
+		return new FutureWrapper<ByteString, CatchItemResult>(api.getRequestHandler()
+				.sendAsyncServerRequests(serverRequest)) {
+			@Override
+			protected CatchItemResult handle(ByteString result) throws RemoteServerException, LoginFailedException {
+				UseItemCaptureResponse response;
+				try {
+					response = UseItemCaptureResponse.parseFrom(result);
+				} catch (InvalidProtocolBufferException e) {
+					throw new RemoteServerException(e);
+				}
+				return new CatchItemResult(response);
+			}
+		};
+	}
+
+	/**
+	 * Tries to use an item on a catchable pokemon (ie razzberry).
+	 *
+	 * @param item the item ID
+	 * @return CatchItemResult info about the new modifiers about the pokemon (can move, item capture multi) eg
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
+	 */
+	public CatchItemResult useItem(ItemId item) throws LoginFailedException, RemoteServerException {
+		return useItemAsync(item).toBlocking();
 	}
 
 	@Override
@@ -415,4 +476,15 @@ public class CatchablePokemon {
 		return (int) this.getEncounterId();
 	}
 
+	/**
+	 * Encounter check
+	 *
+	 * @return Checks if encounter has happened
+	 */
+	public boolean isEncountered() {
+		if (encountered == null) {
+			return false;
+		}
+		return encountered;
+	}
 }
