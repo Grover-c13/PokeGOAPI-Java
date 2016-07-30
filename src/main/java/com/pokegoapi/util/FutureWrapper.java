@@ -10,7 +10,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public abstract class FutureWrapper<T,R> implements PokemonFuture<R> {
-    private final Future<T> result;
+
+    protected final Future<T> result;
     public FutureWrapper(Future<T> result) {
         this.result = result;
     }
@@ -48,7 +49,7 @@ public abstract class FutureWrapper<T,R> implements PokemonFuture<R> {
         return result;
     }
 
-    private R getResult(long timeouut, TimeUnit timeUnit) throws InterruptedException, ExecutionException {
+    protected R getResult(long timeouut, TimeUnit timeUnit) throws InterruptedException, ExecutionException {
         long wait = System.currentTimeMillis() + timeUnit.toMillis(timeouut);
         while (!isDone()) {
             Thread.sleep(10);
@@ -59,12 +60,12 @@ public abstract class FutureWrapper<T,R> implements PokemonFuture<R> {
         try {
             return handle(result.get());
         }
-        catch (RemoteServerException e) {
+        catch (RemoteServerException | LoginFailedException e) {
             throw new ExecutionException(e);
         }
     }
 
-    protected abstract R handle(T result) throws RemoteServerException;
+    protected abstract R handle(T result) throws RemoteServerException, LoginFailedException;
 
     public R toBlocking() throws LoginFailedException, RemoteServerException {
         try {
@@ -82,5 +83,27 @@ public abstract class FutureWrapper<T,R> implements PokemonFuture<R> {
             }
             throw new AsyncPokemonGoException("Unknown exception occurred. ", e);
         }
+    }
+
+    public static <T,R> FutureWrapper<T,R> just(R result) {
+        return new Just<>(result);
+    }
+
+    private static class Just<T,R> extends FutureWrapper<T,R> {
+        private final R result;
+        Just(R result) {
+            super(null);
+            this.result = result;
+        }
+        @Override
+        protected R handle(T ignore) throws RemoteServerException {
+            return this.result;
+        }
+
+        @Override
+        public boolean isDone() {
+            return true;
+        }
+
     }
 }
