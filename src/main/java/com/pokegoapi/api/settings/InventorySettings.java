@@ -1,13 +1,27 @@
 package com.pokegoapi.api.settings;
 
-import POGOProtos.Settings.InventorySettingsOuterClass;
+import lombok.Getter;
 
 /**
  * Created by rama on 27/07/16.
  */
 public class InventorySettings {
-	//TODO: parse & save data
-	protected void update(POGOProtos.Settings.InventorySettingsOuterClass.InventorySettings inventorySettings) {
+	@Getter
+	private int baseBagItems;
+	@Getter
+	private int maxBagItems;
+	@Getter
+	private int baseEggs;
+	@Getter
+	private int basePokemon;
+	@Getter
+	private int maxPokemon;
 
+	protected void update(POGOProtos.Settings.InventorySettingsOuterClass.InventorySettings inventorySettings) {
+		baseBagItems = inventorySettings.getBaseBagItems();
+		maxBagItems = inventorySettings.getMaxBagItems();
+		baseEggs = inventorySettings.getBaseEggs();
+		maxPokemon = inventorySettings.getMaxPokemon();
+		basePokemon = inventorySettings.getBasePokemon();
 	}
 }
