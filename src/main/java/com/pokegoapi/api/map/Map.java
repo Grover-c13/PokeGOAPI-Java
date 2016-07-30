@@ -63,6 +63,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Future;
 
 
 public class Map {
@@ -102,10 +103,7 @@ public class Map {
 	 * @return a List of CatchablePokemon at your current location
 	 */
 	public PokemonFuture<List<CatchablePokemon>> getCatchablePokemonAsync() {
-		List<Long> cellIds = getCellIds(
-				api.getLatitude(),
-				api.getLongitude(),
-				9);
+		List<Long> cellIds = getDefaultCells();
 		return new FutureWrapper<MapObjects, List<CatchablePokemon>>(getMapObjectsAsync(cellIds)) {
 			@Override
 			protected List<CatchablePokemon> handle(MapObjects mapObjects) throws RemoteServerException {
@@ -142,15 +140,47 @@ public class Map {
 	 *
 	 * @return a List of NearbyPokemon at your current location
 	 */
+	public PokemonFuture<List<NearbyPokemon>> getNearbyPokemonAsync() {
+		return new FutureWrapper<MapObjects, List<NearbyPokemon>>(getMapObjectsAsync(getDefaultCells())) {
+			@Override
+			protected List<NearbyPokemon> handle(MapObjects result) throws RemoteServerException {
+				List<NearbyPokemon> pokemons = new ArrayList<>();
+				for (NearbyPokemonOuterClass.NearbyPokemon pokemon : result.getNearbyPokemons()) {
+					pokemons.add(new NearbyPokemon(pokemon));
+				}
+
+				return pokemons;
+			}
+		};
+	}
+
+	/**
+	 * Returns a list of nearby pokemon (non-catchable).
+	 *
+	 * @return a List of NearbyPokemon at your current location
+	 */
 	public List<NearbyPokemon> getNearbyPokemon() throws LoginFailedException, RemoteServerException {
-		List<NearbyPokemon> pokemons = new ArrayList<>();
-		MapObjects objects = getMapObjects();
+		return getNearbyPokemonAsync().toBlocking();
+	}
 
-		for (NearbyPokemonOuterClass.NearbyPokemon pokemon : objects.getNearbyPokemons()) {
-			pokemons.add(new NearbyPokemon(pokemon));
-		}
+	/**
+	 * Returns a list of spawn points.
+	 *
+	 * @return list of spawn points
+	 */
+	public PokemonFuture<List<Point>> getSpawnPointsAsync() {
+		return new FutureWrapper<MapObjects, List<Point>>(getMapObjectsAsync(getDefaultCells())) {
+			@Override
+			protected List<Point> handle(MapObjects result) throws RemoteServerException {
+				List<Point> points = new ArrayList<>();
 
-		return pokemons;
+				for (SpawnPointOuterClass.SpawnPoint point : result.getSpawnPoints()) {
+					points.add(new Point(point));
+				}
+
+				return points;
+			}
+		};
 	}
 
 	/**
@@ -159,14 +189,27 @@ public class Map {
 	 * @return list of spawn points
 	 */
 	public List<Point> getSpawnPoints() throws LoginFailedException, RemoteServerException {
-		List<Point> points = new ArrayList<>();
-		MapObjects objects = getMapObjects();
+		return getSpawnPointsAsync().toBlocking();
+	}
 
-		for (SpawnPointOuterClass.SpawnPoint point : objects.getSpawnPoints()) {
-			points.add(new Point(point));
-		}
+	/**
+	 * Get a list of gyms near the current location.
+	 *
+	 * @return List of gyms
+	 */
+	public PokemonFuture<List<Gym>> getGymsAsync() {
+		return new FutureWrapper<MapObjects, List<Gym>>(getMapObjectsAsync(getDefaultCells())) {
+			@Override
+			protected List<Gym> handle(MapObjects result) throws RemoteServerException {
+				List<Gym> gyms = new ArrayList<>();
 
-		return points;
+				for (FortData fortdata : result.getGyms()) {
+					gyms.add(new Gym(api, fortdata));
+				}
+
+				return gyms;
+			}
+		};
 	}
 
 	/**
@@ -175,17 +218,27 @@ public class Map {
 	 * @return List of gyms
 	 */
 	public List<Gym> getGyms() throws LoginFailedException, RemoteServerException {
-		List<Gym> gyms = new ArrayList<>();
-		MapObjects objects = getMapObjects();
-
-		for (FortData fortdata : objects.getGyms()) {
-			gyms.add(new Gym(api, fortdata));
-		}
-
-		return gyms;
+		return getGymsAsync().toBlocking();
 	}
 
+	/**
+	 * Returns a list of decimated spawn points at current location.
+	 *
+	 * @return list of spawn points
+	 */
+	public PokemonFuture<List<Point>> getDecimatedSpawnPointsAsync() {
+		return new FutureWrapper<MapObjects, List<Point>>(getMapObjectsAsync(getDefaultCells())) {
+			@Override
+			protected List<Point> handle(MapObjects result) throws RemoteServerException {
+				List<Point> points = new ArrayList<>();
+				for (SpawnPointOuterClass.SpawnPoint point : result.getDecimatedSpawnPoints()) {
+					points.add(new Point(point));
+				}
 
+				return points;
+			}
+		};
+	}
 
 	/**
 	 * Returns a list of decimated spawn points at current location.
@@ -193,14 +246,16 @@ public class Map {
 	 * @return list of spawn points
 	 */
 	public List<Point> getDecimatedSpawnPoints() throws LoginFailedException, RemoteServerException {
-		List<Point> points = new ArrayList<>();
-		MapObjects objects = getMapObjects();
+		return getDecimatedSpawnPointsAsync().toBlocking();
+	}
 
-		for (SpawnPointOuterClass.SpawnPoint point : objects.getDecimatedSpawnPoints()) {
-			points.add(new Point(point));
-		}
-
-		return points;
+	/**
+	 * Returns MapObjects around your current location.
+	 *
+	 * @return MapObjects at your current location
+	 */
+	public PokemonFuture<MapObjects> getMapObjectsAsync() {
+		return getMapObjectsAsync(getDefaultCells());
 	}
 
 	/**
@@ -209,7 +264,7 @@ public class Map {
 	 * @return MapObjects at your current location
 	 */
 	public MapObjects getMapObjects() throws LoginFailedException, RemoteServerException {
-		return getMapObjects(9);
+		return getMapObjectsAsync().toBlocking();
 	}
 
 	/**
@@ -218,15 +273,17 @@ public class Map {
 	 * @param width width
 	 * @return MapObjects at your current location
 	 */
+	public PokemonFuture<MapObjects> getMapObjectsAsync(int width) {
+		return getMapObjectsAsync(getCellIds(api.getLatitude(), api.getLongitude(), width));
+	}
+	/**
+	 * Returns MapObjects around your current location within a given width.
+	 *
+	 * @param width width
+	 * @return MapObjects at your current location
+	 */
 	public MapObjects getMapObjects(int width) throws LoginFailedException, RemoteServerException {
-		return getMapObjects(
-				getCellIds(
-						api.getLatitude(),
-						api.getLongitude(),
-						width),
-				api.getLatitude(),
-				api.getLongitude(),
-				api.getAltitude());
+		return getMapObjectsAsync(width).toBlocking();
 	}
 
 	/**
@@ -539,4 +596,10 @@ public class Map {
 		}
 		return response;
 	}
+
+
+	private List<Long> getDefaultCells() {
+		return getCellIds(api.getLatitude(), api.getLongitude(), 9);
+	}
+
 }

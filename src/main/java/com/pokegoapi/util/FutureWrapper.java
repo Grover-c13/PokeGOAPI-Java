@@ -64,7 +64,7 @@ public abstract class FutureWrapper<T,R> implements PokemonFuture<R> {
         }
     }
 
-    protected abstract R handle(T byteString) throws RemoteServerException;
+    protected abstract R handle(T result) throws RemoteServerException;
 
     public R toBlocking() throws LoginFailedException, RemoteServerException {
         try {
