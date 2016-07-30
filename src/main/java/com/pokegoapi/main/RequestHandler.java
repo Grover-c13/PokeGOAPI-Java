@@ -24,6 +24,7 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.AsyncPokemonGoException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.util.FutureWrapper;
 import com.pokegoapi.util.Log;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
@@ -135,6 +136,17 @@ public class RequestHandler implements Runnable {
 		};
 	}
 
+	public void sendServerRequests(ServerRequest... serverRequests) throws RemoteServerException, LoginFailedException {
+		List<Future<ByteString>> futures = new ArrayList<>(serverRequests.length);
+		for (ServerRequest request : serverRequests) {
+			AsyncServerRequest asyncServerRequest = new AsyncServerRequest(request.getType(), request.getRequest());
+			futures.add(sendAsyncServerRequests(asyncServerRequest));
+		}
+		for (int i=0;i!=serverRequests.length;i++) {
+			serverRequests[i].handleData(FutureWrapper.toBlocking(futures.get(i)));
+		}
+	}
+
 	/**
 	 * Sends multiple ServerRequests in a thread safe manner.
 	 *
@@ -142,7 +154,7 @@ public class RequestHandler implements Runnable {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
-	public void sendServerRequests(ServerRequest... serverRequests) throws RemoteServerException, LoginFailedException {
+	private void internalSendServerRequests(ServerRequest... serverRequests) throws RemoteServerException, LoginFailedException {
 		if (serverRequests.length == 0) {
 			return;
 		}
@@ -193,7 +205,7 @@ public class RequestHandler implements Runnable {
 						responseEnvelop.getApiUrl(), responseEnvelop.getError()));
 			} else if (responseEnvelop.getStatusCode() == 53) {
 				// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
-				sendServerRequests(serverRequests);
+				internalSendServerRequests(serverRequests);
 				return;
 			}
 
@@ -359,13 +371,16 @@ public class RequestHandler implements Runnable {
 			} catch (InterruptedException e) {
 				throw new AsyncPokemonGoException("System shutdown", e);
 			}
+			if (workQueue.isEmpty()) {
+				continue;
+			}
 			workQueue.drainTo(requests);
 			ServerRequest[] serverRequests = new ServerRequest[requests.size()];
 			for (int i=0;i!=requests.size();i++) {
 				serverRequests[i] = new ServerRequest(requests.get(i).getType(), requests.get(i).getRequest());
 			}
 			try {
-				sendServerRequests(serverRequests);
+				internalSendServerRequests(serverRequests);
 				for (int i=0;i!=requests.size();i++) {
 					try {
 						resultMap.put(requests.get(i).getId(), ResultOrException.getResult(serverRequests[i].getData()));
@@ -381,6 +396,9 @@ public class RequestHandler implements Runnable {
 					resultMap.put(request.getId(), ResultOrException.getError(e));
 				}
 				continue;
+			}
+			finally {
+				requests.clear();
 			}
 		}
 	}

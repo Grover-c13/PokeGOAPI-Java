@@ -29,6 +29,7 @@ public class ServerRequest {
 
 	@Getter
 	RequestOuterClass.Request request;
+	@Getter
 	private RequestTypeOuterClass.RequestType type;
 	private ByteString data;
 
