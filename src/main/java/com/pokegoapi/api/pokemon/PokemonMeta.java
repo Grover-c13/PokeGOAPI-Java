@@ -19,6 +19,7 @@ import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
+import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -114,6 +115,12 @@ public class PokemonMeta {
 	@Getter
 	@Setter
 	private double cylGroundM;
+	@Getter
+	@Setter
+	private PokemonMove[] quickMoves;
+	@Getter
+	@Setter
+	private PokemonMove[] cinematicMoves;
 	@Getter
 	@Setter
 	private int number;
