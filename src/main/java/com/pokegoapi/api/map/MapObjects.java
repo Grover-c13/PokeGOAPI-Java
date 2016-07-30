@@ -82,7 +82,11 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		this.catchablePokemons.addAll(catchablePokemons);
+		for (MapPokemon p : catchablePokemons) {
+			if (p.getExpirationTimestampMs() != -1 ) {
+				this.catchablePokemons.add(p);
+			}
+		}
 	}
 
 	/**

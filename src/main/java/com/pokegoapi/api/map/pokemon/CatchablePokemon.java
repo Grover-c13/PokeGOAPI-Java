@@ -99,7 +99,7 @@ public class CatchablePokemon {
 		this.spawnPointId = proto.getSpawnPointId();
 		this.encounterId = proto.getEncounterId();
 		this.pokemonId = proto.getPokemonData().getPokemonId();
-		this.expirationTimestampMs = proto.getTimeTillHiddenMs();
+		this.expirationTimestampMs = proto.getLastModifiedTimestampMs() + proto.getTimeTillHiddenMs();
 		this.latitude = proto.getLatitude();
 		this.longitude = proto.getLongitude();
 	}
