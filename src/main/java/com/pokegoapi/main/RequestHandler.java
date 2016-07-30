@@ -271,7 +271,7 @@ public class RequestHandler implements Runnable {
 		AuthTicketOuterClass.AuthTicket authTicket = null;
 		while (true) {
 			try {
-				Thread.sleep(300);
+				Thread.sleep(350);
 			} catch (InterruptedException e) {
 				throw new AsyncPokemonGoException("System shutdown", e);
 			}
