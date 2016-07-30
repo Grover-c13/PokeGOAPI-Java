@@ -29,9 +29,9 @@ public class AsyncServerRequest {
 	@Getter
 	private final long id = System.nanoTime();
 	@Getter
-	private final RequestOuterClass.Request request;
-	@Getter
 	private final RequestTypeOuterClass.RequestType type;
+	@Getter
+	private final GeneratedMessage req;
 
 	/**
 	 * Instantiates a new Server request.
@@ -40,10 +40,7 @@ public class AsyncServerRequest {
 	 * @param req  the req
 	 */
 	public AsyncServerRequest(RequestTypeOuterClass.RequestType type, GeneratedMessage req) {
-		RequestOuterClass.Request.Builder reqBuilder = RequestOuterClass.Request.newBuilder();
-		reqBuilder.setRequestMessage(req.toByteString());
-		reqBuilder.setRequestType(type);
-		this.request = reqBuilder.build();
 		this.type = type;
+		this.req = req;
 	}
 }
