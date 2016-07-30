@@ -56,7 +56,9 @@ public class Battle {
 
 	/**
 	 * New battle to track the state of a battle.
-	 *
+	 * @param api The api instance to submit requests with.
+     * @param team The Pokemon to use for attacking in the battle.
+     * @param gym The Gym to fight at.
 	 */
 	public Battle(PokemonGo api, Pokemon[] team, Gym gym) {
 		this.team = team;
@@ -75,6 +77,8 @@ public class Battle {
 	 * Start a battle.
 	 *
 	 * @return Result of the attempt to start
+     * @throws LoginFailedException  if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public Result start() throws LoginFailedException, RemoteServerException {
 
@@ -120,6 +124,8 @@ public class Battle {
 	 *
 	 * @param times the amount of times to attack
 	 * @return Battle
+     * @throws LoginFailedException  if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public AttackGymResponse attack(int times) throws LoginFailedException, RemoteServerException {
 

@@ -526,7 +526,7 @@ public strictfp class S2EdgeUtil {
    *  (1) robustCrossing(b,a,c,d) == robustCrossing(a,b,c,d) (2)
    * robustCrossing(c,d,a,b) == robustCrossing(a,b,c,d) (3)
    * robustCrossing(a,b,c,d) == 0 if a==c, a==d, b==c, b==d (3)
-   * robustCrossing(a,b,c,d) <= 0 if a==b or c==d
+   * robustCrossing(a,b,c,d) &lt;= 0 if a==b or c==d
    *
    *  Note that if you want to check an edge against a *chain* of other edges,
    * it is much more efficient to use an EdgeCrosser (above).

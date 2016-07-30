@@ -48,6 +48,11 @@ public final strictfp class S2Cap implements S2Region {
     height = 0;
   }
 
+    /**
+     * private constructor
+     * @param axis axis
+     * @param height height
+     */
   private S2Cap(S2Point axis, double height) {
     this.axis = axis;
     this.height = height;

@@ -194,6 +194,8 @@ public class Pokestop {
 	/**
 	 * Returns whether this pokestop has an active lure.
 	 * @return lure status
+     * @throws LoginFailedException If login failed.
+     * @throws RemoteServerException If server communications failed.
 	 */
 	public boolean hasLure() throws LoginFailedException, RemoteServerException {
 

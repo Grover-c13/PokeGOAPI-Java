@@ -44,7 +44,8 @@ public class Gym {
 
 	/**
 	 * Gym object.
-	 *
+	 * @param api The api object to use for requests.
+     * @param proto The FortData to populate the Gym with.
 	 */
 	public Gym(PokemonGo api, FortData proto) {
 		this.api = api;
@@ -153,6 +154,8 @@ public class Gym {
 	 * Get a list of pokemon defending this gym.
 	 *
 	 * @return List of pokemon
+     * @throws LoginFailedException  if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public List<PokemonData> getDefendingPokemon() throws LoginFailedException, RemoteServerException {
 		List<PokemonData> data = new ArrayList<PokemonData>();

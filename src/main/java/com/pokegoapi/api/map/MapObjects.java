@@ -164,8 +164,7 @@ public class MapObjects {
 
 	/**
 	 * updates the object.
-	 *
-	 *
+	 * @param other Update this {@link MapObjects} data with the provided data.
 	 */
 	public void update(MapObjects other) {
 

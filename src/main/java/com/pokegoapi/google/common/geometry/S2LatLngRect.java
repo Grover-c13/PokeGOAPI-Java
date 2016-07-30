@@ -29,7 +29,7 @@ public strictfp class S2LatLngRect implements S2Region {
 
   /**
    * Construct a rectangle from minimum and maximum latitudes and longitudes. If
-   * lo.lng() > hi.lng(), the rectangle spans the 180 degree longitude line.
+   * lo.lng() &gt; hi.lng(), the rectangle spans the 180 degree longitude line.
    */
   public S2LatLngRect(final S2LatLng lo, final S2LatLng hi) {
     lat = new R1Interval(lo.lat().radians(), hi.lat().radians());
@@ -70,7 +70,7 @@ public strictfp class S2LatLngRect implements S2Region {
    * Construct a rectangle from a center point (in lat-lng space) and size in
    * each dimension. If size.lng() is greater than 360 degrees it is clamped,
    * and latitudes greater than +/- 90 degrees are also clamped. So for example,
-   * FromCenterSize((80,170),(20,20)) -> (lo=(60,150),hi=(90,-170)).
+   * FromCenterSize((80,170),(20,20)) -&gt; (lo=(60,150),hi=(90,-170)).
    */
   public static S2LatLngRect fromCenterSize(S2LatLng center, S2LatLng size) {
     return fromPoint(center).expanded(size.mul(0.5));
@@ -186,7 +186,7 @@ public strictfp class S2LatLngRect implements S2Region {
   }
 
   /**
-   * Return true if lng_.lo() > lng_.hi(), i.e. the rectangle crosses the 180
+   * Return true if lng_.lo() &gt; lng_.hi(), i.e. the rectangle crosses the 180
    * degree latitude line.
    */
   public boolean isInverted() {

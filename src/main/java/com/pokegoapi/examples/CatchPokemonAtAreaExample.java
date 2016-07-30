@@ -50,6 +50,7 @@ public class CatchPokemonAtAreaExample {
 
 	/**
 	 * Catches a pokemon at an area.
+     * @param args args
 	 */
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();

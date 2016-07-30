@@ -26,14 +26,18 @@ public final strictfp class R1Interval {
   private final double lo;
   private final double hi;
 
-  /** Interval constructor. If lo > hi, the interval is empty. */
+  /**
+   * Interval constructor. If lo &gt; hi, the interval is empty.
+   * @param lo lo value
+   * @param hi hi value
+   */
   public R1Interval(double lo, double hi) {
     this.lo = lo;
     this.hi = hi;
   }
 
   /**
-   * Returns an empty interval. (Any interval where lo > hi is considered
+   * @return an empty interval. (Any interval where lo &gt; hi is considered
    * empty.)
    */
   public static R1Interval empty() {
@@ -42,6 +46,8 @@ public final strictfp class R1Interval {
 
   /**
    * Convenience method to construct an interval containing a single point.
+   * @param p point to get interval for
+   * @return a new R1Interval from the point.
    */
   public static R1Interval fromPoint(double p) {
     return new R1Interval(p, p);
@@ -51,6 +57,9 @@ public final strictfp class R1Interval {
    * Convenience method to construct the minimal interval containing the two
    * given points. This is equivalent to starting with an empty interval and
    * calling AddPoint() twice, but it is more efficient.
+   * @param p1 first point
+   * @param p2 second point
+   * @return new R1Interval
    */
   public static R1Interval fromPointPair(double p1, double p2) {
     if (p1 <= p2) {
@@ -69,14 +78,14 @@ public final strictfp class R1Interval {
   }
 
   /**
-   * Return true if the interval is empty, i.e. it contains no points.
+   * @return true if the interval is empty, i.e. it contains no points.
    */
   public boolean isEmpty() {
     return lo() > hi();
   }
 
   /**
-   * Return the center of the interval. For empty intervals, the result is
+   * @return the center of the interval. For empty intervals, the result is
    * arbitrary.
    */
   public double getCenter() {
@@ -84,22 +93,35 @@ public final strictfp class R1Interval {
   }
 
   /**
-   * Return the length of the interval. The length of an empty interval is
+   * @return the length of the interval. The length of an empty interval is
    * negative.
    */
   public double getLength() {
     return hi() - lo();
   }
 
+    /**
+     *
+     * @param p point
+     * @return true if p is between lo and hi
+     */
   public boolean contains(double p) {
     return p >= lo() && p <= hi();
   }
 
+    /**
+     *
+     * @param p point
+     * @return true if p is inside lo and hi
+     */
   public boolean interiorContains(double p) {
     return p > lo() && p < hi();
   }
 
-  /** Return true if this interval contains the interval 'y'. */
+  /**
+   * @param y interval
+   * @return true if this interval contains the interval 'y'.
+   */
   public boolean contains(R1Interval y) {
     if (y.isEmpty()) {
       return true;
@@ -108,7 +130,8 @@ public final strictfp class R1Interval {
   }
 
   /**
-   * Return true if the interior of this interval contains the entire interval
+   * @param y interval
+   * @return true if the interior of this interval contains the entire interval
    * 'y' (including its boundary).
    */
   public boolean interiorContains(R1Interval y) {
@@ -119,7 +142,8 @@ public final strictfp class R1Interval {
   }
 
   /**
-   * Return true if this interval intersects the given interval, i.e. if they
+   * @param y interval
+   * @return true if this interval intersects the given interval, i.e. if they
    * have any points in common.
    */
   public boolean intersects(R1Interval y) {
@@ -131,14 +155,19 @@ public final strictfp class R1Interval {
   }
 
   /**
-   * Return true if the interior of this interval intersects any point of the
+   * @param y interval
+   * @return true if the interior of this interval intersects any point of the
    * given interval (including its boundary).
    */
   public boolean interiorIntersects(R1Interval y) {
     return y.lo() < hi() && lo() < y.hi() && lo() < hi() && y.lo() <= y.hi();
   }
 
-  /** Expand the interval so that it contains the given point "p". */
+  /**
+   * Expand the interval so that it contains the given point "p".
+   * @param p p
+   * @return new R1Interval
+   */
   public R1Interval addPoint(double p) {
     if (isEmpty()) {
       return R1Interval.fromPoint(p);
@@ -152,7 +181,8 @@ public final strictfp class R1Interval {
   }
 
   /**
-   * Return an interval that contains all points with a distance "radius" of a
+   * @param radius radius
+   * @return an interval that contains all points with a distance "radius" of a
    * point in this interval. Note that the expansion of an empty interval is
    * always empty.
    */
@@ -165,7 +195,8 @@ public final strictfp class R1Interval {
   }
 
   /**
-   * Return the smallest interval that contains this interval and the given
+   * @param y interval
+   * @return the smallest interval that contains this interval and the given
    * interval "y".
    */
   public R1Interval union(R1Interval y) {
@@ -179,7 +210,8 @@ public final strictfp class R1Interval {
   }
 
   /**
-   * Return the intersection of this interval with the given interval. Empty
+   * @param y interval
+   * @return the intersection of this interval with the given interval. Empty
    * intervals do not need to be special-cased.
    */
   public R1Interval intersection(R1Interval y) {
@@ -216,7 +248,8 @@ public final strictfp class R1Interval {
   /**
    * Return true if length of the symmetric difference between the two intervals
    * is at most the given tolerance.
-   *
+   * @param y y
+   * @param maxError maxError
    */
   public boolean approxEquals(R1Interval y, double maxError) {
     if (isEmpty()) {
