@@ -24,7 +24,7 @@ public class InvalidCurrencyException extends PokemonGoApiException {
 		super(reason);
 	}
 
-	public InvalidCurrencyException(Exception exception) {
+	public InvalidCurrencyException(Throwable exception) {
 		super(exception);
 	}
 }

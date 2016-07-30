@@ -15,20 +15,16 @@
 
 package com.pokegoapi.exceptions;
 
-public class LoginFailedException extends PokemonGoApiException {
-	public LoginFailedException() {
-		super();
-	}
-
-	public LoginFailedException(String reason) {
+public class AsyncRemoteServerException extends AsyncPokemonGoException {
+	public AsyncRemoteServerException(String reason) {
 		super(reason);
 	}
 
-	public LoginFailedException(Throwable exception) {
+	public AsyncRemoteServerException(Exception exception) {
 		super(exception);
 	}
 
-	public LoginFailedException(String reason, Throwable exception) {
+	public AsyncRemoteServerException(String reason, Exception exception) {
 		super(reason, exception);
 	}
 }

@@ -24,11 +24,11 @@ public class RemoteServerException extends PokemonGoApiException {
 		super(reason);
 	}
 
-	public RemoteServerException(Exception exception) {
+	public RemoteServerException(Throwable exception) {
 		super(exception);
 	}
 
-	public RemoteServerException(String reason, Exception exception) {
+	public RemoteServerException(String reason, Throwable exception) {
 		super(reason, exception);
 	}
 }

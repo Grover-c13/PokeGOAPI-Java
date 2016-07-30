@@ -13,22 +13,28 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.main;
 
-public class LoginFailedException extends PokemonGoApiException {
-	public LoginFailedException() {
-		super();
+import com.google.protobuf.ByteString;
+import lombok.Data;
+import lombok.Getter;
+
+public class ResultOrException {
+	@Getter
+	private final ByteString result;
+	@Getter
+	private final Exception exception;
+
+	private ResultOrException(ByteString result, Exception exception) {
+		this.result = result;
+		this.exception = exception;
 	}
 
-	public LoginFailedException(String reason) {
-		super(reason);
+	public static ResultOrException getError(Exception exception) {
+		return new ResultOrException(null, exception);
 	}
 
-	public LoginFailedException(Throwable exception) {
-		super(exception);
-	}
-
-	public LoginFailedException(String reason, Throwable exception) {
-		super(reason, exception);
+	public static ResultOrException getResult(ByteString result) {
+		return new ResultOrException(result, null);
 	}
 }

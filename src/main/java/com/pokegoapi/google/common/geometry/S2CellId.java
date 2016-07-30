@@ -579,7 +579,7 @@ public final strictfp class S2CellId implements Comparable<S2CellId> {
    * closest vertex may only have three neighbors if it is one of the 8 cube
    * vertices.
    *
-   * Requires: level < this.evel(), so that we can determine which vertex is
+   * Requires: level &lt; this.evel(), so that we can determine which vertex is
    * closest (in particular, level == MAX_LEVEL is not allowed).
    */
   public void getVertexNeighbors(int level, List<S2CellId> output) {
@@ -633,7 +633,7 @@ public final strictfp class S2CellId implements Comparable<S2CellId> {
    * not. In particular, two cells that intersect at a single point are
    * neighbors.
    *
-   * Requires: nbr_level >= this->level(). Note that for cells adjacent to a
+   * Requires: nbr_level &gt;= this-&gt;level(). Note that for cells adjacent to a
    * face vertex, the same neighbor may be appended more than once.
    */
   public void getAllNeighbors(int nbrLevel, List<S2CellId> output) {
@@ -808,8 +808,8 @@ public final strictfp class S2CellId implements Comparable<S2CellId> {
 
   /**
    * Return the lowest-numbered bit that is on for this cell id, which is equal
-   * to (uint64(1) << (2 * (MAX_LEVEL - level))). So for example, a.lsb() <=
-   * b.lsb() if and only if a.level() >= b.level(), but the first test is more
+   * to (uint64(1) &lt;&lt; (2 * (MAX_LEVEL - level))). So for example, a.lsb() &lt;=
+   * b.lsb() if and only if a.level() &gt;= b.level(), but the first test is more
    * efficient.
    */
   public static long lowestOnBitForLevel(int level) {
@@ -891,14 +891,14 @@ public final strictfp class S2CellId implements Comparable<S2CellId> {
   }
 
   /**
-   * Returns true if x1 < x2, when both values are treated as unsigned.
+   * @return true if x1 &lt; x2, when both values are treated as unsigned.
    */
   public static boolean unsignedLongLessThan(long x1, long x2) {
     return (x1 + Long.MIN_VALUE) < (x2 + Long.MIN_VALUE);
   }
 
   /**
-   * Returns true if x1 > x2, when both values are treated as unsigned.
+   * @return true if x1 &gt; x2, when both values are treated as unsigned.
    */
   public static boolean unsignedLongGreaterThan(long x1, long x2) {
     return (x1 + Long.MIN_VALUE) > (x2 + Long.MIN_VALUE);

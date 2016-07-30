@@ -12,23 +12,24 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package com.pokegoapi.util;
 
-package com.pokegoapi.exceptions;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
-public class LoginFailedException extends PokemonGoApiException {
-	public LoginFailedException() {
-		super();
-	}
+/**
+ * @author Angelo Rüggeberg
+ */
 
-	public LoginFailedException(String reason) {
-		super(reason);
-	}
-
-	public LoginFailedException(Throwable exception) {
-		super(exception);
-	}
-
-	public LoginFailedException(String reason, Throwable exception) {
-		super(reason, exception);
+public class PokeNames {
+	/**
+	 * Returns the Name for a Pokedex ID including known translations.
+	 * @param pokedexNr
+	 * @param locale
+	 * @return
+	 */
+	public static String getDisplayName(int pokedexNr, Locale locale) {
+		ResourceBundle names = ResourceBundle.getBundle("pokemon_names", locale);
+		return names.getString(String.valueOf(pokedexNr));
 	}
 }

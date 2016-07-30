@@ -13,22 +13,13 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.util;
 
-public class LoginFailedException extends PokemonGoApiException {
-	public LoginFailedException() {
-		super();
-	}
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
 
-	public LoginFailedException(String reason) {
-		super(reason);
-	}
+import java.util.concurrent.Future;
 
-	public LoginFailedException(Throwable exception) {
-		super(exception);
-	}
-
-	public LoginFailedException(String reason, Throwable exception) {
-		super(reason, exception);
-	}
+public interface PokemonFuture<T> extends Future<T> {
+	T toBlocking() throws LoginFailedException, RemoteServerException;
 }

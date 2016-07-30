@@ -195,7 +195,8 @@ public class Pokemon {
 		}
 	}
 
-	/**dus
+	/**
+	 * dus
 	 * Evolve evolution result.
 	 *
 	 * @return the evolution result
@@ -407,7 +408,9 @@ public class Pokemon {
 
 	/**
 	 * Calculate the maximum CP for this individual pokemon
+	 *
 	 * @return The maximum CP for this pokemon
+     * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
 	 */
 	public int getMaxCp() throws NoSuchItemException {
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
@@ -422,18 +425,32 @@ public class Pokemon {
 
 	/**
 	 * Calculates the absolute maximum CP for all pokemons with this PokemonId
+	 *
 	 * @return The absolute maximum CP
+     * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
 	 */
 	public int getAbsoluteMaxCp() throws NoSuchItemException {
-		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
+		return getAbsoluteMaxCp(proto.getPokemonId());
+	}
+
+
+	/**
+	 * Static helper to get the absolute maximum CP for pokemons with their PokemonId.
+     * @param id The {@link POGOProtos.Enums.PokemonIdOuterClass.PokemonId} of the Pokemon to get CP for.
+	 * @return The absolute maximum CP
+     * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
+	 */
+	public static int getAbsoluteMaxCp(PokemonIdOuterClass.PokemonId id) throws NoSuchItemException {
+		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(id);
 		if (pokemonMeta == null) {
-			throw new NoSuchItemException("Cannot find meta data for " + proto.getPokemonId().name());
+			throw new NoSuchItemException("Cannot find meta data for " + id);
 		}
 		int attack = 15 + pokemonMeta.getBaseAttack();
 		int defense = 15 + pokemonMeta.getBaseDefense();
 		int stamina = 15 + pokemonMeta.getBaseStamina();
 		return PokemonCpUtils.getMaxCp(attack, defense, stamina);
 	}
+
 
 	/**
 	 * @return The CP for this pokemon after powerup
@@ -485,6 +502,8 @@ public class Pokemon {
 	 * Heal a pokemon, using various fallbacks for potions
 	 *
 	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
+     * @throws LoginFailedException If login failed.
+     * @throws RemoteServerException If server communication issues occurred.
 	 */
 	public UseItemPotionResponseOuterClass.UseItemPotionResponse.Result heal()
 			throws LoginFailedException, RemoteServerException {
@@ -508,10 +527,12 @@ public class Pokemon {
 	}
 
 	/**
-	 * use a potion on that pokemon. Will check if there is enough potions & if the pokemon need
+	 * use a potion on that pokemon. Will check if there is enough potions and if the pokemon need
 	 * to be healed.
-	 *
-	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
+	 * @param itemId {@link ItemId} of the potion to use.
+	 * @return Result, ERROR_CANNOT_USE if the requirements aren't met
+     * @throws LoginFailedException If login failed.
+     * @throws RemoteServerException If server communications failed.
 	 */
 	public UseItemPotionResponseOuterClass.UseItemPotionResponse.Result usePotion(ItemId itemId)
 			throws LoginFailedException, RemoteServerException {
@@ -546,6 +567,8 @@ public class Pokemon {
 	 * Revive a pokemon, using various fallbacks for revive items
 	 *
 	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
+     * @throws LoginFailedException If login failed.
+     * @throws RemoteServerException If server communications failed.
 	 */
 	public UseItemReviveResponseOuterClass.UseItemReviveResponse.Result revive()
 			throws LoginFailedException, RemoteServerException {
@@ -563,10 +586,12 @@ public class Pokemon {
 	}
 
 	/**
-	 * Use a revive item on the pokemon. Will check if there is enough revive & if the pokemon need
+	 * Use a revive item on the pokemon. Will check if there is enough revive &amp; if the pokemon need
 	 * to be revived.
-	 *
+	 * @param itemId {@link ItemId} of the Revive to use.
 	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
+     * @throws LoginFailedException If login failed.
+     * @throws RemoteServerException If server communications failed.
 	 */
 	public UseItemReviveResponseOuterClass.UseItemReviveResponse.Result useRevive(ItemId itemId)
 			throws LoginFailedException, RemoteServerException {

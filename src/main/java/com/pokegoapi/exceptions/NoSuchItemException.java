@@ -24,7 +24,7 @@ public class NoSuchItemException extends PokemonGoApiException {
 		super(reason);
 	}
 
-	public NoSuchItemException(Exception exception) {
+	public NoSuchItemException(Throwable exception) {
 		super(exception);
 	}
 }

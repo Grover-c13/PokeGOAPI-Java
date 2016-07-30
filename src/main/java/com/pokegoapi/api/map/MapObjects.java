@@ -28,6 +28,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 @ToString
 public class MapObjects {
@@ -146,7 +147,7 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		for (FortData pokestop : pokestops) {
+		for (FortData pokestop: pokestops) {
 			this.pokestops.add(new Pokestop(api, pokestop));
 		}
 	}
@@ -164,8 +165,7 @@ public class MapObjects {
 
 	/**
 	 * updates the object.
-	 *
-	 *
+	 * @param other Update this {@link MapObjects} data with the provided data.
 	 */
 	public void update(MapObjects other) {
 
@@ -184,8 +184,11 @@ public class MapObjects {
 		spawnPoints.clear();
 		addSpawnPoints(other.getSpawnPoints());
 
-		for (FortData otherGym : other.getGyms()) {
-			for (FortData gym : getGyms()) {
+
+		for (FortData otherGym: other.getGyms()) {
+			Iterator<FortData> iterator = gyms.iterator();
+			while (iterator.hasNext()) {
+				FortData gym = iterator.next();
 				if (otherGym.getId().equals(gym.getId())) {
 					gyms.remove(gym);
 					break;
@@ -194,8 +197,10 @@ public class MapObjects {
 			gyms.add(otherGym);
 		}
 
-		for (Pokestop otherPokestop : other.getPokestops()) {
-			for (Pokestop pokestop : pokestops) {
+		for (Pokestop otherPokestop: other.getPokestops()) {
+			Iterator<Pokestop> iterator = pokestops.iterator();
+			while (iterator.hasNext()) {
+				Pokestop pokestop = iterator.next();
 				if (otherPokestop.getId().equals(pokestop.getId())) {
 					pokestops.remove(pokestop);
 					break;
