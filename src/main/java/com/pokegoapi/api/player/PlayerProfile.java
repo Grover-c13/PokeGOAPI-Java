@@ -41,7 +41,6 @@ import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 import lombok.Getter;
 import lombok.Setter;
-import rx.Observable;
 
 import java.util.HashMap;
 import java.util.Map;
