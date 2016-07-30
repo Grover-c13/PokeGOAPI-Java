@@ -30,13 +30,17 @@ import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass;
 import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass.UseItemCaptureResponse;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.FutureWrapper;
+import com.pokegoapi.util.PokemonFuture;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -61,8 +65,7 @@ public class CatchablePokemon {
 	@Getter
 	private final double longitude;
 
-	@Getter
-	private boolean encountered = false;
+	private Boolean encountered = null;
 
 	/**
 	 * Instantiates a new Catchable pokemon.
@@ -123,6 +126,34 @@ public class CatchablePokemon {
 		this.latitude = proto.getLatitude();
 		this.longitude = proto.getLongitude();
 	}
+	/**
+	 * Encounter pokemon encounter result.
+	 *
+	 * @return the encounter result
+	 */
+	public PokemonFuture<EncounterResult> encounterPokemonAsync() {
+		EncounterMessageOuterClass.EncounterMessage reqMsg = EncounterMessageOuterClass.EncounterMessage
+				.newBuilder().setEncounterId(getEncounterId())
+				.setPlayerLatitude(api.getLatitude())
+				.setPlayerLongitude(api.getLongitude())
+				.setSpawnPointId(getSpawnPointId()).build();
+		AsyncServerRequest serverRequest = new AsyncServerRequest(
+				RequestTypeOuterClass.RequestType.ENCOUNTER, reqMsg);
+		return new FutureWrapper<ByteString, EncounterResult>(api.getRequestHandler().sendAsyncServerRequests(serverRequest)) {
+			@Override
+			protected EncounterResult handle(ByteString result) throws RemoteServerException {
+				EncounterResponseOuterClass.EncounterResponse response;
+				try {
+					response = EncounterResponseOuterClass.EncounterResponse
+							.parseFrom(result);
+				} catch (InvalidProtocolBufferException e) {
+					throw new RemoteServerException(e);
+				}
+				encountered = response.getStatus() == EncounterResponse.Status.ENCOUNTER_SUCCESS;
+				return new EncounterResult(response);
+			}
+		};
+	}
 
 	/**
 	 * Encounter pokemon encounter result.
@@ -135,23 +166,7 @@ public class CatchablePokemon {
 	 */
 	public EncounterResult encounterPokemon() throws LoginFailedException,
 			RemoteServerException {
-		EncounterMessageOuterClass.EncounterMessage reqMsg = EncounterMessageOuterClass.EncounterMessage
-				.newBuilder().setEncounterId(getEncounterId())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
-				.setSpawnPointId(getSpawnPointId()).build();
-		ServerRequest serverRequest = new ServerRequest(
-				RequestTypeOuterClass.RequestType.ENCOUNTER, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-		EncounterResponseOuterClass.EncounterResponse response = null;
-		try {
-			response = EncounterResponseOuterClass.EncounterResponse
-					.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-		encountered = response.getStatus() == EncounterResponse.Status.ENCOUNTER_SUCCESS;
-		return new EncounterResult(response);
+		return encounterPokemonAsync().toBlocking();
 	}
 
 	/**
@@ -415,4 +430,10 @@ public class CatchablePokemon {
 		return (int) this.getEncounterId();
 	}
 
+	public boolean isEncountered() {
+		if (encountered == null) {
+			return false;
+		}
+		return encountered.booleanValue();
+	}
 }
