@@ -26,6 +26,7 @@ import com.pokegoapi.util.Log;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import rx.Observable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -72,6 +73,10 @@ public class RequestHandler {
 		hasRequests = true;
 		serverRequests.add(requestIn);
 		builder.addRequests(requestIn.getRequest());
+	}
+
+	public Observable<ByteString> sendAsyncServerRequests(AsyncServerRequest serverRequest) {
+		return Observable.empty();
 	}
 
 	/**
