@@ -188,7 +188,7 @@ public class Pokestop {
 	 */
 	@Deprecated
 	public boolean hasLurePokemon() {
-		return fortData.hasLureInfo() && fortData.getLureInfo().getLureExpiresTimestampMs() < api.currentTimeMillis();
+		return fortData.hasLureInfo() && fortData.getLureInfo().getLureExpiresTimestampMs() > api.currentTimeMillis();
 	}
 
 	/**
