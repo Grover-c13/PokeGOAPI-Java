@@ -51,6 +51,8 @@ public class RequestHandler {
 	 *
 	 * @param api    the api
 	 * @param client the client
+     * @throws LoginFailedException When login fails
+     * @throws RemoteServerException If request errors occur
 	 */
 	public RequestHandler(PokemonGo api, OkHttpClient client) throws LoginFailedException, RemoteServerException {
 		this.api = api;

@@ -60,6 +60,10 @@ public class Settings {
 	/**
 	 * Settings object that hold different configuration aspect of the game.
 	 * Can be used to simulate the real app behaviour.
+     *
+     * @param api api instance
+     * @throws LoginFailedException If login failed.
+     * @throws RemoteServerException If server communications failed.
 	 */
 	public Settings(PokemonGo api) throws LoginFailedException, RemoteServerException {
 		this.api = api;

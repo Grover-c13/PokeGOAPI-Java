@@ -42,7 +42,7 @@ public final strictfp class S2 {
 
   /**
    * If v is non-zero, return an integer {@code exp} such that
-   * {@code (0.5 <= |v|*2^(-exp) < 1)}. If v is zero, return 0.
+   * {@code (0.5 &lt;= |v|*2^(-exp) &lt; 1)}. If v is zero, return 0.
    *
    * <p>Note that this arguably a bad definition of exponent because it makes
    * {@code exp(9) == 4}. In decimal this would be like saying that the
@@ -50,6 +50,7 @@ public final strictfp class S2 {
    * {@code 1.234 x 10^3}.
    *
    * TODO(dbeaumont): Replace this with "DoubleUtils.getExponent(v) - 1" ?
+   * @param v v
    */
 
   static int exp(double v) {
@@ -99,7 +100,7 @@ public final strictfp class S2 {
    * @param orientation the subcell orientation, in the range [0,3].
    * @param position the position of the subcell in the Hilbert traversal, in
    *     the range [0,3].
-   * @return the IJ-index where {@code 0->(0,0), 1->(0,1), 2->(1,0), 3->(1,1)}.
+   * @return the IJ-index where {@code 0-&gt;(0,0), 1-&gt;(0,1), 2-&gt;(1,0), 3-&gt;(1,1)}.
    * @throws IllegalArgumentException if either parameter is out of bounds.
    */
   public static int posToIJ(int orientation, int position) {
@@ -125,7 +126,7 @@ public final strictfp class S2 {
    *
    * @param orientation the subcell orientation, in the range [0,3].
    * @param ijIndex the subcell index where
-   *     {@code 0->(0,0), 1->(0,1), 2->(1,0), 3->(1,1)}.
+   *     {@code 0-&gt;(0,0), 1-&gt;(0,1), 2-&gt;(1,0), 3-&gt;(1,1)}.
    * @return the position of the subcell in the Hilbert traversal, in the range
    *     [0,3].
    * @throws IllegalArgumentException if either parameter is out of bounds.
@@ -148,6 +149,8 @@ public final strictfp class S2 {
 
     /**
      * Defines a cell metric of the given dimension (1 == length, 2 == area).
+     * @param dim dim
+     * @param deriv deriv
      */
     public Metric(int dim, double deriv) {
       this.deriv = deriv;
@@ -157,18 +160,21 @@ public final strictfp class S2 {
     /**
      * The "deriv" value of a metric is a derivative, and must be multiplied by
      * a length or area in (s,t)-space to get a useful value.
+     * @return deriv
      */
     public double deriv() {
       return deriv;
     }
 
-    /** Return the value of a metric for cells at the given level. */
+    /**
+     * @param level value
+     * @return  the value of a metric for cells at the given level. */
     public double getValue(int level) {
       return StrictMath.scalb(deriv, dim * (1 - level));
     }
 
     /**
-     * Return the level at which the metric has approximately the given value.
+     * @return the level at which the metric has approximately the given value.
      * For example, S2::kAvgEdge.GetClosestLevel(0.1) returns the level at which
      * the average cell edge length is approximately 0.1. The return value is
      * always a valid level.
@@ -178,7 +184,8 @@ public final strictfp class S2 {
     }
 
     /**
-     * Return the minimum level such that the metric is at most the given value,
+     * @param value value
+     * @return the minimum level such that the metric is at most the given value,
      * or S2CellId::kMaxLevel if there is no such level. For example,
      * S2::kMaxDiag.GetMinLevel(0.1) returns the minimum level such that all
      * cell diagonal lengths are 0.1 or smaller. The return value is always a
@@ -200,7 +207,8 @@ public final strictfp class S2 {
     }
 
     /**
-     * Return the maximum level such that the metric is at least the given
+     * @param value value
+     * @return the maximum level such that the metric is at least the given
      * value, or zero if there is no such level. For example,
      * S2.kMinWidth.GetMaxLevel(0.1) returns the maximum level such that all
      * cells have a minimum width of 0.1 or larger. The return value is always a
@@ -224,7 +232,7 @@ public final strictfp class S2 {
   }
 
   /**
-   * Return a unique "origin" on the sphere for operations that need a fixed
+   * @return a unique "origin" on the sphere for operations that need a fixed
    * reference point. It should *not* be a point that is commonly used in edge
    * tests in order to avoid triggering code to handle degenerate cases. (This
    * rules out the north and south poles.)
@@ -398,6 +406,9 @@ public final strictfp class S2 {
   /**
    * Like Area(), but returns a positive value for counterclockwise triangles
    * and a negative value otherwise.
+   * @param a First point.
+   * @param b Second point.
+   * @param c Third point.
    */
   public static double signedArea(S2Point a, S2Point b, S2Point c) {
     return area(a, b, c) * robustCCW(a, b, c);
@@ -672,6 +683,12 @@ public final strictfp class S2 {
   }
 
 
+    /**
+     *
+     * @param a a
+     * @param b b
+     * @return &gt;0 if the edge ab is CCW around the origin.
+     */
   public static int planarCCW(R2Vector a, R2Vector b) {
     // Return +1 if the edge AB is CCW around the origin, etc.
     double sab = (a.dotProd(b) > 0) ? -1 : 1;
@@ -693,6 +710,13 @@ public final strictfp class S2 {
     return 0;
   }
 
+    /**
+     *
+     * @param a a
+     * @param b b
+     * @param c c
+     * @return 1, 0, -1
+     */
   public static int planarOrderedCCW(R2Vector a, R2Vector b, R2Vector c) {
     int sum = 0;
     sum += planarCCW(a, b);
@@ -710,16 +734,22 @@ public final strictfp class S2 {
   /**
    * Return true if the edges OA, OB, and OC are encountered in that order while
    * sweeping CCW around the point O. You can think of this as testing whether
-   * A <= B <= C with respect to a continuous CCW ordering around O.
+   *A &lt;= B &lt;= C with respect to a continuous CCW ordering around O.
    *
    * Properties:
    * <ol>
-   *   <li>If orderedCCW(a,b,c,o) && orderedCCW(b,a,c,o), then a == b</li>
-   *   <li>If orderedCCW(a,b,c,o) && orderedCCW(a,c,b,o), then b == c</li>
-   *   <li>If orderedCCW(a,b,c,o) && orderedCCW(c,b,a,o), then a == b == c</li>
+   *   <li>If orderedCCW(a,b,c,o) &amp;&amp; orderedCCW(b,a,c,o), then a == b</li>
+   *   <li>If orderedCCW(a,b,c,o) &amp;&amp; orderedCCW(a,c,b,o), then b == c</li>
+   *   <li>If orderedCCW(a,b,c,o) &amp;&amp; orderedCCW(c,b,a,o), then a == b == c</li>
    *   <li>If a == b or b == c, then orderedCCW(a,b,c,o) is true</li>
    *   <li>Otherwise if a == c, then orderedCCW(a,b,c,o) is false</li>
    * </ol>
+   *
+   * @param a a
+   * @param b b
+   * @param c c
+   * @param o o
+   * @return true if RobustCCW sum is &gt;=2
    */
   public static boolean orderedCCW(S2Point a, S2Point b, S2Point c, S2Point o) {
     // The last inequality below is ">" rather than ">=" so that we return true
@@ -747,6 +777,11 @@ public final strictfp class S2 {
    *  The angle is undefined if A or C is diametrically opposite from B, and
    * becomes numerically unstable as the length of edge AB or BC approaches 180
    * degrees.
+   *
+   * @param a First point in the triangle.
+   * @param b Second point in the triangle.
+   * @param c Third point in the triangle.
+   * @return angle of the points
    */
   public static double angle(S2Point a, S2Point b, S2Point c) {
     return S2Point.crossProd(a, b).angle(S2Point.crossProd(c, b));
@@ -759,9 +794,9 @@ public final strictfp class S2 {
    * turns at vertex B (positive = left, negative = right). Ensures that
    * TurnAngle(a,b,c) == -TurnAngle(c,b,a) for all a,b,c.
    *
-   * @param a
-   * @param b
-   * @param c
+   * @param a a
+   * @param b b
+   * @param c c
    * @return the exterior angle at the vertex B in the triangle ABC
    */
   public static double turnAngle(S2Point a, S2Point b, S2Point c) {
@@ -774,19 +809,43 @@ public final strictfp class S2 {
   /**
    * Return true if two points are within the given distance of each other
    * (mainly useful for testing).
+   * @param a a
+   * @param b b
+   * @param maxError maxError
+   * @return true if angle of AB is &lt;= maxError.
    */
   public static boolean approxEquals(S2Point a, S2Point b, double maxError) {
     return a.angle(b) <= maxError;
   }
 
+    /**
+     *
+     * @param a a
+     * @param b b
+     * @return boolean
+     */
   public static boolean approxEquals(S2Point a, S2Point b) {
     return approxEquals(a, b, 1e-15);
   }
 
+    /**
+     *
+     * @param a a
+     * @param b b
+     * @param maxError maxError
+     * @return true if the difference of AB &lt;= maxError
+     */
   public static boolean approxEquals(double a, double b, double maxError) {
     return Math.abs(a - b) <= maxError;
   }
 
+
+    /**
+     *
+     * @param a a
+     * @param b b
+     * @return true if the difference of AB &lt;= {@code 1e-15}
+     */
   public static boolean approxEquals(double a, double b) {
     return approxEquals(a, b, 1e-15);
   }
