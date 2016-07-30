@@ -259,15 +259,6 @@ public class Map {
 	}
 
 	/**
-	 * Returns MapObjects around your current location.
-	 *
-	 * @return MapObjects at your current location
-	 */
-	public MapObjects getMapObjects() throws LoginFailedException, RemoteServerException {
-		return getMapObjectsAsync().toBlocking();
-	}
-
-	/**
 	 * Returns MapObjects around your current location within a given width.
 	 *
 	 * @param width width
@@ -276,6 +267,84 @@ public class Map {
 	public PokemonFuture<MapObjects> getMapObjectsAsync(int width) {
 		return getMapObjectsAsync(getCellIds(api.getLatitude(), api.getLongitude(), width));
 	}
+
+	/**
+	 * Returns the cells requested.
+	 *
+	 * @param cellIds List of cellId
+	 * @return MapObjects in the given cells
+	 */
+	public PokemonFuture<MapObjects> getMapObjectsAsync(List<Long> cellIds) {
+		if (useCache && (api.currentTimeMillis() - lastMapUpdate > mapObjectsExpiry)) {
+			lastMapUpdate = 0;
+			cachedMapObjects = new MapObjects(api);
+		}
+
+		GetMapObjectsMessage.Builder builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder()
+				.setLatitude(api.getLatitude())
+				.setLongitude(api.getLongitude());
+
+		int index = 0;
+		for (Long cellId : cellIds) {
+			builder.addCellId(cellId);
+			long time = 0;
+
+			builder.addSinceTimestampMs(lastMapUpdate);
+			index++;
+
+		}
+		final AsyncServerRequest asyncServerRequest = new AsyncServerRequest(
+				RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS, builder.build());
+		return new FutureWrapper<ByteString, MapObjects>(api.getRequestHandler()
+				.sendAsyncServerRequests(asyncServerRequest)) {
+			@Override
+			protected MapObjects handle(ByteString byteString) throws RemoteServerException {
+				GetMapObjectsResponseOuterClass.GetMapObjectsResponse response;
+				try {
+					response = GetMapObjectsResponseOuterClass.GetMapObjectsResponse.parseFrom(byteString);
+				} catch (InvalidProtocolBufferException e) {
+					throw new RemoteServerException(e);
+				}
+
+				MapObjects result = new MapObjects(api);
+				for (MapCellOuterClass.MapCell mapCell : response.getMapCellsList()) {
+					result.addNearbyPokemons(mapCell.getNearbyPokemonsList());
+					result.addCatchablePokemons(mapCell.getCatchablePokemonsList());
+					result.addWildPokemons(mapCell.getWildPokemonsList());
+					result.addDecimatedSpawnPoints(mapCell.getDecimatedSpawnPointsList());
+					result.addSpawnPoints(mapCell.getSpawnPointsList());
+
+
+					java.util.Map<FortType, List<FortData>> groupedForts = Stream.of(mapCell.getFortsList())
+							.collect(Collectors.groupingBy(new Function<FortData, FortType>() {
+								@Override
+								public FortType apply(FortData fortData) {
+									return fortData.getType();
+								}
+							}));
+					result.addGyms(groupedForts.get(FortType.GYM));
+					result.addPokestops(groupedForts.get(FortType.CHECKPOINT));
+				}
+				if (useCache) {
+					cachedMapObjects.update(result);
+					result = cachedMapObjects;
+					lastMapUpdate = api.currentTimeMillis();
+				}
+
+				return result;
+			}
+		};
+	}
+
+	/**
+	 * Returns MapObjects around your current location.
+	 *
+	 * @return MapObjects at your current location
+	 */
+	public MapObjects getMapObjects() throws LoginFailedException, RemoteServerException {
+		return getMapObjectsAsync().toBlocking();
+	}
+
 	/**
 	 * Returns MapObjects around your current location within a given width.
 	 *
@@ -350,73 +419,6 @@ public class Map {
 	 * @param cellIds List of cellId
 	 * @return MapObjects in the given cells
 	 */
-	public PokemonFuture<MapObjects> getMapObjectsAsync(List<Long> cellIds)  {
-		if (useCache && (api.currentTimeMillis() - lastMapUpdate > mapObjectsExpiry)) {
-			lastMapUpdate = 0;
-			cachedMapObjects = new MapObjects(api);
-		}
-
-		GetMapObjectsMessage.Builder builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder()
-				.setLatitude(api.getLatitude())
-				.setLongitude(api.getLongitude());
-
-		int index = 0;
-		for (Long cellId : cellIds) {
-			builder.addCellId(cellId);
-			long time = 0;
-
-			builder.addSinceTimestampMs(lastMapUpdate);
-			index++;
-
-		}
-		final AsyncServerRequest asyncServerRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS, builder.build());
-		return new FutureWrapper<ByteString, MapObjects>(api.getRequestHandler().sendAsyncServerRequests(asyncServerRequest)) {
-			@Override
-			protected MapObjects handle(ByteString byteString) throws RemoteServerException {
-				GetMapObjectsResponseOuterClass.GetMapObjectsResponse response;
-				try {
-					response = GetMapObjectsResponseOuterClass.GetMapObjectsResponse.parseFrom(byteString);
-				} catch (InvalidProtocolBufferException e) {
-					throw new RemoteServerException(e);
-				}
-
-				MapObjects result = new MapObjects(api);
-				for (MapCellOuterClass.MapCell mapCell : response.getMapCellsList()) {
-					result.addNearbyPokemons(mapCell.getNearbyPokemonsList());
-					result.addCatchablePokemons(mapCell.getCatchablePokemonsList());
-					result.addWildPokemons(mapCell.getWildPokemonsList());
-					result.addDecimatedSpawnPoints(mapCell.getDecimatedSpawnPointsList());
-					result.addSpawnPoints(mapCell.getSpawnPointsList());
-
-
-
-					java.util.Map<FortType, List<FortData>> groupedForts = Stream.of(mapCell.getFortsList())
-							.collect(Collectors.groupingBy(new Function<FortData, FortType>() {
-								@Override
-								public FortType apply(FortData fortData) {
-									return fortData.getType();
-								}
-							}));
-					result.addGyms(groupedForts.get(FortType.GYM));
-					result.addPokestops(groupedForts.get(FortType.CHECKPOINT));
-				}
-				if (useCache) {
-					cachedMapObjects.update(result);
-					result = cachedMapObjects;
-					lastMapUpdate = api.currentTimeMillis();
-				}
-
-				return result;
-			}
-		};
-	}
-
-	/**
-	 * Returns the cells requested.
-	 *
-	 * @param cellIds List of cellId
-	 * @return MapObjects in the given cells
-	 */
 	public MapObjects getMapObjects(List<Long> cellIds) throws LoginFailedException, RemoteServerException {
 		return getMapObjectsAsync(cellIds).toBlocking();
 	}
@@ -446,7 +448,8 @@ public class Map {
 		int halfWidth = (int) Math.floor(width / 2);
 		for (int x = -halfWidth; x <= halfWidth; x++) {
 			for (int y = -halfWidth; y <= halfWidth; y++) {
-				cells.add(S2CellId.fromFaceIJ(face, index.intValue() + x * size, jindex.intValue() + y * size).parent(15).id());
+				cells.add(S2CellId.fromFaceIJ(face, index.intValue() + x * size, jindex.intValue() + y * size)
+						.parent(15).id());
 			}
 		}
 		return cells;
@@ -467,8 +470,10 @@ public class Map {
 				.setLongitude(lon)
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS, reqMsg);
-		return new FutureWrapper<ByteString, FortDetails>(api.getRequestHandler().sendAsyncServerRequests(serverRequest)) {
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS,
+				reqMsg);
+		return new FutureWrapper<ByteString, FortDetails>(api.getRequestHandler()
+				.sendAsyncServerRequests(serverRequest)) {
 			@Override
 			protected FortDetails handle(ByteString byteString) throws RemoteServerException {
 				FortDetailsResponseOuterClass.FortDetailsResponse response;
@@ -481,6 +486,7 @@ public class Map {
 			}
 		};
 	}
+
 	/**
 	 * Gets fort details.
 	 *
@@ -491,7 +497,8 @@ public class Map {
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 */
-	public FortDetails getFortDetails(String id, long lon, long lat) throws LoginFailedException, RemoteServerException {
+	public FortDetails getFortDetails(String id, long lon, long lat)
+			throws LoginFailedException, RemoteServerException {
 		return getFortDetailsAsync(id, lon, lat).toBlocking();
 	}
 

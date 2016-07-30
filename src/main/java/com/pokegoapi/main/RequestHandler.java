@@ -33,8 +33,20 @@ import okhttp3.Response;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class RequestHandler implements Runnable {
 	private static final String TAG = RequestHandler.class.getSimpleName();
@@ -45,7 +57,7 @@ public class RequestHandler implements Runnable {
 
 	private final ExecutorService executorService = Executors.newFixedThreadPool(1);
 	private final BlockingQueue<AsyncServerRequest> workQueue = new LinkedBlockingQueue<>();
-	private final Map<Long,ResultOrException> resultMap = new HashMap<>();
+	private final Map<Long, ResultOrException> resultMap = new HashMap<>();
 
 	/**
 	 * Instantiates a new Request handler.
@@ -60,6 +72,12 @@ public class RequestHandler implements Runnable {
 		executorService.submit(this);
 	}
 
+	/**
+	 * Make an async server request. The answer will be provided in the future
+	 *
+	 * @param serverRequest Request to make
+	 * @return ByteString response to be processed in the future
+	 */
 	public Future<ByteString> sendAsyncServerRequests(final AsyncServerRequest serverRequest) {
 		workQueue.offer(serverRequest);
 		return new Future<ByteString>() {
@@ -91,7 +109,8 @@ public class RequestHandler implements Runnable {
 			}
 
 			@Override
-			public ByteString get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+			public ByteString get(long timeout, TimeUnit unit)
+					throws InterruptedException, ExecutionException, TimeoutException {
 				ResultOrException resultOrException = getResult(timeout, unit);
 				if (resultOrException == null) {
 					throw new TimeoutException("No result found");
@@ -116,13 +135,20 @@ public class RequestHandler implements Runnable {
 		};
 	}
 
+	/**
+	 * Sends multiple ServerRequests in a thread safe manner.
+	 *
+	 * @param serverRequests list of ServerRequests to be sent
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException  the login failed exception
+	 */
 	public void sendServerRequests(ServerRequest... serverRequests) throws RemoteServerException, LoginFailedException {
 		List<Future<ByteString>> futures = new ArrayList<>(serverRequests.length);
 		for (ServerRequest request : serverRequests) {
 			AsyncServerRequest asyncServerRequest = new AsyncServerRequest(request.getType(), request.getRequest());
 			futures.add(sendAsyncServerRequests(asyncServerRequest));
 		}
-		for (int i=0;i!=serverRequests.length;i++) {
+		for (int i = 0; i != serverRequests.length; i++) {
 			serverRequests[i].handleData(FutureWrapper.toBlocking(futures.get(i)));
 		}
 	}
@@ -134,12 +160,15 @@ public class RequestHandler implements Runnable {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
-	private AuthTicketOuterClass.AuthTicket internalSendServerRequests(AuthTicketOuterClass.AuthTicket authTicket, ServerRequest... serverRequests) throws RemoteServerException, LoginFailedException {
+	private AuthTicketOuterClass.AuthTicket internalSendServerRequests(AuthTicketOuterClass.AuthTicket authTicket,
+			ServerRequest... serverRequests)
+			throws RemoteServerException, LoginFailedException {
 		AuthTicketOuterClass.AuthTicket newAuthTicket = authTicket;
 		if (serverRequests.length == 0) {
 			return authTicket;
 		}
-		RequestEnvelopeOuterClass.RequestEnvelope.Builder builder = RequestEnvelopeOuterClass.RequestEnvelope.newBuilder();
+		RequestEnvelopeOuterClass.RequestEnvelope.Builder builder = RequestEnvelopeOuterClass.RequestEnvelope
+				.newBuilder();
 		resetBuilder(builder, authTicket);
 
 		for (ServerRequest serverRequest : serverRequests) {
@@ -213,7 +242,8 @@ public class RequestHandler implements Runnable {
 		return newAuthTicket;
 	}
 
-	private void resetBuilder(RequestEnvelopeOuterClass.RequestEnvelope.Builder builder, AuthTicketOuterClass.AuthTicket authTicket)
+	private void resetBuilder(RequestEnvelopeOuterClass.RequestEnvelope.Builder builder,
+								AuthTicketOuterClass.AuthTicket authTicket)
 			throws LoginFailedException, RemoteServerException {
 		builder.setStatusCode(2);
 		builder.setRequestId(getRequestId());
@@ -250,28 +280,25 @@ public class RequestHandler implements Runnable {
 			}
 			workQueue.drainTo(requests);
 			ServerRequest[] serverRequests = new ServerRequest[requests.size()];
-			for (int i=0;i!=requests.size();i++) {
+			for (int i = 0; i != requests.size(); i++) {
 				serverRequests[i] = new ServerRequest(requests.get(i).getType(), requests.get(i).getRequest());
 			}
 			try {
 				authTicket = internalSendServerRequests(authTicket, serverRequests);
-				for (int i=0;i!=requests.size();i++) {
+				for (int i = 0; i != requests.size(); i++) {
 					try {
 						resultMap.put(requests.get(i).getId(), ResultOrException.getResult(serverRequests[i].getData()));
-					}
-					catch (InvalidProtocolBufferException e) {
+					} catch (InvalidProtocolBufferException e) {
 						resultMap.put(requests.get(i).getId(), ResultOrException.getError(e));
 					}
 				}
 				continue;
-			}
-			catch (RemoteServerException | LoginFailedException e) {
+			} catch (RemoteServerException | LoginFailedException e) {
 				for (AsyncServerRequest request : requests) {
 					resultMap.put(request.getId(), ResultOrException.getError(e));
 				}
 				continue;
-			}
-			finally {
+			} finally {
 				requests.clear();
 			}
 		}

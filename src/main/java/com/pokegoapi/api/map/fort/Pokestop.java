@@ -66,6 +66,7 @@ public class Pokestop {
 
 	/**
 	 * Returns whether or not a pokestop is in range.
+	 *
 	 * @return true when in range of player
 	 */
 	public boolean inRange() {
@@ -77,6 +78,7 @@ public class Pokestop {
 
 	/**
 	 * can user loot this from current position.
+	 *
 	 * @return true when lootable
 	 */
 	public boolean canLoot() {
@@ -123,8 +125,10 @@ public class Pokestop {
 				.setPlayerLongitude(api.getLongitude())
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH, searchMessage);
-		return new FutureWrapper<ByteString, PokestopLootResult>(api.getRequestHandler().sendAsyncServerRequests(serverRequest)) {
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH,
+				searchMessage);
+		return new FutureWrapper<ByteString, PokestopLootResult>(api.getRequestHandler()
+				.sendAsyncServerRequests(serverRequest)) {
 			@Override
 			protected PokestopLootResult handle(ByteString result) throws RemoteServerException, LoginFailedException {
 				FortSearchResponseOuterClass.FortSearchResponse response;
@@ -176,11 +180,12 @@ public class Pokestop {
 			}
 		};
 	}
+
 	/**
 	 * Adds a modifier to this pokestop. (i.e. add a lure module)
 	 *
 	 * @param item the modifier to add to this pokestop
-	 * @throws LoginFailedException if login failed
+	 * @throws LoginFailedException  if login failed
 	 * @throws RemoteServerException if the server failed to respond or the modifier could not be added to this pokestop
 	 */
 	public void addModifier(ItemIdOuterClass.ItemId item) throws LoginFailedException, RemoteServerException {
@@ -228,6 +233,7 @@ public class Pokestop {
 
 	/**
 	 * Returns whether this pokestop has an active lure.
+	 *
 	 * @return lure status
 	 */
 	@Deprecated
@@ -237,6 +243,7 @@ public class Pokestop {
 
 	/**
 	 * Returns whether this pokestop has an active lure.
+	 *
 	 * @return lure status
 	 */
 	public boolean hasLure() throws LoginFailedException, RemoteServerException {

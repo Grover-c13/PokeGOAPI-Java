@@ -1,3 +1,18 @@
+/*
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.pokegoapi.util;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -68,10 +83,26 @@ public abstract class FutureWrapper<T, R> implements PokemonFuture<R> {
 
 	protected abstract R handle(T result) throws RemoteServerException, LoginFailedException;
 
+	/**
+	 * Convert a future to its result
+	 *
+	 * @return The result or an unwrapped exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException  the login failed exception
+	 */
 	public R toBlocking() throws LoginFailedException, RemoteServerException {
 		return FutureWrapper.toBlocking(this);
 	}
 
+	/**
+	 * Convert a future to its result
+	 *
+	 * @param future The future
+	 * @param <N>    Result type
+	 * @return The result or an unwrapped exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException  the login failed exception
+	 */
 	public static <N> N toBlocking(Future<N> future) throws LoginFailedException, RemoteServerException {
 		try {
 			return future.get();
