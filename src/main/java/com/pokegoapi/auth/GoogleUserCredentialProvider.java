@@ -18,11 +18,12 @@ package com.pokegoapi.auth;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.util.Log;
+import com.pokegoapi.util.Time;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import com.squareup.moshi.Moshi;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -31,13 +32,14 @@ import okhttp3.Response;
 
 import java.io.IOException;
 
+@Slf4j
 public class GoogleUserCredentialProvider extends CredentialProvider {
 
 	public static final String SECRET = "NCjF1TLi2CcY6t5mt0ZveuL7";
 	public static final String CLIENT_ID = "848232511240-73ri3t7plvk96pj4f85uj8otdat2alem.apps.googleusercontent.com";
 	public static final String OAUTH_TOKEN_ENDPOINT = "https://www.googleapis.com/oauth2/v4/token";
 	public static final String LOGIN_URL = "https://accounts.google.com/o/oauth2/auth?client_id=848232511240-73ri3t7plvk96pj4f85uj8otdat2alem.apps.googleusercontent.com&redirect_uri=urn%3Aietf%3Awg%3Aoauth%3A2.0%3Aoob&response_type=code&scope=openid%20email%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email";
-	private static final String TAG = GoogleUserCredentialProvider.class.getSimpleName();
+
 	//We try and refresh token 5 minutes before it actually expires
 	private static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
 	private final OkHttpClient client;
@@ -153,14 +155,14 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 		GoogleAuthTokenJson googleAuthTokenJson = null;
 		try {
 			googleAuthTokenJson = moshi.adapter(GoogleAuthTokenJson.class).fromJson(response.body().string());
-			Log.d(TAG, "" + googleAuthTokenJson.getExpiresIn());
+			log.debug("" + googleAuthTokenJson.getExpiresIn());
 		} catch (IOException e) {
 			throw new RemoteServerException("Failed to unmarshal the Json response to fetch refreshed tokenId", e);
 		}
 		if (googleAuthTokenJson.getError() != null) {
 			throw new LoginFailedException(googleAuthTokenJson.getError());
 		} else {
-			Log.d(TAG, "Refreshed Token " + googleAuthTokenJson.getIdToken());
+			log.debug("Refreshed Token " + googleAuthTokenJson.getIdToken());
 			expiresTimestamp = time.currentTimeMillis()
 					+ (googleAuthTokenJson.getExpiresIn() * 1000 - REFRESH_TOKEN_BUFFER_TIME);
 			tokenId = googleAuthTokenJson.getIdToken();
@@ -201,19 +203,19 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 		GoogleAuthTokenJson googleAuth = null;
 		try {
 			googleAuth = moshi.adapter(GoogleAuthTokenJson.class).fromJson(response.body().string());
-			Log.d(TAG, "" + googleAuth.getExpiresIn());
+			log.debug( "" + googleAuth.getExpiresIn());
 		} catch (IOException e) {
 			throw new RemoteServerException("Failed to unmarshell the Json response to fetch tokenId", e);
 		}
 
-		Log.d(TAG, "Got token: " + googleAuth.getAccessToken());
+		log.debug("Got token: " + googleAuth.getAccessToken());
 
 		expiresTimestamp = time.currentTimeMillis()
 				+ (googleAuth.getExpiresIn() * 1000 - REFRESH_TOKEN_BUFFER_TIME);
 		tokenId = googleAuth.getIdToken();
 		refreshToken = googleAuth.getRefreshToken();
 	}
-	
+
 	@Override
 	public String getTokenId() throws LoginFailedException, RemoteServerException {
 		if (isTokenIdExpired()) {

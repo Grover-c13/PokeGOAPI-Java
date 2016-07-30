@@ -2,6 +2,9 @@
 # PokeGOAPI-Java
 Pokemon GO Java API
 
+The original https://github.com/Grover-c13/PokeGOAPI-Java is more aimed at Android where this is aimed at writing a bot. 
+This means different design choices are made. I will try to keep it up to date with the original repo as much as possible. 
+
 [![Build Status](https://travis-ci.org/Grover-c13/PokeGOAPI-Java.svg?branch=master)](https://travis-ci.org/Grover-c13/PokeGOAPI-Java)
 [![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
 

@@ -24,8 +24,8 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.AsyncPokemonGoException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import lombok.extern.slf4j.Slf4j;
 import com.pokegoapi.util.FutureWrapper;
-import com.pokegoapi.util.Log;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -48,8 +48,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+@Slf4j
 public class RequestHandler implements Runnable {
-	private static final String TAG = RequestHandler.class.getSimpleName();
 	private final PokemonGo api;
 	private String apiEndpoint;
 	private OkHttpClient client;
@@ -182,7 +182,7 @@ public class RequestHandler implements Runnable {
 		try {
 			request.writeTo(stream);
 		} catch (IOException e) {
-			Log.wtf(TAG, "Failed to write request to bytearray ouput stream. This should never happen", e);
+			log.error("Failed to write request to bytearray ouput stream. This should never happen", e);
 		}
 
 		RequestBody body = RequestBody.create(null, stream.toByteArray());
@@ -254,7 +254,7 @@ public class RequestHandler implements Runnable {
 				&& authTicket.getExpireTimestampMs() > api.currentTimeMillis()) {
 			builder.setAuthTicket(authTicket);
 		} else {
-			Log.d(TAG, "Authenticated with static token");
+			log.debug("Authenticated with static token");
 			builder.setAuthInfo(api.getAuthInfo());
 		}
 		builder.setUnknown12(989);

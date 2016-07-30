@@ -44,16 +44,15 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.Log;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The type Pokemon.
  */
+@Slf4j
 public class Pokemon {
-
-	private static final String TAG = Pokemon.class.getSimpleName();
 	private final PokemonGo pgo;
 	private PokemonData proto;
 	private PokemonMeta meta;
@@ -383,7 +382,7 @@ public class Pokemon {
 	}
 
 	public void debug() {
-		Log.d(TAG, proto.toString());
+		log.debug(proto.toString());
 	}
 
 

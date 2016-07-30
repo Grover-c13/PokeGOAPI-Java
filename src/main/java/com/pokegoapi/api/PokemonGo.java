@@ -28,12 +28,12 @@ import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 
-
+@Slf4j
 public class PokemonGo {
 
-	private static final java.lang.String TAG = PokemonGo.class.getSimpleName();
 	private final Time time;
 	@Getter
 	RequestHandler requestHandler;

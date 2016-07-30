@@ -15,7 +15,7 @@
 
 package com.pokegoapi.exceptions;
 
-public class NoSuchItemException extends Exception {
+public class NoSuchItemException extends PokemonGoApiException {
 	public NoSuchItemException() {
 		super();
 	}
