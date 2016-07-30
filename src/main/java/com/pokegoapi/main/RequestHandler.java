@@ -199,7 +199,7 @@ public class RequestHandler implements Runnable {
 
 			/**
 			 * map each reply to the numeric response,
-			 * ie first response = first request and send back to the requests to handle.
+			 * ie first response = first request and send back to the requests to toBlocking.
 			 * */
 			int count = 0;
 			for (ByteString payload : responseEnvelop.getReturnsList()) {
@@ -281,7 +281,7 @@ public class RequestHandler implements Runnable {
 		}
 
 		// map each reply to the numeric response,
-		// ie first response = first request and send back to the requests to handle.
+		// ie first response = first request and send back to the requests to toBlocking.
 		int count = 0;
 		for (ByteString payload : responseEnvelop.getReturnsList()) {
 			ServerRequest serverReq = serverRequests.get(count);
