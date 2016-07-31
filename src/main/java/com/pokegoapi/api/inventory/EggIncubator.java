@@ -26,7 +26,6 @@ import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
-import lombok.Getter;
 
 public class EggIncubator {
 	private final EggIncubatorOuterClass.EggIncubator proto;

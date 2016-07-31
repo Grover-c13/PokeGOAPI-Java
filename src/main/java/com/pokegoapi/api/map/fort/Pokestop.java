@@ -32,13 +32,11 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.FutureWrapper;
 import com.pokegoapi.util.PokemonFuture;
 import lombok.Getter;
 
 import java.util.List;
-import java.util.concurrent.Future;
 
 /**
  * Created by mjmfighter on 7/20/2016.

@@ -31,7 +31,6 @@
 package com.pokegoapi.examples;
 
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse.Result;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.gym.Battle;

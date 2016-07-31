@@ -21,7 +21,6 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import okhttp3.OkHttpClient;
 
-
 import java.util.Scanner;
 
 public class GoogleUserInteractionExample {

@@ -1,7 +1,6 @@
 package com.pokegoapi.api.settings;
 
 import POGOProtos.Settings.InventorySettingsOuterClass;
-import POGOProtos.Settings.MapSettingsOuterClass;
 
 /**
  * Created by rama on 27/07/16.

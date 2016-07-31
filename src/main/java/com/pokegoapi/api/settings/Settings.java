@@ -1,18 +1,13 @@
 package com.pokegoapi.api.settings;
 
-import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
-import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.Log;
 import lombok.Getter;
 
 /**
