@@ -33,8 +33,18 @@ import okhttp3.Response;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class RequestHandler implements Runnable {
 	private static final String TAG = RequestHandler.class.getSimpleName();
@@ -43,7 +53,7 @@ public class RequestHandler implements Runnable {
 	private OkHttpClient client;
 	private Long requestId = new Random().nextLong();
 
-	private final ExecutorService executorService = Executors.newFixedThreadPool(1);
+	private final Thread asyncHttpThread;
 	private final BlockingQueue<AsyncServerRequest> workQueue = new LinkedBlockingQueue<>();
 	private final Map<Long, ResultOrException> resultMap = new HashMap<>();
 
@@ -59,7 +69,9 @@ public class RequestHandler implements Runnable {
 		this.api = api;
 		this.client = client;
 		apiEndpoint = ApiSettings.API_ENDPOINT;
-		executorService.submit(this);
+		asyncHttpThread = new Thread(this, "Async HTTP Thread");
+		asyncHttpThread.setDaemon(true);
+		asyncHttpThread.start();
 	}
 
 	/**
