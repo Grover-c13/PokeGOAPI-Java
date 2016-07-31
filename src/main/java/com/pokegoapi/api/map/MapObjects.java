@@ -28,25 +28,26 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 
 @ToString
 public class MapObjects {
 
 	@Getter
-	Collection<NearbyPokemon> nearbyPokemons = new ArrayList<NearbyPokemon>();
+	Collection<NearbyPokemon> nearbyPokemons = Collections.synchronizedCollection(new ArrayList<NearbyPokemon>());
 	@Getter
-	Collection<MapPokemon> catchablePokemons = new ArrayList<MapPokemon>();
+	Collection<MapPokemon> catchablePokemons = Collections.synchronizedCollection(new ArrayList<MapPokemon>());
 	@Getter
-	Collection<WildPokemon> wildPokemons = new ArrayList<WildPokemon>();
+	Collection<WildPokemon> wildPokemons = Collections.synchronizedCollection(new ArrayList<WildPokemon>());
 	@Getter
-	Collection<SpawnPoint> decimatedSpawnPoints = new ArrayList<SpawnPoint>();
+	Collection<SpawnPoint> decimatedSpawnPoints = Collections.synchronizedCollection(new ArrayList<SpawnPoint>());
 	@Getter
-	Collection<SpawnPoint> spawnPoints = new ArrayList<SpawnPoint>();
+	Collection<SpawnPoint> spawnPoints = Collections.synchronizedCollection(new ArrayList<SpawnPoint>());
 	@Getter
-	Collection<FortData> gyms = new ArrayList<FortData>();
+	Collection<FortData> gyms = Collections.synchronizedCollection(new ArrayList<FortData>());
 	@Getter
-	Collection<Pokestop> pokestops = new ArrayList<>();
+	Collection<Pokestop> pokestops = Collections.synchronizedCollection(new ArrayList<Pokestop>());
 	boolean complete = false;
 	private PokemonGo api;
 
@@ -167,6 +168,7 @@ public class MapObjects {
 	 * updates the object.
 	 * @param other Update this {@link MapObjects} data with the provided data.
 	 */
+	@Deprecated
 	public void update(MapObjects other) {
 
 		nearbyPokemons.clear();
@@ -185,7 +187,7 @@ public class MapObjects {
 		addSpawnPoints(other.getSpawnPoints());
 
 
-		for (FortData otherGym: other.getGyms()) {
+		/* for (FortData otherGym: other.getGyms()) {
 			Iterator<FortData> iterator = gyms.iterator();
 			while (iterator.hasNext()) {
 				FortData gym = iterator.next();
@@ -197,7 +199,7 @@ public class MapObjects {
 			gyms.add(otherGym);
 		}
 
-		for (Pokestop otherPokestop: other.getPokestops()) {
+		/*for (Pokestop otherPokestop: other.getPokestops()) {
 			Iterator<Pokestop> iterator = pokestops.iterator();
 			while (iterator.hasNext()) {
 				Pokestop pokestop = iterator.next();
@@ -207,6 +209,6 @@ public class MapObjects {
 				}
 			}
 			pokestops.add(otherPokestop);
-		}
+		}*/
 	}
 }
