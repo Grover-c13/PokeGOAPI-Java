@@ -43,7 +43,7 @@ public class RequestHandler implements Runnable {
 	private OkHttpClient client;
 	private Long requestId = new Random().nextLong();
 
-	private final ExecutorService executorService = Executors.newFixedThreadPool(1);
+	private final Thread asyncHttpThread;
 	private final BlockingQueue<AsyncServerRequest> workQueue = new LinkedBlockingQueue<>();
 	private final Map<Long, ResultOrException> resultMap = new HashMap<>();
 
@@ -59,7 +59,9 @@ public class RequestHandler implements Runnable {
 		this.api = api;
 		this.client = client;
 		apiEndpoint = ApiSettings.API_ENDPOINT;
-		executorService.submit(this);
+		asyncHttpThread = new Thread(this, "Async HTTP Thread");
+		asyncHttpThread.setDaemon(true);
+		asyncHttpThread.start();
 	}
 
 	/**
