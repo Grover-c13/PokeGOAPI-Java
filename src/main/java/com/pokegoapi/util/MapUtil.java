@@ -12,6 +12,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.pokegoapi.util;
 
 import com.pokegoapi.api.PokemonGo;
@@ -72,14 +73,13 @@ public class MapUtil<K extends MapPoint> {
 	 */
 	public static double distFrom(double lat1, double lng1, double lat2, double lng2) {
 		double earthRadius = 6371000;
-		double dLat = Math.toRadians(lat2 - lat1);
-		double dLng = Math.toRadians(lng2 - lng1);
-		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-				Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-						Math.sin(dLng / 2) * Math.sin(dLng / 2);
-		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+		double lat = Math.toRadians(lat2 - lat1);
+		double lng = Math.toRadians(lng2 - lng1);
+		double a = Math.sin(lat / 2) * Math.sin(lat / 2)
+				+ Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+				* Math.sin(lng / 2) * Math.sin(lng / 2);
 
-		return earthRadius * c;
+		return earthRadius * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 	}
 
 	/**

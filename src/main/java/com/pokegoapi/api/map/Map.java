@@ -130,7 +130,8 @@ public class Map {
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 */
-	public java.util.Map<Double, CatchablePokemon> getCatchablePokemonSort() throws LoginFailedException, RemoteServerException {
+	public java.util.Map<Double, CatchablePokemon> getCatchablePokemonSort()
+			throws LoginFailedException, RemoteServerException {
 		MapUtil<CatchablePokemon> util = new MapUtil<>();
 		return util.sortItems(getCatchablePokemon(), api);
 	}
