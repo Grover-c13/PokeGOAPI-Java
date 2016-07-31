@@ -25,6 +25,7 @@ import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.UseItemCaptureMessageOuterClass.UseItemCaptureMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
+import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass.UseItemCaptureResponse;
@@ -342,8 +343,9 @@ public class CatchablePokemon {
 				razberries++;
 			}
 			result = catchPokemonAsync(normalizedHitPosition, normalizedReticleSize, spinModifier, type).toBlocking();
-			if (!result.isFailed() && result.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_ESCAPE
-					&& result.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_MISSED) {
+			if (!result.isFailed() && result.getStatus() != CatchStatus.CATCH_ESCAPE
+					&& result.getStatus() != CatchStatus.CATCH_MISSED
+					|| result.getStatus() == CatchStatus.CATCH_FLEE) {
 				break;
 			}
 			numThrows++;
@@ -394,14 +396,22 @@ public class CatchablePokemon {
 			@Override
 			protected CatchResult handle(ByteString result) throws RemoteServerException, LoginFailedException {
 				CatchPokemonResponse response;
+
 				try {
 					response = CatchPokemonResponse.parseFrom(result);
+					System.out.println(response);
 				} catch (InvalidProtocolBufferException e) {
 					throw new RemoteServerException(e);
 				}
 
-				if (response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_ESCAPE
-						&& response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_MISSED) {
+				if (response.getStatus() == CatchStatus.CATCH_FLEE ||
+						response.getStatus() == CatchStatus.CATCH_SUCCESS) {
+					api.getMap().getCatchablePokemon().remove(this);
+				}
+
+
+				if (response.getStatus() != CatchStatus.CATCH_ESCAPE
+						&& response.getStatus() != CatchStatus.CATCH_MISSED) {
 					api.getInventories().updateInventories();
 					return new CatchResult(response);
 				} else {
