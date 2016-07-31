@@ -16,6 +16,7 @@
 package com.pokegoapi.api;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
@@ -41,7 +42,6 @@ public class PokemonGo {
 	Map map;
 	@Getter
 	private PlayerProfile playerProfile;
-	@Getter
 	private Inventories inventories;
 	@Getter
 	@Setter
@@ -53,7 +53,6 @@ public class PokemonGo {
 	@Setter
 	private double altitude;
 	private CredentialProvider credentialProvider;
-	@Getter
 	private Settings settings;
 
 	/**
@@ -77,10 +76,7 @@ public class PokemonGo {
 
 		// send profile request to get the ball rolling
 		requestHandler = new RequestHandler(this, client);
-		
 		playerProfile = new PlayerProfile(this);
-		inventories = new Inventories(this);
-		settings = new Settings(this);
 
 		// should have proper end point now.
 		map = new Map(this);
@@ -106,7 +102,7 @@ public class PokemonGo {
 	 * @return AuthInfo object
 	 * @throws LoginFailedException when login fails
 	 */
-	public RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo getAuthInfo()
+	public AuthInfo getAuthInfo()
 			throws LoginFailedException, RemoteServerException {
 		return credentialProvider.getAuthInfo();
 	}
@@ -126,5 +122,34 @@ public class PokemonGo {
 
 	public long currentTimeMillis() {
 		return time.currentTimeMillis();
+	}
+
+	/**
+	 * Get the inventories API
+	 *
+	 * @return Inventories
+	 * @throws LoginFailedException when login fails
+	 * @throws RemoteServerException when server down/issue
+	 */
+	public Inventories getInventories() throws LoginFailedException, RemoteServerException {
+		if (inventories == null) {
+			inventories = new Inventories(this);
+		}
+		return inventories;
+	}
+
+
+	/**
+	 * Get the settings API
+	 *
+	 * @return Settings
+	 * @throws LoginFailedException when login fails
+	 * @throws RemoteServerException when server down/issue
+	 */
+	public Settings getSettings() throws LoginFailedException, RemoteServerException {
+		if (settings == null) {
+			settings = new Settings(this);
+		}
+		return settings;
 	}
 }
