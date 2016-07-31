@@ -51,7 +51,9 @@ public class ServerRequest {
 	 *
 	 * @param bytes the bytes
 	 */
-	public void handleData(ByteString bytes) {
+	public void handleData(ByteString bytes) throws InvalidProtocolBufferException {
+		// TODO: Throw exception here when bytes are null instead of when getting data?
+		// if(data == null || data.isEmpty()){ throw new InvalidProtocolBufferException("Cannot set empty buffer contents!"); }
 		this.data = bytes;
 	}
 

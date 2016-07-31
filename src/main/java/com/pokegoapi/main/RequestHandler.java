@@ -16,6 +16,7 @@
 package com.pokegoapi.main;
 
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass;
+import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass;
 import com.google.protobuf.ByteString;
@@ -29,20 +30,29 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import rx.Observable;
 import rx.functions.Func0;
+import rx.functions.Func1;
+import rx.observables.BlockingObservable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class RequestHandler {
 	private static final String TAG = RequestHandler.class.getSimpleName();
+	private final ThreadPoolExecutor threadPoolExecutor =
+			new ThreadPoolExecutor(1,3,500, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(3));
+
 	private final PokemonGo api;
 	private final OkHttpClient client;
 	private String apiEndpoint = ApiSettings.API_ENDPOINT;
-	private AuthTicketOuterClass.AuthTicket lastAuth;
+	private AuthTicket lastAuth = null;
 	private Long requestId = new Random().nextLong();
 	private Long lastRequestMs = 0L;
+
 
 	public RequestHandler(final PokemonGo api, final OkHttpClient client) {
 		this.api = api;
@@ -50,134 +60,9 @@ public class RequestHandler {
 	}
 
 	private boolean hasValidAuthTicket() {
-		return !(getLastAuth() != null && getLastAuth().getExpireTimestampMs() > 0
+		return (getLastAuth() != null
+				&& getLastAuth().getExpireTimestampMs() > 0
 				&& getLastAuth().getExpireTimestampMs() > getApi().currentTimeMillis());
-	}
-
-	private void resetBuilder(RequestEnvelopeOuterClass.RequestEnvelope.Builder builder)
-			throws LoginFailedException, RemoteServerException {
-
-		builder.setStatusCode(2);
-		builder.setRequestId(getRequestId());
-
-		if (!hasValidAuthTicket()) {
-			builder.setAuthTicket(getLastAuth());
-		} else {
-			Log.d(TAG, "Authenticated with static token");
-			builder.setAuthInfo(getApi().getAuthInfo());
-		}
-
-		builder.setUnknown12(989);
-		builder.setLatitude(getApi().getLatitude());
-		builder.setLongitude(getApi().getLongitude());
-		builder.setAltitude(getApi().getAltitude());
-	}
-
-	private RequestEnvelopeOuterClass.RequestEnvelope.Builder newBuilder() {
-		try {
-			RequestEnvelopeOuterClass.RequestEnvelope.Builder builder =
-					RequestEnvelopeOuterClass.RequestEnvelope.newBuilder();
-
-			resetBuilder(builder);
-
-			return builder;
-		} catch (Exception ex) {
-			return null;
-		}
-	}
-
-	/**
-	 * Sends all the provided requests to the server.
-	 *
-	 * @param requests The requests to send.
-	 * @return An Obvservable response object.
-	 */
-	public Observable<Response> sendServerRequests(final ServerRequest... requests) {
-
-		if (requests.length == 0) {
-			throw new IllegalArgumentException("No server requests were supplied!");
-		}
-
-		return Observable.defer(new Func0<Observable<Response>>() {
-			@Override
-			public Observable<Response> call() {
-				holdUntilClear();
-
-				final RequestEnvelopeOuterClass.RequestEnvelope.Builder builder = newBuilder();
-
-				if (builder == null) {
-					return Observable.error(new Exception("Could not create RequestEnvelope Builder"));
-				}
-
-				for (ServerRequest serverRequest : requests) {
-					builder.addRequests(serverRequest.getRequest());
-				}
-
-				ByteArrayOutputStream stream = new ByteArrayOutputStream();
-				final RequestEnvelopeOuterClass.RequestEnvelope request = builder.build();
-
-				try {
-					request.writeTo(stream);
-				} catch (IOException e) {
-					Log.wtf(TAG, "Failed to write request to bytearray ouput stream. This should never happen", e);
-				}
-
-				final RequestBody body = RequestBody.create(null, stream.toByteArray());
-				final okhttp3.Request httpRequest =
-						new okhttp3.Request.Builder().url(getApiEndpoint()).post(body).build();
-
-				try (Response response = getClient().newCall(httpRequest).execute()) {
-					if (response.code() != 200) {
-						throw new RemoteServerException("Got a unexpected http code : " + response.code());
-					}
-
-					ResponseEnvelopeOuterClass.ResponseEnvelope resEnvelope;
-					try (InputStream content = response.body().byteStream()) {
-						resEnvelope = ResponseEnvelopeOuterClass.ResponseEnvelope.parseFrom(content);
-					} catch (Exception e) {
-						return Observable.error(new RemoteServerException("Received malformed response : " + e));
-					}
-
-					if (resEnvelope.getApiUrl() != null && resEnvelope.getApiUrl().length() > 0) {
-						setApiEndpoint("https://" + resEnvelope.getApiUrl() + "/rpc");
-					}
-
-					if (resEnvelope.hasAuthTicket()) {
-						setLastAuth(resEnvelope.getAuthTicket());
-					}
-
-					if (resEnvelope.getStatusCode() == 102) {
-						throw new LoginFailedException(String.format("Error %s in API Url %s", resEnvelope.getApiUrl(),
-								resEnvelope.getError()));
-					} else if (resEnvelope.getStatusCode() == 53) {
-						return sendServerRequests(requests);
-					}
-
-					int count = 0;
-					for (ByteString payload : resEnvelope.getReturnsList()) {
-						if (payload == null || payload.size() == 0) {
-							throw new InvalidProtocolBufferException("Payload was empty!");
-						}
-
-						ServerRequest serverReq = requests[count++];
-						serverReq.handleData(payload);
-					}
-
-					return Observable.just(response);
-				} catch (InvalidProtocolBufferException | RemoteServerException ex) {
-					if (ex instanceof InvalidProtocolBufferException
-							|| ex.getCause() instanceof InvalidProtocolBufferException) {
-						return sendServerRequests(requests);
-					}
-
-					return Observable.error(ex);
-				} catch (LoginFailedException ex) {
-					return Observable.error(ex);
-				} catch (Exception ex) {
-					return Observable.error(new RemoteServerException(ex));
-				}
-			}
-		});
 	}
 
 	/**
@@ -207,11 +92,11 @@ public class RequestHandler {
 		this.apiEndpoint = apiEndpoint;
 	}
 
-	public synchronized AuthTicketOuterClass.AuthTicket getLastAuth() {
+	public synchronized AuthTicket getLastAuth() {
 		return lastAuth;
 	}
 
-	public synchronized void setLastAuth(AuthTicketOuterClass.AuthTicket lastAuth) {
+	public synchronized void setLastAuth(AuthTicket lastAuth) {
 		this.lastAuth = lastAuth;
 	}
 
@@ -220,15 +105,186 @@ public class RequestHandler {
 	 */
 	private synchronized void holdUntilClear() {
 		long current = System.currentTimeMillis();
-		if ((current - lastRequestMs) >= 350) {
+		long diff = current - lastRequestMs;
+		if (diff >= 300) {
 			lastRequestMs = current;
 		}
 
 		try {
-			Thread.sleep(current - lastRequestMs);
+			Thread.sleep(300);
 			lastRequestMs = System.currentTimeMillis();
 		} catch (InterruptedException ex) {
 			Log.e(TAG, "Request hold interrupted");
 		}
+	}
+
+	private void resetBuilder(RequestEnvelopeOuterClass.RequestEnvelope.Builder builder,
+							  AuthTicketOuterClass.AuthTicket authTicket)
+			throws LoginFailedException, RemoteServerException {
+		builder.setStatusCode(2);
+		builder.setRequestId(getRequestId());
+
+		if (hasValidAuthTicket()) {
+			builder.setAuthTicket(authTicket);
+		} else {
+			Log.d(TAG, "Authenticated with static token");
+			builder.setAuthInfo(getApi().getAuthInfo());
+		}
+		builder.setUnknown12(989);
+		builder.setLatitude(getApi().getLatitude());
+		builder.setLongitude(getApi().getLongitude());
+		builder.setAltitude(getApi().getAltitude());
+	}
+
+	public ServerRequest[] sendServerRequests(final ServerRequest... serverRequests)
+			throws RemoteServerException, LoginFailedException {
+		return sendServerRequests(getLastAuth(), serverRequests);
+	}
+
+	/**
+	 * Sends multiple ServerRequests synchrously.
+	 *
+	 * @param serverRequests list of ServerRequests to be sent
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException  the login failed exception
+	 */
+	public ServerRequest[] sendServerRequests(
+			AuthTicketOuterClass.AuthTicket authTicket, ServerRequest... serverRequests)
+			throws RemoteServerException, LoginFailedException {
+
+		AuthTicketOuterClass.AuthTicket newAuthTicket = authTicket;
+
+		if (serverRequests.length == 0) {
+			return serverRequests;
+		}
+
+		RequestEnvelopeOuterClass.RequestEnvelope.Builder builder =
+				RequestEnvelopeOuterClass.RequestEnvelope.newBuilder();
+
+		resetBuilder(builder, authTicket);
+
+		for (ServerRequest serverRequest : serverRequests) { builder.addRequests(serverRequest.getRequest()); }
+
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		RequestEnvelopeOuterClass.RequestEnvelope request = builder.build();
+
+		try {
+			request.writeTo(stream);
+		}
+		catch(IOException ex)
+		{
+			throw new RemoteServerException("Could not build RequestEnvelope", ex);
+		}
+
+		RequestBody body = RequestBody.create(null, stream.toByteArray());
+		okhttp3.Request httpRequest = new okhttp3.Request.Builder()
+				.url(getApiEndpoint())
+				.post(body)
+				.build();
+
+		holdUntilClear();
+
+		try (Response response = getClient().newCall(httpRequest).execute()) {
+			if (response.code() != 200) {
+				throw new RemoteServerException("Got a unexpected http code : " + response.code());
+			}
+
+			ResponseEnvelopeOuterClass.ResponseEnvelope resEnvelope;
+			try (InputStream content = response.body().byteStream()) {
+				resEnvelope = ResponseEnvelopeOuterClass.ResponseEnvelope.parseFrom(content);
+			} catch (IOException e) {
+				throw new InvalidProtocolBufferException("Malformed response received: " + e);
+			}
+
+			if (resEnvelope.getApiUrl() != null && resEnvelope.getApiUrl().length() > 0) {
+				String newApiEndpoint = "https://" + resEnvelope.getApiUrl() + "/rpc";
+				if(!newApiEndpoint.equalsIgnoreCase(getApiEndpoint())) {
+					setApiEndpoint(newApiEndpoint);
+				}
+			}
+
+			if (resEnvelope.hasAuthTicket()) {
+				newAuthTicket = resEnvelope.getAuthTicket();
+				setLastAuth(newAuthTicket);
+			}
+
+			if (resEnvelope.getStatusCode() == 102) {
+				throw new LoginFailedException(String.format("Error %s in API Url %s",
+						resEnvelope.getApiUrl(), resEnvelope.getError()));
+			} else if (resEnvelope.getStatusCode() == 53) {
+				// 53 means that the api_endpoint was not correctly set,
+				// should be at this point, though, so redo the request
+				return sendServerRequests(newAuthTicket, serverRequests);
+			}
+
+			int count = 0;
+			for (ByteString payload : resEnvelope.getReturnsList()) {
+				ServerRequest serverReq = serverRequests[count++];
+				if (payload != null && !payload.isEmpty()) {
+					serverReq.handleData(payload);
+				} else { throw new InvalidProtocolBufferException("ServerRequest payload is empty!"); }
+			}
+
+			return serverRequests;
+		} catch(InvalidProtocolBufferException e) {
+			Log.v(TAG, "Retrying requests due to InvalidProtocolBufferException");
+			return sendServerRequests(newAuthTicket, serverRequests);
+		} catch (IOException e) {
+			throw new RemoteServerException(e);
+		}catch (RemoteServerException e) {
+			if(e.getCause() instanceof InvalidProtocolBufferException)
+			{
+				Log.v(TAG, "Retrying requests due to error: " + e.getMessage());
+				return sendServerRequests(newAuthTicket, serverRequests);
+			}
+
+			throw e;
+		}
+	}
+
+	/**
+	 * Asynchronously sends the request batch.
+	 *
+	 * @param serverRequests The requests to to send to the remote server.
+	 * @return An Observable event to react to.
+	 */
+	public BlockingObservable<ServerRequest[]> sendAsyncServerRequests(final ServerRequest... serverRequests)
+	{
+		return Observable.defer(new Func0<Observable<ServerRequest[]>>() {
+			@Override
+			public Observable<ServerRequest[]> call() {
+				try {
+					return Observable.just(sendServerRequests(getLastAuth(), serverRequests));
+				}
+				catch(Exception ex)
+				{
+					return Observable.error(ex);
+				}
+			}
+		})
+		.delay(100L, TimeUnit.MILLISECONDS)
+		// .observeOn(Schedulers.from(threadPoolExecutor))
+		.retryWhen(new Func1<Observable<? extends Throwable>, Observable<?>>() {
+			@Override
+			public Observable<?> call(Observable<? extends Throwable> observable) {
+				return observable.flatMap(new Func1<Throwable, Observable<?>>() {
+					@Override
+					public Observable<?> call(Throwable throwable) {
+						System.err.println("Determining if a retry should happen...");
+						if(throwable instanceof InvalidProtocolBufferException
+							|| throwable.getCause() instanceof InvalidProtocolBufferException) {
+							try {
+								holdUntilClear();
+								return Observable.just(sendServerRequests(serverRequests));
+							} catch(Exception ex) {
+								return Observable.error(ex);
+							}
+						}
+						System.err.println("No retry");
+						return Observable.error(throwable);
+					}
+				});
+			}
+		}).toBlocking();
 	}
 }

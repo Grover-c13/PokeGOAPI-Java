@@ -66,12 +66,13 @@ public class PokemonGo {
 		inventories = new Inventories(this);
 
 		// FIXME: These aren't converted yet
-		// settings = new Settings(this);
+		settings = new Settings(this);
 		// map = new Map(this);
 
 		// TODO: Make a data pull method instead of instantly firing requests in the constructor?
 		playerProfile.refreshDataSync();
 		inventories.refreshDataSync(true);
+		settings.refreshDataSync();
 	}
 
 	/**

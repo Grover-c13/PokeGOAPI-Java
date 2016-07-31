@@ -28,7 +28,6 @@ import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.async.ExceptionBox;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -36,10 +35,7 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 import lombok.Getter;
-import okhttp3.Response;
 import rx.Observable;
-import rx.functions.Action1;
-import rx.functions.Func0;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,38 +115,8 @@ public class Inventories {
 		return this;
 	}
 
-	/**
-	 * Updates the inventories with latest data asynchronously.
-	 *
-	 * @param forceUpdate force update if true.
-	 * @return An {@link Observable} Inventories.
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	public Observable<Inventories> refreshData(final boolean forceUpdate)
-			throws LoginFailedException, RemoteServerException {
-		return Observable.defer(new Func0<Observable<Inventories>>() {
-			@Override
-			public Observable<Inventories> call() {
-				try {
-					return Observable.just(refreshDataSync(forceUpdate));
-				} catch (Exception ex) {
-					return Observable.error(ex);
-				}
-			}
-		});
-	}
-
-	/**
-	 * Updates the inventories with latest data synchronously.
-	 *
-	 * @param forceUpdate force update if true.
-	 * @return An {@link Observable} Inventories.
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	public Inventories refreshDataSync(boolean forceUpdate) throws LoginFailedException, RemoteServerException {
-
+	private ServerRequest buildServerRequest(final boolean forceUpdate)
+	{
 		if (forceUpdate) {
 			lastInventoryUpdate = 0;
 			itemBag.reset(api);
@@ -163,61 +129,62 @@ public class Inventories {
 
 		GetInventoryMessage invReqMsg =
 				GetInventoryMessage.newBuilder().setLastTimestampMs(lastInventoryUpdate).build();
-		final ServerRequest inventoryRequest =
-				new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY, invReqMsg);
-		final ExceptionBox exceptionBox = new ExceptionBox();
+		return new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY, invReqMsg);
+	}
 
-		api.getRequestHandler().sendServerRequests(inventoryRequest).subscribe(new Action1<Response>() {
-			@Override
-			public void call(Response response) {
-				try {
-					updateInstanceData(inventoryRequest, response);
-				} catch (Exception e) {
-					exceptionBox.setException(e);
-				}
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(Throwable throwable) {
-				exceptionBox.setException(throwable);
-			}
-		});
+	/**
+	 * Updates the inventories with latest data asynchronously.
+	 *
+	 * @param forceUpdate force update if true.
+	 * @return An {@link Observable} Inventories.
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public Observable<Inventories> refreshData(final boolean forceUpdate)
+			throws LoginFailedException, RemoteServerException {
+		ServerRequest serverRequest = buildServerRequest(forceUpdate);
 
-		if (exceptionBox.hasException()) {
-			if (exceptionBox.getException() instanceof RemoteServerException) {
-				throw (RemoteServerException) exceptionBox.getException();
-			}
+		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).flatMap(
+				new Func1<ServerRequest[], Observable<?>>() {
+					@Override
+					public Observable<?> call(ServerRequest[] requests) {
+						if(requests == null || requests.length == 0){ return Observable.empty(); }
+						try {
+							return Observable.just(updateInstanceData(requests[0]));
+						} catch(Exception e) {
+							return Observable.error(e);
+						}
+					}
+				}).cast(Inventories.class);
+	}
 
-			if (exceptionBox.getException() instanceof LoginFailedException) {
-				throw (LoginFailedException) exceptionBox.getException();
-			}
-
-			throw new RuntimeException("Unhandled exception", exceptionBox.getException());
-		}
-
-		return this;
+	/**
+	 * Updates the inventories with latest data synchronously.
+	 *
+	 * @param forceUpdate force update if true.
+	 * @return An {@link Observable} Inventories.
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public Inventories refreshDataSync(boolean forceUpdate) throws LoginFailedException, RemoteServerException {
+		ServerRequest[] serverRequests = api.getRequestHandler().sendServerRequests(buildServerRequest(forceUpdate));
+		return updateInstanceData(serverRequests[0]);
 	}
 
 	/**
 	 * Update this instance data with the ServerRequest and Response data.
 	 *
 	 * @param request  The server request data.
-	 * @param response The server response.
 	 * @throws RemoteServerException If server errors occured.
 	 */
-	private synchronized void updateInstanceData(final ServerRequest request, final Response response)
-			throws RemoteServerException {
-
-		if (response == null || !response.isSuccessful()) {
-			throw new RemoteServerException("Invalid or unsuccessful response");
-		}
+	private synchronized Inventories updateInstanceData(final ServerRequest request)
+			throws LoginFailedException, RemoteServerException {
 
 		GetInventoryResponse inventoryResponse = null;
 		try {
 			inventoryResponse = GetInventoryResponseOuterClass.GetInventoryResponse.parseFrom(request.getData());
 		} catch (InvalidProtocolBufferException ex) {
-			Log.e(TAG, "Could not parse GetInventoryResponse data");
-			throw new RemoteServerException(ex);
+			return refreshDataSync(true);
 		}
 
 		for (InventoryItemOuterClass.InventoryItem inventoryItem : inventoryResponse.getInventoryDelta()
@@ -267,5 +234,7 @@ public class Inventories {
 
 			lastInventoryUpdate = api.currentTimeMillis();
 		}
+
+		return this;
 	}
 }

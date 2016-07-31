@@ -31,7 +31,6 @@ import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.async.ExceptionBox;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
@@ -41,10 +40,9 @@ import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 import lombok.Getter;
 import lombok.Setter;
-import okhttp3.Response;
 import rx.Observable;
-import rx.functions.Action1;
-import rx.functions.Func0;
+import rx.functions.Func1;
+import rx.observables.BlockingObservable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -82,22 +80,39 @@ public class PlayerProfile {
 		this.api = api;
 	}
 
+	private synchronized PlayerProfile getInstance(){ return this; }
+
 	/**
 	 * Refresh PlayerProfile data asynchronously.
 	 *
 	 * @return An Observable PlayerProfile object.
 	 */
-	public Observable<PlayerProfile> refreshData() {
-		return Observable.defer(new Func0<Observable<PlayerProfile>>() {
-			@Override
-			public Observable<PlayerProfile> call() {
-				try {
-					return Observable.just(refreshDataSync());
-				} catch (Exception ex) {
-					return Observable.error(ex);
-				}
-			}
-		});
+	public PlayerProfile refreshData() {
+
+		final GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
+		final ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
+
+		ServerRequest[] res = api.getRequestHandler().sendAsyncServerRequests(getPlayerServerRequest).first();
+		try {
+			return updateInstanceData(res[0]);
+		}
+		catch(Exception ex) {
+			return null;
+		}
+		/*
+		return api.getRequestHandler().sendAsyncServerRequests(getPlayerServerRequest)
+				.flatMap(new Func1<ServerRequest[], Observable<?>>() {
+					@Override
+					public Observable<?> call(ServerRequest[] requests) {
+						if(requests == null || requests.length == 0){ return Observable.empty(); }
+						try {
+							return Observable.just(updateInstanceData(requests[0]));
+						}
+						catch (Exception e) {
+							return Observable.error(e);
+						}
+					}
+				}).cast(PlayerProfile.class);*/
 	}
 
 	/**
@@ -110,35 +125,9 @@ public class PlayerProfile {
 	public PlayerProfile refreshDataSync() throws LoginFailedException, RemoteServerException {
 		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
 		final ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
-		final ExceptionBox exceptionBox = new ExceptionBox();
 
-		api.getRequestHandler().sendServerRequests(getPlayerServerRequest).subscribe(new Action1<Response>() {
-			@Override
-			public void call(Response response) {
-				try {
-					updateInstanceData(getPlayerServerRequest, response);
-				} catch (RemoteServerException ex) {
-					exceptionBox.setException(ex);
-				}
-			}
-		}, new Action1<Throwable>() {
-			@Override
-			public void call(Throwable throwable) {
-				exceptionBox.setException(throwable);
-			}
-		});
-
-		if (exceptionBox.hasException()) {
-			if (exceptionBox.getException() instanceof RemoteServerException) {
-				throw (RemoteServerException) exceptionBox.getException();
-			}
-
-			if (exceptionBox.getException() instanceof LoginFailedException) {
-				throw (LoginFailedException) exceptionBox.getException();
-			}
-
-			throw new RuntimeException("Unhandled exception", exceptionBox.getException());
-		}
+		api.getRequestHandler().sendServerRequests(getPlayerServerRequest);
+		updateInstanceData(getPlayerServerRequest);
 
 		return this;
 	}
@@ -147,21 +136,17 @@ public class PlayerProfile {
 	 * Updates this instance data with the request/response data.
 	 *
 	 * @param request  The server request.
-	 * @param response The server response data.
 	 * @throws RemoteServerException If the server response was empty or invalid.
 	 */
-	private synchronized void updateInstanceData(final ServerRequest request, final Response response)
-			throws RemoteServerException {
-		if (response == null || !response.isSuccessful()) {
-			throw new RemoteServerException("Invalid or unsuccessful response");
-		}
+	private synchronized PlayerProfile updateInstanceData(final ServerRequest request)
+			throws LoginFailedException, RemoteServerException {
 
 		GetPlayerResponseOuterClass.GetPlayerResponse playerResponse = null;
 		try {
 			playerResponse = GetPlayerResponseOuterClass.GetPlayerResponse.parseFrom(request.getData());
 		} catch (InvalidProtocolBufferException e) {
 			Log.e(TAG, "Could not parse GetPlayerResponse data");
-			throw new RemoteServerException(e);
+			return refreshDataSync();
 		}
 
 		badge = playerResponse.getPlayerData().getEquippedBadge();
@@ -202,6 +187,8 @@ public class PlayerProfile {
 
 		avatar = avatarApi;
 		dailyBonus = bonusApi;
+
+		return this;
 	}
 
 	/**

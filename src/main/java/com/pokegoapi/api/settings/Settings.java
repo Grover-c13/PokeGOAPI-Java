@@ -1,18 +1,13 @@
 package com.pokegoapi.api.settings;
 
-import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
-import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.Log;
 import lombok.Getter;
 
 /**
@@ -71,7 +66,6 @@ public class Settings {
 		this.levelUpSettings = new LevelUpSettings();
 		this.fortSettings = new FortSettings();
 		this.inventorySettings = new InventorySettings();
-		updateSettings();
 	}
 
 	/**
@@ -80,16 +74,23 @@ public class Settings {
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 */
-	public void updateSettings() throws RemoteServerException, LoginFailedException {
+	public Settings refreshDataSync() throws RemoteServerException, LoginFailedException {
 		DownloadSettingsMessageOuterClass.DownloadSettingsMessage msg =
 				DownloadSettingsMessageOuterClass.DownloadSettingsMessage.newBuilder().build();
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.DOWNLOAD_SETTINGS, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest); //here you marked everything as read
+		final ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.DOWNLOAD_SETTINGS, msg);
+
+		api.getRequestHandler().sendServerRequests(serverRequest);
+		return updateInstanceData(serverRequest);
+	}
+
+	private synchronized Settings updateInstanceData(final ServerRequest serverRequest)
+			throws LoginFailedException, RemoteServerException
+	{
 		DownloadSettingsResponseOuterClass.DownloadSettingsResponse response;
 		try {
 			response = DownloadSettingsResponseOuterClass.DownloadSettingsResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			return refreshDataSync();
 		}
 
 		mapSettings.update(response.getSettings().getMapSettings());
@@ -97,7 +98,6 @@ public class Settings {
 		fortSettings.update(response.getSettings().getFortSettings());
 		inventorySettings.update(response.getSettings().getInventorySettings());
 
+		return this;
 	}
-
-
 }
