@@ -58,7 +58,7 @@ public class EggPokemon {
 	 * Get the current distance that has been done with this egg
 	 * @return get distance already walked
 	 */
-	public double getEggKmWalked() {
+	public double getEggKmWalked() throws LoginFailedException, RemoteServerException {
 		if (!isIncubate())
 			return 0;
 		EggIncubator incubator = Stream.of(pgo.getInventories().getIncubators())

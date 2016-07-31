@@ -16,25 +16,18 @@
 package com.pokegoapi.api.player;
 
 import POGOProtos.Data.Player.CurrencyOuterClass;
-import POGOProtos.Data.Player.EquippedBadgeOuterClass;
 import POGOProtos.Data.Player.EquippedBadgeOuterClass.EquippedBadge;
 import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
-import POGOProtos.Inventory.Item.ItemAwardOuterClass;
 import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
-import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
-import POGOProtos.Networking.Requests.Messages.EquipBadgeMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.EquipBadgeMessageOuterClass.EquipBadgeMessage;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass;
 import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
 import POGOProtos.Networking.Responses.EquipBadgeResponseOuterClass;
-import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass;
-import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass;
+import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -51,7 +44,6 @@ import lombok.Setter;
 import java.util.HashMap;
 import java.util.Map;
 
-import static POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.*;
 
 public class PlayerProfile {
 	private static final String TAG = PlayerProfile.class.getSimpleName();
@@ -203,6 +195,8 @@ public class PlayerProfile {
 	 * @param currency the currency
 	 * @return the currency
 	 * @throws InvalidCurrencyException the invalid currency exception
+	 * @throws LoginFailedException when the auth is invalid
+	 * @throws RemoteServerException when the server is down/having issues
 	 */
 	public int getCurrency(Currency currency)
 			throws InvalidCurrencyException, LoginFailedException, RemoteServerException {
@@ -220,6 +214,13 @@ public class PlayerProfile {
 		STARDUST, POKECOIN;
 	}
 
+	/**
+	 * Gets raw player data proto
+	 *
+	 * @return Player data
+	 * @throws LoginFailedException when the auth is invalid
+	 * @throws RemoteServerException when the server is down/having issues
+	 */
 	public PlayerData getPlayerData()
 			throws LoginFailedException, RemoteServerException {
 		if (!init) {
@@ -228,6 +229,13 @@ public class PlayerProfile {
 		return playerData;
 	}
 
+	/**
+	 * Gets avatar
+	 *
+	 * @return Player Avatar object
+	 * @throws LoginFailedException when the auth is invalid
+	 * @throws RemoteServerException when the server is down/having issues
+	 */
 	public PlayerAvatar getAvatar()
 			throws LoginFailedException, RemoteServerException {
 		if (!init) {
@@ -236,6 +244,13 @@ public class PlayerProfile {
 		return avatar;
 	}
 
+	/**
+	 * Gets daily bonus
+	 *
+	 * @return DailyBonus object
+	 * @throws LoginFailedException when the auth is invalid
+	 * @throws RemoteServerException when the server is down/having issues
+	 */
 	public DailyBonus getDailyBonus()
 			throws LoginFailedException, RemoteServerException {
 		if (!init) {
@@ -244,6 +259,13 @@ public class PlayerProfile {
 		return dailyBonus;
 	}
 
+	/**
+	 * Gets contact settings
+	 *
+	 * @return ContactSettings object
+	 * @throws LoginFailedException when the auth is invalid
+	 * @throws RemoteServerException when the server is down/having issues
+	 */
 	public ContactSettings getContactSettings()
 			throws LoginFailedException, RemoteServerException {
 		if (!init) {
@@ -252,6 +274,13 @@ public class PlayerProfile {
 		return contactSettings;
 	}
 
+	/**
+	 * Gets a map of all currencies
+	 *
+	 * @return map of currencies
+	 * @throws LoginFailedException when the auth is invalid
+	 * @throws RemoteServerException when the server is down/having issues
+	 */
 	public Map<Currency, Integer> getCurrencies()
 			throws LoginFailedException, RemoteServerException {
 		if (!init) {

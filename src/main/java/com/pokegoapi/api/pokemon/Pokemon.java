@@ -239,7 +239,8 @@ public class Pokemon {
 		return meta;
 	}
 
-	public int getCandy() {
+
+	public int getCandy() throws LoginFailedException, RemoteServerException {
 		return pgo.getInventories().getCandyjar().getCandies(getPokemonFamily());
 	}
 

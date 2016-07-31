@@ -20,8 +20,7 @@ import POGOProtos.Enums.GenderOuterClass;
 import lombok.Data;
 
 @Data
-public class PlayerAvatar
-{
+public class PlayerAvatar {
 	private PlayerAvatarOuterClass.PlayerAvatar avatar;
 
 	public PlayerAvatar(PlayerAvatarOuterClass.PlayerAvatar data) {
