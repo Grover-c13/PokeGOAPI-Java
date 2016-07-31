@@ -404,7 +404,6 @@ public class CatchablePokemon {
 
 				try {
 					response = CatchPokemonResponse.parseFrom(result);
-					System.out.println(response);
 				} catch (InvalidProtocolBufferException e) {
 					throw new RemoteServerException(e);
 				}
