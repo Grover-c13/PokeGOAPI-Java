@@ -623,4 +623,8 @@ public class Pokemon {
 		}
 	}
 
+	public EvolutionForm getEvolutionForm() {
+		return new EvolutionForm(getPokemonId());
+	}
+
 }
