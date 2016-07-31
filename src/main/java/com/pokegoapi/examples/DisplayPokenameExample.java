@@ -30,6 +30,7 @@ public class DisplayPokenameExample {
 				Locale.FRENCH,
 				Locale.GERMAN,
 				Locale.ENGLISH,
+				Locale.JAPANESE,
 				new Locale("zh", "CN"),
 				new Locale("zh", "HK"),
 				new Locale("ru"),
