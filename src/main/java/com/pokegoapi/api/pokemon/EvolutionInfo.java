@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 import POGOProtos.Enums.PokemonIdOuterClass;
 
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.ABRA;
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.AERODACTYL;
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.ALAKAZAM;
@@ -161,89 +163,89 @@ import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.ZUBAT;
 import static java.util.Arrays.asList;
 
 class EvolutionInfo {
-	private static final PokemonIdOuterClass.PokemonId[] BULBASAUR_EVOLUTION = {BULBASAUR, IVYSAUR, VENUSAUR};
-	private static final PokemonIdOuterClass.PokemonId[] CHARMANDER_EVOLUTION = {CHARMANDER, CHARMELEON, CHARIZARD};
-	private static final PokemonIdOuterClass.PokemonId[] SQUIRTLE_EVOLUTION = {SQUIRTLE, WARTORTLE, BLASTOISE};
-	private static final PokemonIdOuterClass.PokemonId[] CATERPIE_EVOLUTION = {CATERPIE, METAPOD, BUTTERFREE};
-	private static final PokemonIdOuterClass.PokemonId[] WEEDLE_EVOLUTION = {WEEDLE, KAKUNA, BEEDRILL};
-	private static final PokemonIdOuterClass.PokemonId[] PIDGEY_EVOLUTION = {PIDGEY, PIDGEOTTO, PIDGEOT};
-	private static final PokemonIdOuterClass.PokemonId[] RATTATA_EVOLUTION = {RATTATA, RATICATE};
-	private static final PokemonIdOuterClass.PokemonId[] SPEAROW_EVOLUTION = {SPEAROW, FEAROW};
-	private static final PokemonIdOuterClass.PokemonId[] EKANS_EVOLUTION = {EKANS, ARBOK};
-	private static final PokemonIdOuterClass.PokemonId[] PIKACHU_EVOLUTION = {PIKACHU, RAICHU};
-	private static final PokemonIdOuterClass.PokemonId[] SANDSHREW_EVOLUTION = {SANDSHREW, SANDSLASH};
-	private static final PokemonIdOuterClass.PokemonId[] NIDORAN_FEMALE_EVOLUTION = {NIDORAN_FEMALE, NIDORINA, NIDOQUEEN};
-	private static final PokemonIdOuterClass.PokemonId[] NIDORAN_MALE_EVOLUTION = {NIDORAN_MALE, NIDORINO, NIDOKING};
-	private static final PokemonIdOuterClass.PokemonId[] CLEFAIRY_EVOLUTION = {CLEFAIRY, CLEFABLE};
-	private static final PokemonIdOuterClass.PokemonId[] VULPIX_EVOLUTION = {VULPIX, NINETALES};
-	private static final PokemonIdOuterClass.PokemonId[] JIGGLYPUFF_EVOLUTION = {JIGGLYPUFF, WIGGLYTUFF};
-	private static final PokemonIdOuterClass.PokemonId[] ZUBAT_EVOLUTION = {ZUBAT, GOLBAT};
-	private static final PokemonIdOuterClass.PokemonId[] ODDISH_EVOLUTION = {ODDISH, GLOOM, VILEPLUME};
-	private static final PokemonIdOuterClass.PokemonId[] PARAS_EVOLUTION = {PARAS, PARASECT};
-	private static final PokemonIdOuterClass.PokemonId[] VENONAT_EVOLUTION = {VENONAT, VENOMOTH};
-	private static final PokemonIdOuterClass.PokemonId[] DIGLETT_EVOLUTION = {DIGLETT, DUGTRIO};
-	private static final PokemonIdOuterClass.PokemonId[] MEOWTH_EVOLUTION = {MEOWTH, PERSIAN};
-	private static final PokemonIdOuterClass.PokemonId[] PSYDUCK_EVOLUTION = {PSYDUCK, GOLDUCK};
-	private static final PokemonIdOuterClass.PokemonId[] MANKEY_EVOLUTION = {MANKEY, PRIMEAPE};
-	private static final PokemonIdOuterClass.PokemonId[] GROWLITHE_EVOLUTION = {GROWLITHE, ARCANINE};
-	private static final PokemonIdOuterClass.PokemonId[] POLIWAG_EVOLUTION = {POLIWAG, POLIWHIRL, POLIWRATH};
-	private static final PokemonIdOuterClass.PokemonId[] ABRA_EVOLUTION = {ABRA, KADABRA, ALAKAZAM};
-	private static final PokemonIdOuterClass.PokemonId[] MACHOP_EVOLUTION = {MACHOP, MACHOKE, MACHAMP};
-	private static final PokemonIdOuterClass.PokemonId[] BELLSPROUT_EVOLUTION = {BELLSPROUT, WEEPINBELL, VICTREEBEL};
-	private static final PokemonIdOuterClass.PokemonId[] TENTACOOL_EVOLUTION = {TENTACOOL, TENTACRUEL};
-	private static final PokemonIdOuterClass.PokemonId[] GEODUDE_EVOLUTION = {GEODUDE, GRAVELER, GOLEM};
-	private static final PokemonIdOuterClass.PokemonId[] PONYTA_EVOLUTION = {PONYTA, RAPIDASH};
-	private static final PokemonIdOuterClass.PokemonId[] SLOWPOKE_EVOLUTION = {SLOWPOKE, SLOWBRO};
-	private static final PokemonIdOuterClass.PokemonId[] MAGNEMITE_EVOLUTION = {MAGNEMITE, MAGNETON};
-	private static final PokemonIdOuterClass.PokemonId[] FARFETCHD_EVOLUTION = {FARFETCHD};
-	private static final PokemonIdOuterClass.PokemonId[] DODUO_EVOLUTION = {DODUO, DODRIO};
-	private static final PokemonIdOuterClass.PokemonId[] SEEL_EVOLUTION = {SEEL, DEWGONG};
-	private static final PokemonIdOuterClass.PokemonId[] GRIMER_EVOLUTION = {GRIMER, MUK};
-	private static final PokemonIdOuterClass.PokemonId[] SHELLDER_EVOLUTION = {SHELLDER, CLOYSTER};
-	private static final PokemonIdOuterClass.PokemonId[] GASTLY_EVOLUTION = {GASTLY, HAUNTER, GENGAR};
-	private static final PokemonIdOuterClass.PokemonId[] ONIX_EVOLUTION = {ONIX};
-	private static final PokemonIdOuterClass.PokemonId[] DROWZEE_EVOLUTION = {DROWZEE, HYPNO};
-	private static final PokemonIdOuterClass.PokemonId[] KRABBY_EVOLUTION = {KRABBY, KINGLER};
-	private static final PokemonIdOuterClass.PokemonId[] VOLTORB_EVOLUTION = {VOLTORB, ELECTRODE};
-	private static final PokemonIdOuterClass.PokemonId[] EXEGGCUTE_EVOLUTION = {EXEGGCUTE, EXEGGUTOR};
-	private static final PokemonIdOuterClass.PokemonId[] CUBONE_EVOLUTION = {CUBONE, MAROWAK};
-	private static final PokemonIdOuterClass.PokemonId[] HITMONLEE_EVOLUTION = {HITMONLEE, HITMONCHAN};
-	private static final PokemonIdOuterClass.PokemonId[] LICKITUNG_EVOLUTION = {LICKITUNG};
-	private static final PokemonIdOuterClass.PokemonId[] KOFFING_EVOLUTION = {KOFFING, WEEZING};
-	private static final PokemonIdOuterClass.PokemonId[] RHYHORN_EVOLUTION = {RHYHORN, RHYDON};
-	private static final PokemonIdOuterClass.PokemonId[] CHANSEY_EVOLUTION = {CHANSEY};
-	private static final PokemonIdOuterClass.PokemonId[] TANGELA_EVOLUTION = {TANGELA};
-	private static final PokemonIdOuterClass.PokemonId[] KANGASKHAN_EVOLUTION = {KANGASKHAN};
-	private static final PokemonIdOuterClass.PokemonId[] HORSEA_EVOLUTION = {HORSEA, SEADRA};
-	private static final PokemonIdOuterClass.PokemonId[] GOLDEEN_EVOLUTION = {GOLDEEN, SEAKING};
-	private static final PokemonIdOuterClass.PokemonId[] STARYU_EVOLUTION = {STARYU, STARMIE};
-	private static final PokemonIdOuterClass.PokemonId[] MR_MIME_EVOLUTION = {MR_MIME};
-	private static final PokemonIdOuterClass.PokemonId[] SCYTHER_EVOLUTION = {SCYTHER};
-	private static final PokemonIdOuterClass.PokemonId[] JYNX_EVOLUTION = {JYNX};
-	private static final PokemonIdOuterClass.PokemonId[] ELECTABUZZ_EVOLUTION = {ELECTABUZZ};
-	private static final PokemonIdOuterClass.PokemonId[] MAGMAR_EVOLUTION = {MAGMAR};
-	private static final PokemonIdOuterClass.PokemonId[] PINSIR_EVOLUTION = {PINSIR};
-	private static final PokemonIdOuterClass.PokemonId[] TAUROS_EVOLUTION = {TAUROS};
-	private static final PokemonIdOuterClass.PokemonId[] MAGIKARP_EVOLUTION = {MAGIKARP, GYARADOS};
-	private static final PokemonIdOuterClass.PokemonId[] LAPRAS_EVOLUTION = {LAPRAS};
-	private static final PokemonIdOuterClass.PokemonId[] DITTO_EVOLUTION = {DITTO};
+	private static final PokemonId[] BULBASAUR_EVOLUTION = {BULBASAUR, IVYSAUR, VENUSAUR};
+	private static final PokemonId[] CHARMANDER_EVOLUTION = {CHARMANDER, CHARMELEON, CHARIZARD};
+	private static final PokemonId[] SQUIRTLE_EVOLUTION = {SQUIRTLE, WARTORTLE, BLASTOISE};
+	private static final PokemonId[] CATERPIE_EVOLUTION = {CATERPIE, METAPOD, BUTTERFREE};
+	private static final PokemonId[] WEEDLE_EVOLUTION = {WEEDLE, KAKUNA, BEEDRILL};
+	private static final PokemonId[] PIDGEY_EVOLUTION = {PIDGEY, PIDGEOTTO, PIDGEOT};
+	private static final PokemonId[] RATTATA_EVOLUTION = {RATTATA, RATICATE};
+	private static final PokemonId[] SPEAROW_EVOLUTION = {SPEAROW, FEAROW};
+	private static final PokemonId[] EKANS_EVOLUTION = {EKANS, ARBOK};
+	private static final PokemonId[] PIKACHU_EVOLUTION = {PIKACHU, RAICHU};
+	private static final PokemonId[] SANDSHREW_EVOLUTION = {SANDSHREW, SANDSLASH};
+	private static final PokemonId[] NIDORAN_FEMALE_EVOLUTION = {NIDORAN_FEMALE, NIDORINA, NIDOQUEEN};
+	private static final PokemonId[] NIDORAN_MALE_EVOLUTION = {NIDORAN_MALE, NIDORINO, NIDOKING};
+	private static final PokemonId[] CLEFAIRY_EVOLUTION = {CLEFAIRY, CLEFABLE};
+	private static final PokemonId[] VULPIX_EVOLUTION = {VULPIX, NINETALES};
+	private static final PokemonId[] JIGGLYPUFF_EVOLUTION = {JIGGLYPUFF, WIGGLYTUFF};
+	private static final PokemonId[] ZUBAT_EVOLUTION = {ZUBAT, GOLBAT};
+	private static final PokemonId[] ODDISH_EVOLUTION = {ODDISH, GLOOM, VILEPLUME};
+	private static final PokemonId[] PARAS_EVOLUTION = {PARAS, PARASECT};
+	private static final PokemonId[] VENONAT_EVOLUTION = {VENONAT, VENOMOTH};
+	private static final PokemonId[] DIGLETT_EVOLUTION = {DIGLETT, DUGTRIO};
+	private static final PokemonId[] MEOWTH_EVOLUTION = {MEOWTH, PERSIAN};
+	private static final PokemonId[] PSYDUCK_EVOLUTION = {PSYDUCK, GOLDUCK};
+	private static final PokemonId[] MANKEY_EVOLUTION = {MANKEY, PRIMEAPE};
+	private static final PokemonId[] GROWLITHE_EVOLUTION = {GROWLITHE, ARCANINE};
+	private static final PokemonId[] POLIWAG_EVOLUTION = {POLIWAG, POLIWHIRL, POLIWRATH};
+	private static final PokemonId[] ABRA_EVOLUTION = {ABRA, KADABRA, ALAKAZAM};
+	private static final PokemonId[] MACHOP_EVOLUTION = {MACHOP, MACHOKE, MACHAMP};
+	private static final PokemonId[] BELLSPROUT_EVOLUTION = {BELLSPROUT, WEEPINBELL, VICTREEBEL};
+	private static final PokemonId[] TENTACOOL_EVOLUTION = {TENTACOOL, TENTACRUEL};
+	private static final PokemonId[] GEODUDE_EVOLUTION = {GEODUDE, GRAVELER, GOLEM};
+	private static final PokemonId[] PONYTA_EVOLUTION = {PONYTA, RAPIDASH};
+	private static final PokemonId[] SLOWPOKE_EVOLUTION = {SLOWPOKE, SLOWBRO};
+	private static final PokemonId[] MAGNEMITE_EVOLUTION = {MAGNEMITE, MAGNETON};
+	private static final PokemonId[] FARFETCHD_EVOLUTION = {FARFETCHD};
+	private static final PokemonId[] DODUO_EVOLUTION = {DODUO, DODRIO};
+	private static final PokemonId[] SEEL_EVOLUTION = {SEEL, DEWGONG};
+	private static final PokemonId[] GRIMER_EVOLUTION = {GRIMER, MUK};
+	private static final PokemonId[] SHELLDER_EVOLUTION = {SHELLDER, CLOYSTER};
+	private static final PokemonId[] GASTLY_EVOLUTION = {GASTLY, HAUNTER, GENGAR};
+	private static final PokemonId[] ONIX_EVOLUTION = {ONIX};
+	private static final PokemonId[] DROWZEE_EVOLUTION = {DROWZEE, HYPNO};
+	private static final PokemonId[] KRABBY_EVOLUTION = {KRABBY, KINGLER};
+	private static final PokemonId[] VOLTORB_EVOLUTION = {VOLTORB, ELECTRODE};
+	private static final PokemonId[] EXEGGCUTE_EVOLUTION = {EXEGGCUTE, EXEGGUTOR};
+	private static final PokemonId[] CUBONE_EVOLUTION = {CUBONE, MAROWAK};
+	private static final PokemonId[] HITMONLEE_EVOLUTION = {HITMONLEE, HITMONCHAN};
+	private static final PokemonId[] LICKITUNG_EVOLUTION = {LICKITUNG};
+	private static final PokemonId[] KOFFING_EVOLUTION = {KOFFING, WEEZING};
+	private static final PokemonId[] RHYHORN_EVOLUTION = {RHYHORN, RHYDON};
+	private static final PokemonId[] CHANSEY_EVOLUTION = {CHANSEY};
+	private static final PokemonId[] TANGELA_EVOLUTION = {TANGELA};
+	private static final PokemonId[] KANGASKHAN_EVOLUTION = {KANGASKHAN};
+	private static final PokemonId[] HORSEA_EVOLUTION = {HORSEA, SEADRA};
+	private static final PokemonId[] GOLDEEN_EVOLUTION = {GOLDEEN, SEAKING};
+	private static final PokemonId[] STARYU_EVOLUTION = {STARYU, STARMIE};
+	private static final PokemonId[] MR_MIME_EVOLUTION = {MR_MIME};
+	private static final PokemonId[] SCYTHER_EVOLUTION = {SCYTHER};
+	private static final PokemonId[] JYNX_EVOLUTION = {JYNX};
+	private static final PokemonId[] ELECTABUZZ_EVOLUTION = {ELECTABUZZ};
+	private static final PokemonId[] MAGMAR_EVOLUTION = {MAGMAR};
+	private static final PokemonId[] PINSIR_EVOLUTION = {PINSIR};
+	private static final PokemonId[] TAUROS_EVOLUTION = {TAUROS};
+	private static final PokemonId[] MAGIKARP_EVOLUTION = {MAGIKARP, GYARADOS};
+	private static final PokemonId[] LAPRAS_EVOLUTION = {LAPRAS};
+	private static final PokemonId[] DITTO_EVOLUTION = {DITTO};
 
 	// needs to be handled exceptionally
-	private static final PokemonIdOuterClass.PokemonId[] EEVEE_EVOLUTION = {EEVEE, VAPOREON, JOLTEON, FLAREON};
+	private static final PokemonId[] EEVEE_EVOLUTION = {EEVEE, VAPOREON, JOLTEON, FLAREON};
 
-	private static final PokemonIdOuterClass.PokemonId[] PORYGON_EVOLUTION = {PORYGON};
-	private static final PokemonIdOuterClass.PokemonId[] OMANYTE_EVOLUTION = {OMANYTE, OMASTAR};
-	private static final PokemonIdOuterClass.PokemonId[] KABUTO_EVOLUTION = {KABUTO, KABUTOPS};
-	private static final PokemonIdOuterClass.PokemonId[] AERODACTYL_EVOLUTION = {AERODACTYL};
-	private static final PokemonIdOuterClass.PokemonId[] SNORLAX_EVOLUTION = {SNORLAX};
-	private static final PokemonIdOuterClass.PokemonId[] ARTICUNO_EVOLUTION = {ARTICUNO};
-	private static final PokemonIdOuterClass.PokemonId[] ZAPDOS_EVOLUTION = {ZAPDOS};
-	private static final PokemonIdOuterClass.PokemonId[] MOLTRES_EVOLUTION = {MOLTRES};
-	private static final PokemonIdOuterClass.PokemonId[] DRATINI_EVOLUTION = {DRATINI, DRAGONAIR, DRAGONITE};
-	private static final PokemonIdOuterClass.PokemonId[] MEWTWO_EVOLUTION = {MEWTWO};
-	private static final PokemonIdOuterClass.PokemonId[] MEW_EVOLUTION = {MEW};
+	private static final PokemonId[] PORYGON_EVOLUTION = {PORYGON};
+	private static final PokemonId[] OMANYTE_EVOLUTION = {OMANYTE, OMASTAR};
+	private static final PokemonId[] KABUTO_EVOLUTION = {KABUTO, KABUTOPS};
+	private static final PokemonId[] AERODACTYL_EVOLUTION = {AERODACTYL};
+	private static final PokemonId[] SNORLAX_EVOLUTION = {SNORLAX};
+	private static final PokemonId[] ARTICUNO_EVOLUTION = {ARTICUNO};
+	private static final PokemonId[] ZAPDOS_EVOLUTION = {ZAPDOS};
+	private static final PokemonId[] MOLTRES_EVOLUTION = {MOLTRES};
+	private static final PokemonId[] DRATINI_EVOLUTION = {DRATINI, DRAGONAIR, DRAGONITE};
+	private static final PokemonId[] MEWTWO_EVOLUTION = {MEWTWO};
+	private static final PokemonId[] MEW_EVOLUTION = {MEW};
 
-	private static final Map<PokemonIdOuterClass.PokemonId, PokemonIdOuterClass.PokemonId[]> EVOLUTION_INFO = new HashMap<>();
+	private static final Map<PokemonId, PokemonId[]> EVOLUTION_INFO = new HashMap<>();
 
 	static {
 		EVOLUTION_INFO.put(BULBASAUR, BULBASAUR_EVOLUTION);
@@ -408,9 +410,9 @@ class EvolutionInfo {
 	 * @param pokemonId pokemon id
 	 * @return ordered evolution forms
 	 */
-	public static List<EvolutionForm> getEvolutionForms(PokemonIdOuterClass.PokemonId pokemonId) {
+	public static List<EvolutionForm> getEvolutionForms(PokemonId pokemonId) {
 		List<EvolutionForm> evolutionForms = new ArrayList<>();
-		for (PokemonIdOuterClass.PokemonId id : EVOLUTION_INFO.get(pokemonId)) {
+		for (PokemonId id : EVOLUTION_INFO.get(pokemonId)) {
 			evolutionForms.add(new EvolutionForm(id));
 		}
 		return evolutionForms;
@@ -422,8 +424,8 @@ class EvolutionInfo {
 	 * @param pokemonId pokemon id
 	 * @return true if a pokemon is fully evolved, false otherwise
 	 */
-	public static boolean isFullyEvolved(PokemonIdOuterClass.PokemonId pokemonId) {
-		PokemonIdOuterClass.PokemonId[] info = EVOLUTION_INFO.get(pokemonId);
+	public static boolean isFullyEvolved(PokemonId pokemonId) {
+		PokemonId[] info = EVOLUTION_INFO.get(pokemonId);
 		return info[info.length] == pokemonId;
 	}
 
@@ -433,7 +435,7 @@ class EvolutionInfo {
 	 * @param pokemonId pokemon id
 	 * @return 0 based evolution stage number
 	 */
-	public static int getEvolutionStage(PokemonIdOuterClass.PokemonId pokemonId) {
+	public static int getEvolutionStage(PokemonId pokemonId) {
 		return asList(VAPOREON, JOLTEON, FLAREON).contains(pokemonId)
 				? 1
 				: asList(EVOLUTION_INFO.get(pokemonId)).indexOf(pokemonId);
