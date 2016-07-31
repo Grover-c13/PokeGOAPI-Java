@@ -31,69 +31,30 @@
 package com.pokegoapi.examples;
 
 
-import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse.Result;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.gym.Battle;
-import com.pokegoapi.api.gym.Gym;
-import com.pokegoapi.api.pokemon.Pokemon;
-import com.pokegoapi.auth.CredentialProvider;
-import com.pokegoapi.auth.PtcCredentialProvider;
+import com.pokegoapi.auth.GoogleAutoCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
+import com.pokegoapi.util.SystemTimeImpl;
 import okhttp3.OkHttpClient;
 
-import java.util.List;
-
-public class FightGymExample {
+public class UseIncenseExample {
 
 	/**
 	 * Catches a pokemon at an area.
 	 */
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
-		CredentialProvider auth = null;
 		try {
-			auth = new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
-			// or google
-			//auth = new GoogleCredentialProvider(http, token); // currently uses oauth flow so no user or pass needed
-			PokemonGo go = new PokemonGo(auth, http);
-			// set location
-			go.setLocation(-32.011011, 115.932831, 0);
+			GoogleAutoCredentialProvider authProvider = new GoogleAutoCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
+			//new PtcLogin(http).login(ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
+			PokemonGo go = new PokemonGo(authProvider, http, new SystemTimeImpl());
+			
+			go.setLocation(45.817521, 16.028199, 0);
+			go.getInventories().getItemBag().useIncense();
 
-			List<Pokemon> pokemons = go.getInventories().getPokebank().getPokemons();
-			Pokemon[] attackers = new Pokemon[6];
-
-			for (int i = 0; i < 6; i++) {
-				attackers[i] = pokemons.get(i);
-			}
-
-
-			for (Gym gym : go.getMap().getGyms()) {
-				if (gym.isAttackable()) {
-					Battle battle = gym.battle(attackers);
-					// start the battle
-					Result result = battle.start();
-
-					if (result == Result.SUCCESS) {
-						// started battle successfully
-
-						// loop while battle is not finished
-						while (!battle.isConcluded()) {
-							System.out.println("attack:" + battle.attack(5));
-							Thread.sleep(500);
-						}
-
-						System.out.println("Battle result:" + battle.getOutcome());
-
-					} else {
-						System.out.println("FAILED:" + result);
-					}
-				}
-
-			}
-
-		} catch (LoginFailedException | RemoteServerException | InterruptedException e) {
+		} catch (LoginFailedException | RemoteServerException e) {
 			// failed to login, invalid credentials, auth issue or server issue.
 			Log.e("Main", "Failed to login or server issue: ", e);
 

@@ -16,7 +16,6 @@
 package com.pokegoapi.main;
 
 import com.google.protobuf.ByteString;
-import lombok.Data;
 import lombok.Getter;
 
 public class ResultOrException {

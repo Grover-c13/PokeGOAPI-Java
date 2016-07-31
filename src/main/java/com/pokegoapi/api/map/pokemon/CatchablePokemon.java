@@ -375,7 +375,7 @@ public class CatchablePokemon {
 	 * @return CatchResult of resulted try to catch pokemon
 	 */
 	public Observable<CatchResult> catchPokemonAsync(double normalizedHitPosition, double normalizedReticleSize,
-														double spinModifier, Pokeball type) {
+													 double spinModifier, Pokeball type) {
 		if (!isEncountered()) {
 			return Observable.just(new CatchResult());
 		}
@@ -391,32 +391,30 @@ public class CatchablePokemon {
 				RequestTypeOuterClass.RequestType.CATCH_POKEMON, reqMsg);
 		return api.getRequestHandler().sendAsyncServerRequests(serverRequest)
 				.map(new Func1<ByteString, CatchResult>() {
-			@Override
-			public CatchResult call(ByteString result) {
-				CatchPokemonResponse response;
-				try {
-					response = CatchPokemonResponse.parseFrom(result);
-				} catch (InvalidProtocolBufferException e) {
-					throw new AsyncRemoteServerException(e);
-				}
+					@Override
+					public CatchResult call(ByteString result) {
+						CatchPokemonResponse response;
+						try {
+							response = CatchPokemonResponse.parseFrom(result);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
 
-				if (response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_ESCAPE
-						&& response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_MISSED) {
-					try {
-						api.getInventories().updateInventories();
+						if (response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_ESCAPE
+								&& response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_MISSED) {
+							try {
+								api.getInventories().updateInventories();
+							} catch (LoginFailedException e) {
+								throw new AsyncLoginFailedException(e);
+							} catch (RemoteServerException e) {
+								throw new AsyncRemoteServerException(e);
+							}
+							return new CatchResult(response);
+						} else {
+							return new CatchResult();
+						}
 					}
-					catch (LoginFailedException e) {
-						throw new AsyncLoginFailedException(e);
-					}
-					catch (RemoteServerException e) {
-						throw new AsyncRemoteServerException(e);
-					}
-					return new CatchResult(response);
-				} else {
-					return new CatchResult();
-				}
-			}
-		});
+				});
 	}
 
 	/**
@@ -441,17 +439,17 @@ public class CatchablePokemon {
 
 		return api.getRequestHandler().sendAsyncServerRequests(serverRequest)
 				.map(new Func1<ByteString, CatchItemResult>() {
-			@Override
-			public CatchItemResult call(ByteString result) {
-				UseItemCaptureResponse response;
-				try {
-					response = UseItemCaptureResponse.parseFrom(result);
-				} catch (InvalidProtocolBufferException e) {
-					throw new AsyncRemoteServerException(e);
-				}
-				return new CatchItemResult(response);
-			}
-		});
+					@Override
+					public CatchItemResult call(ByteString result) {
+						UseItemCaptureResponse response;
+						try {
+							response = UseItemCaptureResponse.parseFrom(result);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+						return new CatchItemResult(response);
+					}
+				});
 	}
 
 	/**

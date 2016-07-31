@@ -18,17 +18,10 @@ package com.pokegoapi.auth;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.util.Time;
 import com.pokegoapi.util.SystemTimeImpl;
+import com.pokegoapi.util.Time;
 import com.squareup.moshi.Moshi;
-import okhttp3.Cookie;
-import okhttp3.CookieJar;
-import okhttp3.HttpUrl;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import okhttp3.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,15 +39,15 @@ public class PtcCredentialProvider extends CredentialProvider {
 	public static final String USER_AGENT = "niantic";
 	private static final String TAG = PtcCredentialProvider.class.getSimpleName();
 	//We try and refresh token 5 minutes before it actually expires
-	private static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
+	protected static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
 
-	private final OkHttpClient client;
-	private final String username;
-	private final String password;
-	private final Time time;
-	private String tokenId;
-	private long expiresTimestamp;
-	private AuthInfo.Builder authbuilder;
+	protected final OkHttpClient client;
+	protected final String username;
+	protected final String password;
+	protected final Time time;
+	protected String tokenId;
+	protected long expiresTimestamp;
+	protected AuthInfo.Builder authbuilder;
 
 	/**
 	 * Instantiates a new Ptc login.

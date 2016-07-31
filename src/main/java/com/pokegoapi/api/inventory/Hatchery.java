@@ -25,7 +25,6 @@ import com.pokegoapi.api.pokemon.HatchedEgg;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
-
 import lombok.Getter;
 
 import java.util.ArrayList;
