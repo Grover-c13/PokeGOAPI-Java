@@ -426,7 +426,7 @@ class EvolutionInfo {
 	 */
 	public static boolean isFullyEvolved(PokemonId pokemonId) {
 		PokemonId[] info = EVOLUTION_INFO.get(pokemonId);
-		return info[info.length] == pokemonId;
+		return info[info.length - 1] == pokemonId;
 	}
 
 	/**
