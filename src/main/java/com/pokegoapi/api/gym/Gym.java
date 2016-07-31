@@ -30,11 +30,12 @@ import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.MapPoint;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Gym {
+public class Gym implements MapPoint{
 	private FortData proto;
 	private GetGymDetailsResponse details;
 	private PokemonGo api;

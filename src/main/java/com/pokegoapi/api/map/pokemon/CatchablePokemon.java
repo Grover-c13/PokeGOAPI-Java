@@ -37,6 +37,7 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.util.FutureWrapper;
+import com.pokegoapi.util.MapPoint;
 import com.pokegoapi.util.NestedFutureWrapper;
 import com.pokegoapi.util.PokemonFuture;
 import lombok.Getter;
@@ -48,7 +49,7 @@ import java.util.concurrent.Future;
  * The type Catchable pokemon.
  */
 @ToString
-public class CatchablePokemon {
+public class CatchablePokemon implements MapPoint{
 	private static final String TAG = CatchablePokemon.class.getSimpleName();
 	private final PokemonGo api;
 
