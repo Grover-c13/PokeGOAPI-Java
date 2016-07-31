@@ -404,8 +404,8 @@ public class CatchablePokemon {
 					throw new RemoteServerException(e);
 				}
 
-				if (response.getStatus() == CatchStatus.CATCH_FLEE ||
-						response.getStatus() == CatchStatus.CATCH_SUCCESS) {
+				if (response.getStatus() == CatchStatus.CATCH_FLEE
+						|| response.getStatus() == CatchStatus.CATCH_SUCCESS) {
 					api.getMap().getCatchablePokemon().remove(this);
 				}
 
