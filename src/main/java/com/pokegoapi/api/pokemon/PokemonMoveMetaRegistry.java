@@ -15,11 +15,9 @@
 
 package com.pokegoapi.api.pokemon;
 
-import java.util.EnumMap;
-
 import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
 
-import com.pokegoapi.api.pokemon.PokemonType;
+import java.util.EnumMap;
 
 public class PokemonMoveMetaRegistry {
 

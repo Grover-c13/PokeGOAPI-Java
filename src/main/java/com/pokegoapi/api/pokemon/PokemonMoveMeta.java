@@ -16,8 +16,6 @@
 package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
-import com.pokegoapi.api.pokemon.PokemonType;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

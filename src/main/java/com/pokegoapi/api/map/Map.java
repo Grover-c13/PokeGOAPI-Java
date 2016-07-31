@@ -18,7 +18,6 @@ package com.pokegoapi.api.map;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Map.Fort.FortTypeOuterClass.FortType;
-import POGOProtos.Map.MapCellOuterClass;
 import POGOProtos.Map.MapCellOuterClass.MapCell;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
@@ -30,14 +29,11 @@ import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.Fort
 import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass.FortSearchMessage;
 import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
-import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
-
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
@@ -45,8 +41,8 @@ import com.annimon.stream.function.Function;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.map.fort.FortDetails;
 import com.pokegoapi.api.gym.Gym;
+import com.pokegoapi.api.map.fort.FortDetails;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.NearbyPokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -56,18 +52,14 @@ import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.ServerRequest;
-
 import com.pokegoapi.util.DummyFuture;
 import com.pokegoapi.util.FutureWrapper;
 import com.pokegoapi.util.PokemonFuture;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Future;
 
 
 public class Map {

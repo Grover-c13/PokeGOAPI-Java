@@ -24,7 +24,6 @@ import com.pokegoapi.api.pokemon.Pokemon;
 import lombok.Getter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 

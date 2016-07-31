@@ -31,14 +31,12 @@
 package com.pokegoapi.examples;
 
 
-
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.auth.GoogleAutoCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.SystemTimeImpl;
-
 import okhttp3.OkHttpClient;
 
 public class UseIncenseExample {

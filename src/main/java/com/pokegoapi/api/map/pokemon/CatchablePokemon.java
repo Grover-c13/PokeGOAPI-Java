@@ -22,13 +22,11 @@ import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.CatchPokemonMessage;
 import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.UseItemCaptureMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.UseItemCaptureMessageOuterClass.UseItemCaptureMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
-import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass;
 import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass.UseItemCaptureResponse;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -38,14 +36,12 @@ import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.FutureWrapper;
 import com.pokegoapi.util.NestedFutureWrapper;
 import com.pokegoapi.util.PokemonFuture;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**

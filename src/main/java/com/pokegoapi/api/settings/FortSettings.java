@@ -1,7 +1,5 @@
 package com.pokegoapi.api.settings;
 
-import POGOProtos.Settings.FortSettingsOuterClass;
-
 /**
  * Created by rama on 27/07/16.
  */
