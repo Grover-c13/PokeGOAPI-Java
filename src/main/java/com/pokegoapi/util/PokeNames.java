@@ -12,6 +12,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.pokegoapi.util;
 
 import java.util.Locale;
@@ -24,9 +25,9 @@ import java.util.ResourceBundle;
 public class PokeNames {
 	/**
 	 * Returns the Name for a Pokedex ID including known translations.
-	 * @param pokedexNr
-	 * @param locale
-	 * @return
+	 * @param pokedexNr pokedex number
+	 * @param locale locale
+	 * @return the pokemon name locale
 	 */
 	public static String getDisplayName(int pokedexNr, Locale locale) {
 		ResourceBundle names = ResourceBundle.getBundle("pokemon_names", locale);
