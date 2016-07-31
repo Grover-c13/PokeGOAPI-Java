@@ -76,7 +76,6 @@ public class PokemonGo {
 
 		// send profile request to get the ball rolling
 		requestHandler = new RequestHandler(this, client);
-		
 		playerProfile = new PlayerProfile(this);
 
 		// should have proper end point now.
