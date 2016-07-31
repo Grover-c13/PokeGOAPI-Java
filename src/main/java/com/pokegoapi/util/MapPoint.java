@@ -19,17 +19,17 @@ package com.pokegoapi.util;
  * @version 1.0
  */
 public interface MapPoint {
-    /**
-     * Gets latitude.
-     *
-     * @return the latitude
-     */
-     double getLatitude();
+	/**
+	 * Gets latitude.
+	 *
+	 * @return the latitude
+	 */
+	double getLatitude();
 
-    /**
-     * Gets longitude.
-     *
-     * @return the longitude
-     */
-     double getLongitude();
+	/**
+	 * Gets longitude.
+	 *
+	 * @return the longitude
+	 */
+	double getLongitude();
 }
