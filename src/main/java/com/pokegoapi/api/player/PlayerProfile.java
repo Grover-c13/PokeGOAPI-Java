@@ -17,19 +17,25 @@ package com.pokegoapi.api.player;
 
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.Player.EquippedBadgeOuterClass;
+import POGOProtos.Data.Player.EquippedBadgeOuterClass.EquippedBadge;
 import POGOProtos.Data.Player.PlayerStatsOuterClass;
+import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
 import POGOProtos.Inventory.Item.ItemAwardOuterClass;
+import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
 import POGOProtos.Networking.Requests.Messages.EquipBadgeMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.EquipBadgeMessageOuterClass.EquipBadgeMessage;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
-import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass;
+import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
 import POGOProtos.Networking.Responses.EquipBadgeResponseOuterClass;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass;
+import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
@@ -45,37 +51,25 @@ import lombok.Setter;
 import java.util.HashMap;
 import java.util.Map;
 
+import static POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.*;
+
 public class PlayerProfile {
 	private static final String TAG = PlayerProfile.class.getSimpleName();
 	private final PokemonGo api;
-	@Getter
-	private long creationTime;
-	@Getter
-	private String username;
-	@Getter
-	private Team team;
-	@Getter
-	private int pokemonStorage;
-	@Getter
-	private int itemStorage;
-	@Getter
-	private EquippedBadgeOuterClass.EquippedBadge badge;
-
-	@Getter
+	private PlayerData playerData;
+	private EquippedBadge badge;
 	private PlayerAvatar avatar;
-	@Getter
 	private DailyBonus dailyBonus;
-	@Getter
 	private ContactSettings contactSettings;
-	@Getter
 	private Map<Currency, Integer> currencies = new HashMap<Currency, Integer>();
 	@Getter
 	@Setter
 	private PlayerStatsOuterClass.PlayerStats stats;
+	private boolean init;
 
 	public PlayerProfile(PokemonGo api) throws LoginFailedException, RemoteServerException {
 		this.api = api;
-		updateProfile();
+		init = false;
 	}
 
 	/**
@@ -90,23 +84,18 @@ public class PlayerProfile {
 		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
 		api.getRequestHandler().sendServerRequests(getPlayerServerRequest);
 
-		GetPlayerResponseOuterClass.GetPlayerResponse playerResponse = null;
+		GetPlayerResponse playerResponse = null;
 		try {
-			playerResponse = GetPlayerResponseOuterClass.GetPlayerResponse.parseFrom(getPlayerServerRequest.getData());
+			playerResponse = GetPlayerResponse.parseFrom(getPlayerServerRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
 
-		badge = playerResponse.getPlayerData().getEquippedBadge();
-		creationTime = playerResponse.getPlayerData().getCreationTimestampMs();
-		itemStorage = playerResponse.getPlayerData().getMaxItemStorage();
-		pokemonStorage = playerResponse.getPlayerData().getMaxPokemonStorage();
-		team = Team.values()[playerResponse.getPlayerData().getTeamValue()];
-		username = playerResponse.getPlayerData().getUsername();
+		playerData = playerResponse.getPlayerData();
 
-		final PlayerAvatar avatarApi = new PlayerAvatar();
-		final DailyBonus bonusApi = new DailyBonus();
-		final ContactSettings contactApi = new ContactSettings();
+		avatar = new PlayerAvatar(playerData.getAvatar());
+		dailyBonus = new DailyBonus(playerData.getDailyBonus());
+		contactSettings = new ContactSettings(playerData.getContactSettings());
 
 		// maybe something more graceful?
 		for (CurrencyOuterClass.Currency currency : playerResponse.getPlayerData().getCurrenciesList()) {
@@ -117,27 +106,7 @@ public class PlayerProfile {
 			}
 		}
 
-		avatarApi.setGender(playerResponse.getPlayerData().getAvatar().getGender());
-		avatarApi.setBackpack(playerResponse.getPlayerData().getAvatar().getBackpack());
-		avatarApi.setEyes(playerResponse.getPlayerData().getAvatar().getEyes());
-		avatarApi.setHair(playerResponse.getPlayerData().getAvatar().getHair());
-		avatarApi.setHat(playerResponse.getPlayerData().getAvatar().getHat());
-		avatarApi.setPants(playerResponse.getPlayerData().getAvatar().getPants());
-		avatarApi.setShirt(playerResponse.getPlayerData().getAvatar().getShirt());
-		avatarApi.setShoes(playerResponse.getPlayerData().getAvatar().getShoes());
-		avatarApi.setSkin(playerResponse.getPlayerData().getAvatar().getSkin());
-
-		bonusApi.setNextCollectionTimestamp(
-				playerResponse.getPlayerData().getDailyBonus().getNextCollectedTimestampMs()
-		);
-		bonusApi.setNextDefenderBonusCollectTimestamp(
-				playerResponse.getPlayerData().getDailyBonus().getNextDefenderBonusCollectTimestampMs()
-		);
-
-		avatar = avatarApi;
-		dailyBonus = bonusApi;
-
-
+		init = true;
 	}
 
 	/**
@@ -159,17 +128,17 @@ public class PlayerProfile {
 		LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder()
 				.setLevel(level)
 				.build();
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.LEVEL_UP_REWARDS, msg);
+		ServerRequest serverRequest = new ServerRequest(RequestType.LEVEL_UP_REWARDS, msg);
 		api.getRequestHandler().sendServerRequests(serverRequest);
-		LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse response;
+		LevelUpRewardsResponse response;
 		try {
-			response = LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse.parseFrom(serverRequest.getData());
+			response = LevelUpRewardsResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
 		// Add the awarded items to our bag
 		ItemBag bag = api.getInventories().getItemBag();
-		for (ItemAwardOuterClass.ItemAward itemAward : response.getItemsAwardedList()) {
+		for (ItemAward itemAward : response.getItemsAwardedList()) {
 			Item item = bag.getItem(itemAward.getItemId());
 			item.setCount(item.getCount() + itemAward.getItemCount());
 		}
@@ -200,22 +169,22 @@ public class PlayerProfile {
 	 */
 
 	public void checkAndEquipBadges() throws LoginFailedException, RemoteServerException {
-		CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage msg =
-				CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage.newBuilder().build();
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES, msg);
+		CheckAwardedBadgesMessage msg =
+				CheckAwardedBadgesMessage.newBuilder().build();
+		ServerRequest serverRequest = new ServerRequest(RequestType.CHECK_AWARDED_BADGES, msg);
 		api.getRequestHandler().sendServerRequests(serverRequest);
-		CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse response;
+		CheckAwardedBadgesResponse response;
 		try {
-			response = CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse.parseFrom(serverRequest.getData());
+			response = CheckAwardedBadgesResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
 		if (response.getSuccess()) {
 			for (int i = 0; i < response.getAwardedBadgesCount(); i++) {
-				EquipBadgeMessageOuterClass.EquipBadgeMessage msg1 = EquipBadgeMessageOuterClass.EquipBadgeMessage.newBuilder()
+				EquipBadgeMessage msg1 = EquipBadgeMessage.newBuilder()
 						.setBadgeType(response.getAwardedBadges(i))
 						.setBadgeTypeValue(response.getAwardedBadgeLevels(i)).build();
-				ServerRequest serverRequest1 = new ServerRequest(RequestTypeOuterClass.RequestType.EQUIP_BADGE, msg1);
+				ServerRequest serverRequest1 = new ServerRequest(RequestType.EQUIP_BADGE, msg1);
 				api.getRequestHandler().sendServerRequests(serverRequest1);
 				EquipBadgeResponseOuterClass.EquipBadgeResponse response1;
 				try {
@@ -235,7 +204,11 @@ public class PlayerProfile {
 	 * @return the currency
 	 * @throws InvalidCurrencyException the invalid currency exception
 	 */
-	public int getCurrency(Currency currency) throws InvalidCurrencyException {
+	public int getCurrency(Currency currency)
+			throws InvalidCurrencyException, LoginFailedException, RemoteServerException {
+		if (!init) {
+			updateProfile();
+		}
 		if (currencies.containsKey(currency)) {
 			return currencies.get(currency);
 		} else {
@@ -245,5 +218,45 @@ public class PlayerProfile {
 
 	public enum Currency {
 		STARDUST, POKECOIN;
+	}
+
+	public PlayerData getPlayerData()
+			throws LoginFailedException, RemoteServerException {
+		if (!init) {
+			updateProfile();
+		}
+		return playerData;
+	}
+
+	public PlayerAvatar getAvatar()
+			throws LoginFailedException, RemoteServerException {
+		if (!init) {
+			updateProfile();
+		}
+		return avatar;
+	}
+
+	public DailyBonus getDailyBonus()
+			throws LoginFailedException, RemoteServerException {
+		if (!init) {
+			updateProfile();
+		}
+		return dailyBonus;
+	}
+
+	public ContactSettings getContactSettings()
+			throws LoginFailedException, RemoteServerException {
+		if (!init) {
+			updateProfile();
+		}
+		return contactSettings;
+	}
+
+	public Map<Currency, Integer> getCurrencies()
+			throws LoginFailedException, RemoteServerException {
+		if (!init) {
+			updateProfile();
+		}
+		return currencies;
 	}
 }
