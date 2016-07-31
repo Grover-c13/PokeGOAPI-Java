@@ -44,4 +44,27 @@ public class AsyncHelper {
 			throw new AsyncPokemonGoException("Unknown exception occurred. ", e);
 		}
 	}
+
+	/**
+	 * Convert an observable to the actual result, recovering the actual exception and throwing that
+	 *
+	 * @param observable Observable to handle
+	 * @param <T>        Result type
+	 * @return Result of the observable
+	 * @throws LoginFailedException  If an AsyncLoginFailedException was thrown
+	 * @throws RemoteServerException If an AsyncRemoteServerException was thrown
+	 */
+	public static <T> T toCompose(Observable<T> observable) throws LoginFailedException, RemoteServerException {
+		try {
+			return observable.toBlocking().first();
+		} catch (RuntimeException e) {
+			if (e.getCause() instanceof AsyncLoginFailedException) {
+				throw new LoginFailedException(e.getMessage(), e.getCause());
+			}
+			if (e.getCause() instanceof AsyncRemoteServerException) {
+				throw new RemoteServerException(e.getMessage(), e.getCause());
+			}
+			throw new AsyncPokemonGoException("Unknown exception occurred. ", e);
+		}
+	}
 }
