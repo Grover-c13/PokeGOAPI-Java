@@ -31,6 +31,7 @@ import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.async.AsyncDataObject;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
@@ -41,18 +42,15 @@ import com.pokegoapi.util.Log;
 import lombok.Getter;
 import lombok.Setter;
 import rx.Observable;
-import rx.functions.Func1;
-import rx.observables.BlockingObservable;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlayerProfile {
+public class PlayerProfile extends AsyncDataObject<PlayerProfile>{
 	private static final String TAG = PlayerProfile.class.getSimpleName();
-	private final PokemonGo api;
+
 	@Getter
 	private long creationTime;
-
 	@Getter
 	private String username;
 	@Getter
@@ -76,43 +74,24 @@ public class PlayerProfile {
 	@Setter
 	private PlayerStatsOuterClass.PlayerStats stats;
 
-	public PlayerProfile(PokemonGo api) {
-		this.api = api;
+	public PlayerProfile(final PokemonGo api) {
+		super(api);
 	}
 
-	private synchronized PlayerProfile getInstance(){ return this; }
+	@Override
+	public synchronized PlayerProfile getInstance(){ return this; }
 
 	/**
 	 * Refresh PlayerProfile data asynchronously.
 	 *
 	 * @return An Observable PlayerProfile object.
 	 */
-	public PlayerProfile refreshData() {
+	public Observable<PlayerProfile> refreshData() {
 
 		final GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
 		final ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
 
-		ServerRequest[] res = api.getRequestHandler().sendAsyncServerRequests(getPlayerServerRequest).first();
-		try {
-			return updateInstanceData(res[0]);
-		}
-		catch(Exception ex) {
-			return null;
-		}
-		/*
-		return api.getRequestHandler().sendAsyncServerRequests(getPlayerServerRequest)
-				.flatMap(new Func1<ServerRequest[], Observable<?>>() {
-					@Override
-					public Observable<?> call(ServerRequest[] requests) {
-						if(requests == null || requests.length == 0){ return Observable.empty(); }
-						try {
-							return Observable.just(updateInstanceData(requests[0]));
-						}
-						catch (Exception e) {
-							return Observable.error(e);
-						}
-					}
-				}).cast(PlayerProfile.class);*/
+		return sendAsyncServerRequests(getPlayerServerRequest).cast(PlayerProfile.class);
 	}
 
 	/**
@@ -126,21 +105,17 @@ public class PlayerProfile {
 		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
 		final ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
 
-		api.getRequestHandler().sendServerRequests(getPlayerServerRequest);
+		getApi().getRequestHandler().sendServerRequests(getPlayerServerRequest);
 		updateInstanceData(getPlayerServerRequest);
 
 		return this;
 	}
 
-	/**
-	 * Updates this instance data with the request/response data.
-	 *
-	 * @param request  The server request.
-	 * @throws RemoteServerException If the server response was empty or invalid.
-	 */
-	private synchronized PlayerProfile updateInstanceData(final ServerRequest request)
+	@Override
+	protected synchronized PlayerProfile updateInstanceData(final ServerRequest... requests)
 			throws LoginFailedException, RemoteServerException {
 
+		ServerRequest request = requests[0];
 		GetPlayerResponseOuterClass.GetPlayerResponse playerResponse = null;
 		try {
 			playerResponse = GetPlayerResponseOuterClass.GetPlayerResponse.parseFrom(request.getData());
@@ -209,7 +184,7 @@ public class PlayerProfile {
 		}
 		LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder().setLevel(level).build();
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.LEVEL_UP_REWARDS, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		getApi().getRequestHandler().sendServerRequests(serverRequest);
 		LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse response;
 		try {
 			response = LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse.parseFrom(serverRequest.getData());
@@ -217,7 +192,7 @@ public class PlayerProfile {
 			throw new RemoteServerException(e);
 		}
 		// Add the awarded items to our bag
-		ItemBag bag = api.getInventories().getItemBag();
+		ItemBag bag = getApi().getInventories().getItemBag();
 		for (ItemAwardOuterClass.ItemAward itemAward : response.getItemsAwardedList()) {
 			Item item = bag.getItem(itemAward.getItemId());
 			item.setCount(item.getCount() + itemAward.getItemCount());
@@ -252,7 +227,7 @@ public class PlayerProfile {
 		CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage msg =
 				CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage.newBuilder().build();
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		getApi().getRequestHandler().sendServerRequests(serverRequest);
 		CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse response;
 		try {
 			response =
@@ -268,7 +243,7 @@ public class PlayerProfile {
 								.setBadgeTypeValue(response.getAwardedBadgeLevels(i))
 								.build();
 				ServerRequest serverRequest1 = new ServerRequest(RequestTypeOuterClass.RequestType.EQUIP_BADGE, msg1);
-				api.getRequestHandler().sendServerRequests(serverRequest1);
+				getApi().getRequestHandler().sendServerRequests(serverRequest1);
 				EquipBadgeResponseOuterClass.EquipBadgeResponse response1;
 				try {
 					response1 = EquipBadgeResponseOuterClass.EquipBadgeResponse.parseFrom(serverRequest1.getData());

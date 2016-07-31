@@ -28,6 +28,7 @@ import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.async.AsyncDataObject;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -41,11 +42,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Inventories {
+public class Inventories extends AsyncDataObject<Inventories> {
 
 	private static final String TAG = Inventories.class.getSimpleName();
 
-	private final PokemonGo api;
 	@Getter
 	private ItemBag itemBag;
 	@Getter
@@ -61,6 +61,7 @@ public class Inventories {
 
 	private long lastInventoryUpdate = 0;
 
+
 	/**
 	 * Creates Inventories and initializes content.
 	 *
@@ -69,7 +70,7 @@ public class Inventories {
 	 * @throws RemoteServerException the remote server exception
 	 */
 	public Inventories(PokemonGo api) {
-		this.api = api;
+		super(api);
 		itemBag = new ItemBag(api);
 		pokebank = new PokeBank(api);
 		candyjar = new CandyJar(api);
@@ -119,12 +120,12 @@ public class Inventories {
 	{
 		if (forceUpdate) {
 			lastInventoryUpdate = 0;
-			itemBag.reset(api);
-			pokebank.reset(api);
-			candyjar.reset(api);
-			pokedex.reset(api);
+			itemBag.reset(getApi());
+			pokebank.reset(getApi());
+			candyjar.reset(getApi());
+			pokedex.reset(getApi());
 			incubators = new ArrayList<>();
-			hatchery.reset(api);
+			hatchery.reset(getApi());
 		}
 
 		GetInventoryMessage invReqMsg =
@@ -132,30 +133,22 @@ public class Inventories {
 		return new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY, invReqMsg);
 	}
 
+	public Observable<Inventories> refreshData(){ return refreshData(false); }
+
 	/**
 	 * Updates the inventories with latest data asynchronously.
 	 *
 	 * @param forceUpdate force update if true.
 	 * @return An {@link Observable} Inventories.
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
 	 */
-	public Observable<Inventories> refreshData(final boolean forceUpdate)
-			throws LoginFailedException, RemoteServerException {
-		ServerRequest serverRequest = buildServerRequest(forceUpdate);
+	public Observable<Inventories> refreshData(final boolean forceUpdate) {
+		final ServerRequest serverRequest = buildServerRequest(forceUpdate);
+		return sendAsyncServerRequests(serverRequest).cast(Inventories.class);
+	}
 
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).flatMap(
-				new Func1<ServerRequest[], Observable<?>>() {
-					@Override
-					public Observable<?> call(ServerRequest[] requests) {
-						if(requests == null || requests.length == 0){ return Observable.empty(); }
-						try {
-							return Observable.just(updateInstanceData(requests[0]));
-						} catch(Exception e) {
-							return Observable.error(e);
-						}
-					}
-				}).cast(Inventories.class);
+	@Override
+	public Inventories refreshDataSync() throws LoginFailedException, RemoteServerException {
+		return refreshDataSync(false);
 	}
 
 	/**
@@ -167,19 +160,21 @@ public class Inventories {
 	 * @throws RemoteServerException the remote server exception
 	 */
 	public Inventories refreshDataSync(boolean forceUpdate) throws LoginFailedException, RemoteServerException {
-		ServerRequest[] serverRequests = api.getRequestHandler().sendServerRequests(buildServerRequest(forceUpdate));
-		return updateInstanceData(serverRequests[0]);
+		ServerRequest[] serverRequests = getApi().getRequestHandler().sendServerRequests(buildServerRequest(forceUpdate));
+		return updateInstanceData(serverRequests);
 	}
 
 	/**
 	 * Update this instance data with the ServerRequest and Response data.
 	 *
-	 * @param request  The server request data.
+	 * @param requests  The server request data.
 	 * @throws RemoteServerException If server errors occured.
 	 */
-	private synchronized Inventories updateInstanceData(final ServerRequest request)
+	@Override
+	protected synchronized Inventories updateInstanceData(final ServerRequest... requests)
 			throws LoginFailedException, RemoteServerException {
 
+		final ServerRequest request = requests[0];
 		GetInventoryResponse inventoryResponse = null;
 		try {
 			inventoryResponse = GetInventoryResponseOuterClass.GetInventoryResponse.parseFrom(request.getData());
@@ -200,7 +195,7 @@ public class Inventories {
 
 			// pokebank
 			if (itemData.getPokemonData().getPokemonId() != PokemonId.MISSINGNO) {
-				pokebank.addPokemon(new Pokemon(api, inventoryItem.getInventoryItemData().getPokemonData()));
+				pokebank.addPokemon(new Pokemon(getApi(), inventoryItem.getInventoryItemData().getPokemonData()));
 			}
 
 			// items
@@ -217,7 +212,7 @@ public class Inventories {
 			}
 			// player stats
 			if (itemData.hasPlayerStats()) {
-				api.getPlayerProfile().setStats(itemData.getPlayerStats());
+				getApi().getPlayerProfile().setStats(itemData.getPlayerStats());
 			}
 
 			// pokedex
@@ -228,13 +223,15 @@ public class Inventories {
 			if (itemData.hasEggIncubators()) {
 				for (EggIncubatorOuterClass.EggIncubator incubator : itemData.getEggIncubators()
 						.getEggIncubatorList()) {
-					incubators.add(new EggIncubator(api, incubator));
+					incubators.add(new EggIncubator(getApi(), incubator));
 				}
 			}
 
-			lastInventoryUpdate = api.currentTimeMillis();
+			lastInventoryUpdate = getApi().currentTimeMillis();
 		}
 
 		return this;
 	}
+
+	public synchronized Inventories getInstance(){ return this; }
 }

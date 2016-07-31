@@ -5,18 +5,17 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.async.AsyncDataObject;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
+import rx.Observable;
 
 /**
  * Created by rama on 27/07/16.
  */
-public class Settings {
-
-	private final PokemonGo api;
-
+public class Settings extends AsyncDataObject<Settings> {
 
 	@Getter
 	/**
@@ -60,8 +59,8 @@ public class Settings {
      * @throws LoginFailedException If login failed.
      * @throws RemoteServerException If server communications failed.
 	 */
-	public Settings(PokemonGo api) throws LoginFailedException, RemoteServerException {
-		this.api = api;
+	public Settings(final PokemonGo api) {
+		super(api);
 		this.mapSettings = new MapSettings();
 		this.levelUpSettings = new LevelUpSettings();
 		this.fortSettings = new FortSettings();
@@ -75,20 +74,19 @@ public class Settings {
 	 * @throws RemoteServerException the remote server exception
 	 */
 	public Settings refreshDataSync() throws RemoteServerException, LoginFailedException {
-		DownloadSettingsMessageOuterClass.DownloadSettingsMessage msg =
-				DownloadSettingsMessageOuterClass.DownloadSettingsMessage.newBuilder().build();
-		final ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.DOWNLOAD_SETTINGS, msg);
 
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		final ServerRequest serverRequest = makeServerRequest();
+		getApi().getRequestHandler().sendServerRequests(serverRequest);
 		return updateInstanceData(serverRequest);
 	}
 
-	private synchronized Settings updateInstanceData(final ServerRequest serverRequest)
+	@Override
+	protected synchronized Settings updateInstanceData(final ServerRequest... serverRequests)
 			throws LoginFailedException, RemoteServerException
 	{
 		DownloadSettingsResponseOuterClass.DownloadSettingsResponse response;
 		try {
-			response = DownloadSettingsResponseOuterClass.DownloadSettingsResponse.parseFrom(serverRequest.getData());
+			response = DownloadSettingsResponseOuterClass.DownloadSettingsResponse.parseFrom(serverRequests[0].getData());
 		} catch (InvalidProtocolBufferException e) {
 			return refreshDataSync();
 		}
@@ -98,6 +96,22 @@ public class Settings {
 		fortSettings.update(response.getSettings().getFortSettings());
 		inventorySettings.update(response.getSettings().getInventorySettings());
 
+		return this;
+	}
+
+	private ServerRequest makeServerRequest() {
+		DownloadSettingsMessageOuterClass.DownloadSettingsMessage msg =
+				DownloadSettingsMessageOuterClass.DownloadSettingsMessage.newBuilder().build();
+		return new ServerRequest(RequestTypeOuterClass.RequestType.DOWNLOAD_SETTINGS, msg);
+	}
+
+	@Override
+	public Observable<Settings> refreshData() {
+		return sendAsyncServerRequests(makeServerRequest()).cast(Settings.class);
+	}
+
+	@Override
+	public Settings getInstance() {
 		return this;
 	}
 }

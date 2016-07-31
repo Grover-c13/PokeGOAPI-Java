@@ -31,7 +31,7 @@ import okhttp3.Response;
 import rx.Observable;
 import rx.functions.Func0;
 import rx.functions.Func1;
-import rx.observables.BlockingObservable;
+import rx.schedulers.Schedulers;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -112,6 +112,17 @@ public class RequestHandler {
 
 		try {
 			Thread.sleep(300);
+			lastRequestMs = System.currentTimeMillis();
+		} catch (InterruptedException ex) {
+			Log.e(TAG, "Request hold interrupted");
+		}
+	}
+
+	private synchronized void backOff() {
+		try {
+			long time = 1000 + (new Double(Math.random() * 500)).longValue();
+			Log.v(TAG, "Backing off for " + time + "ms");
+			Thread.sleep(time);
 			lastRequestMs = System.currentTimeMillis();
 		} catch (InterruptedException ex) {
 			Log.e(TAG, "Request hold interrupted");
@@ -222,12 +233,16 @@ public class RequestHandler {
 				ServerRequest serverReq = serverRequests[count++];
 				if (payload != null && !payload.isEmpty()) {
 					serverReq.handleData(payload);
-				} else { throw new InvalidProtocolBufferException("ServerRequest payload is empty!"); }
+				} else {
+					Log.v(TAG, serverReq.getRequest().toString());
+					throw new InvalidProtocolBufferException("ServerRequest payload is empty!");
+				}
 			}
 
 			return serverRequests;
 		} catch(InvalidProtocolBufferException e) {
 			Log.v(TAG, "Retrying requests due to InvalidProtocolBufferException");
+			backOff();
 			return sendServerRequests(newAuthTicket, serverRequests);
 		} catch (IOException e) {
 			throw new RemoteServerException(e);
@@ -235,6 +250,7 @@ public class RequestHandler {
 			if(e.getCause() instanceof InvalidProtocolBufferException)
 			{
 				Log.v(TAG, "Retrying requests due to error: " + e.getMessage());
+				backOff();
 				return sendServerRequests(newAuthTicket, serverRequests);
 			}
 
@@ -248,7 +264,7 @@ public class RequestHandler {
 	 * @param serverRequests The requests to to send to the remote server.
 	 * @return An Observable event to react to.
 	 */
-	public BlockingObservable<ServerRequest[]> sendAsyncServerRequests(final ServerRequest... serverRequests)
+	public Observable<ServerRequest[]> sendAsyncServerRequests(final ServerRequest... serverRequests)
 	{
 		return Observable.defer(new Func0<Observable<ServerRequest[]>>() {
 			@Override
@@ -262,15 +278,13 @@ public class RequestHandler {
 				}
 			}
 		})
-		.delay(100L, TimeUnit.MILLISECONDS)
-		// .observeOn(Schedulers.from(threadPoolExecutor))
+		.observeOn(Schedulers.from(threadPoolExecutor))
 		.retryWhen(new Func1<Observable<? extends Throwable>, Observable<?>>() {
 			@Override
 			public Observable<?> call(Observable<? extends Throwable> observable) {
 				return observable.flatMap(new Func1<Throwable, Observable<?>>() {
 					@Override
 					public Observable<?> call(Throwable throwable) {
-						System.err.println("Determining if a retry should happen...");
 						if(throwable instanceof InvalidProtocolBufferException
 							|| throwable.getCause() instanceof InvalidProtocolBufferException) {
 							try {
@@ -280,11 +294,10 @@ public class RequestHandler {
 								return Observable.error(ex);
 							}
 						}
-						System.err.println("No retry");
 						return Observable.error(throwable);
 					}
 				});
 			}
-		}).toBlocking();
+		});
 	}
 }

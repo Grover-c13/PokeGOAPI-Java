@@ -67,7 +67,7 @@ public class PokemonGo {
 
 		// FIXME: These aren't converted yet
 		settings = new Settings(this);
-		// map = new Map(this);
+		map = new Map(this);
 
 		// TODO: Make a data pull method instead of instantly firing requests in the constructor?
 		playerProfile.refreshDataSync();
