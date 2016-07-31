@@ -136,12 +136,14 @@ public class Log {
 
 	public enum Level {
 
+	    	ALL(Integer.MIN_VALUE),
 		VERBOSE(2),
 		DEBUG(3),
 		INFO(4),
 		WARN(5),
 		ERROR(6),
-		ASSERT(7);
+		ASSERT(7),
+		NONE(Integer.MAX_VALUE);
 
 		private int level;
 
