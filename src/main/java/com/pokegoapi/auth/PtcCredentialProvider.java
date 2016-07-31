@@ -46,15 +46,15 @@ public class PtcCredentialProvider extends CredentialProvider {
 	public static final String USER_AGENT = "niantic";
 	private static final String TAG = PtcCredentialProvider.class.getSimpleName();
 	//We try and refresh token 5 minutes before it actually expires
-	private static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
+	protected static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
 
-	private final OkHttpClient client;
-	private final String username;
-	private final String password;
-	private final Time time;
-	private String tokenId;
-	private long expiresTimestamp;
-	private AuthInfo.Builder authbuilder;
+	protected final OkHttpClient client;
+	protected final String username;
+	protected final String password;
+	protected final Time time;
+	protected String tokenId;
+	protected long expiresTimestamp;
+	protected AuthInfo.Builder authbuilder;
 
 	/**
 	 * Instantiates a new Ptc login.
