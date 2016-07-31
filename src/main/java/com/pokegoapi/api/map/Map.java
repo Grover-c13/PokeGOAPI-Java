@@ -467,7 +467,7 @@ public class Map {
 	 * @param lat the lat
 	 * @return the fort details
 	 */
-	public Observable<FortDetails> getFortDetailsAsync(String id, long lon, long lat) {
+	public Observable<FortDetails> getFortDetailsAsync(String id, double lon, double lat) {
 		FortDetailsMessage reqMsg = FortDetailsMessage.newBuilder()
 				.setFortId(id)
 				.setLatitude(lat)
@@ -501,7 +501,7 @@ public class Map {
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 */
-	public FortDetails getFortDetails(String id, long lon, long lat)
+	public FortDetails getFortDetails(String id, double lon, double lat)
 			throws LoginFailedException, RemoteServerException {
 		return AsyncHelper.toBlocking(getFortDetailsAsync(id, lon, lat));
 	}
