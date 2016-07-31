@@ -28,6 +28,7 @@ import POGOProtos.Networking.Responses.FortSearchResponseOuterClass;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.S2LatLng;
@@ -133,7 +134,7 @@ public class Pokestop {
 				try {
 					response = FortSearchResponseOuterClass.FortSearchResponse.parseFrom(result);
 				} catch (InvalidProtocolBufferException e) {
-					throw new RemoteServerException(e);
+					throw new AsyncRemoteServerException(e);
 				}
 				cooldownCompleteTimestampMs = response.getCooldownCompleteTimestampMs();
 				return new PokestopLootResult(response);
@@ -172,7 +173,7 @@ public class Pokestop {
 					//sadly the server response does not contain any information to verify if the request was successful
 					AddFortModifierResponseOuterClass.AddFortModifierResponse.parseFrom(result);
 				} catch (InvalidProtocolBufferException e) {
-					throw new RemoteServerException(e);
+					throw new AsyncRemoteServerException(e);
 				}
 				return Boolean.TRUE;
 			}
@@ -210,7 +211,7 @@ public class Pokestop {
 				try {
 					response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(result);
 				} catch (InvalidProtocolBufferException e) {
-					throw new RemoteServerException(e);
+					throw new AsyncRemoteServerException(e);
 				}
 				return new FortDetails(response);
 			}
