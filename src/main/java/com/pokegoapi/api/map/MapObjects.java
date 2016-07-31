@@ -15,7 +15,6 @@
 
 package com.pokegoapi.api.map;
 
-import POGOProtos.Map.Fort.FortDataOuterClass;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass.NearbyPokemon;

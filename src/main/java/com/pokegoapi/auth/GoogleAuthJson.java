@@ -16,7 +16,6 @@
 package com.pokegoapi.auth;
 
 import com.squareup.moshi.Json;
-
 import lombok.Getter;
 import lombok.Setter;
 

@@ -32,7 +32,6 @@ package com.pokegoapi.examples;
 
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
-
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.pokemon.CatchResult;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
@@ -41,7 +40,6 @@ import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
-
 import okhttp3.OkHttpClient;
 
 import java.util.List;

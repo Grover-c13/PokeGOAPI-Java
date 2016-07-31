@@ -15,11 +15,8 @@
 
 package com.pokegoapi.api.pokemon;
 
-import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
-import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
