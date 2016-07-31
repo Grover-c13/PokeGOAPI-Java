@@ -33,12 +33,12 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.ItemBag;
+import com.pokegoapi.api.inventory.Stats;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
-import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashMap;
@@ -54,9 +54,9 @@ public class PlayerProfile {
 	private DailyBonus dailyBonus;
 	private ContactSettings contactSettings;
 	private Map<Currency, Integer> currencies = new HashMap<Currency, Integer>();
-	@Getter
 	@Setter
-	private PlayerStatsOuterClass.PlayerStats stats;
+	private Stats stats;
+
 	private boolean init;
 
 	public PlayerProfile(PokemonGo api) throws LoginFailedException, RemoteServerException {
@@ -287,5 +287,22 @@ public class PlayerProfile {
 			updateProfile();
 		}
 		return currencies;
+	}
+
+
+
+	/**
+	 * Gets player stats
+	 *
+	 * @return stats API objet
+	 * @throws LoginFailedException when the auth is invalid
+	 * @throws RemoteServerException when the server is down/having issues
+	 */
+	public Stats getStats()
+			throws LoginFailedException, RemoteServerException {
+		if (stats == null) {
+			api.getInventories().updateInventories();
+		}
+		return stats;
 	}
 }

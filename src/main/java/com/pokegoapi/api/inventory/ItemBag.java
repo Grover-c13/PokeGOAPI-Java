@@ -121,6 +121,10 @@ public class ItemBag {
 	 * Get used space inside of player inventory.
 	 *
 	 * @return used space
+	 * @throws RemoteServerException
+	 *             the remote server exception
+	 * @throws LoginFailedException
+	 *             the login failed exception
 	 */
 	public int getItemsCount() {
 		int ct = 0;
@@ -130,6 +134,14 @@ public class ItemBag {
 		return ct;
 	}
 
+	/**
+	 * use an item with itemID
+	 * @param type type of item
+	 * @throws RemoteServerException
+	 *             the remote server exception
+	 * @throws LoginFailedException
+	 *             the login failed exception
+	 */
 	public void useItem(ItemId type) throws RemoteServerException, LoginFailedException {
 		if (type == ItemId.UNRECOGNIZED) {
 			throw new IllegalArgumentException("You cannot use item for UNRECOGNIZED");
@@ -147,6 +159,10 @@ public class ItemBag {
 		}
 	}
 
+	/**
+	 * use an incense
+	 * @param type type of item
+	 */
 	public void useIncense(ItemId type) throws RemoteServerException, LoginFailedException {
 		UseIncenseMessage useIncenseMessage = 
 				UseIncenseMessage.newBuilder()
@@ -166,7 +182,10 @@ public class ItemBag {
 			throw new RemoteServerException(e);
 		}
 	}
-	
+
+	/**
+	 * use an item with itemID
+	 */
 	public void useIncense() throws RemoteServerException, LoginFailedException {	
 		useIncense(ItemId.ITEM_INCENSE_ORDINARY);
 	}
