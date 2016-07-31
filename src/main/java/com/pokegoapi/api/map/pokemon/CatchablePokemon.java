@@ -22,31 +22,27 @@ import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.CatchPokemonMessage;
 import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.UseItemCaptureMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.UseItemCaptureMessageOuterClass.UseItemCaptureMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
-import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass;
 import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass.UseItemCaptureResponse;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Pokeball;
+import com.pokegoapi.exceptions.AsyncLoginFailedException;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
 import lombok.Getter;
 import lombok.ToString;
 import rx.Observable;
 import rx.functions.Func1;
-
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * The type Catchable pokemon.
@@ -146,7 +142,7 @@ public class CatchablePokemon {
 					response = EncounterResponseOuterClass.EncounterResponse
 							.parseFrom(result);
 				} catch (InvalidProtocolBufferException e) {
-					throw new RemoteServerException(e);
+					throw new AsyncRemoteServerException(e);
 				}
 				encountered = response.getStatus() == EncounterResponse.Status.ENCOUNTER_SUCCESS;
 				return new EncounterResult(response);
@@ -400,12 +396,20 @@ public class CatchablePokemon {
 				try {
 					response = CatchPokemonResponse.parseFrom(result);
 				} catch (InvalidProtocolBufferException e) {
-					throw new RemoteServerException(e);
+					throw new AsyncRemoteServerException(e);
 				}
 
 				if (response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_ESCAPE
 						&& response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_MISSED) {
-					api.getInventories().updateInventories();
+					try {
+						api.getInventories().updateInventories();
+					}
+					catch (LoginFailedException e) {
+						throw new AsyncLoginFailedException(e);
+					}
+					catch (RemoteServerException e) {
+						throw new AsyncRemoteServerException(e);
+					}
 					return new CatchResult(response);
 				} else {
 					return new CatchResult();
@@ -442,7 +446,7 @@ public class CatchablePokemon {
 				try {
 					response = UseItemCaptureResponse.parseFrom(result);
 				} catch (InvalidProtocolBufferException e) {
-					throw new RemoteServerException(e);
+					throw new AsyncRemoteServerException(e);
 				}
 				return new CatchItemResult(response);
 			}
