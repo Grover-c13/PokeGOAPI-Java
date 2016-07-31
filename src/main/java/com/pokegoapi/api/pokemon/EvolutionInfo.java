@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 
-import static POGOProtos.Enums.PokemonIdOuterClass.*;
+import POGOProtos.Enums.PokemonIdOuterClass;
+
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.ABRA;
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.AERODACTYL;
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.ALAKAZAM;

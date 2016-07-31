@@ -19,12 +19,12 @@ import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.RecycleInventoryItemMessageOuterClass.RecycleInventoryItemMessage;
 import POGOProtos.Networking.Requests.Messages.UseIncenseMessageOuterClass.UseIncenseMessage;
-import POGOProtos.Networking.Requests.Messages.UseItemXpBoostMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.UseItemXpBoostMessageOuterClass.UseItemXpBoostMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass;
 import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result;
 import POGOProtos.Networking.Responses.UseIncenseResponseOuterClass.UseIncenseResponse;
+import POGOProtos.Networking.Responses.UseItemXpBoostResponseOuterClass.UseItemXpBoostResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -35,7 +35,6 @@ import com.pokegoapi.util.Log;
 import java.util.Collection;
 import java.util.HashMap;
 
-import static POGOProtos.Networking.Requests.RequestTypeOuterClass.*;
 
 /**
  * The type Bag.
@@ -188,30 +187,36 @@ public class ItemBag {
 	}
 
 
-	public void useLuckyEgg() throws RemoteServerException, LoginFailedException {
-		UseItemXpBoostMessage xpMsg = UseItemXpBoostMessage
-										.newBuilder()
-										.setItemId(ItemId.ITEM_LUCKY_EGG)
-										.build();
-
-		ServerRequest req = new ServerRequest(RequestType.USE_ITEM_XP_BOOST,
-				xpMsg);
-		pgo.getRequestHandler().sendServerRequests(req);
-
-		UseIncenseResponse response = null;
-		try {
-			response = UseIncenseResponse.parseFrom(req.getData());
-			Log.i("Main", "Use incense result: " + response.getResult());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-	}
-
 	/**
 	 * use an item with itemID
 	 */
 	public void useIncense() throws RemoteServerException, LoginFailedException {	
 		useIncense(ItemId.ITEM_INCENSE_ORDINARY);
+	}
+
+	/**
+	 * use a lucky egg
+	 * @returns lucky egg response
+	 */
+	public UseItemXpBoostResponse useLuckyEgg() throws RemoteServerException, LoginFailedException {
+		UseItemXpBoostMessage xpMsg = UseItemXpBoostMessage
+				.newBuilder()
+				.setItemId(ItemId.ITEM_LUCKY_EGG)
+				.build();
+
+		ServerRequest req = new ServerRequest(RequestType.USE_ITEM_XP_BOOST,
+				xpMsg);
+		pgo.getRequestHandler().sendServerRequests(req);
+
+		UseItemXpBoostResponse response = null;
+		try {
+			response = UseItemXpBoostResponse.parseFrom(req.getData());
+			Log.i("Main", "Use incense result: " + response.getResult());
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
+
+		return response;
 	}
 
 }

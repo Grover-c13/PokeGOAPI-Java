@@ -38,6 +38,7 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.util.FutureWrapper;
+import com.pokegoapi.util.Log;
 import com.pokegoapi.util.NestedFutureWrapper;
 import com.pokegoapi.util.PokemonFuture;
 import lombok.Getter;
@@ -343,6 +344,10 @@ public class CatchablePokemon {
 				razberries++;
 			}
 			result = catchPokemonAsync(normalizedHitPosition, normalizedReticleSize, spinModifier, type).toBlocking();
+			if (result == null) {
+				Log.wtf(TAG, "Got a null result after catch attempt");
+				break;
+			}
 			if (!result.isFailed() && result.getStatus() != CatchStatus.CATCH_ESCAPE
 					&& result.getStatus() != CatchStatus.CATCH_MISSED
 					|| result.getStatus() == CatchStatus.CATCH_FLEE) {
@@ -415,7 +420,9 @@ public class CatchablePokemon {
 					api.getInventories().updateInventories();
 					return new CatchResult(response);
 				} else {
-					return new CatchResult();
+					CatchResult res = new CatchResult();
+					res.setStatus(CatchStatus.CATCH_ESCAPE);
+					return res;
 				}
 			}
 		};
