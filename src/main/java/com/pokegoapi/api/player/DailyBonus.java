@@ -15,11 +15,22 @@
 
 package com.pokegoapi.api.player;
 
+import POGOProtos.Data.Player.DailyBonusOuterClass;
 import lombok.Data;
 
 @Data
 public class DailyBonus {
+	private final DailyBonusOuterClass.DailyBonus proto;
 
-	private long nextCollectionTimestamp;
-	private long nextDefenderBonusCollectTimestamp;
+	public DailyBonus(DailyBonusOuterClass.DailyBonus proto ) {
+		this.proto = proto;
+	}
+
+	public long getNextCollectedTimestampMs() {
+		return proto.getNextCollectedTimestampMs();
+	}
+
+	public long getNextDefenderBonusCollectTimestampMs() {
+		return proto.getNextDefenderBonusCollectTimestampMs();
+	}
 }

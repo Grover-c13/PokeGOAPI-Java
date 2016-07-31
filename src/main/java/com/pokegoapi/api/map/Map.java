@@ -75,6 +75,8 @@ public class Map {
 	 * Instantiates a new Map.
 	 *
 	 * @param api the api
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public Map(PokemonGo api) throws LoginFailedException, RemoteServerException {
 		this.api = api;
@@ -87,8 +89,6 @@ public class Map {
 	 * Returns a list of catchable pokemon around the current location.
 	 *
 	 * @return a List of CatchablePokemon at your current location
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync() {
 		List<Long> cellIds = getDefaultCells();
@@ -127,6 +127,8 @@ public class Map {
 	 * Returns a list of nearby pokemon (non-catchable).
 	 *
 	 * @return a List of NearbyPokemon at your current location
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public Observable<List<NearbyPokemon>> getNearbyPokemonAsync() {
 		return getMapObjectsAsync(getDefaultCells()).map(new Func1<MapObjects, List<NearbyPokemon>>() {
@@ -188,8 +190,6 @@ public class Map {
 	 * Get a list of gyms near the current location.
 	 *
 	 * @return List of gyms
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public Observable<List<Gym>> getGymsAsync() {
 		return getMapObjectsAsync(getDefaultCells()).map(new Func1<MapObjects, List<Gym>>() {

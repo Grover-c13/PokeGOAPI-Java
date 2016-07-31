@@ -170,7 +170,8 @@ public class CatchablePokemon {
 	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 */
-	public Observable<CatchResult> catchPokemonWithRazzBerryAsync() {
+	public Observable<CatchResult> catchPokemonWithRazzBerryAsync()
+			throws LoginFailedException, RemoteServerException {
 		final Pokeball pokeball;
 
 		ItemBag bag = api.getInventories().getItemBag();
