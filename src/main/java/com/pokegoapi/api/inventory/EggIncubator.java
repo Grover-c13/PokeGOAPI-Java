@@ -123,7 +123,7 @@ public class EggIncubator {
 	 * 
 	 * @return currently used or not
 	 */
-	public boolean isInUse() {
+	public boolean isInUse() throws LoginFailedException, RemoteServerException {
 		return getKmTarget() > pgo.getPlayerProfile().getStats().getKmWalked();
 	}
 }
