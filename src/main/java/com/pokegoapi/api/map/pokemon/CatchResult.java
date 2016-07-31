@@ -28,6 +28,7 @@ import java.util.List;
 public class CatchResult {
 	private CaptureAward captureAward;
 	private CatchPokemonResponse response;
+	private CatchStatus status;
 
 	@Setter
 	private boolean failed;
@@ -41,7 +42,15 @@ public class CatchResult {
 		this.response = response;
 	}
 
+	/**
+	 * Gets a status from response object, or a set one if set
+	 *
+	 * @return catch status
+	 */
 	public CatchStatus getStatus() {
+		if (this.status != null) {
+			return status;
+		}
 		return response.getStatus();
 	}
 
@@ -67,6 +76,10 @@ public class CatchResult {
 
 	public List<Integer> getStardustList() {
 		return captureAward.getStardustList();
+	}
+
+	public void setStatus(CatchStatus status) {
+		this.status = status;
 	}
 
 	/**
