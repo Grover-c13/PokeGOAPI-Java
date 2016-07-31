@@ -39,11 +39,8 @@ import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.util.FutureWrapper;
-<<<<<<< HEAD
 import com.pokegoapi.util.MapPoint;
-=======
 import com.pokegoapi.util.Log;
->>>>>>> 53999abb7af9a93e97bcd82b8a0fa304260948f2
 import com.pokegoapi.util.NestedFutureWrapper;
 import com.pokegoapi.util.PokemonFuture;
 import lombok.Getter;
