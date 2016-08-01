@@ -4,10 +4,16 @@ version = '0.0.1-SNAPSHOT'
 buildscript {
     repositories {
         mavenCentral()
-        maven { url "https://jitpack.io" }
     }
     dependencies {
         classpath 'com.google.protobuf:protobuf-gradle-plugin:0.7.7'
     }
+}
 
+allprojects {
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+    }
 }

@@ -9,11 +9,6 @@ description = """Pokemon Go Java API"""
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
-repositories {
-    mavenCentral()
-    maven { url "https://jitpack.io" }
-}
-
 sourceSets {
     main {
         proto {
