@@ -24,11 +24,12 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.AsyncPokemonGoException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.util.FutureWrapper;
+import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import rx.Observable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -80,9 +81,9 @@ public class RequestHandler implements Runnable {
 	 * @param serverRequest Request to make
 	 * @return ByteString response to be processed in the future
 	 */
-	public Future<ByteString> sendAsyncServerRequests(final AsyncServerRequest serverRequest) {
+	public Observable<ByteString> sendAsyncServerRequests(final AsyncServerRequest serverRequest) {
 		workQueue.offer(serverRequest);
-		return new Future<ByteString>() {
+		return Observable.from(new Future<ByteString>() {
 			@Override
 			public boolean cancel(boolean mayInterruptIfRunning) {
 				return false;
@@ -134,7 +135,7 @@ public class RequestHandler implements Runnable {
 				}
 				return resultMap.remove(serverRequest.getId());
 			}
-		};
+		});
 	}
 
 	/**
@@ -145,13 +146,13 @@ public class RequestHandler implements Runnable {
 	 * @throws LoginFailedException  the login failed exception
 	 */
 	public void sendServerRequests(ServerRequest... serverRequests) throws RemoteServerException, LoginFailedException {
-		List<Future<ByteString>> futures = new ArrayList<>(serverRequests.length);
+		List<Observable<ByteString>> observables = new ArrayList<>(serverRequests.length);
 		for (ServerRequest request : serverRequests) {
 			AsyncServerRequest asyncServerRequest = new AsyncServerRequest(request.getType(), request.getRequest());
-			futures.add(sendAsyncServerRequests(asyncServerRequest));
+			observables.add(sendAsyncServerRequests(asyncServerRequest));
 		}
 		for (int i = 0; i != serverRequests.length; i++) {
-			serverRequests[i].handleData(FutureWrapper.toBlocking(futures.get(i)));
+			serverRequests[i].handleData(AsyncHelper.toBlocking(observables.get(i)));
 		}
 	}
 
