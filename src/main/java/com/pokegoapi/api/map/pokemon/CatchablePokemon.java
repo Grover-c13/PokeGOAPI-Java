@@ -86,7 +86,6 @@ public class CatchablePokemon implements MapPoint {
 	private Boolean encountered = null;
 
 
-
 	/**
 	 * Instantiates a new Catchable pokemon.
 	 *
@@ -209,7 +208,6 @@ public class CatchablePokemon implements MapPoint {
 			RemoteServerException {
 		return encounterNormalPokemonAsync().toBlocking();
 	}
-
 
 
 	/**
@@ -360,7 +358,7 @@ public class CatchablePokemon implements MapPoint {
 		} else {
 			throw new NoSuchItemException();
 		}
-		return catchPokemon(pokeball,amount, razberryLimit);
+		return catchPokemon(pokeball, amount, razberryLimit);
 	}
 
 	/**
