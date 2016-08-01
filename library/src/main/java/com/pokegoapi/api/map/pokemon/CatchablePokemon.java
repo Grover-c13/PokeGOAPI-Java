@@ -469,14 +469,8 @@ public class CatchablePokemon implements MapPoint {
 				useItem(ItemId.ITEM_RAZZ_BERRY);
 				razberries++;
 			}
-<<<<<<< HEAD:src/main/java/com/pokegoapi/api/map/pokemon/CatchablePokemon.java
 			result = AsyncHelper.toBlocking(catchPokemonAsync(normalizedHitPosition,
 					normalizedReticleSize, spinModifier, type));
-=======
-			result = AsyncHelper.toBlocking(
-					catchPokemonAsync(normalizedHitPosition, normalizedReticleSize, spinModifier, type)
-			);
->>>>>>> Development:library/src/main/java/com/pokegoapi/api/map/pokemon/CatchablePokemon.java
 			if (result == null) {
 				Log.wtf(TAG, "Got a null result after catch attempt");
 				break;
