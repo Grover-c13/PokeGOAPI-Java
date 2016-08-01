@@ -24,23 +24,28 @@ import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.Ev
 import POGOProtos.Networking.Requests.Messages.NicknamePokemonMessageOuterClass.NicknamePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.SetFavoritePokemonMessageOuterClass.SetFavoritePokemonMessage;
-import POGOProtos.Networking.Requests.Messages.UpgradePokemonMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.UpgradePokemonMessageOuterClass.UpgradePokemonMessage;
+import POGOProtos.Networking.Requests.Messages.UseItemPotionMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.UseItemReviveMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass.EvolvePokemonResponse;
 import POGOProtos.Networking.Responses.NicknamePokemonResponseOuterClass.NicknamePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
 import POGOProtos.Networking.Responses.SetFavoritePokemonResponseOuterClass.SetFavoritePokemonResponse;
-import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass;
 import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass.UpgradePokemonResponse;
+import POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass;
+import POGOProtos.Networking.Responses.UseItemReviveResponseOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.map.pokemon.EvolutionResult;
 import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
+import lombok.Getter;
 import lombok.Setter;
 
 /**
@@ -52,13 +57,24 @@ public class Pokemon {
 	private final PokemonGo pgo;
 	private PokemonData proto;
 	private PokemonMeta meta;
+	@Getter
+	@Setter
+	private int stamina;
 
 	// API METHODS //
 
 	// DELEGATE METHODS BELOW //
+
+	/**
+	 * Creates a Pokemon object with helper functions around the proto.
+	 *
+	 * @param api   the api to use
+	 * @param proto the proto from the server
+	 */
 	public Pokemon(PokemonGo api, PokemonData proto) {
 		this.pgo = api;
 		this.proto = proto;
+		this.stamina = proto.getStamina();
 	}
 
 	/**
@@ -124,14 +140,14 @@ public class Pokemon {
 	}
 
 	/**
-	* Function to mark the pokemon as favorite or not.
-	*
-	* @param markFavorite Mark Pokemon as Favorite?
-	* @return the SetFavoritePokemonResponse.Result
-	* @throws LoginFailedException  the login failed exception
-	* @throws RemoteServerException the remote server exception
-	*/
-	public SetFavoritePokemonResponse.Result setFavoritePokemon(boolean markFavorite) 
+	 * Function to mark the pokemon as favorite or not.
+	 *
+	 * @param markFavorite Mark Pokemon as Favorite?
+	 * @return the SetFavoritePokemonResponse.Result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public SetFavoritePokemonResponse.Result setFavoritePokemon(boolean markFavorite)
 			throws LoginFailedException, RemoteServerException {
 		SetFavoritePokemonMessage reqMsg = SetFavoritePokemonMessage.newBuilder()
 				.setPokemonId(getId())
@@ -181,6 +197,7 @@ public class Pokemon {
 	}
 
 	/**
+	 * dus
 	 * Evolve evolution result.
 	 *
 	 * @return the evolution result
@@ -222,7 +239,8 @@ public class Pokemon {
 		return meta;
 	}
 
-	public int getCandy() {
+
+	public int getCandy() throws LoginFailedException, RemoteServerException {
 		return pgo.getInventories().getCandyjar().getCandies(getPokemonFamily());
 	}
 
@@ -248,10 +266,6 @@ public class Pokemon {
 
 	public int getCp() {
 		return proto.getCp();
-	}
-
-	public int getStamina() {
-		return proto.getStamina();
 	}
 
 	public int getMaxStamina() {
@@ -294,6 +308,10 @@ public class Pokemon {
 		return proto.getHeightM();
 	}
 
+	public float getWeightKg() {
+		return proto.getWeightKg();
+	}
+
 	public int getIndividualAttack() {
 		return proto.getIndividualAttack();
 	}
@@ -305,9 +323,10 @@ public class Pokemon {
 	public int getIndividualStamina() {
 		return proto.getIndividualStamina();
 	}
-	
+
 	/**
 	 * Calculates the pokemons IV ratio.
+	 *
 	 * @return the pokemons IV ratio as a double between 0 and 1.0, 1.0 being perfect IVs
 	 */
 	public double getIvRatio() {
@@ -341,9 +360,10 @@ public class Pokemon {
 	public long getCreationTimeMs() {
 		return proto.getCreationTimeMs();
 	}
-	
+
 	/**
 	 * Checks whether the Pokémon is set as favorite.
+	 *
 	 * @return true if the Pokémon is set as favorite
 	 */
 	public boolean isFavorite() {
@@ -384,7 +404,227 @@ public class Pokemon {
 		return getMeta().getBaseFleeRate();
 	}
 
+	public float getLevel() {
+		return PokemonCpUtils.getLevelFromCpMultiplier(proto.getCpMultiplier() + proto.getAdditionalCpMultiplier());
+	}
+
+	/**
+	 * Calculate the maximum CP for this individual pokemon
+	 *
+	 * @return The maximum CP for this pokemon
+     * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
+	 */
+	public int getMaxCp() throws NoSuchItemException {
+		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
+		if (pokemonMeta == null) {
+			throw new NoSuchItemException("Cannot find meta data for " + proto.getPokemonId().name());
+		}
+		int attack = proto.getIndividualAttack() + pokemonMeta.getBaseAttack();
+		int defense = proto.getIndividualDefense() + pokemonMeta.getBaseDefense();
+		int stamina = proto.getIndividualStamina() + pokemonMeta.getBaseStamina();
+		return PokemonCpUtils.getMaxCp(attack, defense, stamina);
+	}
+
+	/**
+	 * Calculates the absolute maximum CP for all pokemons with this PokemonId
+	 *
+	 * @return The absolute maximum CP
+     * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
+	 */
+	public int getAbsoluteMaxCp() throws NoSuchItemException {
+		return getAbsoluteMaxCp(proto.getPokemonId());
+	}
+
+
+	/**
+	 * Static helper to get the absolute maximum CP for pokemons with their PokemonId.
+     * @param id The {@link POGOProtos.Enums.PokemonIdOuterClass.PokemonId} of the Pokemon to get CP for.
+	 * @return The absolute maximum CP
+     * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
+	 */
+	public static int getAbsoluteMaxCp(PokemonIdOuterClass.PokemonId id) throws NoSuchItemException {
+		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(id);
+		if (pokemonMeta == null) {
+			throw new NoSuchItemException("Cannot find meta data for " + id);
+		}
+		int attack = 15 + pokemonMeta.getBaseAttack();
+		int defense = 15 + pokemonMeta.getBaseDefense();
+		int stamina = 15 + pokemonMeta.getBaseStamina();
+		return PokemonCpUtils.getMaxCp(attack, defense, stamina);
+	}
+
+
+	/**
+	 * @return The CP for this pokemon after powerup
+	 */
+	public int getCpAfterPowerup() {
+		return PokemonCpUtils.getCpAfterPowerup(proto.getCp(),
+				proto.getCpMultiplier() + proto.getAdditionalCpMultiplier());
+	}
+
+	/**
+	 * @return Cost of candy for a powerup
+	 */
+	public int getCandyCostsForPowerup() {
+		return PokemonCpUtils.getCandyCostsForPowerup(proto.getCpMultiplier() + proto.getAdditionalCpMultiplier(),
+				proto.getNumUpgrades());
+	}
+
+	/**
+	 * @return Cost of stardust for a powerup
+	 */
+	public int getStardustCostsForPowerup() {
+		return PokemonCpUtils.getStartdustCostsForPowerup(proto.getCpMultiplier() + proto.getAdditionalCpMultiplier(),
+				proto.getNumUpgrades());
+	}
+
 	public PokemonIdOuterClass.PokemonId getParent() {
 		return getMeta().getParentId();
 	}
+
+	/**
+	 * Check if pokemon its injured but not fainted. need potions to heal
+	 *
+	 * @return true if pokemon is injured
+	 */
+	public boolean isInjured() {
+		return !isFainted() && getStamina() < getMaxStamina();
+	}
+
+	/**
+	 * check if a pokemon it's died (fainted). need a revive to resurrect
+	 *
+	 * @return true if a pokemon is fainted
+	 */
+	public boolean isFainted() {
+		return getStamina() == 0;
+	}
+
+	/**
+	 * Heal a pokemon, using various fallbacks for potions
+	 *
+	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
+     * @throws LoginFailedException If login failed.
+     * @throws RemoteServerException If server communication issues occurred.
+	 */
+	public UseItemPotionResponseOuterClass.UseItemPotionResponse.Result heal()
+			throws LoginFailedException, RemoteServerException {
+
+		if (!isInjured())
+			return UseItemPotionResponseOuterClass.UseItemPotionResponse.Result.ERROR_CANNOT_USE;
+
+		if (pgo.getInventories().getItemBag().getItem(ItemId.ITEM_POTION).getCount() > 0)
+			return usePotion(ItemId.ITEM_POTION);
+
+		if (pgo.getInventories().getItemBag().getItem(ItemId.ITEM_SUPER_POTION).getCount() > 0)
+			return usePotion(ItemId.ITEM_SUPER_POTION);
+
+		if (pgo.getInventories().getItemBag().getItem(ItemId.ITEM_HYPER_POTION).getCount() > 0)
+			return usePotion(ItemId.ITEM_HYPER_POTION);
+
+		if (pgo.getInventories().getItemBag().getItem(ItemId.ITEM_MAX_POTION).getCount() > 0)
+			return usePotion(ItemId.ITEM_MAX_POTION);
+
+		return UseItemPotionResponseOuterClass.UseItemPotionResponse.Result.ERROR_CANNOT_USE;
+	}
+
+	/**
+	 * use a potion on that pokemon. Will check if there is enough potions and if the pokemon need
+	 * to be healed.
+	 * @param itemId {@link ItemId} of the potion to use.
+	 * @return Result, ERROR_CANNOT_USE if the requirements aren't met
+     * @throws LoginFailedException If login failed.
+     * @throws RemoteServerException If server communications failed.
+	 */
+	public UseItemPotionResponseOuterClass.UseItemPotionResponse.Result usePotion(ItemId itemId)
+			throws LoginFailedException, RemoteServerException {
+
+		Item potion = pgo.getInventories().getItemBag().getItem(itemId);
+		//some sanity check, to prevent wrong use of this call
+		if (!potion.isPotion() || potion.getCount() < 1 || !isInjured())
+			return UseItemPotionResponseOuterClass.UseItemPotionResponse.Result.ERROR_CANNOT_USE;
+
+		UseItemPotionMessageOuterClass.UseItemPotionMessage reqMsg = UseItemPotionMessageOuterClass.UseItemPotionMessage
+				.newBuilder()
+				.setItemId(itemId)
+				.setPokemonId(getId())
+				.build();
+
+		ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_POTION, reqMsg);
+		pgo.getRequestHandler().sendServerRequests(serverRequest);
+
+		UseItemPotionResponseOuterClass.UseItemPotionResponse response;
+		try {
+			response = UseItemPotionResponseOuterClass.UseItemPotionResponse.parseFrom(serverRequest.getData());
+			if (response.getResult() == UseItemPotionResponseOuterClass.UseItemPotionResponse.Result.SUCCESS) {
+				setStamina(response.getStamina());
+			}
+			return response.getResult();
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
+	}
+
+	/**
+	 * Revive a pokemon, using various fallbacks for revive items
+	 *
+	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
+     * @throws LoginFailedException If login failed.
+     * @throws RemoteServerException If server communications failed.
+	 */
+	public UseItemReviveResponseOuterClass.UseItemReviveResponse.Result revive()
+			throws LoginFailedException, RemoteServerException {
+
+		if (!isFainted())
+			return UseItemReviveResponseOuterClass.UseItemReviveResponse.Result.ERROR_CANNOT_USE;
+
+		if (pgo.getInventories().getItemBag().getItem(ItemId.ITEM_REVIVE).getCount() > 0)
+			return useRevive(ItemId.ITEM_REVIVE);
+
+		if (pgo.getInventories().getItemBag().getItem(ItemId.ITEM_MAX_REVIVE).getCount() > 0)
+			return useRevive(ItemId.ITEM_MAX_REVIVE);
+
+		return UseItemReviveResponseOuterClass.UseItemReviveResponse.Result.ERROR_CANNOT_USE;
+	}
+
+	/**
+	 * Use a revive item on the pokemon. Will check if there is enough revive &amp; if the pokemon need
+	 * to be revived.
+	 * @param itemId {@link ItemId} of the Revive to use.
+	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
+     * @throws LoginFailedException If login failed.
+     * @throws RemoteServerException If server communications failed.
+	 */
+	public UseItemReviveResponseOuterClass.UseItemReviveResponse.Result useRevive(ItemId itemId)
+			throws LoginFailedException, RemoteServerException {
+
+		Item item = pgo.getInventories().getItemBag().getItem(itemId);
+		if (!item.isRevive() || item.getCount() < 1 || !isFainted())
+			return UseItemReviveResponseOuterClass.UseItemReviveResponse.Result.ERROR_CANNOT_USE;
+
+		UseItemReviveMessageOuterClass.UseItemReviveMessage reqMsg = UseItemReviveMessageOuterClass.UseItemReviveMessage
+				.newBuilder()
+				.setItemId(itemId)
+				.setPokemonId(getId())
+				.build();
+
+		ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_REVIVE, reqMsg);
+		pgo.getRequestHandler().sendServerRequests(serverRequest);
+
+		UseItemReviveResponseOuterClass.UseItemReviveResponse response;
+		try {
+			response = UseItemReviveResponseOuterClass.UseItemReviveResponse.parseFrom(serverRequest.getData());
+			if (response.getResult() == UseItemReviveResponseOuterClass.UseItemReviveResponse.Result.SUCCESS) {
+				setStamina(response.getStamina());
+			}
+			return response.getResult();
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
+	}
+
+	public EvolutionForm getEvolutionForm() {
+		return new EvolutionForm(getPokemonId());
+	}
+
 }

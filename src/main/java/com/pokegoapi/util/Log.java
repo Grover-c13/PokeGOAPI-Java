@@ -21,10 +21,11 @@ import java.io.StringWriter;
 /**
  * Created by Will on 7/20/16.
  */
-@SuppressWarnings("checkstyle:methodname")
+@SuppressWarnings({ "checkstyle:methodname", "checkstyle:javadocmethod" })
 public class Log {
 
 	private static Logger logger;
+	private static Level level = Level.VERBOSE;
 
 	private static Logger getInstance() {
 		if (logger == null) {
@@ -33,76 +34,117 @@ public class Log {
 		return logger;
 	}
 
-	//Do not call this while logging from a different thread...
-	//That's asking for trouble...
+	// Do not call this while logging from a different thread...
+	// That's asking for trouble...
 	public static void setInstance(Logger logger) {
 		Log.logger = logger;
 	}
 
+	/**
+	 * Sets the level of the Logger. For example, if the level is Error, all
+	 * ERROR and ASSERT messages will be logged, but nothing else.
+	 *
+	 * @param level
+	 *            the level to log at
+	 */
+	public static void setLevel(Level level) {
+		Log.level = level;
+	}
+
 	public static void v(String tag, String msg) {
-		getInstance().v(tag, msg);
+		if (level.level <= Level.VERBOSE.level) {
+			getInstance().v(tag, msg);
+		}
 	}
 
 	public static void v(String tag, String msg, Throwable tr) {
-		getInstance().v(tag, msg, tr);
+		if (Log.level.level <= Level.VERBOSE.level) {
+			getInstance().v(tag, msg, tr);
+		}
 	}
 
 	public static void d(String tag, String msg) {
-		getInstance().d(tag, msg);
+		if (Log.level.level <= Level.DEBUG.level) {
+			getInstance().d(tag, msg);
+		}
 	}
 
 	public static void d(String tag, String msg, Throwable tr) {
-		getInstance().d(tag, msg, tr);
+		if (Log.level.level <= Level.DEBUG.level) {
+			getInstance().d(tag, msg, tr);
+		}
 	}
 
 	public static void i(String tag, String msg) {
-		getInstance().i(tag, msg);
+		if (Log.level.level <= Level.INFO.level) {
+			getInstance().i(tag, msg);
+		}
 	}
 
 	public static void i(String tag, String msg, Throwable tr) {
-		getInstance().i(tag, msg, tr);
+		if (Log.level.level <= Level.INFO.level) {
+			getInstance().i(tag, msg, tr);
+		}
 	}
 
 	public static void w(String tag, String msg) {
-		getInstance().w(tag, msg);
+		if (Log.level.level <= Level.WARN.level) {
+			getInstance().w(tag, msg);
+		}
 	}
 
 	public static void w(String tag, String msg, Throwable tr) {
-		getInstance().w(tag, msg, tr);
+		if (Log.level.level <= Level.WARN.level) {
+			getInstance().w(tag, msg, tr);
+		}
 	}
 
 	public static void w(String tag, Throwable tr) {
-		getInstance().w(tag, tr);
+		if (Log.level.level <= Level.WARN.level) {
+			getInstance().w(tag, tr);
+		}
 	}
 
 	public static void e(String tag, String msg) {
-		getInstance().e(tag, msg);
+		if (Log.level.level <= Level.ERROR.level) {
+			getInstance().e(tag, msg);
+		}
 	}
 
 	public static void e(String tag, String msg, Throwable tr) {
-		getInstance().e(tag, msg, tr);
+		if (Log.level.level <= Level.ERROR.level) {
+			getInstance().e(tag, msg, tr);
+		}
 	}
 
 	public static void wtf(String tag, String msg) {
-		getInstance().wtf(tag, msg);
+		if (Log.level.level <= Level.ASSERT.level) {
+			getInstance().wtf(tag, msg);
+		}
 	}
 
 	public static void wtf(String tag, Throwable tr) {
-		getInstance().wtf(tag, tr);
+		if (Log.level.level <= Level.ASSERT.level) {
+			getInstance().wtf(tag, tr);
+		}
 	}
 
 	public static void wtf(String tag, String msg, Throwable tr) {
-		getInstance().wtf(tag, msg, tr);
+		if (Log.level.level <= Level.ASSERT.level) {
+			getInstance().wtf(tag, msg, tr);
+		}
 	}
 
 	public enum Level {
 
+		ALL(Integer.MIN_VALUE),
 		VERBOSE(2),
 		DEBUG(3),
 		INFO(4),
 		WARN(5),
 		ERROR(6),
-		ASSERT(7);
+		ASSERT(7),
+		NONE(Integer.MAX_VALUE);
 
 		private int level;
 
@@ -125,7 +167,7 @@ public class Log {
 				PrintWriter printWriter = new PrintWriter(sw);
 				tr.printStackTrace(printWriter);
 				body += "\n" + sw.toString();
-				//No need to close. No resources taken up
+				// No need to close. No resources taken up
 			}
 			String result = String.format("%s/%s: %s", prefix, tag, body);
 			System.out.println(result);

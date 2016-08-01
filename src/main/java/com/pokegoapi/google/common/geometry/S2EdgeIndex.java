@@ -16,13 +16,7 @@
 package com.pokegoapi.google.common.geometry;
 
 
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public abstract strictfp class S2EdgeIndex {
   /**
@@ -192,7 +186,7 @@ public abstract strictfp class S2EdgeIndex {
    *
    *  When doing one additional query, the differential cost is m * testCost -
    * costFind(m) With the numbers above, it is better to use the quad tree (if
-   * we have it) if m >= 100.
+   * we have it) if m &gt;= 100.
    *
    *  If m = 100, 30 queries will give m*n*testCost = m * costInsert = 100ms,
    * while the marginal cost to find is 3ms. Thus, this is a reasonable thing to
@@ -529,7 +523,7 @@ public abstract strictfp class S2EdgeIndex {
     }
   }
 
-  /*
+  /**
    * An iterator on data edges that may cross a query edge (a,b). Create the
    * iterator, call getCandidates(), then hasNext()/next() repeatedly.
    *

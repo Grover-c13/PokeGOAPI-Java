@@ -15,14 +15,14 @@
 
 package com.pokegoapi.util;
 
-import static com.pokegoapi.util.Log.Level.ASSERT;
+import com.pokegoapi.util.Log.Level;
+
 import static com.pokegoapi.util.Log.Level.DEBUG;
-import static com.pokegoapi.util.Log.Level.ERROR;
 import static com.pokegoapi.util.Log.Level.INFO;
 import static com.pokegoapi.util.Log.Level.VERBOSE;
 import static com.pokegoapi.util.Log.Level.WARN;
-
-import com.pokegoapi.util.Log.Level;
+import static com.pokegoapi.util.Log.Level.ERROR;
+import static com.pokegoapi.util.Log.Level.ASSERT;
 
 
 /**

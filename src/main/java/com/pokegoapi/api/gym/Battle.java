@@ -18,16 +18,12 @@ package com.pokegoapi.api.gym;
 import POGOProtos.Data.Battle.BattleActionOuterClass.BattleAction;
 import POGOProtos.Data.Battle.BattleActionTypeOuterClass;
 import POGOProtos.Data.Battle.BattlePokemonInfoOuterClass.BattlePokemonInfo;
-import POGOProtos.Data.Battle.BattleStateOuterClass;
 import POGOProtos.Data.Battle.BattleStateOuterClass.BattleState;
 import POGOProtos.Data.PokemonDataOuterClass;
-import POGOProtos.Networking.Requests.Messages.AttackGymMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.AttackGymMessageOuterClass.AttackGymMessage;
 import POGOProtos.Networking.Requests.Messages.StartGymBattleMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.StartGymBattleMessageOuterClass.StartGymBattleMessage.Builder;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.AttackGymResponseOuterClass;
 import POGOProtos.Networking.Responses.AttackGymResponseOuterClass.AttackGymResponse;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse.Result;
@@ -56,7 +52,9 @@ public class Battle {
 
 	/**
 	 * New battle to track the state of a battle.
-	 *
+	 * @param api The api instance to submit requests with.
+     * @param team The Pokemon to use for attacking in the battle.
+     * @param gym The Gym to fight at.
 	 */
 	public Battle(PokemonGo api, Pokemon[] team, Gym gym) {
 		this.team = team;
@@ -75,6 +73,8 @@ public class Battle {
 	 * Start a battle.
 	 *
 	 * @return Result of the attempt to start
+     * @throws LoginFailedException  if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public Result start() throws LoginFailedException, RemoteServerException {
 
@@ -120,6 +120,8 @@ public class Battle {
 	 *
 	 * @param times the amount of times to attack
 	 * @return Battle
+     * @throws LoginFailedException  if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public AttackGymResponse attack(int times) throws LoginFailedException, RemoteServerException {
 
@@ -129,7 +131,7 @@ public class Battle {
 			BattleAction action = BattleAction
 					.newBuilder()
 					.setType(BattleActionTypeOuterClass.BattleActionType.ACTION_ATTACK)
-					.setActionStartMs(System.currentTimeMillis() + (100 * times))
+					.setActionStartMs(api.currentTimeMillis() + (100 * times))
 					.setDurationMs(500)
 					.setTargetIndex(-1)
 					.build();

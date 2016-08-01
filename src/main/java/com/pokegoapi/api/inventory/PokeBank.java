@@ -24,12 +24,13 @@ import com.pokegoapi.api.pokemon.Pokemon;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
 public class PokeBank {
 	@Getter
-	List<Pokemon> pokemons = new ArrayList<Pokemon>();
+	List<Pokemon> pokemons = Collections.synchronizedList(new ArrayList<Pokemon>());
 	@Getter
 	PokemonGo instance;
 

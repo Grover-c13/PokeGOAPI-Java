@@ -15,15 +15,17 @@
 
 package com.pokegoapi.api;
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
+import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.RequestHandler;
-import com.pokegoapi.util.Log;
+import com.pokegoapi.util.SystemTimeImpl;
+import com.pokegoapi.util.Time;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
@@ -32,13 +34,13 @@ import okhttp3.OkHttpClient;
 public class PokemonGo {
 
 	private static final java.lang.String TAG = PokemonGo.class.getSimpleName();
+	private final Time time;
 	@Getter
 	RequestHandler requestHandler;
 	@Getter
 	Map map;
 	@Getter
 	private PlayerProfile playerProfile;
-	@Getter
 	private Inventories inventories;
 	@Getter
 	@Setter
@@ -49,17 +51,19 @@ public class PokemonGo {
 	@Getter
 	@Setter
 	private double altitude;
-
 	private CredentialProvider credentialProvider;
-
-	private RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo authInfo;
+	private Settings settings;
 
 	/**
 	 * Instantiates a new Pokemon go.
 	 *
-	 * @param client the client
+	 * @param credentialProvider the credential provider
+	 * @param client             the http client
+	 * @param time               a time implementation
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
 	 */
-	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client)
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time)
 			throws LoginFailedException, RemoteServerException {
 
 		if (credentialProvider == null) {
@@ -67,19 +71,28 @@ public class PokemonGo {
 		} else {
 			this.credentialProvider = credentialProvider;
 		}
-
-		playerProfile = null;
+		this.time = time;
 
 		// send profile request to get the ball rolling
 		requestHandler = new RequestHandler(this, client);
 		playerProfile = new PlayerProfile(this);
-		inventories = new Inventories(this);
-
-		playerProfile.updateProfile();
-		inventories.updateInventories();
 
 		// should have proper end point now.
 		map = new Map(this);
+	}
+
+	/**
+	 * Instantiates a new Pokemon go.
+	 * Deprecated: specify a time implementation
+	 *
+	 * @param credentialProvider the credential provider
+	 * @param client             the http client
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+	 */
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client)
+			throws LoginFailedException, RemoteServerException {
+		this(credentialProvider, client, new SystemTimeImpl());
 	}
 
 	/**
@@ -88,28 +101,9 @@ public class PokemonGo {
 	 * @return AuthInfo object
 	 * @throws LoginFailedException when login fails
 	 */
-	public RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo getAuthInfo()
+	public AuthInfo getAuthInfo()
 			throws LoginFailedException, RemoteServerException {
 		return credentialProvider.getAuthInfo();
-	}
-
-
-	/**
-	 * Gets player profile.
-	 *
-	 * @param forceUpdate the force update
-	 * @return the player profile
-	 */
-	@Deprecated
-	public PlayerProfile getPlayerProfile(boolean forceUpdate) {
-		if (!forceUpdate && playerProfile != null) {
-			try {
-				playerProfile.updateProfile();
-			} catch (Exception e) {
-				Log.e(TAG, "Error updating Player Profile", e);
-			}
-		}
-		return playerProfile;
 	}
 
 	/**
@@ -123,5 +117,38 @@ public class PokemonGo {
 		setLatitude(latitude);
 		setLongitude(longitude);
 		setAltitude(altitude);
+	}
+
+	public long currentTimeMillis() {
+		return time.currentTimeMillis();
+	}
+
+	/**
+	 * Get the inventories API
+	 *
+	 * @return Inventories
+	 * @throws LoginFailedException when login fails
+	 * @throws RemoteServerException when server down/issue
+	 */
+	public Inventories getInventories() throws LoginFailedException, RemoteServerException {
+		if (inventories == null) {
+			inventories = new Inventories(this);
+		}
+		return inventories;
+	}
+
+
+	/**
+	 * Get the settings API
+	 *
+	 * @return Settings
+	 * @throws LoginFailedException when login fails
+	 * @throws RemoteServerException when server down/issue
+	 */
+	public Settings getSettings() throws LoginFailedException, RemoteServerException {
+		if (settings == null) {
+			settings = new Settings(this);
+		}
+		return settings;
 	}
 }

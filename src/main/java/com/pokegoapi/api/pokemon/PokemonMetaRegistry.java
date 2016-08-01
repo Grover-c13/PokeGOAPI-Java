@@ -17,6 +17,7 @@ package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
+import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
 
 import java.util.EnumMap;
 
@@ -67,7 +68,7 @@ public class PokemonMetaRegistry {
 		highestForFamily.put(PokemonFamilyId.FAMILY_SHELLDER, PokemonId.CLOYSTER);
 		highestForFamily.put(PokemonFamilyId.FAMILY_GASTLY, PokemonId.GENGAR);
 		highestForFamily.put(PokemonFamilyId.FAMILY_ONIX, PokemonId.ONIX);
-		highestForFamily.put(PokemonFamilyId.FAMILY_DROWZEE, PokemonId.DROWZEE);
+		highestForFamily.put(PokemonFamilyId.FAMILY_DROWZEE, PokemonId.HYPNO);
 		highestForFamily.put(PokemonFamilyId.FAMILY_KRABBY, PokemonId.KINGLER);
 		highestForFamily.put(PokemonFamilyId.FAMILY_VOLTORB, PokemonId.ELECTRODE);
 		highestForFamily.put(PokemonFamilyId.FAMILY_EXEGGCUTE, PokemonId.EXEGGUTOR);
@@ -105,7 +106,6 @@ public class PokemonMetaRegistry {
 		highestForFamily.put(PokemonFamilyId.FAMILY_DRATINI, PokemonId.DRAGONITE);
 		highestForFamily.put(PokemonFamilyId.FAMILY_MEWTWO, PokemonId.MEWTWO);
 		highestForFamily.put(PokemonFamilyId.FAMILY_MEW, PokemonId.MEW);
-		highestForFamily.put(PokemonFamilyId.FAMILY_HYPNO, PokemonId.HYPNO);
 
 		PokemonMeta metap;
 		metap = new PokemonMeta();
@@ -139,10 +139,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.VINE_WHIP_FAST,
+				PokemonMove.TACKLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.SEED_BOMB,
+				PokemonMove.POWER_WHIP
+		});
 		metap.setNumber(1);
 		meta.put(PokemonId.BULBASAUR, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0002_POKEMON_IVYSAUR");
@@ -175,10 +182,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.08);
 		metap.setParentId(PokemonId.BULBASAUR);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.VINE_WHIP_FAST,
+				PokemonMove.RAZOR_LEAF_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.POWER_WHIP,
+				PokemonMove.SOLAR_BEAM
+		});
 		metap.setNumber(2);
 		meta.put(PokemonId.IVYSAUR, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0003_POKEMON_VENUSAUR");
@@ -211,10 +225,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.04);
 		metap.setParentId(PokemonId.IVYSAUR);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.VINE_WHIP_FAST,
+				PokemonMove.RAZOR_LEAF_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.PETAL_BLIZZARD,
+				PokemonMove.SOLAR_BEAM
+		});
 		metap.setNumber(3);
 		meta.put(PokemonId.VENUSAUR, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0004_POKEMON_CHARMANDER");
@@ -247,10 +268,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.SCRATCH_FAST,
+				PokemonMove.EMBER_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.FLAME_CHARGE,
+				PokemonMove.FLAME_BURST,
+				PokemonMove.FLAMETHROWER
+		});
 		metap.setNumber(4);
 		meta.put(PokemonId.CHARMANDER, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0005_POKEMON_CHARMELEON");
@@ -283,10 +311,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.08);
 		metap.setParentId(PokemonId.CHARMANDER);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.SCRATCH_FAST,
+				PokemonMove.EMBER_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.FIRE_PUNCH,
+				PokemonMove.FLAME_BURST,
+				PokemonMove.FLAMETHROWER
+		});
 		metap.setNumber(5);
 		meta.put(PokemonId.CHARMELEON, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0006_POKEMON_CHARIZARD");
@@ -319,10 +354,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.04);
 		metap.setParentId(PokemonId.CHARMELEON);
 		metap.setCylGroundM(0.405);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.WING_ATTACK_FAST,
+				PokemonMove.EMBER_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DRAGON_CLAW,
+				PokemonMove.FLAMETHROWER,
+				PokemonMove.FIRE_BLAST
+		});
 		metap.setNumber(6);
 		meta.put(PokemonId.CHARIZARD, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0007_POKEMON_SQUIRTLE");
@@ -355,10 +397,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.TACKLE_FAST,
+				PokemonMove.BUBBLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.AQUA_TAIL,
+				PokemonMove.WATER_PULSE,
+				PokemonMove.AQUA_JET
+		});
 		metap.setNumber(7);
 		meta.put(PokemonId.SQUIRTLE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0008_POKEMON_WARTORTLE");
@@ -391,10 +440,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.08);
 		metap.setParentId(PokemonId.SQUIRTLE);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BITE_FAST,
+				PokemonMove.WATER_GUN_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.ICE_BEAM,
+				PokemonMove.HYDRO_PUMP,
+				PokemonMove.AQUA_JET
+		});
 		metap.setNumber(8);
 		meta.put(PokemonId.WARTORTLE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0009_POKEMON_BLASTOISE");
@@ -427,10 +483,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.04);
 		metap.setParentId(PokemonId.WARTORTLE);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BITE_FAST,
+				PokemonMove.WATER_GUN_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.ICE_BEAM,
+				PokemonMove.FLASH_CANNON,
+				PokemonMove.HYDRO_PUMP
+		});
 		metap.setNumber(9);
 		meta.put(PokemonId.BLASTOISE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0010_POKEMON_CATERPIE");
@@ -463,10 +526,15 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BUG_BITE_FAST,
+				PokemonMove.TACKLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.STRUGGLE
+		});
 		metap.setNumber(10);
 		meta.put(PokemonId.CATERPIE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0011_POKEMON_METAPOD");
@@ -499,10 +567,15 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.2);
 		metap.setParentId(PokemonId.CATERPIE);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BUG_BITE_FAST,
+				PokemonMove.TACKLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.STRUGGLE
+		});
 		metap.setNumber(11);
 		meta.put(PokemonId.METAPOD, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0012_POKEMON_BUTTERFREE");
@@ -535,10 +608,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.1);
 		metap.setParentId(PokemonId.METAPOD);
 		metap.setCylGroundM(0.555);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.CONFUSION_FAST,
+				PokemonMove.BUG_BITE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.BUG_BUZZ,
+				PokemonMove.PSYCHIC,
+				PokemonMove.SIGNAL_BEAM
+		});
 		metap.setNumber(12);
 		meta.put(PokemonId.BUTTERFREE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0013_POKEMON_WEEDLE");
@@ -571,10 +651,15 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.POISON_STING_FAST,
+				PokemonMove.BUG_BITE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.STRUGGLE
+		});
 		metap.setNumber(13);
 		meta.put(PokemonId.WEEDLE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0014_POKEMON_KAKUNA");
@@ -607,10 +692,15 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.2);
 		metap.setParentId(PokemonId.WEEDLE);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.POISON_STING_FAST,
+				PokemonMove.BUG_BITE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.STRUGGLE
+		});
 		metap.setNumber(14);
 		meta.put(PokemonId.KAKUNA, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0015_POKEMON_BEEDRILL");
@@ -643,10 +733,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.1);
 		metap.setParentId(PokemonId.KAKUNA);
 		metap.setCylGroundM(0.385);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BUG_BITE_FAST,
+				PokemonMove.POISON_JAB_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.AERIAL_ACE,
+				PokemonMove.X_SCISSOR
+		});
 		metap.setNumber(15);
 		meta.put(PokemonId.BEEDRILL, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0016_POKEMON_PIDGEY");
@@ -679,10 +776,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.TACKLE_FAST,
+				PokemonMove.QUICK_ATTACK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.TWISTER,
+				PokemonMove.AERIAL_ACE,
+				PokemonMove.AIR_CUTTER
+		});
 		metap.setNumber(16);
 		meta.put(PokemonId.PIDGEY, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0017_POKEMON_PIDGEOTTO");
@@ -715,10 +819,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.2);
 		metap.setParentId(PokemonId.PIDGEY);
 		metap.setCylGroundM(0.395);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.STEEL_WING_FAST,
+				PokemonMove.WING_ATTACK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.TWISTER,
+				PokemonMove.AERIAL_ACE,
+				PokemonMove.AIR_CUTTER
+		});
 		metap.setNumber(17);
 		meta.put(PokemonId.PIDGEOTTO, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0018_POKEMON_PIDGEOT");
@@ -751,10 +862,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.1);
 		metap.setParentId(PokemonId.PIDGEOTTO);
 		metap.setCylGroundM(0.36);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.STEEL_WING_FAST,
+				PokemonMove.WING_ATTACK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.HURRICANE,
+				PokemonMove.AERIAL_ACE,
+				PokemonMove.AIR_CUTTER
+		});
 		metap.setNumber(18);
 		meta.put(PokemonId.PIDGEOT, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0019_POKEMON_RATTATA");
@@ -787,10 +905,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.QUICK_ATTACK_FAST,
+				PokemonMove.TACKLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DIG,
+				PokemonMove.BODY_SLAM,
+				PokemonMove.HYPER_FANG
+		});
 		metap.setNumber(19);
 		meta.put(PokemonId.RATTATA, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0020_POKEMON_RATICATE");
@@ -823,10 +948,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.RATTATA);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BITE_FAST,
+				PokemonMove.QUICK_ATTACK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DIG,
+				PokemonMove.HYPER_BEAM,
+				PokemonMove.HYPER_FANG
+		});
 		metap.setNumber(20);
 		meta.put(PokemonId.RATICATE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0021_POKEMON_SPEAROW");
@@ -859,10 +991,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.QUICK_ATTACK_FAST,
+				PokemonMove.PECK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.TWISTER,
+				PokemonMove.AERIAL_ACE,
+				PokemonMove.DRILL_PECK
+		});
 		metap.setNumber(21);
 		meta.put(PokemonId.SPEAROW, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0022_POKEMON_FEAROW");
@@ -895,10 +1034,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.SPEAROW);
 		metap.setCylGroundM(0.42);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.STEEL_WING_FAST,
+				PokemonMove.PECK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.TWISTER,
+				PokemonMove.AERIAL_ACE,
+				PokemonMove.DRILL_RUN
+		});
 		metap.setNumber(22);
 		meta.put(PokemonId.FEAROW, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0023_POKEMON_EKANS");
@@ -931,10 +1077,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.POISON_STING_FAST,
+				PokemonMove.ACID_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.WRAP,
+				PokemonMove.GUNK_SHOT
+		});
 		metap.setNumber(23);
 		meta.put(PokemonId.EKANS, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0024_POKEMON_ARBOK");
@@ -967,10 +1120,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.EKANS);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BITE_FAST,
+				PokemonMove.ACID_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DARK_PULSE,
+				PokemonMove.GUNK_SHOT,
+				PokemonMove.SLUDGE_WAVE
+		});
 		metap.setNumber(24);
 		meta.put(PokemonId.ARBOK, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0025_POKEMON_PIKACHU");
@@ -1003,10 +1163,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.QUICK_ATTACK_FAST,
+				PokemonMove.THUNDER_SHOCK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.THUNDER,
+				PokemonMove.THUNDERBOLT,
+				PokemonMove.DISCHARGE
+		});
 		metap.setNumber(25);
 		meta.put(PokemonId.PIKACHU, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0026_POKEMON_RAICHU");
@@ -1039,10 +1206,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.08);
 		metap.setParentId(PokemonId.PIKACHU);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.SPARK_FAST,
+				PokemonMove.THUNDER_SHOCK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.THUNDER_PUNCH,
+				PokemonMove.THUNDER,
+				PokemonMove.BRICK_BREAK
+		});
 		metap.setNumber(26);
 		meta.put(PokemonId.RAICHU, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0027_POKEMON_SANDSHREW");
@@ -1075,10 +1249,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SHOT_FAST,
+				PokemonMove.SCRATCH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DIG,
+				PokemonMove.ROCK_SLIDE,
+				PokemonMove.ROCK_TOMB
+		});
 		metap.setNumber(27);
 		meta.put(PokemonId.SANDSHREW, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0028_POKEMON_SANDSLASH");
@@ -1111,10 +1292,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.SANDSHREW);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SHOT_FAST,
+				PokemonMove.METAL_CLAW_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.BULLDOZE,
+				PokemonMove.EARTHQUAKE,
+				PokemonMove.ROCK_TOMB
+		});
 		metap.setNumber(28);
 		meta.put(PokemonId.SANDSLASH, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0029_POKEMON_NIDORAN");
@@ -1147,10 +1335,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BITE_FAST,
+				PokemonMove.POISON_STING_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.POISON_FANG,
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.BODY_SLAM
+		});
 		metap.setNumber(29);
 		meta.put(PokemonId.NIDORAN_FEMALE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0030_POKEMON_NIDORINA");
@@ -1183,10 +1378,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.2);
 		metap.setParentId(PokemonId.NIDORAN_FEMALE);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BITE_FAST,
+				PokemonMove.POISON_STING_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.POISON_FANG,
+				PokemonMove.DIG,
+				PokemonMove.SLUDGE_BOMB
+		});
 		metap.setNumber(30);
 		meta.put(PokemonId.NIDORINA, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0031_POKEMON_NIDOQUEEN");
@@ -1219,10 +1421,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.1);
 		metap.setParentId(PokemonId.NIDORINA);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BITE_FAST,
+				PokemonMove.POISON_JAB_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.STONE_EDGE,
+				PokemonMove.EARTHQUAKE,
+				PokemonMove.SLUDGE_WAVE
+		});
 		metap.setNumber(31);
 		meta.put(PokemonId.NIDOQUEEN, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0032_POKEMON_NIDORAN");
@@ -1255,10 +1464,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.POISON_STING_FAST,
+				PokemonMove.PECK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.HORN_ATTACK,
+				PokemonMove.BODY_SLAM
+		});
 		metap.setNumber(32);
 		meta.put(PokemonId.NIDORAN_MALE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0033_POKEMON_NIDORINO");
@@ -1291,10 +1507,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.2);
 		metap.setParentId(PokemonId.NIDORAN_MALE);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.POISON_STING_FAST,
+				PokemonMove.POISON_JAB_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.DIG,
+				PokemonMove.HORN_ATTACK
+		});
 		metap.setNumber(33);
 		meta.put(PokemonId.NIDORINO, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0034_POKEMON_NIDOKING");
@@ -1327,10 +1550,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.1);
 		metap.setParentId(PokemonId.NIDORINO);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.FURY_CUTTER_FAST,
+				PokemonMove.POISON_JAB_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.MEGAHORN,
+				PokemonMove.EARTHQUAKE,
+				PokemonMove.SLUDGE_WAVE
+		});
 		metap.setNumber(34);
 		meta.put(PokemonId.NIDOKING, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0035_POKEMON_CLEFAIRY");
@@ -1363,10 +1593,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.24);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.POUND_FAST,
+				PokemonMove.ZEN_HEADBUTT_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DISARMING_VOICE,
+				PokemonMove.MOONBLAST,
+				PokemonMove.BODY_SLAM
+		});
 		metap.setNumber(35);
 		meta.put(PokemonId.CLEFAIRY, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0036_POKEMON_CLEFABLE");
@@ -1399,10 +1636,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.08);
 		metap.setParentId(PokemonId.CLEFAIRY);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.POUND_FAST,
+				PokemonMove.ZEN_HEADBUTT_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DAZZLING_GLEAM,
+				PokemonMove.PSYCHIC,
+				PokemonMove.MOONBLAST
+		});
 		metap.setNumber(36);
 		meta.put(PokemonId.CLEFABLE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0037_POKEMON_VULPIX");
@@ -1435,10 +1679,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.24);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.EMBER_FAST,
+				PokemonMove.QUICK_ATTACK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.FLAME_CHARGE,
+				PokemonMove.FLAMETHROWER,
+				PokemonMove.BODY_SLAM
+		});
 		metap.setNumber(37);
 		meta.put(PokemonId.VULPIX, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0038_POKEMON_NINETALES");
@@ -1471,10 +1722,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.08);
 		metap.setParentId(PokemonId.VULPIX);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.FEINT_ATTACK_FAST,
+				PokemonMove.EMBER_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.FLAMETHROWER,
+				PokemonMove.HEAT_WAVE,
+				PokemonMove.FIRE_BLAST
+		});
 		metap.setNumber(38);
 		meta.put(PokemonId.NINETALES, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0039_POKEMON_JIGGLYPUFF");
@@ -1507,10 +1765,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.POUND_FAST,
+				PokemonMove.FEINT_ATTACK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DISARMING_VOICE,
+				PokemonMove.PLAY_ROUGH,
+				PokemonMove.BODY_SLAM
+		});
 		metap.setNumber(39);
 		meta.put(PokemonId.JIGGLYPUFF, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0040_POKEMON_WIGGLYTUFF");
@@ -1543,10 +1808,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.JIGGLYPUFF);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.POUND_FAST,
+				PokemonMove.FEINT_ATTACK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DAZZLING_GLEAM,
+				PokemonMove.PLAY_ROUGH,
+				PokemonMove.HYPER_BEAM
+		});
 		metap.setNumber(40);
 		meta.put(PokemonId.WIGGLYTUFF, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0041_POKEMON_ZUBAT");
@@ -1579,10 +1851,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0.535);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BITE_FAST,
+				PokemonMove.QUICK_ATTACK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.POISON_FANG,
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.AIR_CUTTER
+		});
 		metap.setNumber(41);
 		meta.put(PokemonId.ZUBAT, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0042_POKEMON_GOLBAT");
@@ -1615,10 +1894,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.ZUBAT);
 		metap.setCylGroundM(1.065);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BITE_FAST,
+				PokemonMove.WING_ATTACK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.POISON_FANG,
+				PokemonMove.AIR_CUTTER,
+				PokemonMove.OMINOUS_WIND
+		});
 		metap.setNumber(42);
 		meta.put(PokemonId.GOLBAT, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0043_POKEMON_ODDISH");
@@ -1651,10 +1937,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.48);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ACID_FAST,
+				PokemonMove.RAZOR_LEAF_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.SEED_BOMB,
+				PokemonMove.MOONBLAST
+		});
 		metap.setNumber(43);
 		meta.put(PokemonId.ODDISH, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0044_POKEMON_GLOOM");
@@ -1687,10 +1980,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.24);
 		metap.setParentId(PokemonId.ODDISH);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ACID_FAST,
+				PokemonMove.RAZOR_LEAF_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.PETAL_BLIZZARD,
+				PokemonMove.MOONBLAST
+		});
 		metap.setNumber(44);
 		meta.put(PokemonId.GLOOM, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0045_POKEMON_VILEPLUME");
@@ -1723,10 +2023,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.12);
 		metap.setParentId(PokemonId.GLOOM);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ACID_FAST,
+				PokemonMove.RAZOR_LEAF_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.MOONBLAST,
+				PokemonMove.PETAL_BLIZZARD,
+				PokemonMove.SOLAR_BEAM
+		});
 		metap.setNumber(45);
 		meta.put(PokemonId.VILEPLUME, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0046_POKEMON_PARAS");
@@ -1759,10 +2066,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.32);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BUG_BITE_FAST,
+				PokemonMove.SCRATCH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.CROSS_POISON,
+				PokemonMove.X_SCISSOR,
+				PokemonMove.SEED_BOMB
+		});
 		metap.setNumber(46);
 		meta.put(PokemonId.PARAS, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0047_POKEMON_PARASECT");
@@ -1795,10 +2109,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.PARAS);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BUG_BITE_FAST,
+				PokemonMove.FURY_CUTTER_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.CROSS_POISON,
+				PokemonMove.X_SCISSOR,
+				PokemonMove.SOLAR_BEAM
+		});
 		metap.setNumber(47);
 		meta.put(PokemonId.PARASECT, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0048_POKEMON_VENONAT");
@@ -1831,10 +2152,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.CONFUSION_FAST,
+				PokemonMove.BUG_BITE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DAZZLING_GLEAM,
+				PokemonMove.SHADOW_BALL,
+				PokemonMove.PSYBEAM
+		});
 		metap.setNumber(48);
 		meta.put(PokemonId.VENONAT, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0049_POKEMON_VENOMOTH");
@@ -1867,10 +2195,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.VENONAT);
 		metap.setCylGroundM(0.36);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.CONFUSION_FAST,
+				PokemonMove.BUG_BITE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.POISON_FANG,
+				PokemonMove.PSYCHIC,
+				PokemonMove.BUG_BUZZ
+		});
 		metap.setNumber(49);
 		meta.put(PokemonId.VENOMOTH, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0050_POKEMON_DIGLETT");
@@ -1903,10 +2238,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SHOT_FAST,
+				PokemonMove.SCRATCH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DIG,
+				PokemonMove.MUD_BOMB,
+				PokemonMove.ROCK_TOMB
+		});
 		metap.setNumber(50);
 		meta.put(PokemonId.DIGLETT, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0051_POKEMON_DUGTRIO");
@@ -1939,10 +2281,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.DIGLETT);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.SUCKER_PUNCH_FAST,
+				PokemonMove.MUD_SHOT_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.STONE_EDGE,
+				PokemonMove.EARTHQUAKE,
+				PokemonMove.MUD_BOMB
+		});
 		metap.setNumber(51);
 		meta.put(PokemonId.DUGTRIO, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0052_POKEMON_MEOWTH");
@@ -1975,10 +2324,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BITE_FAST,
+				PokemonMove.SCRATCH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DARK_PULSE,
+				PokemonMove.NIGHT_SLASH,
+				PokemonMove.BODY_SLAM
+		});
 		metap.setNumber(52);
 		meta.put(PokemonId.MEOWTH, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0053_POKEMON_PERSIAN");
@@ -2011,10 +2367,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.MEOWTH);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.SCRATCH_FAST,
+				PokemonMove.FEINT_ATTACK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.PLAY_ROUGH,
+				PokemonMove.POWER_GEM,
+				PokemonMove.NIGHT_SLASH
+		});
 		metap.setNumber(53);
 		meta.put(PokemonId.PERSIAN, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0054_POKEMON_PSYDUCK");
@@ -2047,10 +2410,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.WATER_GUN_FAST,
+				PokemonMove.ZEN_HEADBUTT_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.AQUA_TAIL,
+				PokemonMove.PSYBEAM,
+				PokemonMove.CROSS_CHOP
+		});
 		metap.setNumber(54);
 		meta.put(PokemonId.PSYDUCK, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0055_POKEMON_GOLDUCK");
@@ -2083,10 +2453,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.PSYDUCK);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.CONFUSION_FAST,
+				PokemonMove.WATER_GUN_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.PSYCHIC,
+				PokemonMove.HYDRO_PUMP,
+				PokemonMove.ICE_BEAM
+		});
 		metap.setNumber(55);
 		meta.put(PokemonId.GOLDUCK, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0056_POKEMON_MANKEY");
@@ -2119,10 +2496,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.KARATE_CHOP_FAST,
+				PokemonMove.SCRATCH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.LOW_SWEEP,
+				PokemonMove.BRICK_BREAK,
+				PokemonMove.CROSS_CHOP
+		});
 		metap.setNumber(56);
 		meta.put(PokemonId.MANKEY, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0057_POKEMON_PRIMEAPE");
@@ -2155,10 +2539,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.MANKEY);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.KARATE_CHOP_FAST,
+				PokemonMove.LOW_KICK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.LOW_SWEEP,
+				PokemonMove.NIGHT_SLASH,
+				PokemonMove.CROSS_CHOP
+		});
 		metap.setNumber(57);
 		meta.put(PokemonId.PRIMEAPE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0058_POKEMON_GROWLITHE");
@@ -2191,10 +2582,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.24);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BITE_FAST,
+				PokemonMove.EMBER_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.FLAME_WHEEL,
+				PokemonMove.FLAMETHROWER,
+				PokemonMove.BODY_SLAM
+		});
 		metap.setNumber(58);
 		meta.put(PokemonId.GROWLITHE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0059_POKEMON_ARCANINE");
@@ -2227,10 +2625,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.08);
 		metap.setParentId(PokemonId.GROWLITHE);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BITE_FAST,
+				PokemonMove.FIRE_FANG_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.BULLDOZE,
+				PokemonMove.FLAMETHROWER,
+				PokemonMove.FIRE_BLAST
+		});
 		metap.setNumber(59);
 		meta.put(PokemonId.ARCANINE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0060_POKEMON_POLIWAG");
@@ -2263,10 +2668,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SHOT_FAST,
+				PokemonMove.BUBBLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.MUD_BOMB,
+				PokemonMove.BUBBLE_BEAM,
+				PokemonMove.BODY_SLAM
+		});
 		metap.setNumber(60);
 		meta.put(PokemonId.POLIWAG, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0061_POKEMON_POLIWHIRL");
@@ -2299,10 +2711,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.2);
 		metap.setParentId(PokemonId.POLIWAG);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SHOT_FAST,
+				PokemonMove.BUBBLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SCALD,
+				PokemonMove.MUD_BOMB,
+				PokemonMove.BUBBLE_BEAM
+		});
 		metap.setNumber(61);
 		meta.put(PokemonId.POLIWHIRL, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0062_POKEMON_POLIWRATH");
@@ -2335,10 +2754,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.1);
 		metap.setParentId(PokemonId.POLIWHIRL);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SHOT_FAST,
+				PokemonMove.BUBBLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.HYDRO_PUMP,
+				PokemonMove.SUBMISSION,
+				PokemonMove.ICE_PUNCH
+		});
 		metap.setNumber(62);
 		meta.put(PokemonId.POLIWRATH, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0063_POKEMON_ABRA");
@@ -2371,10 +2797,16 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0.168);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ZEN_HEADBUTT_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SHADOW_BALL,
+				PokemonMove.PSYSHOCK,
+				PokemonMove.SIGNAL_BEAM
+		});
 		metap.setNumber(63);
 		meta.put(PokemonId.ABRA, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0064_POKEMON_KADABRA");
@@ -2407,10 +2839,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.2);
 		metap.setParentId(PokemonId.ABRA);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.CONFUSION_FAST,
+				PokemonMove.PSYCHO_CUT_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DAZZLING_GLEAM,
+				PokemonMove.SHADOW_BALL,
+				PokemonMove.PSYBEAM
+		});
 		metap.setNumber(64);
 		meta.put(PokemonId.KADABRA, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0065_POKEMON_ALAKAZAM");
@@ -2443,10 +2882,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.1);
 		metap.setParentId(PokemonId.KADABRA);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.CONFUSION_FAST,
+				PokemonMove.PSYCHO_CUT_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.PSYCHIC,
+				PokemonMove.DAZZLING_GLEAM,
+				PokemonMove.SHADOW_BALL
+		});
 		metap.setNumber(65);
 		meta.put(PokemonId.ALAKAZAM, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0066_POKEMON_MACHOP");
@@ -2479,10 +2925,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.KARATE_CHOP_FAST,
+				PokemonMove.LOW_KICK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.LOW_SWEEP,
+				PokemonMove.BRICK_BREAK,
+				PokemonMove.CROSS_CHOP
+		});
 		metap.setNumber(66);
 		meta.put(PokemonId.MACHOP, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0067_POKEMON_MACHOKE");
@@ -2515,10 +2968,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.2);
 		metap.setParentId(PokemonId.MACHOP);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.KARATE_CHOP_FAST,
+				PokemonMove.LOW_KICK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SUBMISSION,
+				PokemonMove.BRICK_BREAK,
+				PokemonMove.CROSS_CHOP
+		});
 		metap.setNumber(67);
 		meta.put(PokemonId.MACHOKE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0068_POKEMON_MACHAMP");
@@ -2551,10 +3011,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.1);
 		metap.setParentId(PokemonId.MACHOKE);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.KARATE_CHOP_FAST,
+				PokemonMove.BULLET_PUNCH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.STONE_EDGE,
+				PokemonMove.SUBMISSION,
+				PokemonMove.CROSS_CHOP
+		});
 		metap.setNumber(68);
 		meta.put(PokemonId.MACHAMP, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0069_POKEMON_BELLSPROUT");
@@ -2587,10 +3054,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.VINE_WHIP_FAST,
+				PokemonMove.ACID_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.POWER_WHIP,
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.WRAP
+		});
 		metap.setNumber(69);
 		meta.put(PokemonId.BELLSPROUT, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0070_POKEMON_WEEPINBELL");
@@ -2623,10 +3097,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.2);
 		metap.setParentId(PokemonId.BELLSPROUT);
 		metap.setCylGroundM(0.375);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ACID_FAST,
+				PokemonMove.RAZOR_LEAF_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.POWER_WHIP,
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.SEED_BOMB
+		});
 		metap.setNumber(70);
 		meta.put(PokemonId.WEEPINBELL, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0071_POKEMON_VICTREEBEL");
@@ -2659,10 +3140,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.1);
 		metap.setParentId(PokemonId.WEEPINBELL);
 		metap.setCylGroundM(0.42);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ACID_FAST,
+				PokemonMove.RAZOR_LEAF_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.LEAF_BLADE,
+				PokemonMove.SOLAR_BEAM
+		});
 		metap.setNumber(71);
 		meta.put(PokemonId.VICTREEBEL, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0072_POKEMON_TENTACOOL");
@@ -2695,10 +3183,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0.2625);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.POISON_STING_FAST,
+				PokemonMove.BUBBLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.WATER_PULSE,
+				PokemonMove.BUBBLE_BEAM,
+				PokemonMove.WRAP
+		});
 		metap.setNumber(72);
 		meta.put(PokemonId.TENTACOOL, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0073_POKEMON_TENTACRUEL");
@@ -2731,10 +3226,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.TENTACOOL);
 		metap.setCylGroundM(0.205);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ACID_FAST,
+				PokemonMove.POISON_JAB_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.BLIZZARD,
+				PokemonMove.HYDRO_PUMP,
+				PokemonMove.SLUDGE_WAVE
+		});
 		metap.setNumber(73);
 		meta.put(PokemonId.TENTACRUEL, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0074_POKEMON_GEODUDE");
@@ -2767,10 +3269,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0.261);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ROCK_THROW_FAST,
+				PokemonMove.TACKLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DIG,
+				PokemonMove.ROCK_SLIDE,
+				PokemonMove.ROCK_TOMB
+		});
 		metap.setNumber(74);
 		meta.put(PokemonId.GEODUDE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0075_POKEMON_GRAVELER");
@@ -2803,10 +3312,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.2);
 		metap.setParentId(PokemonId.GEODUDE);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SHOT_FAST,
+				PokemonMove.ROCK_THROW_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DIG,
+				PokemonMove.ROCK_SLIDE,
+				PokemonMove.STONE_EDGE
+		});
 		metap.setNumber(75);
 		meta.put(PokemonId.GRAVELER, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0076_POKEMON_GOLEM");
@@ -2839,10 +3355,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.1);
 		metap.setParentId(PokemonId.GRAVELER);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SHOT_FAST,
+				PokemonMove.ROCK_THROW_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.STONE_EDGE,
+				PokemonMove.EARTHQUAKE,
+				PokemonMove.ANCIENT_POWER
+		});
 		metap.setNumber(76);
 		meta.put(PokemonId.GOLEM, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0077_POKEMON_PONYTA");
@@ -2875,10 +3398,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.32);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.EMBER_FAST,
+				PokemonMove.TACKLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.FLAME_WHEEL,
+				PokemonMove.FLAME_CHARGE,
+				PokemonMove.FIRE_BLAST
+		});
 		metap.setNumber(77);
 		meta.put(PokemonId.PONYTA, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0078_POKEMON_RAPIDASH");
@@ -2911,10 +3441,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.12);
 		metap.setParentId(PokemonId.PONYTA);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.LOW_KICK_FAST,
+				PokemonMove.EMBER_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.HEAT_WAVE,
+				PokemonMove.DRILL_RUN,
+				PokemonMove.FIRE_BLAST
+		});
 		metap.setNumber(78);
 		meta.put(PokemonId.RAPIDASH, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0079_POKEMON_SLOWPOKE");
@@ -2947,10 +3484,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.CONFUSION_FAST,
+				PokemonMove.WATER_GUN_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.PSYCHIC,
+				PokemonMove.WATER_PULSE,
+				PokemonMove.PSYSHOCK
+		});
 		metap.setNumber(79);
 		meta.put(PokemonId.SLOWPOKE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0080_POKEMON_SLOWBRO");
@@ -2983,10 +3527,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.SLOWPOKE);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.CONFUSION_FAST,
+				PokemonMove.WATER_GUN_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.PSYCHIC,
+				PokemonMove.WATER_PULSE,
+				PokemonMove.ICE_BEAM
+		});
 		metap.setNumber(80);
 		meta.put(PokemonId.SLOWBRO, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0081_POKEMON_MAGNEMITE");
@@ -3019,10 +3570,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0.912);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.SPARK_FAST,
+				PokemonMove.THUNDER_SHOCK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.MAGNET_BOMB,
+				PokemonMove.THUNDERBOLT,
+				PokemonMove.DISCHARGE
+		});
 		metap.setNumber(81);
 		meta.put(PokemonId.MAGNEMITE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0082_POKEMON_MAGNETON");
@@ -3055,10 +3613,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.MAGNEMITE);
 		metap.setCylGroundM(0.44);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.SPARK_FAST,
+				PokemonMove.THUNDER_SHOCK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.MAGNET_BOMB,
+				PokemonMove.FLASH_CANNON,
+				PokemonMove.DISCHARGE
+		});
 		metap.setNumber(82);
 		meta.put(PokemonId.MAGNETON, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0083_POKEMON_FARFETCHD");
@@ -3091,10 +3656,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.24);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.FURY_CUTTER_FAST,
+				PokemonMove.CUT_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.AERIAL_ACE,
+				PokemonMove.LEAF_BLADE,
+				PokemonMove.AIR_CUTTER
+		});
 		metap.setNumber(83);
 		meta.put(PokemonId.FARFETCHD, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0084_POKEMON_DODUO");
@@ -3127,10 +3699,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.QUICK_ATTACK_FAST,
+				PokemonMove.PECK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.AERIAL_ACE,
+				PokemonMove.DRILL_PECK,
+				PokemonMove.SWIFT
+		});
 		metap.setNumber(84);
 		meta.put(PokemonId.DODUO, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0085_POKEMON_DODRIO");
@@ -3163,10 +3742,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.DODUO);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.STEEL_WING_FAST,
+				PokemonMove.FEINT_ATTACK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.AERIAL_ACE,
+				PokemonMove.DRILL_PECK,
+				PokemonMove.AIR_CUTTER
+		});
 		metap.setNumber(85);
 		meta.put(PokemonId.DODRIO, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0086_POKEMON_SEEL");
@@ -3199,10 +3785,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.WATER_GUN_FAST,
+				PokemonMove.ICE_SHARD_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.ICY_WIND,
+				PokemonMove.AQUA_TAIL,
+				PokemonMove.AQUA_JET
+		});
 		metap.setNumber(86);
 		meta.put(PokemonId.SEEL, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0087_POKEMON_DEWGONG");
@@ -3235,10 +3828,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.SEEL);
 		metap.setCylGroundM(0.39375);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ICE_SHARD_FAST,
+				PokemonMove.FROST_BREATH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.ICY_WIND,
+				PokemonMove.BLIZZARD,
+				PokemonMove.AQUA_JET
+		});
 		metap.setNumber(87);
 		meta.put(PokemonId.DEWGONG, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0088_POKEMON_GRIMER");
@@ -3271,10 +3871,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SLAP_FAST,
+				PokemonMove.ACID_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.MUD_BOMB,
+				PokemonMove.SLUDGE
+		});
 		metap.setNumber(88);
 		meta.put(PokemonId.GRIMER, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0089_POKEMON_MUK");
@@ -3307,10 +3914,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.GRIMER);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ACID_FAST,
+				PokemonMove.POISON_JAB_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DARK_PULSE,
+				PokemonMove.GUNK_SHOT,
+				PokemonMove.SLUDGE_WAVE
+		});
 		metap.setNumber(89);
 		meta.put(PokemonId.MUK, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0090_POKEMON_SHELLDER");
@@ -3343,10 +3957,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ICE_SHARD_FAST,
+				PokemonMove.TACKLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.ICY_WIND,
+				PokemonMove.WATER_PULSE,
+				PokemonMove.BUBBLE_BEAM
+		});
 		metap.setNumber(90);
 		meta.put(PokemonId.SHELLDER, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0091_POKEMON_CLOYSTER");
@@ -3379,10 +4000,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.SHELLDER);
 		metap.setCylGroundM(0.42);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ICE_SHARD_FAST,
+				PokemonMove.FROST_BREATH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.ICY_WIND,
+				PokemonMove.BLIZZARD,
+				PokemonMove.HYDRO_PUMP
+		});
 		metap.setNumber(91);
 		meta.put(PokemonId.CLOYSTER, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0092_POKEMON_GASTLY");
@@ -3415,10 +4043,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.32);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0.6);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.SUCKER_PUNCH_FAST,
+				PokemonMove.LICK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.DARK_PULSE,
+				PokemonMove.OMINOUS_WIND
+		});
 		metap.setNumber(92);
 		meta.put(PokemonId.GASTLY, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0093_POKEMON_HAUNTER");
@@ -3451,10 +4086,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.GASTLY);
 		metap.setCylGroundM(0.34);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.SHADOW_CLAW_FAST,
+				PokemonMove.LICK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.SHADOW_BALL,
+				PokemonMove.DARK_PULSE
+		});
 		metap.setNumber(93);
 		meta.put(PokemonId.HAUNTER, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0094_POKEMON_GENGAR");
@@ -3487,10 +4129,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.08);
 		metap.setParentId(PokemonId.HAUNTER);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.SUCKER_PUNCH_FAST,
+				PokemonMove.SHADOW_CLAW_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SHADOW_BALL,
+				PokemonMove.DARK_PULSE,
+				PokemonMove.SLUDGE_WAVE
+		});
 		metap.setNumber(94);
 		meta.put(PokemonId.GENGAR, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0095_POKEMON_ONIX");
@@ -3523,10 +4172,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ROCK_THROW_FAST,
+				PokemonMove.TACKLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.IRON_HEAD,
+				PokemonMove.STONE_EDGE,
+				PokemonMove.ROCK_SLIDE
+		});
 		metap.setNumber(95);
 		meta.put(PokemonId.ONIX, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0096_POKEMON_DROWZEE");
@@ -3559,14 +4215,21 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.CONFUSION_FAST,
+				PokemonMove.POUND_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.PSYCHIC,
+				PokemonMove.PSYSHOCK,
+				PokemonMove.PSYBEAM
+		});
 		metap.setNumber(96);
 		meta.put(PokemonId.DROWZEE, metap);
 
-
-
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0097_POKEMON_HYPNO");
-		metap.setFamily(PokemonFamilyId.FAMILY_HYPNO);
+		metap.setFamily(PokemonFamilyId.FAMILY_DROWZEE);
 		metap.setPokemonClass(PokemonClass.UNCOMMON);
 		metap.setType2(PokemonType.NONE);
 		metap.setPokedexHeightM(1.6);
@@ -3595,10 +4258,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.DROWZEE);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.CONFUSION_FAST,
+				PokemonMove.ZEN_HEADBUTT_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.PSYCHIC,
+				PokemonMove.SHADOW_BALL,
+				PokemonMove.PSYSHOCK
+		});
 		metap.setNumber(97);
 		meta.put(PokemonId.HYPNO, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0098_POKEMON_KRABBY");
@@ -3631,10 +4301,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SHOT_FAST,
+				PokemonMove.BUBBLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.WATER_PULSE,
+				PokemonMove.VICE_GRIP,
+				PokemonMove.BUBBLE_BEAM
+		});
 		metap.setNumber(98);
 		meta.put(PokemonId.KRABBY, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0099_POKEMON_KINGLER");
@@ -3667,10 +4344,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.KRABBY);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SHOT_FAST,
+				PokemonMove.METAL_CLAW_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.WATER_PULSE,
+				PokemonMove.X_SCISSOR,
+				PokemonMove.VICE_GRIP
+		});
 		metap.setNumber(99);
 		meta.put(PokemonId.KINGLER, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0100_POKEMON_VOLTORB");
@@ -3703,10 +4387,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.SPARK_FAST,
+				PokemonMove.TACKLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SIGNAL_BEAM,
+				PokemonMove.THUNDERBOLT,
+				PokemonMove.DISCHARGE
+		});
 		metap.setNumber(100);
 		meta.put(PokemonId.VOLTORB, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0101_POKEMON_ELECTRODE");
@@ -3739,10 +4430,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.VOLTORB);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.SPARK_FAST,
+				PokemonMove.TACKLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.HYPER_BEAM,
+				PokemonMove.THUNDERBOLT,
+				PokemonMove.DISCHARGE
+		});
 		metap.setNumber(101);
 		meta.put(PokemonId.ELECTRODE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0102_POKEMON_EXEGGCUTE");
@@ -3775,10 +4473,16 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.CONFUSION_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.PSYCHIC,
+				PokemonMove.SEED_BOMB,
+				PokemonMove.ANCIENT_POWER
+		});
 		metap.setNumber(102);
 		meta.put(PokemonId.EXEGGCUTE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0103_POKEMON_EXEGGUTOR");
@@ -3811,10 +4515,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.EXEGGCUTE);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.CONFUSION_FAST,
+				PokemonMove.ZEN_HEADBUTT_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.PSYCHIC,
+				PokemonMove.SEED_BOMB,
+				PokemonMove.SOLAR_BEAM
+		});
 		metap.setNumber(103);
 		meta.put(PokemonId.EXEGGUTOR, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0104_POKEMON_CUBONE");
@@ -3847,10 +4558,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.32);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SLAP_FAST,
+				PokemonMove.ROCK_SMASH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DIG,
+				PokemonMove.BONE_CLUB,
+				PokemonMove.BULLDOZE
+		});
 		metap.setNumber(104);
 		meta.put(PokemonId.CUBONE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0105_POKEMON_MAROWAK");
@@ -3883,10 +4601,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.12);
 		metap.setParentId(PokemonId.CUBONE);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SLAP_FAST,
+				PokemonMove.ROCK_SMASH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DIG,
+				PokemonMove.EARTHQUAKE,
+				PokemonMove.BONE_CLUB
+		});
 		metap.setNumber(105);
 		meta.put(PokemonId.MAROWAK, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0106_POKEMON_HITMONLEE");
@@ -3919,10 +4644,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.LOW_KICK_FAST,
+				PokemonMove.ROCK_SMASH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.STOMP,
+				PokemonMove.STONE_EDGE,
+				PokemonMove.LOW_SWEEP
+		});
 		metap.setNumber(106);
 		meta.put(PokemonId.HITMONLEE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0107_POKEMON_HITMONCHAN");
@@ -3955,10 +4687,18 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BULLET_PUNCH_FAST,
+				PokemonMove.ROCK_SMASH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.THUNDER_PUNCH,
+				PokemonMove.FIRE_PUNCH,
+				PokemonMove.BRICK_BREAK,
+				PokemonMove.ICE_PUNCH
+		});
 		metap.setNumber(107);
 		meta.put(PokemonId.HITMONCHAN, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0108_POKEMON_LICKITUNG");
@@ -3991,10 +4731,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ZEN_HEADBUTT_FAST,
+				PokemonMove.LICK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.STOMP,
+				PokemonMove.POWER_WHIP,
+				PokemonMove.HYPER_BEAM
+		});
 		metap.setNumber(108);
 		meta.put(PokemonId.LICKITUNG, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0109_POKEMON_KOFFING");
@@ -4027,10 +4774,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0.6);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ACID_FAST,
+				PokemonMove.TACKLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.DARK_PULSE,
+				PokemonMove.SLUDGE
+		});
 		metap.setNumber(109);
 		meta.put(PokemonId.KOFFING, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0110_POKEMON_WEEZING");
@@ -4063,10 +4817,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.KOFFING);
 		metap.setCylGroundM(0.62);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ACID_FAST,
+				PokemonMove.TACKLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.SHADOW_BALL,
+				PokemonMove.DARK_PULSE
+		});
 		metap.setNumber(110);
 		meta.put(PokemonId.WEEZING, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0111_POKEMON_RHYHORN");
@@ -4099,10 +4860,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SLAP_FAST,
+				PokemonMove.ROCK_SMASH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.STOMP,
+				PokemonMove.BULLDOZE,
+				PokemonMove.HORN_ATTACK
+		});
 		metap.setNumber(111);
 		meta.put(PokemonId.RHYHORN, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0112_POKEMON_RHYDON");
@@ -4135,10 +4903,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.RHYHORN);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SLAP_FAST,
+				PokemonMove.ROCK_SMASH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.STONE_EDGE,
+				PokemonMove.EARTHQUAKE,
+				PokemonMove.MEGAHORN
+		});
 		metap.setNumber(112);
 		meta.put(PokemonId.RHYDON, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0113_POKEMON_CHANSEY");
@@ -4171,10 +4946,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.POUND_FAST,
+				PokemonMove.ZEN_HEADBUTT_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.PSYCHIC,
+				PokemonMove.DAZZLING_GLEAM,
+				PokemonMove.PSYBEAM
+		});
 		metap.setNumber(113);
 		meta.put(PokemonId.CHANSEY, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0114_POKEMON_TANGELA");
@@ -4207,10 +4989,16 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.32);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.VINE_WHIP_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.POWER_WHIP,
+				PokemonMove.SLUDGE_BOMB,
+				PokemonMove.SOLAR_BEAM
+		});
 		metap.setNumber(114);
 		meta.put(PokemonId.TANGELA, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0115_POKEMON_KANGASKHAN");
@@ -4243,10 +5031,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SLAP_FAST,
+				PokemonMove.LOW_KICK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.STOMP,
+				PokemonMove.EARTHQUAKE,
+				PokemonMove.BRICK_BREAK
+		});
 		metap.setNumber(115);
 		meta.put(PokemonId.KANGASKHAN, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0116_POKEMON_HORSEA");
@@ -4279,10 +5074,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0.185);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.WATER_GUN_FAST,
+				PokemonMove.BUBBLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.FLASH_CANNON,
+				PokemonMove.BUBBLE_BEAM,
+				PokemonMove.DRAGON_PULSE
+		});
 		metap.setNumber(116);
 		meta.put(PokemonId.HORSEA, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0117_POKEMON_SEADRA");
@@ -4315,10 +5117,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.HORSEA);
 		metap.setCylGroundM(0.46);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.DRAGON_BREATH_FAST,
+				PokemonMove.WATER_GUN_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.BLIZZARD,
+				PokemonMove.HYDRO_PUMP,
+				PokemonMove.DRAGON_PULSE
+		});
 		metap.setNumber(117);
 		meta.put(PokemonId.SEADRA, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0118_POKEMON_GOLDEEN");
@@ -4351,10 +5160,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0.3375);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SHOT_FAST,
+				PokemonMove.PECK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.WATER_PULSE,
+				PokemonMove.HORN_ATTACK,
+				PokemonMove.AQUA_TAIL
+		});
 		metap.setNumber(118);
 		meta.put(PokemonId.GOLDEEN, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0119_POKEMON_SEAKING");
@@ -4387,10 +5203,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.GOLDEEN);
 		metap.setCylGroundM(0.33);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.POISON_JAB_FAST,
+				PokemonMove.PECK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.ICY_WIND,
+				PokemonMove.MEGAHORN,
+				PokemonMove.DRILL_RUN
+		});
 		metap.setNumber(119);
 		meta.put(PokemonId.SEAKING, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0120_POKEMON_STARYU");
@@ -4423,10 +5246,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.4);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.WATER_GUN_FAST,
+				PokemonMove.QUICK_ATTACK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.POWER_GEM,
+				PokemonMove.BUBBLE_BEAM,
+				PokemonMove.SWIFT
+		});
 		metap.setNumber(120);
 		meta.put(PokemonId.STARYU, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0121_POKEMON_STARMIE");
@@ -4459,10 +5289,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.STARYU);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.WATER_GUN_FAST,
+				PokemonMove.QUICK_ATTACK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.PSYBEAM,
+				PokemonMove.HYDRO_PUMP,
+				PokemonMove.POWER_GEM
+		});
 		metap.setNumber(121);
 		meta.put(PokemonId.STARMIE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0122_POKEMON_MR_MIME");
@@ -4495,10 +5332,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.24);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.CONFUSION_FAST,
+				PokemonMove.ZEN_HEADBUTT_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.PSYCHIC,
+				PokemonMove.SHADOW_BALL,
+				PokemonMove.PSYBEAM
+		});
 		metap.setNumber(122);
 		meta.put(PokemonId.MR_MIME, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0123_POKEMON_SCYTHER");
@@ -4531,10 +5375,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.24);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0.4);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.STEEL_WING_FAST,
+				PokemonMove.FURY_CUTTER_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.BUG_BUZZ,
+				PokemonMove.X_SCISSOR,
+				PokemonMove.NIGHT_SLASH
+		});
 		metap.setNumber(123);
 		meta.put(PokemonId.SCYTHER, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0124_POKEMON_JYNX");
@@ -4567,10 +5418,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.24);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.POUND_FAST,
+				PokemonMove.FROST_BREATH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.PSYSHOCK,
+				PokemonMove.DRAINING_KISS,
+				PokemonMove.ICE_PUNCH
+		});
 		metap.setNumber(124);
 		meta.put(PokemonId.JYNX, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0125_POKEMON_ELECTABUZZ");
@@ -4603,10 +5461,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.24);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.LOW_KICK_FAST,
+				PokemonMove.THUNDER_SHOCK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.THUNDER_PUNCH,
+				PokemonMove.THUNDER,
+				PokemonMove.THUNDERBOLT
+		});
 		metap.setNumber(125);
 		meta.put(PokemonId.ELECTABUZZ, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0126_POKEMON_MAGMAR");
@@ -4639,10 +5504,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.24);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.KARATE_CHOP_FAST,
+				PokemonMove.EMBER_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.FIRE_PUNCH,
+				PokemonMove.FLAMETHROWER,
+				PokemonMove.FIRE_BLAST
+		});
 		metap.setNumber(126);
 		meta.put(PokemonId.MAGMAR, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0127_POKEMON_PINSIR");
@@ -4675,10 +5547,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.24);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.FURY_CUTTER_FAST,
+				PokemonMove.ROCK_SMASH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.SUBMISSION,
+				PokemonMove.X_SCISSOR,
+				PokemonMove.VICE_GRIP
+		});
 		metap.setNumber(127);
 		meta.put(PokemonId.PINSIR, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0128_POKEMON_TAUROS");
@@ -4711,10 +5590,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.24);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ZEN_HEADBUTT_FAST,
+				PokemonMove.TACKLE_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.IRON_HEAD,
+				PokemonMove.EARTHQUAKE,
+				PokemonMove.HORN_ATTACK
+		});
 		metap.setNumber(128);
 		meta.put(PokemonId.TAUROS, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0129_POKEMON_MAGIKARP");
@@ -4747,10 +5633,14 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.56);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.SPLASH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.STRUGGLE
+		});
 		metap.setNumber(129);
 		meta.put(PokemonId.MAGIKARP, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0130_POKEMON_GYARADOS");
@@ -4783,10 +5673,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.08);
 		metap.setParentId(PokemonId.MAGIKARP);
 		metap.setCylGroundM(0.48);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BITE_FAST,
+				PokemonMove.DRAGON_BREATH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.TWISTER,
+				PokemonMove.HYDRO_PUMP,
+				PokemonMove.DRAGON_PULSE
+		});
 		metap.setNumber(130);
 		meta.put(PokemonId.GYARADOS, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0131_POKEMON_LAPRAS");
@@ -4819,10 +5716,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ICE_SHARD_FAST,
+				PokemonMove.FROST_BREATH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.BLIZZARD,
+				PokemonMove.ICE_BEAM,
+				PokemonMove.DRAGON_PULSE
+		});
 		metap.setNumber(131);
 		meta.put(PokemonId.LAPRAS, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0132_POKEMON_DITTO");
@@ -4855,10 +5759,14 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.POUND_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.STRUGGLE
+		});
 		metap.setNumber(132);
 		meta.put(PokemonId.DITTO, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0133_POKEMON_EEVEE");
@@ -4891,10 +5799,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.32);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.TACKLE_FAST,
+				PokemonMove.QUICK_ATTACK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DIG,
+				PokemonMove.SWIFT,
+				PokemonMove.BODY_SLAM
+		});
 		metap.setNumber(133);
 		meta.put(PokemonId.EEVEE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0134_POKEMON_VAPOREON");
@@ -4927,10 +5842,16 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.12);
 		metap.setParentId(PokemonId.EEVEE);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.WATER_GUN_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.WATER_PULSE,
+				PokemonMove.HYDRO_PUMP,
+				PokemonMove.AQUA_TAIL
+		});
 		metap.setNumber(134);
 		meta.put(PokemonId.VAPOREON, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0135_POKEMON_JOLTEON");
@@ -4963,10 +5884,16 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.12);
 		metap.setParentId(PokemonId.EEVEE);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.THUNDER_SHOCK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.THUNDER,
+				PokemonMove.THUNDERBOLT,
+				PokemonMove.DISCHARGE
+		});
 		metap.setNumber(135);
 		meta.put(PokemonId.JOLTEON, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0136_POKEMON_FLAREON");
@@ -4999,10 +5926,16 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.12);
 		metap.setParentId(PokemonId.EEVEE);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.EMBER_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.FLAMETHROWER,
+				PokemonMove.HEAT_WAVE,
+				PokemonMove.FIRE_BLAST
+		});
 		metap.setNumber(136);
 		meta.put(PokemonId.FLAREON, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0137_POKEMON_PORYGON");
@@ -5035,10 +5968,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.32);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0.55);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.TACKLE_FAST,
+				PokemonMove.QUICK_ATTACK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DISCHARGE,
+				PokemonMove.PSYBEAM,
+				PokemonMove.SIGNAL_BEAM
+		});
 		metap.setNumber(137);
 		meta.put(PokemonId.PORYGON, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0138_POKEMON_OMANYTE");
@@ -5071,10 +6011,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.32);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SHOT_FAST,
+				PokemonMove.WATER_GUN_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.ROCK_TOMB,
+				PokemonMove.ANCIENT_POWER,
+				PokemonMove.BRINE
+		});
 		metap.setNumber(138);
 		meta.put(PokemonId.OMANYTE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0139_POKEMON_OMASTAR");
@@ -5107,10 +6054,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.12);
 		metap.setParentId(PokemonId.OMANYTE);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ROCK_THROW_FAST,
+				PokemonMove.WATER_GUN_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.HYDRO_PUMP,
+				PokemonMove.ANCIENT_POWER,
+				PokemonMove.ROCK_SLIDE
+		});
 		metap.setNumber(139);
 		meta.put(PokemonId.OMASTAR, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0140_POKEMON_KABUTO");
@@ -5143,10 +6097,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.32);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SHOT_FAST,
+				PokemonMove.SCRATCH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.ANCIENT_POWER,
+				PokemonMove.AQUA_JET,
+				PokemonMove.ROCK_TOMB
+		});
 		metap.setNumber(140);
 		meta.put(PokemonId.KABUTO, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0141_POKEMON_KABUTOPS");
@@ -5179,10 +6140,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.12);
 		metap.setParentId(PokemonId.KABUTO);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.MUD_SHOT_FAST,
+				PokemonMove.FURY_CUTTER_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.STONE_EDGE,
+				PokemonMove.WATER_PULSE,
+				PokemonMove.ANCIENT_POWER
+		});
 		metap.setNumber(141);
 		meta.put(PokemonId.KABUTOPS, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0142_POKEMON_AERODACTYL");
@@ -5215,10 +6183,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0.855);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.BITE_FAST,
+				PokemonMove.STEEL_WING_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.IRON_HEAD,
+				PokemonMove.HYPER_BEAM,
+				PokemonMove.ANCIENT_POWER
+		});
 		metap.setNumber(142);
 		meta.put(PokemonId.AERODACTYL, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0143_POKEMON_SNORLAX");
@@ -5251,10 +6226,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.16);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.ZEN_HEADBUTT_FAST,
+				PokemonMove.LICK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.EARTHQUAKE,
+				PokemonMove.HYPER_BEAM,
+				PokemonMove.BODY_SLAM
+		});
 		metap.setNumber(143);
 		meta.put(PokemonId.SNORLAX, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0144_POKEMON_ARTICUNO");
@@ -5287,10 +6269,16 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0.66);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.FROST_BREATH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.ICY_WIND,
+				PokemonMove.BLIZZARD,
+				PokemonMove.ICE_BEAM
+		});
 		metap.setNumber(144);
 		meta.put(PokemonId.ARTICUNO, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0145_POKEMON_ZAPDOS");
@@ -5323,10 +6311,16 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0.8625);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.THUNDER_SHOCK_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.THUNDER,
+				PokemonMove.THUNDERBOLT,
+				PokemonMove.DISCHARGE
+		});
 		metap.setNumber(145);
 		meta.put(PokemonId.ZAPDOS, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0146_POKEMON_MOLTRES");
@@ -5359,10 +6353,16 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.00);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0.93);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.EMBER_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.FLAMETHROWER,
+				PokemonMove.HEAT_WAVE,
+				PokemonMove.FIRE_BLAST
+		});
 		metap.setNumber(146);
 		meta.put(PokemonId.MOLTRES, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0147_POKEMON_DRATINI");
@@ -5395,10 +6395,16 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.32);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.DRAGON_BREATH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.TWISTER,
+				PokemonMove.WRAP,
+				PokemonMove.AQUA_TAIL
+		});
 		metap.setNumber(147);
 		meta.put(PokemonId.DRATINI, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0148_POKEMON_DRAGONAIR");
@@ -5431,10 +6437,16 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.08);
 		metap.setParentId(PokemonId.DRATINI);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.DRAGON_BREATH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.WRAP,
+				PokemonMove.AQUA_TAIL,
+				PokemonMove.DRAGON_PULSE
+		});
 		metap.setNumber(148);
 		meta.put(PokemonId.DRAGONAIR, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0149_POKEMON_DRAGONITE");
@@ -5467,10 +6479,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0.04);
 		metap.setParentId(PokemonId.DRAGONAIR);
 		metap.setCylGroundM(0.595);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.STEEL_WING_FAST,
+				PokemonMove.DRAGON_BREATH_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.DRAGON_CLAW,
+				PokemonMove.HYPER_BEAM,
+				PokemonMove.DRAGON_PULSE
+		});
 		metap.setNumber(149);
 		meta.put(PokemonId.DRAGONITE, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0150_POKEMON_MEWTWO");
@@ -5503,10 +6522,17 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.CONFUSION_FAST,
+				PokemonMove.PSYCHO_CUT_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.PSYCHIC,
+				PokemonMove.SHADOW_BALL,
+				PokemonMove.HYPER_BEAM
+		});
 		metap.setNumber(150);
 		meta.put(PokemonId.MEWTWO, metap);
-
-
 
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0151_POKEMON_MEW");
@@ -5539,17 +6565,24 @@ public class PokemonMetaRegistry {
 		metap.setBaseCaptureRate(0);
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0.0705);
+		metap.setQuickMoves(new PokemonMove[]{
+				PokemonMove.POUND_FAST
+		});
+		metap.setCinematicMoves(new PokemonMove[]{
+				PokemonMove.MOONBLAST,
+				PokemonMove.FIRE_BLAST,
+				PokemonMove.SOLAR_BEAM,
+				PokemonMove.HYPER_BEAM,
+				PokemonMove.PSYCHIC,
+				PokemonMove.HURRICANE,
+				PokemonMove.EARTHQUAKE,
+				PokemonMove.DRAGON_PULSE,
+				PokemonMove.THUNDER
+		});
 		metap.setNumber(151);
 		meta.put(PokemonId.MEW, metap);
 
-
-
-
-
-
 	}
-
-
 
 	/**
 	 * Return PokemonMeta object containing meta info about a pokemon.
@@ -5571,6 +6604,5 @@ public class PokemonMetaRegistry {
 	public static PokemonId getHightestForFamily(PokemonFamilyId family) {
 		return highestForFamily.get(family);
 	}
-
 
 }

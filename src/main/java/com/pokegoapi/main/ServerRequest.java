@@ -29,6 +29,7 @@ public class ServerRequest {
 
 	@Getter
 	RequestOuterClass.Request request;
+	@Getter
 	private RequestTypeOuterClass.RequestType type;
 	private ByteString data;
 
@@ -43,6 +44,17 @@ public class ServerRequest {
 		reqBuilder.setRequestMessage(req.toByteString());
 		reqBuilder.setRequestType(type);
 		this.request = reqBuilder.build();
+		this.type = type;
+	}
+
+	/**
+	 * Instantiates a new Server request.
+	 *
+	 * @param type the type
+	 * @param request  the req
+	 */
+	ServerRequest(RequestTypeOuterClass.RequestType type, RequestOuterClass.Request request) {
+		this.request = request;
 		this.type = type;
 	}
 

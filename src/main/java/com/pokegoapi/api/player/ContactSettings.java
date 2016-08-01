@@ -15,11 +15,22 @@
 
 package com.pokegoapi.api.player;
 
+import POGOProtos.Data.Player.ContactSettingsOuterClass;
 import lombok.Data;
 
 @Data
 public class ContactSettings {
+	private ContactSettingsOuterClass.ContactSettings proto;
 
-	private boolean sendMarketingEmails;
-	private boolean sendPushNotifications;
+	public ContactSettings(ContactSettingsOuterClass.ContactSettings proto) {
+		this.proto = proto;
+	}
+
+	public boolean getSendMarketingEmails() {
+		return proto.getSendMarketingEmails();
+	}
+
+	public boolean getSendPushNotifications() {
+		return proto.getSendPushNotifications();
+	}
 }

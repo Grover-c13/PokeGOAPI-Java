@@ -21,11 +21,8 @@ import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.TeamColorOuterClass;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Networking.Requests.Messages.GetGymDetailsMessageOuterClass.GetGymDetailsMessage;
-import POGOProtos.Networking.Requests.Messages.StartGymBattleMessageOuterClass.StartGymBattleMessage;
-import POGOProtos.Networking.Requests.Messages.StartGymBattleMessageOuterClass.StartGymBattleMessage.Builder;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetGymDetailsResponseOuterClass.GetGymDetailsResponse;
-import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.ProtocolStringList;
 import com.pokegoapi.api.PokemonGo;
@@ -33,18 +30,20 @@ import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.MapPoint;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Gym {
+public class Gym implements MapPoint {
 	private FortData proto;
 	private GetGymDetailsResponse details;
 	private PokemonGo api;
 
 	/**
 	 * Gym object.
-	 *
+	 * @param api The api object to use for requests.
+     * @param proto The FortData to populate the Gym with.
 	 */
 	public Gym(PokemonGo api, FortData proto) {
 		this.api = api;
@@ -78,6 +77,10 @@ public class Gym {
 
 	public int getGuardPokemonCp() {
 		return proto.getGuardPokemonCp();
+	}
+
+	public long getPoints() {
+		return proto.getGymPoints();
 	}
 
 	public boolean getIsInBattle() {
@@ -149,6 +152,8 @@ public class Gym {
 	 * Get a list of pokemon defending this gym.
 	 *
 	 * @return List of pokemon
+     * @throws LoginFailedException  if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public List<PokemonData> getDefendingPokemon() throws LoginFailedException, RemoteServerException {
 		List<PokemonData> data = new ArrayList<PokemonData>();

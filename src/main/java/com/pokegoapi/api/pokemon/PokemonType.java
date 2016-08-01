@@ -14,5 +14,11 @@ public enum PokemonType {
 	PSYCHIC,
 	FIGHTING,
 	DRAGON,
-	FLYING, ICE, ROCK, GROUND, GHOST, STEEL;
+	FLYING, 
+	ICE, 
+	ROCK, 
+	GROUND, 
+	GHOST, 
+	STEEL,
+	DARK;
 }

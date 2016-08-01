@@ -24,11 +24,11 @@ public class LoginFailedException extends Exception {
 		super(reason);
 	}
 
-	public LoginFailedException(Exception exception) {
+	public LoginFailedException(Throwable exception) {
 		super(exception);
 	}
 
-	public LoginFailedException(String reason, Exception exception) {
+	public LoginFailedException(String reason, Throwable exception) {
 		super(reason, exception);
 	}
 }

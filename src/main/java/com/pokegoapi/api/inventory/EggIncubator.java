@@ -26,7 +26,6 @@ import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
-import lombok.Getter;
 
 public class EggIncubator {
 	private final EggIncubatorOuterClass.EggIncubator proto;
@@ -124,7 +123,7 @@ public class EggIncubator {
 	 * 
 	 * @return currently used or not
 	 */
-	public boolean isInUse() {
+	public boolean isInUse() throws LoginFailedException, RemoteServerException {
 		return getKmTarget() > pgo.getPlayerProfile().getStats().getKmWalked();
 	}
 }

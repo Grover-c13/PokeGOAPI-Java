@@ -136,16 +136,16 @@ public class Inventories {
 			}
 
 			// candyjar
-			if (itemData.getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED
-					&& itemData.getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_UNSET) {
+			if (itemData.getCandy().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED
+					&& itemData.getCandy().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_UNSET) {
 				candyjar.setCandy(
-						itemData.getPokemonFamily().getFamilyId(),
-						itemData.getPokemonFamily().getCandy()
+						itemData.getCandy().getFamilyId(),
+						itemData.getCandy().getCandy()
 				);
 			}
 			// player stats
 			if (itemData.hasPlayerStats()) {
-				api.getPlayerProfile().setStats(itemData.getPlayerStats());
+				api.getPlayerProfile().setStats(new Stats(itemData.getPlayerStats()));
 			}
 
 			// pokedex
@@ -159,7 +159,7 @@ public class Inventories {
 				}
 			}
 
-			lastInventoryUpdate = System.currentTimeMillis();
+			lastInventoryUpdate = api.currentTimeMillis();
 		}
 	}
 }

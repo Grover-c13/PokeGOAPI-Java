@@ -17,14 +17,12 @@ package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
-
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.EggIncubator;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-
 import lombok.Setter;
 
 /**
@@ -58,7 +56,7 @@ public class EggPokemon {
 	 * Get the current distance that has been done with this egg
 	 * @return get distance already walked
 	 */
-	public double getEggKmWalked() {
+	public double getEggKmWalked() throws LoginFailedException, RemoteServerException {
 		if (!isIncubate())
 			return 0;
 		EggIncubator incubator = Stream.of(pgo.getInventories().getIncubators())
