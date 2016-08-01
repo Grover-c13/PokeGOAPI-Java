@@ -127,19 +127,20 @@ public class Pokestop {
 
 		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH,
 				searchMessage);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, PokestopLootResult>() {
-			@Override
-			public PokestopLootResult call(ByteString result) {
-				FortSearchResponseOuterClass.FortSearchResponse response;
-				try {
-					response = FortSearchResponseOuterClass.FortSearchResponse.parseFrom(result);
-				} catch (InvalidProtocolBufferException e) {
-					throw new AsyncRemoteServerException(e);
-				}
-				cooldownCompleteTimestampMs = response.getCooldownCompleteTimestampMs();
-				return new PokestopLootResult(response);
-			}
-		});
+		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
+				new Func1<ByteString, PokestopLootResult>() {
+					@Override
+					public PokestopLootResult call(ByteString result) {
+						FortSearchResponseOuterClass.FortSearchResponse response;
+						try {
+							response = FortSearchResponseOuterClass.FortSearchResponse.parseFrom(result);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+						cooldownCompleteTimestampMs = response.getCooldownCompleteTimestampMs();
+						return new PokestopLootResult(response);
+					}
+				});
 	}
 
 	/**
@@ -244,8 +245,8 @@ public class Pokestop {
 	 * Returns whether this pokestop has an active lure.
 	 *
 	 * @return lure status
-     * @throws LoginFailedException If login failed.
-     * @throws RemoteServerException If server communications failed.
+	 * @throws LoginFailedException  If login failed.
+	 * @throws RemoteServerException If server communications failed.
 	 */
 	public boolean hasLure() throws LoginFailedException, RemoteServerException {
 

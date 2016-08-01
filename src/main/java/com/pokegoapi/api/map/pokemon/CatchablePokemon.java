@@ -45,9 +45,9 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.MapPoint;
-import com.pokegoapi.util.AsyncHelper;
 import lombok.Getter;
 import lombok.ToString;
 import rx.Observable;
@@ -346,8 +346,8 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws NoSuchItemException   the no such item exception
 	 */
-	public CatchResult catchPokemonWithBestBall(boolean noMasterBall, int amount, int razberryLimit) throws LoginFailedException,
-			RemoteServerException, NoSuchItemException {
+	public CatchResult catchPokemonWithBestBall(boolean noMasterBall, int amount, int razberryLimit)
+			throws LoginFailedException, RemoteServerException, NoSuchItemException {
 		ItemBag bag = api.getInventories().getItemBag();
 		Pokeball pokeball;
 		if (bag.getItem(ItemId.ITEM_MASTER_BALL).getCount() > 0 && !noMasterBall) {
@@ -469,7 +469,8 @@ public class CatchablePokemon implements MapPoint {
 				useItem(ItemId.ITEM_RAZZ_BERRY);
 				razberries++;
 			}
-			result = AsyncHelper.toBlocking(catchPokemonAsync(normalizedHitPosition, normalizedReticleSize, spinModifier, type));
+			result = AsyncHelper.toBlocking(catchPokemonAsync(normalizedHitPosition,
+					normalizedReticleSize, spinModifier, type));
 			if (result == null) {
 				Log.wtf(TAG, "Got a null result after catch attempt");
 				break;
@@ -506,8 +507,8 @@ public class CatchablePokemon implements MapPoint {
 	 * @param type                  Type of pokeball to throw
 	 * @return CatchResult of resulted try to catch pokemon
 	 */
-	public Observable<CatchResult> catchPokemonAsync(double normalizedHitPosition, double normalizedReticleSize,
-													 double spinModifier, Pokeball type) {
+	public Observable<CatchResult> catchPokemonAsync(
+			double normalizedHitPosition, double normalizedReticleSize, double spinModifier, Pokeball type) {
 		if (!isEncountered()) {
 			return Observable.just(new CatchResult());
 		}
