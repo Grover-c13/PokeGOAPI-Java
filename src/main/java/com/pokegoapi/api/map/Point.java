@@ -20,7 +20,7 @@ import com.pokegoapi.util.MapPoint;
 import lombok.Getter;
 import lombok.Setter;
 
-public class Point implements MapPoint{
+public class Point implements MapPoint {
 	@Getter
 	@Setter
 	private double longitude;

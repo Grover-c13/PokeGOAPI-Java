@@ -75,11 +75,12 @@ public class MapUtil<K extends MapPoint> {
 		double earthRadius = 6371000;
 		double lat = Math.toRadians(lat2 - lat1);
 		double lng = Math.toRadians(lng2 - lng1);
-		double a = Math.sin(lat / 2) * Math.sin(lat / 2)
+		double haversine = Math.sin(lat / 2) * Math.sin(lat / 2)
 				+ Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
 				* Math.sin(lng / 2) * Math.sin(lng / 2);
 
-		return earthRadius * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+
+		return earthRadius * (2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine)));
 	}
 
 	/**

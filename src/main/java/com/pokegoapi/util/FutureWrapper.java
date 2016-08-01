@@ -145,5 +145,9 @@ public abstract class FutureWrapper<T, R> implements PokemonFuture<R> {
 			return true;
 		}
 
+		@Override
+		protected R getResult(long timeouut, TimeUnit timeUnit) throws InterruptedException, ExecutionException {
+			return result;
+		}
 	}
 }
