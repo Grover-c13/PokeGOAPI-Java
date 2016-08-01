@@ -35,9 +35,11 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.util.FutureWrapper;
+import com.pokegoapi.util.MapPoint;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.NestedFutureWrapper;
 import com.pokegoapi.util.PokemonFuture;
@@ -50,7 +52,7 @@ import java.util.concurrent.Future;
  * The type Catchable pokemon.
  */
 @ToString
-public class CatchablePokemon {
+public class CatchablePokemon implements MapPoint{
 	private static final String TAG = CatchablePokemon.class.getSimpleName();
 	private final PokemonGo api;
 
@@ -174,19 +176,10 @@ public class CatchablePokemon {
 	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public PokemonFuture<CatchResult> catchPokemonWithRazzBerryAsync()
-			throws LoginFailedException, RemoteServerException {
-		final Pokeball pokeball;
+			throws LoginFailedException, RemoteServerException, NoSuchItemException {
+		final Pokeball pokeball = getItemBall();
 
-		ItemBag bag = api.getInventories().getItemBag();
-		if (bag.getItem(ItemId.ITEM_POKE_BALL).getCount() > 0) {
-			pokeball = Pokeball.POKEBALL;
-		} else if (bag.getItem(ItemId.ITEM_GREAT_BALL).getCount() > 0) {
-			pokeball = Pokeball.GREATBALL;
-		} else if (bag.getItem(ItemId.ITEM_ULTRA_BALL).getCount() > 0) {
-			pokeball = Pokeball.ULTRABALL;
-		} else {
-			pokeball = Pokeball.MASTERBALL;
-		}
+
 		return new NestedFutureWrapper<CatchItemResult, CatchResult>(useItemAsync(ItemId.ITEM_RAZZ_BERRY)) {
 			@Override
 			protected Future<CatchResult> handleFuture(CatchItemResult result) {
@@ -199,6 +192,30 @@ public class CatchablePokemon {
 	}
 
 	/**
+	 * Gets item ball to catch a pokemon
+	 *
+	 * @return the item ball
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws NoSuchItemException   the no such item exception
+	 */
+	public Pokeball getItemBall() throws LoginFailedException,
+			RemoteServerException, NoSuchItemException {
+		ItemBag bag = api.getInventories().getItemBag();
+		if (bag.getItem(ItemId.ITEM_POKE_BALL).getCount() > 0) {
+			return Pokeball.POKEBALL;
+		} else if (bag.getItem(ItemId.ITEM_GREAT_BALL).getCount() > 0) {
+			return Pokeball.GREATBALL;
+		} else if (bag.getItem(ItemId.ITEM_ULTRA_BALL).getCount() > 0) {
+			return Pokeball.ULTRABALL;
+		} else if (bag.getItem(ItemId.ITEM_MASTER_BALL).getCount() > 0) {
+			return Pokeball.MASTERBALL;
+		} else {
+			throw new NoSuchItemException();
+		}
+	}
+
+	/**
 	 * Tries to catch a pokemon (will attempt to use a pokeball, if you have
 	 * none will use greatball etc) and uwill use a single razz berry if available.
 	 *
@@ -207,19 +224,8 @@ public class CatchablePokemon {
 	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemonWithRazzBerry() throws LoginFailedException,
-			RemoteServerException {
-		Pokeball pokeball;
-
-		ItemBag bag = api.getInventories().getItemBag();
-		if (bag.getItem(ItemId.ITEM_POKE_BALL).getCount() > 0) {
-			pokeball = Pokeball.POKEBALL;
-		} else if (bag.getItem(ItemId.ITEM_GREAT_BALL).getCount() > 0) {
-			pokeball = Pokeball.GREATBALL;
-		} else if (bag.getItem(ItemId.ITEM_ULTRA_BALL).getCount() > 0) {
-			pokeball = Pokeball.ULTRABALL;
-		} else {
-			pokeball = Pokeball.MASTERBALL;
-		}
+			RemoteServerException, NoSuchItemException {
+		Pokeball pokeball = getItemBall();
 
 		useItem(ItemId.ITEM_RAZZ_BERRY);
 		return catchPokemon(pokeball, -1, -1);
@@ -234,21 +240,9 @@ public class CatchablePokemon {
 	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemon() throws LoginFailedException,
-			RemoteServerException {
-		Pokeball pokeball;
+			RemoteServerException, NoSuchItemException {
 
-		ItemBag bag = api.getInventories().getItemBag();
-		if (bag.getItem(ItemId.ITEM_POKE_BALL).getCount() > 0) {
-			pokeball = Pokeball.POKEBALL;
-		} else if (bag.getItem(ItemId.ITEM_GREAT_BALL).getCount() > 0) {
-			pokeball = Pokeball.GREATBALL;
-		} else if (bag.getItem(ItemId.ITEM_ULTRA_BALL).getCount() > 0) {
-			pokeball = Pokeball.ULTRABALL;
-		} else {
-			pokeball = Pokeball.MASTERBALL;
-		}
-
-		return catchPokemon(pokeball);
+		return catchPokemon(getItemBall());
 	}
 
 	/**

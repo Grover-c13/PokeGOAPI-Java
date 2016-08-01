@@ -54,6 +54,7 @@ import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.DummyFuture;
 import com.pokegoapi.util.FutureWrapper;
+import com.pokegoapi.util.MapUtil;
 import com.pokegoapi.util.PokemonFuture;
 
 import java.util.ArrayList;
@@ -123,6 +124,19 @@ public class Map {
 	}
 
 	/**
+	 * Gets catchable pokemon sort by distance.
+	 *
+	 * @return the catchable pokemon sort
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public java.util.Map<Double, CatchablePokemon> getCatchablePokemonSort()
+			throws LoginFailedException, RemoteServerException {
+		MapUtil<CatchablePokemon> util = new MapUtil<>();
+		return util.sortItems(getCatchablePokemon(), api);
+	}
+
+	/**
 	 * Returns a list of nearby pokemon (non-catchable).
 	 *
 	 * @return a List of NearbyPokemon at your current location
@@ -147,8 +161,8 @@ public class Map {
 	 * Returns a list of nearby pokemon (non-catchable).
 	 *
 	 * @return a List of NearbyPokemon at your current location
-     * @throws LoginFailedException  if the login failed
-     * @throws RemoteServerException When a buffer exception is thrown
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public List<NearbyPokemon> getNearbyPokemon() throws LoginFailedException, RemoteServerException {
 		return getNearbyPokemonAsync().toBlocking();
@@ -178,8 +192,8 @@ public class Map {
 	 * Returns a list of spawn points.
 	 *
 	 * @return list of spawn points
-     * @throws LoginFailedException  if the login failed
-     * @throws RemoteServerException When a buffer exception is thrown
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public List<Point> getSpawnPoints() throws LoginFailedException, RemoteServerException {
 		return getSpawnPointsAsync().toBlocking();
@@ -215,6 +229,18 @@ public class Map {
 	}
 
 	/**
+	 * Gets gym sort by distance.
+	 *
+	 * @return the gym sort
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public java.util.Map<Double, Gym> getGymSort() throws LoginFailedException, RemoteServerException {
+		MapUtil<Gym> util = new MapUtil<>();
+		return util.sortItems(getGyms(), api);
+	}
+
+	/**
 	 * Returns a list of decimated spawn points at current location.
 	 *
 	 * @return list of spawn points
@@ -237,11 +263,24 @@ public class Map {
 	 * Returns a list of decimated spawn points at current location.
 	 *
 	 * @return list of spawn points
-     * @throws LoginFailedException  if the login failed
-     * @throws RemoteServerException When a buffer exception is thrown
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public List<Point> getDecimatedSpawnPoints() throws LoginFailedException, RemoteServerException {
 		return getDecimatedSpawnPointsAsync().toBlocking();
+	}
+
+
+	/**
+	 * Gets decimated spawn points sort by distance.
+	 *
+	 * @return the decimated spawn points sort
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public java.util.Map<Double, Point> getDecimatedSpawnPointsSort() throws LoginFailedException, RemoteServerException {
+		MapUtil<Point> util = new MapUtil<>();
+		return util.sortItems(getDecimatedSpawnPoints(), api);
 	}
 
 	/**
@@ -271,7 +310,7 @@ public class Map {
 	 */
 	public PokemonFuture<MapObjects> getMapObjectsAsync(List<Long> cellIds) {
 
-		if ( (api.currentTimeMillis() - lastMapUpdate) < RESEND_REQUEST ) {
+		if ((api.currentTimeMillis() - lastMapUpdate) < RESEND_REQUEST) {
 			return new DummyFuture<MapObjects>(cachedMapObjects);
 		}
 
@@ -322,7 +361,6 @@ public class Map {
 				}
 
 
-
 				return result;
 			}
 		};
@@ -332,8 +370,8 @@ public class Map {
 	 * Returns MapObjects around your current location.
 	 *
 	 * @return MapObjects at your current location
-     * @throws LoginFailedException  if the login failed
-     * @throws RemoteServerException When a buffer exception is thrown
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public MapObjects getMapObjects() throws LoginFailedException, RemoteServerException {
 		return getMapObjectsAsync().toBlocking();
@@ -344,9 +382,8 @@ public class Map {
 	 *
 	 * @param width width
 	 * @return MapObjects at your current location
-     *
-     * @throws LoginFailedException If login fails.
-     * @throws RemoteServerException If request errors occurred.
+	 * @throws LoginFailedException  If login fails.
+	 * @throws RemoteServerException If request errors occurred.
 	 */
 	public MapObjects getMapObjects(int width) throws LoginFailedException, RemoteServerException {
 		return getMapObjectsAsync(width).toBlocking();
@@ -358,8 +395,8 @@ public class Map {
 	 * @param latitude  latitude
 	 * @param longitude longitude
 	 * @return MapObjects in the given cells
-     * @throws LoginFailedException  if the login failed
-     * @throws RemoteServerException When a buffer exception is thrown
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	@Deprecated
 	public MapObjects getMapObjects(double latitude, double longitude)
@@ -374,8 +411,8 @@ public class Map {
 	 * @param latitude  latitude
 	 * @param longitude longitude
 	 * @return MapObjects in the given cells
-     * @throws LoginFailedException  if the login failed
-     * @throws RemoteServerException When a buffer exception is thrown
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	@Deprecated
 	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude)
@@ -390,8 +427,8 @@ public class Map {
 	 * @param longitude longitude
 	 * @param width     width
 	 * @return MapObjects in the given cells
-     * @throws LoginFailedException  if the login failed
-     * @throws RemoteServerException When a buffer exception is thrown
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	@Deprecated
 	public MapObjects getMapObjects(double latitude, double longitude, int width)
@@ -405,10 +442,10 @@ public class Map {
 	 * @param cellIds   cellIds
 	 * @param latitude  latitude
 	 * @param longitude longitude
-     * @param altitude altitude
+	 * @param altitude  altitude
 	 * @return MapObjects in the given cells
-     * @throws LoginFailedException  if the login failed
-     * @throws RemoteServerException When a buffer exception is thrown
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	@Deprecated
 	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude, double altitude)
@@ -424,8 +461,8 @@ public class Map {
 	 *
 	 * @param cellIds List of cellId
 	 * @return MapObjects in the given cells
-     * @throws LoginFailedException  if the login failed
-     * @throws RemoteServerException When a buffer exception is thrown
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public MapObjects getMapObjects(List<Long> cellIds) throws LoginFailedException, RemoteServerException {
 		return getMapObjectsAsync(cellIds).toBlocking();
