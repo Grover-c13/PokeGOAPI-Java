@@ -46,13 +46,13 @@ OR
   - Clone the repo and cd into the folder
   - `` git submodule update --init ``
   - `` ./gradlew :library:build ``
-  - you should have the api jar in ``build/libs/PokeGOAPI-Java-0.0.1-SNAPSHOT.jar``
+  - you should have the api jar in ``library/build/libs/library-all.jar``
 
 PS : for users who want to import the api into Eclipse IDE, you'll need to :
-  - build once : `` ./gradlew build ``
+  - build once : `` ./gradlew :library:build ``
   - Right click on the project
   - Select Build path > Configure Build Path > Source > Add Folder
-  - Select `build/generated/source/proto/main/java`
+  - Select `library/build/generated/source/proto/main/java`
   - Finish
 
 # Usage exemple (mostly how to login) :
