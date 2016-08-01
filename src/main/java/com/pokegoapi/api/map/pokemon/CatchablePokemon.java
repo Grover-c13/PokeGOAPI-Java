@@ -314,28 +314,45 @@ public class CatchablePokemon implements MapPoint {
 	 */
 	public CatchResult catchPokemonWithBestBall() throws LoginFailedException,
 			RemoteServerException, NoSuchItemException {
-		return catchPokemonWithBestBall(-1);
+		return catchPokemonWithBestBall(false, -1);
 	}
 
 	/**
 	 * Tries to catch a pokemon with you best pokeball first
 	 * (start by the masterball if you have none then use the ultraball etc.)
 	 *
-	 * @param amount the amount
+	 * @param noMasterBall the no master ball
 	 * @return CatchResult catch result
 	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws NoSuchItemException   the no such item exception
 	 */
-	public CatchResult catchPokemonWithBestBall(int amount) throws LoginFailedException,
+	public CatchResult catchPokemonWithBestBall(boolean noMasterBall) throws LoginFailedException,
 			RemoteServerException, NoSuchItemException {
-		return catchPokemonWithBestBall(amount, -1);
+		return catchPokemonWithBestBall(noMasterBall, -1);
 	}
 
 	/**
 	 * Tries to catch a pokemon with you best pokeball first
 	 * (start by the masterball if you have none then use the ultraball etc.)
 	 *
+	 * @param noMasterBall the no master ball
+	 * @param amount       the amount
+	 * @return CatchResult catch result
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
+	 * @throws NoSuchItemException   the no such item exception
+	 */
+	public CatchResult catchPokemonWithBestBall(boolean noMasterBall, int amount) throws LoginFailedException,
+			RemoteServerException, NoSuchItemException {
+		return catchPokemonWithBestBall(noMasterBall, amount, -1);
+	}
+
+	/**
+	 * Tries to catch a pokemon with you best pokeball first
+	 * (start by the masterball if you have none then use the ultraball etc.)
+	 *
+	 * @param noMasterBall  the no master ball
 	 * @param amount        the amount
 	 * @param razberryLimit the razberry limit
 	 * @return CatchResult catch result
@@ -343,11 +360,11 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws NoSuchItemException   the no such item exception
 	 */
-	public CatchResult catchPokemonWithBestBall(int amount, int razberryLimit) throws LoginFailedException,
+	public CatchResult catchPokemonWithBestBall(boolean noMasterBall, int amount, int razberryLimit) throws LoginFailedException,
 			RemoteServerException, NoSuchItemException {
 		ItemBag bag = api.getInventories().getItemBag();
 		Pokeball pokeball;
-		if (bag.getItem(ItemId.ITEM_MASTER_BALL).getCount() > 0) {
+		if (bag.getItem(ItemId.ITEM_MASTER_BALL).getCount() > 0 && !noMasterBall) {
 			pokeball = Pokeball.MASTERBALL;
 		} else if (bag.getItem(ItemId.ITEM_ULTRA_BALL).getCount() > 0) {
 			pokeball = Pokeball.ULTRABALL;
