@@ -22,6 +22,8 @@ import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResp
 
 
 public interface EncounterResult {
+	
 	boolean wasSuccessful();
+
 	EncounterResponse.Status getStatus();
 }

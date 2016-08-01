@@ -35,7 +35,7 @@ import com.pokegoapi.util.MapPoint;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Gym implements MapPoint{
+public class Gym implements MapPoint {
 	private FortData proto;
 	private GetGymDetailsResponse details;
 	private PokemonGo api;

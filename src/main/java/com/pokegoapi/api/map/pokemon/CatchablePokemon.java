@@ -15,22 +15,21 @@
 
 package com.pokegoapi.api.map.pokemon;
 
-import POGOProtos.Enums.PokemonIdOuterClass;
+
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
-import POGOProtos.Map.Fort.FortTypeOuterClass;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.CatchPokemonMessage;
-import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.DiskEncounterMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.DiskEncounterMessageOuterClass.DiskEncounterMessage;
 import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass.EncounterMessage;
 import POGOProtos.Networking.Requests.Messages.UseItemCaptureMessageOuterClass.UseItemCaptureMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus;
 import POGOProtos.Networking.Responses.DiskEncounterResponseOuterClass.DiskEncounterResponse;
-import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass.UseItemCaptureResponse;
 import com.google.protobuf.ByteString;
@@ -55,13 +54,12 @@ import lombok.ToString;
 
 import java.util.concurrent.Future;
 
-import static POGOProtos.Networking.Requests.Messages.DiskEncounterMessageOuterClass.*;
 
 /**
  * The type Catchable pokemon.
  */
 @ToString
-public class CatchablePokemon implements MapPoint{
+public class CatchablePokemon implements MapPoint {
 
 	private enum EncounterKind {
 		NORMAL,
