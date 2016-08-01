@@ -394,7 +394,9 @@ public class CatchablePokemon implements MapPoint {
 				useItem(ItemId.ITEM_RAZZ_BERRY);
 				razberries++;
 			}
-			result = AsyncHelper.toBlocking(catchPokemonAsync(normalizedHitPosition, normalizedReticleSize, spinModifier, type));
+			result = AsyncHelper.toBlocking(
+					catchPokemonAsync(normalizedHitPosition, normalizedReticleSize, spinModifier, type)
+			);
 			if (result == null) {
 				Log.wtf(TAG, "Got a null result after catch attempt");
 				break;
@@ -431,8 +433,8 @@ public class CatchablePokemon implements MapPoint {
 	 * @param type                  Type of pokeball to throw
 	 * @return CatchResult of resulted try to catch pokemon
 	 */
-	public Observable<CatchResult> catchPokemonAsync(double normalizedHitPosition, double normalizedReticleSize,
-													 double spinModifier, Pokeball type) {
+	public Observable<CatchResult> catchPokemonAsync(
+			double normalizedHitPosition, double normalizedReticleSize, double spinModifier, Pokeball type) {
 		if (!isEncountered()) {
 			return Observable.just(new CatchResult());
 		}
