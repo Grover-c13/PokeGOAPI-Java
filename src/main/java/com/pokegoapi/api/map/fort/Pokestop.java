@@ -28,13 +28,15 @@ import POGOProtos.Networking.Responses.FortSearchResponseOuterClass;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.util.FutureWrapper;
-import com.pokegoapi.util.PokemonFuture;
+import com.pokegoapi.util.AsyncHelper;
 import lombok.Getter;
+import rx.Observable;
+import rx.functions.Func1;
 
 import java.util.List;
 
@@ -114,7 +116,7 @@ public class Pokestop {
 	 *
 	 * @return PokestopLootResult
 	 */
-	public PokemonFuture<PokestopLootResult> lootAsync() {
+	public Observable<PokestopLootResult> lootAsync() {
 		FortSearchMessage searchMessage = FortSearchMessage.newBuilder()
 				.setFortId(getId())
 				.setFortLatitude(getLatitude())
@@ -125,20 +127,19 @@ public class Pokestop {
 
 		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH,
 				searchMessage);
-		return new FutureWrapper<ByteString, PokestopLootResult>(api.getRequestHandler()
-				.sendAsyncServerRequests(serverRequest)) {
+		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, PokestopLootResult>() {
 			@Override
-			protected PokestopLootResult handle(ByteString result) throws RemoteServerException, LoginFailedException {
+			public PokestopLootResult call(ByteString result) {
 				FortSearchResponseOuterClass.FortSearchResponse response;
 				try {
 					response = FortSearchResponseOuterClass.FortSearchResponse.parseFrom(result);
 				} catch (InvalidProtocolBufferException e) {
-					throw new RemoteServerException(e);
+					throw new AsyncRemoteServerException(e);
 				}
 				cooldownCompleteTimestampMs = response.getCooldownCompleteTimestampMs();
 				return new PokestopLootResult(response);
 			}
-		};
+		});
 	}
 
 	/**
@@ -149,7 +150,7 @@ public class Pokestop {
 	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public PokestopLootResult loot() throws LoginFailedException, RemoteServerException {
-		return lootAsync().toBlocking();
+		return AsyncHelper.toBlocking(lootAsync());
 	}
 
 	/**
@@ -157,7 +158,7 @@ public class Pokestop {
 	 *
 	 * @param item the modifier to add to this pokestop
 	 */
-	public PokemonFuture<Boolean> addModifierAsync(ItemIdOuterClass.ItemId item) {
+	public Observable<Boolean> addModifierAsync(ItemIdOuterClass.ItemId item) {
 		AddFortModifierMessage msg = AddFortModifierMessage.newBuilder()
 				.setModifierType(item)
 				.setFortId(getId())
@@ -165,18 +166,18 @@ public class Pokestop {
 				.setPlayerLongitude(api.getLongitude())
 				.build();
 		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.ADD_FORT_MODIFIER, msg);
-		return new FutureWrapper<ByteString, Boolean>(api.getRequestHandler().sendAsyncServerRequests(serverRequest)) {
+		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, Boolean>() {
 			@Override
-			protected Boolean handle(ByteString result) throws RemoteServerException, LoginFailedException {
+			public Boolean call(ByteString result) {
 				try {
 					//sadly the server response does not contain any information to verify if the request was successful
 					AddFortModifierResponseOuterClass.AddFortModifierResponse.parseFrom(result);
 				} catch (InvalidProtocolBufferException e) {
-					throw new RemoteServerException(e);
+					throw new AsyncRemoteServerException(e);
 				}
 				return Boolean.TRUE;
 			}
-		};
+		});
 	}
 
 	/**
@@ -187,7 +188,7 @@ public class Pokestop {
 	 * @throws RemoteServerException if the server failed to respond or the modifier could not be added to this pokestop
 	 */
 	public void addModifier(ItemIdOuterClass.ItemId item) throws LoginFailedException, RemoteServerException {
-		addModifierAsync(item).toBlocking();
+		AsyncHelper.toBlocking(addModifierAsync(item));
 	}
 
 	/**
@@ -195,7 +196,7 @@ public class Pokestop {
 	 *
 	 * @return FortDetails
 	 */
-	public PokemonFuture<FortDetails> getDetailsAsync() {
+	public Observable<FortDetails> getDetailsAsync() {
 		FortDetailsMessage reqMsg = FortDetailsMessage.newBuilder()
 				.setFortId(getId())
 				.setLatitude(getLatitude())
@@ -203,18 +204,18 @@ public class Pokestop {
 				.build();
 
 		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS, reqMsg);
-		return new FutureWrapper<ByteString, FortDetails>(api.getRequestHandler().sendAsyncServerRequests(serverRequest)) {
+		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, FortDetails>() {
 			@Override
-			protected FortDetails handle(ByteString result) throws RemoteServerException, LoginFailedException {
+			public FortDetails call(ByteString result) {
 				FortDetailsResponseOuterClass.FortDetailsResponse response = null;
 				try {
 					response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(result);
 				} catch (InvalidProtocolBufferException e) {
-					throw new RemoteServerException(e);
+					throw new AsyncRemoteServerException(e);
 				}
 				return new FortDetails(response);
 			}
-		};
+		});
 	}
 
 
@@ -226,7 +227,7 @@ public class Pokestop {
 	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public FortDetails getDetails() throws LoginFailedException, RemoteServerException {
-		return getDetailsAsync().toBlocking();
+		return AsyncHelper.toBlocking(getDetailsAsync());
 	}
 
 	/**
@@ -247,6 +248,8 @@ public class Pokestop {
      * @throws RemoteServerException If server communications failed.
 	 */
 	public boolean hasLure() throws LoginFailedException, RemoteServerException {
+
+
 		List<FortModifierOuterClass.FortModifier> modifiers = getDetails().getModifier();
 		for (FortModifierOuterClass.FortModifier mod : modifiers) {
 			if (mod.getItemId() == ItemIdOuterClass.ItemId.ITEM_TROY_DISK) {
