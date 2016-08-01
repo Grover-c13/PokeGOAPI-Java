@@ -39,13 +39,13 @@ OR
     - Select Build path > Java Build Path
     - Select Libraries tab
     - Select Add External JARs…
-    - Select `PokeGOAPI-Java/build/libs/PokeGOAPI-Java-0.0.1-SNAPSHOT.jar`
+    - Select `PokeGOAPI-Java/library/build/libs/library-all.jar`
     - Finish
 
 # Build from source
   - Clone the repo and cd into the folder
   - `` git submodule update --init ``
-  - `` ./gradlew build ``
+  - `` ./gradlew :library:build ``
   - you should have the api jar in ``build/libs/PokeGOAPI-Java-0.0.1-SNAPSHOT.jar``
 
 PS : for users who want to import the api into Eclipse IDE, you'll need to :
