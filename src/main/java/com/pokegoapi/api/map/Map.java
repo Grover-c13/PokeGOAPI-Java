@@ -19,6 +19,7 @@ import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Map.Fort.FortTypeOuterClass.FortType;
 import POGOProtos.Map.MapCellOuterClass.MapCell;
+import POGOProtos.Map.Pokemon.MapPokemonOuterClass;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
@@ -38,11 +39,13 @@ import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObj
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
+import com.annimon.stream.function.Predicate;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.gym.Gym;
 import com.pokegoapi.api.map.fort.FortDetails;
+import com.pokegoapi.api.map.fort.Pokestop;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.NearbyPokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -52,7 +55,6 @@ import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.DummyFuture;
 import com.pokegoapi.util.FutureWrapper;
 import com.pokegoapi.util.MapUtil;
 import com.pokegoapi.util.PokemonFuture;
@@ -69,6 +71,7 @@ public class Map {
 	private static int RESEND_REQUEST = 5000;
 	private final PokemonGo api;
 	private MapObjects cachedMapObjects;
+	private List<CatchablePokemon> cachedCatchable;
 	private long lastMapUpdate;
 
 	/**
@@ -91,6 +94,11 @@ public class Map {
 	 * @return a List of CatchablePokemon at your current location
 	 */
 	public PokemonFuture<List<CatchablePokemon>> getCatchablePokemonAsync() {
+
+		if (useCache() && cachedCatchable != null) {
+			return FutureWrapper.just(cachedCatchable);
+		}
+
 		List<Long> cellIds = getDefaultCells();
 		return new FutureWrapper<MapObjects, List<CatchablePokemon>>(getMapObjectsAsync(cellIds)) {
 			@Override
@@ -103,13 +111,22 @@ public class Map {
 				for (WildPokemonOuterClass.WildPokemon wildPokemon : mapObjects.getWildPokemons()) {
 					catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
 				}
-				// TODO: Check if this code is correct; merged because this contains many other fixes
-				/*for (Pokestop pokestop : objects.getPokestops()) {
-					if (pokestop.inRange() && pokestop.hasLurePokemon()) {
+
+				/*
+				TODO: i have more success checking if encounterId > 0
+				i don't want to use the hasLure because it do a request every call
+				*/
+				for (Pokestop pokestop : mapObjects.getPokestops()) {
+					if (pokestop.inRange()
+							&& pokestop.getFortData().hasLureInfo()
+							&& pokestop.getFortData().getLureInfo().getEncounterId() > 0) {
+						//if (pokestop.inRange() && pokestop.hasLurePokemon()) {
 						catchablePokemons.add(new CatchablePokemon(api, pokestop.getFortData()));
 					}
-				}*/
-				return new ArrayList<>(catchablePokemons);
+				}
+
+				cachedCatchable = new ArrayList<>(catchablePokemons);
+				return cachedCatchable;
 			}
 		};
 	}
@@ -310,8 +327,8 @@ public class Map {
 	 */
 	public PokemonFuture<MapObjects> getMapObjectsAsync(List<Long> cellIds) {
 
-		if ((api.currentTimeMillis() - lastMapUpdate) < RESEND_REQUEST) {
-			return new DummyFuture<MapObjects>(cachedMapObjects);
+		if (useCache()) {
+			return FutureWrapper.just(cachedMapObjects);
 		}
 
 		lastMapUpdate = api.currentTimeMillis();
@@ -649,6 +666,14 @@ public class Map {
 		return response;
 	}
 
+	/**
+	 * Wether or not to get a fresh copy or use cache;
+	 *
+	 * @return true if enough time has elapsed since the last request, false otherwise
+	 */
+	private boolean useCache() {
+		return (api.currentTimeMillis() - lastMapUpdate) < RESEND_REQUEST;
+	}
 
 	private List<Long> getDefaultCells() {
 		return getCellIds(api.getLatitude(), api.getLongitude(), CELL_WIDTH);

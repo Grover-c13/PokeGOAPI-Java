@@ -213,7 +213,7 @@ public class RequestHandler implements Runnable {
 			}
 
 			if (responseEnvelop.getStatusCode() == 102) {
-				throw new LoginFailedException(String.format("Error %s in API Url %s",
+				throw new LoginFailedException(String.format("Invalud Auth status code recieved, token not refreshed?",
 						responseEnvelop.getApiUrl(), responseEnvelop.getError()));
 			} else if (responseEnvelop.getStatusCode() == 53) {
 				// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
