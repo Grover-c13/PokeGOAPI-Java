@@ -21,7 +21,15 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import com.squareup.moshi.Moshi;
-import okhttp3.*;
+import okhttp3.Cookie;
+import okhttp3.CookieJar;
+import okhttp3.HttpUrl;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -229,7 +237,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 			this.expiresTimestamp = time.currentTimeMillis()
 					+ (Integer.valueOf(params[1].split("=")[1]) * 1000 - REFRESH_TOKEN_BUFFER_TIME);
 		} catch (Exception e) {
-			throw new LoginFailedException("Failed to fetch token");
+			throw new LoginFailedException("Failed to fetch token, body:" + body);
 		}
 	}
 

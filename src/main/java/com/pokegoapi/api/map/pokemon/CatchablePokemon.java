@@ -15,17 +15,20 @@
 
 package com.pokegoapi.api.map.pokemon;
 
-import POGOProtos.Enums.PokemonIdOuterClass;
+
+import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.CatchPokemonMessage;
-import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.DiskEncounterMessageOuterClass.DiskEncounterMessage;
+import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass.EncounterMessage;
 import POGOProtos.Networking.Requests.Messages.UseItemCaptureMessageOuterClass.UseItemCaptureMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
-import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
+import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus;
+import POGOProtos.Networking.Responses.DiskEncounterResponseOuterClass.DiskEncounterResponse;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass.UseItemCaptureResponse;
 import com.google.protobuf.ByteString;
@@ -33,38 +36,45 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Pokeball;
+import com.pokegoapi.api.map.pokemon.encounter.DiskEncounterResult;
+import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
+import com.pokegoapi.api.map.pokemon.encounter.NormalEncounterResult;
 import com.pokegoapi.exceptions.AsyncLoginFailedException;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.util.AsyncHelper;
+import com.pokegoapi.util.Log;
+import com.pokegoapi.util.MapPoint;
 import lombok.Getter;
 import lombok.ToString;
 import rx.Observable;
 import rx.functions.Func1;
 
+
 /**
  * The type Catchable pokemon.
  */
 @ToString
-public class CatchablePokemon {
+public class CatchablePokemon implements MapPoint {
+
 	private static final String TAG = CatchablePokemon.class.getSimpleName();
 	private final PokemonGo api;
-
 	@Getter
 	private final String spawnPointId;
 	@Getter
 	private final long encounterId;
 	@Getter
-	private final PokemonIdOuterClass.PokemonId pokemonId;
+	private final PokemonId pokemonId;
 	@Getter
 	private final long expirationTimestampMs;
 	@Getter
 	private final double latitude;
 	@Getter
 	private final double longitude;
-
+	private final EncounterKind encounterKind;
 	private Boolean encountered = null;
 
 	/**
@@ -75,7 +85,7 @@ public class CatchablePokemon {
 	 */
 	public CatchablePokemon(PokemonGo api, MapPokemon proto) {
 		this.api = api;
-
+		this.encounterKind = EncounterKind.NORMAL;
 		this.spawnPointId = proto.getSpawnPointId();
 		this.encounterId = proto.getEncounterId();
 		this.pokemonId = proto.getPokemonId();
@@ -83,6 +93,7 @@ public class CatchablePokemon {
 		this.latitude = proto.getLatitude();
 		this.longitude = proto.getLongitude();
 	}
+
 
 	/**
 	 * Instantiates a new Catchable pokemon.
@@ -92,6 +103,7 @@ public class CatchablePokemon {
 	 */
 	public CatchablePokemon(PokemonGo api, WildPokemon proto) {
 		this.api = api;
+		this.encounterKind = EncounterKind.NORMAL;
 		this.spawnPointId = proto.getSpawnPointId();
 		this.encounterId = proto.getEncounterId();
 		this.pokemonId = proto.getPokemonData().getPokemonId();
@@ -112,13 +124,24 @@ public class CatchablePokemon {
 		}
 		this.api = api;
 		// TODO: does this work?
-		this.spawnPointId = null;
+		// seems that spawnPoint it's fortId in catchAPI so it should be safe to just set it in that way
+		this.spawnPointId = proto.getLureInfo().getFortId();
 		this.encounterId = proto.getLureInfo().getEncounterId();
 		this.pokemonId = proto.getLureInfo().getActivePokemonId();
 		this.expirationTimestampMs = proto.getLureInfo()
 				.getLureExpiresTimestampMs();
 		this.latitude = proto.getLatitude();
 		this.longitude = proto.getLongitude();
+		this.encounterKind = EncounterKind.DISK;
+	}
+
+	/**
+	 * Encounter pokemon
+	 *
+	 * @return the encounter result
+	 */
+	public EncounterResult encounterPokemon() throws LoginFailedException, RemoteServerException {
+		return AsyncHelper.toBlocking(encounterPokemonAsync());
 	}
 
 	/**
@@ -127,27 +150,43 @@ public class CatchablePokemon {
 	 * @return the encounter result
 	 */
 	public Observable<EncounterResult> encounterPokemonAsync() {
-		EncounterMessageOuterClass.EncounterMessage reqMsg = EncounterMessageOuterClass.EncounterMessage
+		if (encounterKind == EncounterKind.NORMAL) {
+			return encounterNormalPokemonAsync();
+		} else if (encounterKind == EncounterKind.DISK) {
+			return encounterDiskPokemonAsync();
+		}
+
+		throw new IllegalStateException("Catchable pokemon missing encounter type");
+	}
+
+	/**
+	 * Encounter pokemon encounter result.
+	 *
+	 * @return the encounter result
+	 */
+	public Observable<EncounterResult> encounterNormalPokemonAsync() {
+		EncounterMessage reqMsg = EncounterMessage
 				.newBuilder().setEncounterId(getEncounterId())
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
 				.setSpawnPointId(getSpawnPointId()).build();
 		AsyncServerRequest serverRequest = new AsyncServerRequest(
-				RequestTypeOuterClass.RequestType.ENCOUNTER, reqMsg);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, EncounterResult>() {
-			@Override
-			public EncounterResult call(ByteString result) {
-				EncounterResponseOuterClass.EncounterResponse response;
-				try {
-					response = EncounterResponseOuterClass.EncounterResponse
-							.parseFrom(result);
-				} catch (InvalidProtocolBufferException e) {
-					throw new AsyncRemoteServerException(e);
-				}
-				encountered = response.getStatus() == EncounterResponse.Status.ENCOUNTER_SUCCESS;
-				return new EncounterResult(response);
-			}
-		});
+				RequestType.ENCOUNTER, reqMsg);
+		return api.getRequestHandler()
+				.sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, EncounterResult>() {
+					@Override
+					public EncounterResult call(ByteString result) {
+						EncounterResponse response;
+						try {
+							response = EncounterResponse
+									.parseFrom(result);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+						encountered = response.getStatus() == EncounterResponse.Status.ENCOUNTER_SUCCESS;
+						return new NormalEncounterResult(response);
+					}
+				});
 	}
 
 	/**
@@ -157,9 +196,37 @@ public class CatchablePokemon {
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 */
-	public EncounterResult encounterPokemon() throws LoginFailedException,
+	public EncounterResult encounterNormalPokemon() throws LoginFailedException,
 			RemoteServerException {
-		return AsyncHelper.toBlocking(encounterPokemonAsync());
+		return AsyncHelper.toBlocking(encounterNormalPokemonAsync());
+	}
+
+	/**
+	 * Encounter pokemon
+	 *
+	 * @return the encounter result
+	 */
+	public Observable<EncounterResult> encounterDiskPokemonAsync() {
+		DiskEncounterMessage reqMsg = DiskEncounterMessage
+				.newBuilder().setEncounterId(getEncounterId())
+				.setPlayerLatitude(api.getLatitude())
+				.setPlayerLongitude(api.getLongitude())
+				.setFortId(getSpawnPointId()).build();
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.DISK_ENCOUNTER, reqMsg);
+		return api.getRequestHandler()
+				.sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, EncounterResult>() {
+					@Override
+					public EncounterResult call(ByteString result) {
+						DiskEncounterResponse response;
+						try {
+							response = DiskEncounterResponse.parseFrom(result);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+						encountered = response.getResult() == DiskEncounterResponse.Result.SUCCESS;
+						return new DiskEncounterResult(response);
+					}
+				});
 	}
 
 	/**
@@ -167,23 +234,10 @@ public class CatchablePokemon {
 	 * none will use greatball etc) and uwill use a single razz berry if available.
 	 *
 	 * @return CatchResult
-	 * @throws LoginFailedException  if failed to login
-	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public Observable<CatchResult> catchPokemonWithRazzBerryAsync()
-			throws LoginFailedException, RemoteServerException {
-		final Pokeball pokeball;
-
-		ItemBag bag = api.getInventories().getItemBag();
-		if (bag.getItem(ItemId.ITEM_POKE_BALL).getCount() > 0) {
-			pokeball = Pokeball.POKEBALL;
-		} else if (bag.getItem(ItemId.ITEM_GREAT_BALL).getCount() > 0) {
-			pokeball = Pokeball.GREATBALL;
-		} else if (bag.getItem(ItemId.ITEM_ULTRA_BALL).getCount() > 0) {
-			pokeball = Pokeball.ULTRABALL;
-		} else {
-			pokeball = Pokeball.MASTERBALL;
-		}
+			throws LoginFailedException, RemoteServerException, NoSuchItemException {
+		final Pokeball pokeball = getItemBall();
 		return useItemAsync(ItemId.ITEM_RAZZ_BERRY).flatMap(new Func1<CatchItemResult, Observable<CatchResult>>() {
 			@Override
 			public Observable<CatchResult> call(CatchItemResult result) {
@@ -196,6 +250,30 @@ public class CatchablePokemon {
 	}
 
 	/**
+	 * Gets item ball to catch a pokemon
+	 *
+	 * @return the item ball
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws NoSuchItemException   the no such item exception
+	 */
+	public Pokeball getItemBall() throws LoginFailedException,
+			RemoteServerException, NoSuchItemException {
+		ItemBag bag = api.getInventories().getItemBag();
+		if (bag.getItem(ItemId.ITEM_POKE_BALL).getCount() > 0) {
+			return Pokeball.POKEBALL;
+		} else if (bag.getItem(ItemId.ITEM_GREAT_BALL).getCount() > 0) {
+			return Pokeball.GREATBALL;
+		} else if (bag.getItem(ItemId.ITEM_ULTRA_BALL).getCount() > 0) {
+			return Pokeball.ULTRABALL;
+		} else if (bag.getItem(ItemId.ITEM_MASTER_BALL).getCount() > 0) {
+			return Pokeball.MASTERBALL;
+		} else {
+			throw new NoSuchItemException();
+		}
+	}
+
+	/**
 	 * Tries to catch a pokemon (will attempt to use a pokeball, if you have
 	 * none will use greatball etc) and uwill use a single razz berry if available.
 	 *
@@ -204,19 +282,8 @@ public class CatchablePokemon {
 	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemonWithRazzBerry() throws LoginFailedException,
-			RemoteServerException {
-		Pokeball pokeball;
-
-		ItemBag bag = api.getInventories().getItemBag();
-		if (bag.getItem(ItemId.ITEM_POKE_BALL).getCount() > 0) {
-			pokeball = Pokeball.POKEBALL;
-		} else if (bag.getItem(ItemId.ITEM_GREAT_BALL).getCount() > 0) {
-			pokeball = Pokeball.GREATBALL;
-		} else if (bag.getItem(ItemId.ITEM_ULTRA_BALL).getCount() > 0) {
-			pokeball = Pokeball.ULTRABALL;
-		} else {
-			pokeball = Pokeball.MASTERBALL;
-		}
+			RemoteServerException, NoSuchItemException {
+		Pokeball pokeball = getItemBall();
 
 		useItem(ItemId.ITEM_RAZZ_BERRY);
 		return catchPokemon(pokeball, -1, -1);
@@ -231,21 +298,9 @@ public class CatchablePokemon {
 	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public CatchResult catchPokemon() throws LoginFailedException,
-			RemoteServerException {
-		Pokeball pokeball;
+			RemoteServerException, NoSuchItemException {
 
-		ItemBag bag = api.getInventories().getItemBag();
-		if (bag.getItem(ItemId.ITEM_POKE_BALL).getCount() > 0) {
-			pokeball = Pokeball.POKEBALL;
-		} else if (bag.getItem(ItemId.ITEM_GREAT_BALL).getCount() > 0) {
-			pokeball = Pokeball.GREATBALL;
-		} else if (bag.getItem(ItemId.ITEM_ULTRA_BALL).getCount() > 0) {
-			pokeball = Pokeball.ULTRABALL;
-		} else {
-			pokeball = Pokeball.MASTERBALL;
-		}
-
-		return catchPokemon(pokeball);
+		return catchPokemon(getItemBall());
 	}
 
 	/**
@@ -312,7 +367,6 @@ public class CatchablePokemon {
 		return catchPokemon(normalizedHitPosition, normalizedReticleSize, spinModifier, type, amount, -1);
 	}
 
-
 	/**
 	 * Tries to catch a pokemon.
 	 *
@@ -340,10 +394,14 @@ public class CatchablePokemon {
 				useItem(ItemId.ITEM_RAZZ_BERRY);
 				razberries++;
 			}
-			result = AsyncHelper
-					.toBlocking(catchPokemonAsync(normalizedHitPosition, normalizedReticleSize, spinModifier, type));
-			if (!result.isFailed() && result.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_ESCAPE
-					&& result.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_MISSED) {
+			result = AsyncHelper.toBlocking(catchPokemonAsync(normalizedHitPosition, normalizedReticleSize, spinModifier, type));
+			if (result == null) {
+				Log.wtf(TAG, "Got a null result after catch attempt");
+				break;
+			}
+			if (!result.isFailed() && result.getStatus() != CatchStatus.CATCH_ESCAPE
+					&& result.getStatus() != CatchStatus.CATCH_MISSED
+					|| result.getStatus() == CatchStatus.CATCH_FLEE) {
 				break;
 			}
 			numThrows++;
@@ -352,7 +410,6 @@ public class CatchablePokemon {
 
 		return result;
 	}
-
 
 	/**
 	 * Tries to catch a pokemon.
@@ -388,33 +445,43 @@ public class CatchablePokemon {
 				.setSpinModifier(spinModifier)
 				.setPokeball(type.getBallType()).build();
 		AsyncServerRequest serverRequest = new AsyncServerRequest(
-				RequestTypeOuterClass.RequestType.CATCH_POKEMON, reqMsg);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest)
-				.map(new Func1<ByteString, CatchResult>() {
+				RequestType.CATCH_POKEMON, reqMsg);
+		return api.getRequestHandler()
+				.sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, CatchResult>() {
 					@Override
 					public CatchResult call(ByteString result) {
+						System.out.println("ASYNC CATCH CALL");
 						CatchPokemonResponse response;
+
 						try {
 							response = CatchPokemonResponse.parseFrom(result);
 						} catch (InvalidProtocolBufferException e) {
 							throw new AsyncRemoteServerException(e);
 						}
-
-						if (response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_ESCAPE
-								&& response.getStatus() != CatchPokemonResponse.CatchStatus.CATCH_MISSED) {
-							try {
-								api.getInventories().updateInventories();
-							} catch (LoginFailedException e) {
-								throw new AsyncLoginFailedException(e);
-							} catch (RemoteServerException e) {
-								throw new AsyncRemoteServerException(e);
+						try {
+							if (response.getStatus() == CatchStatus.CATCH_FLEE
+									|| response.getStatus() == CatchStatus.CATCH_SUCCESS) {
+								api.getMap().getCatchablePokemon().remove(this);
 							}
-							return new CatchResult(response);
-						} else {
-							return new CatchResult();
+
+
+							if (response.getStatus() != CatchStatus.CATCH_ESCAPE
+									&& response.getStatus() != CatchStatus.CATCH_MISSED) {
+								api.getInventories().updateInventories();
+								return new CatchResult(response);
+							} else {
+								CatchResult res = new CatchResult();
+								res.setStatus(CatchStatus.CATCH_ESCAPE);
+								return res;
+							}
+						} catch (RemoteServerException e) {
+							throw new AsyncRemoteServerException(e);
+						} catch (LoginFailedException e) {
+							throw new AsyncLoginFailedException(e);
 						}
 					}
 				});
+
 	}
 
 	/**
@@ -422,8 +489,6 @@ public class CatchablePokemon {
 	 *
 	 * @param item the item ID
 	 * @return CatchItemResult info about the new modifiers about the pokemon (can move, item capture multi) eg
-	 * @throws LoginFailedException  if failed to login
-	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public Observable<CatchItemResult> useItemAsync(ItemId item) {
 
@@ -435,10 +500,9 @@ public class CatchablePokemon {
 				.build();
 
 		AsyncServerRequest serverRequest = new AsyncServerRequest(
-				RequestTypeOuterClass.RequestType.USE_ITEM_CAPTURE, reqMsg);
-
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest)
-				.map(new Func1<ByteString, CatchItemResult>() {
+				RequestType.USE_ITEM_CAPTURE, reqMsg);
+		return api.getRequestHandler()
+				.sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, CatchItemResult>() {
 					@Override
 					public CatchItemResult call(ByteString result) {
 						UseItemCaptureResponse response;
@@ -490,5 +554,10 @@ public class CatchablePokemon {
 			return false;
 		}
 		return encountered;
+	}
+
+	private enum EncounterKind {
+		NORMAL,
+		DISK;
 	}
 }

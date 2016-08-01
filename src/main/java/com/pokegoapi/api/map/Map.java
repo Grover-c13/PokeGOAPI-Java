@@ -43,6 +43,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.gym.Gym;
 import com.pokegoapi.api.map.fort.FortDetails;
+import com.pokegoapi.api.map.fort.Pokestop;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.NearbyPokemon;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
@@ -54,6 +55,7 @@ import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
+import com.pokegoapi.util.MapUtil;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -69,6 +71,7 @@ public class Map {
 	private static int RESEND_REQUEST = 5000;
 	private final PokemonGo api;
 	private MapObjects cachedMapObjects;
+	private List<CatchablePokemon> cachedCatchable;
 	private long lastMapUpdate;
 
 	/**
@@ -91,6 +94,11 @@ public class Map {
 	 * @return a List of CatchablePokemon at your current location
 	 */
 	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync() {
+
+		if (useCache() && cachedCatchable != null) {
+			return Observable.just(cachedCatchable);
+		}
+
 		List<Long> cellIds = getDefaultCells();
 		return getMapObjectsAsync(cellIds).map(new Func1<MapObjects, List<CatchablePokemon>>() {
 			@Override
@@ -103,13 +111,22 @@ public class Map {
 				for (WildPokemonOuterClass.WildPokemon wildPokemon : mapObjects.getWildPokemons()) {
 					catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
 				}
-				// TODO: Check if this code is correct; merged because this contains many other fixes
-				/*for (Pokestop pokestop : objects.getPokestops()) {
-					if (pokestop.inRange() && pokestop.hasLurePokemon()) {
+
+				/*
+				TODO: i have more success checking if encounterId > 0
+				i don't want to use the hasLure because it do a request every call
+				*/
+				for (Pokestop pokestop : mapObjects.getPokestops()) {
+					if (pokestop.inRange()
+							&& pokestop.getFortData().hasLureInfo()
+							&& pokestop.getFortData().getLureInfo().getEncounterId() > 0) {
+						//if (pokestop.inRange() && pokestop.hasLurePokemon()) {
 						catchablePokemons.add(new CatchablePokemon(api, pokestop.getFortData()));
 					}
-				}*/
-				return new ArrayList<>(catchablePokemons);
+				}
+
+				cachedCatchable = new ArrayList<>(catchablePokemons);
+				return cachedCatchable;
 			}
 		});
 	}
@@ -121,6 +138,19 @@ public class Map {
 	 */
 	public List<CatchablePokemon> getCatchablePokemon() throws LoginFailedException, RemoteServerException {
 		return AsyncHelper.toBlocking(getCatchablePokemonAsync());
+	}
+
+	/**
+	 * Gets catchable pokemon sort by distance.
+	 *
+	 * @return the catchable pokemon sort
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public java.util.Map<Double, CatchablePokemon> getCatchablePokemonSort()
+			throws LoginFailedException, RemoteServerException {
+		MapUtil<CatchablePokemon> util = new MapUtil<>();
+		return util.sortItems(getCatchablePokemon(), api);
 	}
 
 	/**
@@ -216,6 +246,18 @@ public class Map {
 	}
 
 	/**
+	 * Gets gym sort by distance.
+	 *
+	 * @return the gym sort
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public java.util.Map<Double, Gym> getGymSort() throws LoginFailedException, RemoteServerException {
+		MapUtil<Gym> util = new MapUtil<>();
+		return util.sortItems(getGyms(), api);
+	}
+
+	/**
 	 * Returns a list of decimated spawn points at current location.
 	 *
 	 * @return list of spawn points
@@ -242,6 +284,19 @@ public class Map {
 	 */
 	public List<Point> getDecimatedSpawnPoints() throws LoginFailedException, RemoteServerException {
 		return AsyncHelper.toBlocking(getDecimatedSpawnPointsAsync());
+	}
+
+
+	/**
+	 * Gets decimated spawn points sort by distance.
+	 *
+	 * @return the decimated spawn points sort
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public java.util.Map<Double, Point> getDecimatedSpawnPointsSort() throws LoginFailedException, RemoteServerException {
+		MapUtil<Point> util = new MapUtil<>();
+		return util.sortItems(getDecimatedSpawnPoints(), api);
 	}
 
 	/**
@@ -271,7 +326,7 @@ public class Map {
 	 */
 	public Observable<MapObjects> getMapObjectsAsync(List<Long> cellIds) {
 
-		if ((api.currentTimeMillis() - lastMapUpdate) < RESEND_REQUEST) {
+		if (useCache()) {
 			return Observable.just(cachedMapObjects);
 		}
 
@@ -322,9 +377,9 @@ public class Map {
 						}
 
 
-						return result;
-					}
-				});
+				return result;
+			}
+		});
 	}
 
 	/**
@@ -403,6 +458,7 @@ public class Map {
 	 * @param cellIds   cellIds
 	 * @param latitude  latitude
 	 * @param longitude longitude
+	 * @param altitude  altitude
 	 * @return MapObjects in the given cells
 	 * @throws LoginFailedException  if the login failed
 	 * @throws RemoteServerException When a buffer exception is thrown
@@ -608,6 +664,14 @@ public class Map {
 		return response;
 	}
 
+	/**
+	 * Wether or not to get a fresh copy or use cache;
+	 *
+	 * @return true if enough time has elapsed since the last request, false otherwise
+	 */
+	private boolean useCache() {
+		return (api.currentTimeMillis() - lastMapUpdate) < RESEND_REQUEST;
+	}
 
 	private List<Long> getDefaultCells() {
 		return getCellIds(api.getLatitude(), api.getLongitude(), CELL_WIDTH);

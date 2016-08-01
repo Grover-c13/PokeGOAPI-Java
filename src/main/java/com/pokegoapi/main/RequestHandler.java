@@ -34,8 +34,18 @@ import rx.Observable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class RequestHandler implements Runnable {
 	private static final String TAG = RequestHandler.class.getSimpleName();
@@ -204,7 +214,7 @@ public class RequestHandler implements Runnable {
 			}
 
 			if (responseEnvelop.getStatusCode() == 102) {
-				throw new LoginFailedException(String.format("Error %s in API Url %s",
+				throw new LoginFailedException(String.format("Invalud Auth status code recieved, token not refreshed?",
 						responseEnvelop.getApiUrl(), responseEnvelop.getError()));
 			} else if (responseEnvelop.getStatusCode() == 53) {
 				// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request

@@ -13,28 +13,24 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.api.map;
+package com.pokegoapi.util;
 
-import POGOProtos.Map.SpawnPointOuterClass;
-import com.pokegoapi.util.MapPoint;
-import lombok.Getter;
-import lombok.Setter;
+/**
+ * @author Olaf Braun - Software Development
+ * @version 1.0
+ */
+public interface MapPoint {
+	/**
+	 * Gets latitude.
+	 *
+	 * @return the latitude
+	 */
+	double getLatitude();
 
-public class Point implements MapPoint {
-	@Getter
-	@Setter
-	private double longitude;
-	@Getter
-	@Setter
-	private double latitude;
-
-	public Point(double latitude, double longitude) {
-		this.latitude = latitude;
-		this.longitude = longitude;
-	}
-
-	public Point(SpawnPointOuterClass.SpawnPoint spawnpoint) {
-		this.latitude = spawnpoint.getLatitude();
-		this.longitude = spawnpoint.getLongitude();
-	}
+	/**
+	 * Gets longitude.
+	 *
+	 * @return the longitude
+	 */
+	double getLongitude();
 }

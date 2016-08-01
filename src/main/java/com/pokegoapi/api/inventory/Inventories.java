@@ -145,7 +145,7 @@ public class Inventories {
 			}
 			// player stats
 			if (itemData.hasPlayerStats()) {
-				api.getPlayerProfile().setStats(itemData.getPlayerStats());
+				api.getPlayerProfile().setStats(new Stats(itemData.getPlayerStats()));
 			}
 
 			// pokedex
