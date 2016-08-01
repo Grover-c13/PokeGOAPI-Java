@@ -39,7 +39,7 @@ OR
     - Select Build path > Java Build Path
     - Select Libraries tab
     - Select Add External JARs…
-    - Select `PokeGOAPI-Java/build/libs/PokeGOAPI-Java-0.0.1-SNAPSHOT.jar`
+    - Select `PokeGOAPI-Java/build/libs/library-all.jar`
     - Finish
 
 # Build from source

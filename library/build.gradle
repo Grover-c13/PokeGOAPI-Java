@@ -35,11 +35,8 @@ processResources {
 
 // Run this task to bundle all needed dependency
 task bundle(type: Jar) {
-    from {
-        configurations.compile.collect {
-            it.isDirectory() && !it.isEmpty() ? it : zipTree(it)
-        }
-    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
 
