@@ -16,8 +16,9 @@
 package com.pokegoapi.api.map.pokemon.encounter;
 
 
+import POGOProtos.Data.Capture.CaptureProbabilityOuterClass;
+import POGOProtos.Data.PokemonDataOuterClass;
 import POGOProtos.Networking.Responses.DiskEncounterResponseOuterClass.DiskEncounterResponse;
-import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 import lombok.Getter;
 
@@ -65,5 +66,17 @@ public class DiskEncounterResult implements EncounterResult {
 			default:
 				return EncounterResponse.Status.UNRECOGNIZED;
 		}
+	}
+
+	public CaptureProbabilityOuterClass.CaptureProbability getCaptureProbability() {
+		return response.getCaptureProbability();
+	}
+
+	public PokemonDataOuterClass.PokemonData getPokemonData() {
+		return response.getPokemonData();
+	}
+
+	public DiskEncounterResponse toPrimitive() {
+		return response;
 	}
 }

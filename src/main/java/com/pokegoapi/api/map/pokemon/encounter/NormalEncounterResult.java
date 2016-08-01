@@ -17,7 +17,9 @@ package com.pokegoapi.api.map.pokemon.encounter;
 
 
 import POGOProtos.Data.Capture.CaptureProbabilityOuterClass.CaptureProbability;
+import POGOProtos.Data.PokemonDataOuterClass;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
+import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 
 public class NormalEncounterResult implements EncounterResult {
@@ -53,9 +55,11 @@ public class NormalEncounterResult implements EncounterResult {
 		return response.getWildPokemon();
 	}
 
+	public PokemonDataOuterClass.PokemonData getPokemonData() {
+		return response.getWildPokemon().getPokemonData();
+	}
+
 	public EncounterResponse toPrimitive() {
 		return response;
 	}
-
-
 }
