@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-import POGOProtos.Enums.PokemonIdOuterClass;
-
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.ABRA;
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.AERODACTYL;

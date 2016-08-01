@@ -17,7 +17,6 @@ package com.pokegoapi.api.map.pokemon.encounter;
 
 
 import POGOProtos.Networking.Responses.DiskEncounterResponseOuterClass.DiskEncounterResponse;
-import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 import lombok.Getter;
 
