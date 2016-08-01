@@ -21,7 +21,7 @@ import java.io.StringWriter;
 /**
  * Created by Will on 7/20/16.
  */
-@SuppressWarnings({"checkstyle:methodname", "checkstyle:javadocmethod"})
+@SuppressWarnings({ "checkstyle:methodname", "checkstyle:javadocmethod" })
 public class Log {
 
 	private static Logger logger;
@@ -34,17 +34,18 @@ public class Log {
 		return logger;
 	}
 
-	//Do not call this while logging from a different thread...
-	//That's asking for trouble...
+	// Do not call this while logging from a different thread...
+	// That's asking for trouble...
 	public static void setInstance(Logger logger) {
 		Log.logger = logger;
 	}
 
 	/**
-	 * Sets the level of the Logger. For example, if the level is Error,
-	 * all ERROR and ASSERT messages will be logged, but nothing else.
+	 * Sets the level of the Logger. For example, if the level is Error, all
+	 * ERROR and ASSERT messages will be logged, but nothing else.
 	 *
-	 * @param level the level to log at
+	 * @param level
+	 *            the level to log at
 	 */
 	public static void setLevel(Level level) {
 		Log.level = level;
@@ -136,12 +137,14 @@ public class Log {
 
 	public enum Level {
 
+		ALL(Integer.MIN_VALUE),
 		VERBOSE(2),
 		DEBUG(3),
 		INFO(4),
 		WARN(5),
 		ERROR(6),
-		ASSERT(7);
+		ASSERT(7),
+		NONE(Integer.MAX_VALUE);
 
 		private int level;
 
@@ -164,7 +167,7 @@ public class Log {
 				PrintWriter printWriter = new PrintWriter(sw);
 				tr.printStackTrace(printWriter);
 				body += "\n" + sw.toString();
-				//No need to close. No resources taken up
+				// No need to close. No resources taken up
 			}
 			String result = String.format("%s/%s: %s", prefix, tag, body);
 			System.out.println(result);
