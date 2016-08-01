@@ -22,7 +22,6 @@ import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.CatchPokemonMessage;
-import POGOProtos.Networking.Requests.Messages.DiskEncounterMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.DiskEncounterMessageOuterClass.DiskEncounterMessage;
 import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass.EncounterMessage;
 import POGOProtos.Networking.Requests.Messages.UseItemCaptureMessageOuterClass.UseItemCaptureMessage;
@@ -45,8 +44,8 @@ import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.util.FutureWrapper;
-import com.pokegoapi.util.MapPoint;
 import com.pokegoapi.util.Log;
+import com.pokegoapi.util.MapPoint;
 import com.pokegoapi.util.NestedFutureWrapper;
 import com.pokegoapi.util.PokemonFuture;
 import lombok.Getter;
@@ -304,6 +303,64 @@ public class CatchablePokemon implements MapPoint {
 
 		useItem(ItemId.ITEM_RAZZ_BERRY);
 		return catchPokemon(pokeball, -1, -1);
+	}
+
+	/**
+	 * Tries to catch a pokemon with you best pokeball first
+	 * (start by the masterball if you have none then use the ultraball etc.)
+	 *
+	 * @return CatchResult catch result
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
+	 * @throws NoSuchItemException   the no such item exception
+	 */
+	public CatchResult catchPokemonWithBestBall() throws LoginFailedException,
+			RemoteServerException, NoSuchItemException {
+		return catchPokemonWithBestBall(-1);
+	}
+
+	/**
+	 * Tries to catch a pokemon with you best pokeball first
+	 * (start by the masterball if you have none then use the ultraball etc.)
+	 *
+	 * @param amount the amount
+	 * @return CatchResult catch result
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
+	 * @throws NoSuchItemException   the no such item exception
+	 */
+	public CatchResult catchPokemonWithBestBall(int amount) throws LoginFailedException,
+			RemoteServerException, NoSuchItemException {
+		return catchPokemonWithBestBall(amount, -1);
+	}
+
+	/**
+	 * Tries to catch a pokemon with you best pokeball first
+	 * (start by the masterball if you have none then use the ultraball etc.)
+	 *
+	 * @param amount        the amount
+	 * @param razberryLimit the razberry limit
+	 * @return CatchResult catch result
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
+	 * @throws NoSuchItemException   the no such item exception
+	 */
+	public CatchResult catchPokemonWithBestBall(int amount, int razberryLimit) throws LoginFailedException,
+			RemoteServerException, NoSuchItemException {
+		ItemBag bag = api.getInventories().getItemBag();
+		Pokeball pokeball;
+		if (bag.getItem(ItemId.ITEM_MASTER_BALL).getCount() > 0) {
+			pokeball = Pokeball.MASTERBALL;
+		} else if (bag.getItem(ItemId.ITEM_ULTRA_BALL).getCount() > 0) {
+			pokeball = Pokeball.ULTRABALL;
+		} else if (bag.getItem(ItemId.ITEM_GREAT_BALL).getCount() > 0) {
+			pokeball = Pokeball.GREATBALL;
+		} else if (bag.getItem(ItemId.ITEM_POKE_BALL).getCount() > 0) {
+			pokeball = Pokeball.POKEBALL;
+		} else {
+			throw new NoSuchItemException();
+		}
+		return catchPokemon(pokeball,amount, razberryLimit);
 	}
 
 	/**
