@@ -167,7 +167,7 @@ public class PokemonGo {
 	 * @throws IllegalArgumentException if value exceeds +-180
 	 */
 	public void setLongitude(double value) {
-		if (value > 1800 || value < -180) {
+		if (value > 180 || value < -180) {
 			throw new IllegalArgumentException("longitude can not exceed +/- 180");
 		}
 		longitude = value;
