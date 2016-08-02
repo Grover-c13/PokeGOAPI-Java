@@ -152,5 +152,9 @@ fabric.properties
 # Intellij
 .idea/
 
+# Mac OS
+*.DS_Store
+.AppleDouble
+.LSOverride
 
 
