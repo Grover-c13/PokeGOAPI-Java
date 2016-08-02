@@ -15,7 +15,7 @@
 
 package com.pokegoapi.exceptions;
 
-public class InvalidCurrencyException extends Exception {
+public class InvalidCurrencyException extends RuntimeException {
 	public InvalidCurrencyException() {
 		super();
 	}

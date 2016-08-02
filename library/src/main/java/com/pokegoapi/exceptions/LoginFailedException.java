@@ -15,7 +15,7 @@
 
 package com.pokegoapi.exceptions;
 
-public class LoginFailedException extends Exception {
+public class LoginFailedException extends RuntimeException {
 	public LoginFailedException() {
 		super();
 	}

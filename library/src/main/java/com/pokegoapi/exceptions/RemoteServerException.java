@@ -15,7 +15,7 @@
 
 package com.pokegoapi.exceptions;
 
-public class RemoteServerException extends Exception {
+public class RemoteServerException extends RuntimeException {
 	public RemoteServerException() {
 		super();
 	}
