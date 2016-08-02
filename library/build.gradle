@@ -129,6 +129,7 @@ Properties properties = new Properties()
 try {
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
 } catch (Exception ignore) {
+}
 
 bintray {
     user = properties.getProperty('user')
