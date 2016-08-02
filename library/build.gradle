@@ -127,7 +127,7 @@ artifacts {
 
 Properties properties = new Properties()
 
-task bintrayUploadFillProperties(dependsOn: bintrayUpload) {
+bintrayUpload {
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
 }
 
