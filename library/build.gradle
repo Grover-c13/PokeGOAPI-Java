@@ -21,6 +21,9 @@ description = """Pokemon Go Java API"""
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
+version = "0.3"
+group = "com.pokegoapi"
+
 sourceSets {
     main {
         proto {
@@ -119,24 +122,23 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 
 artifacts {
     archives sourcesJar
-    archives javadocJar
+    //archives javadocJar
 }
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
 bintray {
-    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
-    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    user = properties.getProperty('user')
+    key =  properties.getProperty('apiKey')
     configurations = ['archives']
     pkg {
-        repo = 'generic'
+        repo = 'maven'
         name = 'PokeGOAPI'
         userOrg = user
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/Grover-c13/PokeGOAPI-Java.git'
-        version {
-            name = '0.3'
-            desc = 'Pokemon Go Java API'
-            vcsTag = '0.3.0'
-        }
+        publish = true
     }
 }
 
