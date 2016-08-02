@@ -26,6 +26,7 @@ If you are using this lib to catch pokemon and loot pokestop, take care that you
 ___
 
 # How to import
+<<<<<<< HEAD
 
   Import from Maven/Gradle/SBT/Leiningen using JitPack : [![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
 
@@ -67,6 +68,37 @@ PS : for users who want to import the api into Eclipse IDE, you'll need to :
   - Select `library/build/generated/source/proto/main/java`
   - Finish
 
+=======
+
+  Import from Maven/Gradle/SBT/Leiningen using JitPack : [![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
+  
+  After you clicked on this link, jitpack will show you multiple build (try use the latest one since the api grow everyday).
+  JitPack will show an example for each dependency manager to include our API into your project.
+
+OR
+
+  Import JAR in Eclipse
+    - Right click on the project
+    - Select Build path > Java Build Path
+    - Select Libraries tab
+    - Select Add External JARs…
+    - Select `PokeGOAPI-Java/build/libs/PokeGOAPI-Java-0.0.1-SNAPSHOT.jar`
+    - Finish
+
+# Build from source
+  - Clone the repo and cd into the folder
+  - `` git submodule update --init ``
+  - `` ./gradlew build ``
+  - you should have the api jar in ``build/libs/PokeGOAPI-Java-0.0.1-SNAPSHOT.jar``
+
+PS : for users who want to import the api into Eclipse IDE, you'll need to :
+  - build once : `` ./gradlew build ``
+  - Right click on the project
+  - Select Build path > Configure Build Path > Source > Add Folder
+  - Select `build/generated/source/proto/main/java`
+  - Finish
+
+>>>>>>> d1cd3f98c5c1ecb22cb0f363a0b430d84a66919e
 # Usage exemple (mostly how to login) :
 ```java
 OkHttpClient httpClient = new OkHttpClient();

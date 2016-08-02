@@ -16,6 +16,7 @@
 package com.pokegoapi.util;
 
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.map.Point;
 
 import java.util.List;
 import java.util.Map;

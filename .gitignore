@@ -152,5 +152,6 @@ fabric.properties
 # Intellij
 .idea/
 
+.DS_Store
 
 

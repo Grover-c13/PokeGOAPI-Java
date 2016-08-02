@@ -15,29 +15,9 @@
 
 package com.pokegoapi.util;
 
-<<<<<<< HEAD:library/src/main/java/com/pokegoapi/util/SystemTimeImpl.java
 public class SystemTimeImpl implements Time {
 	@Override
 	public long currentTimeMillis() {
 		return System.currentTimeMillis();
-=======
-import POGOProtos.Data.Player.ContactSettingsOuterClass;
-import lombok.Data;
-
-@Data
-public class ContactSettings {
-	private ContactSettingsOuterClass.ContactSettings proto;
-
-	public ContactSettings(ContactSettingsOuterClass.ContactSettings proto) {
-		this.proto = proto;
-	}
-
-	public boolean getSendMarketingEmails() {
-		return proto.getSendMarketingEmails();
-	}
-
-	public boolean getSendPushNotifications() {
-		return proto.getSendPushNotifications();
->>>>>>> d1cd3f98c5c1ecb22cb0f363a0b430d84a66919e:src/main/java/com/pokegoapi/api/player/ContactSettings.java
 	}
 }

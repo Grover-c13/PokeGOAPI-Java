@@ -15,7 +15,6 @@
 
 package com.pokegoapi.util;
 
-<<<<<<< HEAD:library/src/main/java/com/pokegoapi/util/MapPoint.java
 /**
  * @author Olaf Braun - Software Development
  * @version 1.0
@@ -34,24 +33,4 @@ public interface MapPoint {
 	 * @return the longitude
 	 */
 	double getLongitude();
-=======
-import POGOProtos.Data.Player.DailyBonusOuterClass;
-import lombok.Data;
-
-@Data
-public class DailyBonus {
-	private final DailyBonusOuterClass.DailyBonus proto;
-
-	public DailyBonus(DailyBonusOuterClass.DailyBonus proto ) {
-		this.proto = proto;
-	}
-
-	public long getNextCollectedTimestampMs() {
-		return proto.getNextCollectedTimestampMs();
-	}
-
-	public long getNextDefenderBonusCollectTimestampMs() {
-		return proto.getNextDefenderBonusCollectTimestampMs();
-	}
->>>>>>> d1cd3f98c5c1ecb22cb0f363a0b430d84a66919e:src/main/java/com/pokegoapi/api/player/DailyBonus.java
 }

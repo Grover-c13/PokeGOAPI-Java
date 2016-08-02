@@ -13,6 +13,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+<<<<<<< HEAD:library/src/main/java/com/pokegoapi/util/Time.java
 package com.pokegoapi.util;
 
 public interface Time {
@@ -22,4 +23,106 @@ public interface Time {
 	 * @return the time
 	 */
 	long currentTimeMillis();
+=======
+package com.pokegoapi.api.inventory;
+
+import POGOProtos.Data.Player.PlayerStatsOuterClass;
+import lombok.Getter;
+
+public class Stats {
+	@Getter
+	private PlayerStatsOuterClass.PlayerStats proto;
+
+	public Stats(PlayerStatsOuterClass.PlayerStats proto) {
+		this.proto = proto;
+	}
+
+	public int getLevel() {
+		return proto.getLevel();
+	}
+
+	public long getExperience() {
+		return proto.getExperience();
+	}
+
+	public long getPrevLevelXp() {
+		return proto.getPrevLevelXp();
+	}
+
+	public long getNextLevelXp() {
+		return proto.getNextLevelXp();
+	}
+
+	public float getKmWalked() {
+		return proto.getKmWalked();
+	}
+
+	public int getPokemonsEncountered() {
+		return proto.getPokemonsEncountered();
+	}
+
+	public int getUniquePokedexEntries() {
+		return proto.getUniquePokedexEntries();
+	}
+
+	public int getPokemonsCaptured() {
+		return proto.getPokemonsCaptured();
+	}
+
+	public int getEvolutions() {
+		return proto.getEvolutions();
+	}
+
+	public int getPokeStopVisits() {
+		return proto.getPokeStopVisits();
+	}
+
+	public int getPokeballsThrown() {
+		return proto.getPokeballsThrown();
+	}
+
+	public int getEggsHatched() {
+		return proto.getEggsHatched();
+	}
+
+	public int getBigMagikarpCaught() {
+		return proto.getBigMagikarpCaught();
+	}
+
+	public int getBattleAttackWon() {
+		return proto.getBattleAttackWon();
+	}
+
+	public int getBattleAttackTotal() {
+		return proto.getBattleAttackTotal();
+	}
+
+	public int getBattleDefendedWon() {
+		return proto.getBattleDefendedWon();
+	}
+
+	public int getBattleTrainingWon() {
+		return proto.getBattleTrainingWon();
+	}
+
+	public int getBattleTrainingTotal() {
+		return proto.getBattleTrainingTotal();
+	}
+
+	public int getPrestigeRaisedTotal() {
+		return proto.getPrestigeRaisedTotal();
+	}
+
+	public int getPrestigeDroppedTotal() {
+		return proto.getPrestigeDroppedTotal();
+	}
+
+	public int getPokemonDeployed() {
+		return proto.getPokemonDeployed();
+	}
+
+	public int getSmallRattataCaught() {
+		return proto.getSmallRattataCaught();
+	}
+>>>>>>> d1cd3f98c5c1ecb22cb0f363a0b430d84a66919e:src/main/java/com/pokegoapi/api/inventory/Stats.java
 }
