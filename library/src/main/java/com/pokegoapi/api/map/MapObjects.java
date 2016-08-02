@@ -21,7 +21,6 @@ import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass.NearbyPokemon;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Map.SpawnPointOuterClass.SpawnPoint;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.map.fort.Pokestop;
 import lombok.Getter;
 import lombok.ToString;
 

@@ -39,18 +39,10 @@ public class DisplayPokenameExample {
 		for (int i = 1; i < 152; i++) {
 			//Showcase for Supported Languages
 			for (Locale l : supportedLocales) {
-				Log.d("Names-Example", String.format(
-						l,
-						"Pokedex Nr# %d is %s in %s",
-						i,
-						PokeNames.getDisplayName(i, l),
-						l.getDisplayName(l)));
+				Log.d("Names-Example", String.format(l, "Pokedex Nr# %d is %s in %s", i, PokeNames.getDisplayName(i, l), l.getDisplayName(l)));
 			}
 			//Showcase for Fallback Behaviour
-			Log.d("Names-Example", String.format(
-					"Pokedex Nr# %d is %s in %s",
-					i,
-					PokeNames.getDisplayName(i, new Locale("xx")), "Fallback"));
+			Log.d("Names-Example", String.format("Pokedex Nr# %d is %s in %s", i, PokeNames.getDisplayName(i, new Locale("xx")), "Fallback"));
 		}
 	}
 }

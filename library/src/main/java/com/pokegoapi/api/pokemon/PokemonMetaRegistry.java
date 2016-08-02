@@ -18,7 +18,10 @@ package com.pokegoapi.api.pokemon;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
+<<<<<<< HEAD:library/src/main/java/com/pokegoapi/api/pokemon/PokemonMetaRegistry.java
 import lombok.Getter;
+=======
+>>>>>>> d1cd3f98c5c1ecb22cb0f363a0b430d84a66919e:src/main/java/com/pokegoapi/api/pokemon/PokemonMetaRegistry.java
 
 import java.util.EnumMap;
 

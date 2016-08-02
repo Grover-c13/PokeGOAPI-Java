@@ -13,28 +13,17 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.api.map;
+package com.pokegoapi.api.map.pokemon.encounter;
 
-import POGOProtos.Map.SpawnPointOuterClass;
-import com.pokegoapi.util.MapPoint;
-import lombok.Getter;
-import lombok.Setter;
+import POGOProtos.Data.Capture.CaptureProbabilityOuterClass;
+import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
+import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 
-public class Point implements MapPoint {
-	@Getter
-	@Setter
-	private double longitude;
-	@Getter
-	@Setter
-	private double latitude;
 
-	public Point(double latitude, double longitude) {
-		this.latitude = latitude;
-		this.longitude = longitude;
-	}
 
-	public Point(SpawnPointOuterClass.SpawnPoint spawnpoint) {
-		this.latitude = spawnpoint.getLatitude();
-		this.longitude = spawnpoint.getLongitude();
-	}
+public interface EncounterResult {
+	
+	boolean wasSuccessful();
+
+	EncounterResponse.Status getStatus();
 }

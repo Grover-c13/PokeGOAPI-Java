@@ -43,7 +43,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.gym.Gym;
 import com.pokegoapi.api.map.fort.FortDetails;
-import com.pokegoapi.api.map.fort.Pokestop;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.NearbyPokemon;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
