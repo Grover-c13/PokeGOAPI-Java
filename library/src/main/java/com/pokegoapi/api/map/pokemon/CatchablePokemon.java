@@ -378,7 +378,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	/**
-	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 75%, if you have
+	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 50%, if you have
 	 * none will use greatball etc).
 	 *
 	 * @return the catch result
@@ -396,7 +396,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	/**
-	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 75%, if you have
+	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 50%, if you have
 	 * none will use greatball etc).
 	 *
 	 * @param encounter the encounter
@@ -413,7 +413,7 @@ public class CatchablePokemon implements MapPoint {
 
 
 	/**
-	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 75%, if you have
+	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 50%, if you have
 	 * none will use greatball etc).
 	 *
 	 * @param encounter the encounter
@@ -430,7 +430,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	/**
-	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 75%, if you have
+	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 50%, if you have
 	 * none will use greatball etc).
 	 *
 	 * @param encounter the encounter
@@ -446,7 +446,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	/**
-	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 75%, if you have
+	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 50%, if you have
 	 * none will use greatball etc).
 	 *
 	 * @param encounter the encounter
@@ -463,7 +463,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	/**
-	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 75%, if you have
+	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 50%, if you have
 	 * none will use greatball etc).
 	 *
 	 * @param encounter     the encounter
@@ -478,16 +478,46 @@ public class CatchablePokemon implements MapPoint {
 	public CatchResult catchPokemonBestBallToUse(
 			EncounterResult encounter, List<ItemId> notUse, int amount, int razberryLimit)
 			throws LoginFailedException, RemoteServerException, NoSuchItemException {
+		int razberries = 0;
+		int numThrows = 0;
+		CatchResult result;
+		do {
+
+			if (razberries < razberryLimit || razberryLimit == -1) {
+				useItem(ItemId.ITEM_RAZZ_BERRY);
+				razberries++;
+			}
+			result = AsyncHelper.toBlocking(catchPokemonAsync(1.0, 1.95 + Math.random() * 0.05,
+					0.85 + Math.random() * 0.15, getBestBallToUse(encounter, notUse)));
+			if (result == null) {
+				Log.wtf(TAG, "Got a null result after catch attempt");
+				break;
+			}
+			if (!result.isFailed() && result.getStatus() != CatchStatus.CATCH_ESCAPE
+					&& result.getStatus() != CatchStatus.CATCH_MISSED
+					|| result.getStatus() == CatchStatus.CATCH_FLEE) {
+				break;
+			}
+			numThrows++;
+		}
+		while (amount < 0 || numThrows < amount);
+
+		return result;
+	}
+
+
+	private Pokeball getBestBallToUse(EncounterResult encounter, List<ItemId> notUse)
+			throws LoginFailedException, RemoteServerException, NoSuchItemException {
 		ItemBag bag = api.getInventories().getItemBag();
 		Pokeball pokeball;
 		if (!notUse.contains(ITEM_POKE_BALL)
 				&& bag.getItem(ITEM_POKE_BALL).getCount() > 0
-				&& (encounter.getCaptureProbability().getCaptureProbability(0) >= 0.75
+				&& (encounter.getCaptureProbability().getCaptureProbability(0) >= 0.50
 				|| ((notUse.contains(ITEM_GREAT_BALL) || bag.getItem(ITEM_GREAT_BALL).getCount() <= 0)
 				&& (notUse.contains(ITEM_ULTRA_BALL) || bag.getItem(ITEM_ULTRA_BALL).getCount() <= 0)))) {
 			pokeball = POKEBALL;
 		} else if (!notUse.contains(ITEM_GREAT_BALL) && bag.getItem(ITEM_GREAT_BALL).getCount() > 0
-				&& (encounter.getCaptureProbability().getCaptureProbability(1) >= 0.75
+				&& (encounter.getCaptureProbability().getCaptureProbability(1) >= 0.50
 				|| notUse.contains(ITEM_ULTRA_BALL)
 				|| (!notUse.contains(ITEM_ULTRA_BALL)
 				&& bag.getItem(ITEM_ULTRA_BALL).getCount() <= 0))) {
@@ -498,10 +528,8 @@ public class CatchablePokemon implements MapPoint {
 			//master ball in the moment not exist
 			throw new NoSuchItemException();
 		}
-
-		return catchPokemon(pokeball, amount, razberryLimit);
+		return pokeball;
 	}
-
 	/**
 	 * Tries to catch a pokemon (will attempt to use a pokeball, if you have
 	 * none will use greatball etc).
