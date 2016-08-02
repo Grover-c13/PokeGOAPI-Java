@@ -530,6 +530,7 @@ public class CatchablePokemon implements MapPoint {
 		}
 		return pokeball;
 	}
+	
 	/**
 	 * Tries to catch a pokemon (will attempt to use a pokeball, if you have
 	 * none will use greatball etc).
