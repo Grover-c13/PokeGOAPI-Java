@@ -1,3 +1,4 @@
+group = 'com.github.aphoh'
 version = '0.0.1-SNAPSHOT'
 
 buildscript {
