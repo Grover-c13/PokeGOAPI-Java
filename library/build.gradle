@@ -1,5 +1,3 @@
-version = '0.0.1-SNAPSHOT'
-
 buildscript {
     repositories {
         jcenter()
@@ -11,20 +9,10 @@ buildscript {
 }
 
 apply plugin: 'idea'
-apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'com.google.protobuf'
 apply plugin: 'checkstyle'
 apply plugin: 'com.jfrog.bintray'
-
-archivesBaseName = 'PokeGOAPI-library'
-description = """Pokemon Go Java API"""
-
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
-
-version = "0.3"
-group = "com.pokegoapi"
 
 sourceSets {
     main {

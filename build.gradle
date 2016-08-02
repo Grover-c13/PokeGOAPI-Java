@@ -1,14 +1,11 @@
-group = 'com.github.aphoh'
-version = '0.0.1-SNAPSHOT'
-
-buildscript {
-    repositories {
-    }
-    dependencies {
-    }
-}
-
 allprojects {
+    apply plugin: 'java'
+    group = 'com.pokegoapi'
+    version = '0.3-1'
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+    archivesBaseName = 'PokeGOAPI-sample'
+    description = """Pokemon Go Java API"""
     repositories {
         jcenter()
     }
