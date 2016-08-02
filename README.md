@@ -28,7 +28,19 @@ ___
 # How to import
 
   Import from Maven/Gradle/SBT/Leiningen using JitPack : [![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
-  
+
+  ```groovy
+  allprojects {
+    repositories {
+        jcenter()
+    }
+  }
+
+  dependencies {
+    compile 'com.pokegoapi:library:0.3'
+  }
+  ```
+
   After you clicked on this link, jitpack will show you multiple build (try use the latest one since the api grow everyday).
   JitPack will show an example for each dependency manager to include our API into your project.
 
