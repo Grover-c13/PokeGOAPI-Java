@@ -59,6 +59,10 @@ import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_GREAT_BALL;
 import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_MASTER_BALL;
 import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_POKE_BALL;
 import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL;
+import static com.pokegoapi.api.inventory.Pokeball.GREATBALL;
+import static com.pokegoapi.api.inventory.Pokeball.MASTERBALL;
+import static com.pokegoapi.api.inventory.Pokeball.POKEBALL;
+import static com.pokegoapi.api.inventory.Pokeball.ULTRABALL;
 
 
 /**
@@ -268,13 +272,13 @@ public class CatchablePokemon implements MapPoint {
 			RemoteServerException, NoSuchItemException {
 		ItemBag bag = api.getInventories().getItemBag();
 		if (bag.getItem(ITEM_POKE_BALL).getCount() > 0) {
-			return Pokeball.POKEBALL;
+			return POKEBALL;
 		} else if (bag.getItem(ITEM_GREAT_BALL).getCount() > 0) {
-			return Pokeball.GREATBALL;
+			return GREATBALL;
 		} else if (bag.getItem(ITEM_ULTRA_BALL).getCount() > 0) {
-			return Pokeball.ULTRABALL;
+			return ULTRABALL;
 		} else if (bag.getItem(ITEM_MASTER_BALL).getCount() > 0) {
-			return Pokeball.MASTERBALL;
+			return MASTERBALL;
 		} else {
 			throw new NoSuchItemException();
 		}
@@ -358,13 +362,13 @@ public class CatchablePokemon implements MapPoint {
 		ItemBag bag = api.getInventories().getItemBag();
 		Pokeball pokeball;
 		if (bag.getItem(ITEM_MASTER_BALL).getCount() > 0 && !noMasterBall) {
-			pokeball = Pokeball.MASTERBALL;
+			pokeball = MASTERBALL;
 		} else if (bag.getItem(ITEM_ULTRA_BALL).getCount() > 0) {
-			pokeball = Pokeball.ULTRABALL;
+			pokeball = ULTRABALL;
 		} else if (bag.getItem(ITEM_GREAT_BALL).getCount() > 0) {
-			pokeball = Pokeball.GREATBALL;
+			pokeball = GREATBALL;
 		} else if (bag.getItem(ITEM_POKE_BALL).getCount() > 0) {
-			pokeball = Pokeball.POKEBALL;
+			pokeball = POKEBALL;
 		} else {
 			throw new NoSuchItemException();
 		}
