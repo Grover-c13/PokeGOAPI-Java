@@ -53,6 +53,13 @@ import lombok.ToString;
 import rx.Observable;
 import rx.functions.Func1;
 
+import java.util.List;
+
+import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_GREAT_BALL;
+import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_MASTER_BALL;
+import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_POKE_BALL;
+import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL;
+
 
 /**
  * The type Catchable pokemon.
@@ -260,13 +267,13 @@ public class CatchablePokemon implements MapPoint {
 	public Pokeball getItemBall() throws LoginFailedException,
 			RemoteServerException, NoSuchItemException {
 		ItemBag bag = api.getInventories().getItemBag();
-		if (bag.getItem(ItemId.ITEM_POKE_BALL).getCount() > 0) {
+		if (bag.getItem(ITEM_POKE_BALL).getCount() > 0) {
 			return Pokeball.POKEBALL;
-		} else if (bag.getItem(ItemId.ITEM_GREAT_BALL).getCount() > 0) {
+		} else if (bag.getItem(ITEM_GREAT_BALL).getCount() > 0) {
 			return Pokeball.GREATBALL;
-		} else if (bag.getItem(ItemId.ITEM_ULTRA_BALL).getCount() > 0) {
+		} else if (bag.getItem(ITEM_ULTRA_BALL).getCount() > 0) {
 			return Pokeball.ULTRABALL;
-		} else if (bag.getItem(ItemId.ITEM_MASTER_BALL).getCount() > 0) {
+		} else if (bag.getItem(ITEM_MASTER_BALL).getCount() > 0) {
 			return Pokeball.MASTERBALL;
 		} else {
 			throw new NoSuchItemException();
@@ -350,13 +357,13 @@ public class CatchablePokemon implements MapPoint {
 			throws LoginFailedException, RemoteServerException, NoSuchItemException {
 		ItemBag bag = api.getInventories().getItemBag();
 		Pokeball pokeball;
-		if (bag.getItem(ItemId.ITEM_MASTER_BALL).getCount() > 0 && !noMasterBall) {
+		if (bag.getItem(ITEM_MASTER_BALL).getCount() > 0 && !noMasterBall) {
 			pokeball = Pokeball.MASTERBALL;
-		} else if (bag.getItem(ItemId.ITEM_ULTRA_BALL).getCount() > 0) {
+		} else if (bag.getItem(ITEM_ULTRA_BALL).getCount() > 0) {
 			pokeball = Pokeball.ULTRABALL;
-		} else if (bag.getItem(ItemId.ITEM_GREAT_BALL).getCount() > 0) {
+		} else if (bag.getItem(ITEM_GREAT_BALL).getCount() > 0) {
 			pokeball = Pokeball.GREATBALL;
-		} else if (bag.getItem(ItemId.ITEM_POKE_BALL).getCount() > 0) {
+		} else if (bag.getItem(ITEM_POKE_BALL).getCount() > 0) {
 			pokeball = Pokeball.POKEBALL;
 		} else {
 			throw new NoSuchItemException();
