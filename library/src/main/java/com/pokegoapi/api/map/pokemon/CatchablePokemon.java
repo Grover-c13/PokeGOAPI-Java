@@ -288,6 +288,20 @@ public class CatchablePokemon implements MapPoint {
 		useItem(ItemId.ITEM_RAZZ_BERRY);
 		return catchPokemon(pokeball, -1, -1);
 	}
+	
+	/**
+	 * Tries to catch a pokemon with the given type of pokeball.
+	 *
+	 * @param pokeball Type of pokeball
+	 * @return CatchResult
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
+	 */
+	public CatchResult catchPokemonWithRazzBerry(Pokeball pokeball)
+	throws LoginFailedException, RemoteServerException {
+		useItem(ItemId.ITEM_RAZZ_BERRY);
+		return catchPokemon(pokeball, -1, -1);
+	}
 
 	/**
 	 * Tries to catch a pokemon with you best pokeball first
@@ -379,7 +393,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	/**
-	 * Tries to catch a pokeball with the given type.
+	 * Tries to catch a pokemon with the given type of pokeball.
 	 *
 	 * @param pokeball Type of pokeball
 	 * @return CatchResult
