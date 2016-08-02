@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class Point implements MapPoint {
+
 	@Getter
 	@Setter
 	private double longitude;
