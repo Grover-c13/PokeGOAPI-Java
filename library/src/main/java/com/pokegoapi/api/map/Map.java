@@ -66,12 +66,12 @@ import java.util.Set;
 
 
 public class Map {
-	private static int CELL_WIDTH = 3;
 	// time between getting a new MapObjects
 	private static int RESEND_REQUEST = 5000;
 	private final PokemonGo api;
 	private MapObjects cachedMapObjects;
 	private List<CatchablePokemon> cachedCatchable;
+	private int cellWidth = 3;
 	private long lastMapUpdate;
 
 	/**
@@ -416,7 +416,7 @@ public class Map {
 	@Deprecated
 	public MapObjects getMapObjects(double latitude, double longitude)
 			throws LoginFailedException, RemoteServerException {
-		return getMapObjects(latitude, longitude, CELL_WIDTH);
+		return getMapObjects(latitude, longitude, cellWidth);
 	}
 
 	/**
@@ -662,6 +662,10 @@ public class Map {
 		}
 		return response;
 	}
+	
+	public void setDefaultWidth(int width) {
+		cellWidth = width;
+	}
 
 	/**
 	 * Wether or not to get a fresh copy or use cache;
@@ -673,7 +677,7 @@ public class Map {
 	}
 
 	private List<Long> getDefaultCells() {
-		return getCellIds(api.getLatitude(), api.getLongitude(), CELL_WIDTH);
+		return getCellIds(api.getLatitude(), api.getLongitude(), cellWidth);
 	}
 
 }
