@@ -18,12 +18,15 @@ package com.pokegoapi.api.pokemon;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
+import lombok.Getter;
 
 import java.util.EnumMap;
 
 public class PokemonMetaRegistry {
 
+	@Getter
 	private static EnumMap<PokemonFamilyId, PokemonId> highestForFamily = new EnumMap<>(PokemonFamilyId.class);
+	@Getter
 	private static EnumMap<PokemonId, PokemonMeta> meta = new EnumMap<>(PokemonId.class);
 
 	static {

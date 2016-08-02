@@ -16,11 +16,13 @@
 package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
+import lombok.Getter;
 
 import java.util.EnumMap;
 
 public class PokemonMoveMetaRegistry {
 
+	@Getter
 	private static EnumMap<PokemonMove, PokemonMoveMeta> meta = new EnumMap<>(PokemonMove.class);
 
 	static {
