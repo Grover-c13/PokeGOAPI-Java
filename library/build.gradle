@@ -95,7 +95,7 @@ checkstyleMain.doLast {
 }
 
 dependencies {
-    compile 'com.github.svarzee:gpsoauth-java:v0.3.0'
+    compile 'svarzee.gps:gpsoauth:0.3'
     compile 'com.squareup.okio:okio:1.9.0'
     compile 'com.squareup.moshi:moshi:1.2.0'
     compile 'com.annimon:stream:1.1.1'
