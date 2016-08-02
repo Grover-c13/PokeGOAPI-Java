@@ -55,6 +55,7 @@ import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
+import com.pokegoapi.util.Log;
 import com.pokegoapi.util.MapUtil;
 import rx.Observable;
 import rx.functions.Func1;
@@ -96,8 +97,10 @@ public class Map {
 	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync() {
 
 		if (useCache() && cachedCatchable != null) {
+			Log.i("MAP", "Catchable: cached data");
 			return Observable.just(cachedCatchable);
 		}
+		Log.i("MAP", "Catchable: live data");
 
 		List<Long> cellIds = getDefaultCells();
 		return getMapObjectsAsync(cellIds).map(new Func1<MapObjects, List<CatchablePokemon>>() {
@@ -327,8 +330,10 @@ public class Map {
 	public Observable<MapObjects> getMapObjectsAsync(List<Long> cellIds) {
 
 		if (useCache()) {
+			Log.i("MAP", "Map: cached data");
 			return Observable.just(cachedMapObjects);
 		}
+		Log.i("MAP", "Map: live data");
 
 		lastMapUpdate = api.currentTimeMillis();
 		GetMapObjectsMessage.Builder builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder()
@@ -358,6 +363,7 @@ public class Map {
 
 						MapObjects result = new MapObjects(api);
 						cachedMapObjects = result;
+						cachedCatchable = null;
 						for (MapCell mapCell : response.getMapCellsList()) {
 							result.addNearbyPokemons(mapCell.getNearbyPokemonsList());
 							result.addCatchablePokemons(mapCell.getCatchablePokemonsList());
