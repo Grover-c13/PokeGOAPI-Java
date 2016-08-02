@@ -95,7 +95,7 @@ public class Map {
 	 */
 	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync() {
 
-		if (useCache() && cachedCatchable != null) {
+		if (cachedCatchable != null) {
 			return Observable.just(cachedCatchable);
 		}
 
@@ -338,11 +338,10 @@ public class Map {
 		int index = 0;
 		for (Long cellId : cellIds) {
 			builder.addCellId(cellId);
-			long time = 0;
 			builder.addSinceTimestampMs(0);
 			index++;
-
 		}
+
 		final AsyncServerRequest asyncServerRequest = new AsyncServerRequest(
 				RequestType.GET_MAP_OBJECTS, builder.build());
 		return api.getRequestHandler()
@@ -376,7 +375,7 @@ public class Map {
 							result.addPokestops(groupedForts.get(FortType.CHECKPOINT));
 						}
 
-
+						cachedCatchable = null;
 						return result;
 					}
 				});
