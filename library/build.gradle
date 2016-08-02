@@ -96,6 +96,7 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.4.0-RC1'
     compile 'com.google.protobuf:protobuf-java:3.0.0-beta-3'
     compile 'io.reactivex:rxjava:1.1.8'
+    compileOnly 'org.slf4j:slf4j-api:1.7.21'
     compileOnly 'org.projectlombok:lombok:1.16.6'
 }
 
