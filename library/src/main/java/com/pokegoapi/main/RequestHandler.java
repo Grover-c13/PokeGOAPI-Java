@@ -15,9 +15,9 @@
 
 package com.pokegoapi.main;
 
-import POGOProtos.Networking.Envelopes.AuthTicketOuterClass;
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
-import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass;
+import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
+import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -126,10 +126,10 @@ public class RequestHandler implements Runnable {
 			}
 
 			private ResultOrException getResult(long timeouut, TimeUnit timeUnit) throws InterruptedException {
-				long wait = System.currentTimeMillis() + timeUnit.toMillis(timeouut);
+				long wait = api.currentTimeMillis() + timeUnit.toMillis(timeouut);
 				while (!isDone()) {
 					Thread.sleep(10);
-					if (wait < System.currentTimeMillis()) {
+					if (wait < api.currentTimeMillis()) {
 						return null;
 					}
 				}
@@ -163,15 +163,13 @@ public class RequestHandler implements Runnable {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
-	private AuthTicketOuterClass.AuthTicket internalSendServerRequests(AuthTicketOuterClass.AuthTicket authTicket,
-			ServerRequest... serverRequests)
+	private AuthTicket internalSendServerRequests(AuthTicket authTicket, ServerRequest... serverRequests)
 			throws RemoteServerException, LoginFailedException {
-		AuthTicketOuterClass.AuthTicket newAuthTicket = authTicket;
+		AuthTicket newAuthTicket = authTicket;
 		if (serverRequests.length == 0) {
 			return authTicket;
 		}
-		RequestEnvelopeOuterClass.RequestEnvelope.Builder builder = RequestEnvelopeOuterClass.RequestEnvelope
-				.newBuilder();
+		RequestEnvelope.Builder builder = RequestEnvelope.newBuilder();
 		resetBuilder(builder, authTicket);
 
 		for (ServerRequest serverRequest : serverRequests) {
@@ -179,7 +177,7 @@ public class RequestHandler implements Runnable {
 		}
 
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		RequestEnvelopeOuterClass.RequestEnvelope request = builder.build();
+		RequestEnvelope request = builder.build();
 		try {
 			request.writeTo(stream);
 		} catch (IOException e) {
@@ -197,9 +195,9 @@ public class RequestHandler implements Runnable {
 				throw new RemoteServerException("Got a unexpected http code : " + response.code());
 			}
 
-			ResponseEnvelopeOuterClass.ResponseEnvelope responseEnvelop;
+			ResponseEnvelope responseEnvelop;
 			try (InputStream content = response.body().byteStream()) {
-				responseEnvelop = ResponseEnvelopeOuterClass.ResponseEnvelope.parseFrom(content);
+				responseEnvelop = ResponseEnvelope.parseFrom(content);
 			} catch (IOException e) {
 				// retrieved garbage from the server
 				throw new RemoteServerException("Received malformed response : " + e);
@@ -214,7 +212,7 @@ public class RequestHandler implements Runnable {
 			}
 
 			if (responseEnvelop.getStatusCode() == 102) {
-				throw new LoginFailedException(String.format("Invalud Auth status code recieved, token not refreshed?",
+				throw new LoginFailedException(String.format("Invalid Auth status code recieved, token not refreshed?",
 						responseEnvelop.getApiUrl(), responseEnvelop.getError()));
 			} else if (responseEnvelop.getStatusCode() == 53) {
 				// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
@@ -245,19 +243,20 @@ public class RequestHandler implements Runnable {
 		return newAuthTicket;
 	}
 
-	private void resetBuilder(RequestEnvelopeOuterClass.RequestEnvelope.Builder builder,
-								AuthTicketOuterClass.AuthTicket authTicket)
+	private void resetBuilder(RequestEnvelope.Builder builder,
+								AuthTicket authTicket)
 			throws LoginFailedException, RemoteServerException {
 		builder.setStatusCode(2);
 		builder.setRequestId(getRequestId());
-		if (authTicket != null
+		builder.setAuthInfo(api.getAuthInfo());
+		/*if (authTicket != null
 				&& authTicket.getExpireTimestampMs() > 0
 				&& authTicket.getExpireTimestampMs() > api.currentTimeMillis()) {
 			builder.setAuthTicket(authTicket);
 		} else {
 			Log.d(TAG, "Authenticated with static token");
 			builder.setAuthInfo(api.getAuthInfo());
-		}
+		}*/
 		builder.setUnknown12(989);
 		builder.setLatitude(api.getLatitude());
 		builder.setLongitude(api.getLongitude());
@@ -271,7 +270,7 @@ public class RequestHandler implements Runnable {
 	@Override
 	public void run() {
 		List<AsyncServerRequest> requests = new LinkedList<>();
-		AuthTicketOuterClass.AuthTicket authTicket = null;
+		AuthTicket authTicket = null;
 		while (true) {
 			try {
 				Thread.sleep(350);

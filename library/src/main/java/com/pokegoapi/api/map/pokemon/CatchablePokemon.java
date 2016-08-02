@@ -526,7 +526,6 @@ public class CatchablePokemon implements MapPoint {
 				.sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, CatchResult>() {
 					@Override
 					public CatchResult call(ByteString result) {
-						System.out.println("ASYNC CATCH CALL");
 						CatchPokemonResponse response;
 
 						try {
