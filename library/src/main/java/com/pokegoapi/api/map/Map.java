@@ -71,7 +71,6 @@ public class Map {
 	private static int RESEND_REQUEST = 5000;
 	private final PokemonGo api;
 	private MapObjects cachedMapObjects;
-	private List<CatchablePokemon> cachedCatchable;
 	private long lastMapUpdate;
 
 	/**
@@ -94,11 +93,6 @@ public class Map {
 	 * @return a List of CatchablePokemon at your current location
 	 */
 	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync() {
-
-		if (useCache() && cachedCatchable != null) {
-			return Observable.just(cachedCatchable);
-		}
-
 		List<Long> cellIds = getDefaultCells();
 		return getMapObjectsAsync(cellIds).map(new Func1<MapObjects, List<CatchablePokemon>>() {
 			@Override
@@ -125,8 +119,7 @@ public class Map {
 					}
 				}
 
-				cachedCatchable = new ArrayList<>(catchablePokemons);
-				return cachedCatchable;
+				return new ArrayList<>(catchablePokemons);
 			}
 		});
 	}
