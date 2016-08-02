@@ -41,6 +41,7 @@ import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.NormalEncounterResult;
 import com.pokegoapi.exceptions.AsyncLoginFailedException;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
+import com.pokegoapi.exceptions.EncounterFailedException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -53,6 +54,7 @@ import lombok.ToString;
 import rx.Observable;
 import rx.functions.Func1;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_GREAT_BALL;
@@ -372,6 +374,131 @@ public class CatchablePokemon implements MapPoint {
 		} else {
 			throw new NoSuchItemException();
 		}
+		return catchPokemon(pokeball, amount, razberryLimit);
+	}
+
+	/**
+	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 75%, if you have
+	 * none will use greatball etc).
+	 *
+	 * @return the catch result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws NoSuchItemException   the no such item exception
+	 */
+	public CatchResult catchPokemonBestBallToUse()
+			throws LoginFailedException, RemoteServerException, NoSuchItemException,
+			EncounterFailedException {
+		EncounterResult encounter = encounterPokemon();
+		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
+
+		return catchPokemonBestBallToUse(encounter, new ArrayList<ItemId>());
+	}
+
+	/**
+	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 75%, if you have
+	 * none will use greatball etc).
+	 *
+	 * @param encounter the encounter
+	 * @return the catch result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws NoSuchItemException   the no such item exception
+	 */
+	public CatchResult catchPokemonBestBallToUse(EncounterResult encounter)
+			throws LoginFailedException, RemoteServerException, NoSuchItemException {
+
+		return catchPokemonBestBallToUse(encounter, new ArrayList<ItemId>(), -1);
+	}
+
+
+	/**
+	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 75%, if you have
+	 * none will use greatball etc).
+	 *
+	 * @param encounter the encounter
+	 * @param amount    the amount
+	 * @return the catch result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws NoSuchItemException   the no such item exception
+	 */
+	public CatchResult catchPokemonBestBallToUse(EncounterResult encounter, int amount)
+			throws LoginFailedException, RemoteServerException, NoSuchItemException {
+
+		return catchPokemonBestBallToUse(encounter, new ArrayList<ItemId>(), amount);
+	}
+
+	/**
+	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 75%, if you have
+	 * none will use greatball etc).
+	 *
+	 * @param encounter the encounter
+	 * @param notUse    the not use
+	 * @return the catch result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws NoSuchItemException   the no such item exception
+	 */
+	public CatchResult catchPokemonBestBallToUse(EncounterResult encounter, List<ItemId> notUse)
+			throws LoginFailedException, RemoteServerException, NoSuchItemException {
+		return catchPokemonBestBallToUse(encounter, notUse, -1, -1);
+	}
+
+	/**
+	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 75%, if you have
+	 * none will use greatball etc).
+	 *
+	 * @param encounter the encounter
+	 * @param notUse    the not use
+	 * @param amount    the amount
+	 * @return the catch result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws NoSuchItemException   the no such item exception
+	 */
+	public CatchResult catchPokemonBestBallToUse(EncounterResult encounter, List<ItemId> notUse, int amount)
+			throws LoginFailedException, RemoteServerException, NoSuchItemException {
+		return catchPokemonBestBallToUse(encounter, notUse, amount, -1);
+	}
+
+	/**
+	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 75%, if you have
+	 * none will use greatball etc).
+	 *
+	 * @param encounter     the encounter
+	 * @param notUse        the not use
+	 * @param amount        the amount
+	 * @param razberryLimit the razberry limit
+	 * @return the catch result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws NoSuchItemException   the no such item exception
+	 */
+	public CatchResult catchPokemonBestBallToUse(
+			EncounterResult encounter, List<ItemId> notUse, int amount, int razberryLimit)
+			throws LoginFailedException, RemoteServerException, NoSuchItemException {
+		ItemBag bag = api.getInventories().getItemBag();
+		Pokeball pokeball;
+		if (!notUse.contains(ITEM_POKE_BALL)
+				&& bag.getItem(ITEM_POKE_BALL).getCount() > 0
+				&& (encounter.getCaptureProbability().getCaptureProbability(0) >= 0.75
+				|| ((notUse.contains(ITEM_GREAT_BALL) || bag.getItem(ITEM_GREAT_BALL).getCount() <= 0)
+				&& (notUse.contains(ITEM_ULTRA_BALL) || bag.getItem(ITEM_ULTRA_BALL).getCount() <= 0)))) {
+			pokeball = POKEBALL;
+		} else if (!notUse.contains(ITEM_GREAT_BALL) && bag.getItem(ITEM_GREAT_BALL).getCount() > 0
+				&& (encounter.getCaptureProbability().getCaptureProbability(1) >= 0.75
+				|| notUse.contains(ITEM_ULTRA_BALL)
+				|| (!notUse.contains(ITEM_ULTRA_BALL)
+				&& bag.getItem(ITEM_ULTRA_BALL).getCount() <= 0))) {
+			pokeball = GREATBALL;
+		} else if (!notUse.contains(ITEM_ULTRA_BALL) && bag.getItem(ITEM_ULTRA_BALL).getCount() > 0) {
+			pokeball = ULTRABALL;
+		} else {
+			//master ball in the moment not exist
+			throw new NoSuchItemException();
+		}
+
 		return catchPokemon(pokeball, amount, razberryLimit);
 	}
 
