@@ -146,14 +146,14 @@ You can't. The Google Identity Platform uses the SHA1 fingerprint and package na
 	|__app
     ```
     
- 2. I'm going to include a fenced code block as part of this bullet:
+ 2. Go to your settings.gradle (Module:PokeGoAPI) and add
 
     ```gradle
 include ":PokeGOAPI"
 project(":PokeGOAPI").projectDir = file("./PokeGOAPI")
     ```
     
- 3. Go to your build.gradle (Module: app) and add
+ 3. Go to your build.gradle (Module: app) and add to your dependencies:
 
     ```gradle
 compile project(":PokeGOAPI")
