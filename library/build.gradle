@@ -115,8 +115,8 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
-    javadoc.source = sourceSets.main.allJava
     javadoc.failOnError(false);
+    javadoc.source = sourceSets.main.allJava
     from javadoc.destinationDir
 }
 
