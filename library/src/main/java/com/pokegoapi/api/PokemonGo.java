@@ -38,22 +38,18 @@ public class PokemonGo {
 	@Getter
 	RequestHandler requestHandler;
 	@Getter
-	Map map;
-	@Getter
 	private PlayerProfile playerProfile;
 	private Inventories inventories;
 	@Getter
-	@Setter
 	private double latitude;
 	@Getter
-	@Setter
 	private double longitude;
 	@Getter
 	@Setter
 	private double altitude;
 	private CredentialProvider credentialProvider;
 	private Settings settings;
-
+	private Map map;
 	/**
 	 * Instantiates a new Pokemon go.
 	 *
@@ -72,13 +68,12 @@ public class PokemonGo {
 			this.credentialProvider = credentialProvider;
 		}
 		this.time = time;
-
-		// send profile request to get the ball rolling
 		requestHandler = new RequestHandler(this, client);
 		playerProfile = new PlayerProfile(this);
-
-		// should have proper end point now.
 		map = new Map(this);
+		longitude = Double.NaN;
+		latitude = Double.NaN;
+
 	}
 
 	/**
@@ -151,4 +146,43 @@ public class PokemonGo {
 		}
 		return settings;
 	}
+
+
+
+	/**
+	 * Validates and sets a given latitude value
+	 *
+	 * @throwsIllegalArgumentException if value exceeds +-90
+	 */
+	public void setLatitude(double value) {
+		if (value > 90 || value < -90) {
+			throw new IllegalArgumentException("latittude can not exceed +/- 90");
+		}
+		latitude = value;
+	}
+
+	/**
+	 * Validates and sets a given longitude value
+	 *
+	 * @throws IllegalArgumentException if value exceeds +-180
+	 */
+	public void setLongitude(double value) {
+		if (value > 1800 || value < -180) {
+			throw new IllegalArgumentException("longitude can not exceed +/- 180");
+		}
+		longitude = value;
+	}
+
+	/**
+	 * Gets the map API
+	 *
+	 * @throws IllegalStateException if location has not been set
+	 */
+	public Map getMap() {
+		if (this.latitude == Double.NaN || this.longitude == Double.NaN) {
+			throw new IllegalStateException("Attempt to get map without setting location first");
+		}
+		return map;
+	}
+
 }
