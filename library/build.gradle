@@ -115,18 +115,22 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
-    javadoc.failOnError(false);
     javadoc.source = sourceSets.main.allJava
+    javadoc.failOnError(false);
     from javadoc.destinationDir
 }
 
 artifacts {
     archives sourcesJar
-    //archives javadocJar
+    archives javadocJar
 }
 
 Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+
+task bintrayUploadFillProperties(dependsOn: javadoc) {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+}
 
 bintray {
     user = properties.getProperty('user')
