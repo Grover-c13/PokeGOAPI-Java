@@ -126,10 +126,9 @@ artifacts {
 }
 
 Properties properties = new Properties()
-
-bintrayUpload {
+try {
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
-}
+} catch (Exception ignore) {
 
 bintray {
     user = properties.getProperty('user')
