@@ -39,6 +39,7 @@ import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.map.pokemon.encounter.DiskEncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.NormalEncounterResult;
+import com.pokegoapi.api.pokemon.PokemonDetails;
 import com.pokegoapi.exceptions.AsyncLoginFailedException;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -184,7 +185,7 @@ public class CatchablePokemon implements MapPoint {
 							throw new AsyncRemoteServerException(e);
 						}
 						encountered = response.getStatus() == EncounterResponse.Status.ENCOUNTER_SUCCESS;
-						return new NormalEncounterResult(response);
+						return new NormalEncounterResult(api, response);
 					}
 				});
 	}
@@ -224,7 +225,7 @@ public class CatchablePokemon implements MapPoint {
 							throw new AsyncRemoteServerException(e);
 						}
 						encountered = response.getResult() == DiskEncounterResponse.Result.SUCCESS;
-						return new DiskEncounterResult(response);
+						return new DiskEncounterResult(api, response);
 					}
 				});
 	}
@@ -439,7 +440,7 @@ public class CatchablePokemon implements MapPoint {
 									double normalizedReticleSize, double spinModifier, Pokeball type,
 									int amount) throws LoginFailedException, RemoteServerException {
 
-		return catchPokemon(normalizedHitPosition, normalizedReticleSize, spinModifier, type, amount, -1);
+		return catchPokemon(normalizedHitPosition, normalizedReticleSize, spinModifier, type, amount, 0);
 	}
 
 	/**
@@ -477,7 +478,14 @@ public class CatchablePokemon implements MapPoint {
 			}
 			if (!result.isFailed() && result.getStatus() != CatchStatus.CATCH_ESCAPE
 					&& result.getStatus() != CatchStatus.CATCH_MISSED
-					|| result.getStatus() == CatchStatus.CATCH_FLEE) {
+					|| result.getStatus() == CatchStatus.CATCH_FLEE
+					) {
+				break;
+			}
+			if (result.getStatus() == CatchStatus.CATCH_ERROR
+					|| result.getStatus() == CatchStatus.UNRECOGNIZED) {
+				Log.wtf(TAG, "Got an error or unrecognized catch attempt");
+				Log.wtf(TAG, "Proto:" + result);
 				break;
 			}
 			numThrows++;
@@ -513,6 +521,7 @@ public class CatchablePokemon implements MapPoint {
 			return Observable.just(new CatchResult());
 		}
 
+		final CatchablePokemon instance = this;
 		CatchPokemonMessage reqMsg = CatchPokemonMessage.newBuilder()
 				.setEncounterId(getEncounterId()).setHitPokemon(true)
 				.setNormalizedHitPosition(normalizedHitPosition)
@@ -534,21 +543,22 @@ public class CatchablePokemon implements MapPoint {
 							throw new AsyncRemoteServerException(e);
 						}
 						try {
+
+							// pokemon is caught of flees
 							if (response.getStatus() == CatchStatus.CATCH_FLEE
 									|| response.getStatus() == CatchStatus.CATCH_SUCCESS) {
-								api.getMap().getCatchablePokemon().remove(this);
+								api.getMap().removeCatchable(instance);
 							}
 
 
-							if (response.getStatus() != CatchStatus.CATCH_ESCAPE
-									&& response.getStatus() != CatchStatus.CATCH_MISSED) {
+							// escapes
+							if (response.getStatus() == CatchStatus.CATCH_ESCAPE) {
 								api.getInventories().updateInventories();
-								return new CatchResult(response);
-							} else {
-								CatchResult res = new CatchResult();
-								res.setStatus(CatchStatus.CATCH_ESCAPE);
-								return res;
 							}
+
+							CatchResult res = new CatchResult(response);
+							res.setStatus(response.getStatus());
+							return res;
 						} catch (RemoteServerException e) {
 							throw new AsyncRemoteServerException(e);
 						} catch (LoginFailedException e) {
