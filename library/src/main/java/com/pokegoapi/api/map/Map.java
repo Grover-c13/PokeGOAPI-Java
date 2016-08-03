@@ -120,15 +120,8 @@ public class Map {
 					catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
 				}
 
-				/*
-				TODO: i have more success checking if encounterId > 0
-				i don't want to use the hasLure because it do a request every call
-				*/
 				for (Pokestop pokestop : mapObjects.getPokestops()) {
-					if (pokestop.inRange()
-							&& pokestop.getFortData().hasLureInfo()
-							&& pokestop.getFortData().getLureInfo().getEncounterId() > 0) {
-						//if (pokestop.inRange() && pokestop.hasLurePokemon()) {
+					if (pokestop.inRange() && pokestop.getFortData().hasLureInfo()) {
 						catchablePokemons.add(new CatchablePokemon(api, pokestop.getFortData()));
 					}
 				}
