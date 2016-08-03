@@ -96,7 +96,7 @@ public class Map {
 	 */
 	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync() {
 
-		if (cachedCatchable != null && useCache()) {
+		if (cachedCatchable != null) {
 			return Observable.just(cachedCatchable);
 		}
 
