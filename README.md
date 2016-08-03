@@ -35,9 +35,11 @@ ___
   }
 
   dependencies {
-    compile 'com.pokegoapi:PokeGOAPI-library:0.3.0'
+    compile 'com.pokegoapi:PokeGOAPI-library:0.X.X'
   }
   ```
+Replace X.X with the version below:
+[ ![Download](https://api.bintray.com/packages/grover-c13/maven/PokeGOAPI/images/download.svg) ](https://bintray.com/grover-c13/maven/PokeGOAPI/_latestVersion)
 
 OR
 
