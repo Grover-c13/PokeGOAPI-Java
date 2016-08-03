@@ -64,7 +64,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
+
 
 public class Map {
 	// time between getting a new MapObjects
@@ -96,16 +96,7 @@ public class Map {
 	 */
 	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync() {
 
-		if (!useCache())
-		{
-			System.out.println("not using cache");
-			// getMapObjects wont be called unless this is null
-			// so need to force it if due for a refresh
-			cachedCatchable = null;
-		}
-
-		if (cachedCatchable != null) {
-			System.out.println("using cache");
+		if (cachedCatchable != null && useCache()) {
 			return Observable.just(cachedCatchable);
 		}
 
@@ -136,7 +127,7 @@ public class Map {
 					}
 				}
 
-				cachedCatchable = Collections.synchronizedList(new CopyOnWriteArrayList<>(catchablePokemons));
+				cachedCatchable = Collections.synchronizedList(new ArrayList<>(catchablePokemons));
 				return cachedCatchable;
 			}
 		});
