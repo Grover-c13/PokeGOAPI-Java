@@ -1,3 +1,5 @@
+archivesBaseName = 'PokeGOAPI-sample'
+
 dependencies {
     compile project(':library')
 }
