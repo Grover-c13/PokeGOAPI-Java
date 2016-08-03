@@ -60,14 +60,15 @@ import rx.Observable;
 import rx.functions.Func1;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Map {
 	// time between getting a new MapObjects
-	private static int RESEND_REQUEST = 5000;
+	private static int RESEND_REQUEST = 10000;
 	private final PokemonGo api;
 	private MapObjects cachedMapObjects;
 	private List<CatchablePokemon> cachedCatchable;
@@ -95,9 +96,10 @@ public class Map {
 	 */
 	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync() {
 
-		if (cachedCatchable != null) {
+		if (cachedCatchable != null && useCache()) {
 			return Observable.just(cachedCatchable);
 		}
+
 
 		List<Long> cellIds = getDefaultCells();
 		return getMapObjectsAsync(cellIds).map(new Func1<MapObjects, List<CatchablePokemon>>() {
@@ -125,10 +127,16 @@ public class Map {
 					}
 				}
 
-				cachedCatchable = new ArrayList<>(catchablePokemons);
+				cachedCatchable = Collections.synchronizedList(new CopyOnWriteArrayList<>(catchablePokemons));
 				return cachedCatchable;
 			}
 		});
+	}
+
+	public void removeCatchable(CatchablePokemon pokemon) {
+		if (cachedCatchable != null) {
+			cachedCatchable.remove(pokemon);
+		}
 	}
 
 	/**

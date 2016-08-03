@@ -18,14 +18,18 @@ package com.pokegoapi.api.map.pokemon.encounter;
 
 import POGOProtos.Data.Capture.CaptureProbabilityOuterClass.CaptureProbability;
 import POGOProtos.Data.PokemonDataOuterClass;
+import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.pokemon.PokemonDetails;
 
-public class NormalEncounterResult implements EncounterResult {
+public class NormalEncounterResult  extends PokemonDetails implements EncounterResult {
 	private EncounterResponse response;
 
-	public NormalEncounterResult(EncounterResponse response) {
+	public NormalEncounterResult(PokemonGo api, EncounterResponse response) {
+		super(api, response.getWildPokemon().getPokemonData());
 		this.response = response;
 	}
 
@@ -55,7 +59,7 @@ public class NormalEncounterResult implements EncounterResult {
 		return response.getWildPokemon();
 	}
 
-	public PokemonDataOuterClass.PokemonData getPokemonData() {
+	public PokemonData getPokemonData() {
 		return response.getWildPokemon().getPokemonData();
 	}
 
