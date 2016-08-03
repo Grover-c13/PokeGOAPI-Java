@@ -96,7 +96,13 @@ public class Map {
 	 */
 	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync() {
 
-		if (cachedCatchable != null && useCache()) {
+		if (!useCache()) {
+			// getMapObjects wont be called unless this is null
+			// so need to force it if due for a refresh
+			cachedCatchable = null;
+		}
+
+		if (cachedCatchable != null) {
 			return Observable.just(cachedCatchable);
 		}
 

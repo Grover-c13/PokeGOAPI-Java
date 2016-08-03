@@ -750,12 +750,10 @@ public class CatchablePokemon implements MapPoint {
 						api.getMap().removeCatchable(instance);
 					}
 
-
 					// escapes
 					if (response.getStatus() == CatchStatus.CATCH_ESCAPE) {
 						api.getInventories().updateInventories();
 					}
-
 					CatchResult res = new CatchResult();
 					res.setStatus(response.getStatus());
 					return res;
