@@ -45,9 +45,6 @@ import java.util.List;
  */
 public class Pokestop {
 
-	private static final int POKESTOP_RANGE_DISTANCE = 30;
-	private static final int LURED_POKEMON_RANGE_DISTANCE = 30;
-
 	private final PokemonGo api;
 	@Getter
 	private final FortDataOuterClass.FortData fortData;
@@ -76,9 +73,9 @@ public class Pokestop {
 		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
 		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
 		double distance = pokestop.getEarthDistance(player);
-		return distance <= POKESTOP_RANGE_DISTANCE;
+		return distance <= api.getSettings().getMapSettings().getPokemonVisibilityRange();
 	}
-	
+
 	/**
 	 * Returns whether or not the lured pokemon is in range.
 	 *
@@ -88,7 +85,7 @@ public class Pokestop {
 		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
 		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
 		double distance = pokestop.getEarthDistance(player);
-		return distance <= LURED_POKEMON_RANGE_DISTANCE;
+		return distance <= api.getSettings().getFortSettings().getInteractionRangeInMeters();
 	}
 
 	/**

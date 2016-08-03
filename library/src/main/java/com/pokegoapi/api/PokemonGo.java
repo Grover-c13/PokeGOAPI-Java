@@ -48,6 +48,7 @@ public class PokemonGo {
 	@Setter
 	private double altitude;
 	private CredentialProvider credentialProvider;
+	@Getter
 	private Settings settings;
 	private Map map;
 	/**
@@ -71,6 +72,7 @@ public class PokemonGo {
 		this.time = time;
 		requestHandler = new RequestHandler(this, client);
 		playerProfile = new PlayerProfile(this);
+		settings = new Settings(this);
 		map = new Map(this);
 		longitude = Double.NaN;
 		latitude = Double.NaN;
@@ -131,23 +133,6 @@ public class PokemonGo {
 		}
 		return inventories;
 	}
-
-
-	/**
-	 * Get the settings API
-	 *
-	 * @return Settings
-	 * @throws LoginFailedException when login fails
-	 * @throws RemoteServerException when server down/issue
-	 */
-	public Settings getSettings() throws LoginFailedException, RemoteServerException {
-		if (settings == null) {
-			settings = new Settings(this);
-		}
-		return settings;
-	}
-
-
 
 	/**
 	 * Validates and sets a given latitude value
