@@ -96,7 +96,16 @@ public class Map {
 	 */
 	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync() {
 
+		if (!useCache())
+		{
+			System.out.println("not using cache");
+			// getMapObjects wont be called unless this is null
+			// so need to force it if due for a refresh
+			cachedCatchable = null;
+		}
+
 		if (cachedCatchable != null) {
+			System.out.println("using cache");
 			return Observable.just(cachedCatchable);
 		}
 
