@@ -495,7 +495,14 @@ public class CatchablePokemon implements MapPoint {
 			}
 			if (!result.isFailed() && result.getStatus() != CatchStatus.CATCH_ESCAPE
 					&& result.getStatus() != CatchStatus.CATCH_MISSED
-					|| result.getStatus() == CatchStatus.CATCH_FLEE) {
+					|| result.getStatus() == CatchStatus.CATCH_FLEE
+					) {
+				break;
+			}
+			if (result.getStatus() == CatchStatus.CATCH_ERROR
+					|| result.getStatus() == CatchStatus.UNRECOGNIZED) {
+				Log.wtf(TAG, "Got an error or unrecognized catch attempt");
+				Log.wtf(TAG, "Proto:" + result);
 				break;
 			}
 			numThrows++;
