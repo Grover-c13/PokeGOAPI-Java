@@ -139,6 +139,10 @@ public class Map {
 		});
 	}
 
+	/**
+	 * Remove a catchable pokemon from the cache
+	 *
+	 */
 	public void removeCatchable(CatchablePokemon pokemon) {
 		if (cachedCatchable != null) {
 			cachedCatchable.remove(pokemon);
