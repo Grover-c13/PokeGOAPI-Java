@@ -45,6 +45,9 @@ import java.util.List;
  */
 public class Pokestop {
 
+	private static final int POKESTOP_RANGE_DISTANCE = 30;
+	private static final int LURED_POKEMON_RANGE_DISTANCE = 30;
+
 	private final PokemonGo api;
 	@Getter
 	private final FortDataOuterClass.FortData fortData;
@@ -73,7 +76,19 @@ public class Pokestop {
 		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
 		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
 		double distance = pokestop.getEarthDistance(player);
-		return distance < 30;
+		return distance <= POKESTOP_RANGE_DISTANCE;
+	}
+	
+	/**
+	 * Returns whether or not the lured pokemon is in range.
+	 *
+	 * @return true when the lured pokemon is in range of player
+	 */
+	public boolean inRangeForLuredPokemon() {
+		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
+		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
+		double distance = pokestop.getEarthDistance(player);
+		return distance <= LURED_POKEMON_RANGE_DISTANCE;
 	}
 
 	/**
@@ -249,8 +264,6 @@ public class Pokestop {
 	 * @throws RemoteServerException If server communications failed.
 	 */
 	public boolean hasLure() throws LoginFailedException, RemoteServerException {
-
-
 		List<FortModifierOuterClass.FortModifier> modifiers = getDetails().getModifier();
 		for (FortModifierOuterClass.FortModifier mod : modifiers) {
 			if (mod.getItemId() == ItemIdOuterClass.ItemId.ITEM_TROY_DISK) {

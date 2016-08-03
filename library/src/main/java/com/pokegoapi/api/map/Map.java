@@ -121,7 +121,7 @@ public class Map {
 				}
 
 				for (Pokestop pokestop : mapObjects.getPokestops()) {
-					if (pokestop.inRange() && pokestop.getFortData().hasLureInfo()) {
+					if (pokestop.inRangeForLuredPokemon() && pokestop.getFortData().hasLureInfo()) {
 						catchablePokemons.add(new CatchablePokemon(api, pokestop.getFortData()));
 					}
 				}
