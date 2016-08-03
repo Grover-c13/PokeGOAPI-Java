@@ -15,6 +15,7 @@
 
 package com.pokegoapi.util;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -31,6 +32,13 @@ public class PokeNames {
 	 */
 	public static String getDisplayName(int pokedexNr, Locale locale) {
 		ResourceBundle names = ResourceBundle.getBundle("pokemon_names", locale);
-		return names.getString(String.valueOf(pokedexNr));
+		String s = names.getString(String.valueOf(pokedexNr));
+		if (locale == Locale.FRENCH)
+			try {
+				return new String(s.getBytes("ISO-8859-1"), "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		return s;
 	}
 }
