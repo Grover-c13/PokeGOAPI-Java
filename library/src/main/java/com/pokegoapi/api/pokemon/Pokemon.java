@@ -244,7 +244,8 @@ public class Pokemon extends PokemonDetails {
 	 * @return Cost of stardust for a powerup
 	 */
 	public int getStardustCostsForPowerup() {
-		return PokemonCpUtils.getStartdustCostsForPowerup(getProto().getCpMultiplier() + getProto().getAdditionalCpMultiplier(),
+		return PokemonCpUtils.getStartdustCostsForPowerup(
+				getProto().getCpMultiplier() + getProto().getAdditionalCpMultiplier(),
 				getProto().getNumUpgrades());
 	}
 

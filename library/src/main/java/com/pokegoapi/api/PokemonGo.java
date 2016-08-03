@@ -152,7 +152,7 @@ public class PokemonGo {
 	/**
 	 * Validates and sets a given latitude value
 	 *
-	 * @throwsIllegalArgumentException if value exceeds +-90
+	 * @throws IllegalArgumentException if value exceeds +-90
 	 */
 	public void setLatitude(double value) {
 		if (value > 90 || value < -90) {
