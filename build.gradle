@@ -4,7 +4,6 @@ allprojects {
     version = '0.3'
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
-    archivesBaseName = 'PokeGOAPI-sample'
     description = """Pokemon Go Java API"""
     repositories {
         jcenter()

@@ -24,6 +24,8 @@ sourceSets {
     }
 }
 
+archivesBaseName = 'PokeGOAPI-library'
+
 // Remove all .proto definition from the final build
 processResources {
     exclude('POGOProtos/')
