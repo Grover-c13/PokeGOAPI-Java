@@ -95,9 +95,8 @@ public class Map {
 	 * @return a List of CatchablePokemon at your current location
 	 */
 	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync() {
-		
-		if (!useCache())
-		{
+
+		if (!useCache()) {
 			// getMapObjects wont be called unless this is null
 			// so need to force it if due for a refresh
 			cachedCatchable = null;
