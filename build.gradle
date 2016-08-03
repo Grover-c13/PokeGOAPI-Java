@@ -1,18 +1,12 @@
-group = 'com.github.aphoh'
-version = '0.0.1-SNAPSHOT'
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-    }
-}
-
 allprojects {
+    apply plugin: 'java'
+    group = 'com.pokegoapi'
+    version = '0.3.0'
+    archivesBaseName = 'PokeGOAPI'
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+    description = """Pokemon Go Java API"""
     repositories {
         jcenter()
-        mavenCentral()
-        maven { url "https://jitpack.io" }
     }
 }
