@@ -493,12 +493,20 @@ public class CatchablePokemon implements MapPoint {
 				Log.wtf(TAG, "Got a null result after catch attempt");
 				break;
 			}
-			if (!result.isFailed() && result.getStatus() != CatchStatus.CATCH_ESCAPE
-					&& result.getStatus() != CatchStatus.CATCH_MISSED
-					|| result.getStatus() == CatchStatus.CATCH_FLEE
-					) {
+			// continue for the following cases:
+			// CatchStatus.CATCH_ESCAPE
+			// CatchStatus.CATCH_MISSED
+			// covers all cases
+
+			// if its caught of has fleed, end the loop
+			// FLEE OR SUCCESS
+			if (result.getStatus() == CatchStatus.CATCH_FLEE
+					|| result.getStatus() == CatchStatus.CATCH_SUCCESS) {
+				Log.v(TAG, "Pokemon caught/or flee");
 				break;
 			}
+			// if error or unrecognized end the loop
+			// ERROR OR UNRECOGNIZED
 			if (result.getStatus() == CatchStatus.CATCH_ERROR
 					|| result.getStatus() == CatchStatus.UNRECOGNIZED) {
 				Log.wtf(TAG, "Got an error or unrecognized catch attempt");
