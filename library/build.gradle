@@ -33,7 +33,7 @@ processResources {
 
 // Run this task to bundle all needed dependency
 task bundle(type: Jar) {
-    baseName = archivesBaseName + '-' + version + '-all'
+    baseName = archivesBaseName + '-all'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
