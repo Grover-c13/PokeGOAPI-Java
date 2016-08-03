@@ -101,21 +101,62 @@ public class EggIncubator {
 	}
 	
 	/**
-	 * Get the target distance for egg to hatch.
+	 * Get the total distance you need to walk to hatch the current egg.
 	 * 
-	 * @return km distance to hatch the egg
+	 * @return total distance to walk to hatch the egg (km)
 	 */
 	public double getKmTarget() {
 		return proto.getTargetKmWalked();
 	}
 	
 	/**
-	 * Get the current distance walked with this incubator.
+	 * Get the distance walked before the current egg was incubated.
 	 * 
-	 * @return km walked with an egg
+	 * @return distance to walked before incubating egg
+	 * @deprecated Wrong method name, use {@link #getKmStart()}
 	 */
 	public double getKmWalked() {
+		return getKmStart();
+	}
+	
+	/**
+	 * Get the distance walked before the current egg was incubated.
+	 * 
+	 * @return distance walked before incubating egg (km)
+	 */
+	public double getKmStart() {
 		return proto.getStartKmWalked();
+	}
+	
+	/**
+	 * Gets the total distance to walk with the current egg before hatching.
+	 * 
+	 * @return total km between incubation and hatching
+	 */
+	public double getHatchDistance() {
+		return getKmTarget() - getKmStart();
+	}
+	
+	/**
+	 * Get the distance walked with the current incubated egg.
+	 * 
+	 * @return distance walked with the current incubated egg (km)
+	 * @throws LoginFailedException if there is an error with the token during retrieval of player stats
+	 * @throws RemoteServerException if the server responds badly during retrieval of player stats
+	 */
+	public double getKmCurrentlyWalked() throws LoginFailedException, RemoteServerException {
+		return pgo.getPlayerProfile().getStats().getKmWalked() - getKmStart();
+	}
+	
+	/**
+	 * Get the distance left to walk before this incubated egg will hatch.
+	 * 
+	 * @return distance to walk before hatch (km)
+	 * @throws LoginFailedException if there is an error with the token during retrieval of player stats
+	 * @throws RemoteServerException if the server responds badly during retrieval of player stats
+	 */
+	public double getKmLeftToWalk() throws LoginFailedException, RemoteServerException {
+		return getKmTarget() - pgo.getPlayerProfile().getStats().getKmWalked();
 	}
 	
 	/**
