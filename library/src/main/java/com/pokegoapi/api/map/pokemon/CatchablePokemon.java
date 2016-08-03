@@ -548,7 +548,6 @@ public class CatchablePokemon implements MapPoint {
 							if (response.getStatus() == CatchStatus.CATCH_FLEE
 									|| response.getStatus() == CatchStatus.CATCH_SUCCESS) {
 								api.getMap().removeCatchable(instance);
-								System.out.println("removing catchable pokemon");
 							}
 
 

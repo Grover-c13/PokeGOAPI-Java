@@ -64,7 +64,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Map {
 	// time between getting a new MapObjects
@@ -127,7 +127,7 @@ public class Map {
 					}
 				}
 
-				cachedCatchable = Collections.synchronizedList(new ArrayList<>(catchablePokemons));
+				cachedCatchable = Collections.synchronizedList(new CopyOnWriteArrayList<>(catchablePokemons));
 				return cachedCatchable;
 			}
 		});
