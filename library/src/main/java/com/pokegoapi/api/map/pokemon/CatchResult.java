@@ -93,4 +93,9 @@ public class CatchResult {
 		}
 		return (this.getStatus() != CatchStatus.CATCH_SUCCESS || failed);
 	}
+
+	public boolean hasCaptureAward()
+	{
+		return captureAward != null;
+	}
 }
