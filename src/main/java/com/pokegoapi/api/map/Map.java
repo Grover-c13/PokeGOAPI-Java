@@ -97,6 +97,8 @@ public class Map {
 	 * Returns a list of catchable pokemon around the current location.
 	 *
 	 * @return a List of CatchablePokemon at your current location
+     * @throws LoginFailedException  if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public List<CatchablePokemon> getCatchablePokemon() throws LoginFailedException, RemoteServerException {
 		Set<CatchablePokemon> catchablePokemons = new HashSet<>();
@@ -124,6 +126,8 @@ public class Map {
 	 * Returns a list of nearby pokemon (non-catchable).
 	 *
 	 * @return a List of NearbyPokemon at your current location
+     * @throws LoginFailedException  if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public List<NearbyPokemon> getNearbyPokemon() throws LoginFailedException, RemoteServerException {
 		List<NearbyPokemon> pokemons = new ArrayList<>();
@@ -140,6 +144,8 @@ public class Map {
 	 * Returns a list of spawn points.
 	 *
 	 * @return list of spawn points
+     * @throws LoginFailedException  if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public List<Point> getSpawnPoints() throws LoginFailedException, RemoteServerException {
 		List<Point> points = new ArrayList<>();
@@ -156,6 +162,8 @@ public class Map {
 	 * Get a list of gyms near the current location.
 	 *
 	 * @return List of gyms
+     * @throws LoginFailedException  if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public List<Gym> getGyms() throws LoginFailedException, RemoteServerException {
 		List<Gym> gyms = new ArrayList<>();
@@ -174,6 +182,8 @@ public class Map {
 	 * Returns a list of decimated spawn points at current location.
 	 *
 	 * @return list of spawn points
+     * @throws LoginFailedException  if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public List<Point> getDecimatedSpawnPoints() throws LoginFailedException, RemoteServerException {
 		List<Point> points = new ArrayList<>();
@@ -190,6 +200,8 @@ public class Map {
 	 * Returns MapObjects around your current location.
 	 *
 	 * @return MapObjects at your current location
+     * @throws LoginFailedException  if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public MapObjects getMapObjects() throws LoginFailedException, RemoteServerException {
 		return getMapObjects(9);
@@ -200,6 +212,9 @@ public class Map {
 	 *
 	 * @param width width
 	 * @return MapObjects at your current location
+     *
+     * @throws LoginFailedException If login fails.
+     * @throws RemoteServerException If request errors occurred.
 	 */
 	public MapObjects getMapObjects(int width) throws LoginFailedException, RemoteServerException {
 		return getMapObjects(
@@ -218,6 +233,8 @@ public class Map {
 	 * @param latitude  latitude
 	 * @param longitude longitude
 	 * @return MapObjects in the given cells
+     * @throws LoginFailedException  if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	@Deprecated
 	public MapObjects getMapObjects(double latitude, double longitude)
@@ -232,6 +249,8 @@ public class Map {
 	 * @param latitude  latitude
 	 * @param longitude longitude
 	 * @return MapObjects in the given cells
+     * @throws LoginFailedException  if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	@Deprecated
 	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude)
@@ -246,6 +265,8 @@ public class Map {
 	 * @param longitude longitude
 	 * @param width     width
 	 * @return MapObjects in the given cells
+     * @throws LoginFailedException  if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	@Deprecated
 	public MapObjects getMapObjects(double latitude, double longitude, int width)
@@ -259,7 +280,10 @@ public class Map {
 	 * @param cellIds   cellIds
 	 * @param latitude  latitude
 	 * @param longitude longitude
+     * @param altitude altitude
 	 * @return MapObjects in the given cells
+     * @throws LoginFailedException  if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	@Deprecated
 	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude, double altitude)
@@ -275,6 +299,8 @@ public class Map {
 	 *
 	 * @param cellIds List of cellId
 	 * @return MapObjects in the given cells
+     * @throws LoginFailedException  if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public MapObjects getMapObjects(List<Long> cellIds) throws LoginFailedException, RemoteServerException {
 		GetMapObjectsMessage.Builder builder = GetMapObjectsMessage.newBuilder();
