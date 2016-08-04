@@ -1,10 +1,6 @@
 package com.pokegoapi.api.pokemon;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
 
@@ -425,15 +421,11 @@ public class EvolutionInfo {
 	 * @return ordered evolutions
 	 */
 	public static List<PokemonId> getEvolutions(PokemonId pokemonId) {
-		List<PokemonId> evolutions = new ArrayList<>();
 		PokemonId[] evoInfo = EVOLUTION_INFO.get(pokemonId);
 		if (evoInfo == null)
-			return evolutions;
+			return new ArrayList<>();
 
-		for (PokemonId id : evoInfo) {
-			evolutions.add(id);
-		}
-		return evolutions;
+		return new ArrayList<>(Arrays.asList(evoInfo));
 	}
 
 	/**
