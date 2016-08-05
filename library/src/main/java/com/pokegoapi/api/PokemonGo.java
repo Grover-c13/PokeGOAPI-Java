@@ -16,6 +16,7 @@
 package com.pokegoapi.api;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
@@ -29,6 +30,9 @@ import com.pokegoapi.util.Time;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class PokemonGo {
@@ -50,6 +54,8 @@ public class PokemonGo {
 	private CredentialProvider credentialProvider;
 	private Settings settings;
 	private Map map;
+	private List<Unknown6OuterClass.Unknown6> unknown6s = new ArrayList<>();
+
 	/**
 	 * Instantiates a new Pokemon go.
 	 *
@@ -152,7 +158,7 @@ public class PokemonGo {
 	/**
 	 * Validates and sets a given latitude value
 	 *
-	 * @throwsIllegalArgumentException if value exceeds +-90
+	 * @throws IllegalArgumentException if value exceeds +-90
 	 */
 	public void setLatitude(double value) {
 		if (value > 90 || value < -90) {
@@ -185,4 +191,21 @@ public class PokemonGo {
 		return map;
 	}
 
+	/**
+	 * Get the list of Unknown6's to be used for the request.
+	 *
+	 * @return the unknown6's
+	 */
+	public List<Unknown6OuterClass.Unknown6> getUnknown6s() {
+		return unknown6s;
+	}
+
+	/**
+	 * Set the list of Unknown6's to be used for the request.
+	 *
+	 * @param unknown6s the unknown6's
+	 */
+	public void setUnknown6s(List<Unknown6OuterClass.Unknown6> unknown6s) {
+		this.unknown6s = unknown6s;
+	}
 }
