@@ -18,6 +18,8 @@ package com.pokegoapi.main;
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
+import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
+import POGOProtos.Networking.Envelopes.Unknown6OuterClass.Unknown6;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -257,6 +259,12 @@ public class RequestHandler implements Runnable {
 			Log.d(TAG, "Authenticated with static token");
 			builder.setAuthInfo(api.getAuthInfo());
 		}*/
+		List<Unknown6> unknown6s = api.getUnknown6s();
+		if (unknown6s != null) {
+			for (Unknown6 unknown6 : unknown6s) {
+				builder.addUnknown6(unknown6);
+			}
+		}
 		builder.setUnknown12(989);
 		builder.setLatitude(api.getLatitude());
 		builder.setLongitude(api.getLongitude());
