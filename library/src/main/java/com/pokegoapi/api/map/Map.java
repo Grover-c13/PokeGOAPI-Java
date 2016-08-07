@@ -60,18 +60,19 @@ import rx.Observable;
 import rx.functions.Func1;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Map {
-	private static int CELL_WIDTH = 3;
 	// time between getting a new MapObjects
-	private static int RESEND_REQUEST = 5000;
+	private static int RESEND_REQUEST = 10000;
 	private final PokemonGo api;
 	private MapObjects cachedMapObjects;
 	private List<CatchablePokemon> cachedCatchable;
+	private int cellWidth = 3;
 	private long lastMapUpdate;
 
 	/**
@@ -95,9 +96,16 @@ public class Map {
 	 */
 	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync() {
 
-		if (useCache() && cachedCatchable != null) {
+		if (!useCache()) {
+			// getMapObjects wont be called unless this is null
+			// so need to force it if due for a refresh
+			cachedCatchable = null;
+		}
+
+		if (cachedCatchable != null) {
 			return Observable.just(cachedCatchable);
 		}
+
 
 		List<Long> cellIds = getDefaultCells();
 		return getMapObjectsAsync(cellIds).map(new Func1<MapObjects, List<CatchablePokemon>>() {
@@ -125,10 +133,20 @@ public class Map {
 					}
 				}
 
-				cachedCatchable = new ArrayList<>(catchablePokemons);
+				cachedCatchable = Collections.synchronizedList(new CopyOnWriteArrayList<>(catchablePokemons));
 				return cachedCatchable;
 			}
 		});
+	}
+
+	/**
+	 * Remove a catchable pokemon from the cache
+	 *
+	 */
+	public void removeCatchable(CatchablePokemon pokemon) {
+		if (cachedCatchable != null) {
+			cachedCatchable.remove(pokemon);
+		}
 	}
 
 	/**
@@ -338,11 +356,10 @@ public class Map {
 		int index = 0;
 		for (Long cellId : cellIds) {
 			builder.addCellId(cellId);
-			long time = 0;
 			builder.addSinceTimestampMs(0);
 			index++;
-
 		}
+
 		final AsyncServerRequest asyncServerRequest = new AsyncServerRequest(
 				RequestType.GET_MAP_OBJECTS, builder.build());
 		return api.getRequestHandler()
@@ -376,7 +393,7 @@ public class Map {
 							result.addPokestops(groupedForts.get(FortType.CHECKPOINT));
 						}
 
-
+						cachedCatchable = null;
 						return result;
 					}
 				});
@@ -417,7 +434,7 @@ public class Map {
 	@Deprecated
 	public MapObjects getMapObjects(double latitude, double longitude)
 			throws LoginFailedException, RemoteServerException {
-		return getMapObjects(latitude, longitude, CELL_WIDTH);
+		return getMapObjects(latitude, longitude, cellWidth);
 	}
 
 	/**
@@ -663,6 +680,10 @@ public class Map {
 		}
 		return response;
 	}
+	
+	public void setDefaultWidth(int width) {
+		cellWidth = width;
+	}
 
 	/**
 	 * Wether or not to get a fresh copy or use cache;
@@ -674,7 +695,7 @@ public class Map {
 	}
 
 	private List<Long> getDefaultCells() {
-		return getCellIds(api.getLatitude(), api.getLongitude(), CELL_WIDTH);
+		return getCellIds(api.getLatitude(), api.getLongitude(), cellWidth);
 	}
 
 }

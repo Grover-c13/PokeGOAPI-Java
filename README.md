@@ -27,26 +27,48 @@ ___
 
 # How to import
 
-  Import from Maven/Gradle/SBT/Leiningen using JitPack : [![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
-  
-  After you clicked on this link, jitpack will show you multiple build (try use the latest one since the api grow everyday).
-  JitPack will show an example for each dependency manager to include our API into your project.
+  ```groovy
+  allprojects {
+    repositories {
+        jcenter()
+    }
+  }
+
+  dependencies {
+    compile 'com.pokegoapi:PokeGOAPI-library:0.X.X'
+  }
+  ```
+Replace X.X with the version below:
+[ ![Download](https://api.bintray.com/packages/grover-c13/maven/PokeGOAPI/images/download.svg) ](https://bintray.com/grover-c13/maven/PokeGOAPI/_latestVersion)
 
 OR
 
-  Import JAR in Eclipse
-    - Right click on the project
-    - Select Build path > Java Build Path
-    - Select Libraries tab
-    - Select Add External JARs…
-    - Select `PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.0.1-SNAPSHOT.jar`
-    - Finish
+Import JAR with gradle
+  - Complete `Build from source` below
+  - Open the project gradle.build file
+  - Locate ``dependencies {`` 
+  - Add ``compile files('PATH_TO/PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.X.X.jar')``
+    - (PATH_TO is the exact path from root to the API folder, i.e. C:/MyGitProjects)
+    - (0.X.X refers to the version number provided in the JAR filename, ie. 0.3.0)
+
+OR
+
+Import JAR in Eclipse
+  - Complete `Build from source` below
+  - Right click on the project
+  - Select Build path > Java Build Path
+  - Select Libraries tab
+  - Select Add External JARs…
+  - Select ``PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.X.X.jar``
+    - (0.X.X refers to the version number provided in the JAR filename, ie. 0.3.0)
+  - Finish
 
 # Build from source
   - Clone the repo and cd into the folder
   - `` git submodule update --init ``
   - `` ./gradlew :library:build ``
-  - you should have the api jar in ``library/build/libs/PokeGOAPI-library-all-0.0.1-SNAPSHOT.jar``
+  - you should have the api jar in ``library/build/libs/PokeGOAPI-library-all-0.X.X.jar``
+      - (0.X.X refers to the version number provided in the JAR filename, ie. 0.3.0)
 
 PS : for users who want to import the api into Eclipse IDE, you'll need to :
   - build once : `` ./gradlew :library:build ``

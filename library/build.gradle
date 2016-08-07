@@ -1,25 +1,20 @@
-version = '0.0.1-SNAPSHOT'
-
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath 'com.google.protobuf:protobuf-gradle-plugin:0.7.7'
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1"
     }
 }
 
 apply plugin: 'idea'
-apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'com.google.protobuf'
 apply plugin: 'checkstyle'
+apply plugin: 'com.jfrog.bintray'
 
-archivesBaseName = 'PokeGOAPI-library'
-description = """Pokemon Go Java API"""
-
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+archivesBaseName = archivesBaseName + '-library'
 
 sourceSets {
     main {
@@ -30,6 +25,8 @@ sourceSets {
         }
     }
 }
+
+archivesBaseName = 'PokeGOAPI-library'
 
 // Remove all .proto definition from the final build
 processResources {
@@ -89,14 +86,14 @@ checkstyleMain.doLast {
 }
 
 dependencies {
-    compile 'com.github.svarzee:gpsoauth-java:v0.3.0'
+    compile 'svarzee.gps:gpsoauth:0.3'
     compile 'com.squareup.okio:okio:1.9.0'
     compile 'com.squareup.moshi:moshi:1.2.0'
     compile 'com.annimon:stream:1.1.1'
-    compile 'com.squareup.okhttp3:okhttp:3.4.0-RC1'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
     compile 'com.google.protobuf:protobuf-java:3.0.0-beta-3'
     compile 'io.reactivex:rxjava:1.1.8'
-    compileOnly 'org.projectlombok:lombok:1.16.6'
+    compileOnly 'org.projectlombok:lombok:1.16.10'
 }
 
 idea {
@@ -121,3 +118,24 @@ artifacts {
     archives sourcesJar
     archives javadocJar
 }
+
+Properties properties = new Properties()
+try {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+} catch (Exception ignore) {
+}
+
+bintray {
+    user = properties.getProperty('user')
+    key =  properties.getProperty('apiKey')
+    configurations = ['archives']
+    pkg {
+        repo = 'maven'
+        name = 'PokeGOAPI'
+        userOrg = user
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/Grover-c13/PokeGOAPI-Java.git'
+        publish = true
+    }
+}
+

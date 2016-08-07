@@ -16,6 +16,7 @@
 package com.pokegoapi.api;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
@@ -30,6 +31,9 @@ import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class PokemonGo {
 
@@ -38,21 +42,19 @@ public class PokemonGo {
 	@Getter
 	RequestHandler requestHandler;
 	@Getter
-	Map map;
-	@Getter
 	private PlayerProfile playerProfile;
 	private Inventories inventories;
 	@Getter
-	@Setter
 	private double latitude;
 	@Getter
-	@Setter
 	private double longitude;
 	@Getter
 	@Setter
 	private double altitude;
 	private CredentialProvider credentialProvider;
 	private Settings settings;
+	private Map map;
+	private List<Unknown6OuterClass.Unknown6> unknown6s = new ArrayList<>();
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -63,6 +65,7 @@ public class PokemonGo {
 	 * @throws LoginFailedException  When login fails
 	 * @throws RemoteServerException When server fails
 	 */
+
 	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time)
 			throws LoginFailedException, RemoteServerException {
 
@@ -72,13 +75,11 @@ public class PokemonGo {
 			this.credentialProvider = credentialProvider;
 		}
 		this.time = time;
-
-		// send profile request to get the ball rolling
 		requestHandler = new RequestHandler(this, client);
 		playerProfile = new PlayerProfile(this);
-
-		// should have proper end point now.
 		map = new Map(this);
+		longitude = Double.NaN;
+		latitude = Double.NaN;
 	}
 
 	/**
@@ -150,5 +151,61 @@ public class PokemonGo {
 			settings = new Settings(this);
 		}
 		return settings;
+	}
+
+
+
+	/**
+	 * Validates and sets a given latitude value
+	 *
+	 * @throws IllegalArgumentException if value exceeds +-90
+	 */
+	public void setLatitude(double value) {
+		if (value > 90 || value < -90) {
+			throw new IllegalArgumentException("latittude can not exceed +/- 90");
+		}
+		latitude = value;
+	}
+
+	/**
+	 * Validates and sets a given longitude value
+	 *
+	 * @throws IllegalArgumentException if value exceeds +-180
+	 */
+	public void setLongitude(double value) {
+		if (value > 180 || value < -180) {
+			throw new IllegalArgumentException("longitude can not exceed +/- 180");
+		}
+		longitude = value;
+	}
+
+	/**
+	 * Gets the map API
+	 *
+	 * @throws IllegalStateException if location has not been set
+	 */
+	public Map getMap() {
+		if (this.latitude == Double.NaN || this.longitude == Double.NaN) {
+			throw new IllegalStateException("Attempt to get map without setting location first");
+		}
+		return map;
+	}
+
+	/**
+	 * Get the list of Unknown6's to be used for the request.
+	 *
+	 * @return the unknown6's
+	 */
+	public List<Unknown6OuterClass.Unknown6> getUnknown6s() {
+		return unknown6s;
+	}
+
+	/**
+	 * Set the list of Unknown6's to be used for the request.
+	 *
+	 * @param unknown6s the unknown6's
+	 */
+	public void setUnknown6s(List<Unknown6OuterClass.Unknown6> unknown6s) {
+		this.unknown6s = unknown6s;
 	}
 }
