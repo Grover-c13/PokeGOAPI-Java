@@ -15,12 +15,9 @@
 
 package com.pokegoapi.main;
 
-import POGOProtos.Networking.Envelopes.AuthTicketOuterClass;
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
-import POGOProtos.Networking.Envelopes.SignatureOuterClass;
-import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -28,12 +25,8 @@ import com.pokegoapi.exceptions.AsyncPokemonGoException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.AsyncHelper;
-import com.pokegoapi.util.Crypto;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.Signature;
-import net.jpountz.xxhash.StreamingXXHash32;
-import net.jpountz.xxhash.StreamingXXHash64;
-import net.jpountz.xxhash.XXHashFactory;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -42,9 +35,18 @@ import rx.Observable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class RequestHandler implements Runnable {
 	private static final String TAG = RequestHandler.class.getSimpleName();
@@ -243,8 +245,7 @@ public class RequestHandler implements Runnable {
 		return newAuthTicket;
 	}
 
-	private void resetBuilder(RequestEnvelope.Builder builder,
-							  AuthTicket authTicket)
+	private void resetBuilder(RequestEnvelope.Builder builder, AuthTicket authTicket)
 			throws LoginFailedException, RemoteServerException {
 		builder.setStatusCode(2);
 		builder.setRequestId(getRequestId());
