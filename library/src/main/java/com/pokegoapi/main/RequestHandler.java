@@ -342,40 +342,46 @@ public class RequestHandler implements Runnable {
 				.setUnknown2(Unknown6OuterClass.Unknown6.Unknown2.newBuilder().setUnknown1(ByteString.copyFrom(encrypted)));
 	}
 
+	private static byte[] getBytes(double d) {
+		long x = Double.doubleToRawLongBits(d);
+		return new byte[]{
+				(byte) (x >>> 56),
+				(byte) (x >>> 48),
+				(byte) (x >>> 40),
+				(byte) (x >>> 32),
+				(byte) (x >>> 24),
+				(byte) (x >>> 16),
+				(byte) (x >>> 8),
+				(byte) x
+		};
+	}
+
 	private int getLocationHash1(byte[] authTicket, RequestEnvelope.Builder builder) {
 		XXHashFactory factory = XXHashFactory.fastestInstance();
 		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x1B845238);
 		xx32.update(authTicket, 0, authTicket.length);
-		byte[] bytes = new byte[8];
-		ByteBuffer.wrap(bytes).putDouble(builder.getLatitude());
+		xx32 = factory.newStreamingHash32(xx32.getValue());
+		byte[] bytes = new byte[8 * 3];
 
-		xx32.update(bytes, 0, 8);
-		bytes = new byte[8];
-		ByteBuffer.wrap(bytes).putDouble(builder.getLongitude());
+		System.arraycopy(getBytes(api.getLatitude()), 0, bytes, 0, 8);
+		System.arraycopy(getBytes(api.getLongitude()), 0, bytes, 8, 8);
+		System.arraycopy(getBytes(api.getAltitude()), 0, bytes, 16, 8);
 
-		xx32.update(bytes, 0, 8);
-		bytes = new byte[8];
-		ByteBuffer.wrap(bytes).putDouble(builder.getAltitude());
-
-		xx32.update(bytes, 0, 8);
+		xx32.update(bytes, 0, bytes.length);
 		return xx32.getValue();
 	}
 
 	private int getLocationHash2(RequestEnvelope.Builder builder) {
 		XXHashFactory factory = XXHashFactory.fastestInstance();
 		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x1B845238);
-		byte[] bytes = new byte[8];
-		ByteBuffer.wrap(bytes).putDouble(builder.getLatitude());
+		byte[] bytes = new byte[8 * 3];
+		
+		System.arraycopy(getBytes(api.getLatitude()), 0, bytes, 0, 8);
+		System.arraycopy(getBytes(api.getLongitude()), 0, bytes, 8, 8);
+		System.arraycopy(getBytes(api.getAltitude()), 0, bytes, 16, 8);
 
-		xx32.update(bytes, 0, 8);
-		bytes = new byte[8];
-		ByteBuffer.wrap(bytes).putDouble(builder.getLongitude());
+		xx32.update(bytes, 0, bytes.length);
 
-		xx32.update(bytes, 0, 8);
-		bytes = new byte[8];
-		ByteBuffer.wrap(bytes).putDouble(builder.getAltitude());
-
-		xx32.update(bytes, 0, 8);
 		return xx32.getValue();
 	}
 
@@ -383,6 +389,7 @@ public class RequestHandler implements Runnable {
 		XXHashFactory factory = XXHashFactory.fastestInstance();
 		StreamingXXHash64 xx64 = factory.newStreamingHash64(0x1B845238);
 		xx64.update(authTicket, 0, authTicket.length);
+		xx64 = factory.newStreamingHash64(xx64.getValue());
 		xx64.update(request, 0, request.length);
 		return xx64.getValue();
 	}
