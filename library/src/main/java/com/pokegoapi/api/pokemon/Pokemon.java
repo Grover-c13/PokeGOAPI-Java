@@ -249,6 +249,18 @@ public class Pokemon extends PokemonDetails {
 				getProto().getNumUpgrades());
 	}
 
+	public int getMaxCpFullEvolveAndPowerup() {
+		PokemonIdOuterClass.PokemonId highestUpgradedFamily = PokemonMetaRegistry.getHightestForFamily(pokemon.getPokemonFamily());
+		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
+		int attack = getProto().getIndividualAttack() + pokemonMeta.getBaseAttack();
+		int defense = getProto().getIndividualDefense() + pokemonMeta.getBaseDefense();
+		int stamina = getProto().getIndividualStamina() + pokemonMeta.getBaseStamina();
+		return PokemonCpUtils.getMaxCp(attack, defense, stamina);
+	}
+
+	public PokemonIdOuterClass.PokemonId getParent() {
+		return getMeta().getParentId();
+	}
 
 
 	/**
