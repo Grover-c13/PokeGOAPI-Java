@@ -249,16 +249,6 @@ public class Pokemon extends PokemonDetails {
 				getProto().getNumUpgrades());
 	}
 
-    public int getMaxCpFullEvolveAndPowerup() {
-        PokemonIdOuterClass.PokemonId highestUpgradedFamily = PokemonMetaRegistry.getHightestForFamily(getPokemonFamily());
-        PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
-        int attack = getProto().getIndividualAttack() + pokemonMeta.getBaseAttack();
-        int defense = getProto().getIndividualDefense() + pokemonMeta.getBaseDefense();
-        int stamina = getProto().getIndividualStamina() + pokemonMeta.getBaseStamina();
-        return PokemonCpUtils.getMaxCp(attack, defense, stamina);
-    }
-
-
 	/**
 	 * Check if pokemon its injured but not fainted. need potions to heal
 	 *
