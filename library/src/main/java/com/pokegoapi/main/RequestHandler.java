@@ -18,8 +18,8 @@ package com.pokegoapi.main;
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
+import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
-import POGOProtos.Networking.Envelopes.Unknown6OuterClass.Unknown6;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -28,6 +28,9 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
+import net.jpountz.xxhash.StreamingXXHash32;
+import net.jpountz.xxhash.StreamingXXHash64;
+import net.jpountz.xxhash.XXHashFactory;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -36,37 +39,27 @@ import rx.Observable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.nio.ByteBuffer;
+import java.util.*;
+import java.util.concurrent.*;
 
 public class RequestHandler implements Runnable {
 	private static final String TAG = RequestHandler.class.getSimpleName();
 	private final PokemonGo api;
-	private String apiEndpoint;
-	private OkHttpClient client;
-	private Long requestId = new Random().nextLong();
-
 	private final Thread asyncHttpThread;
 	private final BlockingQueue<AsyncServerRequest> workQueue = new LinkedBlockingQueue<>();
 	private final Map<Long, ResultOrException> resultMap = new HashMap<>();
+	private String apiEndpoint;
+	private OkHttpClient client;
+	private Long requestId = new Random().nextLong();
 
 	/**
 	 * Instantiates a new Request handler.
 	 *
 	 * @param api    the api
 	 * @param client the client
-     * @throws LoginFailedException When login fails
-     * @throws RemoteServerException If request errors occur
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException If request errors occur
 	 */
 	public RequestHandler(PokemonGo api, OkHttpClient client) throws LoginFailedException, RemoteServerException {
 		this.api = api;
@@ -178,6 +171,8 @@ public class RequestHandler implements Runnable {
 			builder.addRequests(serverRequest.getRequest());
 		}
 
+		setSignature(builder, serverRequests);
+
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		RequestEnvelope request = builder.build();
 		try {
@@ -246,7 +241,7 @@ public class RequestHandler implements Runnable {
 	}
 
 	private void resetBuilder(RequestEnvelope.Builder builder,
-								AuthTicket authTicket)
+							  AuthTicket authTicket)
 			throws LoginFailedException, RemoteServerException {
 		builder.setStatusCode(2);
 		builder.setRequestId(getRequestId());
@@ -259,12 +254,6 @@ public class RequestHandler implements Runnable {
 			Log.d(TAG, "Authenticated with static token");
 			builder.setAuthInfo(api.getAuthInfo());
 		}*/
-		List<Unknown6> unknown6s = api.getUnknown6s();
-		if (unknown6s != null) {
-			for (Unknown6 unknown6 : unknown6s) {
-				builder.addUnknown6(unknown6);
-			}
-		}
 		builder.setUnknown12(989);
 		builder.setLatitude(api.getLatitude());
 		builder.setLongitude(api.getLongitude());
@@ -312,5 +301,78 @@ public class RequestHandler implements Runnable {
 				requests.clear();
 			}
 		}
+	}
+
+	private void setSignature(RequestEnvelope.Builder builder, ServerRequest[] serverRequests) {
+		byte[] uk22 = new byte[32];
+		new Random().nextBytes(uk22);
+
+		long curTime = api.currentTimeMillis();
+
+		byte[] authTicket = builder.getAuthTicket().toByteArray();
+
+		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
+				.setLocationHash1(getLocationHash1(authTicket, builder))
+				.setLocationHash2(getLocationHash2(builder))
+				.setUnk22(ByteString.copyFrom(uk22))
+				.setTimestamp(api.currentTimeMillis())
+				.setTimestampSinceStart(curTime - api.startTime);
+
+
+		for (ServerRequest serverRequest : serverRequests) {
+			byte[] request = serverRequest.getRequest().toByteArray();
+			sigBuilder.addRequestHash(getRequestHash(authTicket, request));
+		}
+
+		// TODO: Call encrypt function on this
+		ByteString uk2 = sigBuilder.build().toByteString();
+		Unknown6OuterClass.Unknown6.newBuilder()
+				.setRequestType(6)
+				.setUnknown2(Unknown6OuterClass.Unknown6.Unknown2.newBuilder().setUnknown1(uk2));
+	}
+
+	private int getLocationHash1(byte[] authTicket, RequestEnvelope.Builder builder) {
+		XXHashFactory factory = XXHashFactory.fastestInstance();
+		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x1B845238);
+		xx32.update(authTicket, 0, authTicket.length);
+		byte[] bytes = new byte[8];
+		ByteBuffer.wrap(bytes).putDouble(builder.getLatitude());
+
+		xx32.update(bytes, 0, 8);
+		bytes = new byte[8];
+		ByteBuffer.wrap(bytes).putDouble(builder.getLongitude());
+
+		xx32.update(bytes, 0, 8);
+		bytes = new byte[8];
+		ByteBuffer.wrap(bytes).putDouble(builder.getAltitude());
+
+		xx32.update(bytes, 0, 8);
+		return xx32.getValue();
+	}
+
+	private int getLocationHash2(RequestEnvelope.Builder builder) {
+		XXHashFactory factory = XXHashFactory.fastestInstance();
+		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x1B845238);
+		byte[] bytes = new byte[8];
+		ByteBuffer.wrap(bytes).putDouble(builder.getLatitude());
+
+		xx32.update(bytes, 0, 8);
+		bytes = new byte[8];
+		ByteBuffer.wrap(bytes).putDouble(builder.getLongitude());
+
+		xx32.update(bytes, 0, 8);
+		bytes = new byte[8];
+		ByteBuffer.wrap(bytes).putDouble(builder.getAltitude());
+
+		xx32.update(bytes, 0, 8);
+		return xx32.getValue();
+	}
+
+	private long getRequestHash(byte[] authTicket, byte[] request) {
+		XXHashFactory factory = XXHashFactory.fastestInstance();
+		StreamingXXHash64 xx64 = factory.newStreamingHash64(0x1B845238);
+		xx64.update(authTicket, 0, authTicket.length);
+		xx64.update(request, 0, request.length);
+		return xx64.getValue();
 	}
 }
