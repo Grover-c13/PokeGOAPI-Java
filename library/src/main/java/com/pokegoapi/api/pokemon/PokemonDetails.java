@@ -234,6 +234,18 @@ public class PokemonDetails {
 		return getAbsoluteMaxCp(proto.getPokemonId());
 	}
 
+	/**
+	 * Calculated the max cp of this pokemon, if you upgrade it fully
+	 * @return Max cp of this pokemon
+	 */
+	public int getMaxCpFullEvolveAndPowerup() {
+		PokemonIdOuterClass.PokemonId highestUpgradedFamily = PokemonMetaRegistry.getHightestForFamily(getPokemonFamily());
+		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
+		int attack = getProto().getIndividualAttack() + pokemonMeta.getBaseAttack();
+		int defense = getProto().getIndividualDefense() + pokemonMeta.getBaseDefense();
+		int stamina = getProto().getIndividualStamina() + pokemonMeta.getBaseStamina();
+		return PokemonCpUtils.getMaxCp(attack, defense, stamina);
+	}
 
 
 	/**
