@@ -123,6 +123,10 @@ public class PokemonDetails {
 		return proto.getCpMultiplier();
 	}
 
+	public float getAdditionalCpMultiplier() {
+		return proto.getAdditionalCpMultiplier();
+	}
+
 	public ItemId getPokeball() {
 		return proto.getPokeball();
 	}
