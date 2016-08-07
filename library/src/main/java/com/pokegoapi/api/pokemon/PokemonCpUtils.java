@@ -172,7 +172,7 @@ public class PokemonCpUtils {
 	 */
 	public static float getAdditionalCpAfterPowerup(float cpMultiplier, float additionalCpMultiplier) {
 		float nextLevel = getLevelFromCpMultiplier(cpMultiplier + additionalCpMultiplier) + .5f;
-		return cpMultiplier - LEVEL_CPMULTIPLIER.get(nextLevel);
+		return LEVEL_CPMULTIPLIER.get(nextLevel) - cpMultiplier;
 	}
 
 	/**
