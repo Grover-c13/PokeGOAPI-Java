@@ -249,6 +249,8 @@ public class Pokemon extends PokemonDetails {
 				getProto().getNumUpgrades());
 	}
 
+
+
 	/**
 	 * Check if pokemon its injured but not fainted. need potions to heal
 	 *
