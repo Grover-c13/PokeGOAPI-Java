@@ -109,14 +109,14 @@ public class PokemonCpUtils {
 		LEVEL_CPMULTIPLIER.put(40f, 0.79030001f);
 	}
 
-	private static float getLevel(float cpMuliplier) {
+	private static float getLevel(float combinedCpMultiplier) {
 		float level;
-		if (cpMuliplier < 0.734f) {
+		if (combinedCpMultiplier < 0.734f) {
 			// compute polynomial approximation obtained by regression
-			level = 58.35178527f * cpMuliplier * cpMuliplier - 2.838007664f * cpMuliplier + 0.8539209906f;
+			level = 58.35178527f * combinedCpMultiplier * combinedCpMultiplier - 2.838007664f * combinedCpMultiplier + 0.8539209906f;
 		} else {
 			// compute linear approximation obtained by regression
-			level = 171.0112688f * cpMuliplier - 95.20425243f;
+			level = 171.0112688f * combinedCpMultiplier - 95.20425243f;
 		}
 		// round to nearest .5 value and return
 		return Math.round((level) * 2) / 2.0f;
@@ -124,11 +124,11 @@ public class PokemonCpUtils {
 
 	/**
 	 * Get the level from the cp multiplier
-	 * @param cpMultiplier All CP multiplier values combined
+	 * @param combinedCpMultiplier All CP multiplier values combined
 	 * @return Level
 	 */
-	public static float getLevelFromCpMultiplier(float cpMultiplier) {
-		return getLevel(cpMultiplier);
+	public static float getLevelFromCpMultiplier(float combinedCpMultiplier) {
+		return getLevel(combinedCpMultiplier);
 	}
 
 	/**
@@ -146,33 +146,44 @@ public class PokemonCpUtils {
 	/**
 	 * Get the CP after powerup
 	 * @param cp Current CP level
-	 * @param cpMultiplier All CP multiplier values combined
+	 * @param combinedCpMultiplier All CP multiplier values combined
 	 * @return New CP level
 	 */
-	public static int getCpAfterPowerup(float cp, float cpMultiplier) {
+	public static int getCpAfterPowerup(float cp, float combinedCpMultiplier) {
 		// Based on http://pokemongo.gamepress.gg/power-up-costs
-		float level = getLevelFromCpMultiplier(cpMultiplier);
+		float level = getLevelFromCpMultiplier(combinedCpMultiplier);
 		if (level <= 10) {
-			return (int)((cp * 0.009426125469) / Math.pow(cpMultiplier, 2));
+			return (int)((cp * 0.009426125469) / Math.pow(combinedCpMultiplier, 2));
 		}
 		if (level <= 20) {
-			return (int)((cp * 0.008919025675) / Math.pow(cpMultiplier, 2));
+			return (int)((cp * 0.008919025675) / Math.pow(combinedCpMultiplier, 2));
 		}
 		if (level <= 30) {
-			return (int)((cp * 0.008924905903) / Math.pow(cpMultiplier, 2));
+			return (int)((cp * 0.008924905903) / Math.pow(combinedCpMultiplier, 2));
 		}
-		return (int)((cp * 0.00445946079) / Math.pow(cpMultiplier, 2));
+		return (int)((cp * 0.00445946079) / Math.pow(combinedCpMultiplier, 2));
+	}
+
+	/**
+	 * Get the new addidional multiplier after powerup
+	 * @param cpMultiplier Multiplier
+	 * @param additionalCpMultiplier Additional multiplier
+	 * @return Additional multiplier after upgrade
+	 */
+	public static float getAdditionalCpAfterPowerup(float cpMultiplier, float additionalCpMultiplier) {
+		float nextLevel = getLevelFromCpMultiplier(cpMultiplier + additionalCpMultiplier) + .5f;
+		return LEVEL_CPMULTIPLIER.get(nextLevel) - cpMultiplier;
 	}
 
 	/**
 	 * Get the amount of stardust required to do a powerup
-	 * @param cpMultiplier All CP multiplier values combined
+	 * @param combinedCpMultiplier All CP multiplier values combined
 	 * @param powerups Number of previous powerups
 	 * @return Amount of stardust
 	 */
-	public static int getStartdustCostsForPowerup(float cpMultiplier, int powerups) {
+	public static int getStartdustCostsForPowerup(float combinedCpMultiplier, int powerups) {
 		// Based on http://pokemongo.gamepress.gg/power-up-costs
-		float level = getLevelFromCpMultiplier(cpMultiplier);
+		float level = getLevelFromCpMultiplier(combinedCpMultiplier);
 		if (level <= 3 && powerups <= 4) {
 			return 200;
 		}
@@ -235,13 +246,13 @@ public class PokemonCpUtils {
 
 	/**
 	 * Get the amount of candy required to do a powerup
-	 * @param cpMultiplier All CP multiplier values combined
+	 * @param combinedCpMultiplier All CP multiplier values combined
 	 * @param powerups Number of previous powerups
 	 * @return Amount of candy
 	 */
-	public static int getCandyCostsForPowerup(float cpMultiplier, int powerups) {
+	public static int getCandyCostsForPowerup(float combinedCpMultiplier, int powerups) {
 		// Based on http://pokemongo.gamepress.gg/power-up-costs
-		float level = getLevelFromCpMultiplier(cpMultiplier);
+		float level = getLevelFromCpMultiplier(combinedCpMultiplier);
 		if (level <= 13 && powerups <= 20 ) {
 			return 1;
 		}
