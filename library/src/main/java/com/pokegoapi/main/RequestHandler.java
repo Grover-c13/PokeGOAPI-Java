@@ -30,6 +30,7 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Crypto;
 import com.pokegoapi.util.Log;
+import com.pokegoapi.util.Signature;
 import net.jpountz.xxhash.StreamingXXHash32;
 import net.jpountz.xxhash.StreamingXXHash64;
 import net.jpountz.xxhash.XXHashFactory;
@@ -173,7 +174,7 @@ public class RequestHandler implements Runnable {
 			builder.addRequests(serverRequest.getRequest());
 		}
 
-		setSignature(authTicket, builder, serverRequests);
+		Signature.setSignature(api, builder);
 
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		RequestEnvelope request = builder.build();
@@ -305,93 +306,5 @@ public class RequestHandler implements Runnable {
 		}
 	}
 
-	private void setSignature(AuthTicket authTicket, RequestEnvelope.Builder builder, ServerRequest[] serverRequests) {
-		if (authTicket == null) {
-			System.out.println("Ticket == null");
-			return;
-		}
-		byte[] uk22 = new byte[32];
-		new Random().nextBytes(uk22);
-
-		long curTime = api.currentTimeMillis();
-
-		byte[] authTicketBA = authTicket.toByteArray();
-
-		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
-				.setLocationHash1(getLocationHash1(authTicketBA, builder))
-				.setLocationHash2(getLocationHash2(builder))
-				.setUnk22(ByteString.copyFrom(uk22))
-				.setTimestamp(api.currentTimeMillis())
-				.setTimestampSinceStart(curTime - api.startTime);
-
-
-		for (ServerRequest serverRequest : serverRequests) {
-			byte[] request = serverRequest.getRequest().toByteArray();
-			sigBuilder.addRequestHash(getRequestHash(authTicketBA, request));
-		}
-
-		// TODO: Call encrypt function on this
-		byte[] uk2 = sigBuilder.build().toByteArray();
-		byte[] iv = new byte[32];
-		new Random().nextBytes(iv);
-		byte[] encrypted = Crypto.encrypt(uk2, iv).toByteBuffer().array();
-		System.out.println(uk2);
-		System.out.println(encrypted);
-		Unknown6OuterClass.Unknown6.newBuilder()
-				.setRequestType(6)
-				.setUnknown2(Unknown6OuterClass.Unknown6.Unknown2.newBuilder().setUnknown1(ByteString.copyFrom(encrypted)));
-	}
-
-	private static byte[] getBytes(double d) {
-		long x = Double.doubleToRawLongBits(d);
-		return new byte[]{
-				(byte) (x >>> 56),
-				(byte) (x >>> 48),
-				(byte) (x >>> 40),
-				(byte) (x >>> 32),
-				(byte) (x >>> 24),
-				(byte) (x >>> 16),
-				(byte) (x >>> 8),
-				(byte) x
-		};
-	}
-
-	private int getLocationHash1(byte[] authTicket, RequestEnvelope.Builder builder) {
-		XXHashFactory factory = XXHashFactory.fastestInstance();
-		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x1B845238);
-		xx32.update(authTicket, 0, authTicket.length);
-		xx32 = factory.newStreamingHash32(xx32.getValue());
-		byte[] bytes = new byte[8 * 3];
-
-		System.arraycopy(getBytes(api.getLatitude()), 0, bytes, 0, 8);
-		System.arraycopy(getBytes(api.getLongitude()), 0, bytes, 8, 8);
-		System.arraycopy(getBytes(api.getAltitude()), 0, bytes, 16, 8);
-
-		xx32.update(bytes, 0, bytes.length);
-		return xx32.getValue();
-	}
-
-	private int getLocationHash2(RequestEnvelope.Builder builder) {
-		XXHashFactory factory = XXHashFactory.fastestInstance();
-		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x1B845238);
-		byte[] bytes = new byte[8 * 3];
-
-		System.arraycopy(getBytes(api.getLatitude()), 0, bytes, 0, 8);
-		System.arraycopy(getBytes(api.getLongitude()), 0, bytes, 8, 8);
-		System.arraycopy(getBytes(api.getAltitude()), 0, bytes, 16, 8);
-
-		xx32.update(bytes, 0, bytes.length);
-
-		return xx32.getValue();
-	}
-
-	private long getRequestHash(byte[] authTicket, byte[] request) {
-		XXHashFactory factory = XXHashFactory.fastestInstance();
-		StreamingXXHash64 xx64 = factory.newStreamingHash64(0x1B845238);
-		xx64.update(authTicket, 0, authTicket.length);
-		xx64 = factory.newStreamingHash64(xx64.getValue());
-		xx64.update(request, 0, request.length);
-		return xx64.getValue();
-	}
 
 }

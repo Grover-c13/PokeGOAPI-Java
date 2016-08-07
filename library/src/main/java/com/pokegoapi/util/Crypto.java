@@ -1,9 +1,5 @@
 package com.pokegoapi.util;
 
-import com.annimon.stream.Stream;
-import com.annimon.stream.function.Consumer;
-
-import javax.xml.bind.DatatypeConverter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
@@ -12,59 +8,18 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class Crypto {
-
-	private static Random random = new Random(0);
-
-	public static void main(String[] args) {
-
-
-		byte[] test1 = generateSamples(200);
-		printTestCase(test1);
-		byte[] iv = generateSamples(32);
-		printTestCase(iv);
-
-		encrypt(test1, iv).print();
-
-	}
-
-	public static byte[] generateSamples(int count) {
-		byte[] samples = new byte[count];
-		random.nextBytes(samples);
-		return samples;
-	}
-
-	public static void printTestCase(byte[] t) {
-		System.out.print("unsigned char iv[" + t.length + "] = {");
-		for (int i = 0; i < t.length; ++i) {
-			System.out.print(Integer.toString(t[i] & 0xff));
-			if (i != t.length - 1)
-				System.out.print(", ");
-		}
-		System.out.println("};");
-	}
-
-	public static void printBytes(byte[] t) {
-		String hex = DatatypeConverter.printHexBinary(t);
-		System.out.println(hex.toLowerCase());
-	}
-
-	public static void printInts(int[] t) {
-
-		Stream.of(t).forEach(new Consumer<int[]>() {
-			@Override
-			public void accept(int[] ints) {
-				System.out.println(ints);
-			}
-		});
-		System.out.println();
-
-	}
-
-	public static Ciptext encrypt(byte[] input, byte[] iv) {
+	/**
+	 * Shuffles bytes.
+	 *
+	 * @param input input data
+	 * @param iv iv (32 random bytes)
+	 * @return shuffled bytes
+	 */
+	public static CipherText encrypt(byte[] input, byte[] iv) {
 
 		byte[] arr2 = new byte[256];
-		byte[] arr3 = new byte[256];
-		Ciptext output;
+		byte[] arr3;
+		CipherText output;
 
 		if (iv.length != 32) {
 			return null;
@@ -75,9 +30,8 @@ public class Crypto {
 				arr2[32 * j + i] = rotl8(iv[i], j); // rotate byte left
 			}
 		}
-		printBytes(arr2);
 
-		output = new Ciptext(input, iv);
+		output = new CipherText(input, iv);
 
 		for (int i = 0; i < output.content.size(); ++i) {
 			byte[] current = output.content.get(i);
@@ -8399,13 +8353,19 @@ public class Crypto {
 		return result;
 	}
 
-	public static class Ciptext {
+	public static class CipherText {
 		public byte[] prefix;
 		public ArrayList<byte[]> content;
 
 		int totalsize = 32;
 
-		public Ciptext(byte[] input, byte[] iv) {
+		/**
+		 * Create new CipherText with contents and IV.
+		 *
+		 * @param input the contents
+		 * @param iv random IV (32 bytes)
+		 */
+		public CipherText(byte[] input, byte[] iv) {
 			prefix = new byte[32];
 			content = new ArrayList<>();
 			int roundedsize = input.length + (256 - (input.length % 256));
@@ -8424,23 +8384,16 @@ public class Crypto {
 
 		}
 
+		/**
+		 * Convert this Ciptext to a ByteBuffer
+		 *
+		 * @return contents as bytebuffer
+		 */
 		public ByteBuffer toByteBuffer() {
 			ByteBuffer buff = ByteBuffer.allocate(totalsize).put(prefix);
 			for (int i = 0; i < content.size(); ++i)
 				buff.put(content.get(i));
 			return buff;
-		}
-
-		public void print() {
-
-			printBytes(prefix);
-			Stream.of(content).forEach(new Consumer<byte[]>() {
-				@Override
-				public void accept(byte[] bytes) {
-					printBytes(bytes);
-				}
-			});
-
 		}
 
 	}
