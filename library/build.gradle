@@ -100,7 +100,6 @@ dependencies {
     compile 'com.google.protobuf:protobuf-java:3.0.0-beta-3'
     compile 'io.reactivex:rxjava:1.1.8'
     compile 'net.jpountz.lz4:lz4:1.3.0'
-    compile 'net.java.dev.jna:jna-platform:4.2.2'
     compileOnly 'org.projectlombok:lombok:1.16.10'
 }
 

@@ -28,10 +28,8 @@ import com.pokegoapi.exceptions.AsyncPokemonGoException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.AsyncHelper;
+import com.pokegoapi.util.Crypto;
 import com.pokegoapi.util.Log;
-import com.sun.jna.Library;
-import com.sun.jna.Native;
-import com.sun.jna.platform.win32.WinDef;
 import net.jpountz.xxhash.StreamingXXHash32;
 import net.jpountz.xxhash.StreamingXXHash64;
 import net.jpountz.xxhash.XXHashFactory;
@@ -334,7 +332,9 @@ public class RequestHandler implements Runnable {
 
 		// TODO: Call encrypt function on this
 		byte[] uk2 = sigBuilder.build().toByteArray();
-		byte[] encrypted = encrypt(uk2);
+		byte[] iv = new byte[32];
+		new Random().nextBytes(iv);
+		byte[] encrypted = Crypto.encrypt(uk2, iv).toByteBuffer().array();
 		System.out.println(uk2);
 		System.out.println(encrypted);
 		Unknown6OuterClass.Unknown6.newBuilder()
@@ -387,29 +387,4 @@ public class RequestHandler implements Runnable {
 		return xx64.getValue();
 	}
 
-	private interface Encrypt extends Library {
-		int encrypt(byte[] input, int input_size,
-					byte[] iv, int iv_size,
-					byte[] output, WinDef.ULONGByReference output_size);
-
-	}
-
-	private static byte[] encrypt(byte[] input) {
-		Encrypt encrypt =
-				(Encrypt) Native.loadLibrary("encrypt", Encrypt.class);
-		byte[] iv = new byte[32];
-		new Random().nextBytes(iv);
-		WinDef.ULONGByReference outputLength = new WinDef.ULONGByReference();
-		int rv = encrypt.encrypt(input, input.length, iv, iv.length, null, outputLength);
-		if (rv != 0) {
-			throw new RuntimeException("Encrypt failed: " + rv);
-		}
-
-		byte[] output = new byte[outputLength.getValue().intValue()];
-		rv = encrypt.encrypt(input, input.length, iv, iv.length, output, outputLength);
-		if (rv != 0) {
-			throw new RuntimeException("Encrypt failed: " + rv);
-		}
-		return output;
-	}
 }
