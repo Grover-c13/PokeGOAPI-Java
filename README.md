@@ -3,6 +3,9 @@
 Pokemon GO Java API
 
 [![Build Status](https://travis-ci.org/Grover-c13/PokeGOAPI-Java.svg?branch=master)](https://travis-ci.org/Grover-c13/PokeGOAPI-Java)
+[![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
+
+Javadocs : [CLICK ME](https://jitpack.io/com/github/Grover-c13/PokeGOAPI-Java/a2828da60d/javadoc/) 
 
 See this guide for adding functionality:
    https://docs.google.com/document/d/1BE8O6Z19sQ54T5T7QauXgA11GbL6D9vx9AAMCM5KlRA
@@ -11,47 +14,134 @@ See this spreadsheet for RPC endpoints and progress :
    https://docs.google.com/spreadsheets/d/1Xv0Gw5PzIRaVou2xrl6r7qySrcmOKjQWLBjJA73YnJM
 
 ___
-:exclamation:
+:exclamation: :exclamation: :exclamation:
 
-This API may seem unstable. This is because the backend Pokemon GO servers are unstable.
+This API may have issues when the PokemonGO servers are under high load or down, in this case please wait for the official to get back up. You can check the official servers status on [IsPokemonGoDownOrNot.com](http://ispokemongodownornot.com) or [MMOServerStatus.com](http://www.mmoserverstatus.com/pokemon_go).
 
-In case stuff is not working as expected, wait a moment to see if the problem resolves itself automatically.
+This API doesnt fake the official client perfectly, niantic may know that you arent using the official app, we encourage you to use a alternate account to play with this API.
 
-You may also check the status of the servers on [IsPokemonGoDownOrNot.com](http://ispokemongodownornot.com) or [MMOServerStatus.com](http://www.mmoserverstatus.com/pokemon_go).
+If you are using this lib to catch pokemon and loot pokestop, take care that you arent teleporting, the servers may issue a softban against your client (its temporary, between 10 and 30 minutes in general).
 
-If you just want to use it, wait some days until the server issues are resolved (or if there is a problem with this library, you may fix it and send a PR this way).
-
-:exclamation:
+:exclamation: :exclamation: :exclamation:
 ___
 
-# Build
+# How to import
+
+  ```groovy
+  allprojects {
+    repositories {
+        jcenter()
+    }
+  }
+
+  dependencies {
+    compile 'com.pokegoapi:PokeGOAPI-library:0.X.X'
+  }
+  ```
+Replace X.X with the version below:
+[ ![Download](https://api.bintray.com/packages/grover-c13/maven/PokeGOAPI/images/download.svg) ](https://bintray.com/grover-c13/maven/PokeGOAPI/_latestVersion)
+
+OR
+
+Import JAR with gradle
+  - Complete `Build from source` below
+  - Open the project gradle.build file
+  - Locate ``dependencies {`` 
+  - Add ``compile files('PATH_TO/PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.X.X.jar')``
+    - (PATH_TO is the exact path from root to the API folder, i.e. C:/MyGitProjects)
+    - (0.X.X refers to the version number provided in the JAR filename, ie. 0.3.0)
+
+OR
+
+Import JAR in Eclipse
+  - Complete `Build from source` below
+  - Right click on the project
+  - Select Build path > Java Build Path
+  - Select Libraries tab
+  - Select Add External JARs…
+  - Select ``PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.X.X.jar``
+    - (0.X.X refers to the version number provided in the JAR filename, ie. 0.3.0)
+  - Finish
+
+# Build from source
   - Clone the repo and cd into the folder
   - `` git submodule update --init ``
-  - compile and package
-  - `` ./gradlew build bundle ``
-  - you should have the api bundled in ``build/libs/PokeGOAPI-Java_bundle-0.0.1-SNAPSHOT.jar``
+  - `` ./gradlew :library:build ``
+  - you should have the api jar in ``library/build/libs/PokeGOAPI-library-all-0.X.X.jar``
+      - (0.X.X refers to the version number provided in the JAR filename, ie. 0.3.0)
 
-  PS : To Eclipse user, you must build once : `` ./gradlew build `` and add the generated java class for proto into eclipse source path : Right click on the project > Build path > Configure Build Path > Source > Add Folder > Select `build/generated/source/proto/main/java` > Finish
+PS : for users who want to import the api into Eclipse IDE, you'll need to :
+  - build once : `` ./gradlew :library:build ``
+  - Right click on the project
+  - Select Build path > Configure Build Path > Source > Add Folder
+  - Select `library/build/generated/source/proto/main/java`
+  - Finish
 
-# Usage
-Include the API as jar from your own build, or use Maven/Gradle/SBT/Leiningen: https://jitpack.io/#Grover-c13/PokeGOAPI-Java/master-SNAPSHOT
-
-Mostly everything is accessed through the PokemonGo class in the API package.
-
-The constructor of PokemonGo class requires a AuthInfo object which can be obtained from GoogleLogin().login or PtcLogin().login, and a OkHttpClient object.
-
-EG:
+# Usage exemple (mostly how to login) :
 ```java
 OkHttpClient httpClient = new OkHttpClient();
-//Use Google
-//First Ever Login. Persist info when you recieve callback
-PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient,listner),httpClient);
-//Subsequently
-PokemonGo go = new PokemonGo(new GoogleCredentialProvider(httpClient,refreshToken),httpClient);
-//Or use PTC
+
+/** 
+* Google: 
+* You will need to redirect your user to GoogleUserCredentialProvider.LOGIN_URL
+* Afer this, the user must signin on google and get the token that will be show to him.
+* This token will need to be put as argument to login.
+*/
+GoogleUserCredentialProvider provider = new GoogleUserCredentialProvider(http);
+
+// in this url, you will get a code for the google account that is logged
+System.out.println("Please go to " + GoogleUserCredentialProvider.LOGIN_URL);
+System.out.println("Enter authorisation code:");
+			
+// Ask the user to enter it in the standart input
+Scanner sc = new Scanner(System.in);
+String access = sc.nextLine();
+			
+// we should be able to login with this token
+provider.login(access);
+PokemonGo go = new PokemonGo(provider, httpClient);
+
+/**
+* After this, if you do not want to re-authorize the google account every time, 
+* you will need to store the refresh_token that you can get the first time with provider.getRefreshToken()
+* ! The API does not store the refresh token for you !
+* log in using the refresh token like this :
+*/
+PokemonGo go = new PokemonGo(new GoogleUserCredentialProvider(httpClient, refreshToken), httpClient);
+
+/**
+* PTC is much simpler, but less secure.
+* You will need the username and password for each user log in
+* This account does not currently support a refresh_token. 
+* Example log in :
+*/
 PokemonGo go = new PokemonGo(new PtcCredentialProvider(httpClient,username,password),httpClient);
-Log.v(go.getPlayerProfile());
+
+// After this you can access the api from the PokemonGo instance :
+go.getPlayerProfile(); // to get the user profile
+go.getInventories(); // to get all his inventories (Pokemon, backpack, egg, incubator)
+go.setLocation(lat, long, alt); // set your position to get stuff around (altitude is not needed, you can use 1 for example)
+go.getMap().getCatchablePokemon(); // get all currently Catchable Pokemon around you
+
+// If you want to go deeper, you can directly send your request with our RequestHandler
+// For example, here we are sending a request to get the award for our level
+// This applies to any method defined in the protos file as Request/Response)
+
+LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder().setLevel(yourLVL).build(); 
+ServerRequest serverRequest = new ServerRequest(RequestType.LEVEL_UP_REWARDS, msg);
+go.getRequestHandler().sendServerRequests(serverRequest);
+
+// and get the response like this :
+
+LevelUpRewardsResponse response = null;
+try {
+	response = LevelUpRewardsResponse.parseFrom(serverRequest.getData());
+} catch (InvalidProtocolBufferException e) {
+	// its possible that the parsing fail when servers are in high load for example.
+	throw new RemoteServerException(e);
+}
 ```
+
 ##Android Dev FAQ
 
   - I can't use the sample code! It just throws a login exception!
@@ -75,10 +165,11 @@ You can't. The Google Identity Platform uses the SHA1 fingerprint and package na
   - Submit a pull request on the `Development` branch :D
 
 ## Contributors
-  - Grover-c13
-  - jabbink
-  - zeladada
-  - darakath
-  - vmarchaud
+  - @Grover-c13
+  - @jabbink
+  - @Aphoh
+  - @mjmfighter
+  - @vmarchaud
+  - @langerhans
 
-You can join us in the slack channel #javaapi on the pkre.slack.com (you should get an invite by a bot posted somewhere in the subreddit /r/pokemongodev)
+You can join us in the slack channel #javaapi on the pkre.slack.com ([you can get invited here](https://shielded-earth-81203.herokuapp.com/))

@@ -1,1 +1,1 @@
-rootProject.name = 'PokeGOAPI-Java'
+include ':library', ':sample'

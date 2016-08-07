@@ -1,0 +1,5 @@
+archivesBaseName = archivesBaseName + '-sample'
+
+dependencies {
+    compile project(':library')
+}

@@ -1,119 +1,12 @@
-group = 'com.github.aphoh'
-version = '0.0.1-SNAPSHOT'
-
-buildscript {
+allprojects {
+    apply plugin: 'java'
+    group = 'com.pokegoapi'
+    version = '0.3.0'
+    archivesBaseName = 'PokeGOAPI'
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+    description = """Pokemon Go Java API"""
     repositories {
-        mavenCentral()
+        jcenter()
     }
-    dependencies {
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.7.7'
-    }
-
-
-}
-
-apply plugin: 'idea'
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'com.google.protobuf'
-apply plugin: 'checkstyle'
-
-description = """Pokemon Go Java API"""
-
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
-
-repositories {
-    mavenCentral()
-}
-
-sourceSets {
-    main {
-        proto {
-            // Need to use custom dir cause Gradle doesn't like us otherwise :(
-            srcDir 'src/resources/protobuf/src'
-            include '**/*.proto'
-        }
-    }
-}
-
-// Remove all .proto definition from the final build
-processResources {
-    exclude('**/*')
-}
-
-// Run this task to bundle all needed dependency
-task bundle(type: Jar) {
-    baseName = project.name + '_bundle'
-
-    from {
-        configurations.compile.collect {
-            it.isDirectory() && !it.isEmpty() ? it : zipTree(it)
-        }
-    }
-    with jar
-}
-
-protobuf {
-    // Configure the protoc executable
-    protoc {
-        // Download from repositories
-        artifact = 'com.google.protobuf:protoc:3.0.0-beta-3'
-    }
-}
-
-def checkstyleOutputDir = "${project.projectDir}/build/reports/checkstyle/"
-
-checkstyle {
-    toolVersion = '7.0'
-    configFile = file("${project.projectDir}/config/checkstyle.xml")
-    configProperties = [ "suppressionFile" : file("${project.projectDir}/config/suppressions.xml")]
-    reportsDir = file(checkstyleOutputDir)
-
-    ignoreFailures = false
-
-    checkstyleMain {
-        source = sourceSets.main.allSource
-    }
-
-    configurations {
-        checkstyle
-    }
-
-
-    dependencies {
-        checkstyle "com.puppycrawl.tools:checkstyle:${toolVersion}"
-    }
-}
-
-//Abort if any checkstyle warnings
-checkstyleMain.doLast {
-    def outputFile = file(checkstyleOutputDir + "main.xml")
-    if (outputFile.exists() && outputFile.text.contains("<error ")) {
-        throw new GradleException("There were checkstyle warnings! For more info check $outputFile")
-    }
-}
-
-dependencies {
-    compile 'com.squareup.okio:okio:1.9.0'
-    compile 'com.squareup.moshi:moshi:1.2.0'
-    compile 'com.annimon:stream:1.1.1'
-    compile 'com.squareup.okhttp3:okhttp:3.4.0-RC1'
-    compile 'com.google.protobuf:protobuf-java:3.0.0-beta-3'
-    compileOnly 'org.projectlombok:lombok:1.16.6'
-}
-
-idea {
-    module {
-        sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/java");
-    }
-}
-
-task sourcesJar(type: Jar) {
-    from sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-artifacts {
-    archives sourcesJar
 }
