@@ -265,7 +265,11 @@ public class PokemonDetails {
 		return PokemonCpUtils.getMaxCp(attack, defense, stamina);
 	}
 
-
-
+	/**
+	 * @return The number of powerups already done
+	 */
+	public int getNumerOfPowerupsDone() {
+		return getProto().getNumUpgrades();
+	}
 
 }
