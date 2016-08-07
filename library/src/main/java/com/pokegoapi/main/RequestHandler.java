@@ -18,8 +18,6 @@ package com.pokegoapi.main;
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
-import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
-import POGOProtos.Networking.Envelopes.Unknown6OuterClass.Unknown6;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -28,6 +26,7 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
+import com.pokegoapi.util.Signature;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -52,21 +51,20 @@ import java.util.concurrent.TimeoutException;
 public class RequestHandler implements Runnable {
 	private static final String TAG = RequestHandler.class.getSimpleName();
 	private final PokemonGo api;
-	private String apiEndpoint;
-	private OkHttpClient client;
-	private Long requestId = new Random().nextLong();
-
 	private final Thread asyncHttpThread;
 	private final BlockingQueue<AsyncServerRequest> workQueue = new LinkedBlockingQueue<>();
 	private final Map<Long, ResultOrException> resultMap = new HashMap<>();
+	private String apiEndpoint;
+	private OkHttpClient client;
+	private Long requestId = new Random().nextLong();
 
 	/**
 	 * Instantiates a new Request handler.
 	 *
 	 * @param api    the api
 	 * @param client the client
-     * @throws LoginFailedException When login fails
-     * @throws RemoteServerException If request errors occur
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException If request errors occur
 	 */
 	public RequestHandler(PokemonGo api, OkHttpClient client) throws LoginFailedException, RemoteServerException {
 		this.api = api;
@@ -178,6 +176,8 @@ public class RequestHandler implements Runnable {
 			builder.addRequests(serverRequest.getRequest());
 		}
 
+		Signature.setSignature(api, builder);
+
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		RequestEnvelope request = builder.build();
 		try {
@@ -245,25 +245,18 @@ public class RequestHandler implements Runnable {
 		return newAuthTicket;
 	}
 
-	private void resetBuilder(RequestEnvelope.Builder builder,
-								AuthTicket authTicket)
+	private void resetBuilder(RequestEnvelope.Builder builder, AuthTicket authTicket)
 			throws LoginFailedException, RemoteServerException {
 		builder.setStatusCode(2);
 		builder.setRequestId(getRequestId());
-		builder.setAuthInfo(api.getAuthInfo());
-		/*if (authTicket != null
+		//builder.setAuthInfo(api.getAuthInfo());
+		if (authTicket != null
 				&& authTicket.getExpireTimestampMs() > 0
 				&& authTicket.getExpireTimestampMs() > api.currentTimeMillis()) {
 			builder.setAuthTicket(authTicket);
 		} else {
 			Log.d(TAG, "Authenticated with static token");
 			builder.setAuthInfo(api.getAuthInfo());
-		}*/
-		List<Unknown6> unknown6s = api.getUnknown6s();
-		if (unknown6s != null) {
-			for (Unknown6 unknown6 : unknown6s) {
-				builder.addUnknown6(unknown6);
-			}
 		}
 		builder.setUnknown12(989);
 		builder.setLatitude(api.getLatitude());
@@ -313,4 +306,6 @@ public class RequestHandler implements Runnable {
 			}
 		}
 	}
+
+
 }

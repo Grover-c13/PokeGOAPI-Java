@@ -39,6 +39,7 @@ public class PokemonGo {
 
 	private static final java.lang.String TAG = PokemonGo.class.getSimpleName();
 	private final Time time;
+	public final long startTime;
 	@Getter
 	RequestHandler requestHandler;
 	@Getter
@@ -82,6 +83,7 @@ public class PokemonGo {
 		map = new Map(this);
 		longitude = Double.NaN;
 		latitude = Double.NaN;
+		startTime = currentTimeMillis();
 	}
 
 	/**
@@ -174,23 +176,5 @@ public class PokemonGo {
 			throw new IllegalStateException("Attempt to get map without setting location first");
 		}
 		return map;
-	}
-
-	/**
-	 * Get the list of Unknown6's to be used for the request.
-	 *
-	 * @return the unknown6's
-	 */
-	public List<Unknown6OuterClass.Unknown6> getUnknown6s() {
-		return unknown6s;
-	}
-
-	/**
-	 * Set the list of Unknown6's to be used for the request.
-	 *
-	 * @param unknown6s the unknown6's
-	 */
-	public void setUnknown6s(List<Unknown6OuterClass.Unknown6> unknown6s) {
-		this.unknown6s = unknown6s;
 	}
 }
