@@ -2,8 +2,6 @@ package com.pokegoapi.util;
 
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Consumer;
-import net.jpountz.xxhash.StreamingXXHash32;
-import net.jpountz.xxhash.XXHashFactory;
 
 import javax.xml.bind.DatatypeConverter;
 import java.nio.ByteBuffer;
@@ -26,15 +24,6 @@ public class Crypto {
 		printTestCase(iv);
 
 		encrypt(test1, iv).print();
-
-		byte[] a = new byte[]{0x13, 0x00, 0x00, 0x00, 0x08, 0x00};
-		XXHashFactory factory = XXHashFactory.fastestInstance();
-		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x1B845238);
-		xx32.update(a, 0, a.length);
-		xx32 = factory.newStreamingHash32(xx32.getValue());
-		xx32.update(a, 0, a.length);
-
-		System.out.println(Integer.toHexString(xx32.getValue()));
 
 	}
 

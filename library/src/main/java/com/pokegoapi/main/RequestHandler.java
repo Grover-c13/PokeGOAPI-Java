@@ -375,7 +375,7 @@ public class RequestHandler implements Runnable {
 		XXHashFactory factory = XXHashFactory.fastestInstance();
 		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x1B845238);
 		byte[] bytes = new byte[8 * 3];
-		
+
 		System.arraycopy(getBytes(api.getLatitude()), 0, bytes, 0, 8);
 		System.arraycopy(getBytes(api.getLongitude()), 0, bytes, 8, 8);
 		System.arraycopy(getBytes(api.getAltitude()), 0, bytes, 16, 8);
