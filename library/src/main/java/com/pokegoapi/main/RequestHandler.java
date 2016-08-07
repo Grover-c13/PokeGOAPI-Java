@@ -15,6 +15,7 @@
 
 package com.pokegoapi.main;
 
+import POGOProtos.Networking.Envelopes.AuthTicketOuterClass;
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
@@ -28,6 +29,9 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
+import com.sun.jna.Library;
+import com.sun.jna.Native;
+import com.sun.jna.platform.win32.WinDef;
 import net.jpountz.xxhash.StreamingXXHash32;
 import net.jpountz.xxhash.StreamingXXHash64;
 import net.jpountz.xxhash.XXHashFactory;
@@ -171,7 +175,7 @@ public class RequestHandler implements Runnable {
 			builder.addRequests(serverRequest.getRequest());
 		}
 
-		setSignature(builder, serverRequests);
+		setSignature(authTicket, builder, serverRequests);
 
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		RequestEnvelope request = builder.build();
@@ -303,16 +307,20 @@ public class RequestHandler implements Runnable {
 		}
 	}
 
-	private void setSignature(RequestEnvelope.Builder builder, ServerRequest[] serverRequests) {
+	private void setSignature(AuthTicket authTicket, RequestEnvelope.Builder builder, ServerRequest[] serverRequests) {
+		if (authTicket == null) {
+			System.out.println("Ticket == null");
+			return;
+		}
 		byte[] uk22 = new byte[32];
 		new Random().nextBytes(uk22);
 
 		long curTime = api.currentTimeMillis();
 
-		byte[] authTicket = builder.getAuthTicket().toByteArray();
+		byte[] authTicketBA = authTicket.toByteArray();
 
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
-				.setLocationHash1(getLocationHash1(authTicket, builder))
+				.setLocationHash1(getLocationHash1(authTicketBA, builder))
 				.setLocationHash2(getLocationHash2(builder))
 				.setUnk22(ByteString.copyFrom(uk22))
 				.setTimestamp(api.currentTimeMillis())
@@ -321,14 +329,17 @@ public class RequestHandler implements Runnable {
 
 		for (ServerRequest serverRequest : serverRequests) {
 			byte[] request = serverRequest.getRequest().toByteArray();
-			sigBuilder.addRequestHash(getRequestHash(authTicket, request));
+			sigBuilder.addRequestHash(getRequestHash(authTicketBA, request));
 		}
 
 		// TODO: Call encrypt function on this
-		ByteString uk2 = sigBuilder.build().toByteString();
+		byte[] uk2 = sigBuilder.build().toByteArray();
+		byte[] encrypted = encrypt(uk2);
+		System.out.println(uk2);
+		System.out.println(encrypted);
 		Unknown6OuterClass.Unknown6.newBuilder()
 				.setRequestType(6)
-				.setUnknown2(Unknown6OuterClass.Unknown6.Unknown2.newBuilder().setUnknown1(uk2));
+				.setUnknown2(Unknown6OuterClass.Unknown6.Unknown2.newBuilder().setUnknown1(ByteString.copyFrom(encrypted)));
 	}
 
 	private int getLocationHash1(byte[] authTicket, RequestEnvelope.Builder builder) {
@@ -374,5 +385,31 @@ public class RequestHandler implements Runnable {
 		xx64.update(authTicket, 0, authTicket.length);
 		xx64.update(request, 0, request.length);
 		return xx64.getValue();
+	}
+
+	private interface Encrypt extends Library {
+		int encrypt(byte[] input, int input_size,
+					byte[] iv, int iv_size,
+					byte[] output, WinDef.ULONGByReference output_size);
+
+	}
+
+	private static byte[] encrypt(byte[] input) {
+		Encrypt encrypt =
+				(Encrypt) Native.loadLibrary("encrypt", Encrypt.class);
+		byte[] iv = new byte[32];
+		new Random().nextBytes(iv);
+		WinDef.ULONGByReference outputLength = new WinDef.ULONGByReference();
+		int rv = encrypt.encrypt(input, input.length, iv, iv.length, null, outputLength);
+		if (rv != 0) {
+			throw new RuntimeException("Encrypt failed: " + rv);
+		}
+
+		byte[] output = new byte[outputLength.getValue().intValue()];
+		rv = encrypt.encrypt(input, input.length, iv, iv.length, output, outputLength);
+		if (rv != 0) {
+			throw new RuntimeException("Encrypt failed: " + rv);
+		}
+		return output;
 	}
 }
