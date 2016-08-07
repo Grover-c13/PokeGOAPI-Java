@@ -792,8 +792,7 @@ public class CatchablePokemon implements MapPoint {
 					if (response.getStatus() == CatchStatus.CATCH_ESCAPE) {
 						api.getInventories().updateInventories();
 					}
-					CatchResult res = new CatchResult();
-					res.setStatus(response.getStatus());
+					CatchResult res = new CatchResult(response);
 					return res;
 				} catch (RemoteServerException e) {
 					throw new AsyncRemoteServerException(e);
