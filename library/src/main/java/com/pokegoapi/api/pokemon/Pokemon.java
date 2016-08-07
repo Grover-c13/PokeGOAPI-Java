@@ -250,7 +250,7 @@ public class Pokemon extends PokemonDetails {
 	}
 
     public int getMaxCpFullEvolveAndPowerup() {
-        PokemonIdOuterClass.PokemonId highestUpgradedFamily = PokemonMetaRegistry.getHightestForFamily(pokemon.getPokemonFamily());
+        PokemonIdOuterClass.PokemonId highestUpgradedFamily = PokemonMetaRegistry.getHightestForFamily(getPokemonFamily());
         PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
         int attack = getProto().getIndividualAttack() + pokemonMeta.getBaseAttack();
         int defense = getProto().getIndividualDefense() + pokemonMeta.getBaseDefense();
