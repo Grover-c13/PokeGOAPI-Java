@@ -247,15 +247,15 @@ public class RequestHandler implements Runnable {
 			throws LoginFailedException, RemoteServerException {
 		builder.setStatusCode(2);
 		builder.setRequestId(getRequestId());
-		builder.setAuthInfo(api.getAuthInfo());
-		/*if (authTicket != null
+		//builder.setAuthInfo(api.getAuthInfo());
+		if (authTicket != null
 				&& authTicket.getExpireTimestampMs() > 0
 				&& authTicket.getExpireTimestampMs() > api.currentTimeMillis()) {
 			builder.setAuthTicket(authTicket);
 		} else {
 			Log.d(TAG, "Authenticated with static token");
 			builder.setAuthInfo(api.getAuthInfo());
-		}*/
+		}
 		builder.setUnknown12(989);
 		builder.setLatitude(api.getLatitude());
 		builder.setLongitude(api.getLongitude());
