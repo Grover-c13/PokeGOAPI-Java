@@ -310,8 +310,7 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 */
-	public CatchResult catchPokemonWithRazzBerry(Pokeball pokeball)
-	throws LoginFailedException, RemoteServerException {
+	public CatchResult catchPokemonWithRazzBerry(Pokeball pokeball) throws LoginFailedException, RemoteServerException {
 		useItem(ItemId.ITEM_RAZZ_BERRY);
 		return catchPokemon(pokeball, -1, -1);
 	}
@@ -793,8 +792,7 @@ public class CatchablePokemon implements MapPoint {
 					if (response.getStatus() == CatchStatus.CATCH_ESCAPE) {
 						api.getInventories().updateInventories();
 					}
-					CatchResult res = new CatchResult();
-					res.setStatus(response.getStatus());
+					CatchResult res = new CatchResult(response);
 					return res;
 				} catch (RemoteServerException e) {
 					throw new AsyncRemoteServerException(e);
