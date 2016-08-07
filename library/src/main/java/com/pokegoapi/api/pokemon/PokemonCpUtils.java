@@ -24,7 +24,7 @@ import java.util.Map;
  * and
  * http://pokemongo.gamepress.gg/pokemon-stats-advanced
  */
-class PokemonCpUtils {
+public class PokemonCpUtils {
 	private static final Map<Float,Float> LEVEL_CPMULTIPLIER = new HashMap<>();
 
 	static {
@@ -138,7 +138,7 @@ class PokemonCpUtils {
 	 * @param stamina All stamina values combined
 	 * @return Maximum CP for these levels
 	 */
-	static int getMaxCp(int attack, int defense, int stamina) {
+	public static int getMaxCp(int attack, int defense, int stamina) {
 		float maxCpMultplier = LEVEL_CPMULTIPLIER.get(40f);
 		return (int)(attack * Math.pow(defense, 0.5) * Math.pow(stamina, 0.5) * Math.pow(maxCpMultplier,2) / 10f);
 	}
