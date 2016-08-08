@@ -22,7 +22,12 @@ package com.pokegoapi.api.device;
 public interface SensorInfos {
 	/**
 	 *
-	 * @return accelerometer axes
+	 * @return timestamp snapshot in ms
+	 */
+	long getTimestampSnapshot();
+	/**
+	 *
+	 * @return accelerometer axes, always 3
 	 */
 	long getAccelerometerAxes();
 

@@ -37,6 +37,7 @@ public class SensorInfo {
 	public SensorInfo(SensorInfos sensorInfos) {
 		this();
 		sensorInfoBuilder
+				.setTimestampSnapshot(sensorInfos.getTimestampSnapshot())
 				.setAccelerometerAxes(sensorInfos.getAccelerometerAxes())
 				.setAccelNormalizedX(sensorInfos.getAccelNormalizedX())
 				.setAccelNormalizedY(sensorInfos.getAccelNormalizedY())
@@ -54,7 +55,15 @@ public class SensorInfo {
 	}
 
 	/**
-	 * Sets accelerometer axes
+	 * Sets timestamp snapshot in ms
+	 *
+	 */
+	public void setTimestampSnapshot(long timestampSnapshot) {
+		sensorInfoBuilder.setTimestampSnapshot(timestampSnapshot);
+	}
+
+	/**
+	 * Sets accelerometer axes, always 3
 	 *
 	 */
 	public void setAccelerometerAxes(long accelerometerAxes) {
