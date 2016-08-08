@@ -203,6 +203,9 @@ public class PokemonGo {
 	}
 
 	public SignatureOuterClass.Signature.DeviceInfo getDeviceInfo() {
+		if(deviceInfo == null) {
+			return null;
+		}
 		return deviceInfo.getDeviceInfo();
 	}
 }
