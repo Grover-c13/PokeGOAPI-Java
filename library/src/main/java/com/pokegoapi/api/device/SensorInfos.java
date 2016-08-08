@@ -25,6 +25,7 @@ public interface SensorInfos {
 	 * @return timestamp snapshot in ms
 	 */
 	long getTimestampSnapshot();
+	
 	/**
 	 *
 	 * @return accelerometer axes, always 3
