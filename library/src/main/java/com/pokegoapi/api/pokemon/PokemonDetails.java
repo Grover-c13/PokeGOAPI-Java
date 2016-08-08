@@ -13,6 +13,11 @@ import com.pokegoapi.util.Log;
 import lombok.Getter;
 import lombok.Setter;
 
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.FLAREON;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.JOLTEON;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.VAPOREON;
+import static java.util.Arrays.asList;
+
 public class PokemonDetails {
 	private static final String TAG = Pokemon.class.getSimpleName();
 	private PokemonGo api;
@@ -255,6 +260,29 @@ public class PokemonDetails {
 		return PokemonCpUtils.getMaxCp(attack, defense, stamina, playerLevel);
 	}
 
+	public int getCpAfterEvolve() {
+		if (asList(VAPOREON, JOLTEON, FLAREON).contains(getPokemonId())) {
+			return getCp();
+		}
+		PokemonIdOuterClass.PokemonId highestUpgradedFamily = PokemonMetaRegistry.getHightestForFamily(getPokemonFamily());
+		if (getPokemonId() == highestUpgradedFamily) {
+			return getCp();
+		}
+		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
+		PokemonIdOuterClass.PokemonId secondHighest = pokemonMeta.getParentId();
+		float level = PokemonCpUtils.getLevelFromCpMultiplier(getCpMultiplier() + getAdditionalCpMultiplier());
+		if (getPokemonId() == secondHighest) {
+			int attack = getProto().getIndividualAttack() + pokemonMeta.getBaseAttack();
+			int defense = getProto().getIndividualDefense() + pokemonMeta.getBaseDefense();
+			int stamina = getProto().getIndividualStamina() + pokemonMeta.getBaseStamina();
+			return PokemonCpUtils.getCp(attack, defense, stamina, level);
+		}
+		pokemonMeta = PokemonMetaRegistry.getMeta(secondHighest);
+		int attack = getProto().getIndividualAttack() + pokemonMeta.getBaseAttack();
+		int defense = getProto().getIndividualDefense() + pokemonMeta.getBaseDefense();
+		int stamina = getProto().getIndividualStamina() + pokemonMeta.getBaseStamina();
+		return PokemonCpUtils.getCp(attack, defense, stamina, level);
+	}
 
 	/**
 	 * Static helper to get the absolute maximum CP for pokemons with their PokemonId.

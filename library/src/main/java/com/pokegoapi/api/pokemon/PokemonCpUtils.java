@@ -145,6 +145,18 @@ public class PokemonCpUtils {
 	}
 
 	/**
+	 * Calculate CP based on raw values
+	 * @param attack All attack values combined
+	 * @param defense All defense values combined
+	 * @param stamina All stamina values combined
+	 * @param level Level of the pokemon
+	 * @return CP
+	 */
+	public static int getCp(int attack, int defense, int stamina, float level) {
+		return (int)(attack * Math.pow(defense, 0.5) * Math.pow(stamina, 0.5) * Math.pow(level,2) / 10f);
+	}
+
+	/**
 	 * Get the CP after powerup
 	 * @param cp Current CP level
 	 * @param combinedCpMultiplier All CP multiplier values combined
