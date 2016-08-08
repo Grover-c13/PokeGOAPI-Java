@@ -23,7 +23,6 @@ import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 
 public class DeviceInfo {
 
-	private SignatureOuterClass.Signature.DeviceInfo deviceInfo;
 	private SignatureOuterClass.Signature.DeviceInfo.Builder deviceInfoBuilder;
 
 	public DeviceInfo() {
@@ -31,7 +30,8 @@ public class DeviceInfo {
 	}
 
 	public DeviceInfo(DeviceInfos deviceInfos) {
-		deviceInfo = SignatureOuterClass.Signature.DeviceInfo.newBuilder()
+		this();
+		deviceInfoBuilder
 				.setAndroidBoardName(deviceInfos.getAndroidBoardName())
 				.setAndroidBootloader(deviceInfos.getAndroidBootloader())
 				.setDeviceBrand(deviceInfos.getDeviceBrand())
@@ -44,8 +44,7 @@ public class DeviceInfo {
 				.setFirmwareTags(deviceInfos.getFirmwareTags())
 				.setFirmwareType(deviceInfos.getFirmwareType())
 				.setHardwareManufacturer(deviceInfos.getHardwareManufacturer())
-				.setHardwareModel(deviceInfos.getHardwareModel())
-				.build();
+				.setHardwareModel(deviceInfos.getHardwareModel());
 	}
 
 	public void setAndroidBoardName(String androidBoardName) {
@@ -101,9 +100,6 @@ public class DeviceInfo {
 	}
 
 	public SignatureOuterClass.Signature.DeviceInfo getDeviceInfo() {
-		if(deviceInfoBuilder != null) {
-			return deviceInfoBuilder.build();
-		}
-		return deviceInfo;
+		return deviceInfoBuilder.build();
 	}
 }
