@@ -47,58 +47,128 @@ public class DeviceInfo {
 				.setHardwareModel(deviceInfos.getHardwareModel());
 	}
 
+	/**
+	 * Sets AndroidBoardName.
+	 *
+	 * @param androidBoardName  the AndroidBoardName
+	 */
 	public void setAndroidBoardName(String androidBoardName) {
 		deviceInfoBuilder.setAndroidBoardName(androidBoardName);
 	}
 
+	/**
+	 * Sets AndroidBootloader.
+	 *
+	 * @param androidBootloader  the AndroidBootloader
+	 */
 	public void setAndroidBootloader(String androidBootloader) {
 		deviceInfoBuilder.setAndroidBootloader(androidBootloader);
 	}
 
+	/**
+	 * Sets DeviceBrand.
+	 *
+	 * @param deviceBrand  the DeviceBrand
+	 */
 	public void setDeviceBrand(String deviceBrand) {
 		deviceInfoBuilder.setDeviceBrand(deviceBrand);
 	}
 
+	/**
+	 * Sets DeviceId.
+	 *
+	 * @param deviceId  the DeviceId
+	 */
 	public void setDeviceId(String deviceId) {
 		deviceInfoBuilder.setDeviceId(deviceId);
 	}
 
+	/**
+	 * Sets DeviceModel.
+	 *
+	 * @param deviceModel  the DeviceModel
+	 */
 	public void setDeviceModel(String deviceModel) {
 		deviceInfoBuilder.setDeviceModel(deviceModel);
 	}
 
+	/**
+	 * Sets DeviceModelBoot.
+	 *
+	 * @param deviceModelBoot  the DeviceModelBoot
+	 */
 	public void setDeviceModelBoot(String deviceModelBoot) {
 		deviceInfoBuilder.setDeviceModelBoot(deviceModelBoot);
 	}
 
+	/**
+	 * Sets DeviceModelIdentifier.
+	 *
+	 * @param deviceModelIdentifier  the DeviceModelIdentifier
+	 */
 	public void setDeviceModelIdentifier(String deviceModelIdentifier) {
 		deviceInfoBuilder.setDeviceModelIdentifier(deviceModelIdentifier);
 	}
 
+	/**
+	 * Sets FirmwareBrand.
+	 *
+	 * @param firmwareBrand  the FirmwareBrand
+	 */
 	public void setFirmwareBrand(String firmwareBrand) {
 		deviceInfoBuilder.setFirmwareBrand(firmwareBrand);
 	}
 
+	/**
+	 * Sets FirmwareFingerprint.
+	 *
+	 * @param firmwareFingerprint  the FirmwareFingerprint
+	 */
 	public void setFirmwareFingerprint(String firmwareFingerprint) {
 		deviceInfoBuilder.setFirmwareFingerprint(firmwareFingerprint);
 	}
 
+	/**
+	 * Sets FirmwareTags.
+	 *
+	 * @param firmwareTags  the FirmwareTags
+	 */
 	public void setFirmwareTags(String firmwareTags) {
 		deviceInfoBuilder.setFirmwareTags(firmwareTags);
 	}
 
+	/**
+	 * Sets FirmwareType.
+	 *
+	 * @param firmwareType  the FirmwareType
+	 */
 	public void setFirmwareType(String firmwareType) {
 		deviceInfoBuilder.setFirmwareType(firmwareType);
 	}
 
+	/**
+	 * Sets HardwareManufacturer.
+	 *
+	 * @param hardwareManufacturer  the HardwareManufacturer
+	 */
 	public void setHardwareManufacturer(String hardwareManufacturer) {
 		deviceInfoBuilder.setHardwareManufacturer(hardwareManufacturer);
 	}
 
+	/**
+	 * Sets HardwareModel.
+	 *
+	 * @param hardwareModel  the HardwareModel
+	 */
 	public void setHardwareModel(String hardwareModel) {
 		deviceInfoBuilder.setHardwareModel(hardwareModel);
 	}
 
+	/**
+	 * Gets DeviceInfo.
+	 *
+	 * @return DeviceInfo
+	 */
 	public SignatureOuterClass.Signature.DeviceInfo getDeviceInfo() {
 		return deviceInfoBuilder.build();
 	}
