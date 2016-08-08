@@ -53,117 +53,169 @@ public class DeviceInfo {
 	}
 
 	/**
-	 * Sets AndroidBoardName.
+	 * Set AndroidBoardName
 	 *
-	 * @param androidBoardName  the AndroidBoardName
+	 * <pre>
+	 * {@code deviceInfo.setAndroidBoardName(Build.BOARD);}
+	 * </pre>
+	 *
+	 * @param androidBoardName AndroidBoardName, for example: "angler"
 	 */
 	public void setAndroidBoardName(String androidBoardName) {
 		deviceInfoBuilder.setAndroidBoardName(androidBoardName);
 	}
 
 	/**
-	 * Sets AndroidBootloader.
+	 * Set AndroidBootloader
 	 *
-	 * @param androidBootloader  the AndroidBootloader
+	 * <pre>
+	 * {@code deviceInfo.setAndroidBootloader(Build.BOOTLOADER);}
+	 * </pre>
+	 *
+	 * @param androidBootloader AndroidBootloader, for example: "angler-03.58"
 	 */
 	public void setAndroidBootloader(String androidBootloader) {
 		deviceInfoBuilder.setAndroidBootloader(androidBootloader);
 	}
 
 	/**
-	 * Sets DeviceBrand.
+	 * Set DeviceBrand
 	 *
-	 * @param deviceBrand  the DeviceBrand
+	 * <pre>
+	 * {@code deviceInfo.setDeviceBrand(Build.BRAND);}
+	 * </pre>
+	 *
+	 * @param deviceBrand DeviceBrand, for example: "google"
 	 */
 	public void setDeviceBrand(String deviceBrand) {
 		deviceInfoBuilder.setDeviceBrand(deviceBrand);
 	}
 
 	/**
-	 * Sets DeviceId.
+	 * Set DeviceId
 	 *
-	 * @param deviceId  the DeviceId
+	 * <pre>
+	 * {@code deviceInfo.setDeviceId(UUID.randomUUID().toString());}
+	 * </pre>
+	 *
+	 * @param deviceId DeviceId, for example: "****************"
 	 */
 	public void setDeviceId(String deviceId) {
 		deviceInfoBuilder.setDeviceId(deviceId);
 	}
 
 	/**
-	 * Sets DeviceModel.
+	 * Set DeviceModel
 	 *
-	 * @param deviceModel  the DeviceModel
+	 * <pre>
+	 * {@code deviceInfo.setDeviceModel(Build.MODEL);}
+	 * </pre>
+	 *
+	 * @param deviceModel DeviceModel, for example: "Nexus 6P"
 	 */
 	public void setDeviceModel(String deviceModel) {
 		deviceInfoBuilder.setDeviceModel(deviceModel);
 	}
 
 	/**
-	 * Sets DeviceModelBoot.
+	 * Set DeviceModelBoot
 	 *
-	 * @param deviceModelBoot  the DeviceModelBoot
+	 * <pre>
+	 * {@code deviceInfo.setDeviceModelBoot("qcom");}
+	 * </pre>
+	 *
+	 * @param deviceModelBoot DeviceModelBoot, for example: "qcom"
 	 */
 	public void setDeviceModelBoot(String deviceModelBoot) {
 		deviceInfoBuilder.setDeviceModelBoot(deviceModelBoot);
 	}
 
 	/**
-	 * Sets DeviceModelIdentifier.
+	 * Set DeviceModelIdentifier
 	 *
-	 * @param deviceModelIdentifier  the DeviceModelIdentifier
+	 * <pre>
+	 * {@code deviceInfo.setDeviceModelIdentifier(Build.PRODUCT);}
+	 * </pre>
+	 *
+	 * @param deviceModelIdentifier DeviceModelIdentifier, for example: "angler"
 	 */
 	public void setDeviceModelIdentifier(String deviceModelIdentifier) {
 		deviceInfoBuilder.setDeviceModelIdentifier(deviceModelIdentifier);
 	}
 
 	/**
-	 * Sets FirmwareBrand.
+	 * Set FirmwareBrand
 	 *
-	 * @param firmwareBrand  the FirmwareBrand
+	 * <pre>
+	 * {@code deviceInfo.setFirmwareBrand(Build.PRODUCT);}
+	 * </pre>
+	 *
+	 * @param firmwareBrand FirmwareBrand, for example: "angler"
 	 */
 	public void setFirmwareBrand(String firmwareBrand) {
 		deviceInfoBuilder.setFirmwareBrand(firmwareBrand);
 	}
 
 	/**
-	 * Sets FirmwareFingerprint.
+	 * Set FirmwareFingerprint
 	 *
-	 * @param firmwareFingerprint  the FirmwareFingerprint
+	 * <pre>
+	 * {@code deviceInfo.setFirmwareFingerprint(Build.FINGERPRINT);}
+	 * </pre>
+	 *
+	 * @param firmwareFingerprint FirmwareFingerprint, for example: "google/angler/angler:7.0/NPD90G/3051502:user/release-keys"
 	 */
 	public void setFirmwareFingerprint(String firmwareFingerprint) {
 		deviceInfoBuilder.setFirmwareFingerprint(firmwareFingerprint);
 	}
 
 	/**
-	 * Sets FirmwareTags.
+	 * Set FirmwareTags
 	 *
-	 * @param firmwareTags  the FirmwareTags
+	 * <pre>
+	 * {@code deviceInfo.setFirmwareTags(Build.TAGS);}
+	 * </pre>
+	 *
+	 * @param firmwareTags FirmwareTags, for example: "google/angler/angler:7.0/NPD90G/3051502:user/release-keys"
 	 */
 	public void setFirmwareTags(String firmwareTags) {
 		deviceInfoBuilder.setFirmwareTags(firmwareTags);
 	}
 
 	/**
-	 * Sets FirmwareType.
+	 * Set FirmwareType
 	 *
-	 * @param firmwareType  the FirmwareType
+	 * <pre>
+	 * {@code deviceInfo.setFirmwareType(Build.TYPE);}
+	 * </pre>
+	 *
+	 * @param firmwareType FirmwareType, for example: "user"
 	 */
 	public void setFirmwareType(String firmwareType) {
 		deviceInfoBuilder.setFirmwareType(firmwareType);
 	}
 
 	/**
-	 * Sets HardwareManufacturer.
+	 * Set HardwareManufacturer
 	 *
-	 * @param hardwareManufacturer  the HardwareManufacturer
+	 * <pre>
+	 * {@code deviceInfo.setHardwareManufacturer(Build.MANUFACTURER);}
+	 * </pre>
+	 *
+	 * @param hardwareManufacturer HardwareManufacturer, for example: "Huawei"
 	 */
 	public void setHardwareManufacturer(String hardwareManufacturer) {
 		deviceInfoBuilder.setHardwareManufacturer(hardwareManufacturer);
 	}
 
 	/**
-	 * Sets HardwareModel.
+	 * Set HardwareModel
 	 *
-	 * @param hardwareModel  the HardwareModel
+	 * <pre>
+	 * {@code deviceInfo.setHardwareModel(Build.HARDWARE);}
+	 * </pre>
+	 *
+	 * @param hardwareModel HardwareModel, for example: "Nexus 6P"
 	 */
 	public void setHardwareModel(String hardwareModel) {
 		deviceInfoBuilder.setHardwareModel(hardwareModel);
