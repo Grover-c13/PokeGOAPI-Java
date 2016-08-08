@@ -266,13 +266,13 @@ public class PokemonCpUtils {
 	public static int getCandyCostsForPowerup(float combinedCpMultiplier, int powerups) {
 		// Based on http://pokemongo.gamepress.gg/power-up-costs
 		float level = getLevelFromCpMultiplier(combinedCpMultiplier);
-		if (level <= 13 && powerups <= 20 ) {
+		if (level < 13 && powerups <= 20 ) {
 			return 1;
 		}
-		if (level <= 21 && powerups <= 36 ) {
+		if (level < 21 && powerups <= 36 ) {
 			return 2;
 		}
-		if (level <= 31 && powerups <= 60 ) {
+		if (level < 31 && powerups <= 60 ) {
 			return 3;
 		}
 		return 4;
