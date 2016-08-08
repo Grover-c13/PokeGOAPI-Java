@@ -138,7 +138,18 @@ public class PokemonCpUtils {
 	 * @param stamina All stamina values combined
 	 * @return Maximum CP for these levels
 	 */
-	public static int getMaxCp(int attack, int defense, int stamina, int playerLevel) {
+	public static int getMaxCp(int attack, int defense, int stamina) {
+		return getMaxCpForPlayer(attack, defense, stamina, 40);
+	}
+
+	/**
+	 * Get the maximum CP from the values
+	 * @param attack All attack values combined
+	 * @param defense All defense values combined
+	 * @param stamina All stamina values combined
+	 * @return Maximum CP for these levels
+	 */
+	public static int getMaxCpForPlayer(int attack, int defense, int stamina, int playerLevel) {
 		float maxLevel = Math.min(playerLevel + 1.5f, 40f);
 		float maxCpMultplier = LEVEL_CPMULTIPLIER.get(maxLevel);
 		return (int)(attack * Math.pow(defense, 0.5) * Math.pow(stamina, 0.5) * Math.pow(maxCpMultplier,2) / 10f);
