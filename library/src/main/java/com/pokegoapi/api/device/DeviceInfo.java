@@ -53,7 +53,7 @@ public class DeviceInfo {
 	}
 
 	/**
-	 * Set AndroidBoardName
+	 * Sets AndroidBoardName
 	 *
 	 * <pre>
 	 * {@code deviceInfo.setAndroidBoardName(Build.BOARD);}
@@ -66,7 +66,7 @@ public class DeviceInfo {
 	}
 
 	/**
-	 * Set AndroidBootloader
+	 * Sets AndroidBootloader
 	 *
 	 * <pre>
 	 * {@code deviceInfo.setAndroidBootloader(Build.BOOTLOADER);}
@@ -79,7 +79,7 @@ public class DeviceInfo {
 	}
 
 	/**
-	 * Set DeviceBrand
+	 * Sets DeviceBrand
 	 *
 	 * <pre>
 	 * {@code deviceInfo.setDeviceBrand(Build.BRAND);}
@@ -92,7 +92,7 @@ public class DeviceInfo {
 	}
 
 	/**
-	 * Set DeviceId
+	 * Sets DeviceId
 	 *
 	 * <pre>
 	 * {@code deviceInfo.setDeviceId(UUID.randomUUID().toString());}
@@ -105,7 +105,7 @@ public class DeviceInfo {
 	}
 
 	/**
-	 * Set DeviceModel
+	 * Sets DeviceModel
 	 *
 	 * <pre>
 	 * {@code deviceInfo.setDeviceModel(Build.MODEL);}
@@ -118,7 +118,7 @@ public class DeviceInfo {
 	}
 
 	/**
-	 * Set DeviceModelBoot
+	 * Sets DeviceModelBoot
 	 *
 	 * <pre>
 	 * {@code deviceInfo.setDeviceModelBoot("qcom");}
@@ -131,7 +131,7 @@ public class DeviceInfo {
 	}
 
 	/**
-	 * Set DeviceModelIdentifier
+	 * Sets DeviceModelIdentifier
 	 *
 	 * <pre>
 	 * {@code deviceInfo.setDeviceModelIdentifier(Build.PRODUCT);}
@@ -144,7 +144,7 @@ public class DeviceInfo {
 	}
 
 	/**
-	 * Set FirmwareBrand
+	 * Sets FirmwareBrand
 	 *
 	 * <pre>
 	 * {@code deviceInfo.setFirmwareBrand(Build.PRODUCT);}
@@ -157,7 +157,7 @@ public class DeviceInfo {
 	}
 
 	/**
-	 * Set FirmwareFingerprint
+	 * Sets FirmwareFingerprint
 	 *
 	 * <pre>
 	 * {@code deviceInfo.setFirmwareFingerprint(Build.FINGERPRINT);}
@@ -170,7 +170,7 @@ public class DeviceInfo {
 	}
 
 	/**
-	 * Set FirmwareTags
+	 * Sets FirmwareTags
 	 *
 	 * <pre>
 	 * {@code deviceInfo.setFirmwareTags(Build.TAGS);}
@@ -183,7 +183,7 @@ public class DeviceInfo {
 	}
 
 	/**
-	 * Set FirmwareType
+	 * Sets FirmwareType
 	 *
 	 * <pre>
 	 * {@code deviceInfo.setFirmwareType(Build.TYPE);}
@@ -196,7 +196,7 @@ public class DeviceInfo {
 	}
 
 	/**
-	 * Set HardwareManufacturer
+	 * Sets HardwareManufacturer
 	 *
 	 * <pre>
 	 * {@code deviceInfo.setHardwareManufacturer(Build.MANUFACTURER);}
@@ -209,7 +209,7 @@ public class DeviceInfo {
 	}
 
 	/**
-	 * Set HardwareModel
+	 * Sets HardwareModel
 	 *
 	 * <pre>
 	 * {@code deviceInfo.setHardwareModel(Build.HARDWARE);}
