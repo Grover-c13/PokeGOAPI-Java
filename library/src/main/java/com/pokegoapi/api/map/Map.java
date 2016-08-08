@@ -67,8 +67,6 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Map {
-	// time between getting a new MapObjects
-	private static int RESEND_REQUEST = 10000;
 	private final PokemonGo api;
 	private MapObjects cachedMapObjects;
 	private List<CatchablePokemon> cachedCatchable;
@@ -87,7 +85,6 @@ public class Map {
 		cachedMapObjects = new MapObjects(api);
 		lastMapUpdate = 0;
 	}
-
 
 	/**
 	 * Returns a list of catchable pokemon around the current location.
@@ -120,15 +117,8 @@ public class Map {
 					catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
 				}
 
-				/*
-				TODO: i have more success checking if encounterId > 0
-				i don't want to use the hasLure because it do a request every call
-				*/
 				for (Pokestop pokestop : mapObjects.getPokestops()) {
-					if (pokestop.inRange()
-							&& pokestop.getFortData().hasLureInfo()
-							&& pokestop.getFortData().getLureInfo().getEncounterId() > 0) {
-						//if (pokestop.inRange() && pokestop.hasLurePokemon()) {
+					if (pokestop.inRangeForLuredPokemon() && pokestop.getFortData().hasLureInfo()) {
 						catchablePokemons.add(new CatchablePokemon(api, pokestop.getFortData()));
 					}
 				}
@@ -680,7 +670,7 @@ public class Map {
 		}
 		return response;
 	}
-	
+
 	public void setDefaultWidth(int width) {
 		cellWidth = width;
 	}
@@ -691,11 +681,10 @@ public class Map {
 	 * @return true if enough time has elapsed since the last request, false otherwise
 	 */
 	private boolean useCache() {
-		return (api.currentTimeMillis() - lastMapUpdate) < RESEND_REQUEST;
+		return (api.currentTimeMillis() - lastMapUpdate) < api.getSettings().getMapSettings().getMinRefresh();
 	}
 
 	private List<Long> getDefaultCells() {
 		return getCellIds(api.getLatitude(), api.getLongitude(), cellWidth);
 	}
-
 }
