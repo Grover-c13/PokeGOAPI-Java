@@ -163,7 +163,8 @@ public class DeviceInfo {
 	 * {@code deviceInfo.setFirmwareFingerprint(Build.FINGERPRINT);}
 	 * </pre>
 	 *
-	 * @param firmwareFingerprint FirmwareFingerprint, for example: "google/angler/angler:7.0/NPD90G/3051502:user/release-keys"
+	 * @param firmwareFingerprint FirmwareFingerprint,
+	 *        for example: "google/angler/angler:7.0/NPD90G/3051502:user/release-keys"
 	 */
 	public void setFirmwareFingerprint(String firmwareFingerprint) {
 		deviceInfoBuilder.setFirmwareFingerprint(firmwareFingerprint);
@@ -176,8 +177,7 @@ public class DeviceInfo {
 	 * {@code deviceInfo.setFirmwareTags(Build.TAGS);}
 	 * </pre>
 	 *
-	 * @param firmwareTags FirmwareTags,
-	 * 	      for example: "google/angler/angler:7.0/NPD90G/3051502:user/release-keys"
+	 * @param firmwareTags FirmwareTags, for example: "release-keys"
 	 */
 	public void setFirmwareTags(String firmwareTags) {
 		deviceInfoBuilder.setFirmwareTags(firmwareTags);
