@@ -176,7 +176,8 @@ public class DeviceInfo {
 	 * {@code deviceInfo.setFirmwareTags(Build.TAGS);}
 	 * </pre>
 	 *
-	 * @param firmwareTags FirmwareTags, for example: "google/angler/angler:7.0/NPD90G/3051502:user/release-keys"
+	 * @param firmwareTags FirmwareTags,
+	 * 	      for example: "google/angler/angler:7.0/NPD90G/3051502:user/release-keys"
 	 */
 	public void setFirmwareTags(String firmwareTags) {
 		deviceInfoBuilder.setFirmwareTags(firmwareTags);
