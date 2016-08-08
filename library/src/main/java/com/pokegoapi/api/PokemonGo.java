@@ -16,10 +16,10 @@
 package com.pokegoapi.api;
 
 import POGOProtos.Enums.TutorialStateOuterClass;
+import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
 
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
@@ -197,7 +197,7 @@ public class PokemonGo {
 		return map;
 	}
 
-	public void acceptTos() throws LoginFailedException, RemoteServerException {
+	public void skipTos() throws LoginFailedException, RemoteServerException {
 		MarkTutorialCompleteMessageOuterClass.MarkTutorialCompleteMessage.Builder tosBuilder = MarkTutorialCompleteMessageOuterClass
 				.MarkTutorialCompleteMessage.newBuilder();
 		tosBuilder.addTutorialsCompleted(TutorialState.LEGAL_SCREEN)
