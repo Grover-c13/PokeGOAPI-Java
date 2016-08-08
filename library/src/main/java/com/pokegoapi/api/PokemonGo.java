@@ -16,7 +16,11 @@
 package com.pokegoapi.api;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
+
+import com.pokegoapi.api.device.DeviceInfo;
+import com.pokegoapi.api.device.DeviceInfos;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
@@ -53,9 +57,12 @@ public class PokemonGo {
 	@Setter
 	private double altitude;
 	private CredentialProvider credentialProvider;
+	@Getter
 	private Settings settings;
 	private Map map;
 	private List<Unknown6OuterClass.Unknown6> unknown6s = new ArrayList<>();
+	@Setter
+	private DeviceInfo deviceInfo;
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -78,6 +85,7 @@ public class PokemonGo {
 		this.time = time;
 		requestHandler = new RequestHandler(this, client);
 		playerProfile = new PlayerProfile(this);
+		settings = new Settings(this);
 		map = new Map(this);
 		longitude = Double.NaN;
 		latitude = Double.NaN;
@@ -140,23 +148,6 @@ public class PokemonGo {
 		return inventories;
 	}
 
-
-	/**
-	 * Get the settings API
-	 *
-	 * @return Settings
-	 * @throws LoginFailedException when login fails
-	 * @throws RemoteServerException when server down/issue
-	 */
-	public Settings getSettings() throws LoginFailedException, RemoteServerException {
-		if (settings == null) {
-			settings = new Settings(this);
-		}
-		return settings;
-	}
-
-
-
 	/**
 	 * Validates and sets a given latitude value
 	 *
@@ -191,5 +182,17 @@ public class PokemonGo {
 			throw new IllegalStateException("Attempt to get map without setting location first");
 		}
 		return map;
+	}
+
+	/**
+	 * Gets the device info
+	 *
+	 * @return the device info
+	 */
+	public SignatureOuterClass.Signature.DeviceInfo getDeviceInfo() {
+		if (deviceInfo == null) {
+			return null;
+		}
+		return deviceInfo.getDeviceInfo();
 	}
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import POGOProtos.Enums.PokemonIdOuterClass;
 
 public class EvolutionForm {
-	private static PokemonIdOuterClass.PokemonId pokemonId;
+	private PokemonIdOuterClass.PokemonId pokemonId;
 
 	EvolutionForm(PokemonIdOuterClass.PokemonId pokemonId) {
 		this.pokemonId = pokemonId;
@@ -23,7 +23,7 @@ public class EvolutionForm {
 		return EvolutionInfo.getEvolutionStage(pokemonId);
 	}
 
-	public static PokemonIdOuterClass.PokemonId getPokemonId() {
+	public PokemonIdOuterClass.PokemonId getPokemonId() {
 		return pokemonId;
 	}
 }

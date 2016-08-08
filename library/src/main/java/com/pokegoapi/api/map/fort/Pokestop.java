@@ -15,6 +15,18 @@
 
 package com.pokegoapi.api.map.fort;
 
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.google.common.geometry.S2LatLng;
+import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.util.AsyncHelper;
+
+import java.util.List;
+
 import POGOProtos.Inventory.Item.ItemIdOuterClass;
 import POGOProtos.Map.Fort.FortDataOuterClass;
 import POGOProtos.Map.Fort.FortModifierOuterClass;
@@ -25,20 +37,9 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.AddFortModifierResponseOuterClass;
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.google.common.geometry.S2LatLng;
-import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.util.AsyncHelper;
 import lombok.Getter;
 import rx.Observable;
 import rx.functions.Func1;
-
-import java.util.List;
 
 /**
  * Created by mjmfighter on 7/20/2016.
@@ -65,15 +66,32 @@ public class Pokestop {
 	}
 
 	/**
+	 * Returns the distance to a pokestop.
+	 *
+	 * @return the calculated distance
+	 */
+	public double getDistance() {
+		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
+		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
+		return pokestop.getEarthDistance(player);
+	}
+
+	/**
 	 * Returns whether or not a pokestop is in range.
 	 *
 	 * @return true when in range of player
 	 */
 	public boolean inRange() {
-		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
-		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
-		double distance = pokestop.getEarthDistance(player);
-		return distance < 30;
+		return getDistance() <= api.getSettings().getFortSettings().getInteractionRangeInMeters();
+	}
+
+	/**
+	 * Returns whether or not the lured pokemon is in range.
+	 *
+	 * @return true when the lured pokemon is in range of player
+	 */
+	public boolean inRangeForLuredPokemon() {
+		return getDistance() <= api.getSettings().getMapSettings().getPokemonVisibilityRange();
 	}
 
 	/**
@@ -249,8 +267,6 @@ public class Pokestop {
 	 * @throws RemoteServerException If server communications failed.
 	 */
 	public boolean hasLure() throws LoginFailedException, RemoteServerException {
-
-
 		List<FortModifierOuterClass.FortModifier> modifiers = getDetails().getModifier();
 		for (FortModifierOuterClass.FortModifier mod : modifiers) {
 			if (mod.getItemId() == ItemIdOuterClass.ItemId.ITEM_TROY_DISK) {

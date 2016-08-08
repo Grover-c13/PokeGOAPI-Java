@@ -20,7 +20,7 @@ public class Signature {
 	/**
 	 * Given a fully built request, set the signature correctly.
 	 *
-	 * @param api the api
+	 * @param api     the api
 	 * @param builder the requestenvelop builder
 	 */
 	public static void setSignature(PokemonGo api, RequestEnvelopeOuterClass.RequestEnvelope.Builder builder) {
@@ -41,6 +41,11 @@ public class Signature {
 				.setUnk22(ByteString.copyFrom(uk22))
 				.setTimestamp(api.currentTimeMillis())
 				.setTimestampSinceStart(curTime - api.startTime);
+
+		SignatureOuterClass.Signature.DeviceInfo deviceInfo = api.getDeviceInfo();
+		if (deviceInfo != null) {
+			sigBuilder.setDeviceInfo(deviceInfo);
+		}
 
 
 		for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
