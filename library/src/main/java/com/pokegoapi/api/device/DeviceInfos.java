@@ -20,42 +20,42 @@ package com.pokegoapi.api.device;
  */
 
 public interface DeviceInfos {
-	/* adb.exe shell getprop ro.product.board */
+	/* adb.exe shell getprop ro.product.board, for example: "angler" */
 	String getAndroidBoardName();
 
-	/* adb.exe shell getprop ro.boot.bootloader */
+	/* adb.exe shell getprop ro.boot.bootloader, for example: "angler-03.58" */
 	String getAndroidBootloader();
 
-	/* adb.exe shell getprop ro.product.brand */
+	/* adb.exe shell getprop ro.product.brand, for example: "google" */
 	String getDeviceBrand();
 
-	/* adb.exe shell settings get secure android_id */
+	/* adb.exe shell settings get secure android_id, for example: "****************" */
 	String getDeviceId();
 
-	/* adb.exe shell getprop ro.product.model */
+	/* adb.exe shell getprop ro.product.model, for example: "Nexus 6P" */
 	String getDeviceModel();
 
-	/* adb.exe shell getprop ro.product.name */
+	/* adb.exe shell getprop ro.product.name, for example: "angler" */
 	String getDeviceModelIdentifier();
 
 	/* qcom */
 	String getDeviceModelBoot();
 
-	/* adb.exe shell getprop ro.product.manufacturer */
+	/* adb.exe shell getprop ro.product.manufacturer, for example: "Huawei" */
 	String getHardwareManufacturer();
 
-	/* adb.exe shell getprop ro.product.model */
+	/* adb.exe shell getprop ro.product.model, for example: "Nexus 6P" */
 	String getHardwareModel();
 
-	/* adb.exe shell getprop ro.product.name */
+	/* adb.exe shell getprop ro.product.name, for example: "angler" */
 	String getFirmwareBrand();
 
-	/* adb.exe shell getprop ro.build.tags */
+	/* adb.exe shell getprop ro.build.tags, for example: "release-keys" */
 	String getFirmwareTags();
 
-	/* adb.exe shell getprop ro.build.type */
+	/* adb.exe shell getprop ro.build.type, for example: "user" */
 	String getFirmwareType();
 
-	/* adb.exe shell getprop ro.build.fingerprint */
+	/* adb.exe shell getprop ro.build.fingerprint, for example: "google/angler/angler:7.0/NPD90G/*******:user/release-keys" */
 	String getFirmwareFingerprint();
 }
