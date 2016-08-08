@@ -47,6 +47,11 @@ public class Signature {
 			sigBuilder.setDeviceInfo(deviceInfo);
 		}
 
+		SignatureOuterClass.Signature.SensorInfo sensorInfo = api.getSensorInfo();
+		if (sensorInfo != null) {
+			sigBuilder.setSensorInfo(sensorInfo);
+		}
+
 
 		for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
 			byte[] request = serverRequest.toByteArray();
