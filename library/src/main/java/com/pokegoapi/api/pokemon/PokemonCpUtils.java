@@ -138,9 +138,22 @@ public class PokemonCpUtils {
 	 * @param stamina All stamina values combined
 	 * @return Maximum CP for these levels
 	 */
-	public static int getMaxCp(int attack, int defense, int stamina) {
-		float maxCpMultplier = LEVEL_CPMULTIPLIER.get(40f);
+	public static int getMaxCp(int attack, int defense, int stamina, int playerLevel) {
+		float maxLevel = Math.min(playerLevel + 1.5f, 40f);
+		float maxCpMultplier = LEVEL_CPMULTIPLIER.get(maxLevel);
 		return (int)(attack * Math.pow(defense, 0.5) * Math.pow(stamina, 0.5) * Math.pow(maxCpMultplier,2) / 10f);
+	}
+
+	/**
+	 * Calculate CP based on raw values
+	 * @param attack All attack values combined
+	 * @param defense All defense values combined
+	 * @param stamina All stamina values combined
+	 * @param level Level of the pokemon
+	 * @return CP
+	 */
+	public static int getCp(int attack, int defense, int stamina, float level) {
+		return (int)(attack * Math.pow(defense, 0.5) * Math.pow(stamina, 0.5) * Math.pow(level,2) / 10f);
 	}
 
 	/**
@@ -168,9 +181,9 @@ public class PokemonCpUtils {
 	 * Get the new addidional multiplier after powerup
 	 * @param cpMultiplier Multiplier
 	 * @param additionalCpMultiplier Additional multiplier
-	 * @return Additional multiplier after upgrade
+	 * @return Additional CP multiplier after upgrade
 	 */
-	public static float getAdditionalCpAfterPowerup(float cpMultiplier, float additionalCpMultiplier) {
+	public static float getAdditionalCpMultiplierAfterPowerup(float cpMultiplier, float additionalCpMultiplier) {
 		float nextLevel = getLevelFromCpMultiplier(cpMultiplier + additionalCpMultiplier) + .5f;
 		return LEVEL_CPMULTIPLIER.get(nextLevel) - cpMultiplier;
 	}
