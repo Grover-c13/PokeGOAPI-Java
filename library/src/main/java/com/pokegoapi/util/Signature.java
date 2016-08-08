@@ -1,6 +1,5 @@
 package com.pokegoapi.util;
 
-import POGOProtos.Networking.Envelopes.AuthTicketOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
@@ -8,7 +7,6 @@ import POGOProtos.Networking.Envelopes.Unknown6OuterClass.Unknown6.Unknown2;
 import POGOProtos.Networking.Requests.RequestOuterClass;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.main.ServerRequest;
 import net.jpountz.xxhash.StreamingXXHash32;
 import net.jpountz.xxhash.StreamingXXHash64;
 import net.jpountz.xxhash.XXHashFactory;
@@ -38,9 +36,22 @@ public class Signature {
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
 				.setLocationHash1(getLocationHash1(api, authTicketBA, builder))
 				.setLocationHash2(getLocationHash2(api, builder))
-				.setUnk22(ByteString.copyFrom(uk22))
+				.setUnknown22(ByteString.copyFrom(uk22))
 				.setTimestamp(api.currentTimeMillis())
-				.setTimestampSinceStart(curTime - api.startTime);
+				.setTimestampSinceStart(curTime - api.startTime)
+				.setActivityStatus(
+						SignatureOuterClass.Signature.ActivityStatus.newBuilder()
+								.setStartTimeMs(1)
+								.setUnknownStatus(true)
+								.setWalking(true)
+								.setRunning(true)
+								.setStationary(true)
+								.setAutomotive(true)
+								.setTilting(true)
+								.setCycling(true)
+								.setStatus(ByteString.copyFromUtf8("1"))
+								.build()
+				);
 
 		SignatureOuterClass.Signature.DeviceInfo deviceInfo = api.getDeviceInfo();
 		if (deviceInfo != null) {
@@ -65,8 +76,8 @@ public class Signature {
 		byte[] encrypted = Crypto.encrypt(uk2, iv).toByteBuffer().array();
 		Unknown6OuterClass.Unknown6 uk6 = Unknown6OuterClass.Unknown6.newBuilder()
 				.setRequestType(6)
-				.setUnknown2(Unknown2.newBuilder().setUnknown1(ByteString.copyFrom(encrypted))).build();
-		builder.addUnknown6(uk6);
+				.setUnknown2(Unknown2.newBuilder().setEncryptedSignature(ByteString.copyFrom(encrypted))).build();
+		builder.setUnknown6(uk6);
 	}
 
 	private static byte[] getBytes(double input) {
