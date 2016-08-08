@@ -149,19 +149,19 @@ public class PokemonCpUtils {
 	 * @param combinedCpMultiplier All CP multiplier values combined
 	 * @return New CP level
 	 */
-	public static int getCpAfterPowerup(float cp, float combinedCpMultiplier) {
+	public static int getCpAfterPowerup(int cp, float combinedCpMultiplier) {
 		// Based on http://pokemongo.gamepress.gg/power-up-costs
 		float level = getLevelFromCpMultiplier(combinedCpMultiplier);
 		if (level <= 10) {
-			return (int)((cp * 0.009426125469) / Math.pow(combinedCpMultiplier, 2));
+			return cp + (int)((cp * 0.009426125469) / Math.pow(combinedCpMultiplier, 2));
 		}
 		if (level <= 20) {
-			return (int)((cp * 0.008919025675) / Math.pow(combinedCpMultiplier, 2));
+			return cp + (int)((cp * 0.008919025675) / Math.pow(combinedCpMultiplier, 2));
 		}
 		if (level <= 30) {
-			return (int)((cp * 0.008924905903) / Math.pow(combinedCpMultiplier, 2));
+			return cp + (int)((cp * 0.008924905903) / Math.pow(combinedCpMultiplier, 2));
 		}
-		return (int)((cp * 0.00445946079) / Math.pow(combinedCpMultiplier, 2));
+		return cp + (int)((cp * 0.00445946079) / Math.pow(combinedCpMultiplier, 2));
 	}
 
 	/**
