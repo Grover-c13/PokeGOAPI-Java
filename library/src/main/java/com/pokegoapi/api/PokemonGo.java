@@ -16,6 +16,7 @@
 package com.pokegoapi.api;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
@@ -30,11 +31,15 @@ import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class PokemonGo {
 
 	private static final java.lang.String TAG = PokemonGo.class.getSimpleName();
 	private final Time time;
+	public final long startTime;
 	@Getter
 	RequestHandler requestHandler;
 	@Getter
@@ -50,6 +55,8 @@ public class PokemonGo {
 	private CredentialProvider credentialProvider;
 	private Settings settings;
 	private Map map;
+	private List<Unknown6OuterClass.Unknown6> unknown6s = new ArrayList<>();
+
 	/**
 	 * Instantiates a new Pokemon go.
 	 *
@@ -74,6 +81,7 @@ public class PokemonGo {
 		map = new Map(this);
 		longitude = Double.NaN;
 		latitude = Double.NaN;
+		startTime = currentTimeMillis();
 	}
 
 	/**
@@ -184,5 +192,4 @@ public class PokemonGo {
 		}
 		return map;
 	}
-
 }

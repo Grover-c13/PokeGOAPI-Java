@@ -43,20 +43,32 @@ Replace X.X with the version below:
 
 OR
 
-  Import JAR in Eclipse
-    - Complete `Build from source` below
-    - Right click on the project
-    - Select Build path > Java Build Path
-    - Select Libraries tab
-    - Select Add External JARs…
-    - Select `PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.3.0.jar`
-    - Finish
+Import JAR with gradle
+  - Complete `Build from source` below
+  - Open the project gradle.build file
+  - Locate ``dependencies {`` 
+  - Add ``compile files('PATH_TO/PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.X.X.jar')``
+    - (PATH_TO is the exact path from root to the API folder, i.e. C:/MyGitProjects)
+    - (0.X.X refers to the version number provided in the JAR filename, ie. 0.3.0)
+
+OR
+
+Import JAR in Eclipse
+  - Complete `Build from source` below
+  - Right click on the project
+  - Select Build path > Java Build Path
+  - Select Libraries tab
+  - Select Add External JARs…
+  - Select ``PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.X.X.jar``
+    - (0.X.X refers to the version number provided in the JAR filename, ie. 0.3.0)
+  - Finish
 
 # Build from source
   - Clone the repo and cd into the folder
   - `` git submodule update --init ``
   - `` ./gradlew :library:build ``
-  - you should have the api jar in ``library/build/libs/PokeGOAPI-library-all-0.3.0.jar``
+  - you should have the api jar in ``library/build/libs/PokeGOAPI-library-all-0.X.X.jar``
+      - (0.X.X refers to the version number provided in the JAR filename, ie. 0.3.0)
 
 PS : for users who want to import the api into Eclipse IDE, you'll need to :
   - build once : `` ./gradlew :library:build ``
