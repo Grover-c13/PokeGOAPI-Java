@@ -16,7 +16,11 @@
 package com.pokegoapi.api;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
+
+import com.pokegoapi.api.device.DeviceInfo;
+import com.pokegoapi.api.device.DeviceInfos;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
@@ -57,6 +61,8 @@ public class PokemonGo {
 	private Settings settings;
 	private Map map;
 	private List<Unknown6OuterClass.Unknown6> unknown6s = new ArrayList<>();
+	@Setter
+	private DeviceInfo deviceInfo;
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -176,5 +182,17 @@ public class PokemonGo {
 			throw new IllegalStateException("Attempt to get map without setting location first");
 		}
 		return map;
+	}
+
+	/**
+	 * Gets the device info
+	 *
+	 * @return the device info
+	 */
+	public SignatureOuterClass.Signature.DeviceInfo getDeviceInfo() {
+		if (deviceInfo == null) {
+			return null;
+		}
+		return deviceInfo.getDeviceInfo();
 	}
 }
