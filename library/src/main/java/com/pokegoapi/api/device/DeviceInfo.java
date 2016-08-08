@@ -16,9 +16,6 @@
 package com.pokegoapi.api.device;
 
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
-import lombok.Getter;
-
-import static sun.audio.AudioDevice.device;
 
 /**
  * Created by fabianterhorst on 08.08.16.
@@ -31,6 +28,24 @@ public class DeviceInfo {
 
 	public DeviceInfo() {
 		deviceInfoBuilder = SignatureOuterClass.Signature.DeviceInfo.newBuilder();
+	}
+
+	public DeviceInfo(DeviceInfos deviceInfos) {
+		deviceInfo = SignatureOuterClass.Signature.DeviceInfo.newBuilder()
+				.setAndroidBoardName(deviceInfos.getAndroidBoardName())
+				.setAndroidBootloader(deviceInfos.getAndroidBootloader())
+				.setDeviceBrand(deviceInfos.getDeviceBrand())
+				.setDeviceId(deviceInfos.getDeviceId())
+				.setDeviceModel(deviceInfos.getDeviceModel())
+				.setDeviceModelBoot(deviceInfos.getDeviceModelBoot())
+				.setDeviceModelIdentifier(deviceInfos.getDeviceModelIdentifier())
+				.setFirmwareBrand(deviceInfos.getFirmwareBrand())
+				.setFirmwareFingerprint(deviceInfos.getFirmwareFingerprint())
+				.setFirmwareTags(deviceInfos.getFirmwareTags())
+				.setFirmwareType(deviceInfos.getFirmwareType())
+				.setHardwareManufacturer(deviceInfos.getHardwareManufacturer())
+				.setHardwareModel(deviceInfos.getHardwareModel())
+				.build();
 	}
 
 	public void setAndroidBoardName(String androidBoardName) {
@@ -83,24 +98,6 @@ public class DeviceInfo {
 
 	public void setHardwareModel(String hardwareModel) {
 		deviceInfoBuilder.setHardwareModel(hardwareModel);
-	}
-
-	public DeviceInfo(DeviceInfos deviceInfos) {
-		deviceInfo = SignatureOuterClass.Signature.DeviceInfo.newBuilder()
-				.setAndroidBoardName(deviceInfos.getAndroidBoardName())
-				.setAndroidBootloader(deviceInfos.getAndroidBootloader())
-				.setDeviceBrand(deviceInfos.getDeviceBrand())
-				.setDeviceId(deviceInfos.getDeviceId())
-				.setDeviceModel(deviceInfos.getDeviceModel())
-				.setDeviceModelBoot(deviceInfos.getDeviceModelBoot())
-				.setDeviceModelIdentifier(deviceInfos.getDeviceModelIdentifier())
-				.setFirmwareBrand(deviceInfos.getFirmwareBrand())
-				.setFirmwareFingerprint(deviceInfos.getFirmwareFingerprint())
-				.setFirmwareTags(deviceInfos.getFirmwareTags())
-				.setFirmwareType(deviceInfos.getFirmwareType())
-				.setHardwareManufacturer(deviceInfos.getHardwareManufacturer())
-				.setHardwareModel(deviceInfos.getHardwareModel())
-				.build();
 	}
 
 	public SignatureOuterClass.Signature.DeviceInfo getDeviceInfo() {
