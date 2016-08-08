@@ -216,8 +216,10 @@ public class PokemonDetails {
 	 *
 	 * @return The maximum CP for this pokemon
 	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
+	 * @throws LoginFailedException If login failed
+	 * @throws RemoteServerException If the server is causing issues
 	 */
-	public int getMaxCp() throws NoSuchItemException {
+	public int getMaxCp() throws NoSuchItemException, LoginFailedException, RemoteServerException {
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
 		if (pokemonMeta == null) {
 			throw new NoSuchItemException("Cannot find meta data for " + proto.getPokemonId().name());
@@ -225,7 +227,8 @@ public class PokemonDetails {
 		int attack = proto.getIndividualAttack() + pokemonMeta.getBaseAttack();
 		int defense = proto.getIndividualDefense() + pokemonMeta.getBaseDefense();
 		int stamina = proto.getIndividualStamina() + pokemonMeta.getBaseStamina();
-		return PokemonCpUtils.getMaxCp(attack, defense, stamina);
+		int playerLevel = api.getPlayerProfile().getStats().getLevel();
+		return PokemonCpUtils.getMaxCp(attack, defense, stamina, playerLevel);
 	}
 
 	/**
@@ -239,16 +242,17 @@ public class PokemonDetails {
 	}
 
 	/**
-	 * Calculated the max cp of this pokemon, if you upgrade it fully
+	 * Calculated the max cp of this pokemon, if you upgrade it fully with your current player level
 	 * @return Max cp of this pokemon
 	 */
-	public int getMaxCpFullEvolveAndPowerup() {
+	public int getMaxCpFullEvolveAndPowerup() throws LoginFailedException, RemoteServerException {
 		PokemonIdOuterClass.PokemonId highestUpgradedFamily = PokemonMetaRegistry.getHightestForFamily(getPokemonFamily());
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
 		int attack = getProto().getIndividualAttack() + pokemonMeta.getBaseAttack();
 		int defense = getProto().getIndividualDefense() + pokemonMeta.getBaseDefense();
 		int stamina = getProto().getIndividualStamina() + pokemonMeta.getBaseStamina();
-		return PokemonCpUtils.getMaxCp(attack, defense, stamina);
+		int playerLevel = api.getPlayerProfile().getStats().getLevel();
+		return PokemonCpUtils.getMaxCp(attack, defense, stamina, playerLevel);
 	}
 
 
@@ -266,7 +270,7 @@ public class PokemonDetails {
 		int attack = 15 + pokemonMeta.getBaseAttack();
 		int defense = 15 + pokemonMeta.getBaseDefense();
 		int stamina = 15 + pokemonMeta.getBaseStamina();
-		return PokemonCpUtils.getMaxCp(attack, defense, stamina);
+		return PokemonCpUtils.getMaxCp(attack, defense, stamina, 40);
 	}
 
 	/**

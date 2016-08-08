@@ -138,8 +138,9 @@ public class PokemonCpUtils {
 	 * @param stamina All stamina values combined
 	 * @return Maximum CP for these levels
 	 */
-	public static int getMaxCp(int attack, int defense, int stamina) {
-		float maxCpMultplier = LEVEL_CPMULTIPLIER.get(40f);
+	public static int getMaxCp(int attack, int defense, int stamina, int playerLevel) {
+		float maxLevel = Math.min(playerLevel + 1.5f, 40f);
+		float maxCpMultplier = LEVEL_CPMULTIPLIER.get(maxLevel);
 		return (int)(attack * Math.pow(defense, 0.5) * Math.pow(stamina, 0.5) * Math.pow(maxCpMultplier,2) / 10f);
 	}
 
@@ -149,28 +150,28 @@ public class PokemonCpUtils {
 	 * @param combinedCpMultiplier All CP multiplier values combined
 	 * @return New CP level
 	 */
-	public static int getCpAfterPowerup(float cp, float combinedCpMultiplier) {
+	public static int getCpAfterPowerup(int cp, float combinedCpMultiplier) {
 		// Based on http://pokemongo.gamepress.gg/power-up-costs
 		float level = getLevelFromCpMultiplier(combinedCpMultiplier);
 		if (level <= 10) {
-			return (int)((cp * 0.009426125469) / Math.pow(combinedCpMultiplier, 2));
+			return cp + (int)((cp * 0.009426125469) / Math.pow(combinedCpMultiplier, 2));
 		}
 		if (level <= 20) {
-			return (int)((cp * 0.008919025675) / Math.pow(combinedCpMultiplier, 2));
+			return cp + (int)((cp * 0.008919025675) / Math.pow(combinedCpMultiplier, 2));
 		}
 		if (level <= 30) {
-			return (int)((cp * 0.008924905903) / Math.pow(combinedCpMultiplier, 2));
+			return cp + (int)((cp * 0.008924905903) / Math.pow(combinedCpMultiplier, 2));
 		}
-		return (int)((cp * 0.00445946079) / Math.pow(combinedCpMultiplier, 2));
+		return cp + (int)((cp * 0.00445946079) / Math.pow(combinedCpMultiplier, 2));
 	}
 
 	/**
 	 * Get the new addidional multiplier after powerup
 	 * @param cpMultiplier Multiplier
 	 * @param additionalCpMultiplier Additional multiplier
-	 * @return Additional multiplier after upgrade
+	 * @return Additional CP multiplier after upgrade
 	 */
-	public static float getAdditionalCpAfterPowerup(float cpMultiplier, float additionalCpMultiplier) {
+	public static float getAdditionalCpMultiplierAfterPowerup(float cpMultiplier, float additionalCpMultiplier) {
 		float nextLevel = getLevelFromCpMultiplier(cpMultiplier + additionalCpMultiplier) + .5f;
 		return LEVEL_CPMULTIPLIER.get(nextLevel) - cpMultiplier;
 	}
