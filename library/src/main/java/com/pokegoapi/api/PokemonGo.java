@@ -60,6 +60,7 @@ public class PokemonGo {
 	private Settings settings;
 	private Map map;
 	private List<Unknown6OuterClass.Unknown6> unknown6s = new ArrayList<>();
+	@Getter
 	private DeviceInfo deviceInfo;
 
 	/**
@@ -196,10 +197,6 @@ public class PokemonGo {
 			throw new IllegalStateException("Attempt to get map without setting location first");
 		}
 		return map;
-	}
-
-	public void setDeviceInfo(DeviceInfos deviceInfos) {
-		this.deviceInfo = new DeviceInfo(deviceInfos);
 	}
 
 	public SignatureOuterClass.Signature.DeviceInfo getDeviceInfo() {
