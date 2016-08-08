@@ -29,6 +29,11 @@ public class SensorInfo {
 		sensorInfoBuilder = SignatureOuterClass.Signature.SensorInfo.newBuilder();
 	}
 
+	/**
+	 * Create a sensor info with already existing sensor infos
+	 *
+	 * @param sensorInfos the sensor infos interface
+	 */
 	public SensorInfo(SensorInfos sensorInfos) {
 		this();
 		sensorInfoBuilder
