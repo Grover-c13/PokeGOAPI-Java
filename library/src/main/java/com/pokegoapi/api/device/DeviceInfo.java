@@ -29,6 +29,11 @@ public class DeviceInfo {
 		deviceInfoBuilder = SignatureOuterClass.Signature.DeviceInfo.newBuilder();
 	}
 
+	/**
+	 * Create a device info with already existing device infos
+	 *
+	 * @param deviceInfos the device infos interface
+	 */
 	public DeviceInfo(DeviceInfos deviceInfos) {
 		this();
 		deviceInfoBuilder

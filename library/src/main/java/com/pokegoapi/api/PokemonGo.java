@@ -199,6 +199,11 @@ public class PokemonGo {
 		return map;
 	}
 
+	/**
+	 * Gets the device info
+	 *
+	 * @return the device info
+	 */
 	public SignatureOuterClass.Signature.DeviceInfo getDeviceInfo() {
 		if (deviceInfo == null) {
 			return null;
