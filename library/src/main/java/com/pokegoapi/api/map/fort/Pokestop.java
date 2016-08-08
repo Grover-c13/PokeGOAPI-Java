@@ -73,7 +73,19 @@ public class Pokestop {
 		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
 		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
 		double distance = pokestop.getEarthDistance(player);
-		return distance < 30;
+		return distance <= api.getSettings().getFortSettings().getInteractionRangeInMeters();
+	}
+
+	/**
+	 * Returns whether or not the lured pokemon is in range.
+	 *
+	 * @return true when the lured pokemon is in range of player
+	 */
+	public boolean inRangeForLuredPokemon() {
+		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
+		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
+		double distance = pokestop.getEarthDistance(player);
+		return distance <= api.getSettings().getFortSettings().getInteractionRangeInMeters();
 	}
 
 	/**
@@ -249,8 +261,6 @@ public class Pokestop {
 	 * @throws RemoteServerException If server communications failed.
 	 */
 	public boolean hasLure() throws LoginFailedException, RemoteServerException {
-
-
 		List<FortModifierOuterClass.FortModifier> modifiers = getDetails().getModifier();
 		for (FortModifierOuterClass.FortModifier mod : modifiers) {
 			if (mod.getItemId() == ItemIdOuterClass.ItemId.ITEM_TROY_DISK) {

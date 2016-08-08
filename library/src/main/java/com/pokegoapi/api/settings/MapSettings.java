@@ -46,7 +46,7 @@ public class MapSettings {
 	 *
 	 * @return distance in meters.
 	 */
-	private double encoungerRange;
+	private double encounterRange;
 
 	@Getter
 	/**
@@ -69,10 +69,8 @@ public class MapSettings {
 		minMapObjectDistance = mapSettings.getGetMapObjectsMinDistanceMeters();
 		maxRefresh = mapSettings.getGetMapObjectsMaxRefreshSeconds() * 1000;
 		minRefresh = mapSettings.getGetMapObjectsMinRefreshSeconds() * 1000;
-		encoungerRange = mapSettings.getEncounterRangeMeters();
+		encounterRange = mapSettings.getEncounterRangeMeters();
 		pokemonVisibilityRange = mapSettings.getPokemonVisibleRange();
 		pokeNavRange = mapSettings.getPokeNavRangeMeters();
-
 	}
-
 }
