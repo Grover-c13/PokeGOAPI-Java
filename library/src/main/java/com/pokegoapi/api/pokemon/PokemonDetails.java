@@ -289,7 +289,7 @@ public class PokemonDetails {
 	private int getMaxCpFullEvolveAndPowerup(int playerLevel) {
 		PokemonIdOuterClass.PokemonId highestUpgradedFamily;
 		if (getPokemonId() == EEVEE) {
-			highestUpgradedFamily = PokemonIdOuterClass.PokemonId.FLAREON;
+			highestUpgradedFamily = FLAREON;
 		}
 		else {
 			highestUpgradedFamily = PokemonMetaRegistry.getHightestForFamily(getPokemonFamily());
