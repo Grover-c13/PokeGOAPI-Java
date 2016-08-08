@@ -15,8 +15,12 @@
 
 package com.pokegoapi.api;
 
+import POGOProtos.Enums.TutorialStateOuterClass;
+import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
+import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
@@ -25,6 +29,7 @@ import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.RequestHandler;
+import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import lombok.Getter;
@@ -56,7 +61,6 @@ public class PokemonGo {
 	@Getter
 	private Settings settings;
 	private Map map;
-	private List<Unknown6OuterClass.Unknown6> unknown6s = new ArrayList<>();
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -176,5 +180,15 @@ public class PokemonGo {
 			throw new IllegalStateException("Attempt to get map without setting location first");
 		}
 		return map;
+	}
+
+	public void skipTos() throws LoginFailedException, RemoteServerException {
+		MarkTutorialCompleteMessageOuterClass.MarkTutorialCompleteMessage.Builder tosBuilder = MarkTutorialCompleteMessageOuterClass
+				.MarkTutorialCompleteMessage.newBuilder();
+		tosBuilder.addTutorialsCompleted(TutorialState.LEGAL_SCREEN)
+				.setSendMarketingEmails(false)
+				.setSendPushNotifications(false);
+		ServerRequest serverRequest = new ServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tosBuilder.build());
+		getRequestHandler().sendServerRequests(serverRequest);
 	}
 }
