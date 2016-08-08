@@ -43,6 +43,7 @@ public interface DeviceInfos {
 
 	/**
 	 *  adb.exe shell settings get secure android_id
+	 *  UUID.randomUUID().toString();
 	 *
 	 * @return device id, for example: "****************"
 	 */
@@ -107,7 +108,7 @@ public interface DeviceInfos {
 	/**
 	 *  adb.exe shell getprop ro.build.fingerprint
 	 *
-	 * @return firmware fingerprint, for example: "google/angler/angler:7.0/NPD90G/*******:user/release-keys"
+	 * @return firmware fingerprint, for example: "google/angler/angler:7.0/NPD90G/3051502:user/release-keys"
 	 */
 	String getFirmwareFingerprint();
 }
