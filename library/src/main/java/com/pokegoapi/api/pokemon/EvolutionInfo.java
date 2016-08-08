@@ -1,10 +1,6 @@
 package com.pokegoapi.api.pokemon;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
 
@@ -162,7 +158,7 @@ import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.ZAPDOS;
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.ZUBAT;
 import static java.util.Arrays.asList;
 
-class EvolutionInfo {
+public class EvolutionInfo {
 	private static final PokemonId[] BULBASAUR_EVOLUTION = {BULBASAUR, IVYSAUR, VENUSAUR};
 	private static final PokemonId[] CHARMANDER_EVOLUTION = {CHARMANDER, CHARMELEON, CHARIZARD};
 	private static final PokemonId[] SQUIRTLE_EVOLUTION = {SQUIRTLE, WARTORTLE, BLASTOISE};
@@ -416,6 +412,20 @@ class EvolutionInfo {
 			evolutionForms.add(new EvolutionForm(id));
 		}
 		return evolutionForms;
+	}
+
+	/**
+	 * Get evolutions
+	 *
+	 * @param pokemonId pokemon id
+	 * @return ordered evolutions
+	 */
+	public static List<PokemonId> getEvolutions(PokemonId pokemonId) {
+		PokemonId[] evoInfo = EVOLUTION_INFO.get(pokemonId);
+		if (evoInfo == null)
+			return new ArrayList<>();
+
+		return new ArrayList<>(Arrays.asList(evoInfo));
 	}
 
 	/**

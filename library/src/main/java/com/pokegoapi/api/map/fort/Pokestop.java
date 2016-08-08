@@ -65,15 +65,23 @@ public class Pokestop {
 	}
 
 	/**
+	 * Returns the distance to a pokestop.
+	 *
+	 * @return the calculated distance
+	 */
+	public double getDistance() {
+		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
+		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
+		return pokestop.getEarthDistance(player);
+	}
+
+	/**
 	 * Returns whether or not a pokestop is in range.
 	 *
 	 * @return true when in range of player
 	 */
 	public boolean inRange() {
-		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
-		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
-		double distance = pokestop.getEarthDistance(player);
-		return distance < 30;
+		return getDistance() < 30;
 	}
 
 	/**
