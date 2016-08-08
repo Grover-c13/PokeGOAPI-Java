@@ -40,7 +40,8 @@ public class Signature {
 				.setLocationHash2(getLocationHash2(api, builder))
 				.setUnk22(ByteString.copyFrom(uk22))
 				.setTimestamp(api.currentTimeMillis())
-				.setTimestampSinceStart(curTime - api.startTime);
+				.setTimestampSinceStart(curTime - api.startTime)
+				.setDeviceInfo(api.getDeviceInfo());
 
 
 		for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
