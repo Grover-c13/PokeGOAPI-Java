@@ -138,7 +138,18 @@ public class PokemonCpUtils {
 	 * @param stamina All stamina values combined
 	 * @return Maximum CP for these levels
 	 */
-	public static int getMaxCp(int attack, int defense, int stamina, int playerLevel) {
+	public static int getMaxCp(int attack, int defense, int stamina) {
+		return getMaxCpForPlayer(attack, defense, stamina, 40);
+	}
+
+	/**
+	 * Get the maximum CP from the values
+	 * @param attack All attack values combined
+	 * @param defense All defense values combined
+	 * @param stamina All stamina values combined
+	 * @return Maximum CP for these levels
+	 */
+	public static int getMaxCpForPlayer(int attack, int defense, int stamina, int playerLevel) {
 		float maxLevel = Math.min(playerLevel + 1.5f, 40f);
 		float maxCpMultplier = LEVEL_CPMULTIPLIER.get(maxLevel);
 		return (int)(attack * Math.pow(defense, 0.5) * Math.pow(stamina, 0.5) * Math.pow(maxCpMultplier,2) / 10f);
@@ -197,61 +208,61 @@ public class PokemonCpUtils {
 	public static int getStartdustCostsForPowerup(float combinedCpMultiplier, int powerups) {
 		// Based on http://pokemongo.gamepress.gg/power-up-costs
 		float level = getLevelFromCpMultiplier(combinedCpMultiplier);
-		if (level <= 3 && powerups <= 4) {
+		if (level < 3 && powerups <= 4) {
 			return 200;
 		}
-		if (level <= 4 && powerups <= 8) {
+		if (level < 4 && powerups <= 8) {
 			return 400;
 		}
-		if (level <= 7 && powerups <= 12) {
+		if (level < 7 && powerups <= 12) {
 			return 600;
 		}
-		if (level <= 8 && powerups <= 16) {
+		if (level < 8 && powerups <= 16) {
 			return 800;
 		}
-		if (level <= 11 && powerups <= 20) {
+		if (level < 11 && powerups <= 20) {
 			return 1000;
 		}
-		if (level <= 13 && powerups <= 24) {
+		if (level < 13 && powerups <= 24) {
 			return 1300;
 		}
-		if (level <= 15 && powerups <= 28) {
+		if (level < 15 && powerups <= 28) {
 			return 1600;
 		}
-		if (level <= 17 && powerups <= 32) {
+		if (level < 17 && powerups <= 32) {
 			return 1900;
 		}
-		if (level <= 19 && powerups <= 36) {
+		if (level < 19 && powerups <= 36) {
 			return 2200;
 		}
-		if (level <= 21 && powerups <= 40) {
+		if (level < 21 && powerups <= 40) {
 			return 2500;
 		}
-		if (level <= 23 && powerups <= 44) {
+		if (level < 23 && powerups <= 44) {
 			return 3000;
 		}
-		if (level <= 25 && powerups <= 48) {
+		if (level < 25 && powerups <= 48) {
 			return 3500;
 		}
-		if (level <= 27 && powerups <= 52) {
+		if (level < 27 && powerups <= 52) {
 			return 4000;
 		}
-		if (level <= 29 && powerups <= 56) {
+		if (level < 29 && powerups <= 56) {
 			return 4500;
 		}
-		if (level <= 31 && powerups <= 60) {
+		if (level < 31 && powerups <= 60) {
 			return 5000;
 		}
-		if (level <= 33 && powerups <= 64) {
+		if (level < 33 && powerups <= 64) {
 			return 6000;
 		}
-		if (level <= 35 && powerups <= 68) {
+		if (level < 35 && powerups <= 68) {
 			return 7000;
 		}
-		if (level <= 37 && powerups <= 72) {
+		if (level < 37 && powerups <= 72) {
 			return 8000;
 		}
-		if (level <= 39 && powerups <= 76) {
+		if (level < 39 && powerups <= 76) {
 			return 9000;
 		}
 		return 10000;
@@ -266,13 +277,13 @@ public class PokemonCpUtils {
 	public static int getCandyCostsForPowerup(float combinedCpMultiplier, int powerups) {
 		// Based on http://pokemongo.gamepress.gg/power-up-costs
 		float level = getLevelFromCpMultiplier(combinedCpMultiplier);
-		if (level <= 13 && powerups <= 20 ) {
+		if (level < 13 && powerups <= 20 ) {
 			return 1;
 		}
-		if (level <= 21 && powerups <= 36 ) {
+		if (level < 21 && powerups <= 36 ) {
 			return 2;
 		}
-		if (level <= 31 && powerups <= 60 ) {
+		if (level < 31 && powerups <= 60 ) {
 			return 3;
 		}
 		return 4;
