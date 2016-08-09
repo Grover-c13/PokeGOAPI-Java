@@ -39,19 +39,6 @@ public class Signature {
 				.setUnknown22(ByteString.copyFrom(uk22))
 				.setTimestamp(api.currentTimeMillis())
 				.setTimestampSinceStart(curTime - api.startTime)
-				.setActivityStatus(
-						SignatureOuterClass.Signature.ActivityStatus.newBuilder()
-								.setStartTimeMs(1)
-								.setUnknownStatus(true)
-								.setWalking(true)
-								.setRunning(true)
-								.setStationary(true)
-								.setAutomotive(true)
-								.setTilting(true)
-								.setCycling(true)
-								.setStatus(ByteString.copyFromUtf8("1"))
-								.build()
-				);
 
 		SignatureOuterClass.Signature.DeviceInfo deviceInfo = api.getDeviceInfo();
 		if (deviceInfo != null) {
