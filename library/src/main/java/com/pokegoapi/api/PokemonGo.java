@@ -38,6 +38,7 @@ import okhttp3.OkHttpClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 public class PokemonGo {
@@ -45,6 +46,8 @@ public class PokemonGo {
 	private static final java.lang.String TAG = PokemonGo.class.getSimpleName();
 	private final Time time;
 	public final long startTime;
+	@Getter
+	private final byte[] uk22;
 	@Getter
 	RequestHandler requestHandler;
 	@Getter
@@ -86,6 +89,10 @@ public class PokemonGo {
 			this.credentialProvider = credentialProvider;
 		}
 		this.time = time;
+
+		uk22 = new byte[32];
+		new Random().nextBytes(uk22);
+
 		requestHandler = new RequestHandler(this, client);
 		playerProfile = new PlayerProfile(this);
 		settings = new Settings(this);

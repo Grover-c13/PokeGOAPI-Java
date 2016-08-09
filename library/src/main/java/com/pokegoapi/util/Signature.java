@@ -26,8 +26,6 @@ public class Signature {
 			//System.out.println("Ticket == null");
 			return;
 		}
-		byte[] uk22 = new byte[32];
-		new Random().nextBytes(uk22);
 
 		long curTime = api.currentTimeMillis();
 
@@ -36,7 +34,7 @@ public class Signature {
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
 				.setLocationHash1(getLocationHash1(api, authTicketBA, builder))
 				.setLocationHash2(getLocationHash2(api, builder))
-				.setUnknown22(ByteString.copyFrom(uk22))
+				.setUnknown22(ByteString.copyFrom(api.getUk22()))
 				.setTimestamp(api.currentTimeMillis())
 				.setTimestampSinceStart(curTime - api.startTime);
 
