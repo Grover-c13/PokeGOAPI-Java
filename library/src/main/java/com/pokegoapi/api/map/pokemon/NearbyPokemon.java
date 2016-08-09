@@ -36,4 +36,12 @@ public class NearbyPokemon {
 	public long getEncounterId() {
 		return proto.getEncounterId();
 	}
+
+	public String getFortId() {
+		return proto.getFortId();
+	}
+
+	public String getFortImageUrl() {
+		return proto.getFortImageUrl();
+	}
 }
