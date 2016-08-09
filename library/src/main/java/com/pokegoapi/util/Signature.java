@@ -38,7 +38,7 @@ public class Signature {
 				.setLocationHash2(getLocationHash2(api, builder))
 				.setUnknown22(ByteString.copyFrom(uk22))
 				.setTimestamp(api.currentTimeMillis())
-				.setTimestampSinceStart(curTime - api.startTime)
+				.setTimestampSinceStart(curTime - api.startTime);
 
 		SignatureOuterClass.Signature.DeviceInfo deviceInfo = api.getDeviceInfo();
 		if (deviceInfo != null) {
