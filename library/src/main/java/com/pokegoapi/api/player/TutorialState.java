@@ -29,7 +29,11 @@ public class TutorialState {
         return tutorialStateList;
     }
 
-    public void setTutorialStateList() {
+    public void addTutorialState(TutorialStateOuterClass.TutorialState state) {
+        tutorialStateList.add(state);
+    }
 
+    public void addTutorialStates(List<TutorialStateOuterClass.TutorialState> states) {
+        tutorialStateList.addAll(states);
     }
 }

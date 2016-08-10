@@ -321,7 +321,8 @@ public class PlayerProfile {
 		MarkTutorialCompleteResponse response;
 		try {
 			response = MarkTutorialCompleteResponse.parseFrom(serverRequest.getData());
-			Log.d("tutooo", response.toString());
+			playerData = response.getPlayerData();
+			tutorialState.addTutorialStates(playerData.getTutorialStateList());
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
