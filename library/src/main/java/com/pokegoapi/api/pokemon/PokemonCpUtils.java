@@ -24,7 +24,7 @@ import java.util.Map;
  * and
  * http://pokemongo.gamepress.gg/pokemon-stats-advanced
  */
-class PokemonCpUtils {
+public class PokemonCpUtils {
 	private static final Map<Float,Float> LEVEL_CPMULTIPLIER = new HashMap<>();
 
 	static {
@@ -109,14 +109,14 @@ class PokemonCpUtils {
 		LEVEL_CPMULTIPLIER.put(40f, 0.79030001f);
 	}
 
-	private static float getLevel(float cpMuliplier) {
+	private static float getLevel(float combinedCpMultiplier) {
 		float level;
-		if (cpMuliplier < 0.734f) {
+		if (combinedCpMultiplier < 0.734f) {
 			// compute polynomial approximation obtained by regression
-			level = 58.35178527f * cpMuliplier * cpMuliplier - 2.838007664f * cpMuliplier + 0.8539209906f;
+			level = 58.35178527f * combinedCpMultiplier * combinedCpMultiplier - 2.838007664f * combinedCpMultiplier + 0.8539209906f;
 		} else {
 			// compute linear approximation obtained by regression
-			level = 171.0112688f * cpMuliplier - 95.20425243f;
+			level = 171.0112688f * combinedCpMultiplier - 95.20425243f;
 		}
 		// round to nearest .5 value and return
 		return Math.round((level) * 2) / 2.0f;
@@ -124,11 +124,11 @@ class PokemonCpUtils {
 
 	/**
 	 * Get the level from the cp multiplier
-	 * @param cpMultiplier All CP multiplier values combined
+	 * @param combinedCpMultiplier All CP multiplier values combined
 	 * @return Level
 	 */
-	static float getLevelFromCpMultiplier(float cpMultiplier) {
-		return getLevel(cpMultiplier);
+	public static float getLevelFromCpMultiplier(float combinedCpMultiplier) {
+		return getLevel(combinedCpMultiplier);
 	}
 
 	/**
@@ -138,96 +138,131 @@ class PokemonCpUtils {
 	 * @param stamina All stamina values combined
 	 * @return Maximum CP for these levels
 	 */
-	static int getMaxCp(int attack, int defense, int stamina) {
-		float maxCpMultplier = LEVEL_CPMULTIPLIER.get(40f);
+	public static int getMaxCp(int attack, int defense, int stamina) {
+		return getMaxCpForPlayer(attack, defense, stamina, 40);
+	}
+
+	/**
+	 * Get the maximum CP from the values
+	 * @param attack All attack values combined
+	 * @param defense All defense values combined
+	 * @param stamina All stamina values combined
+	 * @return Maximum CP for these levels
+	 */
+	public static int getMaxCpForPlayer(int attack, int defense, int stamina, int playerLevel) {
+		float maxLevel = Math.min(playerLevel + 1.5f, 40f);
+		float maxCpMultplier = LEVEL_CPMULTIPLIER.get(maxLevel);
 		return (int)(attack * Math.pow(defense, 0.5) * Math.pow(stamina, 0.5) * Math.pow(maxCpMultplier,2) / 10f);
+	}
+
+	/**
+	 * Calculate CP based on raw values
+	 * @param attack All attack values combined
+	 * @param defense All defense values combined
+	 * @param stamina All stamina values combined
+	 * @param level Level of the pokemon
+	 * @return CP
+	 */
+	public static int getCp(int attack, int defense, int stamina, float level) {
+		return (int)(attack * Math.pow(defense, 0.5) * Math.pow(stamina, 0.5) * Math.pow(level,2) / 10f);
 	}
 
 	/**
 	 * Get the CP after powerup
 	 * @param cp Current CP level
-	 * @param cpMultiplier All CP multiplier values combined
+	 * @param combinedCpMultiplier All CP multiplier values combined
 	 * @return New CP level
 	 */
-	static int getCpAfterPowerup(float cp, float cpMultiplier) {
+	public static int getCpAfterPowerup(int cp, float combinedCpMultiplier) {
 		// Based on http://pokemongo.gamepress.gg/power-up-costs
-		float level = getLevelFromCpMultiplier(cpMultiplier);
+		float level = getLevelFromCpMultiplier(combinedCpMultiplier);
 		if (level <= 10) {
-			return (int)((cp * 0.009426125469) / Math.pow(cpMultiplier, 2));
+			return cp + (int)((cp * 0.009426125469) / Math.pow(combinedCpMultiplier, 2));
 		}
 		if (level <= 20) {
-			return (int)((cp * 0.008919025675) / Math.pow(cpMultiplier, 2));
+			return cp + (int)((cp * 0.008919025675) / Math.pow(combinedCpMultiplier, 2));
 		}
 		if (level <= 30) {
-			return (int)((cp * 0.008924905903) / Math.pow(cpMultiplier, 2));
+			return cp + (int)((cp * 0.008924905903) / Math.pow(combinedCpMultiplier, 2));
 		}
-		return (int)((cp * 0.00445946079) / Math.pow(cpMultiplier, 2));
+		return cp + (int)((cp * 0.00445946079) / Math.pow(combinedCpMultiplier, 2));
+	}
+
+	/**
+	 * Get the new addidional multiplier after powerup
+	 * @param cpMultiplier Multiplier
+	 * @param additionalCpMultiplier Additional multiplier
+	 * @return Additional CP multiplier after upgrade
+	 */
+	public static float getAdditionalCpMultiplierAfterPowerup(float cpMultiplier, float additionalCpMultiplier) {
+		float nextLevel = getLevelFromCpMultiplier(cpMultiplier + additionalCpMultiplier) + .5f;
+		return LEVEL_CPMULTIPLIER.get(nextLevel) - cpMultiplier;
 	}
 
 	/**
 	 * Get the amount of stardust required to do a powerup
-	 * @param cpMultiplier All CP multiplier values combined
+	 * @param combinedCpMultiplier All CP multiplier values combined
 	 * @param powerups Number of previous powerups
 	 * @return Amount of stardust
 	 */
-	static int getStartdustCostsForPowerup(float cpMultiplier, int powerups) {
+	public static int getStartdustCostsForPowerup(float combinedCpMultiplier, int powerups) {
 		// Based on http://pokemongo.gamepress.gg/power-up-costs
-		float level = getLevelFromCpMultiplier(cpMultiplier);
-		if (level <= 3 && powerups <= 4) {
+		float level = getLevelFromCpMultiplier(combinedCpMultiplier);
+		if (level < 3 && powerups <= 4) {
 			return 200;
 		}
-		if (level <= 4 && powerups <= 8) {
+		if (level < 4 && powerups <= 8) {
 			return 400;
 		}
-		if (level <= 7 && powerups <= 12) {
+		if (level < 7 && powerups <= 12) {
 			return 600;
 		}
-		if (level <= 8 && powerups <= 16) {
+		if (level < 8 && powerups <= 16) {
 			return 800;
 		}
-		if (level <= 11 && powerups <= 20) {
+		if (level < 11 && powerups <= 20) {
 			return 1000;
 		}
-		if (level <= 13 && powerups <= 24) {
+		if (level < 13 && powerups <= 24) {
 			return 1300;
 		}
-		if (level <= 15 && powerups <= 28) {
+		if (level < 15 && powerups <= 28) {
 			return 1600;
 		}
-		if (level <= 17 && powerups <= 32) {
+		if (level < 17 && powerups <= 32) {
 			return 1900;
 		}
-		if (level <= 19 && powerups <= 36) {
+		if (level < 19 && powerups <= 36) {
 			return 2200;
 		}
-		if (level <= 21 && powerups <= 40) {
+		if (level < 21 && powerups <= 40) {
 			return 2500;
 		}
-		if (level <= 23 && powerups <= 44) {
+		if (level < 23 && powerups <= 44) {
 			return 3000;
 		}
-		if (level <= 25 && powerups <= 48) {
+		if (level < 25 && powerups <= 48) {
 			return 3500;
 		}
-		if (level <= 27 && powerups <= 52) {
+		if (level < 27 && powerups <= 52) {
 			return 4000;
 		}
-		if (level <= 29 && powerups <= 56) {
+		if (level < 29 && powerups <= 56) {
 			return 4500;
 		}
-		if (level <= 31 && powerups <= 60) {
+		if (level < 31 && powerups <= 60) {
 			return 5000;
 		}
-		if (level <= 33 && powerups <= 64) {
+		if (level < 33 && powerups <= 64) {
 			return 6000;
 		}
-		if (level <= 35 && powerups <= 68) {
+		if (level < 35 && powerups <= 68) {
 			return 7000;
 		}
-		if (level <= 37 && powerups <= 72) {
+		if (level < 37 && powerups <= 72) {
 			return 8000;
 		}
-		if (level <= 39 && powerups <= 76) {
+		if (level < 39 && powerups <= 76) {
 			return 9000;
 		}
 		return 10000;
@@ -235,20 +270,20 @@ class PokemonCpUtils {
 
 	/**
 	 * Get the amount of candy required to do a powerup
-	 * @param cpMultiplier All CP multiplier values combined
+	 * @param combinedCpMultiplier All CP multiplier values combined
 	 * @param powerups Number of previous powerups
 	 * @return Amount of candy
 	 */
-	static int getCandyCostsForPowerup(float cpMultiplier, int powerups) {
+	public static int getCandyCostsForPowerup(float combinedCpMultiplier, int powerups) {
 		// Based on http://pokemongo.gamepress.gg/power-up-costs
-		float level = getLevelFromCpMultiplier(cpMultiplier);
-		if (level <= 13 && powerups <= 20 ) {
+		float level = getLevelFromCpMultiplier(combinedCpMultiplier);
+		if (level < 13 && powerups <= 20 ) {
 			return 1;
 		}
-		if (level <= 21 && powerups <= 36 ) {
+		if (level < 21 && powerups <= 36 ) {
 			return 2;
 		}
-		if (level <= 31 && powerups <= 60 ) {
+		if (level < 31 && powerups <= 60 ) {
 			return 3;
 		}
 		return 4;

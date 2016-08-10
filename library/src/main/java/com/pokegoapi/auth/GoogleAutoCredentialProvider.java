@@ -103,7 +103,7 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	public AuthInfo getAuthInfo() throws LoginFailedException, RemoteServerException {
 		AuthInfo.Builder builder = AuthInfo.newBuilder();
 		builder.setProvider("google");
-		builder.setToken(AuthInfo.JWT.newBuilder().setContents(tokenInfo.authToken.getToken()).setUnknown2(59).build());
+		builder.setToken(AuthInfo.JWT.newBuilder().setContents(getTokenId()).setUnknown2(59).build());
 		return builder.build();
 	}
 

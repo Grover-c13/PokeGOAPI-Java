@@ -13,6 +13,12 @@ import com.pokegoapi.util.Log;
 import lombok.Getter;
 import lombok.Setter;
 
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.EEVEE;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.FLAREON;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.JOLTEON;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.VAPOREON;
+import static java.util.Arrays.asList;
+
 public class PokemonDetails {
 	private static final String TAG = Pokemon.class.getSimpleName();
 	private PokemonGo api;
@@ -123,6 +129,10 @@ public class PokemonDetails {
 		return proto.getCpMultiplier();
 	}
 
+	public float getAdditionalCpMultiplier() {
+		return proto.getAdditionalCpMultiplier();
+	}
+
 	public ItemId getPokeball() {
 		return proto.getPokeball();
 	}
@@ -208,10 +218,12 @@ public class PokemonDetails {
 	}
 
 	/**
-	 * Calculate the maximum CP for this individual pokemon
+	 * Calculate the maximum CP for this individual pokemon when the player is at level 40
 	 *
 	 * @return The maximum CP for this pokemon
 	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
+	 * @throws LoginFailedException If login failed
+	 * @throws RemoteServerException If the server is causing issues
 	 */
 	public int getMaxCp() throws NoSuchItemException {
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
@@ -225,6 +237,26 @@ public class PokemonDetails {
 	}
 
 	/**
+	 * Calculate the maximum CP for this individual pokemon and this player's level
+	 *
+	 * @return The maximum CP for this pokemon
+	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
+	 * @throws LoginFailedException If login failed
+	 * @throws RemoteServerException If the server is causing issues
+	 */
+	public int getMaxCpForPlayer() throws NoSuchItemException, LoginFailedException, RemoteServerException {
+		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
+		if (pokemonMeta == null) {
+			throw new NoSuchItemException("Cannot find meta data for " + proto.getPokemonId().name());
+		}
+		int attack = proto.getIndividualAttack() + pokemonMeta.getBaseAttack();
+		int defense = proto.getIndividualDefense() + pokemonMeta.getBaseDefense();
+		int stamina = proto.getIndividualStamina() + pokemonMeta.getBaseStamina();
+		int playerLevel = api.getPlayerProfile().getStats().getLevel();
+		return PokemonCpUtils.getMaxCpForPlayer(attack, defense, stamina, playerLevel);
+	}
+
+	/**
 	 * Calculates the absolute maximum CP for all pokemons with this PokemonId
 	 *
 	 * @return The absolute maximum CP
@@ -234,7 +266,68 @@ public class PokemonDetails {
 		return getAbsoluteMaxCp(proto.getPokemonId());
 	}
 
+	/**
+	 * Calculated the max cp of this pokemon, if you upgrade it fully and the player is at level 40
+	 * @return Max cp of this pokemon
+	 */
+	public int getCpFullEvolveAndPowerup() throws LoginFailedException, RemoteServerException {
+		return getMaxCpFullEvolveAndPowerup(40);
+	}
 
+	/**
+	 * Calculated the max cp of this pokemon, if you upgrade it fully with your current player level
+	 * @return Max cp of this pokemon
+	 */
+	public int getMaxCpFullEvolveAndPowerupForPlayer() throws LoginFailedException, RemoteServerException {
+		return getMaxCpFullEvolveAndPowerup(api.getPlayerProfile().getStats().getLevel());
+	}
+
+	/**
+	 * Calculated the max cp of this pokemon, if you upgrade it fully with your current player level
+	 * @return Max cp of this pokemon
+	 */
+	private int getMaxCpFullEvolveAndPowerup(int playerLevel) {
+		PokemonIdOuterClass.PokemonId highestUpgradedFamily;
+		if (getPokemonId() == EEVEE) {
+			highestUpgradedFamily = FLAREON;
+		}
+		else {
+			highestUpgradedFamily = PokemonMetaRegistry.getHightestForFamily(getPokemonFamily());
+		}
+		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
+		int attack = getProto().getIndividualAttack() + pokemonMeta.getBaseAttack();
+		int defense = getProto().getIndividualDefense() + pokemonMeta.getBaseDefense();
+		int stamina = getProto().getIndividualStamina() + pokemonMeta.getBaseStamina();
+		return PokemonCpUtils.getMaxCpForPlayer(attack, defense, stamina, playerLevel);
+	}
+
+	/**
+	 * Calculate the CP after evolving this Pokemon
+	 * @return New CP after evolve
+	 */
+	public int getCpAfterEvolve() {
+		if (asList(VAPOREON, JOLTEON, FLAREON).contains(getPokemonId())) {
+			return getCp();
+		}
+		PokemonIdOuterClass.PokemonId highestUpgradedFamily = PokemonMetaRegistry.getHightestForFamily(getPokemonFamily());
+		if (getPokemonId() == highestUpgradedFamily) {
+			return getCp();
+		}
+		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
+		PokemonIdOuterClass.PokemonId secondHighest = pokemonMeta.getParentId();
+		float level = PokemonCpUtils.getLevelFromCpMultiplier(getCpMultiplier() + getAdditionalCpMultiplier());
+		if (getPokemonId() == secondHighest) {
+			int attack = getProto().getIndividualAttack() + pokemonMeta.getBaseAttack();
+			int defense = getProto().getIndividualDefense() + pokemonMeta.getBaseDefense();
+			int stamina = getProto().getIndividualStamina() + pokemonMeta.getBaseStamina();
+			return PokemonCpUtils.getCp(attack, defense, stamina, level);
+		}
+		pokemonMeta = PokemonMetaRegistry.getMeta(secondHighest);
+		int attack = getProto().getIndividualAttack() + pokemonMeta.getBaseAttack();
+		int defense = getProto().getIndividualDefense() + pokemonMeta.getBaseDefense();
+		int stamina = getProto().getIndividualStamina() + pokemonMeta.getBaseStamina();
+		return PokemonCpUtils.getCp(attack, defense, stamina, level);
+	}
 
 	/**
 	 * Static helper to get the absolute maximum CP for pokemons with their PokemonId.
@@ -250,10 +343,14 @@ public class PokemonDetails {
 		int attack = 15 + pokemonMeta.getBaseAttack();
 		int defense = 15 + pokemonMeta.getBaseDefense();
 		int stamina = 15 + pokemonMeta.getBaseStamina();
-		return PokemonCpUtils.getMaxCp(attack, defense, stamina);
+		return PokemonCpUtils.getMaxCpForPlayer(attack, defense, stamina, 40);
 	}
 
-
-
+	/**
+	 * @return The number of powerups already done
+	 */
+	public int getNumerOfPowerupsDone() {
+		return getProto().getNumUpgrades();
+	}
 
 }
