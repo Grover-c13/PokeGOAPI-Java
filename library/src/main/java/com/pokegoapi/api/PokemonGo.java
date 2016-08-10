@@ -21,7 +21,6 @@ import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
 
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.DeviceInfos;
-
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
@@ -30,8 +29,8 @@ import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.RequestHandler;
-import com.pokegoapi.util.Time;
 import com.pokegoapi.util.SystemTimeImpl;
+import com.pokegoapi.util.Time;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
