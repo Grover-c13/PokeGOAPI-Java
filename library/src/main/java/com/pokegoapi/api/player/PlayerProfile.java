@@ -41,6 +41,7 @@ import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 import lombok.Setter;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +54,7 @@ public class PlayerProfile {
 	private PlayerAvatar avatar;
 	private DailyBonus dailyBonus;
 	private ContactSettings contactSettings;
-	private Map<Currency, Integer> currencies = new HashMap<Currency, Integer>();
+	private Map<Currency, Integer> currencies = new EnumMap<Currency, Integer>(Currency.class);
 	@Setter
 	private Stats stats;
 

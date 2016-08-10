@@ -1,6 +1,7 @@
 package com.pokegoapi.api.pokemon;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -245,7 +246,7 @@ class EvolutionInfo {
 	private static final PokemonId[] MEWTWO_EVOLUTION = {MEWTWO};
 	private static final PokemonId[] MEW_EVOLUTION = {MEW};
 
-	private static final Map<PokemonId, PokemonId[]> EVOLUTION_INFO = new HashMap<>();
+	private static final Map<PokemonId, PokemonId[]> EVOLUTION_INFO = new EnumMap<>(PokemonId.class);
 
 	static {
 		EVOLUTION_INFO.put(BULBASAUR, BULBASAUR_EVOLUTION);
