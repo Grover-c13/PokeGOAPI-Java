@@ -77,7 +77,7 @@ PS : for users who want to import the api into Eclipse IDE, you'll need to :
   - Select `library/build/generated/source/proto/main/java`
   - Finish
 
-# Usage exemple (mostly how to login) :
+# Usage example (mostly how to login) :
 ```java
 OkHttpClient httpClient = new OkHttpClient();
 
