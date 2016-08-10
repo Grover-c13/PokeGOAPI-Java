@@ -308,7 +308,7 @@ public class PlayerProfile {
 	 *
 	 * @throws LoginFailedException
 	 * @throws RemoteServerException
-     */
+         */
 	public void enableAccount() throws LoginFailedException, RemoteServerException {
 		MarkTutorialCompleteMessage.Builder tutorialBuilder = MarkTutorialCompleteMessage.newBuilder();
 		tutorialBuilder.addTutorialsCompleted(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN)
