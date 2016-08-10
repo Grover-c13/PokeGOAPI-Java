@@ -28,8 +28,6 @@ public class Signature {
 			//System.out.println("Ticket == null");
 			return;
 		}
-		byte[] uk22 = new byte[32];
-		new Random().nextBytes(uk22);
 
 		long curTime = api.currentTimeMillis();
 
@@ -38,7 +36,7 @@ public class Signature {
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
 				.setLocationHash1(getLocationHash1(api, authTicketBA, builder))
 				.setLocationHash2(getLocationHash2(api, builder))
-				.setUnk22(ByteString.copyFrom(uk22))
+				.setUnk22(ByteString.copyFrom(api.getUk22()))
 				.setTimestamp(api.currentTimeMillis())
 				.setTimestampSinceStart(curTime - api.startTime);
 
@@ -79,7 +77,8 @@ public class Signature {
 	}
 
 
-	private static int getLocationHash1(PokemonGo api, byte[] authTicket, RequestEnvelopeOuterClass.RequestEnvelope.Builder builder) {
+	private static int getLocationHash1(PokemonGo api, byte[] authTicket,
+										RequestEnvelopeOuterClass.RequestEnvelope.Builder builder) {
 		XXHashFactory factory = XXHashFactory.fastestInstance();
 		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x1B845238);
 		xx32.update(authTicket, 0, authTicket.length);
