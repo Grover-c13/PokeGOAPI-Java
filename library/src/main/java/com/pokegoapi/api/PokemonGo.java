@@ -15,13 +15,9 @@
 
 package com.pokegoapi.api;
 
-import POGOProtos.Enums.TutorialStateOuterClass;
-import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
-import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 
 import com.pokegoapi.api.device.DeviceInfo;
@@ -38,8 +34,9 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.SystemTimeImpl;
+import com.pokegoapi.util.Log;
 import com.pokegoapi.util.Time;
+import com.pokegoapi.util.SystemTimeImpl;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
@@ -203,22 +200,5 @@ public class PokemonGo {
 			return null;
 		}
 		return deviceInfo.getDeviceInfo();
-	}
-
-	public void setTutorialState() throws LoginFailedException, RemoteServerException {
-		GetPlayerMessageOuterClass.GetPlayerMessage.Builder getPlayerMessageBuilder = GetPlayerMessageOuterClass
-				.GetPlayerMessage.newBuilder();
-
-		MarkTutorialCompleteMessageOuterClass.MarkTutorialCompleteMessage.Builder tosBuilder = MarkTutorialCompleteMessageOuterClass
-				.MarkTutorialCompleteMessage.newBuilder();
-		tosBuilder.addTutorialsCompleted(TutorialState.LEGAL_SCREEN)
-				.setSendMarketingEmails(false)
-				.setSendPushNotifications(false);
-
-		ServerRequest[] serverRequests = new ServerRequest[2];
-		serverRequests[0] = new ServerRequest(RequestType.GET_PLAYER, getPlayerMessageBuilder.build());
-		serverRequests[1] = new ServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tosBuilder.build());
-
-		getRequestHandler().sendServerRequests(serverRequests);
 	}
 }
