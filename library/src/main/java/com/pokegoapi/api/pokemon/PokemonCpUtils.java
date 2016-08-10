@@ -15,9 +15,6 @@
 
 package com.pokegoapi.api.pokemon;
 
-import com.annimon.stream.Collectors;
-import com.annimon.stream.Stream;
-import com.annimon.stream.function.Function;
 import com.pokegoapi.exceptions.NoSuchItemException;
 
 import java.util.HashMap;
@@ -33,7 +30,6 @@ import POGOProtos.Enums.PokemonIdOuterClass;
  */
 public class PokemonCpUtils {
 	private static final Map<Float, Float> LEVEL_CP_MULTIPLIER = new HashMap<>();
-	private static final Map<Float, Float> CP_MULTIPLIER_LEVEL;
 
 	static {
 		LEVEL_CP_MULTIPLIER.put(1f, 0.094f);
@@ -115,23 +111,19 @@ public class PokemonCpUtils {
 		LEVEL_CP_MULTIPLIER.put(39f, 0.78463697f);
 		LEVEL_CP_MULTIPLIER.put(39.5f, 0.787473578f);
 		LEVEL_CP_MULTIPLIER.put(40f, 0.79030001f);
-
-		CP_MULTIPLIER_LEVEL = Stream.of(LEVEL_CP_MULTIPLIER.entrySet())
-				.collect(Collectors.toMap(new Function<Map.Entry<Float, Float>, Float>() {
-					@Override
-					public Float apply(Map.Entry<Float, Float> entry) {
-						return entry.getValue();
-					}
-				}, new Function<Map.Entry<Float, Float>, Float>() {
-					@Override
-					public Float apply(Map.Entry<Float, Float> entry) {
-						return entry.getKey();
-					}
-				}));
 	}
 
 	private static float getLevel(float combinedCpMultiplier) {
-		return CP_MULTIPLIER_LEVEL.get(combinedCpMultiplier);
+		float level;
+		if (combinedCpMultiplier < 0.734f) {
+			// compute polynomial approximation obtained by regression
+			level = 58.35178527f * combinedCpMultiplier * combinedCpMultiplier - 2.838007664f * combinedCpMultiplier + 0.8539209906f;
+		} else {
+			// compute linear approximation obtained by regression
+			level = 171.0112688f * combinedCpMultiplier - 95.20425243f;
+		}
+		// round to nearest .5 value and return
+		return Math.round((level) * 2) / 2.0f;
 	}
 
 	/**
@@ -198,7 +190,7 @@ public class PokemonCpUtils {
 	 * @return CP
 	 */
 	public static int getCp(int attack, int defense, int stamina, float combinedCpMultiplier) {
-		return (int) (attack * Math.pow(defense, 0.5) * Math.pow(stamina, 0.5) * Math.pow(combinedCpMultiplier, 2) / 10f);
+		return (int) Math.round(attack * Math.pow(defense, 0.5) * Math.pow(stamina, 0.5) * Math.pow(combinedCpMultiplier, 2) / 10f);
 	}
 
 	/**
@@ -212,15 +204,15 @@ public class PokemonCpUtils {
 		// Based on http://pokemongo.gamepress.gg/power-up-costs
 		float level = getLevelFromCpMultiplier(combinedCpMultiplier);
 		if (level <= 10) {
-			return cp + (int) ((cp * 0.009426125469) / Math.pow(combinedCpMultiplier, 2));
+			return cp + (int) Math.round((cp * 0.009426125469) / Math.pow(combinedCpMultiplier, 2));
 		}
 		if (level <= 20) {
-			return cp + (int) ((cp * 0.008919025675) / Math.pow(combinedCpMultiplier, 2));
+			return cp + (int) Math.round((cp * 0.008919025675) / Math.pow(combinedCpMultiplier, 2));
 		}
 		if (level <= 30) {
-			return cp + (int) ((cp * 0.008924905903) / Math.pow(combinedCpMultiplier, 2));
+			return cp + (int) Math.round((cp * 0.008924905903) / Math.pow(combinedCpMultiplier, 2));
 		}
-		return cp + (int) ((cp * 0.00445946079) / Math.pow(combinedCpMultiplier, 2));
+		return cp + (int) Math.round((cp * 0.00445946079) / Math.pow(combinedCpMultiplier, 2));
 	}
 
 	/**
