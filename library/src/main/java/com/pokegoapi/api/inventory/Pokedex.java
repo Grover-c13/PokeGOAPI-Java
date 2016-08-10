@@ -20,7 +20,6 @@ import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import com.pokegoapi.api.PokemonGo;
 
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
 
 public class Pokedex {
@@ -34,7 +33,7 @@ public class Pokedex {
 
 	public void reset(PokemonGo pgo) {
 		this.api = pgo;
-		pokedexMap = new HashMap<>();
+		pokedexMap = new EnumMap<PokemonId, PokedexEntry>(PokemonId.class);
 	}
 
 	/**

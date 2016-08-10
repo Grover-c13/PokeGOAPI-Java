@@ -17,7 +17,6 @@ package com.pokegoapi.api.player;
 
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.Player.EquippedBadgeOuterClass.EquippedBadge;
-import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
 import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
@@ -42,7 +41,6 @@ import com.pokegoapi.util.Log;
 import lombok.Setter;
 
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
 
 

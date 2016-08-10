@@ -2,12 +2,9 @@ package com.pokegoapi.api.pokemon;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-import POGOProtos.Enums.PokemonIdOuterClass;
 
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.ABRA;
