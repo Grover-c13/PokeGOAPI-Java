@@ -174,7 +174,7 @@ public class Pokemon extends PokemonDetails {
 	 * @throws RemoteServerException the remote server exception
 	 */
 	public boolean canPowerUp() throws LoginFailedException, RemoteServerException {
-		return getCandy() >= getCandyCostsForPowerup() && getStamina() >= getStardustCostsForPowerup();
+		return getCandy() >= getCandyCostsForPowerup();
 	}
 
 	/**
