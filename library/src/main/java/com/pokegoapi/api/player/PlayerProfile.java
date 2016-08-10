@@ -19,16 +19,19 @@ import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.Player.EquippedBadgeOuterClass.EquippedBadge;
 import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
+import POGOProtos.Enums.TutorialStateOuterClass;
 import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
 import POGOProtos.Networking.Requests.Messages.EquipBadgeMessageOuterClass.EquipBadgeMessage;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
+import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass.MarkTutorialCompleteMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
 import POGOProtos.Networking.Responses.EquipBadgeResponseOuterClass;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
+import POGOProtos.Networking.Responses.MarkTutorialCompleteResponseOuterClass.MarkTutorialCompleteResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
@@ -54,14 +57,18 @@ public class PlayerProfile {
 	private DailyBonus dailyBonus;
 	private ContactSettings contactSettings;
 	private Map<Currency, Integer> currencies = new HashMap<Currency, Integer>();
+	private TutorialState tutorialState;
 	@Setter
 	private Stats stats;
 
-	private boolean init;
-
 	public PlayerProfile(PokemonGo api) throws LoginFailedException, RemoteServerException {
 		this.api = api;
-		init = false;
+
+		updateProfile();
+
+		if (tutorialState.getTutorialStates().isEmpty()) {
+			enableAccount();
+		}
 	}
 
 	/**
@@ -98,7 +105,8 @@ public class PlayerProfile {
 			}
 		}
 
-		init = true;
+		// Tutorial state
+		tutorialState = new TutorialState(playerData.getTutorialStateList());
 	}
 
 	/**
@@ -200,9 +208,6 @@ public class PlayerProfile {
 	 */
 	public int getCurrency(Currency currency)
 			throws InvalidCurrencyException, LoginFailedException, RemoteServerException {
-		if (!init) {
-			updateProfile();
-		}
 		if (currencies.containsKey(currency)) {
 			return currencies.get(currency);
 		} else {
@@ -223,9 +228,6 @@ public class PlayerProfile {
 	 */
 	public PlayerData getPlayerData()
 			throws LoginFailedException, RemoteServerException {
-		if (!init) {
-			updateProfile();
-		}
 		return playerData;
 	}
 
@@ -238,9 +240,6 @@ public class PlayerProfile {
 	 */
 	public PlayerAvatar getAvatar()
 			throws LoginFailedException, RemoteServerException {
-		if (!init) {
-			updateProfile();
-		}
 		return avatar;
 	}
 
@@ -253,9 +252,6 @@ public class PlayerProfile {
 	 */
 	public DailyBonus getDailyBonus()
 			throws LoginFailedException, RemoteServerException {
-		if (!init) {
-			updateProfile();
-		}
 		return dailyBonus;
 	}
 
@@ -268,9 +264,6 @@ public class PlayerProfile {
 	 */
 	public ContactSettings getContactSettings()
 			throws LoginFailedException, RemoteServerException {
-		if (!init) {
-			updateProfile();
-		}
 		return contactSettings;
 	}
 
@@ -283,13 +276,8 @@ public class PlayerProfile {
 	 */
 	public Map<Currency, Integer> getCurrencies()
 			throws LoginFailedException, RemoteServerException {
-		if (!init) {
-			updateProfile();
-		}
 		return currencies;
 	}
-
-
 
 	/**
 	 * Gets player stats
@@ -304,5 +292,39 @@ public class PlayerProfile {
 			api.getInventories().updateInventories();
 		}
 		return stats;
+	}
+
+	/**
+	 * Gets tutorial states
+	 *
+	 * @return TutorialState object
+	 */
+	public TutorialState getTutorialState() {
+		return tutorialState;
+	}
+
+	/**
+	 * Set the account to legal screen in order to receive valid response
+	 *
+	 * @throws LoginFailedException
+	 * @throws RemoteServerException
+         */
+	public void enableAccount() throws LoginFailedException, RemoteServerException {
+		MarkTutorialCompleteMessage.Builder tutorialBuilder = MarkTutorialCompleteMessage.newBuilder();
+		tutorialBuilder.addTutorialsCompleted(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN)
+				.setSendMarketingEmails(false)
+				.setSendPushNotifications(false);
+
+		ServerRequest serverRequest = new ServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialBuilder.build());
+		api.getRequestHandler().sendServerRequests(serverRequest);
+
+		MarkTutorialCompleteResponse response;
+		try {
+			response = MarkTutorialCompleteResponse.parseFrom(serverRequest.getData());
+			playerData = response.getPlayerData();
+			tutorialState.addTutorialStates(playerData.getTutorialStateList());
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
 	}
 }
