@@ -18,7 +18,6 @@ package com.pokegoapi.api;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.DeviceInfos;
@@ -33,8 +32,6 @@ import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.RequestHandler;
-import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.Log;
 import com.pokegoapi.util.Time;
 import com.pokegoapi.util.SystemTimeImpl;
 import lombok.Getter;

@@ -298,14 +298,17 @@ public class PlayerProfile {
 	 * Gets tutorial states
 	 *
 	 * @return TutorialState object
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public TutorialState getTutorialState()
-			throws LoginFailedException, RemoteServerException {
+	public TutorialState getTutorialState() {
 		return tutorialState;
 	}
 
+	/**
+	 * Set the account to legal screen in order to receive valid response
+	 *
+	 * @throws LoginFailedException
+	 * @throws RemoteServerException
+     */
 	public void enableAccount() throws LoginFailedException, RemoteServerException {
 		MarkTutorialCompleteMessage.Builder tutorialBuilder = MarkTutorialCompleteMessage.newBuilder();
 		tutorialBuilder.addTutorialsCompleted(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN)
