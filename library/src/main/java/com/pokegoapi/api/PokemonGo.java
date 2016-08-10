@@ -22,8 +22,6 @@ import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.DeviceInfos;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
