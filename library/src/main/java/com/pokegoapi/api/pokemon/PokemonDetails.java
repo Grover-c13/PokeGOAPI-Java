@@ -1,15 +1,16 @@
 package com.pokegoapi.api.pokemon;
 
-import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
-import POGOProtos.Enums.PokemonFamilyIdOuterClass;
-import POGOProtos.Enums.PokemonIdOuterClass;
-import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
-import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
+
+import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
+import POGOProtos.Enums.PokemonFamilyIdOuterClass;
+import POGOProtos.Enums.PokemonIdOuterClass;
+import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
+import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,7 +22,7 @@ import static java.util.Arrays.asList;
 
 public class PokemonDetails {
 	private static final String TAG = Pokemon.class.getSimpleName();
-	private PokemonGo api;
+	protected PokemonGo api;
 	@Getter
 	@Setter
 	private PokemonData proto;
@@ -32,8 +33,6 @@ public class PokemonDetails {
 		this.proto = proto;
 	}
 
-
-
 	public int getCandy() throws LoginFailedException, RemoteServerException {
 		return api.getInventories().getCandyjar().getCandies(getPokemonFamily());
 	}
@@ -41,8 +40,6 @@ public class PokemonDetails {
 	public PokemonFamilyIdOuterClass.PokemonFamilyId getPokemonFamily() {
 		return getMeta().getFamily();
 	}
-
-
 
 	public PokemonData getDefaultInstanceForType() {
 		return proto.getDefaultInstanceForType();
@@ -133,6 +130,10 @@ public class PokemonDetails {
 		return proto.getAdditionalCpMultiplier();
 	}
 
+	public float getCombinedCpMultiplier() {
+		return getCpMultiplier() + getAdditionalCpMultiplier();
+	}
+
 	public ItemId getPokeball() {
 		return proto.getPokeball();
 	}
@@ -183,7 +184,6 @@ public class PokemonDetails {
 		Log.d(TAG, proto.toString());
 	}
 
-
 	public int getBaseStam() {
 		return getMeta().getBaseStamina();
 	}
@@ -201,7 +201,7 @@ public class PokemonDetails {
 	}
 
 	public float getLevel() {
-		return PokemonCpUtils.getLevelFromCpMultiplier(proto.getCpMultiplier() + proto.getAdditionalCpMultiplier());
+		return PokemonCpUtils.getLevelFromCpMultiplier(getCombinedCpMultiplier());
 	}
 
 	/**
@@ -221,8 +221,8 @@ public class PokemonDetails {
 	 * Calculate the maximum CP for this individual pokemon when the player is at level 40
 	 *
 	 * @return The maximum CP for this pokemon
-	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
-	 * @throws LoginFailedException If login failed
+	 * @throws NoSuchItemException   If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
+	 * @throws LoginFailedException  If login failed
 	 * @throws RemoteServerException If the server is causing issues
 	 */
 	public int getMaxCp() throws NoSuchItemException {
@@ -230,9 +230,9 @@ public class PokemonDetails {
 		if (pokemonMeta == null) {
 			throw new NoSuchItemException("Cannot find meta data for " + proto.getPokemonId().name());
 		}
-		int attack = proto.getIndividualAttack() + pokemonMeta.getBaseAttack();
-		int defense = proto.getIndividualDefense() + pokemonMeta.getBaseDefense();
-		int stamina = proto.getIndividualStamina() + pokemonMeta.getBaseStamina();
+		int attack = getIndividualAttack() + pokemonMeta.getBaseAttack();
+		int defense = getIndividualDefense() + pokemonMeta.getBaseDefense();
+		int stamina = getIndividualStamina() + pokemonMeta.getBaseStamina();
 		return PokemonCpUtils.getMaxCp(attack, defense, stamina);
 	}
 
@@ -240,8 +240,8 @@ public class PokemonDetails {
 	 * Calculate the maximum CP for this individual pokemon and this player's level
 	 *
 	 * @return The maximum CP for this pokemon
-	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
-	 * @throws LoginFailedException If login failed
+	 * @throws NoSuchItemException   If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
+	 * @throws LoginFailedException  If login failed
 	 * @throws RemoteServerException If the server is causing issues
 	 */
 	public int getMaxCpForPlayer() throws NoSuchItemException, LoginFailedException, RemoteServerException {
@@ -249,9 +249,9 @@ public class PokemonDetails {
 		if (pokemonMeta == null) {
 			throw new NoSuchItemException("Cannot find meta data for " + proto.getPokemonId().name());
 		}
-		int attack = proto.getIndividualAttack() + pokemonMeta.getBaseAttack();
-		int defense = proto.getIndividualDefense() + pokemonMeta.getBaseDefense();
-		int stamina = proto.getIndividualStamina() + pokemonMeta.getBaseStamina();
+		int attack = getIndividualAttack() + pokemonMeta.getBaseAttack();
+		int defense = getIndividualDefense() + pokemonMeta.getBaseDefense();
+		int stamina = getIndividualStamina() + pokemonMeta.getBaseStamina();
 		int playerLevel = api.getPlayerProfile().getStats().getLevel();
 		return PokemonCpUtils.getMaxCpForPlayer(attack, defense, stamina, playerLevel);
 	}
@@ -263,11 +263,12 @@ public class PokemonDetails {
 	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
 	 */
 	public int getAbsoluteMaxCp() throws NoSuchItemException {
-		return getAbsoluteMaxCp(proto.getPokemonId());
+		return PokemonCpUtils.getAbsoluteMaxCp(getPokemonId());
 	}
 
 	/**
 	 * Calculated the max cp of this pokemon, if you upgrade it fully and the player is at level 40
+	 *
 	 * @return Max cp of this pokemon
 	 */
 	public int getCpFullEvolveAndPowerup() throws LoginFailedException, RemoteServerException {
@@ -276,6 +277,7 @@ public class PokemonDetails {
 
 	/**
 	 * Calculated the max cp of this pokemon, if you upgrade it fully with your current player level
+	 *
 	 * @return Max cp of this pokemon
 	 */
 	public int getMaxCpFullEvolveAndPowerupForPlayer() throws LoginFailedException, RemoteServerException {
@@ -284,25 +286,26 @@ public class PokemonDetails {
 
 	/**
 	 * Calculated the max cp of this pokemon, if you upgrade it fully with your current player level
+	 *
 	 * @return Max cp of this pokemon
 	 */
 	private int getMaxCpFullEvolveAndPowerup(int playerLevel) {
 		PokemonIdOuterClass.PokemonId highestUpgradedFamily;
 		if (getPokemonId() == EEVEE) {
 			highestUpgradedFamily = FLAREON;
-		}
-		else {
+		} else {
 			highestUpgradedFamily = PokemonMetaRegistry.getHightestForFamily(getPokemonFamily());
 		}
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
-		int attack = getProto().getIndividualAttack() + pokemonMeta.getBaseAttack();
-		int defense = getProto().getIndividualDefense() + pokemonMeta.getBaseDefense();
-		int stamina = getProto().getIndividualStamina() + pokemonMeta.getBaseStamina();
+		int attack = getIndividualAttack() + pokemonMeta.getBaseAttack();
+		int defense = getIndividualDefense() + pokemonMeta.getBaseDefense();
+		int stamina = getIndividualStamina() + pokemonMeta.getBaseStamina();
 		return PokemonCpUtils.getMaxCpForPlayer(attack, defense, stamina, playerLevel);
 	}
 
 	/**
 	 * Calculate the CP after evolving this Pokemon
+	 *
 	 * @return New CP after evolve
 	 */
 	public int getCpAfterEvolve() {
@@ -315,35 +318,37 @@ public class PokemonDetails {
 		}
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
 		PokemonIdOuterClass.PokemonId secondHighest = pokemonMeta.getParentId();
-		float level = PokemonCpUtils.getLevelFromCpMultiplier(getCpMultiplier() + getAdditionalCpMultiplier());
 		if (getPokemonId() == secondHighest) {
-			int attack = getProto().getIndividualAttack() + pokemonMeta.getBaseAttack();
-			int defense = getProto().getIndividualDefense() + pokemonMeta.getBaseDefense();
-			int stamina = getProto().getIndividualStamina() + pokemonMeta.getBaseStamina();
-			return PokemonCpUtils.getCp(attack, defense, stamina, level);
+			int attack = getIndividualAttack() + pokemonMeta.getBaseAttack();
+			int defense = getIndividualDefense() + pokemonMeta.getBaseDefense();
+			int stamina = getIndividualStamina() + pokemonMeta.getBaseStamina();
+			return PokemonCpUtils.getCp(attack, defense, stamina, getCombinedCpMultiplier());
 		}
 		pokemonMeta = PokemonMetaRegistry.getMeta(secondHighest);
-		int attack = getProto().getIndividualAttack() + pokemonMeta.getBaseAttack();
-		int defense = getProto().getIndividualDefense() + pokemonMeta.getBaseDefense();
-		int stamina = getProto().getIndividualStamina() + pokemonMeta.getBaseStamina();
-		return PokemonCpUtils.getCp(attack, defense, stamina, level);
+		int attack = getIndividualAttack() + pokemonMeta.getBaseAttack();
+		int defense = getIndividualDefense() + pokemonMeta.getBaseDefense();
+		int stamina = getIndividualStamina() + pokemonMeta.getBaseStamina();
+		return PokemonCpUtils.getCp(attack, defense, stamina, getCombinedCpMultiplier());
 	}
 
 	/**
-	 * Static helper to get the absolute maximum CP for pokemons with their PokemonId.
-	 * @param id The {@link PokemonIdOuterClass.PokemonId} of the Pokemon to get CP for.
-	 * @return The absolute maximum CP
-	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
+	 * Calculate the CP after fully evolving this Pokemon
+	 *
+	 * @return New CP after evolve
 	 */
-	public static int getAbsoluteMaxCp(PokemonIdOuterClass.PokemonId id) throws NoSuchItemException {
-		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(id);
-		if (pokemonMeta == null) {
-			throw new NoSuchItemException("Cannot find meta data for " + id);
+	public int getCpAfterFullEvolve() {
+		if (asList(VAPOREON, JOLTEON, FLAREON).contains(getPokemonId())) {
+			return getCp();
 		}
-		int attack = 15 + pokemonMeta.getBaseAttack();
-		int defense = 15 + pokemonMeta.getBaseDefense();
-		int stamina = 15 + pokemonMeta.getBaseStamina();
-		return PokemonCpUtils.getMaxCpForPlayer(attack, defense, stamina, 40);
+		PokemonIdOuterClass.PokemonId highestUpgradedFamily = PokemonMetaRegistry.getHightestForFamily(getPokemonFamily());
+		if (getPokemonId() == highestUpgradedFamily) {
+			return getCp();
+		}
+		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
+		int attack = getProto().getIndividualAttack() + pokemonMeta.getBaseAttack();
+		int defense = getProto().getIndividualDefense() + pokemonMeta.getBaseDefense();
+		int stamina = getProto().getIndividualStamina() + pokemonMeta.getBaseStamina();
+		return PokemonCpUtils.getCp(attack, defense, stamina, getCombinedCpMultiplier());
 	}
 
 	/**
@@ -353,4 +358,24 @@ public class PokemonDetails {
 		return getProto().getNumUpgrades();
 	}
 
+	/**
+	 * @return The CP for this pokemon after powerup
+	 */
+	public int getCpAfterPowerup() {
+		return PokemonCpUtils.getCpAfterPowerup(getCp(), getCombinedCpMultiplier());
+	}
+
+	/**
+	 * @return Cost of candy for a powerup
+	 */
+	public int getCandyCostsForPowerup() {
+		return PokemonCpUtils.getCandyCostsForPowerup(getCombinedCpMultiplier(), getNumerOfPowerupsDone());
+	}
+
+	/**
+	 * @return Cost of stardust for a powerup
+	 */
+	public int getStardustCostsForPowerup() {
+		return PokemonCpUtils.getStartdustCostsForPowerup(getCombinedCpMultiplier(), getNumerOfPowerupsDone());
+	}
 }
