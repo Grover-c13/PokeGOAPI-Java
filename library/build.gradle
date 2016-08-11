@@ -23,11 +23,6 @@ sourceSets {
             srcDir 'src/resources/protobuf/src'
             include '**/*.proto'
         }
-        proto {
-            // Need to use custom dir cause Gradle doesn't like us otherwise :(
-            srcDir 'src/resources/signature'
-            include 'Signature.proto'
-        }
     }
 }
 
