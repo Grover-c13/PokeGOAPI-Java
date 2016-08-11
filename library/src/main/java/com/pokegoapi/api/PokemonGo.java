@@ -51,8 +51,9 @@ public class PokemonGo {
 	@Getter
 	RequestHandler requestHandler;
 	@Getter
-	private PlayerProfile playerProfile;
-	private Inventories inventories;
+	private final PlayerProfile playerProfile;
+	@Getter
+	private final Inventories inventories;
 	@Getter
 	private double latitude;
 	@Getter
@@ -100,6 +101,7 @@ public class PokemonGo {
 		longitude = Double.NaN;
 		latitude = Double.NaN;
 		startTime = currentTimeMillis();
+		inventories = new Inventories(this);
 	}
 
 	/**
@@ -142,20 +144,6 @@ public class PokemonGo {
 
 	public long currentTimeMillis() {
 		return time.currentTimeMillis();
-	}
-
-	/**
-	 * Get the inventories API
-	 *
-	 * @return Inventories
-	 * @throws LoginFailedException when login fails
-	 * @throws RemoteServerException when server down/issue
-	 */
-	public Inventories getInventories() throws LoginFailedException, RemoteServerException {
-		if (inventories == null) {
-			inventories = new Inventories(this);
-		}
-		return inventories;
 	}
 
 	/**
