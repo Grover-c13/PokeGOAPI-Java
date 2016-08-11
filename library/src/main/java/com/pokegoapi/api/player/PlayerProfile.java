@@ -47,11 +47,10 @@ import lombok.Setter;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class PlayerProfile {
 	private static final String TAG = PlayerProfile.class.getSimpleName();
 	private final PokemonGo api;
-	private PlayerData playerData;
+	private static PlayerData playerData;
 	private EquippedBadge badge;
 	private PlayerAvatar avatar;
 	private DailyBonus dailyBonus;
@@ -64,12 +63,11 @@ public class PlayerProfile {
 	public PlayerProfile(PokemonGo api) throws LoginFailedException, RemoteServerException {
 		this.api = api;
 
-		updateProfile();
-
-		if (tutorialState.getTutorialStates().isEmpty()) {
-			enableAccount();
-		}
-	}
+        if (playerData == null) {
+            Log.e("test", "updating profile data");
+            updateProfile();
+        }
+    }
 
 	/**
 	 * Updates the player profile with the latest data.
@@ -78,7 +76,6 @@ public class PlayerProfile {
 	 * @throws RemoteServerException the remote server exception
 	 */
 	public void updateProfile() throws RemoteServerException, LoginFailedException {
-
 		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
 		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
 		api.getRequestHandler().sendServerRequests(getPlayerServerRequest);
@@ -107,7 +104,12 @@ public class PlayerProfile {
 
 		// Tutorial state
 		tutorialState = new TutorialState(playerData.getTutorialStateList());
-	}
+
+        // Check if we are allowed to receive valid responses
+        if (tutorialState.getTutorialStates().isEmpty()) {
+            enableAccount();
+        }
+    }
 
 	/**
 	 * Accept the rewards granted and the items unlocked by gaining a trainer level up. Rewards are retained by the
