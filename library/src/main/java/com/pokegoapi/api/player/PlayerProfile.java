@@ -17,7 +17,6 @@ package com.pokegoapi.api.player;
 
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.Player.EquippedBadgeOuterClass.EquippedBadge;
-import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
 import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
@@ -41,7 +40,7 @@ import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 import lombok.Setter;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 
@@ -53,7 +52,7 @@ public class PlayerProfile {
 	private PlayerAvatar avatar;
 	private DailyBonus dailyBonus;
 	private ContactSettings contactSettings;
-	private Map<Currency, Integer> currencies = new HashMap<Currency, Integer>();
+	private Map<Currency, Integer> currencies = new EnumMap<Currency, Integer>(Currency.class);
 	@Setter
 	private Stats stats;
 

@@ -15,13 +15,17 @@
 
 package com.pokegoapi.api.pokemon;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.map.pokemon.EvolutionResult;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.AsyncHelper;
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
@@ -43,6 +47,8 @@ import POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass.UseItemPo
 import POGOProtos.Networking.Responses.UseItemReviveResponseOuterClass.UseItemReviveResponse;
 import lombok.Getter;
 import lombok.Setter;
+import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * The type Pokemon.
@@ -159,6 +165,17 @@ public class Pokemon extends PokemonDetails {
 	}
 
 	/**
+	 * Check if can powers up this pokemon
+	 *
+	 * @return the boolean
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public boolean canPowerUp() throws LoginFailedException, RemoteServerException {
+		return getCandy() >= getCandyCostsForPowerup();
+	}
+
+	/**
 	 * Powers up a pokemon with candy and stardust.
 	 * After powering up this pokemon object will reflect the new changes.
 	 *
@@ -167,21 +184,34 @@ public class Pokemon extends PokemonDetails {
 	 * @throws RemoteServerException the remote server exception
 	 */
 	public UpgradePokemonResponse.Result powerUp() throws LoginFailedException, RemoteServerException {
-		UpgradePokemonMessage reqMsg = UpgradePokemonMessage.newBuilder()
-				.setPokemonId(this.getId())
-				.build();
+		return AsyncHelper.toBlocking(powerUpAsync());
+	}
 
-		ServerRequest serverRequest = new ServerRequest(RequestType.UPGRADE_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+	/**
+	 * Powers up a pokemon with candy and stardust.
+	 * After powering up this pokemon object will reflect the new changes.
+	 *
+	 * @return The result
+	 */
+	public Observable<UpgradePokemonResponse.Result> powerUpAsync() {
+		UpgradePokemonMessage reqMsg = UpgradePokemonMessage.newBuilder().setPokemonId(getId()).build();
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.UPGRADE_POKEMON, reqMsg);
 
-		UpgradePokemonResponse response;
-		try {
-			response = UpgradePokemonResponse.parseFrom(serverRequest.getData());
-			setProto(response.getUpgradedPokemon());
-			return response.getResult();
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
+				new Func1<ByteString, UpgradePokemonResponse.Result>() {
+					@Override
+					public UpgradePokemonResponse.Result call(ByteString result) {
+						UpgradePokemonResponse response;
+						try {
+							response = UpgradePokemonResponse.parseFrom(result);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+						//set new pokemon details
+						setProto(response.getUpgradedPokemon());
+						return response.getResult();
+					}
+				});
 	}
 
 	/**
