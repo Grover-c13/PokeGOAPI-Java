@@ -24,13 +24,13 @@ import com.pokegoapi.api.pokemon.Pokemon;
 import lombok.Getter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class PokeBank {
 	@Getter
-	List<Pokemon> pokemons = Collections.synchronizedList(new ArrayList<Pokemon>());
+	List<Pokemon> pokemons = new CopyOnWriteArrayList<>();
 	@Getter
 	PokemonGo instance;
 
@@ -40,7 +40,7 @@ public class PokeBank {
 
 	public void reset(PokemonGo pgo) {
 		this.instance = pgo;
-		pokemons = new ArrayList<>();
+		pokemons.clear();
 	}
 
 	/**

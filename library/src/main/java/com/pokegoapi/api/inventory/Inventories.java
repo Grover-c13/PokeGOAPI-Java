@@ -15,6 +15,10 @@
 
 package com.pokegoapi.api.inventory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Inventory.EggIncubatorOuterClass;
@@ -34,25 +38,21 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
 public class Inventories {
 
 	private final PokemonGo api;
 	@Getter
-	private ItemBag itemBag;
+	private final ItemBag itemBag;
 	@Getter
-	private PokeBank pokebank;
+	private final PokeBank pokebank;
 	@Getter
-	private CandyJar candyjar;
+	private final CandyJar candyjar;
 	@Getter
-	private Pokedex pokedex;
+	private final Pokedex pokedex;
 	@Getter
-	private List<EggIncubator> incubators;
+	private final List<EggIncubator> incubators;
 	@Getter
-	private Hatchery hatchery;
+	private final Hatchery hatchery;
 
 	private long lastInventoryUpdate = 0;
 
@@ -69,7 +69,7 @@ public class Inventories {
 		pokebank = new PokeBank(api);
 		candyjar = new CandyJar(api);
 		pokedex = new Pokedex(api);
-		incubators = new ArrayList<>();
+		incubators = new CopyOnWriteArrayList<>();
 		hatchery = new Hatchery(api);
 		updateInventories();
 	}
@@ -98,7 +98,7 @@ public class Inventories {
 			pokebank.reset(api);
 			candyjar.reset(api);
 			pokedex.reset(api);
-			incubators = new ArrayList<>();
+			incubators.clear();
 			hatchery.reset(api);
 		}
 		GetInventoryMessage invReqMsg = GetInventoryMessage.newBuilder()
@@ -154,9 +154,11 @@ public class Inventories {
 			}
 
 			if (itemData.hasEggIncubators()) {
+				List<EggIncubator> buffer = new ArrayList<>();
 				for (EggIncubatorOuterClass.EggIncubator incubator : itemData.getEggIncubators().getEggIncubatorList()) {
-					incubators.add(new EggIncubator(api, incubator));
+					buffer.add(new EggIncubator(api, incubator));
 				}
+				incubators.addAll(buffer);
 			}
 
 			lastInventoryUpdate = api.currentTimeMillis();

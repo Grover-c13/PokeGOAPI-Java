@@ -60,7 +60,6 @@ import rx.Observable;
 import rx.functions.Func1;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -123,7 +122,7 @@ public class Map {
 					}
 				}
 
-				cachedCatchable = Collections.synchronizedList(new CopyOnWriteArrayList<>(catchablePokemons));
+				cachedCatchable = new CopyOnWriteArrayList<>(catchablePokemons);
 				return cachedCatchable;
 			}
 		});

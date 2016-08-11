@@ -28,13 +28,13 @@ import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class Hatchery {
 	@Getter
-	Set<EggPokemon> eggs = new HashSet<EggPokemon>();
+	Set<EggPokemon> eggs = new CopyOnWriteArraySet<EggPokemon>();
 	@Getter
 	PokemonGo instance;
 
@@ -44,7 +44,7 @@ public class Hatchery {
 
 	public void reset(PokemonGo pgo) {
 		this.instance = pgo;
-		eggs = new HashSet<>();
+		eggs.clear();
 	}
 
 	public void addEgg(EggPokemon egg) {
