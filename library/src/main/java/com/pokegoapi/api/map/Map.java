@@ -92,8 +92,8 @@ public class Map {
 		final double deltaLatitude = difference.latDegrees() / stepsRequired;
 		final double deltaLongitude = difference.lngDegrees() / stepsRequired;
 		while (stepsRequired > 0) {
-			api.setLatitude(api.getLatitude() + deltaLatitude);
-			api.setLongitude(api.getLongitude() + deltaLongitude);
+			api.setLatitude(api.getLatitude() + deltaLatitude + getSmallRandom());
+			api.setLongitude(api.getLongitude() + deltaLongitude + getSmallRandom());
 		}
 	}
 
@@ -110,8 +110,8 @@ public class Map {
 		timer.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
-				api.setLatitude(api.getLatitude() + deltaLatitude);
-				api.setLongitude(api.getLongitude() + deltaLongitude);
+				api.setLatitude(api.getLatitude() + deltaLatitude + getSmallRandom());
+				api.setLongitude(api.getLongitude() + deltaLongitude + getSmallRandom());
 				stepsRequired.getAndAdd(-1);
 				if (stepsRequired.get() <= 0) {
 					cancel();
