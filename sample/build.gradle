@@ -1,3 +1,7 @@
+apply plugin:'application'
+
+mainClassName = "com.pokegoapi.examples.CatchPokemonAtAreaExample"
+
 archivesBaseName = archivesBaseName + '-sample'
 
 dependencies {
