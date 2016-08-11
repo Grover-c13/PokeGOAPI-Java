@@ -47,7 +47,7 @@ public class PokemonGo {
 	private final Time time;
 	public final long startTime;
 	@Getter
-	private final byte[] uk22;
+	private final byte[] sessionHash;
 	@Getter
 	RequestHandler requestHandler;
 	@Getter
@@ -90,8 +90,8 @@ public class PokemonGo {
 		}
 		this.time = time;
 
-		uk22 = new byte[32];
-		new Random().nextBytes(uk22);
+		sessionHash = new byte[32];
+		new Random().nextBytes(sessionHash);
 
 		requestHandler = new RequestHandler(this, client);
 		playerProfile = new PlayerProfile(this);
