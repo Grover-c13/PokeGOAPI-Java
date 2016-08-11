@@ -64,7 +64,6 @@ public class PlayerProfile {
 		this.api = api;
 
         if (playerData == null) {
-            Log.e("test", "updating profile data");
             updateProfile();
         }
     }
