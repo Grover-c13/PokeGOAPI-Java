@@ -64,7 +64,6 @@ public class PokemonGo {
 	@Getter
 	private Settings settings;
 	private Map map;
-	private List<Unknown6OuterClass.Unknown6> unknown6s = new ArrayList<>();
 	@Setter
 	private DeviceInfo deviceInfo;
 	@Setter
