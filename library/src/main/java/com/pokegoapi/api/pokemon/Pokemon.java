@@ -16,10 +16,6 @@
 package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
-import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
-import POGOProtos.Enums.PokemonIdOuterClass;
-import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
-import POGOProtos.Enums.PokemonMoveOuterClass;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.EvolvePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.NicknamePokemonMessageOuterClass.NicknamePokemonMessage;
@@ -35,21 +31,23 @@ import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleaseP
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
 import POGOProtos.Networking.Responses.SetFavoritePokemonResponseOuterClass.SetFavoritePokemonResponse;
 import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass.UpgradePokemonResponse;
-import POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass;
 import POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass.UseItemPotionResponse;
-import POGOProtos.Networking.Responses.UseItemReviveResponseOuterClass;
 import POGOProtos.Networking.Responses.UseItemReviveResponseOuterClass.UseItemReviveResponse;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.map.pokemon.EvolutionResult;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.Log;
+import com.pokegoapi.util.AsyncHelper;
 import lombok.Getter;
 import lombok.Setter;
+import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * The type Pokemon.
@@ -169,6 +167,17 @@ public class Pokemon extends PokemonDetails {
 	}
 
 	/**
+	 * Check if can powers up this pokemon
+	 *
+	 * @return the boolean
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public boolean canPowerUp() throws LoginFailedException, RemoteServerException {
+		return getCandy() >= getCandyCostsForPowerup();
+	}
+
+	/**
 	 * Powers up a pokemon with candy and stardust.
 	 * After powering up this pokemon object will reflect the new changes.
 	 *
@@ -177,21 +186,34 @@ public class Pokemon extends PokemonDetails {
 	 * @throws RemoteServerException the remote server exception
 	 */
 	public UpgradePokemonResponse.Result powerUp() throws LoginFailedException, RemoteServerException {
-		UpgradePokemonMessage reqMsg = UpgradePokemonMessage.newBuilder()
-				.setPokemonId(this.getId())
-				.build();
+		return AsyncHelper.toBlocking(powerUpAsync());
+	}
 
-		ServerRequest serverRequest = new ServerRequest(RequestType.UPGRADE_POKEMON, reqMsg);
-		pgo.getRequestHandler().sendServerRequests(serverRequest);
+	/**
+	 * Powers up a pokemon with candy and stardust.
+	 * After powering up this pokemon object will reflect the new changes.
+	 *
+	 * @return The result
+	 */
+	public Observable<UpgradePokemonResponse.Result> powerUpAsync() {
+		UpgradePokemonMessage reqMsg = UpgradePokemonMessage.newBuilder().setPokemonId(getId()).build();
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.UPGRADE_POKEMON, reqMsg);
 
-		UpgradePokemonResponse response;
-		try {
-			response = UpgradePokemonResponse.parseFrom(serverRequest.getData());
-			setProto(response.getUpgradedPokemon());
-			return response.getResult();
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+		return pgo.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
+				new Func1<ByteString, UpgradePokemonResponse.Result>() {
+					@Override
+					public UpgradePokemonResponse.Result call(ByteString result) {
+						UpgradePokemonResponse response;
+						try {
+							response = UpgradePokemonResponse.parseFrom(result);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+						//set new pokemon details
+						setProto(response.getUpgradedPokemon());
+						return response.getResult();
+					}
+				});
 	}
 
 	/**
@@ -250,7 +272,6 @@ public class Pokemon extends PokemonDetails {
 	}
 
 
-
 	/**
 	 * Check if pokemon its injured but not fainted. need potions to heal
 	 *
@@ -273,8 +294,8 @@ public class Pokemon extends PokemonDetails {
 	 * Heal a pokemon, using various fallbacks for potions
 	 *
 	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
-     * @throws LoginFailedException If login failed.
-     * @throws RemoteServerException If server communication issues occurred.
+	 * @throws LoginFailedException  If login failed.
+	 * @throws RemoteServerException If server communication issues occurred.
 	 */
 	public UseItemPotionResponse.Result heal()
 			throws LoginFailedException, RemoteServerException {
@@ -300,10 +321,11 @@ public class Pokemon extends PokemonDetails {
 	/**
 	 * use a potion on that pokemon. Will check if there is enough potions and if the pokemon need
 	 * to be healed.
+	 *
 	 * @param itemId {@link ItemId} of the potion to use.
 	 * @return Result, ERROR_CANNOT_USE if the requirements aren't met
-     * @throws LoginFailedException If login failed.
-     * @throws RemoteServerException If server communications failed.
+	 * @throws LoginFailedException  If login failed.
+	 * @throws RemoteServerException If server communications failed.
 	 */
 	public UseItemPotionResponse.Result usePotion(ItemId itemId)
 			throws LoginFailedException, RemoteServerException {
@@ -338,8 +360,8 @@ public class Pokemon extends PokemonDetails {
 	 * Revive a pokemon, using various fallbacks for revive items
 	 *
 	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
-     * @throws LoginFailedException If login failed.
-     * @throws RemoteServerException If server communications failed.
+	 * @throws LoginFailedException  If login failed.
+	 * @throws RemoteServerException If server communications failed.
 	 */
 	public UseItemReviveResponse.Result revive()
 			throws LoginFailedException, RemoteServerException {
@@ -359,10 +381,11 @@ public class Pokemon extends PokemonDetails {
 	/**
 	 * Use a revive item on the pokemon. Will check if there is enough revive &amp; if the pokemon need
 	 * to be revived.
+	 *
 	 * @param itemId {@link ItemId} of the Revive to use.
 	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
-     * @throws LoginFailedException If login failed.
-     * @throws RemoteServerException If server communications failed.
+	 * @throws LoginFailedException  If login failed.
+	 * @throws RemoteServerException If server communications failed.
 	 */
 	public UseItemReviveResponse.Result useRevive(ItemId itemId)
 			throws LoginFailedException, RemoteServerException {
@@ -395,5 +418,4 @@ public class Pokemon extends PokemonDetails {
 	public EvolutionForm getEvolutionForm() {
 		return new EvolutionForm(getPokemonId());
 	}
-
 }
