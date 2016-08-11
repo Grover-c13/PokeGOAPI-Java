@@ -25,7 +25,7 @@ import java.util.Map;
 public class Pokedex {
 
 	private PokemonGo api;
-	private Map<PokemonId, PokedexEntry> pokedexMap = new EnumMap<>(PokemonId.class);
+	private final Map<PokemonId, PokedexEntry> pokedexMap = new EnumMap<>(PokemonId.class);
 
 	public Pokedex(PokemonGo pgo) {
 		reset(pgo);
@@ -33,7 +33,7 @@ public class Pokedex {
 
 	public void reset(PokemonGo pgo) {
 		this.api = pgo;
-		pokedexMap = new EnumMap<PokemonId, PokedexEntry>(PokemonId.class);
+		pokedexMap.clear();
 	}
 
 	/**

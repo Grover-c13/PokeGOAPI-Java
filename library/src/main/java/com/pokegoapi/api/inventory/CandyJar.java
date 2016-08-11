@@ -20,11 +20,13 @@ import com.pokegoapi.api.PokemonGo;
 import lombok.ToString;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @ToString
 public class CandyJar {
 	private PokemonGo pgo;
-	private HashMap<PokemonFamilyId, Integer> candies;
+	private ConcurrentMap<PokemonFamilyId, Integer> candies;
 
 	public CandyJar(PokemonGo pgo) {
 		reset(pgo);
@@ -32,7 +34,7 @@ public class CandyJar {
 
 	public void reset(PokemonGo pgo) {
 		this.pgo = pgo;
-		candies = new HashMap<>();
+		candies = new ConcurrentHashMap<>();
 	}
 
 	/**

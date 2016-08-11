@@ -33,7 +33,8 @@ import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 
 /**
@@ -41,7 +42,7 @@ import java.util.HashMap;
  */
 public class ItemBag {
 	private PokemonGo pgo;
-	private HashMap<ItemId, Item> items;
+	private ConcurrentMap<ItemId, Item> items;
 
 	public ItemBag(PokemonGo pgo) {
 		reset(pgo);
@@ -49,7 +50,7 @@ public class ItemBag {
 
 	public void reset(PokemonGo pgo) {
 		this.pgo = pgo;
-		items = new HashMap<>();
+		items = new ConcurrentHashMap<>();
 	}
 
 	public void addItem(Item item) {
@@ -109,9 +110,7 @@ public class ItemBag {
 		}
 
 		// prevent returning null
-		if (!items.containsKey(type)) {
-			return new Item(ItemData.newBuilder().setCount(0).setItemId(type).build());
-		}
+		items.putIfAbsent(type, new Item(ItemData.newBuilder().setCount(0).setItemId(type).build()));
 
 		return items.get(type);
 	}
