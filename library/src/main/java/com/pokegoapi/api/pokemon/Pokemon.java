@@ -55,7 +55,7 @@ import rx.functions.Func1;
 public class Pokemon extends PokemonDetails {
 
 	private static final String TAG = Pokemon.class.getSimpleName();
-	private final PokemonGo pgo;
+	private final PokemonGo api;
 	@Getter
 	@Setter
 	private int stamina;
@@ -69,7 +69,7 @@ public class Pokemon extends PokemonDetails {
 	 */
 	public Pokemon(PokemonGo api, PokemonData proto) {
 		super(api, proto);
-		this.pgo = api;
+		this.api = api;
 		this.stamina = proto.getStamina();
 	}
 
@@ -84,7 +84,7 @@ public class Pokemon extends PokemonDetails {
 		ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.RELEASE_POKEMON, reqMsg);
-		pgo.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest);
 
 		ReleasePokemonResponse response;
 		try {
@@ -94,12 +94,12 @@ public class Pokemon extends PokemonDetails {
 		}
 
 		if (response.getResult() == Result.SUCCESS) {
-			pgo.getInventories().getPokebank().removePokemon(this);
+			api.getInventories().getPokebank().removePokemon(this);
 		}
 
-		pgo.getInventories().getPokebank().removePokemon(this);
+		api.getInventories().getPokebank().removePokemon(this);
 
-		pgo.getInventories().updateInventories();
+		api.getInventories().updateInventories();
 
 		return response.getResult();
 	}
@@ -120,7 +120,7 @@ public class Pokemon extends PokemonDetails {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.NICKNAME_POKEMON, reqMsg);
-		pgo.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest);
 
 		NicknamePokemonResponse response;
 		try {
@@ -129,8 +129,8 @@ public class Pokemon extends PokemonDetails {
 			throw new RemoteServerException(e);
 		}
 
-		pgo.getInventories().getPokebank().removePokemon(this);
-		pgo.getInventories().updateInventories();
+		api.getInventories().getPokebank().removePokemon(this);
+		api.getInventories().updateInventories();
 
 		return response.getResult();
 	}
@@ -151,7 +151,7 @@ public class Pokemon extends PokemonDetails {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.SET_FAVORITE_POKEMON, reqMsg);
-		pgo.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest);
 
 		SetFavoritePokemonResponse response;
 		try {
@@ -160,8 +160,8 @@ public class Pokemon extends PokemonDetails {
 			throw new RemoteServerException(e);
 		}
 
-		pgo.getInventories().getPokebank().removePokemon(this);
-		pgo.getInventories().updateInventories();
+		api.getInventories().getPokebank().removePokemon(this);
+		api.getInventories().updateInventories();
 
 		return response.getResult();
 	}
@@ -199,7 +199,7 @@ public class Pokemon extends PokemonDetails {
 		UpgradePokemonMessage reqMsg = UpgradePokemonMessage.newBuilder().setPokemonId(getId()).build();
 		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.UPGRADE_POKEMON, reqMsg);
 
-		return pgo.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
+		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
 				new Func1<ByteString, UpgradePokemonResponse.Result>() {
 					@Override
 					public UpgradePokemonResponse.Result call(ByteString result) {
@@ -228,7 +228,7 @@ public class Pokemon extends PokemonDetails {
 		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.EVOLVE_POKEMON, reqMsg);
-		pgo.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest);
 
 		EvolvePokemonResponse response;
 		try {
@@ -237,11 +237,11 @@ public class Pokemon extends PokemonDetails {
 			return null;
 		}
 
-		EvolutionResult result = new EvolutionResult(pgo, response);
+		EvolutionResult result = new EvolutionResult(api, response);
 
-		pgo.getInventories().getPokebank().removePokemon(this);
+		api.getInventories().getPokebank().removePokemon(this);
 
-		pgo.getInventories().updateInventories();
+		api.getInventories().updateInventories();
 
 		return result;
 	}
@@ -303,16 +303,16 @@ public class Pokemon extends PokemonDetails {
 		if (!isInjured())
 			return UseItemPotionResponse.Result.ERROR_CANNOT_USE;
 
-		if (pgo.getInventories().getItemBag().getItem(ItemId.ITEM_POTION).getCount() > 0)
+		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_POTION).getCount() > 0)
 			return usePotion(ItemId.ITEM_POTION);
 
-		if (pgo.getInventories().getItemBag().getItem(ItemId.ITEM_SUPER_POTION).getCount() > 0)
+		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_SUPER_POTION).getCount() > 0)
 			return usePotion(ItemId.ITEM_SUPER_POTION);
 
-		if (pgo.getInventories().getItemBag().getItem(ItemId.ITEM_HYPER_POTION).getCount() > 0)
+		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_HYPER_POTION).getCount() > 0)
 			return usePotion(ItemId.ITEM_HYPER_POTION);
 
-		if (pgo.getInventories().getItemBag().getItem(ItemId.ITEM_MAX_POTION).getCount() > 0)
+		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_MAX_POTION).getCount() > 0)
 			return usePotion(ItemId.ITEM_MAX_POTION);
 
 		return UseItemPotionResponse.Result.ERROR_CANNOT_USE;
@@ -330,7 +330,7 @@ public class Pokemon extends PokemonDetails {
 	public UseItemPotionResponse.Result usePotion(ItemId itemId)
 			throws LoginFailedException, RemoteServerException {
 
-		Item potion = pgo.getInventories().getItemBag().getItem(itemId);
+		Item potion = api.getInventories().getItemBag().getItem(itemId);
 		//some sanity check, to prevent wrong use of this call
 		if (!potion.isPotion() || potion.getCount() < 1 || !isInjured())
 			return UseItemPotionResponse.Result.ERROR_CANNOT_USE;
@@ -342,7 +342,7 @@ public class Pokemon extends PokemonDetails {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_POTION, reqMsg);
-		pgo.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest);
 
 		UseItemPotionResponse response;
 		try {
@@ -369,10 +369,10 @@ public class Pokemon extends PokemonDetails {
 		if (!isFainted())
 			return UseItemReviveResponse.Result.ERROR_CANNOT_USE;
 
-		if (pgo.getInventories().getItemBag().getItem(ItemId.ITEM_REVIVE).getCount() > 0)
+		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_REVIVE).getCount() > 0)
 			return useRevive(ItemId.ITEM_REVIVE);
 
-		if (pgo.getInventories().getItemBag().getItem(ItemId.ITEM_MAX_REVIVE).getCount() > 0)
+		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_MAX_REVIVE).getCount() > 0)
 			return useRevive(ItemId.ITEM_MAX_REVIVE);
 
 		return UseItemReviveResponse.Result.ERROR_CANNOT_USE;
@@ -390,7 +390,7 @@ public class Pokemon extends PokemonDetails {
 	public UseItemReviveResponse.Result useRevive(ItemId itemId)
 			throws LoginFailedException, RemoteServerException {
 
-		Item item = pgo.getInventories().getItemBag().getItem(itemId);
+		Item item = api.getInventories().getItemBag().getItem(itemId);
 		if (!item.isRevive() || item.getCount() < 1 || !isFainted())
 			return UseItemReviveResponse.Result.ERROR_CANNOT_USE;
 
@@ -401,7 +401,7 @@ public class Pokemon extends PokemonDetails {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_REVIVE, reqMsg);
-		pgo.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest);
 
 		UseItemReviveResponse response;
 		try {
