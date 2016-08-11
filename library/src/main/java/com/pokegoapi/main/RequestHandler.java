@@ -125,8 +125,8 @@ public class RequestHandler implements Runnable {
 
 			}
 
-			private ResultOrException getResult(long timeouut, TimeUnit timeUnit) throws InterruptedException {
-				long wait = api.currentTimeMillis() + timeUnit.toMillis(timeouut);
+			private ResultOrException getResult(long timeout, TimeUnit timeUnit) throws InterruptedException {
+				long wait = api.currentTimeMillis() + timeUnit.toMillis(timeout);
 				while (!isDone()) {
 					Thread.sleep(10);
 					if (wait < api.currentTimeMillis()) {
