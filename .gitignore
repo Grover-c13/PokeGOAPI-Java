@@ -15,7 +15,7 @@ serve as a standard template for any Bapcraft Java projects.
 .mtj.tmp/
 
 # Package Files #
-*.jar
+.jar
 *.war
 *.ear
 
