@@ -267,6 +267,23 @@ public class PokemonDetails {
 	}
 
 	/**
+	 * Static helper to get the absolute maximum CP for pokemons with their PokemonId.
+	 * @param id The {@link PokemonIdOuterClass.PokemonId} of the Pokemon to get CP for.
+	 * @return The absolute maximum CP
+	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
+	 */
+	public static int getAbsoluteMaxCp(PokemonIdOuterClass.PokemonId id) throws NoSuchItemException {
+		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(id);
+		if (pokemonMeta == null) {
+			throw new NoSuchItemException("Cannot find meta data for " + id);
+		}
+		int attack = 15 + pokemonMeta.getBaseAttack();
+		int defense = 15 + pokemonMeta.getBaseDefense();
+		int stamina = 15 + pokemonMeta.getBaseStamina();
+		return PokemonCpUtils.getMaxCpForPlayer(attack, defense, stamina, 40);
+	}
+
+	/**
 	 * Calculated the max cp of this pokemon, if you upgrade it fully and the player is at level 40
 	 * @return Max cp of this pokemon
 	 */
@@ -293,8 +310,7 @@ public class PokemonDetails {
 		}
 		else if (getPokemonId() == EEVEE) {
 			highestUpgradedFamily = FLAREON;
-		}
-		else {
+		} else {
 			highestUpgradedFamily = PokemonMetaRegistry.getHightestForFamily(getPokemonFamily());
 		}
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
@@ -330,23 +346,6 @@ public class PokemonDetails {
 		int defense = getProto().getIndividualDefense() + pokemonMeta.getBaseDefense();
 		int stamina = getProto().getIndividualStamina() + pokemonMeta.getBaseStamina();
 		return PokemonCpUtils.getCp(attack, defense, stamina, level);
-	}
-
-	/**
-	 * Static helper to get the absolute maximum CP for pokemons with their PokemonId.
-	 * @param id The {@link PokemonIdOuterClass.PokemonId} of the Pokemon to get CP for.
-	 * @return The absolute maximum CP
-	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
-	 */
-	public static int getAbsoluteMaxCp(PokemonIdOuterClass.PokemonId id) throws NoSuchItemException {
-		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(id);
-		if (pokemonMeta == null) {
-			throw new NoSuchItemException("Cannot find meta data for " + id);
-		}
-		int attack = 15 + pokemonMeta.getBaseAttack();
-		int defense = 15 + pokemonMeta.getBaseDefense();
-		int stamina = 15 + pokemonMeta.getBaseStamina();
-		return PokemonCpUtils.getMaxCpForPlayer(attack, defense, stamina, 40);
 	}
 
 	/**
