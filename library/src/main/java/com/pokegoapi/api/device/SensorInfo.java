@@ -55,7 +55,7 @@ public class SensorInfo {
 	}
 
 	/**
-	 * Sets timestamp snapshot in ms
+	 * Sets timestamp snapshot in ms since start
 	 *
 	 */
 	public void setTimestampSnapshot(long timestampSnapshot) {
