@@ -219,7 +219,10 @@ public class RequestHandler implements Runnable {
 			} else if (responseEnvelop.getStatusCode() == 53) {
 				// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
 				return internalSendServerRequests(newAuthTicket, serverRequests);
+			}  else if (responseEnvelop.getStatusCode() == 3) {
+				throw new RemoteServerException("Youre account may be banned! please try from the official client.");
 			}
+
 
 			/**
 			 * map each reply to the numeric response,
