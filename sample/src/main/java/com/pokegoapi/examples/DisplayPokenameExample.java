@@ -57,5 +57,16 @@ public class DisplayPokenameExample {
 					i,
 					PokeNames.getDisplayName(i, new Locale("xx")), "Fallback"));
 		}
+
+		for (int i = 1; i < 152; i++) {
+			//Translate English Pokemon name to Simplified Chinese
+			Locale chs = new Locale("zh", "CN");
+			Log.d("English Names to Simplified Chinese - Example", String.format(
+					chs,
+					"Pokedex Nr# %d is %s in %s",
+					i,
+					PokeNames.translateName(PokeNames.getDisplayName(i, Locale.ENGLISH), chs),
+					chs.getDisplayName(chs)));
+		}
 	}
 }
