@@ -36,19 +36,19 @@ public class Hatchery {
 	@Getter
 	Set<EggPokemon> eggs = new HashSet<EggPokemon>();
 	@Getter
-	PokemonGo instance;
+	PokemonGo api;
 
 	public Hatchery(PokemonGo pgo) {
 		reset(pgo);
 	}
 
-	public void reset(PokemonGo pgo) {
-		this.instance = pgo;
+	public void reset(PokemonGo api) {
+		this.api = api;
 		eggs = new HashSet<>();
 	}
 
 	public void addEgg(EggPokemon egg) {
-		egg.setPgo(instance);
+		egg.setApi(api);
 		eggs.add(egg);
 	}
 	
@@ -63,7 +63,7 @@ public class Hatchery {
 	public List<HatchedEgg> queryHatchedEggs() throws RemoteServerException, LoginFailedException {
 		GetHatchedEggsMessage msg = GetHatchedEggsMessage.newBuilder().build(); 
 		ServerRequest serverRequest = new ServerRequest(RequestType.GET_HATCHED_EGGS, msg);
-		instance.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest);
 		
 		GetHatchedEggsResponse response = null;
 		try {
@@ -71,7 +71,7 @@ public class Hatchery {
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
-		instance.getInventories().updateInventories();
+		api.getInventories().updateInventories();
 		List<HatchedEgg> eggs = new ArrayList<HatchedEgg>();
 		for (int i = 0; i < response.getPokemonIdCount(); i++) {
 			eggs.add(new HatchedEgg(response.getPokemonId(i), 

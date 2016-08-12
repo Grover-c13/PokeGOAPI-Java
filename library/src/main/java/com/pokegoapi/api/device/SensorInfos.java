@@ -22,7 +22,7 @@ package com.pokegoapi.api.device;
 public interface SensorInfos {
 	/**
 	 *
-	 * @return timestamp snapshot in ms
+	 * @return timestamp snapshot in ms since start
 	 */
 	long getTimestampSnapshot();
 

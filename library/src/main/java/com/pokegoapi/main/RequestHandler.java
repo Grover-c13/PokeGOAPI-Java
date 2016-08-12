@@ -125,8 +125,8 @@ public class RequestHandler implements Runnable {
 
 			}
 
-			private ResultOrException getResult(long timeouut, TimeUnit timeUnit) throws InterruptedException {
-				long wait = api.currentTimeMillis() + timeUnit.toMillis(timeouut);
+			private ResultOrException getResult(long timeout, TimeUnit timeUnit) throws InterruptedException {
+				long wait = api.currentTimeMillis() + timeUnit.toMillis(timeout);
 				while (!isDone()) {
 					Thread.sleep(10);
 					if (wait < api.currentTimeMillis()) {
@@ -214,7 +214,7 @@ public class RequestHandler implements Runnable {
 			}
 
 			if (responseEnvelop.getStatusCode() == 102) {
-				throw new LoginFailedException(String.format("Invalid Auth status code recieved, token not refreshed?",
+				throw new LoginFailedException(String.format("Invalid Auth status code recieved, token not refreshed? %s %s",
 						responseEnvelop.getApiUrl(), responseEnvelop.getError()));
 			} else if (responseEnvelop.getStatusCode() == 53) {
 				// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request

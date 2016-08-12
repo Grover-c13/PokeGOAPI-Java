@@ -17,10 +17,8 @@ package com.pokegoapi.api;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
-import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
 
 import com.pokegoapi.api.device.DeviceInfo;
-import com.pokegoapi.api.device.DeviceInfos;
 import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
@@ -36,8 +34,6 @@ import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 
@@ -47,7 +43,7 @@ public class PokemonGo {
 	private final Time time;
 	public final long startTime;
 	@Getter
-	private final byte[] uk22;
+	private final byte[] sessionHash;
 	@Getter
 	RequestHandler requestHandler;
 	@Getter
@@ -64,7 +60,6 @@ public class PokemonGo {
 	@Getter
 	private Settings settings;
 	private Map map;
-	private List<Unknown6OuterClass.Unknown6> unknown6s = new ArrayList<>();
 	@Setter
 	private DeviceInfo deviceInfo;
 	@Setter
@@ -90,8 +85,8 @@ public class PokemonGo {
 		}
 		this.time = time;
 
-		uk22 = new byte[32];
-		new Random().nextBytes(uk22);
+		sessionHash = new byte[32];
+		new Random().nextBytes(sessionHash);
 
 		requestHandler = new RequestHandler(this, client);
 		playerProfile = new PlayerProfile(this);

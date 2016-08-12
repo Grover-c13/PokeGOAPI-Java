@@ -117,7 +117,8 @@ public class PokemonCpUtils {
 		float level;
 		if (combinedCpMultiplier < 0.734f) {
 			// compute polynomial approximation obtained by regression
-			level = 58.35178527f * combinedCpMultiplier * combinedCpMultiplier - 2.838007664f * combinedCpMultiplier + 0.8539209906f;
+			level = 58.35178527f * combinedCpMultiplier * combinedCpMultiplier
+					- 2.838007664f * combinedCpMultiplier + 0.8539209906f;
 		} else {
 			// compute linear approximation obtained by regression
 			level = 171.0112688f * combinedCpMultiplier - 95.20425243f;
@@ -190,7 +191,8 @@ public class PokemonCpUtils {
 	 * @return CP
 	 */
 	public static int getCp(int attack, int defense, int stamina, float combinedCpMultiplier) {
-		return (int) Math.round(attack * Math.pow(defense, 0.5) * Math.pow(stamina, 0.5) * Math.pow(combinedCpMultiplier, 2) / 10f);
+		return (int) Math.round(attack * Math.pow(defense, 0.5) * Math.pow(stamina, 0.5)
+				* Math.pow(combinedCpMultiplier, 2) / 10f);
 	}
 
 	/**
