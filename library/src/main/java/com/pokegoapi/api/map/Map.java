@@ -15,6 +15,7 @@
 
 package com.pokegoapi.api.map;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Map.Fort.FortTypeOuterClass.FortType;
@@ -59,11 +60,7 @@ import com.pokegoapi.util.MapUtil;
 import rx.Observable;
 import rx.functions.Func1;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Map {
@@ -85,6 +82,48 @@ public class Map {
 		cachedMapObjects = new MapObjects(api);
 		lastMapUpdate = 0;
 	}
+
+	public void walkToLocation(S2LatLng destination, double speed) {
+		S2LatLng start = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
+		S2LatLng difference = destination.sub(start);
+		double distance = start.getEarthDistance(destination);
+		double time = distance / speed;
+		final double stepsRequired = time / (200D / 1000D);
+		final double deltaLatitude = difference.latDegrees() / stepsRequired;
+		final double deltaLongitude = difference.lngDegrees() / stepsRequired;
+		while (stepsRequired > 0) {
+			api.setLatitude(api.getLatitude() + deltaLatitude + getSmallRandom());
+			api.setLongitude(api.getLongitude() + deltaLongitude + getSmallRandom());
+		}
+	}
+
+	public void walkToLocationAsync(S2LatLng destination, double speed) {
+		S2LatLng start = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
+		S2LatLng difference = destination.sub(start);
+		double distance = start.getEarthDistance(destination);
+		double time = distance / speed;
+		final AtomicDouble stepsRequired = new AtomicDouble(time / (200D / 1000D));
+		final double deltaLatitude = difference.latDegrees() / stepsRequired.get();
+		final double deltaLongitude = difference.lngDegrees() / stepsRequired.get();
+
+		Timer timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				api.setLatitude(api.getLatitude() + deltaLatitude + getSmallRandom());
+				api.setLongitude(api.getLongitude() + deltaLongitude + getSmallRandom());
+				stepsRequired.getAndAdd(-1);
+				if (stepsRequired.get() <= 0) {
+					cancel();
+				}
+			}
+		}, 0, 200L);
+	}
+
+	private double getSmallRandom() {
+		return Math.random() * 0.0001 - 0.00005;
+	}
+
 
 	/**
 	 * Returns a list of catchable pokemon around the current location.
