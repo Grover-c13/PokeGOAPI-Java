@@ -6604,7 +6604,7 @@ public class PokemonMetaRegistry {
 	 * @param family the id of the pokemon family
 	 * @return PokemonId
 	 */
-	public static PokemonId getHightestForFamily(PokemonFamilyId family) {
+	public static PokemonId getHighestForFamily(PokemonFamilyId family) {
 		return highestForFamily.get(family);
 	}
 

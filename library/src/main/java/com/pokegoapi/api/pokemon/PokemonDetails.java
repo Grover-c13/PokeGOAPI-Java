@@ -294,7 +294,7 @@ public class PokemonDetails {
 		if (getPokemonId() == EEVEE) {
 			highestUpgradedFamily = FLAREON;
 		} else {
-			highestUpgradedFamily = PokemonMetaRegistry.getHightestForFamily(getPokemonFamily());
+			highestUpgradedFamily = PokemonMetaRegistry.getHighestForFamily(getPokemonFamily());
 		}
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
 		int attack = getIndividualAttack() + pokemonMeta.getBaseAttack();
@@ -312,7 +312,7 @@ public class PokemonDetails {
 		if (asList(VAPOREON, JOLTEON, FLAREON).contains(getPokemonId())) {
 			return getCp();
 		}
-		PokemonIdOuterClass.PokemonId highestUpgradedFamily = PokemonMetaRegistry.getHightestForFamily(getPokemonFamily());
+		PokemonIdOuterClass.PokemonId highestUpgradedFamily = PokemonMetaRegistry.getHighestForFamily(getPokemonFamily());
 		if (getPokemonId() == highestUpgradedFamily) {
 			return getCp();
 		}
