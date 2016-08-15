@@ -340,7 +340,7 @@ public class PokemonDetails {
 		if (asList(VAPOREON, JOLTEON, FLAREON).contains(getPokemonId())) {
 			return getCp();
 		}
-		PokemonIdOuterClass.PokemonId highestUpgradedFamily = PokemonMetaRegistry.getHightestForFamily(getPokemonFamily());
+		PokemonIdOuterClass.PokemonId highestUpgradedFamily = PokemonMetaRegistry.getHighestForFamily(getPokemonFamily());
 		if (getPokemonId() == highestUpgradedFamily) {
 			return getCp();
 		}
