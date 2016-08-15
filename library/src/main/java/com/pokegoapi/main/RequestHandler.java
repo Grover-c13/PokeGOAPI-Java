@@ -56,7 +56,7 @@ public class RequestHandler implements Runnable {
 	private final Map<Long, ResultOrException> resultMap = new HashMap<>();
 	private String apiEndpoint;
 	private OkHttpClient client;
-	private Long requestId = new Random().nextLong();
+	private Long requestId = Math.abs(new Random().nextLong());
 
 	/**
 	 * Instantiates a new Request handler.
