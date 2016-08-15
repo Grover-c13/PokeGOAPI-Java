@@ -15,6 +15,18 @@
 
 package com.pokegoapi.api.pokemon;
 
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Item;
+import com.pokegoapi.api.map.pokemon.EvolutionResult;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.AsyncHelper;
+
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.EvolvePokemonMessage;
@@ -33,17 +45,6 @@ import POGOProtos.Networking.Responses.SetFavoritePokemonResponseOuterClass.SetF
 import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass.UpgradePokemonResponse;
 import POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass.UseItemPotionResponse;
 import POGOProtos.Networking.Responses.UseItemReviveResponseOuterClass.UseItemReviveResponse;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.Item;
-import com.pokegoapi.api.map.pokemon.EvolutionResult;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.AsyncHelper;
 import lombok.Getter;
 import lombok.Setter;
 import rx.Observable;
@@ -55,11 +56,9 @@ import rx.functions.Func1;
 public class Pokemon extends PokemonDetails {
 
 	private static final String TAG = Pokemon.class.getSimpleName();
-	private final PokemonGo api;
 	@Getter
 	@Setter
 	private int stamina;
-
 
 	/**
 	 * Creates a Pokemon object with helper functions around the proto.
@@ -69,7 +68,6 @@ public class Pokemon extends PokemonDetails {
 	 */
 	public Pokemon(PokemonGo api, PokemonData proto) {
 		super(api, proto);
-		this.api = api;
 		this.stamina = proto.getStamina();
 	}
 
@@ -245,32 +243,6 @@ public class Pokemon extends PokemonDetails {
 
 		return result;
 	}
-
-	/**
-	 * @return The CP for this pokemon after powerup
-	 */
-	public int getCpAfterPowerup() {
-		return PokemonCpUtils.getCpAfterPowerup(getProto().getCp(),
-				getProto().getCpMultiplier() + getProto().getAdditionalCpMultiplier());
-	}
-
-	/**
-	 * @return Cost of candy for a powerup
-	 */
-	public int getCandyCostsForPowerup() {
-		return PokemonCpUtils.getCandyCostsForPowerup(getProto().getCpMultiplier() + getProto().getAdditionalCpMultiplier(),
-				getProto().getNumUpgrades());
-	}
-
-	/**
-	 * @return Cost of stardust for a powerup
-	 */
-	public int getStardustCostsForPowerup() {
-		return PokemonCpUtils.getStartdustCostsForPowerup(
-				getProto().getCpMultiplier() + getProto().getAdditionalCpMultiplier(),
-				getProto().getNumUpgrades());
-	}
-
 
 	/**
 	 * Check if pokemon its injured but not fainted. need potions to heal
