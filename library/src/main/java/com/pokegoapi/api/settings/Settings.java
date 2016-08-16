@@ -8,6 +8,8 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
+
+import POGOProtos.Settings.GpsSettingsOuterClass;
 import lombok.Getter;
 
 /**
@@ -51,6 +53,14 @@ public class Settings {
 	 */
 	private final InventorySettings inventorySettings;
 
+	@Getter
+	/**
+	 * Settings for showing speed warnings
+	 *
+	 * @return GpsSettings instance.
+	 */
+	private final GpsSettings gpsSettings;
+
 
 	/**
 	 * Settings object that hold different configuration aspect of the game.
@@ -66,6 +76,7 @@ public class Settings {
 		this.levelUpSettings = new LevelUpSettings();
 		this.fortSettings = new FortSettings();
 		this.inventorySettings = new InventorySettings();
+		this.gpsSettings = new GpsSettings();
 		updateSettings();
 	}
 
@@ -91,7 +102,7 @@ public class Settings {
 		levelUpSettings.update(response.getSettings().getInventorySettings());
 		fortSettings.update(response.getSettings().getFortSettings());
 		inventorySettings.update(response.getSettings().getInventorySettings());
-
+		gpsSettings.update(response.getSettings().getGpsSettings());
 	}
 
 
