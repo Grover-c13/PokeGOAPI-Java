@@ -86,12 +86,6 @@ checkstyleMain.doLast {
     }
 }
 
-project.gradle.buildFinished { buildResult ->
-    if (buildResult.getFailure() != null) {
-        println "Reports: " + checkstyleMain.reports.getXml().getDestination().text
-    }
-}
-
 dependencies {
     compile 'svarzee.gps:gpsoauth:0.3'
     compile 'com.squareup.okio:okio:1.9.0'
