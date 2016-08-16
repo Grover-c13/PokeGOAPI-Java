@@ -80,9 +80,9 @@ checkstyleMain.doLast {
     def outputFile = file(checkstyleOutputDir + "main.xml")
     if (outputFile.exists() && outputFile.text.contains("<error ")) {
         logger.warn("!!!!-----------------------------------!!!!")
+        logger.warn("There were checkstyle warnings! For more info check $outputFile")
         logger.warn("PLEASE CORRECT BEFORE SUBMITTING A PULLREQUEST")
         logger.warn("!!!!-----------------------------------!!!!")
-        throw new GradleException("There were checkstyle warnings! For more info check $outputFile")
     }
 }
 
