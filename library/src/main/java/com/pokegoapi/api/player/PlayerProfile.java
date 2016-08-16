@@ -15,6 +15,20 @@
 
 package com.pokegoapi.api.player;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Item;
+import com.pokegoapi.api.inventory.ItemBag;
+import com.pokegoapi.api.inventory.Stats;
+import com.pokegoapi.exceptions.InvalidCurrencyException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.Log;
+
+import java.util.EnumMap;
+import java.util.Map;
+
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.Player.EquippedBadgeOuterClass.EquippedBadge;
 import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
@@ -31,22 +45,7 @@ import POGOProtos.Networking.Responses.EquipBadgeResponseOuterClass;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import POGOProtos.Networking.Responses.MarkTutorialCompleteResponseOuterClass.MarkTutorialCompleteResponse;
-
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.Item;
-import com.pokegoapi.api.inventory.ItemBag;
-import com.pokegoapi.api.inventory.Stats;
-import com.pokegoapi.exceptions.InvalidCurrencyException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.Log;
-
 import lombok.Setter;
-
-import java.util.EnumMap;
-import java.util.Map;
 
 public class PlayerProfile {
 	private static final String TAG = PlayerProfile.class.getSimpleName();
@@ -56,7 +55,7 @@ public class PlayerProfile {
 	private PlayerAvatar avatar;
 	private DailyBonus dailyBonus;
 	private ContactSettings contactSettings;
-	private Map<Currency, Integer> currencies = new EnumMap<Currency, Integer>(Currency.class);
+	private Map<Currency, Integer> currencies = new EnumMap<>(Currency.class);
 	@Setter
 	private Stats stats;
 	private TutorialState tutorialState;
@@ -81,12 +80,11 @@ public class PlayerProfile {
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
 	public void updateProfile() throws RemoteServerException, LoginFailedException {
-
 		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
 		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
 		api.getRequestHandler().sendServerRequests(getPlayerServerRequest);
 
-		GetPlayerResponse playerResponse = null;
+		GetPlayerResponse playerResponse;
 		try {
 			playerResponse = GetPlayerResponse.parseFrom(getPlayerServerRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
@@ -177,8 +175,7 @@ public class PlayerProfile {
 	 */
 
 	public void checkAndEquipBadges() throws LoginFailedException, RemoteServerException {
-		CheckAwardedBadgesMessage msg =
-				CheckAwardedBadgesMessage.newBuilder().build();
+		CheckAwardedBadgesMessage msg = CheckAwardedBadgesMessage.newBuilder().build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.CHECK_AWARDED_BADGES, msg);
 		api.getRequestHandler().sendServerRequests(serverRequest);
 		CheckAwardedBadgesResponse response;
@@ -210,17 +207,9 @@ public class PlayerProfile {
 	 *
 	 * @param currency the currency
 	 * @return the currency
-	 * @throws InvalidCurrencyException the invalid currency exception
-	 * @throws LoginFailedException     when the auth is invalid
-	 * @throws RemoteServerException    when the server is down/having issues
 	 */
-	public int getCurrency(Currency currency)
-			throws InvalidCurrencyException, LoginFailedException, RemoteServerException {
-		if (currencies.containsKey(currency)) {
-			return currencies.get(currency);
-		} else {
-			throw new InvalidCurrencyException();
-		}
+	public int getCurrency(Currency currency) {
+		return currencies.get(currency);
 	}
 
 	public enum Currency {
@@ -231,11 +220,8 @@ public class PlayerProfile {
 	 * Gets raw player data proto
 	 *
 	 * @return Player data
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public PlayerData getPlayerData()
-			throws LoginFailedException, RemoteServerException {
+	public PlayerData getPlayerData() {
 		return playerData;
 	}
 
@@ -243,11 +229,8 @@ public class PlayerProfile {
 	 * Gets avatar
 	 *
 	 * @return Player Avatar object
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public PlayerAvatar getAvatar()
-			throws LoginFailedException, RemoteServerException {
+	public PlayerAvatar getAvatar() {
 		return avatar;
 	}
 
@@ -255,11 +238,8 @@ public class PlayerProfile {
 	 * Gets daily bonus
 	 *
 	 * @return DailyBonus object
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public DailyBonus getDailyBonus()
-			throws LoginFailedException, RemoteServerException {
+	public DailyBonus getDailyBonus() {
 		return dailyBonus;
 	}
 
@@ -267,11 +247,8 @@ public class PlayerProfile {
 	 * Gets contact settings
 	 *
 	 * @return ContactSettings object
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public ContactSettings getContactSettings()
-			throws LoginFailedException, RemoteServerException {
+	public ContactSettings getContactSettings() {
 		return contactSettings;
 	}
 
@@ -279,11 +256,8 @@ public class PlayerProfile {
 	 * Gets a map of all currencies
 	 *
 	 * @return map of currencies
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public Map<Currency, Integer> getCurrencies()
-			throws LoginFailedException, RemoteServerException {
+	public Map<Currency, Integer> getCurrencies() {
 		return currencies;
 	}
 
@@ -294,8 +268,7 @@ public class PlayerProfile {
 	 * @throws LoginFailedException  when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public Stats getStats()
-			throws LoginFailedException, RemoteServerException {
+	public Stats getStats() throws LoginFailedException, RemoteServerException {
 		if (stats == null) {
 			api.getInventories().updateInventories();
 		}
