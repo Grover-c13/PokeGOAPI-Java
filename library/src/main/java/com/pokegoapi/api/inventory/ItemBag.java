@@ -25,6 +25,7 @@ import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass;
 import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result;
 import POGOProtos.Networking.Responses.UseIncenseResponseOuterClass.UseIncenseResponse;
 import POGOProtos.Networking.Responses.UseItemXpBoostResponseOuterClass.UseItemXpBoostResponse;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -59,15 +60,11 @@ public class ItemBag {
 	/**
 	 * Remove item result.
 	 *
-	 * @param id
-	 *            the id
-	 * @param quantity
-	 *            the quantity
+	 * @param id       the id
+	 * @param quantity the quantity
 	 * @return the result
-	 * @throws RemoteServerException
-	 *             the remote server exception
-	 * @throws LoginFailedException
-	 *             the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException  the login failed exception
 	 */
 	public Result removeItem(ItemId id, int quantity) throws RemoteServerException, LoginFailedException {
 		Item item = getItem(id);
@@ -99,8 +96,7 @@ public class ItemBag {
 	/**
 	 * Gets item.
 	 *
-	 * @param type
-	 *            the type
+	 * @param type the type
 	 * @return the item
 	 */
 	public Item getItem(ItemId type) {
@@ -124,10 +120,6 @@ public class ItemBag {
 	 * Get used space inside of player inventory.
 	 *
 	 * @return used space
-	 * @throws RemoteServerException
-	 *             the remote server exception
-	 * @throws LoginFailedException
-	 *             the login failed exception
 	 */
 	public int getItemsCount() {
 		int ct = 0;
@@ -139,11 +131,10 @@ public class ItemBag {
 
 	/**
 	 * use an item with itemID
+	 *
 	 * @param type type of item
-	 * @throws RemoteServerException
-	 *             the remote server exception
-	 * @throws LoginFailedException
-	 *             the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException  the login failed exception
 	 */
 	public void useItem(ItemId type) throws RemoteServerException, LoginFailedException {
 		if (type == ItemId.UNRECOGNIZED) {
@@ -164,15 +155,18 @@ public class ItemBag {
 
 	/**
 	 * use an incense
+	 *
 	 * @param type type of item
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException  the login failed exception
 	 */
 	public void useIncense(ItemId type) throws RemoteServerException, LoginFailedException {
-		UseIncenseMessage useIncenseMessage = 
+		UseIncenseMessage useIncenseMessage =
 				UseIncenseMessage.newBuilder()
-				.setIncenseType(type)
-				.setIncenseTypeValue(type.getNumber())
-				.build();
-		
+						.setIncenseType(type)
+						.setIncenseTypeValue(type.getNumber())
+						.build();
+
 		ServerRequest useIncenseRequest = new ServerRequest(RequestType.USE_INCENSE,
 				useIncenseMessage);
 		pgo.getRequestHandler().sendServerRequests(useIncenseRequest);
@@ -189,14 +183,20 @@ public class ItemBag {
 
 	/**
 	 * use an item with itemID
+	 *
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException  the login failed exception
 	 */
-	public void useIncense() throws RemoteServerException, LoginFailedException {	
+	public void useIncense() throws RemoteServerException, LoginFailedException {
 		useIncense(ItemId.ITEM_INCENSE_ORDINARY);
 	}
 
 	/**
 	 * use a lucky egg
-	 * @returns lucky egg response
+	 *
+	 * @return the xp boost response
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException  the login failed exception
 	 */
 	public UseItemXpBoostResponse useLuckyEgg() throws RemoteServerException, LoginFailedException {
 		UseItemXpBoostMessage xpMsg = UseItemXpBoostMessage

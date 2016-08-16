@@ -16,11 +16,13 @@
 package com.pokegoapi.auth;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import com.squareup.moshi.Moshi;
+
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
@@ -116,6 +118,8 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 * @param client   the client
 	 * @param username Username
 	 * @param password password
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public PtcCredentialProvider(OkHttpClient client, String username, String password)
 			throws LoginFailedException, RemoteServerException {
@@ -128,6 +132,8 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 *
 	 * @param username PTC username
 	 * @param password PTC password
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	private void login(String username, String password) throws LoginFailedException, RemoteServerException {
 		//TODO: stop creating an okhttp client per request
@@ -253,7 +259,8 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 * Valid auth info object	 *
 	 *
 	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
-	 * @throws LoginFailedException when refreshing fails
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	@Override
 	public AuthInfo getAuthInfo() throws LoginFailedException, RemoteServerException {
@@ -269,10 +276,6 @@ public class PtcCredentialProvider extends CredentialProvider {
 
 	@Override
 	public boolean isTokenIdExpired() {
-		if (time.currentTimeMillis() > expiresTimestamp) {
-			return true;
-		} else {
-			return false;
-		}
+		return time.currentTimeMillis() > expiresTimestamp;
 	}
 }

@@ -173,6 +173,7 @@ public class PokemonCpUtils {
 	 * @param attack  All attack values combined
 	 * @param defense All defense values combined
 	 * @param stamina All stamina values combined
+	 * @param playerLevel The player level
 	 * @return Maximum CP for these levels
 	 */
 	public static int getMaxCpForPlayer(int attack, int defense, int stamina, int playerLevel) {

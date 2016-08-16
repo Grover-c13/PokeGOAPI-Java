@@ -41,8 +41,8 @@ public class EggPokemon {
 	 * 
 	 * @param incubator : the incubator
 	 * @return status of putting egg in incubator
-	 * @throws LoginFailedException e
-	 * @throws RemoteServerException e
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public UseItemEggIncubatorResponse.Result incubate(EggIncubator incubator) 
 			throws LoginFailedException, RemoteServerException {
@@ -55,6 +55,8 @@ public class EggPokemon {
 	/**
 	 * Get the current distance that has been done with this egg
 	 * @return get distance already walked
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public double getEggKmWalked() throws LoginFailedException, RemoteServerException {
 		if (!isIncubate())

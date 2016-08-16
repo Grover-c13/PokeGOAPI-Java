@@ -163,6 +163,8 @@ public class EggIncubator {
 	 * Is the incubator currently being used
 	 * 
 	 * @return currently used or not
+	 * @throws LoginFailedException if there is an error with the token during retrieval of player stats
+	 * @throws RemoteServerException if the server responds badly during retrieval of player stats
 	 */
 	public boolean isInUse() throws LoginFailedException, RemoteServerException {
 		return getKmTarget() > pgo.getPlayerProfile().getStats().getKmWalked();

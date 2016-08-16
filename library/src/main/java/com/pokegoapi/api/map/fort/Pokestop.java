@@ -176,6 +176,7 @@ public class Pokestop {
 	 * Adds a modifier to this pokestop. (i.e. add a lure module)
 	 *
 	 * @param item the modifier to add to this pokestop
+	 * @return true if success
 	 */
 	public Observable<Boolean> addModifierAsync(ItemIdOuterClass.ItemId item) {
 		AddFortModifierMessage msg = AddFortModifierMessage.newBuilder()
