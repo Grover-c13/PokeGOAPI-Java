@@ -26,62 +26,64 @@ import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 
 public class DeviceInfo {
 
-	public static final DeviceInfo DEFAULT = new DeviceInfo() {{
-		String uuid = UUID.randomUUID().toString();
-		Random random = new Random(uuid.hashCode());
-		String[][] devices =
-				{
-						{"iPad3,1", "iPad", "J1AP"},
-						{"iPad3,2", "iPad", "J2AP"},
-						{"iPad3,3", "iPad", "J2AAP"},
-						{"iPad3,4", "iPad", "P101AP"},
-						{"iPad3,5", "iPad", "P102AP"},
-						{"iPad3,6", "iPad", "P103AP"},
+	public static final DeviceInfo DEFAULT = new DeviceInfo() {
+		{
+			String uuid = UUID.randomUUID().toString();
+			setDeviceId(uuid);
+			Random random = new Random(uuid.hashCode());
+			String[][] devices =
+					{
+							{"iPad3,1", "iPad", "J1AP"},
+							{"iPad3,2", "iPad", "J2AP"},
+							{"iPad3,3", "iPad", "J2AAP"},
+							{"iPad3,4", "iPad", "P101AP"},
+							{"iPad3,5", "iPad", "P102AP"},
+							{"iPad3,6", "iPad", "P103AP"},
 
-						{"iPad4,1", "iPad", "J71AP"},
-						{"iPad4,2", "iPad", "J72AP"},
-						{"iPad4,3", "iPad", "J73AP"},
-						{"iPad4,4", "iPad", "J85AP"},
-						{"iPad4,5", "iPad", "J86AP"},
-						{"iPad4,6", "iPad", "J87AP"},
-						{"iPad4,7", "iPad", "J85mAP"},
-						{"iPad4,8", "iPad", "J86mAP"},
-						{"iPad4,9", "iPad", "J87mAP"},
+							{"iPad4,1", "iPad", "J71AP"},
+							{"iPad4,2", "iPad", "J72AP"},
+							{"iPad4,3", "iPad", "J73AP"},
+							{"iPad4,4", "iPad", "J85AP"},
+							{"iPad4,5", "iPad", "J86AP"},
+							{"iPad4,6", "iPad", "J87AP"},
+							{"iPad4,7", "iPad", "J85mAP"},
+							{"iPad4,8", "iPad", "J86mAP"},
+							{"iPad4,9", "iPad", "J87mAP"},
 
-						{"iPad5,1", "iPad", "J96AP"},
-						{"iPad5,2", "iPad", "J97AP"},
-						{"iPad5,3", "iPad", "J81AP"},
-						{"iPad5,4", "iPad", "J82AP"},
+							{"iPad5,1", "iPad", "J96AP"},
+							{"iPad5,2", "iPad", "J97AP"},
+							{"iPad5,3", "iPad", "J81AP"},
+							{"iPad5,4", "iPad", "J82AP"},
 
-						{"iPad6,7", "iPad", "J98aAP"},
-						{"iPad6,8", "iPad", "J99aAP"},
+							{"iPad6,7", "iPad", "J98aAP"},
+							{"iPad6,8", "iPad", "J99aAP"},
 
-						{"iPhone5,1", "iPhone", "N41AP"},
-						{"iPhone5,2", "iPhone", "N42AP"},
-						{"iPhone5,3", "iPhone", "N48AP"},
-						{"iPhone5,4", "iPhone", "N49AP"},
+							{"iPhone5,1", "iPhone", "N41AP"},
+							{"iPhone5,2", "iPhone", "N42AP"},
+							{"iPhone5,3", "iPhone", "N48AP"},
+							{"iPhone5,4", "iPhone", "N49AP"},
 
-						{"iPhone6,1", "iPhone", "N51AP"},
-						{"iPhone6,2", "iPhone", "N53AP"},
+							{"iPhone6,1", "iPhone", "N51AP"},
+							{"iPhone6,2", "iPhone", "N53AP"},
 
-						{"iPhone7,1", "iPhone", "N56AP"},
-						{"iPhone7,2", "iPhone", "N61AP"},
+							{"iPhone7,1", "iPhone", "N56AP"},
+							{"iPhone7,2", "iPhone", "N61AP"},
 
-						{"iPhone8,1", "iPhone", "N71AP"}
-				
-				};
-		String[] osVersions = {"8.1.1", "8.1.2", "8.1.3", "8.2", "8.3", "8.4", "8.4.1",
-				"9.0", "9.0.1", "9.0.2", "9.1", "9.2", "9.2.1", "9.3", "9.3.1", "9.3.2", "9.3.3", "9.3.4"};
-		String[] device = devices[random.nextInt(devices.length)];
-		setDeviceId(uuid);
-		setDeviceBrand("Apple");
-		setDeviceModel(device[1]);
-		setDeviceModelBoot(device[0]);
-		setHardwareManufacturer("Apple");
-		setHardwareModel(device[2]);
-		setFirmwareBrand("iPhone OS");
-		setFirmwareType(osVersions[random.nextInt(osVersions.length)]);
-	}};
+							{"iPhone8,1", "iPhone", "N71AP"}
+
+					};
+			String[] osVersions = {"8.1.1", "8.1.2", "8.1.3", "8.2", "8.3", "8.4", "8.4.1",
+					"9.0", "9.0.1", "9.0.2", "9.1", "9.2", "9.2.1", "9.3", "9.3.1", "9.3.2", "9.3.3", "9.3.4"};
+			setFirmwareType(osVersions[random.nextInt(osVersions.length)]);
+			String[] device = devices[random.nextInt(devices.length)];
+			setDeviceModelBoot(device[0]);
+			setDeviceModel(device[1]);
+			setHardwareModel(device[2]);
+			setFirmwareBrand("iPhone OS");
+			setDeviceBrand("Apple");
+			setHardwareManufacturer("Apple");
+		}
+	};
 
 	private SignatureOuterClass.Signature.DeviceInfo.Builder deviceInfoBuilder;
 

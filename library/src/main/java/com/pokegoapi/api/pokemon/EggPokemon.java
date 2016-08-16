@@ -32,7 +32,7 @@ public class EggPokemon {
 
 	private static final String TAG = EggPokemon.class.getSimpleName();
 	@Setter
-	PokemonGo pgo;
+	PokemonGo api;
 	private PokemonData proto;
 
 	// API METHODS //
@@ -59,7 +59,7 @@ public class EggPokemon {
 	public double getEggKmWalked() throws LoginFailedException, RemoteServerException {
 		if (!isIncubate())
 			return 0;
-		EggIncubator incubator = Stream.of(pgo.getInventories().getIncubators())
+		EggIncubator incubator = Stream.of(api.getInventories().getIncubators())
 				.filter(new Predicate<EggIncubator>() {
 					@Override
 					public boolean test(EggIncubator incub) {
@@ -71,7 +71,7 @@ public class EggPokemon {
 			return 0;
 		else
 			return proto.getEggKmWalkedTarget()
-					- (incubator.getKmTarget() - pgo.getPlayerProfile().getStats().getKmWalked());
+					- (incubator.getKmTarget() - api.getPlayerProfile().getStats().getKmWalked());
 	}
 
 	// DELEGATE METHODS BELOW //

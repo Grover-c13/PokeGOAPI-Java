@@ -34,7 +34,7 @@ public class Signature {
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
 				.setLocationHash1(getLocationHash1(api, authTicketBA, builder))
 				.setLocationHash2(getLocationHash2(api, builder))
-				.setUnknown22(ByteString.copyFrom(api.getUk22()))
+				.setSessionHash(ByteString.copyFrom(api.getSessionHash()))
 				.setTimestamp(api.currentTimeMillis())
 				.setTimestampSinceStart(curTime - api.startTime);
 
