@@ -17,6 +17,7 @@ package com.pokegoapi.api.inventory;
 
 import POGOProtos.Data.PokedexEntryOuterClass.PokedexEntry;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
+
 import com.pokegoapi.api.PokemonGo;
 
 import java.util.EnumMap;
@@ -38,6 +39,7 @@ public class Pokedex {
 
 	/**
 	 * Add/Update a PokdexEntry.
+	 *
 	 * @param entry The entry to add or update
 	 */
 	public void add(PokedexEntry entry) {
@@ -47,6 +49,7 @@ public class Pokedex {
 
 	/**
 	 * Get a pokedex entry value.
+	 *
 	 * @param pokemonId the ID of the pokemon to get
 	 * @return Entry if in pokedex or null if it doesn't
 	 */

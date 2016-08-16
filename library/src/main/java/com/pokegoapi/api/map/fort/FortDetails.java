@@ -19,6 +19,7 @@ import POGOProtos.Enums.TeamColorOuterClass;
 import POGOProtos.Map.Fort.FortModifierOuterClass;
 import POGOProtos.Map.Fort.FortTypeOuterClass;
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
+
 import com.google.protobuf.ProtocolStringList;
 
 import java.util.List;

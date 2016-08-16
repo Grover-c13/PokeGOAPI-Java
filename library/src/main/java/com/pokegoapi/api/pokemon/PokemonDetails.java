@@ -221,9 +221,7 @@ public class PokemonDetails {
 	 * Calculate the maximum CP for this individual pokemon when the player is at level 40
 	 *
 	 * @return The maximum CP for this pokemon
-	 * @throws NoSuchItemException   If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
-	 * @throws LoginFailedException  If login failed
-	 * @throws RemoteServerException If the server is causing issues
+	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
 	 */
 	public int getMaxCp() throws NoSuchItemException {
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
@@ -270,6 +268,8 @@ public class PokemonDetails {
 	 * Calculated the max cp of this pokemon, if you upgrade it fully and the player is at level 40
 	 *
 	 * @return Max cp of this pokemon
+	 * @throws LoginFailedException  If login failed
+	 * @throws RemoteServerException If the server is causing issues
 	 */
 	public int getCpFullEvolveAndPowerup() throws LoginFailedException, RemoteServerException {
 		return getMaxCpFullEvolveAndPowerup(40);
@@ -279,6 +279,8 @@ public class PokemonDetails {
 	 * Calculated the max cp of this pokemon, if you upgrade it fully with your current player level
 	 *
 	 * @return Max cp of this pokemon
+	 * @throws LoginFailedException  If login failed
+	 * @throws RemoteServerException If the server is causing issues
 	 */
 	public int getMaxCpFullEvolveAndPowerupForPlayer() throws LoginFailedException, RemoteServerException {
 		return getMaxCpFullEvolveAndPowerup(api.getPlayerProfile().getStats().getLevel());

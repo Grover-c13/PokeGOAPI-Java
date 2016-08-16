@@ -30,6 +30,7 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
+
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
@@ -115,7 +116,8 @@ public class PokemonGo {
 	 * Fetches valid AuthInfo
 	 *
 	 * @return AuthInfo object
-	 * @throws LoginFailedException when login fails
+	 * @throws LoginFailedException  when login fails
+	 * @throws RemoteServerException When server fails
 	 */
 	public AuthInfo getAuthInfo()
 			throws LoginFailedException, RemoteServerException {
@@ -143,7 +145,7 @@ public class PokemonGo {
 	 * Get the inventories API
 	 *
 	 * @return Inventories
-	 * @throws LoginFailedException when login fails
+	 * @throws LoginFailedException  when login fails
 	 * @throws RemoteServerException when server down/issue
 	 */
 	public Inventories getInventories() throws LoginFailedException, RemoteServerException {
@@ -156,6 +158,7 @@ public class PokemonGo {
 	/**
 	 * Validates and sets a given latitude value
 	 *
+	 * @param value the latitude
 	 * @throws IllegalArgumentException if value exceeds +-90
 	 */
 	public void setLatitude(double value) {
@@ -168,6 +171,7 @@ public class PokemonGo {
 	/**
 	 * Validates and sets a given longitude value
 	 *
+	 * @param value the longitude
 	 * @throws IllegalArgumentException if value exceeds +-180
 	 */
 	public void setLongitude(double value) {
@@ -180,6 +184,7 @@ public class PokemonGo {
 	/**
 	 * Gets the map API
 	 *
+	 * @return the map
 	 * @throws IllegalStateException if location has not been set
 	 */
 	public Map getMap() {

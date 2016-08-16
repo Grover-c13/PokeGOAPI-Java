@@ -16,11 +16,13 @@
 package com.pokegoapi.api.inventory;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
+
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
+
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -45,6 +47,7 @@ public class PokeBank {
 
 	/**
 	 * Add a pokemon to the pokebank inventory.  Will not add duplicates (pokemon with same id).
+	 *
 	 * @param pokemon Pokemon to add to the inventory
 	 */
 	public void addPokemon(final Pokemon pokemon) {

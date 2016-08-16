@@ -18,7 +18,6 @@ package com.pokegoapi.api.player;
 import lombok.Getter;
 
 public enum Team {
-	// VALUES CONFIRMED
 	TEAM_NONE(0),
 	TEAM_MYSTIC(1),
 	TEAM_VALOR(2),

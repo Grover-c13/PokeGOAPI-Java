@@ -17,12 +17,14 @@ package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
+
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.EggIncubator;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+
 import lombok.Setter;
 
 /**
@@ -36,25 +38,29 @@ public class EggPokemon {
 	private PokemonData proto;
 
 	// API METHODS //
+
 	/**
 	 * Incubate this egg.
-	 * 
+	 *
 	 * @param incubator : the incubator
 	 * @return status of putting egg in incubator
-	 * @throws LoginFailedException e
-	 * @throws RemoteServerException e
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
-	public UseItemEggIncubatorResponse.Result incubate(EggIncubator incubator) 
+	public UseItemEggIncubatorResponse.Result incubate(EggIncubator incubator)
 			throws LoginFailedException, RemoteServerException {
 		if (incubator.isInUse()) {
 			throw new IllegalArgumentException("Incubator already used");
 		}
 		return incubator.hatchEgg(this);
 	}
-	
+
 	/**
 	 * Get the current distance that has been done with this egg
+	 *
 	 * @return get distance already walked
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public double getEggKmWalked() throws LoginFailedException, RemoteServerException {
 		if (!isIncubate())
@@ -75,9 +81,10 @@ public class EggPokemon {
 	}
 
 	// DELEGATE METHODS BELOW //
+
 	/**
 	 * Build a EggPokemon wrapper from the proto.
-	 * 
+	 *
 	 * @param proto : the prototype
 	 */
 	public EggPokemon(PokemonData proto) {
@@ -90,7 +97,7 @@ public class EggPokemon {
 	public long getId() {
 		return proto.getId();
 	}
-	
+
 	public double getEggKmWalkedTarget() {
 		return proto.getEggKmWalkedTarget();
 	}
@@ -106,7 +113,7 @@ public class EggPokemon {
 	public String getEggIncubatorId() {
 		return proto.getEggIncubatorId();
 	}
-	
+
 	public boolean isIncubate() {
 		return proto.getEggIncubatorId().length() > 0;
 	}

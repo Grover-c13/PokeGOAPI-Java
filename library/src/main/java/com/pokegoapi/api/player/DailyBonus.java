@@ -22,7 +22,7 @@ import lombok.Data;
 public class DailyBonus {
 	private final DailyBonusOuterClass.DailyBonus proto;
 
-	public DailyBonus(DailyBonusOuterClass.DailyBonus proto ) {
+	public DailyBonus(DailyBonusOuterClass.DailyBonus proto) {
 		this.proto = proto;
 	}
 

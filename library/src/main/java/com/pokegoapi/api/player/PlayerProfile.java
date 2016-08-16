@@ -62,9 +62,8 @@ public class PlayerProfile {
 	private TutorialState tutorialState;
 
 	/**
-	 *
 	 * @param api the api
-	 * @throws LoginFailedException when the auth is invalid
+	 * @throws LoginFailedException  when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
 	public PlayerProfile(PokemonGo api) throws LoginFailedException, RemoteServerException {
@@ -315,7 +314,7 @@ public class PlayerProfile {
 	/**
 	 * Set the account to legal screen in order to receive valid response
 	 *
-	 * @throws LoginFailedException when the auth is invalid
+	 * @throws LoginFailedException  when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
 	public void enableAccount() throws LoginFailedException, RemoteServerException {

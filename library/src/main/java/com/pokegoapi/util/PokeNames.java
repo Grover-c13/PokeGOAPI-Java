@@ -26,8 +26,9 @@ import java.util.ResourceBundle;
 public class PokeNames {
 	/**
 	 * Returns the Name for a Pokedex ID including known translations.
+	 *
 	 * @param pokedexNr pokedex number
-	 * @param locale locale
+	 * @param locale    locale
 	 * @return the pokemon name locale
 	 */
 	public static String getDisplayName(int pokedexNr, Locale locale) {
