@@ -40,17 +40,16 @@ public class CatchOptions {
 	private final PokemonGo api;
 	private boolean useBestPokeball;
 	private boolean skipMasterBall;
-	@Getter
+	private boolean useRazzBerries;
 	private int numberRazzberries;
-	@Getter
 	private Pokeball pokeBall;
-	@Getter
 	private boolean strictBallType;
 	@Getter
 	private int numberBalls;
 	
 	public CatchOptions(PokemonGo api) {
 		this.api = api;
+		this.useRazzBerries = false;
 		this.numberRazzberries = -1;
 		this.useBestPokeball = false;
 		this.skipMasterBall = false;
@@ -117,9 +116,28 @@ public class CatchOptions {
 		}
 	}
 	
+	/**
+	 * Gets razzberries to catch a pokemon
+	 *
+	 * @return the number to use
+	 */
+	public int getRazzberries() {
+		int razzberries = numberRazzberries;
+		if (useRazzBerries && numberRazzberries <= 1) {
+			razzberries = 1;
+		} else if (numberRazzberries <= 0) {
+			razzberries = -1;
+		} else {
+			razzberries = numberRazzberries;
+		}
+		return razzberries;
+	}
+	
+	public void useRazzberries(boolean useRazzBerries) {
+		this.useRazzBerries = useRazzBerries;
+	}
+	
 	public void maxRazzberries(int numberRazzberries) {
-		if (numberRazzberries <= 0)
-			numberRazzberries = -1;
 		this.numberRazzberries = numberRazzberries;
 	}
 	
@@ -140,6 +158,8 @@ public class CatchOptions {
 	}
 	
 	public void maxPokeballs(int numberBalls) {
+		if (numberBalls <= 1)
+			numberBalls = -1;
 		this.numberBalls = numberBalls;
 	}
 

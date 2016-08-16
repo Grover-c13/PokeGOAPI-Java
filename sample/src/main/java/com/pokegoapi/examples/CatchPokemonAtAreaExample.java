@@ -33,6 +33,7 @@ package com.pokegoapi.examples;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.map.pokemon.CatchOptions;
 import com.pokegoapi.api.map.pokemon.CatchResult;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
@@ -73,7 +74,9 @@ public class CatchPokemonAtAreaExample {
 				// if encounter was succesful, catch
 				if (encResult.wasSuccessful()) {
 					System.out.println("Encounted:" + cp.getPokemonId());
-					CatchResult result = cp.catchPokemonWithRazzBerry();
+					CatchOptions options = new CatchOptions(go);
+					options.useRazzberries(true);
+					CatchResult result = cp.catchPokemon(options);
 					System.out.println("Attempt to catch:" + cp.getPokemonId() + " " + result.getStatus());
 				}
 
