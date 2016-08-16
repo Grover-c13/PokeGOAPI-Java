@@ -59,6 +59,7 @@ import rx.functions.Func1;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.lang.NoSuchMethodException;
 
 import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_GREAT_BALL;
 import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_MASTER_BALL;
@@ -327,6 +328,130 @@ public class CatchablePokemon implements MapPoint {
 		return catchPokemon(1.0, 1.95 + Math.random() * 0.05,
 				0.85 + Math.random() * 0.15, pokeball, amount, razberryLimit);
 	}
+	
+	/**
+	 * @deprecated Please use CatchOptions instead
+	 *
+	 * CatchOptions options = new CatchOptions(go);
+	 * options.useRazzberries(true);
+	 * cp.catchPokemon(options);
+	 */
+	@Deprecated
+	public CatchResult catchPokemonWithRazzBerry() throws NoSuchMethodException {
+		throw new NoSuchMethodException("catchPokemonWithRazzBerry no longer supported");
+	}
+	
+	/**
+	 * @deprecated Please use CatchOptions instead
+	 *
+	 * CatchOptions options = new CatchOptions(go);
+	 * options.useRazzberries(true);
+	 * options.usePokeball(pokeball);
+	 * cp.catchPokemon(options);
+	 */
+	@Deprecated
+	public CatchResult catchPokemonWithRazzBerry(Pokeball pokeball)
+			throws NoSuchMethodException {
+		throw new NoSuchMethodException("catchPokemonWithRazzBerry no longer supported");
+	}
+	
+	/**
+	 * @deprecated Please use CatchOptions instead
+	 *
+	 * CatchOptions options = new CatchOptions(go);
+	 * options.useBestBall(true);
+	 * cp.catchPokemon(options);
+	 */
+	@Deprecated
+	public CatchResult catchPokemonWithBestBall() throws NoSuchMethodException {
+		throw new NoSuchMethodException("catchPokemonWithBestBall no longer supported");
+	}
+	
+	/**
+	 * @deprecated Please use CatchOptions instead
+	 *
+	 * CatchOptions options = new CatchOptions(go);
+	 * options.useBestBall(true);
+	 * options.noMasterBall(noMasterBall);
+	 * cp.catchPokemon(options);
+	 */
+	@Deprecated
+	public CatchResult catchPokemonWithBestBall(boolean noMasterBall)
+ 			throws NoSuchMethodException {
+		throw new NoSuchMethodException("catchPokemonWithBestBall no longer supported");
+	}
+	
+	/**
+	 * @deprecated Please use CatchOptions instead
+	 *
+	 * CatchOptions options = new CatchOptions(go);
+	 * options.useBestBall(true);
+	 * options.noMasterBall(noMasterBall);
+	 * options.maxPokeballs(amount);
+	 * cp.catchPokemon(options);
+	 */
+	@Deprecated
+	public CatchResult catchPokemonWithBestBall(boolean noMasterBall, int amount)
+ 			throws NoSuchMethodException {
+		throw new NoSuchMethodException("catchPokemonWithBestBall no longer supported");
+	}
+	
+	/**
+	 * @deprecated Please use CatchOptions instead
+	 *
+	 * CatchOptions options = new CatchOptions(go);
+	 * options.useBestBall(true);
+	 * options.noMasterBall(noMasterBall);
+	 * options.maxPokeballs(amount);
+	 * options.maxRazzberries(razzberryLimit);
+	 * cp.catchPokemon(options);
+	 */
+	@Deprecated
+	public CatchResult catchPokemonWithBestBall(boolean noMasterBall, int amount, int razberryLimit)
+			throws NoSuchMethodException {
+		throw new NoSuchMethodException("catchPokemonWithBestBall no longer supported");
+	}
+	
+	/**
+	 * @deprecated Please use CatchOptions instead
+	 *
+	 * CatchOptions options = new CatchOptions(go);
+	 * options.usePokeball(pokeball);
+	 * cp.catchPokemon(options);
+	 */
+	@Deprecated
+	public CatchResult catchPokemon(Pokeball pokeball) throws NoSuchMethodException {
+		throw new NoSuchMethodException("catchPokemon(pokeball) no longer supported");
+	}
+	
+	/**
+	 * @deprecated Please use CatchOptions instead
+	 *
+	 * CatchOptions options = new CatchOptions(go);
+	 * options.usePokeball(pokeball);
+	 * options.maxPokeballs(amount);
+	 * cp.catchPokemon(options);
+	 */
+	@Deprecated
+	public CatchResult catchPokemon(Pokeball pokeball, int amount)
+			throws NoSuchMethodException {
+		throw new NoSuchMethodException("catchPokemon(pokeball) no longer supported");
+	}
+	
+	/**
+	 * @deprecated Please use CatchOptions instead
+	 *
+	 * CatchOptions options = new CatchOptions(go);
+	 * options.usePokeball(pokeball);
+	 * options.maxPokeballs(amount);
+	 * options.maxRazzberries(razzberryLimit);
+	 * cp.catchPokemon(options);
+	 */
+	@Deprecated
+	public CatchResult catchPokemon(Pokeball pokeball, int amount, int razberryLimit)
+			throws NoSuchMethodException {
+		throw new NoSuchMethodException("catchPokemon(pokeball) no longer supported");	
+	}
 
 	/**
 	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 50%, if you have
@@ -555,7 +680,7 @@ public class CatchablePokemon implements MapPoint {
 	public CatchResult catchPokemon() throws LoginFailedException,
 			RemoteServerException, NoSuchItemException {
 
-		return catchPokemon(null);
+		return catchPokemon(new CatchOptions(api));
 	}
 
 	/**
