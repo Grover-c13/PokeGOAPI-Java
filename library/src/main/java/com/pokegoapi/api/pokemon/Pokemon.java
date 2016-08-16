@@ -20,7 +20,9 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.map.pokemon.EvolutionResult;
+import com.pokegoapi.api.player.PlayerProfile.Currency;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
+import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
@@ -172,7 +174,30 @@ public class Pokemon extends PokemonDetails {
 	 * @throws RemoteServerException the remote server exception
 	 */
 	public boolean canPowerUp() throws LoginFailedException, RemoteServerException {
-		return getCandy() >= getCandyCostsForPowerup();
+		boolean can = false;
+		int totalCandies = this.getCandy();
+		int totalStardust = 0;
+		try{
+			totalStardust = this.api.getPlayerProfile().getCurrency(Currency.STARDUST);
+		}
+		catch(InvalidCurrencyException ignored){}
+		int candiesForPowerUp = this.getCandyCostsForPowerup();
+		int stardustForPowerUp = this.getStardustCostsForPowerup();
+		if((totalCandies>=candiesForPowerUp)&&(totalStardust>=stardustForPowerUp)){
+			can = true;
+		}
+		return can;
+	}
+	
+	/**
+	 * Check if can evolve this pokemon
+	 *
+	 * @return the boolean
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public boolean canEvolve() throws LoginFailedException, RemoteServerException {
+		return getCandy() >= getCandiesToEvolve();
 	}
 
 	/**
