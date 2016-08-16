@@ -25,6 +25,7 @@ import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.EggPokemon;
@@ -32,6 +33,7 @@ import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
+
 import lombok.Getter;
 
 import java.util.ArrayList;

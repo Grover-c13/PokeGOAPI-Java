@@ -221,7 +221,7 @@ public class PokemonDetails {
 	 * Calculate the maximum CP for this individual pokemon when the player is at level 40
 	 *
 	 * @return The maximum CP for this pokemon
-	 * @throws NoSuchItemException   If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
+	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
 	 */
 	public int getMaxCp() throws NoSuchItemException {
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());

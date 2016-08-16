@@ -20,6 +20,7 @@ import POGOProtos.Inventory.EggIncubatorTypeOuterClass.EggIncubatorType;
 import POGOProtos.Networking.Requests.Messages.UseItemEggIncubatorMessageOuterClass.UseItemEggIncubatorMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.EggPokemon;
@@ -61,7 +62,7 @@ public class EggIncubator {
 	 */
 	public UseItemEggIncubatorResponse.Result hatchEgg(EggPokemon egg)
 			throws LoginFailedException, RemoteServerException {
-		
+
 		UseItemEggIncubatorMessage reqMsg = UseItemEggIncubatorMessage.newBuilder()
 				.setItemId(proto.getId())
 				.setPokemonId(egg.getId())
@@ -81,89 +82,89 @@ public class EggIncubator {
 
 		return response.getResult();
 	}
-	
+
 	/**
 	 * Get incubator id.
-	 * 
+	 *
 	 * @return the id
 	 */
 	public String getId() {
 		return proto.getId();
 	}
-	
+
 	/**
 	 * Get incubator type.
-	 * 
+	 *
 	 * @return EggIncubatorType
 	 */
 	public EggIncubatorType getType() {
 		return proto.getIncubatorType();
 	}
-	
+
 	/**
 	 * Get the total distance you need to walk to hatch the current egg.
-	 * 
+	 *
 	 * @return total distance to walk to hatch the egg (km)
 	 */
 	public double getKmTarget() {
 		return proto.getTargetKmWalked();
 	}
-	
+
 	/**
 	 * Get the distance walked before the current egg was incubated.
-	 * 
+	 *
 	 * @return distance to walked before incubating egg
 	 * @deprecated Wrong method name, use {@link #getKmStart()}
 	 */
 	public double getKmWalked() {
 		return getKmStart();
 	}
-	
+
 	/**
 	 * Get the distance walked before the current egg was incubated.
-	 * 
+	 *
 	 * @return distance walked before incubating egg (km)
 	 */
 	public double getKmStart() {
 		return proto.getStartKmWalked();
 	}
-	
+
 	/**
 	 * Gets the total distance to walk with the current egg before hatching.
-	 * 
+	 *
 	 * @return total km between incubation and hatching
 	 */
 	public double getHatchDistance() {
 		return getKmTarget() - getKmStart();
 	}
-	
+
 	/**
 	 * Get the distance walked with the current incubated egg.
-	 * 
+	 *
 	 * @return distance walked with the current incubated egg (km)
-	 * @throws LoginFailedException if there is an error with the token during retrieval of player stats
+	 * @throws LoginFailedException  if there is an error with the token during retrieval of player stats
 	 * @throws RemoteServerException if the server responds badly during retrieval of player stats
 	 */
 	public double getKmCurrentlyWalked() throws LoginFailedException, RemoteServerException {
 		return pgo.getPlayerProfile().getStats().getKmWalked() - getKmStart();
 	}
-	
+
 	/**
 	 * Get the distance left to walk before this incubated egg will hatch.
-	 * 
+	 *
 	 * @return distance to walk before hatch (km)
-	 * @throws LoginFailedException if there is an error with the token during retrieval of player stats
+	 * @throws LoginFailedException  if there is an error with the token during retrieval of player stats
 	 * @throws RemoteServerException if the server responds badly during retrieval of player stats
 	 */
 	public double getKmLeftToWalk() throws LoginFailedException, RemoteServerException {
 		return getKmTarget() - pgo.getPlayerProfile().getStats().getKmWalked();
 	}
-	
+
 	/**
 	 * Is the incubator currently being used
-	 * 
+	 *
 	 * @return currently used or not
-	 * @throws LoginFailedException if there is an error with the token during retrieval of player stats
+	 * @throws LoginFailedException  if there is an error with the token during retrieval of player stats
 	 * @throws RemoteServerException if the server responds badly during retrieval of player stats
 	 */
 	public boolean isInUse() throws LoginFailedException, RemoteServerException {

@@ -22,10 +22,11 @@ import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
+
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.PokemonDetails;
 
-public class NormalEncounterResult  extends PokemonDetails implements EncounterResult {
+public class NormalEncounterResult extends PokemonDetails implements EncounterResult {
 	private EncounterResponse response;
 
 	public NormalEncounterResult(PokemonGo api, EncounterResponse response) {

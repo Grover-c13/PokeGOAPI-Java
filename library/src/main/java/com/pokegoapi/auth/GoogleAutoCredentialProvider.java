@@ -85,7 +85,7 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	 * @param refreshToken refresh token
 	 * @return the token info
 	 * @throws RemoteServerException login failed possibly due to invalid credentials
-	 * @throws LoginFailedException some server/network failure
+	 * @throws LoginFailedException  some server/network failure
 	 */
 	private TokenInfo refreshToken(String username, String refreshToken)
 			throws RemoteServerException, LoginFailedException {
@@ -101,10 +101,9 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	}
 
 	/**
-	 *
 	 * @return token id
 	 * @throws RemoteServerException login failed possibly due to invalid credentials
-	 * @throws LoginFailedException some server/network failure
+	 * @throws LoginFailedException  some server/network failure
 	 */
 	@Override
 	public String getTokenId() throws RemoteServerException, LoginFailedException {
@@ -115,10 +114,9 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	}
 
 	/**
-	 *
 	 * @return auth info
 	 * @throws RemoteServerException login failed possibly due to invalid credentials
-	 * @throws LoginFailedException some server/network failure
+	 * @throws LoginFailedException  some server/network failure
 	 */
 	@Override
 	public AuthInfo getAuthInfo() throws RemoteServerException, LoginFailedException {

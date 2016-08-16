@@ -3,6 +3,7 @@ package com.pokegoapi.api.settings;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -65,10 +66,10 @@ public class Settings {
 	/**
 	 * Settings object that hold different configuration aspect of the game.
 	 * Can be used to simulate the real app behaviour.
-     *
-     * @param api api instance
-     * @throws LoginFailedException If login failed.
-     * @throws RemoteServerException If server communications failed.
+	 *
+	 * @param api api instance
+	 * @throws LoginFailedException  If login failed.
+	 * @throws RemoteServerException If server communications failed.
 	 */
 	public Settings(PokemonGo api) throws LoginFailedException, RemoteServerException {
 		this.api = api;

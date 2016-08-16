@@ -17,9 +17,11 @@ package com.pokegoapi.main;
 
 import POGOProtos.Networking.Requests.RequestOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+
 import com.google.protobuf.ByteString;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
+
 import lombok.Getter;
 
 /**
@@ -50,8 +52,8 @@ public class ServerRequest {
 	/**
 	 * Instantiates a new Server request.
 	 *
-	 * @param type the type
-	 * @param request  the req
+	 * @param type    the type
+	 * @param request the req
 	 */
 	ServerRequest(RequestTypeOuterClass.RequestType type, RequestOuterClass.Request request) {
 		this.request = request;

@@ -12,7 +12,7 @@ public class Crypto {
 	 * Shuffles bytes.
 	 *
 	 * @param input input data
-	 * @param iv iv (32 random bytes)
+	 * @param iv    iv (32 random bytes)
 	 * @return shuffled bytes
 	 */
 	public static CipherText encrypt(byte[] input, byte[] iv) {
@@ -8363,7 +8363,7 @@ public class Crypto {
 		 * Create new CipherText with contents and IV.
 		 *
 		 * @param input the contents
-		 * @param iv random IV (32 bytes)
+		 * @param iv    random IV (32 bytes)
 		 */
 		public CipherText(byte[] input, byte[] iv) {
 			prefix = new byte[32];

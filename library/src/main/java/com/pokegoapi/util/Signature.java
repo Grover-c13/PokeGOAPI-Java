@@ -5,8 +5,10 @@ import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
 import POGOProtos.Networking.Envelopes.Unknown6OuterClass.Unknown6.Unknown2;
 import POGOProtos.Networking.Requests.RequestOuterClass;
+
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
+
 import net.jpountz.xxhash.StreamingXXHash32;
 import net.jpountz.xxhash.StreamingXXHash64;
 import net.jpountz.xxhash.XXHashFactory;

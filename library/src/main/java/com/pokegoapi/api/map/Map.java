@@ -35,6 +35,7 @@ import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResp
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
+
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
@@ -56,6 +57,7 @@ import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.MapUtil;
+
 import rx.Observable;
 import rx.functions.Func1;
 
