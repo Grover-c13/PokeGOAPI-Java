@@ -317,9 +317,8 @@ public class CatchablePokemon implements MapPoint {
 		if (options != null) {
 			pokeball = options.getItemBall();
 			razberryLimit = options.getNumberRazzberries();
-			if (razberryLimit <= 1) {
-				if (razberryLimit == 1)
-					useItem(ItemId.ITEM_RAZZ_BERRY);
+			if (razberryLimit == 1) {
+				useItem(ItemId.ITEM_RAZZ_BERRY);
 				razberryLimit = -1;
 			}
 			amount = options.getNumberBalls();

@@ -118,6 +118,8 @@ public class CatchOptions {
 	}
 	
 	public void maxRazzberries(int numberRazzberries) {
+		if (numberRazzberries <= 0)
+			numberRazzberries = -1;
 		this.numberRazzberries = numberRazzberries;
 	}
 	
