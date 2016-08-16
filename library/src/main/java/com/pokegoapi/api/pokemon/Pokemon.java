@@ -176,6 +176,17 @@ public class Pokemon extends PokemonDetails {
 		return getCandy() >= getCandyCostsForPowerup() && api.getPlayerProfile()
 			.getCurrency(PlayerProfile.Currency.STARDUST) >= getStardustCostsForPowerup();
 	}
+	
+	/**
+	 * Check if can evolve this pokemon
+	 *
+	 * @return the boolean
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 */
+	public boolean canEvolve() throws LoginFailedException, RemoteServerException {
+		return getCandy() >= getCandiesToEvolve();
+	}
 
 	/**
 	 * Powers up a pokemon with candy and stardust.
