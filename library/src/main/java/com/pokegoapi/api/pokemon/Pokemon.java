@@ -418,7 +418,7 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException if threw from {@link #getMaxCpForPlayer()}
 	 * @throws RemoteServerException if threw from {@link #getMaxCpForPlayer()}
 	 */
-	public int getCPInPercentageActualPlayerLevel() throws NoSuchItemException, LoginFailedException, RemoteServerException{
+	public int getCPInPercentageActualPlayerLevel() throws NoSuchItemException, LoginFailedException, RemoteServerException {
 		return ((getCp()*100)/getMaxCpForPlayer());
 	}
 	
@@ -426,14 +426,14 @@ public class Pokemon extends PokemonDetails {
 	 * @return Actual cp in percentage relative to the maximum cp that this pokemon can reach at player-level 40 (useful in ProgressBars)
 	 * @throws NoSuchItemException if threw from {@link #getMaxCp()}
 	 */
-	public int getCPInPercentageMaxPlayerLevel() throws NoSuchItemException{
+	public int getCPInPercentageMaxPlayerLevel() throws NoSuchItemException {
 		return ((getCp()*100)/getMaxCp());
 	}
 	
 	/**
 	 * @return IV in percentage
 	 */
-	public double getIvInPercentage(){
+	public double getIvInPercentage() {
 		return ((Math.floor((this.getIvRatio()*100)*100))/100);
 	}
 }
