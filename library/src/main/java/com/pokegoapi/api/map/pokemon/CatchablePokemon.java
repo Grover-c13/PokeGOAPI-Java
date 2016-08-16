@@ -84,6 +84,8 @@ public class CatchablePokemon implements MapPoint {
 	@Getter
 	private final PokemonId pokemonId;
 	@Getter
+	private final int pokemonIdValue;
+	@Getter
 	private final long expirationTimestampMs;
 	@Getter
 	private final double latitude;
@@ -104,6 +106,7 @@ public class CatchablePokemon implements MapPoint {
 		this.spawnPointId = proto.getSpawnPointId();
 		this.encounterId = proto.getEncounterId();
 		this.pokemonId = proto.getPokemonId();
+		this.pokemonIdValue = proto.getPokemonIdValue();
 		this.expirationTimestampMs = proto.getExpirationTimestampMs();
 		this.latitude = proto.getLatitude();
 		this.longitude = proto.getLongitude();
@@ -122,6 +125,7 @@ public class CatchablePokemon implements MapPoint {
 		this.spawnPointId = proto.getSpawnPointId();
 		this.encounterId = proto.getEncounterId();
 		this.pokemonId = proto.getPokemonData().getPokemonId();
+		this.pokemonIdValue = proto.getPokemonData().getPokemonIdValue();
 		this.expirationTimestampMs = proto.getTimeTillHiddenMs();
 		this.latitude = proto.getLatitude();
 		this.longitude = proto.getLongitude();
@@ -143,6 +147,7 @@ public class CatchablePokemon implements MapPoint {
 		this.spawnPointId = proto.getLureInfo().getFortId();
 		this.encounterId = proto.getLureInfo().getEncounterId();
 		this.pokemonId = proto.getLureInfo().getActivePokemonId();
+		this.pokemonIdValue = proto.getLureInfo().getActivePokemonIdValue();
 		this.expirationTimestampMs = proto.getLureInfo()
 				.getLureExpiresTimestampMs();
 		this.latitude = proto.getLatitude();
