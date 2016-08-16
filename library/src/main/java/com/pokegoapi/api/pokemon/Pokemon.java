@@ -20,6 +20,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.map.pokemon.EvolutionResult;
+import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -172,7 +173,8 @@ public class Pokemon extends PokemonDetails {
 	 * @throws RemoteServerException the remote server exception
 	 */
 	public boolean canPowerUp() throws LoginFailedException, RemoteServerException {
-		return getCandy() >= getCandyCostsForPowerup();
+		return getCandy() >= getCandyCostsForPowerup() && api.getPlayerProfile()
+			.getCurrency(PlayerProfile.Currency.STARDUST) >= getStardustCostsForPowerup();
 	}
 
 	/**
