@@ -321,7 +321,7 @@ public class CatchablePokemon implements MapPoint {
 				useItem(ItemId.ITEM_RAZZ_BERRY);
 				razberryLimit = -1;
 			}
-			amount = options.getNumberBalls();
+			amount = options.getMaxPokeballs();
 		}
 
 		return catchPokemon(1.0, 1.95 + Math.random() * 0.05,

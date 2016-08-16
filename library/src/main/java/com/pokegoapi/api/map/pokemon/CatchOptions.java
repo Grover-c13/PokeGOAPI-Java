@@ -41,21 +41,26 @@ public class CatchOptions {
 	private boolean useBestPokeball;
 	private boolean skipMasterBall;
 	private boolean useRazzBerries;
-	private int numberRazzberries;
+	private int maxRazzBerries;
 	private Pokeball pokeBall;
 	private boolean strictBallType;
 	@Getter
-	private int numberBalls;
+	private int maxPokeballs;
 	
+	/**
+	 * Instantiates a new CatchOptions object.
+	 *
+	 * @param api   the api
+	 */
 	public CatchOptions(PokemonGo api) {
 		this.api = api;
 		this.useRazzBerries = false;
-		this.numberRazzberries = -1;
+		this.maxRazzBerries = -1;
 		this.useBestPokeball = false;
 		this.skipMasterBall = false;
 		this.pokeBall = POKEBALL;
 		this.strictBallType = false;
-		this.numberBalls = 1;
+		this.maxPokeballs = 1;
 	}
 	
 	/**
@@ -122,45 +127,85 @@ public class CatchOptions {
 	 * @return the number to use
 	 */
 	public int getRazzberries() {
-		int razzberries = numberRazzberries;
-		if (useRazzBerries && numberRazzberries <= 1) {
+		int razzberries = maxRazzBerries;
+		if (useRazzBerries && maxRazzBerries <= 1) {
 			razzberries = 1;
-		} else if (numberRazzberries <= 0) {
+		} else if (maxRazzBerries <= 0) {
 			razzberries = -1;
 		} else {
-			razzberries = numberRazzberries;
+			razzberries = maxRazzBerries;
 		}
 		return razzberries;
 	}
 	
+	/**
+	 * Enable or disable the use of razzberries
+	 *
+	 * @param useRazzBerries   true or false
+	 */
 	public void useRazzberries(boolean useRazzBerries) {
 		this.useRazzBerries = useRazzBerries;
 	}
 	
-	public void maxRazzberries(int numberRazzberries) {
-		this.numberRazzberries = numberRazzberries;
+	/**
+	 * Set a maximum number of razzberries
+	 *
+	 * @param maxRazzBerries   maximum allowed
+	 */
+	public void maxRazzberries(int maxRazzBerries) {
+		this.maxRazzBerries = maxRazzBerries;
 	}
 	
-	public void usePokeBall(Pokeball pokeBall) {
+	/**
+	 * Set a specific Pokeball to use
+	 *
+	 * @param pokeBall   the pokeball to use
+	 */
+	public void usePokeball(Pokeball pokeBall) {
 		this.pokeBall = pokeBall;
 	}
 	
+	/**
+	 * Set using the best available ball
+	 *
+	 * @param useBestPokeball   true or false
+	 */
 	public void useBestBall(boolean useBestPokeball) {
 		this.useBestPokeball = useBestPokeball;
 	}
 	
+	/**
+	 * Set using only the defined ball type
+	 *   combined with useBestBall: Sets the minimum
+	 *   combined with usePokeball: Sets the maximum
+	 *
+	 *   no other options will attempt the ball specified
+	 *       or throw an error
+	 *
+	 * @param useBestPokeball   true or false
+	 */
 	public void noFallback(boolean strictBallType) {
 		this.strictBallType = strictBallType;
 	}
 	
+	/**
+	 * Set whether or not Master balls can be used
+	 *
+	 * @param skipMasterBall   true or false
+	 */
 	public void noMasterBall(boolean skipMasterBall) {
 		this.skipMasterBall = skipMasterBall;
 	}
 	
-	public void maxPokeballs(int numberBalls) {
-		if (numberBalls <= 1)
-			numberBalls = -1;
-		this.numberBalls = numberBalls;
+	/**
+	 * Set a maximum number of pokeballs
+	 *
+	 * @param maxPokeballs   maximum allowed
+	 */
+	public void maxPokeballs(int maxPokeballs) {
+		if (maxPokeballs <= 1)
+			maxPokeballs = -1;
+		this.maxPokeballs = maxPokeballs;
 	}
 
 }
