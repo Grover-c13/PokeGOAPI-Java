@@ -72,7 +72,7 @@ public class CatchOptions {
 	 * @throws NoSuchItemException   the no such item exception
 	 */
 	public Pokeball getItemBall() throws LoginFailedException,
-	RemoteServerException, NoSuchItemException {
+						RemoteServerException, NoSuchItemException {
 		ItemBag bag = api.getInventories().getItemBag();
 		if (strictBallType) {
 			if (bag.getItem(pokeBall.getBallType()).getCount() > 0) {
@@ -141,71 +141,86 @@ public class CatchOptions {
 	/**
 	 * Enable or disable the use of razzberries
 	 *
-	 * @param useRazzBerries   true or false
+	 * @param useRazzBerries true or false
+	 * @return               the CatchOptions object
 	 */
-	public void useRazzberries(boolean useRazzBerries) {
+	public CatchOptions useRazzberries(boolean useRazzBerries) {
 		this.useRazzBerries = useRazzBerries;
+		return this;
 	}
 	
 	/**
 	 * Set a maximum number of razzberries
 	 *
-	 * @param maxRazzBerries   maximum allowed
+	 * @param maxRazzBerries maximum allowed
+	 * @return               the CatchOptions object
 	 */
-	public void maxRazzberries(int maxRazzBerries) {
+	public CatchOptions maxRazzberries(int maxRazzBerries) {
 		this.maxRazzBerries = maxRazzBerries;
+		return this;
 	}
 	
 	/**
 	 * Set a specific Pokeball to use
 	 *
-	 * @param pokeBall   the pokeball to use
+	 * @param pokeBall the pokeball to use
+	 * @return         the CatchOptions object
 	 */
-	public void usePokeball(Pokeball pokeBall) {
+	public CatchOptions usePokeball(Pokeball pokeBall) {
 		this.pokeBall = pokeBall;
+		return this;
 	}
 	
 	/**
 	 * Set using the best available ball
 	 *
-	 * @param useBestPokeball   true or false
+	 * @param useBestPokeball true or false
+	 * @return                the CatchOptions object
 	 */
-	public void useBestBall(boolean useBestPokeball) {
+	public CatchOptions useBestBall(boolean useBestPokeball) {
 		this.useBestPokeball = useBestPokeball;
+		return this;
 	}
 	
 	/**
+	 * <pre>
 	 * Set using only the defined ball type
 	 *   combined with useBestBall: Sets the minimum
 	 *   combined with usePokeball: Sets the maximum
 	 *
-	 *   no other options will attempt the ball specified
+	 *   without either will attempt the ball specified
 	 *       or throw an error
-	 *
-	 * @param useBestPokeball   true or false
+	 * </pre>
+	 * @param strictBallType  true or false
+	 * @return                the CatchOptions object
 	 */
-	public void noFallback(boolean strictBallType) {
+	public CatchOptions noFallback(boolean strictBallType) {
 		this.strictBallType = strictBallType;
+		return this;
 	}
 	
 	/**
 	 * Set whether or not Master balls can be used
 	 *
-	 * @param skipMasterBall   true or false
+	 * @param skipMasterBall true or false
+	 * @return               the CatchOptions object
 	 */
-	public void noMasterBall(boolean skipMasterBall) {
+	public CatchOptions noMasterBall(boolean skipMasterBall) {
 		this.skipMasterBall = skipMasterBall;
+		return this;
 	}
 	
 	/**
 	 * Set a maximum number of pokeballs
 	 *
-	 * @param maxPokeballs   maximum allowed
+	 * @param maxPokeballs maximum allowed
+	 * @return             the CatchOptions object
 	 */
-	public void maxPokeballs(int maxPokeballs) {
+	public CatchOptions maxPokeballs(int maxPokeballs) {
 		if (maxPokeballs <= 1)
 			maxPokeballs = -1;
 		this.maxPokeballs = maxPokeballs;
+		return this;
 	}
 
 }
