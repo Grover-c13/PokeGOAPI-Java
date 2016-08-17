@@ -24,17 +24,22 @@ public class DisplayPokenameExample {
 
 	/**
 	 * Displays All 151 Pokemon Names for all Supported Locales
+	 *
 	 * @param args Not used
 	 */
 	public static void main(String[] args) {
 		Locale[] supportedLocales = {
-				Locale.FRENCH,
 				Locale.GERMAN,
 				Locale.ENGLISH,
+				new Locale("es"),
+				Locale.FRENCH,
+				Locale.ITALIAN,
 				Locale.JAPANESE,
+				Locale.KOREAN,
+				new Locale("ru"),
 				new Locale("zh", "CN"),
 				new Locale("zh", "HK"),
-				new Locale("ru"),
+				new Locale("zh", "TW"),
 		};
 		for (int i = 1; i < 152; i++) {
 			//Showcase for Supported Languages
