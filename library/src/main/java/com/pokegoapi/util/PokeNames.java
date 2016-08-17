@@ -33,7 +33,6 @@ public class PokeNames {
 	 */
 	public static String getDisplayName(int pokedexNr, Locale locale) {
 		ResourceBundle names = ResourceBundle.getBundle("pokemon_names", locale);
-		String str = names.getString(String.valueOf(pokedexNr));
-		return str;
+		return names.getString(String.valueOf(pokedexNr));
 	}
 }
