@@ -34,12 +34,6 @@ public class PokeNames {
 	public static String getDisplayName(int pokedexNr, Locale locale) {
 		ResourceBundle names = ResourceBundle.getBundle("pokemon_names", locale);
 		String str = names.getString(String.valueOf(pokedexNr));
-		if (locale == Locale.FRENCH)
-			try {
-				return new String(str.getBytes("ISO-8859-1"), "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
 		return str;
 	}
 }
