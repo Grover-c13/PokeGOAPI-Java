@@ -17,7 +17,7 @@ package com.pokegoapi.examples;
 
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.PokeNames;
-import java.io.UnsupportedEncodingException;
+
 import java.util.Locale;
 import java.util.MissingResourceException;
 
@@ -53,8 +53,6 @@ public class DisplayPokenameExample {
 							i,
 							PokeNames.getDisplayName(i, l),
 							l.getDisplayName(l)));
-				} catch (UnsupportedEncodingException e) {
-					Log.e("Main", "Unable to display name with given locale: ", e);
 				} catch (MissingResourceException e) {
 					Log.e("Main", "Unable to find Pokemon name with given Pokedex: ", e);
 				}
@@ -65,8 +63,6 @@ public class DisplayPokenameExample {
 						"Pokedex# %d is %s in %s",
 						i,
 						PokeNames.getDisplayName(i, new Locale("xx")), "Fallback"));
-			} catch (UnsupportedEncodingException e) {
-				Log.e("Main", "Unable to display name with given locale: ", e);
 			} catch (MissingResourceException e) {
 				Log.e("Main", "Unable to find Pokemon name with given Pokedex: ", e);
 			}
@@ -82,8 +78,6 @@ public class DisplayPokenameExample {
 						i,
 						PokeNames.translateName(PokeNames.getDisplayName(i, Locale.ENGLISH), chs),
 						chs.getDisplayName(chs)));
-			} catch (UnsupportedEncodingException e) {
-				Log.e("Main", "Unable to display name with given locale: ", e);
 			} catch (MissingResourceException e) {
 				Log.e("Main", "Unable to find Pokemon name with given Pokedex: ", e);
 			}

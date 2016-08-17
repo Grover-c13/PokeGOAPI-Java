@@ -15,7 +15,6 @@
 
 package com.pokegoapi.util;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -32,11 +31,9 @@ public class PokeNames {
 	 * @param pokedex Pokemon index number
 	 * @param locale taget name locale
 	 * @return the Pokemon name in locale
-	 * @throws UnsupportedEncodingException if the named charset is not supported
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
-	public static String getDisplayName(int pokedex, Locale locale)
-			throws UnsupportedEncodingException, MissingResourceException {
+	public static String getDisplayName(int pokedex, Locale locale) throws MissingResourceException {
 		ResourceBundle names = ResourceBundle.getBundle("pokemon_names", locale);
 		return names.getString(String.valueOf(pokedex));
 	}
@@ -47,11 +44,9 @@ public class PokeNames {
 	 * @param engName pokemon ENGLISH name
 	 * @param newLocale the locale you want translate to
 	 * @return translated pokemon name
-	 * @throws UnsupportedEncodingException if the named charset is not supported
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
-	public static String translateName(String engName, Locale newLocale)
-			throws UnsupportedEncodingException, MissingResourceException {
+	public static String translateName(String engName, Locale newLocale) throws MissingResourceException {
 		return getDisplayName(getPokedexFromName(engName), newLocale);
 	}
 
@@ -61,15 +56,12 @@ public class PokeNames {
 	 * @param pokeName pokemon name in locale
 	 * @param locale the locale on this name
 	 * @return pokedex
-	 * @throws UnsupportedEncodingException if the named charset is not supported
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
-	public static int getPokedexFromName(String pokeName, Locale locale)
-			throws UnsupportedEncodingException, MissingResourceException {
+	public static int getPokedexFromName(String pokeName, Locale locale) throws MissingResourceException {
 		ResourceBundle nameList = ResourceBundle.getBundle("pokemon_names", locale);
 		for (String key : nameList.keySet()) {
-			String nameUTF8 = new String(nameList.getString(key).getBytes("ISO-8859-1"), "UTF-8");
-			if (nameUTF8.equalsIgnoreCase(pokeName)) {
+			if (nameList.getString(key).equalsIgnoreCase(pokeName)) {
 				return Integer.parseInt(key);
 			}
 		}
@@ -81,11 +73,9 @@ public class PokeNames {
 	 *
 	 * @param pokeName the Pokemon ENGLISH name
 	 * @return pokedex
-	 * @throws UnsupportedEncodingException if the named charset is not supported
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
-	public static int getPokedexFromName(String pokeName)
-			throws UnsupportedEncodingException, MissingResourceException {
+	public static int getPokedexFromName(String pokeName) throws MissingResourceException {
 		return getPokedexFromName(pokeName, Locale.ENGLISH);
 	}
 }
