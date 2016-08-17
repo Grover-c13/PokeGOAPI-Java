@@ -230,6 +230,7 @@ class EvolutionInfo {
 
 	// needs to be handled exceptionally
 	private static final PokemonId[] EEVEE_EVOLUTION = {EEVEE, VAPOREON, JOLTEON, FLAREON};
+	private static final List<PokemonId> EEVEE_FINAL_EVOLUTIONS = asList(VAPOREON, JOLTEON, FLAREON);
 
 	private static final PokemonId[] PORYGON_EVOLUTION = {PORYGON};
 	private static final PokemonId[] OMANYTE_EVOLUTION = {OMANYTE, OMASTAR};
@@ -242,7 +243,6 @@ class EvolutionInfo {
 	private static final PokemonId[] DRATINI_EVOLUTION = {DRATINI, DRAGONAIR, DRAGONITE};
 	private static final PokemonId[] MEWTWO_EVOLUTION = {MEWTWO};
 	private static final PokemonId[] MEW_EVOLUTION = {MEW};
-
 	private static final Map<PokemonId, PokemonId[]> EVOLUTION_INFO = new EnumMap<>(PokemonId.class);
 
 	static {
@@ -423,8 +423,12 @@ class EvolutionInfo {
 	 * @return true if a pokemon is fully evolved, false otherwise
 	 */
 	public static boolean isFullyEvolved(PokemonId pokemonId) {
-		PokemonId[] info = EVOLUTION_INFO.get(pokemonId);
-		return info[info.length - 1] == pokemonId;
+		if (EEVEE_FINAL_EVOLUTIONS.contains(pokemonId)) {
+			return true;
+		} else {
+			PokemonId[] info = EVOLUTION_INFO.get(pokemonId);
+			return info[info.length - 1] == pokemonId;
+		}
 	}
 
 	/**
@@ -434,7 +438,7 @@ class EvolutionInfo {
 	 * @return 0 based evolution stage number
 	 */
 	public static int getEvolutionStage(PokemonId pokemonId) {
-		return asList(VAPOREON, JOLTEON, FLAREON).contains(pokemonId)
+		return EEVEE_FINAL_EVOLUTIONS.contains(pokemonId)
 				? 1
 				: asList(EVOLUTION_INFO.get(pokemonId)).indexOf(pokemonId);
 	}
