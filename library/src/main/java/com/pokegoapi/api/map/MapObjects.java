@@ -20,8 +20,10 @@ import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass.NearbyPokemon;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Map.SpawnPointOuterClass.SpawnPoint;
+
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.fort.Pokestop;
+
 import lombok.Getter;
 import lombok.ToString;
 
@@ -146,7 +148,7 @@ public class MapObjects {
 			return;
 		}
 		complete = true;
-		for (FortData pokestop: pokestops) {
+		for (FortData pokestop : pokestops) {
 			this.pokestops.add(new Pokestop(api, pokestop));
 		}
 	}
@@ -164,6 +166,7 @@ public class MapObjects {
 
 	/**
 	 * updates the object.
+	 *
 	 * @param other Update this {@link MapObjects} data with the provided data.
 	 */
 	@Deprecated

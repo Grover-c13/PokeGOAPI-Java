@@ -15,18 +15,27 @@
 
 package com.pokegoapi.api.player;
 
-import lombok.Getter;
+import POGOProtos.Enums.TutorialStateOuterClass;
 
-public enum Team {
-	TEAM_NONE(0),
-	TEAM_MYSTIC(1),
-	TEAM_VALOR(2),
-	TEAM_INSTINCT(3);
+import java.util.ArrayList;
+import java.util.List;
 
-	@Getter
-	private int value;
+public class TutorialState {
+	private final ArrayList<TutorialStateOuterClass.TutorialState> tutorialStateList = new ArrayList<>();
 
-	private Team(int value) {
-		this.value = value;
+	public TutorialState(List<TutorialStateOuterClass.TutorialState> tutorialStateList) {
+		this.tutorialStateList.addAll(tutorialStateList);
+	}
+
+	public ArrayList<TutorialStateOuterClass.TutorialState> getTutorialStates() {
+		return tutorialStateList;
+	}
+
+	public void addTutorialState(TutorialStateOuterClass.TutorialState state) {
+		tutorialStateList.add(state);
+	}
+
+	public void addTutorialStates(List<TutorialStateOuterClass.TutorialState> states) {
+		tutorialStateList.addAll(states);
 	}
 }

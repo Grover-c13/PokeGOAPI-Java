@@ -15,19 +15,6 @@
 
 package com.pokegoapi.api.player;
 
-import POGOProtos.Data.Player.CurrencyOuterClass;
-import POGOProtos.Data.Player.EquippedBadgeOuterClass.EquippedBadge;
-import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
-import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
-import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
-import POGOProtos.Networking.Requests.Messages.EquipBadgeMessageOuterClass.EquipBadgeMessage;
-import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
-import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
-import POGOProtos.Networking.Responses.EquipBadgeResponseOuterClass;
-import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
-import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
@@ -38,11 +25,27 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
-import lombok.Setter;
 
 import java.util.EnumMap;
 import java.util.Map;
 
+import POGOProtos.Data.Player.CurrencyOuterClass;
+import POGOProtos.Data.Player.EquippedBadgeOuterClass.EquippedBadge;
+import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
+import POGOProtos.Enums.TutorialStateOuterClass;
+import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
+import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
+import POGOProtos.Networking.Requests.Messages.EquipBadgeMessageOuterClass.EquipBadgeMessage;
+import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
+import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
+import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass.MarkTutorialCompleteMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
+import POGOProtos.Networking.Responses.EquipBadgeResponseOuterClass;
+import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
+import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
+import POGOProtos.Networking.Responses.MarkTutorialCompleteResponseOuterClass.MarkTutorialCompleteResponse;
+import lombok.Setter;
 
 public class PlayerProfile {
 	private static final String TAG = PlayerProfile.class.getSimpleName();
@@ -52,30 +55,36 @@ public class PlayerProfile {
 	private PlayerAvatar avatar;
 	private DailyBonus dailyBonus;
 	private ContactSettings contactSettings;
-	private Map<Currency, Integer> currencies = new EnumMap<Currency, Integer>(Currency.class);
+	private Map<Currency, Integer> currencies = new EnumMap<>(Currency.class);
 	@Setter
 	private Stats stats;
+	private TutorialState tutorialState;
 
-	private boolean init;
-
+	/**
+	 * @param api the api
+	 * @throws LoginFailedException  when the auth is invalid
+	 * @throws RemoteServerException when the server is down/having issues
+	 */
 	public PlayerProfile(PokemonGo api) throws LoginFailedException, RemoteServerException {
 		this.api = api;
-		init = false;
+
+		if (playerData == null) {
+			updateProfile();
+		}
 	}
 
 	/**
 	 * Updates the player profile with the latest data.
 	 *
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException  when the auth is invalid
+	 * @throws RemoteServerException when the server is down/having issues
 	 */
 	public void updateProfile() throws RemoteServerException, LoginFailedException {
-
 		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
 		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
 		api.getRequestHandler().sendServerRequests(getPlayerServerRequest);
 
-		GetPlayerResponse playerResponse = null;
+		GetPlayerResponse playerResponse;
 		try {
 			playerResponse = GetPlayerResponse.parseFrom(getPlayerServerRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
@@ -97,7 +106,13 @@ public class PlayerProfile {
 			}
 		}
 
-		init = true;
+		// Tutorial state
+		tutorialState = new TutorialState(playerData.getTutorialStateList());
+
+		// Check if we are allowed to receive valid responses
+		if (tutorialState.getTutorialStates().isEmpty()) {
+			enableAccount();
+		}
 	}
 
 	/**
@@ -105,11 +120,11 @@ public class PlayerProfile {
 	 * server until a player actively accepts them.
 	 * The rewarded items are automatically inserted into the players item bag.
 	 *
-	 * @see PlayerLevelUpRewards
 	 * @param level the trainer level that you want to accept the rewards for
 	 * @return a PlayerLevelUpRewards object containing information about the items rewarded and unlocked for this level
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException if the server failed to respond
+	 * @throws LoginFailedException  when the auth is invalid
+	 * @throws RemoteServerException when the server is down/having issues
+	 * @see PlayerLevelUpRewards
 	 */
 	public PlayerLevelUpRewards acceptLevelUpRewards(int level) throws RemoteServerException, LoginFailedException {
 		// Check if we even have achieved this level yet
@@ -155,13 +170,12 @@ public class PlayerProfile {
 	/**
 	 * Check and equip badges.
 	 *
-	 * @throws LoginFailedException  if the login failed
+	 * @throws LoginFailedException  when the auth is invalid
 	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 
 	public void checkAndEquipBadges() throws LoginFailedException, RemoteServerException {
-		CheckAwardedBadgesMessage msg =
-				CheckAwardedBadgesMessage.newBuilder().build();
+		CheckAwardedBadgesMessage msg = CheckAwardedBadgesMessage.newBuilder().build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.CHECK_AWARDED_BADGES, msg);
 		api.getRequestHandler().sendServerRequests(serverRequest);
 		CheckAwardedBadgesResponse response;
@@ -193,20 +207,9 @@ public class PlayerProfile {
 	 *
 	 * @param currency the currency
 	 * @return the currency
-	 * @throws InvalidCurrencyException the invalid currency exception
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public int getCurrency(Currency currency)
-			throws InvalidCurrencyException, LoginFailedException, RemoteServerException {
-		if (!init) {
-			updateProfile();
-		}
-		if (currencies.containsKey(currency)) {
-			return currencies.get(currency);
-		} else {
-			throw new InvalidCurrencyException();
-		}
+	public int getCurrency(Currency currency) {
+		return currencies.get(currency);
 	}
 
 	public enum Currency {
@@ -217,14 +220,8 @@ public class PlayerProfile {
 	 * Gets raw player data proto
 	 *
 	 * @return Player data
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public PlayerData getPlayerData()
-			throws LoginFailedException, RemoteServerException {
-		if (!init) {
-			updateProfile();
-		}
+	public PlayerData getPlayerData() {
 		return playerData;
 	}
 
@@ -232,14 +229,8 @@ public class PlayerProfile {
 	 * Gets avatar
 	 *
 	 * @return Player Avatar object
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public PlayerAvatar getAvatar()
-			throws LoginFailedException, RemoteServerException {
-		if (!init) {
-			updateProfile();
-		}
+	public PlayerAvatar getAvatar() {
 		return avatar;
 	}
 
@@ -247,14 +238,8 @@ public class PlayerProfile {
 	 * Gets daily bonus
 	 *
 	 * @return DailyBonus object
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public DailyBonus getDailyBonus()
-			throws LoginFailedException, RemoteServerException {
-		if (!init) {
-			updateProfile();
-		}
+	public DailyBonus getDailyBonus() {
 		return dailyBonus;
 	}
 
@@ -262,14 +247,8 @@ public class PlayerProfile {
 	 * Gets contact settings
 	 *
 	 * @return ContactSettings object
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public ContactSettings getContactSettings()
-			throws LoginFailedException, RemoteServerException {
-		if (!init) {
-			updateProfile();
-		}
+	public ContactSettings getContactSettings() {
 		return contactSettings;
 	}
 
@@ -277,31 +256,56 @@ public class PlayerProfile {
 	 * Gets a map of all currencies
 	 *
 	 * @return map of currencies
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public Map<Currency, Integer> getCurrencies()
-			throws LoginFailedException, RemoteServerException {
-		if (!init) {
-			updateProfile();
-		}
+	public Map<Currency, Integer> getCurrencies() {
 		return currencies;
 	}
-
-
 
 	/**
 	 * Gets player stats
 	 *
 	 * @return stats API objet
-	 * @throws LoginFailedException when the auth is invalid
+	 * @throws LoginFailedException  when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public Stats getStats()
-			throws LoginFailedException, RemoteServerException {
+	public Stats getStats() throws LoginFailedException, RemoteServerException {
 		if (stats == null) {
 			api.getInventories().updateInventories();
 		}
 		return stats;
+	}
+
+	/**
+	 * Gets tutorial states
+	 *
+	 * @return TutorialState object
+	 */
+	public TutorialState getTutorialState() {
+		return tutorialState;
+	}
+
+	/**
+	 * Set the account to legal screen in order to receive valid response
+	 *
+	 * @throws LoginFailedException  when the auth is invalid
+	 * @throws RemoteServerException when the server is down/having issues
+	 */
+	public void enableAccount() throws LoginFailedException, RemoteServerException {
+		MarkTutorialCompleteMessage.Builder tutorialBuilder = MarkTutorialCompleteMessage.newBuilder();
+		tutorialBuilder.addTutorialsCompleted(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN)
+				.setSendMarketingEmails(false)
+				.setSendPushNotifications(false);
+
+		ServerRequest serverRequest = new ServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialBuilder.build());
+		api.getRequestHandler().sendServerRequests(serverRequest);
+
+		MarkTutorialCompleteResponse response;
+		try {
+			response = MarkTutorialCompleteResponse.parseFrom(serverRequest.getData());
+			playerData = response.getPlayerData();
+			tutorialState.addTutorialStates(playerData.getTutorialStateList());
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
 	}
 }

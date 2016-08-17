@@ -31,6 +31,7 @@ import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokem
 import POGOProtos.Networking.Responses.DiskEncounterResponseOuterClass.DiskEncounterResponse;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass.UseItemCaptureResponse;
+
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -49,6 +50,7 @@ import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.MapPoint;
+
 import lombok.Getter;
 import lombok.ToString;
 import rx.Observable;
@@ -82,6 +84,8 @@ public class CatchablePokemon implements MapPoint {
 	@Getter
 	private final PokemonId pokemonId;
 	@Getter
+	private final int pokemonIdValue;
+	@Getter
 	private final long expirationTimestampMs;
 	@Getter
 	private final double latitude;
@@ -102,6 +106,7 @@ public class CatchablePokemon implements MapPoint {
 		this.spawnPointId = proto.getSpawnPointId();
 		this.encounterId = proto.getEncounterId();
 		this.pokemonId = proto.getPokemonId();
+		this.pokemonIdValue = proto.getPokemonIdValue();
 		this.expirationTimestampMs = proto.getExpirationTimestampMs();
 		this.latitude = proto.getLatitude();
 		this.longitude = proto.getLongitude();
@@ -120,6 +125,7 @@ public class CatchablePokemon implements MapPoint {
 		this.spawnPointId = proto.getSpawnPointId();
 		this.encounterId = proto.getEncounterId();
 		this.pokemonId = proto.getPokemonData().getPokemonId();
+		this.pokemonIdValue = proto.getPokemonData().getPokemonIdValue();
 		this.expirationTimestampMs = proto.getTimeTillHiddenMs();
 		this.latitude = proto.getLatitude();
 		this.longitude = proto.getLongitude();
@@ -141,6 +147,7 @@ public class CatchablePokemon implements MapPoint {
 		this.spawnPointId = proto.getLureInfo().getFortId();
 		this.encounterId = proto.getLureInfo().getEncounterId();
 		this.pokemonId = proto.getLureInfo().getActivePokemonId();
+		this.pokemonIdValue = proto.getLureInfo().getActivePokemonIdValue();
 		this.expirationTimestampMs = proto.getLureInfo()
 				.getLureExpiresTimestampMs();
 		this.latitude = proto.getLatitude();
@@ -152,6 +159,8 @@ public class CatchablePokemon implements MapPoint {
 	 * Encounter pokemon
 	 *
 	 * @return the encounter result
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
 	 */
 	public EncounterResult encounterPokemon() throws LoginFailedException, RemoteServerException {
 		return AsyncHelper.toBlocking(encounterPokemonAsync());
@@ -247,6 +256,9 @@ public class CatchablePokemon implements MapPoint {
 	 * none will use greatball etc) and uwill use a single razz berry if available.
 	 *
 	 * @return CatchResult
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws NoSuchItemException   the no such item exception
 	 */
 	public Observable<CatchResult> catchPokemonWithRazzBerryAsync()
 			throws LoginFailedException, RemoteServerException, NoSuchItemException {
@@ -293,6 +305,7 @@ public class CatchablePokemon implements MapPoint {
 	 * @return CatchResult
 	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
+	 * @throws NoSuchItemException   the no such item exception
 	 */
 	public CatchResult catchPokemonWithRazzBerry() throws LoginFailedException,
 			RemoteServerException, NoSuchItemException {
@@ -301,7 +314,7 @@ public class CatchablePokemon implements MapPoint {
 		useItem(ItemId.ITEM_RAZZ_BERRY);
 		return catchPokemon(pokeball, -1, -1);
 	}
-	
+
 	/**
 	 * Tries to catch a pokemon with the given type of pokeball.
 	 *
@@ -395,9 +408,10 @@ public class CatchablePokemon implements MapPoint {
 	 * none will use greatball etc).
 	 *
 	 * @return the catch result
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 * @throws NoSuchItemException   the no such item exception
+	 * @throws LoginFailedException     the login failed exception
+	 * @throws RemoteServerException    the remote server exception
+	 * @throws NoSuchItemException      the no such item exception
+	 * @throws EncounterFailedException the encounter failed exception
 	 */
 	public CatchResult catchPokemonBestBallToUse()
 			throws LoginFailedException, RemoteServerException, NoSuchItemException,
@@ -543,11 +557,14 @@ public class CatchablePokemon implements MapPoint {
 	 * @param normalizedReticleSize the normalized hit reticle
 	 * @param spinModifier          the spin modifier
 	 * @return CatchResult of resulted try to catch pokemon
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws NoSuchItemException   the no such item exception
 	 */
 	public Observable<CatchResult> catchPokemonBestBallToUseAsync(
 			EncounterResult encounter, List<ItemId> notUse, double normalizedHitPosition,
 			double normalizedReticleSize, double spinModifier)
-			throws NoSuchItemException, LoginFailedException, RemoteServerException {
+			throws LoginFailedException, RemoteServerException, NoSuchItemException {
 		if (!isEncountered()) {
 			return Observable.just(new CatchResult());
 		}
@@ -565,6 +582,17 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 
+	/**
+	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 50%, if you have
+	 * none will use greatball etc).
+	 *
+	 * @param encounter the encounter
+	 * @param notUse    the not use
+	 * @return CatchResult of resulted try to catch pokemon
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws NoSuchItemException   the no such item exception
+	 */
 	private Pokeball getBestBallToUse(EncounterResult encounter, List<ItemId> notUse)
 			throws LoginFailedException, RemoteServerException, NoSuchItemException {
 		ItemBag bag = api.getInventories().getItemBag();
@@ -597,6 +625,7 @@ public class CatchablePokemon implements MapPoint {
 	 * @return CatchResult
 	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
+	 * @throws NoSuchItemException   the no such item exception
 	 */
 	public CatchResult catchPokemon() throws LoginFailedException,
 			RemoteServerException, NoSuchItemException {

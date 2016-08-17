@@ -27,12 +27,14 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.AttackGymResponseOuterClass.AttackGymResponse;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse.Result;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
+
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -52,9 +54,10 @@ public class Battle {
 
 	/**
 	 * New battle to track the state of a battle.
-	 * @param api The api instance to submit requests with.
-     * @param team The Pokemon to use for attacking in the battle.
-     * @param gym The Gym to fight at.
+	 *
+	 * @param api  The api instance to submit requests with.
+	 * @param team The Pokemon to use for attacking in the battle.
+	 * @param gym  The Gym to fight at.
 	 */
 	public Battle(PokemonGo api, Pokemon[] team, Gym gym) {
 		this.team = team;
@@ -73,8 +76,8 @@ public class Battle {
 	 * Start a battle.
 	 *
 	 * @return Result of the attempt to start
-     * @throws LoginFailedException  if the login failed
-     * @throws RemoteServerException When a buffer exception is thrown
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public Result start() throws LoginFailedException, RemoteServerException {
 
@@ -113,15 +116,13 @@ public class Battle {
 	}
 
 
-
-
 	/**
 	 * Attack a gym.
 	 *
 	 * @param times the amount of times to attack
 	 * @return Battle
-     * @throws LoginFailedException  if the login failed
-     * @throws RemoteServerException When a buffer exception is thrown
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public AttackGymResponse attack(int times) throws LoginFailedException, RemoteServerException {
 
@@ -141,7 +142,6 @@ public class Battle {
 		AttackGymResponse result = doActions(actions);
 
 
-
 		return result;
 	}
 
@@ -149,16 +149,16 @@ public class Battle {
 	/**
 	 * Creates a battle pokemon object to send with the request.
 	 *
-	 * @Param Pokemon
 	 * @return BattlePokemonInfo
+	 * @Param Pokemon
 	 */
 	private BattlePokemonInfo createBattlePokemon(Pokemon pokemon) {
 		BattlePokemonInfo info = BattlePokemonInfo
-									.newBuilder()
-									.setCurrentEnergy(0)
-									.setCurrentHealth(100)
-									.setPokemonData(pokemon.getDefaultInstanceForType())
-									.build();
+				.newBuilder()
+				.setCurrentEnergy(0)
+				.setCurrentHealth(100)
+				.setPokemonData(pokemon.getDefaultInstanceForType())
+				.build();
 		return info;
 	}
 
@@ -220,16 +220,15 @@ public class Battle {
 
 
 		AttackGymMessage.Builder message = AttackGymMessage
-									.newBuilder()
-									.setGymId(gym.getId())
-									.setPlayerLatitude(api.getLatitude())
-									.setPlayerLongitude(api.getLongitude())
-									.setBattleId(battleResponse.getBattleId());
+				.newBuilder()
+				.setGymId(gym.getId())
+				.setPlayerLatitude(api.getLatitude())
+				.setPlayerLongitude(api.getLongitude())
+				.setBattleId(battleResponse.getBattleId());
 
 		for (BattleAction action : actions) {
 			message.addAttackActions(action);
 		}
-
 
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.ATTACK_GYM, message.build());
@@ -240,13 +239,12 @@ public class Battle {
 			AttackGymResponse response = AttackGymResponse.parseFrom(serverRequest.getData());
 
 			if (response.getBattleLog().getState() == BattleState.DEFEATED
-						|| response.getBattleLog().getState() == BattleState.VICTORY
-						|| response.getBattleLog().getState() == BattleState.TIMED_OUT) {
+					|| response.getBattleLog().getState() == BattleState.VICTORY
+					|| response.getBattleLog().getState() == BattleState.TIMED_OUT) {
 				concluded = true;
 			}
 
 			outcome = response.getBattleLog().getState();
-
 
 
 			return response;

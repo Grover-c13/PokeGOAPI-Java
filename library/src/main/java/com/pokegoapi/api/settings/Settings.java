@@ -3,11 +3,14 @@ package com.pokegoapi.api.settings;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
+
+import POGOProtos.Settings.GpsSettingsOuterClass;
 import lombok.Getter;
 
 /**
@@ -51,14 +54,22 @@ public class Settings {
 	 */
 	private final InventorySettings inventorySettings;
 
+	@Getter
+	/**
+	 * Settings for showing speed warnings
+	 *
+	 * @return GpsSettings instance.
+	 */
+	private final GpsSettings gpsSettings;
+
 
 	/**
 	 * Settings object that hold different configuration aspect of the game.
 	 * Can be used to simulate the real app behaviour.
-     *
-     * @param api api instance
-     * @throws LoginFailedException If login failed.
-     * @throws RemoteServerException If server communications failed.
+	 *
+	 * @param api api instance
+	 * @throws LoginFailedException  If login failed.
+	 * @throws RemoteServerException If server communications failed.
 	 */
 	public Settings(PokemonGo api) throws LoginFailedException, RemoteServerException {
 		this.api = api;
@@ -66,6 +77,7 @@ public class Settings {
 		this.levelUpSettings = new LevelUpSettings();
 		this.fortSettings = new FortSettings();
 		this.inventorySettings = new InventorySettings();
+		this.gpsSettings = new GpsSettings();
 		updateSettings();
 	}
 
@@ -91,7 +103,7 @@ public class Settings {
 		levelUpSettings.update(response.getSettings().getInventorySettings());
 		fortSettings.update(response.getSettings().getFortSettings());
 		inventorySettings.update(response.getSettings().getInventorySettings());
-
+		gpsSettings.update(response.getSettings().getGpsSettings());
 	}
 
 

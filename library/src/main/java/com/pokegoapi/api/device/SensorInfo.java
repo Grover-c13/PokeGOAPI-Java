@@ -55,16 +55,18 @@ public class SensorInfo {
 	}
 
 	/**
-	 * Sets timestamp snapshot in ms since start
+	 * Sets timestamp snapshot since start
 	 *
+	 * @param timestampSnapshot timestamp in ms since app start
 	 */
 	public void setTimestampSnapshot(long timestampSnapshot) {
 		sensorInfoBuilder.setTimestampSnapshot(timestampSnapshot);
 	}
 
 	/**
-	 * Sets accelerometer axes, always 3
+	 * Sets accelerometer axes
 	 *
+	 * @param accelerometerAxes accelerometer axes (always 3)
 	 */
 	public void setAccelerometerAxes(long accelerometerAxes) {
 		sensorInfoBuilder.setAccelerometerAxes(accelerometerAxes);
@@ -72,7 +74,8 @@ public class SensorInfo {
 
 	/**
 	 * Sets accel normalized x
-	 * 
+	 *
+	 * @param accelNormalizedX accel normalized x
 	 */
 	public void setAccelNormalizedX(double accelNormalizedX) {
 		sensorInfoBuilder.setAccelNormalizedX(accelNormalizedX);
@@ -81,6 +84,7 @@ public class SensorInfo {
 	/**
 	 * Sets accel normalized y
 	 *
+	 * @param accelNormalizedY accel normalized y
 	 */
 	public void setAccelNormalizedY(double accelNormalizedY) {
 		sensorInfoBuilder.setAngleNormalizedY(accelNormalizedY);
@@ -89,6 +93,7 @@ public class SensorInfo {
 	/**
 	 * Sets accel normalized z
 	 *
+	 * @param accelNormalizedZ accel normalized z
 	 */
 	public void setAccelNormalizedZ(double accelNormalizedZ) {
 		sensorInfoBuilder.setAccelNormalizedZ(accelNormalizedZ);
@@ -97,6 +102,7 @@ public class SensorInfo {
 	/**
 	 * Sets accel raw x
 	 *
+	 * @param accelRawX accel raw x
 	 */
 	public void setAccelRawX(double accelRawX) {
 		sensorInfoBuilder.setAccelRawX(accelRawX);
@@ -105,6 +111,7 @@ public class SensorInfo {
 	/**
 	 * Sets accel raw y
 	 *
+	 * @param accelRawY accel raw y
 	 */
 	public void setAccelRawY(double accelRawY) {
 		sensorInfoBuilder.setAccelRawY(accelRawY);
@@ -113,6 +120,7 @@ public class SensorInfo {
 	/**
 	 * Sets accel raw z
 	 *
+	 * @param accelRawZ accel raw z
 	 */
 	public void setAccelRawZ(double accelRawZ) {
 		sensorInfoBuilder.setAccelRawZ(accelRawZ);
@@ -121,6 +129,7 @@ public class SensorInfo {
 	/**
 	 * Sets angel normalized x
 	 *
+	 * @param angleNormalizedX angel normalized x
 	 */
 	public void setAngleNormalizedX(double angleNormalizedX) {
 		sensorInfoBuilder.setAngleNormalizedX(angleNormalizedX);
@@ -129,6 +138,7 @@ public class SensorInfo {
 	/**
 	 * Sets angel normalized y
 	 *
+	 * @param angleNormalizedY angel normalized y
 	 */
 	public void setAngleNormalizedY(double angleNormalizedY) {
 		sensorInfoBuilder.setAngleNormalizedY(angleNormalizedY);
@@ -137,6 +147,7 @@ public class SensorInfo {
 	/**
 	 * Sets angel normalized z
 	 *
+	 * @param angleNormalizedZ angel normalized z
 	 */
 	public void setAngleNormalizedZ(double angleNormalizedZ) {
 		sensorInfoBuilder.setAngleNormalizedZ(angleNormalizedZ);
@@ -145,6 +156,7 @@ public class SensorInfo {
 	/**
 	 * Sets gyroscope raw x
 	 *
+	 * @param gyroscopeRawX gyroscope raw x
 	 */
 	public void setGyroscopeRawX(double gyroscopeRawX) {
 		sensorInfoBuilder.setGyroscopeRawX(gyroscopeRawX);
@@ -153,6 +165,7 @@ public class SensorInfo {
 	/**
 	 * Sets gyroscope raw y
 	 *
+	 * @param gyroscopeRawY gyroscope raw y
 	 */
 	public void setGyroscopeRawY(double gyroscopeRawY) {
 		sensorInfoBuilder.setGyroscopeRawY(gyroscopeRawY);
@@ -161,6 +174,7 @@ public class SensorInfo {
 	/**
 	 * Sets gyroscope raw z
 	 *
+	 * @param gyroscopeRawZ gyroscope raw z
 	 */
 	public void setGyroscopeRawZ(double gyroscopeRawZ) {
 		sensorInfoBuilder.setGyroscopeRawZ(gyroscopeRawZ);

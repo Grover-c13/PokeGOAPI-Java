@@ -35,6 +35,7 @@ import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResp
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
+
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
@@ -57,6 +58,7 @@ import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.MapUtil;
+
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -134,6 +136,7 @@ public class Map {
 	/**
 	 * Remove a catchable pokemon from the cache
 	 *
+	 * @param pokemon the catchable pokemon
 	 */
 	public void removeCatchable(CatchablePokemon pokemon) {
 		if (cachedCatchable != null) {
@@ -145,6 +148,8 @@ public class Map {
 	 * Returns a list of catchable pokemon around the current location.
 	 *
 	 * @return a List of CatchablePokemon at your current location
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
 	 */
 	public List<CatchablePokemon> getCatchablePokemon() throws LoginFailedException, RemoteServerException {
 		return AsyncHelper.toBlocking(getCatchablePokemonAsync());
@@ -167,8 +172,6 @@ public class Map {
 	 * Returns a list of nearby pokemon (non-catchable).
 	 *
 	 * @return a List of NearbyPokemon at your current location
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public Observable<List<NearbyPokemon>> getNearbyPokemonAsync() {
 		return getMapObjectsAsync(getDefaultCells()).map(new Func1<MapObjects, List<NearbyPokemon>>() {
@@ -250,6 +253,8 @@ public class Map {
 	 * Get a list of gyms near the current location.
 	 *
 	 * @return List of gyms
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
 	 */
 	public List<Gym> getGyms() throws LoginFailedException, RemoteServerException {
 		return AsyncHelper.toBlocking(getGymsAsync());

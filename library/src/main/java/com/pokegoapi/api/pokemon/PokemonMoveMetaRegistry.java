@@ -1402,8 +1402,7 @@ public class PokemonMoveMetaRegistry {
 	/**
 	 * Return PokemonMoveMeta object containing meta info about a pokemon move.
 	 *
-	 * @param id
-	 *            the id of the pokemon move
+	 * @param id the id of the pokemon move
 	 * @return PokemonMoveMeta
 	 */
 	public static PokemonMoveMeta getMeta(PokemonMove id) {

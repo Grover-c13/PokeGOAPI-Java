@@ -21,9 +21,8 @@ import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 
 
-
 public interface EncounterResult {
-	
+
 	boolean wasSuccessful();
 
 	EncounterResponse.Status getStatus();

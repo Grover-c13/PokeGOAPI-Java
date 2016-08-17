@@ -51,7 +51,10 @@ public class CatchResult {
 		if (this.status != null) {
 			return status;
 		}
-		return response.getStatus();
+		if (this.response != null) {
+			return response.getStatus();
+		}
+		return null;
 	}
 
 	public double getMissPercent() {

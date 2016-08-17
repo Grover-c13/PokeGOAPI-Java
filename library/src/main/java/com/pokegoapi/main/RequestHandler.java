@@ -18,6 +18,7 @@ package com.pokegoapi.main;
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
+
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -27,6 +28,7 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.Signature;
+
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -219,7 +221,7 @@ public class RequestHandler implements Runnable {
 			} else if (responseEnvelop.getStatusCode() == 53) {
 				// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
 				return internalSendServerRequests(newAuthTicket, serverRequests);
-			}  else if (responseEnvelop.getStatusCode() == 3) {
+			} else if (responseEnvelop.getStatusCode() == 3) {
 				throw new RemoteServerException("Your account may be banned! please try from the official client.");
 			}
 

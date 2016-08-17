@@ -123,5 +123,4 @@ public class PokemonMeta {
 	private int number;
 
 
-
 }

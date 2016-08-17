@@ -16,10 +16,12 @@
 package com.pokegoapi.auth;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
 import com.squareup.moshi.Moshi;
+
 import lombok.Getter;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -57,7 +59,8 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	 *
 	 * @param client       OkHttp client
 	 * @param refreshToken Refresh Token Persisted by user
-	 * @throws LoginFailedException When login fails
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public GoogleCredentialProvider(OkHttpClient client, String refreshToken)
 			throws LoginFailedException, RemoteServerException {
@@ -92,7 +95,8 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	 * Given the refresh token fetches a new access token and returns AuthInfo.
 	 *
 	 * @param refreshToken Refresh token persisted by the user after initial login
-	 * @throws LoginFailedException If we fail to get tokenId
+	 * @throws LoginFailedException  If we fail to get tokenId
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public void refreshToken(String refreshToken) throws LoginFailedException, RemoteServerException {
 		HttpUrl url = HttpUrl.parse(OAUTH_TOKEN_ENDPOINT).newBuilder()
@@ -134,6 +138,8 @@ public class GoogleCredentialProvider extends CredentialProvider {
 
 	/**
 	 * Starts a login flow for google using googles device oauth endpoint.
+	 *
+	 * @throws LoginFailedException If we fail to get tokenId
 	 */
 	public void login() throws LoginFailedException {
 
@@ -191,7 +197,15 @@ public class GoogleCredentialProvider extends CredentialProvider {
 		refreshToken = googleAuthTokenJson.getRefreshToken();
 	}
 
-
+	/**
+	 * Get the google auth token json from the google auth json
+	 *
+	 * @param json google auth json
+	 * @return google auth token json
+	 * @throws URISyntaxException   syntax exception
+	 * @throws IOException          io exception
+	 * @throws LoginFailedException If we fail to get tokenId
+	 */
 	private GoogleAuthTokenJson poll(GoogleAuthJson json) throws URISyntaxException, IOException, LoginFailedException {
 		HttpUrl url = HttpUrl.parse(OAUTH_TOKEN_ENDPOINT).newBuilder()
 				.addQueryParameter("client_id", CLIENT_ID)
@@ -232,7 +246,8 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	 * Refreshes tokenId if it has expired
 	 *
 	 * @return AuthInfo object
-	 * @throws LoginFailedException When login fails
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException if the server failed to respond
 	 */
 	@Override
 	public AuthInfo getAuthInfo() throws LoginFailedException, RemoteServerException {
@@ -246,11 +261,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 
 	@Override
 	public boolean isTokenIdExpired() {
-		if (System.currentTimeMillis() > expiresTimestamp) {
-			return true;
-		} else {
-			return false;
-		}
+		return System.currentTimeMillis() > expiresTimestamp;
 	}
 
 	/**

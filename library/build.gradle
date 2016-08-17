@@ -34,6 +34,10 @@ processResources {
     exclude('signature/Signature.proto')
 }
 
+javadoc {
+    exclude "**/google/common/geometry/**"
+}
+
 // Run this task to bundle all needed dependency
 task bundle(type: Jar) {
     baseName = archivesBaseName + '-all'
@@ -136,7 +140,7 @@ bintray {
         repo = 'maven'
         name = 'PokeGOAPI'
         userOrg = user
-        licenses = ['Apache-2.0']
+        licenses = ['GPL-3.0']
         vcsUrl = 'https://github.com/Grover-c13/PokeGOAPI-Java.git'
         publish = true
     }

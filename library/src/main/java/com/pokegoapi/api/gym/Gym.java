@@ -23,6 +23,7 @@ import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Networking.Requests.Messages.GetGymDetailsMessageOuterClass.GetGymDetailsMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetGymDetailsResponseOuterClass.GetGymDetailsResponse;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.ProtocolStringList;
 import com.pokegoapi.api.PokemonGo;
@@ -42,8 +43,9 @@ public class Gym implements MapPoint {
 
 	/**
 	 * Gym object.
-	 * @param api The api object to use for requests.
-     * @param proto The FortData to populate the Gym with.
+	 *
+	 * @param api   The api object to use for requests.
+	 * @param proto The FortData to populate the Gym with.
 	 */
 	public Gym(PokemonGo api, FortData proto) {
 		this.api = api;
@@ -99,13 +101,13 @@ public class Gym implements MapPoint {
 	private GetGymDetailsResponse details() throws LoginFailedException, RemoteServerException {
 		if (details == null) {
 			GetGymDetailsMessage reqMsg = GetGymDetailsMessage
-											.newBuilder()
-											.setGymId(this.getId())
-											.setGymLatitude(this.getLatitude())
-											.setGymLongitude(this.getLongitude())
-											.setPlayerLatitude(api.getLatitude())
-											.setPlayerLongitude(api.getLongitude())
-											.build();
+					.newBuilder()
+					.setGymId(this.getId())
+					.setGymLatitude(this.getLatitude())
+					.setGymLongitude(this.getLongitude())
+					.setPlayerLatitude(api.getLatitude())
+					.setPlayerLongitude(api.getLongitude())
+					.build();
 
 
 			ServerRequest serverRequest = new ServerRequest(RequestType.GET_GYM_DETAILS, reqMsg);
@@ -136,7 +138,7 @@ public class Gym implements MapPoint {
 
 	public boolean inRange() throws LoginFailedException, RemoteServerException {
 		GetGymDetailsResponse.Result result = getResult();
-		return ( result != GetGymDetailsResponse.Result.ERROR_NOT_IN_RANGE);
+		return (result != GetGymDetailsResponse.Result.ERROR_NOT_IN_RANGE);
 	}
 
 	public String getDescription() throws LoginFailedException, RemoteServerException {
@@ -152,8 +154,8 @@ public class Gym implements MapPoint {
 	 * Get a list of pokemon defending this gym.
 	 *
 	 * @return List of pokemon
-     * @throws LoginFailedException  if the login failed
-     * @throws RemoteServerException When a buffer exception is thrown
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public List<PokemonData> getDefendingPokemon() throws LoginFailedException, RemoteServerException {
 		List<PokemonData> data = new ArrayList<PokemonData>();

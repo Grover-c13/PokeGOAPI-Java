@@ -1,10 +1,12 @@
 package com.pokegoapi.auth;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
+
 import lombok.Getter;
 import okhttp3.OkHttpClient;
 import svarzee.gps.gpsoauth.AuthToken;
@@ -27,15 +29,16 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	private final Gpsoauth gpsoauth;
 	private final String username;
 	private Time time;
-	
+
 	@Getter
 	private TokenInfo tokenInfo;
 
 	/**
 	 * Constructs credential provider using username and password
 	 *
-	 * @param username - google username
-	 * @param password - google password
+	 * @param httpClient OkHttp client
+	 * @param username   google username
+	 * @param password   google password
 	 * @throws LoginFailedException  - login failed possibly due to invalid credentials
 	 * @throws RemoteServerException - some server/network failure
 	 */
@@ -48,13 +51,12 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	}
 
 	/**
-	 * 
-	 * @param httpClient : the client that will make http call
-	 * @param username : google username
-	 * @param password : google pwd
-	 * @param time : time instance used to refresh token
-	 * @throws LoginFailedException -  login failed possibly due to invalid credentials
-	 * @throws RemoteServerException - some server/network failure
+	 * @param httpClient the client that will make http call
+	 * @param username   google username
+	 * @param password   google pwd
+	 * @param time       time instance used to refresh token
+	 * @throws LoginFailedException  login failed possibly due to invalid credentials
+	 * @throws RemoteServerException some server/network failure
 	 */
 	public GoogleAutoCredentialProvider(OkHttpClient httpClient, String username, String password, Time time)
 			throws LoginFailedException, RemoteServerException {
@@ -78,6 +80,13 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 		}
 	}
 
+	/**
+	 * @param username     user name
+	 * @param refreshToken refresh token
+	 * @return the token info
+	 * @throws RemoteServerException login failed possibly due to invalid credentials
+	 * @throws LoginFailedException  some server/network failure
+	 */
 	private TokenInfo refreshToken(String username, String refreshToken)
 			throws RemoteServerException, LoginFailedException {
 		try {
@@ -91,16 +100,26 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 		}
 	}
 
+	/**
+	 * @return token id
+	 * @throws RemoteServerException login failed possibly due to invalid credentials
+	 * @throws LoginFailedException  some server/network failure
+	 */
 	@Override
-	public String getTokenId() throws LoginFailedException, RemoteServerException {
+	public String getTokenId() throws RemoteServerException, LoginFailedException {
 		if (isTokenIdExpired()) {
 			this.tokenInfo = refreshToken(username, tokenInfo.refreshToken);
 		}
 		return tokenInfo.authToken.getToken();
 	}
 
+	/**
+	 * @return auth info
+	 * @throws RemoteServerException login failed possibly due to invalid credentials
+	 * @throws LoginFailedException  some server/network failure
+	 */
 	@Override
-	public AuthInfo getAuthInfo() throws LoginFailedException, RemoteServerException {
+	public AuthInfo getAuthInfo() throws RemoteServerException, LoginFailedException {
 		AuthInfo.Builder builder = AuthInfo.newBuilder();
 		builder.setProvider("google");
 		builder.setToken(AuthInfo.JWT.newBuilder().setContents(getTokenId()).setUnknown2(59).build());
