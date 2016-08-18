@@ -31,6 +31,7 @@ import com.pokegoapi.util.AsyncHelper;
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.EvolvePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.NicknamePokemonMessageOuterClass.NicknamePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
@@ -38,7 +39,6 @@ import POGOProtos.Networking.Requests.Messages.SetFavoritePokemonMessageOuterCla
 import POGOProtos.Networking.Requests.Messages.UpgradePokemonMessageOuterClass.UpgradePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.UseItemPotionMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.UseItemReviveMessageOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass.EvolvePokemonResponse;
 import POGOProtos.Networking.Responses.NicknamePokemonResponseOuterClass.NicknamePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
@@ -179,6 +179,28 @@ public class Pokemon extends PokemonDetails {
 	}
 	
 	/**
+	 * Check if can powers up this pokemon, you can choose whether or not to consider the max cp limit for current
+	 * player level passing true to consider and false to not consider.
+	 * 
+	 * @param  considerMaxCPLimitForPlayerLevel Consider max cp limit for actual player level
+	 * @return the boolean
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws NoSuchItemException   If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
+	 */
+	public boolean canPowerUp(boolean considerMaxCPLimitForPlayerLevel)
+		throws LoginFailedException, RemoteServerException, NoSuchItemException {
+	    boolean result = false;
+	    if(considerMaxCPLimitForPlayerLevel){
+		result = (this.canPowerUp() && (this.getCp() < this.getMaxCpForPlayer()));
+	    }
+	    else{
+		result = this.canPowerUp();
+	    }
+	    return result;
+	}
+	
+	/**
 	 * Check if can evolve this pokemon
 	 *
 	 * @return the boolean
@@ -186,7 +208,7 @@ public class Pokemon extends PokemonDetails {
 	 * @throws RemoteServerException the remote server exception
 	 */
 	public boolean canEvolve() throws LoginFailedException, RemoteServerException {
-		return getCandy() >= getCandiesToEvolve();
+		return ((!EvolutionInfo.isFullyEvolved(this.getPokemonId())) && (getCandy() >= getCandiesToEvolve()));
 	}
 
 	/**
