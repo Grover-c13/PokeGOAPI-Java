@@ -189,10 +189,10 @@ public class Pokemon extends PokemonDetails {
 	 * @throws NoSuchItemException   If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
 	 */
 	public boolean canPowerUp(boolean considerMaxCPLimitForPlayerLevel)
-		throws LoginFailedException, RemoteServerException, NoSuchItemException {
-		return considerMaxCPLimitForPlayerLevel 
-				? this.canPowerUp() && (this.getCp() < this.getMaxCpForPlayer())
-                : canPowerUp();
+			throws LoginFailedException, RemoteServerException, NoSuchItemException {
+		return considerMaxCPLimitForPlayerLevel
+				? this.canPowerUp() && (this.getCp() < this.getMaxCpForPlayer()) 
+						: canPowerUp();
 	}
 	
 	/**
