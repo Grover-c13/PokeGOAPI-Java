@@ -24,10 +24,10 @@ import java.util.ResourceBundle;
  */
 public class PokeDictionary {
 	private static final String POKE_NAMES_BUNDLE = "pokemon_names";
-	private static final String POKE_DESCRIPTIONS_BUNDLE ="pokemon_descriptions";
+	private static final String POKE_DESCRIPTIONS_BUNDLE = "pokemon_descriptions";
 
 	private static ResourceBundle getPokeBundle(String bundleBaseName, Locale locale)
-			throws MissingResourceException{
+			throws MissingResourceException {
 		return ResourceBundle.getBundle(bundleBaseName, locale);
 	}
 
