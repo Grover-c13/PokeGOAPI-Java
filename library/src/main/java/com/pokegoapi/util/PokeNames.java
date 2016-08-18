@@ -19,7 +19,7 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 
 /**
- * Deprecated. Use {@link PokeDictionary} instead.
+ * Deprecated, use {@link PokeDictionary} instead.
  */
 @Deprecated
 public class PokeNames {
