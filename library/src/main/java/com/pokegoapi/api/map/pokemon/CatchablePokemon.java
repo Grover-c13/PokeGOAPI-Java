@@ -40,6 +40,7 @@ import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.map.pokemon.encounter.DiskEncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.NormalEncounterResult;
+import com.pokegoapi.api.settings.AsyncCatchOptions;
 import com.pokegoapi.api.settings.CatchOptions;
 import com.pokegoapi.exceptions.AsyncLoginFailedException;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
@@ -251,29 +252,6 @@ public class CatchablePokemon implements MapPoint {
 						return new DiskEncounterResult(api, response);
 					}
 				});
-	}
-
-	/**
-	 * Tries to catch a pokemon (will attempt to use a pokeball, if you have
-	 * none will use greatball etc) and uwill use a single razz berry if available.
-	 *
-	 * @return CatchResult
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 * @throws NoSuchItemException   the no such item exception
-	 */
-	public Observable<CatchResult> catchPokemonWithRazzBerryAsync()
-			throws LoginFailedException, RemoteServerException, NoSuchItemException {
-		final Pokeball pokeball = getItemBall();
-		return useItemAsync(ItemId.ITEM_RAZZ_BERRY).flatMap(new Func1<CatchItemResult, Observable<CatchResult>>() {
-			@Override
-			public Observable<CatchResult> call(CatchItemResult result) {
-				if (!result.getSuccess()) {
-					return Observable.just(new CatchResult());
-				}
-				return catchPokemonAsync(pokeball);
-			}
-		});
 	}
 
 	/**
@@ -680,8 +658,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 	
 	/**
-	 * Tries to catch a pokemon (will attempt to use a pokeball, if you have
-	 * none will use greatball etc) and uwill use a single razz berry if available.
+	 * Tries to catch a pokemon (using defined CatchOptions).
 	 *
 	 * @param  options               the CatchOptions object
 	 * @return CatchResult
@@ -696,12 +673,12 @@ public class CatchablePokemon implements MapPoint {
 		int amount = -1;
 		if (options != null) {
 			pokeball = options.getItemBall();
+			amount = options.getMaxPokeballs();
 			razberryLimit = options.getRazzberries();
 			if (razberryLimit == 1) {
 				useItem(ItemId.ITEM_RAZZ_BERRY);
 				razberryLimit = -1;
 			}
-			amount = options.getMaxPokeballs();
 		}
 		
 		return catchPokemon(1.0, 1.95 + Math.random() * 0.05,
@@ -741,6 +718,39 @@ public class CatchablePokemon implements MapPoint {
 									int amount) throws LoginFailedException, RemoteServerException {
 
 		return catchPokemon(normalizedHitPosition, normalizedReticleSize, spinModifier, type, amount, 0);
+	}
+	
+	/**
+	 * Tries to catch a pokemon (using defined AsyncCatchOptions).
+	 *
+	 * @param  options                the AsyncCatchOptions object
+	 * @return Observable CatchResult
+	 * @throws LoginFailedException   if failed to login
+	 * @throws RemoteServerException  if the server failed to respond
+	 * @throws NoSuchItemException    the no such item exception
+	 */
+	public Observable<CatchResult> catchPokemon(AsyncCatchOptions options)
+						throws LoginFailedException, RemoteServerException, NoSuchItemException {
+		Pokeball pokeball = getItemBall();
+		if (options != null) {
+			pokeball = options.getItemBall();
+			if (options.getUseRazzBerry() != 0) {
+				final Pokeball asyncBall = pokeball;
+				return useItemAsync(ItemId.ITEM_RAZZ_BERRY).flatMap(
+						new Func1<CatchItemResult, Observable<CatchResult>>() {
+							@Override
+							public Observable<CatchResult> call(CatchItemResult result) {
+								if (!result.getSuccess()) {
+									return Observable.just(new CatchResult());
+								}
+								return catchPokemonAsync(1.0, 1.95 + Math.random() * 0.05,
+														0.85 + Math.random() * 0.15, asyncBall);
+							}
+						});
+			}
+		}
+		return catchPokemonAsync(1.0, 1.95 + Math.random() * 0.05,
+								0.85 + Math.random() * 0.15, pokeball);
 	}
 
 	/**
@@ -804,16 +814,37 @@ public class CatchablePokemon implements MapPoint {
 
 		return result;
 	}
-
+	
 	/**
-	 * Tries to catch a pokemon.
-	 *
-	 * @param type Type of pokeball to throw
-	 * @return CatchResult of resulted try to catch pokemon
+	 * @deprecated Please use AsyncCatchOptions instead
+	 * <pre>
+	 * AsyncCatchOptions options = new AsyncCatchOptions(go);
+	 * options.useRazzberries(true);
+	 * cp.catchPokemon(options);
+	 * </pre>
+	 * @return Observable CatchResult
+	 * @throws NoSuchMethodException method removal notice
 	 */
-	public Observable<CatchResult> catchPokemonAsync(Pokeball type) {
-		return catchPokemonAsync(1.0, 1.95 + Math.random() * 0.05,
-				0.85 + Math.random() * 0.15, type);
+	@Deprecated
+	public Observable<CatchResult> catchPokemonWithRazzBerryAsync()
+						throws NoSuchMethodException {
+		throw new NoSuchMethodException("catchPokemonWithRazzBerryAsync no longer supported");
+	}
+	
+	/**
+	 * @deprecated Please use AsyncCatchOptions instead
+	 * <pre>
+	 * AsyncCatchOptions options = new AsyncCatchOptions(go);
+	 * options.usePokeball(pokeball);
+	 * cp.catchPokemon(options);
+	 * </pre>
+	 * @param  type                   deprecated parameter
+	 * @return Observable CatchResult
+	 * @throws NoSuchMethodException  method removal notice
+	 */
+	@Deprecated
+	public Observable<CatchResult> catchPokemonAsync(Pokeball type) throws NoSuchMethodException {
+		throw new NoSuchMethodException("catchPokemonAsync(pokeball) no longer supported");
 	}
 
 	/**
