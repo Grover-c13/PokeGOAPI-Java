@@ -21,6 +21,8 @@ task runSample << {
 		mainClassName = "com.pokegoapi.examples.TransferOnePidgeyExample"
 	} else if (sample == "6") {
 		mainClassName = "com.pokegoapi.examples.UseIncenseExample"
+	} else if (sample == "7") {
+		mainClassName = "com.pokegoapi.examples.TranslatePokenameExample"
 	}
     run.execute()
 }

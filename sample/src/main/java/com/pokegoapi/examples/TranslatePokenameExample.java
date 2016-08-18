@@ -21,44 +21,32 @@ import com.pokegoapi.util.PokeDictionary;
 import java.util.Locale;
 import java.util.MissingResourceException;
 
-import static com.pokegoapi.util.PokeDictionary.supportedLocales;
-
-public class DisplayPokenameExample {
-
+/**
+ * Created by Angelo on 18.08.2016.
+ */
+public class TranslatePokenameExample {
 	/**
 	 * Displays All 151 Pokemon Names for all Supported Locales
 	 *
 	 * @param args Not used
 	 */
 	public static void main(String[] args) {
+		// Translate English Pokemon name to Simplified Chinese
+		// Note:    You can use PokeDictionary.getDisplayName(int pokedexId, Locale locale)
+		//          instead, if you already know the Pokedex Id.
+		//          See DisplayPokenameExample for an example.
+		Locale chs = new Locale("zh", "CN");
 		for (int i = 1; i < 152; i++) {
-			//Showcase for Supported Languages
-			for (Locale l : supportedLocales) {
-				try {
-					System.out.println(String.format(
-							l,
-							"%s: Pokedex #%d is %s\n    %s",
-							l.getDisplayName(l),
-							i,
-							PokeDictionary.getDisplayName(i, l),
-							PokeDictionary.getDisplayDescription(i, l)));
-				} catch (MissingResourceException e) {
-					Log.e("Main", "Unable to find Pokemon name with given Pokedex: " + i, e);
-				}
-			}
-			//Showcase for Fallback Behaviour
 			try {
 				System.out.println(String.format(
-						"%s: Pokedex# %d is %s\n    %s",
-						"Fallback",
+						chs,
+						"Pokedex# %d is %s in %s",
 						i,
-						PokeDictionary.getDisplayName(i, new Locale("xx")),
-						PokeDictionary.getDisplayDescription(i, new Locale("xx"))));
+						PokeDictionary.translateName(PokeDictionary.getDisplayName(i, Locale.ENGLISH), chs),
+						chs.getDisplayName(chs)));
 			} catch (MissingResourceException e) {
 				Log.e("Main", "Unable to find Pokemon name with given Pokedex: ", e);
 			}
-			System.out.println();
 		}
-
 	}
 }
