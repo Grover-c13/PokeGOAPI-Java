@@ -15,27 +15,51 @@
 
 package com.pokegoapi.util;
 
+
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
- * Offers methods to get information about pokémon as seen in the pokédex.
+ * Offers methods to get information about pokemon as seen in the pokedex.
  */
 public class PokeDictionary {
 	private static final String POKE_NAMES_BUNDLE = "pokemon_names";
 	private static final String POKE_DESCRIPTIONS_BUNDLE = "pokemon_descriptions";
 
+	/**
+	 * An array of all supported locales.
+	 */
+	public static final Locale[] supportedLocales = {
+			Locale.GERMAN,
+			Locale.ENGLISH,
+			new Locale("es"),
+			Locale.FRENCH,
+			Locale.ITALIAN,
+			Locale.JAPANESE,
+			Locale.KOREAN,
+			new Locale("ru"),
+			new Locale("zh", "CN"),
+			new Locale("zh", "HK"),
+			new Locale("zh", "TW"),
+	};
+
 	private static ResourceBundle getPokeBundle(String bundleBaseName, Locale locale)
 			throws MissingResourceException {
-		return ResourceBundle.getBundle(bundleBaseName, locale);
+		return ResourceBundle.getBundle(bundleBaseName, locale, new ResourceBundle.Control() {
+			@Override
+			public Locale getFallbackLocale(String baseName, Locale locale) {
+				return Locale.ENGLISH;
+			}
+		});
 	}
 
 	/**
 	 * Returns the Pokédex Name for a Pokedex ID including known translations.
+	 * Fallback to English if names do not exist for the given {@link Locale}.
 	 *
 	 * @param pokedexId Pokemon index number
-	 * @param locale taget name locale
+	 * @param locale    target name locale
 	 * @return the Pokemon name in locale
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
@@ -46,9 +70,10 @@ public class PokeDictionary {
 
 	/**
 	 * Returns the Pokédex Description for a Pokédex ID including known translations.
+	 * Fallback to English if names do not exist for the given {@link Locale}.
 	 *
 	 * @param pokedexId Pokemon index number
-	 * @param locale target name locale
+	 * @param locale    target name locale
 	 * @return the Pokemon description in locale
 	 * @throws MissingResourceException if can not find a matched Pokemon description for the given pokedex
 	 */
@@ -59,8 +84,9 @@ public class PokeDictionary {
 
 	/**
 	 * Returns translated Pokemon name from ENGLISH locale.
+	 * Fallback to English if names do not exist for the given {@link Locale}.
 	 *
-	 * @param engName pokemon ENGLISH name
+	 * @param engName   pokemon ENGLISH name
 	 * @param newLocale the locale you want translate to
 	 * @return translated pokemon name
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
@@ -74,7 +100,7 @@ public class PokeDictionary {
 	 * Returns the Pokemon index from the Pokemon name list.
 	 *
 	 * @param pokeName pokemon name in locale
-	 * @param locale the locale on this name
+	 * @param locale   the locale on this name
 	 * @return pokedex Pokedex Id if a Pokemon with the given pokedex id exists, else -1.
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
