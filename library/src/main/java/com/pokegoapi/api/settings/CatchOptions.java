@@ -13,7 +13,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.api.map.pokemon;
+package com.pokegoapi.api.settings;
 
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.ItemBag;
@@ -33,6 +33,10 @@ import static com.pokegoapi.api.inventory.Pokeball.ULTRABALL;
 
 import lombok.Getter;
 import lombok.ToString;
+
+/**
+ * Created by LoungeKatt on 8/16/16.
+ */
 
 @ToString
 public class CatchOptions {
