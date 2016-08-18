@@ -18,19 +18,21 @@ package com.pokegoapi.util;
 import java.util.Locale;
 import java.util.MissingResourceException;
 
+
 /**
- * Deprecated, use {@link PokeDictionary} instead.
+ * @deprecated Replaced by {@link PokeDictionary}
  */
 @Deprecated
 public class PokeNames {
 	/**
 	 * Returns the Name for a Pokedex ID including known translations.
-	 *
+	 * @deprecated Replaced by {@link PokeDictionary#getDisplayName(int, Locale)}
 	 * @param pokedex Pokemon index number
-	 * @param locale taget name locale
+	 * @param locale target name locale
 	 * @return the Pokemon name in locale
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
+	@Deprecated
 	public static String getDisplayName(int pokedex, Locale locale) throws MissingResourceException {
 		return PokeDictionary.getDisplayName(pokedex, locale);
 	}
@@ -38,11 +40,13 @@ public class PokeNames {
 	/**
 	 * Returns translated Pokemon name from ENGLISH locale.
 	 *
+	 * @deprecated Replaced by {@link PokeDictionary#translateName(String, Locale)}
 	 * @param engName pokemon ENGLISH name
 	 * @param newLocale the locale you want translate to
 	 * @return translated pokemon name
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
+	@Deprecated
 	public static String translateName(String engName, Locale newLocale) throws MissingResourceException {
 		return PokeDictionary.translateName(engName, newLocale);
 	}
@@ -50,11 +54,13 @@ public class PokeNames {
 	/**
 	 * Returns the Pokemon index from the Pokemon name list.
 	 *
+	 * @deprecated Replaced by {@link PokeDictionary#getPokedexFromName(String, Locale)}
 	 * @param pokeName pokemon name in locale
 	 * @param locale the locale on this name
 	 * @return pokedex
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
+	@Deprecated
 	public static int getPokedexFromName(String pokeName, Locale locale) throws MissingResourceException {
 		return PokeDictionary.getPokedexFromName(pokeName, locale);
 	}
@@ -62,10 +68,12 @@ public class PokeNames {
 	/**
 	 * Returns the Pokemon index from the Pokemon name list in ENGLISH.
 	 *
+	 * @deprecated Replaced by {@link PokeDictionary#getPokedexFromName(String)}
 	 * @param pokeName the Pokemon ENGLISH name
 	 * @return pokedex
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
+	@Deprecated
 	public static int getPokedexFromName(String pokeName) throws MissingResourceException {
 		return PokeDictionary.getPokedexFromName(pokeName);
 	}
