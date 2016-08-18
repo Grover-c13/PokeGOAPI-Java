@@ -191,10 +191,9 @@ public class Pokemon extends PokemonDetails {
 	public boolean canPowerUp(boolean considerMaxCPLimitForPlayerLevel)
 		throws LoginFailedException, RemoteServerException, NoSuchItemException {
 	    boolean result = false;
-	    if(considerMaxCPLimitForPlayerLevel){
+	    if (considerMaxCPLimitForPlayerLevel) {
 		result = (this.canPowerUp() && (this.getCp() < this.getMaxCpForPlayer()));
-	    }
-	    else{
+	    } else {
 		result = this.canPowerUp();
 	    }
 	    return result;
