@@ -17,7 +17,6 @@ package com.pokegoapi.util;
 
 import java.util.Locale;
 import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
 /**
  * Deprecated. Use {@link PokeDictionary} instead.
