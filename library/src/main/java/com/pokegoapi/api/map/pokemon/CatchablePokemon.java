@@ -494,7 +494,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 	
 	/**
-	 * @deprecated Please use CatchOptions instead
+	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
 	 * options.useRazzberries(true);
@@ -509,7 +509,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 	
 	/**
-	 * @deprecated Please use CatchOptions instead
+	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
 	 * options.useRazzberries(true);
@@ -527,7 +527,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 	
 	/**
-	 * @deprecated Please use CatchOptions instead
+	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
 	 * options.useBestBall(true);
@@ -542,7 +542,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 	
 	/**
-	 * @deprecated Please use CatchOptions instead
+	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
 	 * options.useBestBall(true);
@@ -560,7 +560,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 	
 	/**
-	 * @deprecated Please use CatchOptions instead
+	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
 	 * options.useBestBall(true);
@@ -580,7 +580,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 	
 	/**
-	 * @deprecated Please use CatchOptions instead
+	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
 	 * options.useBestBall(true);
@@ -602,7 +602,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 	
 	/**
-	 * @deprecated Please use CatchOptions instead
+	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
 	 * options.usePokeball(pokeball);
@@ -618,7 +618,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 	
 	/**
-	 * @deprecated Please use CatchOptions instead
+	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
 	 * options.usePokeball(pokeball);
@@ -637,7 +637,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 	
 	/**
-	 * @deprecated Please use CatchOptions instead
+	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
 	 * options.usePokeball(pokeball);
@@ -658,7 +658,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 	
 	/**
-	 * Tries to catch a pokemon (using defined CatchOptions).
+	 * Tries to catch a pokemon (using defined {@link CatchOptions}).
 	 *
 	 * @param  options               the CatchOptions object
 	 * @return CatchResult
@@ -721,7 +721,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 	
 	/**
-	 * Tries to catch a pokemon (using defined AsyncCatchOptions).
+	 * Tries to catch a pokemon (using defined {@link AsyncCatchOptions}).
 	 *
 	 * @param  options                the AsyncCatchOptions object
 	 * @return Observable CatchResult
@@ -816,7 +816,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 	
 	/**
-	 * @deprecated Please use AsyncCatchOptions instead
+	 * @deprecated Please use {@link AsyncCatchOptions} instead
 	 * <pre>
 	 * AsyncCatchOptions options = new AsyncCatchOptions(go);
 	 * options.useRazzberries(true);
@@ -832,7 +832,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 	
 	/**
-	 * @deprecated Please use AsyncCatchOptions instead
+	 * @deprecated Please use {@link AsyncCatchOptions} instead
 	 * <pre>
 	 * AsyncCatchOptions options = new AsyncCatchOptions(go);
 	 * options.usePokeball(pokeball);
