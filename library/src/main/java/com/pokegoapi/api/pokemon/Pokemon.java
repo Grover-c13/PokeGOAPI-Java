@@ -186,7 +186,7 @@ public class Pokemon extends PokemonDetails {
 	 * @throws RemoteServerException the remote server exception
 	 */
 	public boolean canEvolve() throws LoginFailedException, RemoteServerException {
-		return getCandy() >= getCandiesToEvolve();
+		return ((!EvolutionInfo.isFullyEvolved(this.getPokemonId())) && (getCandy() >= getCandiesToEvolve()));
 	}
 
 	/**
