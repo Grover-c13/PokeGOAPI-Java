@@ -16,6 +16,7 @@
 package com.pokegoapi.examples;
 
 import com.pokegoapi.util.Log;
+import com.pokegoapi.util.PokeDictionary;
 import com.pokegoapi.util.PokeNames;
 
 import java.util.Locale;
@@ -51,7 +52,7 @@ public class DisplayPokenameExample {
 							l,
 							"Pokedex# %d is %s in %s",
 							i,
-							PokeNames.getDisplayName(i, l),
+							PokeDictionary.getDisplayName(i, l),
 							l.getDisplayName(l)));
 				} catch (MissingResourceException e) {
 					Log.e("Main", "Unable to find Pokemon name with given Pokedex: ", e);
@@ -62,7 +63,7 @@ public class DisplayPokenameExample {
 				Log.d("Names-Example", String.format(
 						"Pokedex# %d is %s in %s",
 						i,
-						PokeNames.getDisplayName(i, new Locale("xx")), "Fallback"));
+						PokeDictionary.getDisplayName(i, new Locale("xx")), "Fallback"));
 			} catch (MissingResourceException e) {
 				Log.e("Main", "Unable to find Pokemon name with given Pokedex: ", e);
 			}
@@ -76,7 +77,7 @@ public class DisplayPokenameExample {
 						chs,
 						"Pokedex# %d is %s in %s",
 						i,
-						PokeNames.translateName(PokeNames.getDisplayName(i, Locale.ENGLISH), chs),
+						PokeDictionary.translateName(PokeDictionary.getDisplayName(i, Locale.ENGLISH), chs),
 						chs.getDisplayName(chs)));
 			} catch (MissingResourceException e) {
 				Log.e("Main", "Unable to find Pokemon name with given Pokedex: ", e);

@@ -20,10 +20,9 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
- * @author Angelo Rüggeberg
- * @author Nyazuki
+ * Deprecated. Use {@link PokeDictionary} instead.
  */
-
+@Deprecated
 public class PokeNames {
 	/**
 	 * Returns the Name for a Pokedex ID including known translations.
@@ -34,8 +33,7 @@ public class PokeNames {
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
 	public static String getDisplayName(int pokedex, Locale locale) throws MissingResourceException {
-		ResourceBundle names = ResourceBundle.getBundle("pokemon_names", locale);
-		return names.getString(String.valueOf(pokedex));
+		return PokeDictionary.getDisplayName(pokedex, locale);
 	}
 
 	/**
@@ -47,7 +45,7 @@ public class PokeNames {
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
 	public static String translateName(String engName, Locale newLocale) throws MissingResourceException {
-		return getDisplayName(getPokedexFromName(engName), newLocale);
+		return PokeDictionary.translateName(engName, newLocale);
 	}
 
 	/**
@@ -59,13 +57,7 @@ public class PokeNames {
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
 	public static int getPokedexFromName(String pokeName, Locale locale) throws MissingResourceException {
-		ResourceBundle nameList = ResourceBundle.getBundle("pokemon_names", locale);
-		for (String key : nameList.keySet()) {
-			if (nameList.getString(key).equalsIgnoreCase(pokeName)) {
-				return Integer.parseInt(key);
-			}
-		}
-		return -1;
+		return PokeDictionary.getPokedexFromName(pokeName, locale);
 	}
 
 	/**
@@ -76,6 +68,6 @@ public class PokeNames {
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
 	public static int getPokedexFromName(String pokeName) throws MissingResourceException {
-		return getPokedexFromName(pokeName, Locale.ENGLISH);
+		return PokeDictionary.getPokedexFromName(pokeName);
 	}
 }
