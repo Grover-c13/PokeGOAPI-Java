@@ -4,8 +4,14 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+/**
+ * Offers methods to get information about pokémon as seen in the pokédex.
+ */
 public class PokeDictionary {
-	private static ResourceBundle getResourceBundle(String bundleBaseName, Locale locale)
+	private static final String POKE_NAMES_BUNDLE = "pokemon_names";
+	private static final String POKE_DESCRIPTIONS_BUNDLE ="pokemon_descriptions";
+
+	private static ResourceBundle getPokeBundle(String bundleBaseName, Locale locale)
 			throws MissingResourceException{
 		return ResourceBundle.getBundle(bundleBaseName, locale);
 	}
@@ -20,7 +26,7 @@ public class PokeDictionary {
 	 */
 	public static String getDisplayName(int pokedexId, Locale locale)
 			throws MissingResourceException {
-		return getResourceBundle("pokemon_names", locale).getString(String.valueOf(pokedexId));
+		return getPokeBundle(POKE_NAMES_BUNDLE, locale).getString(String.valueOf(pokedexId));
 	}
 
 	/**
@@ -33,7 +39,7 @@ public class PokeDictionary {
 	 */
 	public static String getDisplayDescription(int pokedexId, Locale locale)
 			throws MissingResourceException {
-		return getResourceBundle("pokemon_descriptions", locale).getString(String.valueOf(pokedexId));
+		return getPokeBundle(POKE_DESCRIPTIONS_BUNDLE, locale).getString(String.valueOf(pokedexId));
 	}
 
 	/**
@@ -59,7 +65,7 @@ public class PokeDictionary {
 	 */
 	public static int getPokedexFromName(String pokeName, Locale locale)
 			throws MissingResourceException {
-		ResourceBundle nameList = getResourceBundle(pokeName, locale);
+		ResourceBundle nameList = getPokeBundle(pokeName, locale);
 		for (String key : nameList.keySet()) {
 			if (nameList.getString(key).equalsIgnoreCase(pokeName)) {
 				return Integer.parseInt(key);
@@ -79,6 +85,4 @@ public class PokeDictionary {
 			throws MissingResourceException {
 		return getPokedexFromName(pokeName, Locale.ENGLISH);
 	}
-
-
 }
