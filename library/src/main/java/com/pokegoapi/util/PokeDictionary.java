@@ -5,7 +5,8 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 public class PokeDictionary {
-	private static ResourceBundle getResourceBundle(String bundleBaseName, Locale locale){
+	private static ResourceBundle getResourceBundle(String bundleBaseName, Locale locale)
+			throws MissingResourceException{
 		return ResourceBundle.getBundle(bundleBaseName, locale);
 	}
 
@@ -17,7 +18,8 @@ public class PokeDictionary {
 	 * @return the Pokemon name in locale
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
-	public static String getDisplayName(int pokedexId, Locale locale) throws MissingResourceException {
+	public static String getDisplayName(int pokedexId, Locale locale)
+			throws MissingResourceException {
 		return getResourceBundle("pokemon_names", locale).getString(String.valueOf(pokedexId));
 	}
 
@@ -29,7 +31,8 @@ public class PokeDictionary {
 	 * @return the Pokemon description in locale
 	 * @throws MissingResourceException if can not find a matched Pokemon description for the given pokedex
 	 */
-	public static String getDisplayDescription(int pokedexId, Locale locale) throws MissingResourceException {
+	public static String getDisplayDescription(int pokedexId, Locale locale)
+			throws MissingResourceException {
 		return getResourceBundle("pokemon_descriptions", locale).getString(String.valueOf(pokedexId));
 	}
 
@@ -41,7 +44,8 @@ public class PokeDictionary {
 	 * @return translated pokemon name
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
-	public static String translateName(String engName, Locale newLocale) throws MissingResourceException {
+	public static String translateName(String engName, Locale newLocale)
+			throws MissingResourceException {
 		return getDisplayName(getPokedexFromName(engName), newLocale);
 	}
 
@@ -53,7 +57,8 @@ public class PokeDictionary {
 	 * @return pokedex Pokedex Id if a Pokemon with the given pokedex id exists, else -1.
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
-	public static int getPokedexFromName(String pokeName, Locale locale) throws MissingResourceException {
+	public static int getPokedexFromName(String pokeName, Locale locale)
+			throws MissingResourceException {
 		ResourceBundle nameList = getResourceBundle(pokeName, locale);
 		for (String key : nameList.keySet()) {
 			if (nameList.getString(key).equalsIgnoreCase(pokeName)) {
@@ -70,7 +75,8 @@ public class PokeDictionary {
 	 * @return pokedex
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
-	public static int getPokedexFromName(String pokeName) throws MissingResourceException {
+	public static int getPokedexFromName(String pokeName)
+			throws MissingResourceException {
 		return getPokedexFromName(pokeName, Locale.ENGLISH);
 	}
 
