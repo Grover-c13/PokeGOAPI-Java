@@ -75,7 +75,7 @@ public class CatchOptions {
 		this.probability = 0.50;
 		this.normalizedHitPosition = 1.0;
 		this.normalizedReticleSize = 1.95 + Math.random() * 0.05;
-		this.spinModifier = Math.random() * 0.15;
+		this.spinModifier = 0.85 + Math.random() * 0.15;
 	}
 	
 	/**
