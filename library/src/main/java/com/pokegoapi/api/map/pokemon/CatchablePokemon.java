@@ -255,30 +255,6 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	/**
-	 * Gets item ball to catch a pokemon
-	 *
-	 * @return the item ball
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 * @throws NoSuchItemException   the no such item exception
-	 */
-	public Pokeball getItemBall() throws LoginFailedException,
-			RemoteServerException, NoSuchItemException {
-		ItemBag bag = api.getInventories().getItemBag();
-		if (bag.getItem(ITEM_POKE_BALL).getCount() > 0) {
-			return POKEBALL;
-		} else if (bag.getItem(ITEM_GREAT_BALL).getCount() > 0) {
-			return GREATBALL;
-		} else if (bag.getItem(ITEM_ULTRA_BALL).getCount() > 0) {
-			return ULTRABALL;
-		} else if (bag.getItem(ITEM_MASTER_BALL).getCount() > 0) {
-			return MASTERBALL;
-		} else {
-			throw new NoSuchItemException();
-		}
-	}
-
-	/**
 	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
@@ -602,21 +578,22 @@ public class CatchablePokemon implements MapPoint {
 	 */
 	public CatchResult catchPokemon(CatchOptions options) throws LoginFailedException,
 						RemoteServerException, NoSuchItemException {
-		Pokeball pokeball = getItemBall();
-		int razberryLimit = -1;
-		int amount = -1;
 		if (options != null) {
-			pokeball = options.getItemBall();
-			amount = options.getMaxPokeballs();
-			razberryLimit = options.getRazzberries();
-			if (razberryLimit == 1) {
+			if (options.getRazzberries() == 1) {
 				useItem(ItemId.ITEM_RAZZ_BERRY);
-				razberryLimit = -1;
+				options.useRazzberries(false);
+				options.maxRazzberries(-1);
 			}
+		} else {
+			options = new CatchOptions(api);
 		}
 		
-		return catchPokemon(1.0, 1.95 + Math.random() * 0.05,
-							0.85 + Math.random() * 0.15, pokeball, amount, razberryLimit);
+		return catchPokemon(options.getNormalizedHitPosition(),
+							options.getNormalizedReticleSize(),
+							options.getSpinModifier(),
+							options.getItemBall(),
+							options.getMaxPokeballs(),
+							options.getRazzberries());
 	}
 	
 	/**
@@ -638,21 +615,22 @@ public class CatchablePokemon implements MapPoint {
 		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
 		double probability = encounter.getCaptureProbability().getCaptureProbability(0);
 		
-		Pokeball pokeball = getItemBall();
-		int razberryLimit = -1;
-		int amount = -1;
 		if (options != null) {
-			pokeball = options.getItemBall(probability);
-			amount = options.getMaxPokeballs();
-			razberryLimit = options.getRazzberries();
-			if (razberryLimit == 1) {
+			if (options.getRazzberries() == 1) {
 				useItem(ItemId.ITEM_RAZZ_BERRY);
-				razberryLimit = -1;
+				options.useRazzberries(false);
+				options.maxRazzberries(-1);
 			}
+		} else {
+			options = new CatchOptions(api);
 		}
 		
-		return catchPokemon(1.0, 1.95 + Math.random() * 0.05,
-							0.85 + Math.random() * 0.15, pokeball, amount, razberryLimit);
+		return catchPokemon(options.getNormalizedHitPosition(),
+							options.getNormalizedReticleSize(),
+							options.getSpinModifier(),
+							options.getItemBall(probability),
+							options.getMaxPokeballs(),
+							options.getRazzberries());
 	}
 
 	/**
@@ -701,11 +679,10 @@ public class CatchablePokemon implements MapPoint {
 	 */
 	public Observable<CatchResult> catchPokemon(AsyncCatchOptions options)
 						throws LoginFailedException, RemoteServerException, NoSuchItemException {
-		Pokeball pokeball = getItemBall();
 		if (options != null) {
-			pokeball = options.getItemBall();
 			if (options.getUseRazzBerry() != 0) {
-				final Pokeball asyncBall = pokeball;
+				final AsyncCatchOptions asyncOptions = options;
+				final Pokeball asyncPokeball = asyncOptions.getItemBall();
 				return useItemAsync(ItemId.ITEM_RAZZ_BERRY).flatMap(
 						new Func1<CatchItemResult, Observable<CatchResult>>() {
 							@Override
@@ -713,14 +690,20 @@ public class CatchablePokemon implements MapPoint {
 								if (!result.getSuccess()) {
 									return Observable.just(new CatchResult());
 								}
-								return catchPokemonAsync(1.0, 1.95 + Math.random() * 0.05,
-														0.85 + Math.random() * 0.15, asyncBall);
+								return catchPokemonAsync(asyncOptions.getNormalizedHitPosition(),
+														asyncOptions.getNormalizedReticleSize(),
+														asyncOptions.getSpinModifier(),
+														asyncPokeball);
 							}
 						});
 			}
+		} else {
+			options = new AsyncCatchOptions(api);
 		}
-		return catchPokemonAsync(1.0, 1.95 + Math.random() * 0.05,
-								0.85 + Math.random() * 0.15, pokeball);
+		return catchPokemonAsync(options.getNormalizedHitPosition(),
+								options.getNormalizedReticleSize(),
+								options.getSpinModifier(),
+								options.getItemBall());
 	}
 	
 	/**
@@ -743,11 +726,10 @@ public class CatchablePokemon implements MapPoint {
 		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
 		double probability = encounter.getCaptureProbability().getCaptureProbability(0);
 		
-		Pokeball pokeball = getItemBall();
 		if (options != null) {
-			pokeball = options.getItemBall(probability);
 			if (options.getUseRazzBerry() != 0) {
-				final Pokeball asyncBall = pokeball;
+				final AsyncCatchOptions asyncOptions = options;
+				final Pokeball asyncPokeball = asyncOptions.getItemBall(probability);
 				return useItemAsync(ItemId.ITEM_RAZZ_BERRY).flatMap(
 						new Func1<CatchItemResult, Observable<CatchResult>>() {
 							@Override
@@ -755,14 +737,20 @@ public class CatchablePokemon implements MapPoint {
 								if (!result.getSuccess()) {
 									return Observable.just(new CatchResult());
 								}
-								return catchPokemonAsync(1.0, 1.95 + Math.random() * 0.05,
-														0.85 + Math.random() * 0.15, asyncBall);
+								return catchPokemonAsync(asyncOptions.getNormalizedHitPosition(),
+														asyncOptions.getNormalizedReticleSize(),
+														asyncOptions.getSpinModifier(),
+														asyncPokeball);
 							}
 						});
 			}
+		} else {
+			options = new AsyncCatchOptions(api);
 		}
-		return catchPokemonAsync(1.0, 1.95 + Math.random() * 0.05,
-								0.85 + Math.random() * 0.15, pokeball);
+		return catchPokemonAsync(options.getNormalizedHitPosition(),
+								options.getNormalizedReticleSize(),
+								options.getSpinModifier(),
+								options.getItemBall(probability));
 	}
 
 	/**

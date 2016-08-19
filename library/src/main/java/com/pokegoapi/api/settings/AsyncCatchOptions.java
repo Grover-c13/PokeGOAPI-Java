@@ -49,6 +49,12 @@ public class AsyncCatchOptions {
 	private Pokeball pokeBall;
 	private boolean strictBallType;
 	private double probability;
+	@Getter
+	private double normalizedHitPosition;
+	@Getter
+	private double normalizedReticleSize;
+	@Getter
+	private double spinModifier;
 	
 	/**
 	 * Instantiates a new CatchOptions object.
@@ -63,6 +69,9 @@ public class AsyncCatchOptions {
 		this.pokeBall = POKEBALL;
 		this.strictBallType = false;
 		this.probability = 0;
+		this.normalizedHitPosition = 1.0;
+		this.normalizedReticleSize = 1.95 + Math.random() * 0.05;
+		this.spinModifier = Math.random() * 0.15;
 	}
 	
 	/**
@@ -248,6 +257,39 @@ public class AsyncCatchOptions {
 	 */
 	public AsyncCatchOptions withProbability(double probability) {
 		this.probability = probability;
+		return this;
+	}
+	
+	/**
+	 * Set the normalized hit position of a pokeball throw
+	 *
+	 * @param normalizedHitPosition the normalized position
+	 * @return                      the AsynCatchOptions object
+	 */
+	public AsyncCatchOptions setNormalizedHitPosition(double normalizedHitPosition) {
+		this.normalizedHitPosition = normalizedHitPosition;
+		return this;
+	}
+	
+	/**
+	 * Set the normalized reticle for a pokeball throw
+	 *
+	 * @param normalizedReticleSize the normalized size
+	 * @return                      the AsynCatchOptions object
+	 */
+	public AsyncCatchOptions setNormalizedReticleSize(double normalizedReticleSize) {
+		this.normalizedReticleSize = normalizedReticleSize;
+		return this;
+	}
+	
+	/**
+	 * Set the spin modifier of a pokeball throw
+	 *
+	 * @param spinModifier the spin modifier
+	 * @return             the AsynCatchOptions object
+	 */
+	public AsyncCatchOptions setSpinModifier(double spinModifier) {
+		this.spinModifier = spinModifier;
 		return this;
 	}
 

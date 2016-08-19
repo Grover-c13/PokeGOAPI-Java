@@ -51,6 +51,12 @@ public class CatchOptions {
 	@Getter
 	private int maxPokeballs;
 	private double probability;
+	@Getter
+	private double normalizedHitPosition;
+	@Getter
+	private double normalizedReticleSize;
+	@Getter
+	private double spinModifier;
 	
 	/**
 	 * Instantiates a new CatchOptions object.
@@ -66,7 +72,10 @@ public class CatchOptions {
 		this.pokeBall = POKEBALL;
 		this.strictBallType = false;
 		this.maxPokeballs = 1;
-		this.probability = 0;
+		this.probability = 0.50;
+		this.normalizedHitPosition = 1.0;
+		this.normalizedReticleSize = 1.95 + Math.random() * 0.05;
+		this.spinModifier = Math.random() * 0.15;
 	}
 	
 	/**
@@ -293,6 +302,39 @@ public class CatchOptions {
 	 */
 	public CatchOptions withProbability(double probability) {
 		this.probability = probability;
+		return this;
+	}
+	
+	/**
+	 * Set the normalized hit position of a pokeball throw
+	 *
+	 * @param normalizedHitPosition the normalized position
+	 * @return                      the CatchOptions object
+	 */
+	public CatchOptions setNormalizedHitPosition(double normalizedHitPosition) {
+		this.normalizedHitPosition = normalizedHitPosition;
+		return this;
+	}
+	
+	/**
+	 * Set the normalized reticle for a pokeball throw
+	 *
+	 * @param normalizedReticleSize the normalized size
+	 * @return                      the CatchOptions object
+	 */
+	public CatchOptions setNormalizedReticleSize(double normalizedReticleSize) {
+		this.normalizedReticleSize = normalizedReticleSize;
+		return this;
+	}
+	
+	/**
+	 * Set the spin modifier of a pokeball throw
+	 *
+	 * @param spinModifier the spin modifier
+	 * @return             the CatchOptions object
+	 */
+	public CatchOptions setSpinModifier(double spinModifier) {
+		this.spinModifier = spinModifier;
 		return this;
 	}
 
