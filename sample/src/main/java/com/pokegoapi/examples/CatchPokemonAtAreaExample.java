@@ -36,6 +36,7 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.pokemon.CatchResult;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
+import com.pokegoapi.api.settings.CatchOptions;
 import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
@@ -73,7 +74,9 @@ public class CatchPokemonAtAreaExample {
 				// if encounter was succesful, catch
 				if (encResult.wasSuccessful()) {
 					System.out.println("Encounted:" + cp.getPokemonId());
-					CatchResult result = cp.catchPokemonWithRazzBerry();
+					CatchOptions options = new CatchOptions(go);
+					options.useRazzberries(true);
+					CatchResult result = cp.catchPokemon(options);
 					System.out.println("Attempt to catch:" + cp.getPokemonId() + " " + result.getStatus());
 				}
 

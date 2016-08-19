@@ -142,6 +142,46 @@ try {
 }
 ```
 
+## (Async)CatchOptions
+
+Parameters for a capture now use a CatchOptions or AsyncCatchOptions object
+
+This object allows setting all parameters at once, or modifying them on-the-fly
+
+```
+import com.pokegoapi.api.settings.AsyncCatchOptions;
+```
+OR
+```
+import com.pokegoapi.api.settings.CatchOptions;
+```
+
+Usage:
+
+```
+CatchOptions options = new CatchOptions(go);
+options.maxRazzberries(5);
+options.useBestBall(true);
+options.noMasterBall(true);
+
+cp.catchPokemon(options);
+```
+
+OR
+
+```
+AsyncCatchOptions options = new AsyncCatchOptions(go);
+options.useRazzberries(true);
+options.useBestBall(true);
+options.noMasterBall(true);
+
+cp.catchPokemon(options);
+```
+
+Each option has a default and can override any with a similar functionality based on the most relevant option (for example, usePokeBall can be set as a minimum by using it with useBestBall, a maximum by using it alone, or exclusive by using with noFallback).
+
+Please see the javadocs for each item for further explanation. Replaced methods include examples of their CatchOptions or AsyncCatchOptions equivalent to simplify conversion.
+
 ##Android Dev FAQ
 
   - I can't use the sample code! It just throws a login exception!
