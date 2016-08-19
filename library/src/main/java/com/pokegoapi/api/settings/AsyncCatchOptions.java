@@ -48,6 +48,7 @@ public class AsyncCatchOptions {
 	private int useRazzBerry;
 	private Pokeball pokeBall;
 	private boolean strictBallType;
+	private double probability;
 	
 	/**
 	 * Instantiates a new CatchOptions object.
@@ -61,6 +62,7 @@ public class AsyncCatchOptions {
 		this.skipMasterBall = false;
 		this.pokeBall = POKEBALL;
 		this.strictBallType = false;
+		this.probability = 0;
 	}
 	
 	/**
@@ -116,6 +118,61 @@ public class AsyncCatchOptions {
 				} else if (!skipMasterBall && index <= 0 && bag.getItem(ITEM_MASTER_BALL).getCount() > 0) {
 					return MASTERBALL;
 				}
+			}
+			throw new NoSuchItemException();
+		}
+	}
+	
+	/**
+	 * Gets item ball to catch a pokemon
+	 *
+	 * @param  encounterProbability  the capture probability to compare
+	 * @return the item ball
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws NoSuchItemException   the no such item exception
+	 */
+	public Pokeball getItemBall(double encounterProbability) throws LoginFailedException,
+						RemoteServerException, NoSuchItemException {
+		ItemBag bag = api.getInventories().getItemBag();
+		if (strictBallType || probability <= 0) {
+			if (encounterProbability < probability) {
+				throw new NoSuchItemException("No ball available for capture probability");
+			}
+			if (bag.getItem(pokeBall.getBallType()).getCount() > 0) {
+				return pokeBall;
+			} else if (useBestPokeball) {
+				if (!skipMasterBall) {
+					if (bag.getItem(ITEM_MASTER_BALL).getCount() > 0) {
+						return MASTERBALL;
+					}
+				} else if (bag.getItem(ITEM_ULTRA_BALL).getCount() > 0) {
+					return ULTRABALL;
+				}
+			} else if (bag.getItem(ITEM_POKE_BALL).getCount() > 0) {
+				return POKEBALL;
+			}
+			throw new NoSuchItemException("No ball available for capture probability");
+		} else {
+			int index = 3;
+			if (pokeBall.getBallType() == ITEM_MASTER_BALL) index = 3;
+			if (pokeBall.getBallType() == ITEM_ULTRA_BALL) index = 2;
+			if (pokeBall.getBallType() == ITEM_GREAT_BALL) index = 1;
+			if (pokeBall.getBallType() == ITEM_POKE_BALL) index = 0;
+			
+			if (encounterProbability <= probability && index >= 0
+						&& bag.getItem(ITEM_POKE_BALL).getCount() > 0) {
+				return POKEBALL;
+			} else if (encounterProbability <= probability && index >= 1
+						&& bag.getItem(ITEM_GREAT_BALL).getCount() > 0) {
+				return GREATBALL;
+			} else if (encounterProbability <= probability && index >= 2
+						&& bag.getItem(ITEM_ULTRA_BALL).getCount() > 0) {
+				return ULTRABALL;
+			} else if (encounterProbability <= probability
+						&& !skipMasterBall && index <= 0
+						&& bag.getItem(ITEM_MASTER_BALL).getCount() > 0) {
+				return MASTERBALL;
 			}
 			throw new NoSuchItemException();
 		}
@@ -179,6 +236,18 @@ public class AsyncCatchOptions {
 	 */
 	public AsyncCatchOptions noMasterBall(boolean skipMasterBall) {
 		this.skipMasterBall = skipMasterBall;
+		return this;
+	}
+	
+	/**
+	 * Set a capture probability before switching balls
+	 *		or the minimum probability for a specific ball
+	 *
+	 * @param probability    the probability
+	 * @return               the AsyncCatchOptions object
+	 */
+	public AsyncCatchOptions withProbability(double probability) {
+		this.probability = probability;
 		return this;
 	}
 

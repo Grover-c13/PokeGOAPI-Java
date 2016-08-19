@@ -279,147 +279,126 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	/**
-	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 50%, if you have
-	 * none will use greatball etc).
+	 * @deprecated Please use {@link CatchOptions} instead
+	 * <pre>
+	 * CatchOptions options = new CatchOptions(go);
+	 * options.withProbability(probability);
+	 * cp.catchPokemon(options);
+	 * </pre>
 	 *
 	 * @return the catch result
-	 * @throws LoginFailedException     the login failed exception
-	 * @throws RemoteServerException    the remote server exception
-	 * @throws NoSuchItemException      the no such item exception
-	 * @throws EncounterFailedException the encounter failed exception
+	 * @throws NoSuchMethodException method removal notice
 	 */
+	@Deprecated
 	public CatchResult catchPokemonBestBallToUse()
-			throws LoginFailedException, RemoteServerException, NoSuchItemException,
-			EncounterFailedException {
-		EncounterResult encounter = encounterPokemon();
-		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
-
-		return catchPokemonBestBallToUse(encounter, new ArrayList<ItemId>());
+			throws NoSuchMethodException {
+		throw new NoSuchMethodException("catchPokemonWithRazzBerry no longer supported");
 	}
 
 	/**
-	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 50%, if you have
-	 * none will use greatball etc).
+	 * @deprecated Please use {@link CatchOptions} instead
+	 * <pre>
+	 * CatchOptions options = new CatchOptions(go);
+	 * options.withProbability(probability);
+	 * cp.catchPokemon(options);
+	 * </pre>
 	 *
-	 * @param encounter the encounter
+	 * @param encounter              the encounter
 	 * @return the catch result
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 * @throws NoSuchItemException   the no such item exception
+	 * @throws NoSuchMethodException method removal notice
 	 */
+	@Deprecated
 	public CatchResult catchPokemonBestBallToUse(EncounterResult encounter)
-			throws LoginFailedException, RemoteServerException, NoSuchItemException {
-
-		return catchPokemonBestBallToUse(encounter, new ArrayList<ItemId>(), -1);
+			throws NoSuchMethodException {
+		throw new NoSuchMethodException("catchPokemonWithRazzBerry no longer supported");
 	}
 
 
 	/**
-	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 50%, if you have
-	 * none will use greatball etc).
+	 * @deprecated Please use {@link CatchOptions} instead
+	 * <pre>
+	 * CatchOptions options = new CatchOptions(go);
+	 * options.maxPokeBalls(amount);
+	 * options.withProbability(probability);
+	 * cp.catchPokemon(options);
+	 * </pre>
 	 *
-	 * @param encounter the encounter
-	 * @param amount    the amount
+	 * @param encounter              the encounter
+	 * @param amount                 the amount
 	 * @return the catch result
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 * @throws NoSuchItemException   the no such item exception
+	 * @throws NoSuchMethodException method removal notice
 	 */
+	@Deprecated
 	public CatchResult catchPokemonBestBallToUse(EncounterResult encounter, int amount)
-			throws LoginFailedException, RemoteServerException, NoSuchItemException {
-
-		return catchPokemonBestBallToUse(encounter, new ArrayList<ItemId>(), amount);
+			throws NoSuchMethodException {
+		throw new NoSuchMethodException("catchPokemonWithRazzBerry no longer supported");
 	}
 
 	/**
-	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 50%, if you have
-	 * none will use greatball etc).
+	 * @deprecated Please use {@link CatchOptions} instead
+	 * <pre>
+	 * CatchOptions options = new CatchOptions(go);
+	 * options.noMasterBall(true);
+	 * options.withProbability(probability);
+	 * cp.catchPokemon(options);
+	 * </pre>
 	 *
-	 * @param encounter the encounter
-	 * @param notUse    the not use
+	 * @param encounter              the encounter
+	 * @param notUse                 the not use
 	 * @return the catch result
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 * @throws NoSuchItemException   the no such item exception
+	 * @throws NoSuchMethodException method removal notice
 	 */
+	@Deprecated
 	public CatchResult catchPokemonBestBallToUse(EncounterResult encounter, List<ItemId> notUse)
-			throws LoginFailedException, RemoteServerException, NoSuchItemException {
-		return catchPokemonBestBallToUse(encounter, notUse, -1, -1);
+			throws NoSuchMethodException {
+		throw new NoSuchMethodException("catchPokemonWithRazzBerry no longer supported");
 	}
 
 	/**
-	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 50%, if you have
-	 * none will use greatball etc).
+	 * @deprecated Please use {@link CatchOptions} instead
+	 * <pre>
+	 * CatchOptions options = new CatchOptions(go);
+	 * options.noMasterBall(true);
+	 * options.maxPokeballs(amount);
+	 * options.withProbability(probability);
+	 * cp.catchPokemon(options);
+	 * </pre>
 	 *
-	 * @param encounter the encounter
-	 * @param notUse    the not use
-	 * @param amount    the amount
+	 * @param encounter              the encounter
+	 * @param notUse                 the not use
+	 * @param amount                 the amount
 	 * @return the catch result
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 * @throws NoSuchItemException   the no such item exception
+	 * @throws NoSuchMethodException method removal notice
 	 */
+	@Deprecated
 	public CatchResult catchPokemonBestBallToUse(EncounterResult encounter, List<ItemId> notUse, int amount)
-			throws LoginFailedException, RemoteServerException, NoSuchItemException {
-		return catchPokemonBestBallToUse(encounter, notUse, amount, -1);
+			throws NoSuchMethodException {
+		throw new NoSuchMethodException("catchPokemonWithRazzBerry no longer supported");
 	}
 
 	/**
-	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 50%, if you have
-	 * none will use greatball etc).
+	 * @deprecated Please use {@link CatchOptions} instead
+	 * <pre>
+	 * CatchOptions options = new CatchOptions(go);
+	 * options.maxRazzberries(razzberryLimit);
+	 * options.maxPokeballs(amount);
+	 * options.noMasterBall(true);
+	 * options.withProbability(probability);
+	 * cp.catchPokemon(options);
+	 * </pre>
 	 *
-	 * @param encounter     the encounter
-	 * @param notUse        the not use
-	 * @param amount        the amount
-	 * @param razberryLimit the razberry limit
+	 * @param encounter              the encounter
+	 * @param notUse                 the not use
+	 * @param amount                 the amount
+	 * @param razberryLimit          the razberry limit
 	 * @return the catch result
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 * @throws NoSuchItemException   the no such item exception
+	 * @throws NoSuchMethodException method removal notice
 	 */
+	@Deprecated
 	public CatchResult catchPokemonBestBallToUse(
 			EncounterResult encounter, List<ItemId> notUse, int amount, int razberryLimit)
-			throws LoginFailedException, RemoteServerException, NoSuchItemException {
-		int razberries = 0;
-		int numThrows = 0;
-		CatchResult result;
-		do {
-
-			if (razberries < razberryLimit || razberryLimit == -1) {
-				useItem(ItemId.ITEM_RAZZ_BERRY);
-				razberries++;
-			}
-			result = AsyncHelper.toBlocking(catchPokemonBestBallToUseAsync(encounter, notUse, 1.0,
-					1.95 + Math.random() * 0.05, 0.85 + Math.random() * 0.15));
-			if (result == null) {
-				Log.wtf(TAG, "Got a null result after catch attempt");
-				break;
-			}
-			// continue for the following cases:
-			// CatchStatus.CATCH_ESCAPE
-			// CatchStatus.CATCH_MISSED
-			// covers all cases
-
-			// if its caught of has fleed, end the loop
-			// FLEE OR SUCCESS
-			if (result.getStatus() == CatchStatus.CATCH_FLEE
-					|| result.getStatus() == CatchStatus.CATCH_SUCCESS) {
-				Log.v(TAG, "Pokemon caught/or flee");
-				break;
-			}
-			// if error or unrecognized end the loop
-			// ERROR OR UNRECOGNIZED
-			if (result.getStatus() == CatchStatus.CATCH_ERROR
-					|| result.getStatus() == CatchStatus.UNRECOGNIZED) {
-				Log.wtf(TAG, "Got an error or unrecognized catch attempt");
-				Log.wtf(TAG, "Proto:" + result);
-				break;
-			}
-			numThrows++;
-		}
-		while (amount < 0 || numThrows < amount);
-
-		return result;
+			throws NoSuchMethodException {
+		throw new NoSuchMethodException("catchPokemonWithRazzBerry no longer supported");
 	}
 
 	/**
@@ -673,6 +652,42 @@ public class CatchablePokemon implements MapPoint {
 		int amount = -1;
 		if (options != null) {
 			pokeball = options.getItemBall();
+			amount = options.getMaxPokeballs();
+			razberryLimit = options.getRazzberries();
+			if (razberryLimit == 1) {
+				useItem(ItemId.ITEM_RAZZ_BERRY);
+				razberryLimit = -1;
+			}
+		}
+		
+		return catchPokemon(1.0, 1.95 + Math.random() * 0.05,
+							0.85 + Math.random() * 0.15, pokeball, amount, razberryLimit);
+	}
+	
+	/**
+	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 50%, if you have
+	 * none will use greatball etc).
+	 *
+	 * @param  encounter                the encounter to compare
+	 * @param  options                  the CatchOptions object
+	 * @return the catch result
+	 * @throws LoginFailedException     the login failed exception
+	 * @throws RemoteServerException    the remote server exception
+	 * @throws NoSuchItemException      the no such item exception
+	 * @throws EncounterFailedException the encounter failed exception
+	 */
+	public CatchResult catchPokemon(EncounterResult encounter, CatchOptions options)
+			throws LoginFailedException, RemoteServerException,
+			NoSuchItemException, EncounterFailedException {
+		
+		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
+		double probability = encounter.getCaptureProbability().getCaptureProbability(0);
+		
+		Pokeball pokeball = getItemBall();
+		int razberryLimit = -1;
+		int amount = -1;
+		if (options != null) {
+			pokeball = options.getItemBall(probability);
 			amount = options.getMaxPokeballs();
 			razberryLimit = options.getRazzberries();
 			if (razberryLimit == 1) {
