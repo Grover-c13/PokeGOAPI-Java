@@ -198,8 +198,8 @@ public class CatchOptions {
 	 */
 	public int getRazzberries() {
 		int razzberries = maxRazzBerries;
-		if (useRazzBerries && maxRazzBerries <= 1) {
-			razzberries = 1;
+		if(!useRazzBerries){
+			return 0;
 		} else if (maxRazzBerries <= 0) {
 			razzberries = -1;
 		} else {
