@@ -175,14 +175,14 @@ public class Pokemon extends PokemonDetails {
 	 */
 	public boolean canPowerUp() throws LoginFailedException, RemoteServerException {
 		return getCandy() >= getCandyCostsForPowerup() && api.getPlayerProfile()
-			.getCurrency(PlayerProfile.Currency.STARDUST) >= getStardustCostsForPowerup();
+				.getCurrency(PlayerProfile.Currency.STARDUST) >= getStardustCostsForPowerup();
 	}
-	
+
 	/**
 	 * Check if can powers up this pokemon, you can choose whether or not to consider the max cp limit for current
 	 * player level passing true to consider and false to not consider.
-	 * 
-	 * @param  considerMaxCPLimitForPlayerLevel Consider max cp limit for actual player level
+	 *
+	 * @param considerMaxCPLimitForPlayerLevel Consider max cp limit for actual player level
 	 * @return the boolean
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
@@ -190,11 +190,11 @@ public class Pokemon extends PokemonDetails {
 	 */
 	public boolean canPowerUp(boolean considerMaxCPLimitForPlayerLevel)
 			throws LoginFailedException, RemoteServerException, NoSuchItemException {
-		return considerMaxCPLimitForPlayerLevel 
+		return considerMaxCPLimitForPlayerLevel
 				? this.canPowerUp() && (this.getCp() < this.getMaxCpForPlayer())
 				: canPowerUp();
 	}
-	
+
 	/**
 	 * Check if can evolve this pokemon
 	 *
@@ -421,35 +421,39 @@ public class Pokemon extends PokemonDetails {
 	public EvolutionForm getEvolutionForm() {
 		return new EvolutionForm(getPokemonId());
 	}
-	
+
 	/**
 	 * @return Actual stamina in percentage relative to the current maximum stamina (useful in ProgressBars)
 	 */
 	public int getStaminaInPercentage() {
 		return (getStamina() * 100) / getMaxStamina();
 	}
-	
+
 	/**
-	 * @return Actual cp in percentage relative to the maximum cp that this pokemon can reach at the actual player 
-    level (useful in ProgressBars)
-	 * @throws NoSuchItemException if threw from {@link #getMaxCpForPlayer()}
-	 * @throws LoginFailedException if threw from {@link #getMaxCpForPlayer()}
+	 * Actual cp in percentage relative to the maximum cp that this pokemon can reach
+	 * at the actual player level (useful in ProgressBars)
+	 *
+	 * @return Actual cp in percentage
+	 * @throws NoSuchItemException   if threw from {@link #getMaxCpForPlayer()}
+	 * @throws LoginFailedException  if threw from {@link #getMaxCpForPlayer()}
 	 * @throws RemoteServerException if threw from {@link #getMaxCpForPlayer()}
 	 */
-	public int getCPInPercentageActualPlayerLevel() 
+	public int getCPInPercentageActualPlayerLevel()
 			throws NoSuchItemException, LoginFailedException, RemoteServerException {
 		return ((getCp() * 100) / getMaxCpForPlayer());
 	}
-	
+
 	/**
-	 * @return Actual cp in percentage relative to the maximum cp that this pokemon can reach at player-level 40 
-	(useful in ProgressBars)
+	 * Actual cp in percentage relative to the maximum cp that this pokemon can reach at player-level 40
+	 * (useful in ProgressBars)
+	 *
+	 * @return Actual cp in percentage
 	 * @throws NoSuchItemException if threw from {@link #getMaxCp()}
 	 */
 	public int getCPInPercentageMaxPlayerLevel() throws NoSuchItemException {
 		return ((getCp() * 100) / getMaxCp());
 	}
-	
+
 	/**
 	 * @return IV in percentage
 	 */
