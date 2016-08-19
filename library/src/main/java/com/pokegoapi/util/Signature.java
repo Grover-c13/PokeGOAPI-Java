@@ -138,7 +138,7 @@ public class Signature {
 
 	private static SignatureOuterClass.Signature.SensorInfo buildSensorInfo(long startTime) {
 		SignatureOuterClass.Signature.SensorInfo sensorInfo = SignatureOuterClass.Signature.SensorInfo.newBuilder()
-				.setTimestampSnapshot(startTime + (sRandom.nextInt(300 - 150) + 150))
+				.setTimestampSnapshot( + (sRandom.nextInt(300 - 150) + 150))
 				.setMagnetometerX(-2.0 + sRandom.nextDouble() * 4.0)
 				.setMagnetometerY(-2.0 + sRandom.nextDouble() * 4.0)
 				.setMagnetometerZ(-1.0 + sRandom.nextDouble() * 2.0)
