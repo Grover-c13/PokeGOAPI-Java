@@ -195,18 +195,6 @@ public class PokemonGo {
 	}
 
 	/**
-	 * Gets the device info
-	 *
-	 * @return the device info
-	 */
-	public SignatureOuterClass.Signature.DeviceInfo getDeviceInfo() {
-		if (deviceInfo == null) {
-			return null;
-		}
-		return deviceInfo.getDeviceInfo();
-	}
-
-	/**
 	 * Gets the sensor info
 	 *
 	 * @return the sensor info
