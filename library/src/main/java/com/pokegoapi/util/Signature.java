@@ -9,6 +9,7 @@ import POGOProtos.Networking.Requests.RequestOuterClass;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.util.Crypto;
+import com.pokegoapi.util.Log;
 
 import net.jpountz.xxhash.StreamingXXHash32;
 import net.jpountz.xxhash.StreamingXXHash64;
@@ -45,7 +46,14 @@ public class Signature {
 				.setTimestampSinceStart(curTime - api.startTime);
 
 		if (sDeviceInfo == null) {
-			sDeviceInfo = buildDeviceInfo();
+			if (api.getDeviceInfo() != null) {
+				sDeviceInfo = api.getDeviceInfo();
+			}
+
+			// fallback
+			if (sDeviceInfo == null) {
+				sDeviceInfo = buildDeviceInfo();
+			}
 		}
 
 		Log.e("DeviceInfo", sDeviceInfo.toString());
@@ -128,6 +136,9 @@ public class Signature {
 
 	private static SignatureOuterClass.Signature.DeviceInfo buildDeviceInfo() {
 		String customId = getUniqueId();
+		if (customId.isEmpty()) {
+			return SignatureOuterClass.Signature.DeviceInfo.newBuilder().build();
+		}
 
 		return SignatureOuterClass.Signature.DeviceInfo.newBuilder()
 				.setDeviceId(customId)
@@ -161,18 +172,24 @@ public class Signature {
 			serial = "";
 			int i = 0;
 			int k = 0;
-			while (serial.length() != 16) {
-				try {
-					String s = splittedSerial[i];
-					if (isNumber(s)) {
-						s = fakeNumber(s);
-					}
+			if (serial.length() == 16) {
+				// good to go
+			}  else if (serial.length() > 16) {
+				serial = serial.substring(0, 16);
+			} else {
+				while (serial.length() != 16) {
+					try {
+						String s = splittedSerial[i];
+						if (isNumber(s)) {
+							s = fakeNumber(s);
+						}
 
-					serial = serial + s;
-					i++;
-				} catch (IndexOutOfBoundsException e) {
-					i = k;
-					k = k == 1 ? 0 : 1;
+						serial = serial + s;
+						i++;
+					} catch (IndexOutOfBoundsException e) {
+						i = k;
+						k = k == 1 ? 0 : 1;
+					}
 				}
 			}
 			return serial.toLowerCase();
