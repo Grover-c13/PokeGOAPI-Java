@@ -20,6 +20,7 @@ import java.util.Random;
 public class Signature {
 
 	private static DeviceInfo sDeviceInfo;
+	private static Random sRandom;
 
 	/**
 	 * Given a fully built request, set the signature correctly.
@@ -55,9 +56,14 @@ public class Signature {
 			}
 		}
 
-		SignatureOuterClass.Signature.SensorInfo sensorInfo = api.getSensorInfo();
-		if (sensorInfo != null) {
-			sigBuilder.setSensorInfo(sensorInfo);
+		if (sRandom == null) {
+			sRandom = new Random();
+		}
+
+		if (api.getSensorInfo() != null) {
+			sigBuilder.setSensorInfo(api.getSensorInfo());
+		} else {
+			sigBuilder.setSensorInfo(buildSensorInfo(curTime));
 		}
 
 		for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
@@ -128,5 +134,47 @@ public class Signature {
 		xx64 = factory.newStreamingHash64(xx64.getValue());
 		xx64.update(request, 0, request.length);
 		return xx64.getValue();
+	}
+
+	private static SignatureOuterClass.Signature.SensorInfo buildSensorInfo(long startTime) {
+		SignatureOuterClass.Signature.SensorInfo sensorInfo = SignatureOuterClass.Signature.SensorInfo.newBuilder()
+				.setTimestampSnapshot(startTime + (sRandom.nextInt(300 - 150) + 150))
+				.setMagnetometerX(-2.0 + sRandom.nextDouble() * 4.0)
+				.setMagnetometerY(-2.0 + sRandom.nextDouble() * 4.0)
+				.setMagnetometerZ(-1.0 + sRandom.nextDouble() * 2.0)
+				.setAngleNormalizedX(-50.0 + sRandom.nextDouble() * 100.0)
+				.setAngleNormalizedY(-50.0 + sRandom.nextDouble() * 100.0)
+				.setAngleNormalizedZ(-50.0 + sRandom.nextDouble() * 100.0)
+				.setAccelRawX(-1.0 + sRandom.nextDouble())
+				.setAccelRawY(-1.0 + sRandom.nextDouble())
+				.setAccelRawZ(-1.0 + sRandom.nextDouble())
+				.setGyroscopeRawX(-2.0 + sRandom.nextDouble() * 4.0)
+				.setGyroscopeRawY(-2.0 + sRandom.nextDouble() * 4.0)
+				.setGyroscopeRawZ(-2.0 + sRandom.nextDouble() * 4.0)
+				.setAccelNormalizedX(-10.0 + sRandom.nextDouble() * 20.0)
+				.setAccelNormalizedY(-10.0 + sRandom.nextDouble() * 20.0)
+				.setAccelNormalizedZ(-10.0 + sRandom.nextDouble() * 20.0)
+				.setAccelerometerAxes(3)
+				.build();
+
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getTimestampSnapshot()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getMagnetometerX()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getMagnetometerY()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getMagnetometerZ()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAngleNormalizedX()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAngleNormalizedY()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAngleNormalizedZ()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAccelRawX()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAccelRawY()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAccelRawZ()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getGyroscopeRawX()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getGyroscopeRawY()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getGyroscopeRawZ()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAccelNormalizedX()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAccelNormalizedY()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAccelNormalizedZ()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAccelerometerAxes()));
+
+		return sensorInfo;
 	}
 }
