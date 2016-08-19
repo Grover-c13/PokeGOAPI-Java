@@ -18,8 +18,6 @@ package com.pokegoapi.api;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 
-import com.pokegoapi.api.device.DeviceInfo;
-import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
@@ -37,12 +35,12 @@ import okhttp3.OkHttpClient;
 
 import java.util.Random;
 
-
 public class PokemonGo {
 
 	private static final java.lang.String TAG = PokemonGo.class.getSimpleName();
 	private final Time time;
 	public final long startTime;
+	public final String deviceInfoId;
 	@Getter
 	private final byte[] sessionHash;
 	@Getter
@@ -61,10 +59,6 @@ public class PokemonGo {
 	@Getter
 	private Settings settings;
 	private Map map;
-	@Setter
-	private DeviceInfo deviceInfo;
-	@Setter
-	private SensorInfo sensorInfo;
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -72,11 +66,13 @@ public class PokemonGo {
 	 * @param credentialProvider the credential provider
 	 * @param client             the http client
 	 * @param time               a time implementation
+	 * @param deviceInfoId		 a device id to build the signature device info.
+	 *                           use UUID.randomUUID().toString() and safely store it somewhere
+	 *
 	 * @throws LoginFailedException  When login fails
 	 * @throws RemoteServerException When server fails
 	 */
-
-	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time)
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time, String deviceInfoId)
 			throws LoginFailedException, RemoteServerException {
 
 		if (credentialProvider == null) {
@@ -85,6 +81,9 @@ public class PokemonGo {
 			this.credentialProvider = credentialProvider;
 		}
 		this.time = time;
+		this.deviceInfoId = deviceInfoId.replace("-", "");
+
+		startTime = currentTimeMillis();
 
 		sessionHash = new byte[32];
 		new Random().nextBytes(sessionHash);
@@ -95,7 +94,22 @@ public class PokemonGo {
 		map = new Map(this);
 		longitude = Double.NaN;
 		latitude = Double.NaN;
-		startTime = currentTimeMillis();
+	}
+
+	/**
+	 * Instantiates a new Pokemon go.
+	 * Deprecated: specify a device info to use as seed to build the signature device info
+	 *
+	 * @param credentialProvider the credential provider
+	 * @param client             the http client
+	 * @param time               a time implementation
+	 *
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+	 */
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time)
+			throws LoginFailedException, RemoteServerException {
+		this(credentialProvider, client, time, "");
 	}
 
 	/**
@@ -104,12 +118,30 @@ public class PokemonGo {
 	 *
 	 * @param credentialProvider the credential provider
 	 * @param client             the http client
+	 * @param deviceInfoId		 a device id to build the signature device info.
+	 *                           use UUID.randomUUID().toString() and safely store it somewhere.
+	 *
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+	 */
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, String deviceInfoId)
+			throws LoginFailedException, RemoteServerException {
+		this(credentialProvider, client, new SystemTimeImpl(), deviceInfoId);
+	}
+
+	/**
+	 * Instantiates a new Pokemon go.
+	 * Deprecated: specify a time implementation
+	 *
+	 * @param credentialProvider the credential provider
+	 * @param client             the http client
+	 *
 	 * @throws LoginFailedException  When login fails
 	 * @throws RemoteServerException When server fails
 	 */
 	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client)
 			throws LoginFailedException, RemoteServerException {
-		this(credentialProvider, client, new SystemTimeImpl());
+		this(credentialProvider, client, new SystemTimeImpl(), "");
 	}
 
 	/**
@@ -192,29 +224,5 @@ public class PokemonGo {
 			throw new IllegalStateException("Attempt to get map without setting location first");
 		}
 		return map;
-	}
-
-	/**
-	 * Gets the device info
-	 *
-	 * @return the device info
-	 */
-	public SignatureOuterClass.Signature.DeviceInfo getDeviceInfo() {
-		if (deviceInfo == null) {
-			return null;
-		}
-		return deviceInfo.getDeviceInfo();
-	}
-
-	/**
-	 * Gets the sensor info
-	 *
-	 * @return the sensor info
-	 */
-	public SignatureOuterClass.Signature.SensorInfo getSensorInfo() {
-		if (sensorInfo == null) {
-			return null;
-		}
-		return sensorInfo.getSensorInfo();
 	}
 }
