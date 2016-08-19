@@ -63,7 +63,7 @@ public class Signature {
 		if (api.getSensorInfo() != null) {
 			sigBuilder.setSensorInfo(api.getSensorInfo());
 		} else {
-			sigBuilder.setSensorInfo(buildSensorInfo(curTime));
+			sigBuilder.setSensorInfo(buildSensorInfo(curTime - api.startTime));
 		}
 
 		for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
@@ -136,9 +136,9 @@ public class Signature {
 		return xx64.getValue();
 	}
 
-	private static SignatureOuterClass.Signature.SensorInfo buildSensorInfo(long startTime) {
+	private static SignatureOuterClass.Signature.SensorInfo buildSensorInfo(long snapshot) {
 		SignatureOuterClass.Signature.SensorInfo sensorInfo = SignatureOuterClass.Signature.SensorInfo.newBuilder()
-				.setTimestampSnapshot( + (sRandom.nextInt(300 - 150) + 150))
+				.setTimestampSnapshot(snapshot)
 				.setMagnetometerX(-2.0 + sRandom.nextDouble() * 4.0)
 				.setMagnetometerY(-2.0 + sRandom.nextDouble() * 4.0)
 				.setMagnetometerZ(-1.0 + sRandom.nextDouble() * 2.0)
