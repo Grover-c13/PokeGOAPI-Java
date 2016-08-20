@@ -58,10 +58,6 @@ public class Signature {
 			}
 		}
 
-		if (sRandom == null) {
-			sRandom = new Random();
-		}
-
 		if (api.getSensorInfo() != null) {
 			sigBuilder.setSensorInfo(api.getSensorInfo());
 		} else {
