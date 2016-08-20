@@ -266,14 +266,29 @@ public class Stats {
 		return proto.getBattleTrainingTotal();
 	}
 
+	/**
+	 * Get the total prestige raised in gyms.
+	 *
+	 * @return Total prestige raised in gyms.
+	 */
 	public int getPrestigeRaisedTotal() {
 		return proto.getPrestigeRaisedTotal();
 	}
 
+	/**
+	 * Get the total prestige dropped in gyms.
+	 *
+	 * @return Total prestige dropped in gyms.
+	 */
 	public int getPrestigeDroppedTotal() {
 		return proto.getPrestigeDroppedTotal();
 	}
 
+	/**
+	 * Get the amount of pokemons deployed in gyms.
+	 *
+	 * @return Amount of pokemons deployed in gyms.
+	 */
 	public int getPokemonDeployed() {
 		return proto.getPokemonDeployed();
 	}
