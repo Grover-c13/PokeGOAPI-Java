@@ -77,7 +77,7 @@ public class PokemonGo {
 	 */
 
 	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time)
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, RemoteServerException, InterruptedException {
 
 		if (credentialProvider == null) {
 			throw new LoginFailedException("Credential Provider is null");
@@ -91,7 +91,9 @@ public class PokemonGo {
 
 		requestHandler = new RequestHandler(this, client);
 		playerProfile = new PlayerProfile(this);
+		Thread.sleep(800);
 		settings = new Settings(this);
+		Thread.sleep(800);
 		map = new Map(this);
 		longitude = Double.NaN;
 		latitude = Double.NaN;
@@ -108,7 +110,7 @@ public class PokemonGo {
 	 * @throws RemoteServerException When server fails
 	 */
 	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client)
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, RemoteServerException, InterruptedException {
 		this(credentialProvider, client, new SystemTimeImpl());
 	}
 
