@@ -15,7 +15,7 @@
 
 package com.pokegoapi.api.inventory;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -23,61 +23,61 @@ import com.pokegoapi.exceptions.RemoteServerException;
 
 public final class LevelToExpUtils {
 
-	private static final HashMap<Integer, Integer> LEVEL_TOT_EXP_TO_REACH = new HashMap<Integer, Integer>();
+	private static final ArrayList<Integer> LEVEL_TOT_EXP_TO_REACH = new ArrayList<Integer>();
 
 	static {
-		LEVEL_TOT_EXP_TO_REACH.put(1, 0);
-		LEVEL_TOT_EXP_TO_REACH.put(2, 1000);
-		LEVEL_TOT_EXP_TO_REACH.put(3, 3000);
-		LEVEL_TOT_EXP_TO_REACH.put(4, 6000);
-		LEVEL_TOT_EXP_TO_REACH.put(5, 10000);
-		LEVEL_TOT_EXP_TO_REACH.put(6, 15000);
-		LEVEL_TOT_EXP_TO_REACH.put(7, 21000);
-		LEVEL_TOT_EXP_TO_REACH.put(8, 28000);
-		LEVEL_TOT_EXP_TO_REACH.put(9, 36000);
-		LEVEL_TOT_EXP_TO_REACH.put(10, 45000);
-		LEVEL_TOT_EXP_TO_REACH.put(11, 55000);
-		LEVEL_TOT_EXP_TO_REACH.put(12, 65000);
-		LEVEL_TOT_EXP_TO_REACH.put(13, 75000);
-		LEVEL_TOT_EXP_TO_REACH.put(14, 85000);
-		LEVEL_TOT_EXP_TO_REACH.put(15, 100000);
-		LEVEL_TOT_EXP_TO_REACH.put(16, 120000);
-		LEVEL_TOT_EXP_TO_REACH.put(17, 140000);
-		LEVEL_TOT_EXP_TO_REACH.put(18, 160000);
-		LEVEL_TOT_EXP_TO_REACH.put(19, 185000);
-		LEVEL_TOT_EXP_TO_REACH.put(20, 210000);
-		LEVEL_TOT_EXP_TO_REACH.put(21, 260000);
-		LEVEL_TOT_EXP_TO_REACH.put(22, 335000);
-		LEVEL_TOT_EXP_TO_REACH.put(23, 435000);
-		LEVEL_TOT_EXP_TO_REACH.put(24, 560000);
-		LEVEL_TOT_EXP_TO_REACH.put(25, 710000);
-		LEVEL_TOT_EXP_TO_REACH.put(26, 900000);
-		LEVEL_TOT_EXP_TO_REACH.put(27, 1100000);
-		LEVEL_TOT_EXP_TO_REACH.put(28, 1350000);
-		LEVEL_TOT_EXP_TO_REACH.put(29, 1650000);
-		LEVEL_TOT_EXP_TO_REACH.put(30, 2000000);
-		LEVEL_TOT_EXP_TO_REACH.put(31, 2500000);
-		LEVEL_TOT_EXP_TO_REACH.put(32, 3000000);
-		LEVEL_TOT_EXP_TO_REACH.put(33, 3750000);
-		LEVEL_TOT_EXP_TO_REACH.put(34, 4750000);
-		LEVEL_TOT_EXP_TO_REACH.put(35, 6000000);
-		LEVEL_TOT_EXP_TO_REACH.put(36, 7500000);
-		LEVEL_TOT_EXP_TO_REACH.put(37, 9500000);
-		LEVEL_TOT_EXP_TO_REACH.put(38, 12000000);
-		LEVEL_TOT_EXP_TO_REACH.put(39, 15000000);
-		LEVEL_TOT_EXP_TO_REACH.put(40, 20000000);
+		LEVEL_TOT_EXP_TO_REACH.add(0); // LVL 1
+		LEVEL_TOT_EXP_TO_REACH.add(1000); // LVL 2
+		LEVEL_TOT_EXP_TO_REACH.add(3000); // LVL 3
+		LEVEL_TOT_EXP_TO_REACH.add(6000); // LVL 4
+		LEVEL_TOT_EXP_TO_REACH.add(10000); // LVL 5
+		LEVEL_TOT_EXP_TO_REACH.add(15000); // LVL 6
+		LEVEL_TOT_EXP_TO_REACH.add(21000); // LVL 7
+		LEVEL_TOT_EXP_TO_REACH.add(28000); // LVL 8
+		LEVEL_TOT_EXP_TO_REACH.add(36000); // LVL 9
+		LEVEL_TOT_EXP_TO_REACH.add(45000); // LVL 10
+		LEVEL_TOT_EXP_TO_REACH.add(55000); // LVL 11
+		LEVEL_TOT_EXP_TO_REACH.add(65000); // LVL 12
+		LEVEL_TOT_EXP_TO_REACH.add(75000); // LVL 13
+		LEVEL_TOT_EXP_TO_REACH.add(85000); // LVL 14
+		LEVEL_TOT_EXP_TO_REACH.add(100000); // LVL 15
+		LEVEL_TOT_EXP_TO_REACH.add(120000); // LVL 16
+		LEVEL_TOT_EXP_TO_REACH.add(140000); // LVL 17
+		LEVEL_TOT_EXP_TO_REACH.add(160000); // LVL 18
+		LEVEL_TOT_EXP_TO_REACH.add(185000); // LVL 19
+		LEVEL_TOT_EXP_TO_REACH.add(210000); // LVL 20
+		LEVEL_TOT_EXP_TO_REACH.add(260000); // LVL 21
+		LEVEL_TOT_EXP_TO_REACH.add(335000); // LVL 22
+		LEVEL_TOT_EXP_TO_REACH.add(435000); // LVL 23
+		LEVEL_TOT_EXP_TO_REACH.add(560000); // LVL 24
+		LEVEL_TOT_EXP_TO_REACH.add(710000); // LVL 25
+		LEVEL_TOT_EXP_TO_REACH.add(900000); // LVL 26
+		LEVEL_TOT_EXP_TO_REACH.add(1100000); // LVL 27
+		LEVEL_TOT_EXP_TO_REACH.add(1350000); // LVL 28
+		LEVEL_TOT_EXP_TO_REACH.add(1650000); // LVL 29
+		LEVEL_TOT_EXP_TO_REACH.add(2000000); // LVL 30
+		LEVEL_TOT_EXP_TO_REACH.add(2500000); // LVL 31
+		LEVEL_TOT_EXP_TO_REACH.add(3000000); // LVL 32
+		LEVEL_TOT_EXP_TO_REACH.add(3750000); // LVL 33
+		LEVEL_TOT_EXP_TO_REACH.add(4750000); // LVL 34
+		LEVEL_TOT_EXP_TO_REACH.add(6000000); // LVL 35
+		LEVEL_TOT_EXP_TO_REACH.add(7500000); // LVL 36
+		LEVEL_TOT_EXP_TO_REACH.add(9500000); // LVL 37
+		LEVEL_TOT_EXP_TO_REACH.add(12000000); // LVL 38
+		LEVEL_TOT_EXP_TO_REACH.add(15000000); // LVL 39
+		LEVEL_TOT_EXP_TO_REACH.add(20000000); // LVL 40
 	}
 
 	/**
-	 * Get the total experience required to reach the previous level of the one
-	 * passed as parameter.
+	 * Get the total experience required to reach the previous level of the
+	 * level passed as parameter.
 	 *
 	 * @param lvl
 	 *            The level.
 	 * @return Total experience required to reach the previous level.
 	 */
 	public static int getTotExpToReachPrevLevelOf(final int lvl) {
-		return LEVEL_TOT_EXP_TO_REACH.get(lvl - 1);
+		return LEVEL_TOT_EXP_TO_REACH.get(lvl - 2);
 	}
 
 	/**
@@ -88,11 +88,11 @@ public final class LevelToExpUtils {
 	 * @return Total experience required to reach the level.
 	 */
 	public static int getTotExpToReachLevel(final int lvl) {
-		return LEVEL_TOT_EXP_TO_REACH.get(lvl);
+		return LEVEL_TOT_EXP_TO_REACH.get(lvl - 1);
 	}
 
 	/**
-	 * Get the total experience required to reach the next level of the one
+	 * Get the total experience required to reach the next level of the level
 	 * passed as parameter.
 	 *
 	 * @param lvl
@@ -100,7 +100,7 @@ public final class LevelToExpUtils {
 	 * @return Total experience required to reach the next level.
 	 */
 	public static int getTotExpToReachNextLevelOf(final int lvl) {
-		return LEVEL_TOT_EXP_TO_REACH.get(lvl + 1);
+		return LEVEL_TOT_EXP_TO_REACH.get(lvl);
 	}
 
 	/**
