@@ -22,6 +22,7 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
 
+import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_GREAT_BALL;
 import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_MASTER_BALL;
 import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_POKE_BALL;
@@ -30,6 +31,8 @@ import static com.pokegoapi.api.inventory.Pokeball.GREATBALL;
 import static com.pokegoapi.api.inventory.Pokeball.MASTERBALL;
 import static com.pokegoapi.api.inventory.Pokeball.POKEBALL;
 import static com.pokegoapi.api.inventory.Pokeball.ULTRABALL;
+
+import java.util.Arrays;
 
 import lombok.Getter;
 import lombok.ToString;
@@ -48,6 +51,7 @@ public class CatchOptions {
 	private int maxRazzBerries;
 	private Pokeball pokeBall;
 	private boolean strictBallType;
+	private boolean smartSelect;
 	@Getter
 	private int maxPokeballs;
 	private double probability;
@@ -71,6 +75,7 @@ public class CatchOptions {
 		this.skipMasterBall = false;
 		this.pokeBall = POKEBALL;
 		this.strictBallType = false;
+		this.smartSelect = false;
 		this.maxPokeballs = 1;
 		this.probability = 0.50;
 		this.normalizedHitPosition = 1.0;
@@ -93,47 +98,51 @@ public class CatchOptions {
 			if (bag.getItem(pokeBall.getBallType()).getCount() > 0) {
 				return pokeBall;
 			} else if (useBestPokeball) {
-				if (!skipMasterBall) {
-					if (bag.getItem(ITEM_MASTER_BALL).getCount() > 0) {
-						return MASTERBALL;
-					}
+				if (!skipMasterBall && bag.getItem(ITEM_MASTER_BALL).getCount() > 0) {
+					return MASTERBALL;
 				} else if (bag.getItem(ITEM_ULTRA_BALL).getCount() > 0) {
 					return ULTRABALL;
+				} else if (bag.getItem(ITEM_GREAT_BALL).getCount() > 0) {
+					return GREATBALL;
 				}
-			} else if (bag.getItem(ITEM_POKE_BALL).getCount() > 0) {
+			}
+			if (bag.getItem(ITEM_POKE_BALL).getCount() > 0) {
 				return POKEBALL;
 			}
 			throw new NoSuchItemException();
 		} else {
-			int index = 3;
-			if (pokeBall.getBallType() == ITEM_MASTER_BALL) index = 3;
-			if (pokeBall.getBallType() == ITEM_ULTRA_BALL) index = 2;
-			if (pokeBall.getBallType() == ITEM_GREAT_BALL) index = 1;
-			if (pokeBall.getBallType() == ITEM_POKE_BALL) index = 0;
+			int index = Arrays.asList(new ItemId[] { ITEM_MASTER_BALL, ITEM_ULTRA_BALL,
+					ITEM_GREAT_BALL, ITEM_POKE_BALL }).indexOf(pokeBall.getBallType());
 			
 			if (useBestPokeball) {
-				if (!skipMasterBall && index <= 3 && bag.getItem(ITEM_MASTER_BALL).getCount() > 0) {
+				if (!skipMasterBall && index >= 0 && bag.getItem(ITEM_MASTER_BALL).getCount() > 0) {
 					return MASTERBALL;
-				} else if (index <= 2 && bag.getItem(ITEM_ULTRA_BALL).getCount() > 0) {
+				} else if (index >= 1 && bag.getItem(ITEM_ULTRA_BALL).getCount() > 0) {
 					return ULTRABALL;
-				} else if (index <= 1 && bag.getItem(ITEM_GREAT_BALL).getCount() > 0) {
+				} else if (index >= 2 && bag.getItem(ITEM_GREAT_BALL).getCount() > 0) {
 					return GREATBALL;
 				} else if (bag.getItem(ITEM_POKE_BALL).getCount() > 0) {
 					return POKEBALL;
 				}
 			} else {
-				if (index >= 0 && bag.getItem(ITEM_POKE_BALL).getCount() > 0) {
+				if (index <= 3 && bag.getItem(ITEM_POKE_BALL).getCount() > 0) {
 					return POKEBALL;
-				} else if (index >= 1 && bag.getItem(ITEM_GREAT_BALL).getCount() > 0) {
+				} else if (index <= 2 && bag.getItem(ITEM_GREAT_BALL).getCount() > 0) {
 					return GREATBALL;
-				} else if (index >= 2 && bag.getItem(ITEM_ULTRA_BALL).getCount() > 0) {
+				} else if (index <= 1 && bag.getItem(ITEM_ULTRA_BALL).getCount() > 0) {
 					return ULTRABALL;
-				} else if (!skipMasterBall && index <= 0 && bag.getItem(ITEM_MASTER_BALL).getCount() > 0) {
+				} else if (!skipMasterBall && bag.getItem(ITEM_MASTER_BALL).getCount() > 0) {
 					return MASTERBALL;
 				}
 			}
-			throw new NoSuchItemException();
 		}
+		if (smartSelect) {
+			useBestPokeball = false;
+			skipMasterBall = false;
+			smartSelect = false;
+			return getItemBall();
+		}
+		throw new NoSuchItemException();
 	}
 	
 	/**
@@ -147,48 +156,12 @@ public class CatchOptions {
 	 */
 	public Pokeball getItemBall(double encounterProbability) throws LoginFailedException,
 						RemoteServerException, NoSuchItemException {
-		ItemBag bag = api.getInventories().getItemBag();
-		if (strictBallType || probability <= 0) {
-			if (encounterProbability < probability) {
-				throw new NoSuchItemException("No ball available for capture probability");
-			}
-			if (bag.getItem(pokeBall.getBallType()).getCount() > 0) {
-				return pokeBall;
-			} else if (useBestPokeball) {
-				if (!skipMasterBall) {
-					if (bag.getItem(ITEM_MASTER_BALL).getCount() > 0) {
-						return MASTERBALL;
-					}
-				} else if (bag.getItem(ITEM_ULTRA_BALL).getCount() > 0) {
-					return ULTRABALL;
-				}
-			} else if (bag.getItem(ITEM_POKE_BALL).getCount() > 0) {
-				return POKEBALL;
-			}
-			throw new NoSuchItemException("No ball available for capture probability");
+		if (encounterProbability >= probability) {
+			useBestPokeball = false;
 		} else {
-			int index = 3;
-			if (pokeBall.getBallType() == ITEM_MASTER_BALL) index = 3;
-			if (pokeBall.getBallType() == ITEM_ULTRA_BALL) index = 2;
-			if (pokeBall.getBallType() == ITEM_GREAT_BALL) index = 1;
-			if (pokeBall.getBallType() == ITEM_POKE_BALL) index = 0;
-			
-			if (encounterProbability <= probability && index >= 0
-						&& bag.getItem(ITEM_POKE_BALL).getCount() > 0) {
-				return POKEBALL;
-			} else if (encounterProbability <= probability && index >= 1
-						&& bag.getItem(ITEM_GREAT_BALL).getCount() > 0) {
-				return GREATBALL;
-			} else if (encounterProbability <= probability && index >= 2
-						&& bag.getItem(ITEM_ULTRA_BALL).getCount() > 0) {
-				return ULTRABALL;
-			} else if (encounterProbability <= probability
-						&& !skipMasterBall && index <= 0
-						&& bag.getItem(ITEM_MASTER_BALL).getCount() > 0) {
-				return MASTERBALL;
-			}
-			throw new NoSuchItemException();
+			useBestPokeball = true;
 		}
+		return getItemBall();
 	}
 	
 	/**
@@ -269,6 +242,17 @@ public class CatchOptions {
 	 */
 	public CatchOptions noMasterBall(boolean skipMasterBall) {
 		this.skipMasterBall = skipMasterBall;
+		return this;
+	}
+	
+	/**
+	 * Set whether or not to use adaptive ball selection
+	 *
+	 * @param smartSelect    true or false
+	 * @return               the CatchOptions object
+	 */
+	public CatchOptions useSmartSelect(boolean smartSelect) {
+		this.smartSelect = smartSelect;
 		return this;
 	}
 	
