@@ -21,6 +21,9 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 
+/**
+ * This class can help you retriving informations about experience from level.
+ */
 public final class LevelToExpUtils {
 
 	private static final ArrayList<Integer> LEVEL_TOT_EXP_TO_REACH = new ArrayList<Integer>();
@@ -136,10 +139,12 @@ public final class LevelToExpUtils {
 	 *            PokemonGo instance
 	 * @return Experience earned in current level.
 	 * @throws LoginFailedException
-	 *             when the auth is invalid.
+	 *             When the auth is invalid. Threw from
+	 *             {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
 	 * @throws RemoteServerException
-	 *             when the server is down/having issues or no internet
-	 *             connection.
+	 *             When the server is down/having issues or no internet
+	 *             connection. Threw from
+	 *             {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
 	 */
 	public static int getExpEarnedInCurrentLevel(final PokemonGo api)
 			throws LoginFailedException, RemoteServerException {
@@ -169,10 +174,12 @@ public final class LevelToExpUtils {
 	 *            PokemonGo instance
 	 * @return Experience earned in current level in percentage.
 	 * @throws LoginFailedException
-	 *             when the auth is invalid.
+	 *             When the auth is invalid. Threw from
+	 *             {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
 	 * @throws RemoteServerException
-	 *             when the server is down/having issues or no internet
-	 *             connection.
+	 *             When the server is down/having issues or no internet
+	 *             connection. Threw from
+	 *             {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
 	 */
 	public static int getExpEarnedInCurrentLevelInPercentage(final PokemonGo api)
 			throws LoginFailedException, RemoteServerException {
@@ -200,10 +207,12 @@ public final class LevelToExpUtils {
 	 *            PokemonGo instance
 	 * @return Experience missing to level up.
 	 * @throws LoginFailedException
-	 *             when the auth is invalid.
+	 *             When the auth is invalid. Threw from
+	 *             {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
 	 * @throws RemoteServerException
-	 *             when the server is down/having issues or no internet
-	 *             connection.
+	 *             When the server is down/having issues or no internet
+	 *             connection. Threw from
+	 *             {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
 	 */
 	public static int getMissingExpToLevelUp(final PokemonGo api) throws LoginFailedException, RemoteServerException {
 		return getMissingExpToLevelUp(api.getPlayerProfile().getStats().getLevel(),
@@ -231,10 +240,12 @@ public final class LevelToExpUtils {
 	 *            PokemonGo instance
 	 * @return Missing experience to level up in percentage.
 	 * @throws LoginFailedException
-	 *             when the auth is invalid.
+	 *             When the auth is invalid. Threw from
+	 *             {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
 	 * @throws RemoteServerException
-	 *             when the server is down/having issues or no internet
-	 *             connection.
+	 *             When the server is down/having issues or no internet
+	 *             connection. Threw from
+	 *             {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
 	 */
 	public static int getMissingExpToLevelUpInPercentage(final PokemonGo api)
 			throws LoginFailedException, RemoteServerException {
