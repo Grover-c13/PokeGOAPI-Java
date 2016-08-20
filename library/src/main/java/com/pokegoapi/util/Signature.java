@@ -64,6 +64,8 @@ public class Signature {
 			sigBuilder.setSensorInfo(buildSensorInfo(curTime));
 		}
 
+		sigBuilder.setActivityStatus(buildActivityStatus());
+
 		for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
 			byte[] request = serverRequest.toByteArray();
 			sigBuilder.addRequestHash(getRequestHash(authTicketBA, request));
@@ -135,6 +137,10 @@ public class Signature {
 	}
 
 	private static SignatureOuterClass.Signature.SensorInfo buildSensorInfo(long startTime) {
+		if (sRandom == null) {
+			sRandom = new Random();
+		}
+
 		SignatureOuterClass.Signature.SensorInfo.Builder sensorInfoBuilder =
 				SignatureOuterClass.Signature.SensorInfo.newBuilder();
 		if (sFirstSensorInfo) {
@@ -191,5 +197,22 @@ public class Signature {
 		Log.e("SensorInfo", String.valueOf(sensorInfo.getAccelerometerAxes()));
 
 		return sensorInfo;
+	}
+
+	private static SignatureOuterClass.Signature.ActivityStatus buildActivityStatus() {
+		SignatureOuterClass.Signature.ActivityStatus.Builder activityStatusBuilder =
+				SignatureOuterClass.Signature.ActivityStatus.newBuilder();
+		if (sRandom == null) {
+			sRandom = new Random();
+		}
+		boolean tilting = sRandom.nextInt() % 2 == 0;
+		activityStatusBuilder.setStationary(true);
+		if (tilting) {
+			activityStatusBuilder.setTilting(true);
+		}
+		SignatureOuterClass.Signature.ActivityStatus activityStatus = activityStatusBuilder.build();
+		Log.e("ActivityStatus", String.valueOf(activityStatus.getStationary()));
+		Log.e("ActivityStatus", String.valueOf(activityStatus.getTilting()));
+		return activityStatus;
 	}
 }
