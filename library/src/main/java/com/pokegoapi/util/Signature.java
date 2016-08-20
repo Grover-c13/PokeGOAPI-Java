@@ -61,7 +61,7 @@ public class Signature {
 		if (api.getSensorInfo() != null) {
 			sigBuilder.setSensorInfo(api.getSensorInfo());
 		} else {
-			sigBuilder.setSensorInfo(buildSensorInfo(curTime));
+			sigBuilder.setSensorInfo(buildSensorInfo(api.startTime - curTime));
 		}
 
 		sigBuilder.setActivityStatus(buildActivityStatus());
@@ -110,6 +110,7 @@ public class Signature {
 
 		xx32 = factory.newStreamingHash32(xx32.getValue());
 		xx32.update(bytes, 0, bytes.length);
+		Log.e("LocationHash", String.valueOf(xx32.getValue()));
 		return xx32.getValue();
 	}
 
@@ -136,7 +137,7 @@ public class Signature {
 		return xx64.getValue();
 	}
 
-	private static SignatureOuterClass.Signature.SensorInfo buildSensorInfo(long startTime) {
+	private static SignatureOuterClass.Signature.SensorInfo buildSensorInfo(long timestampSnapshot) {
 		if (sRandom == null) {
 			sRandom = new Random();
 		}
@@ -145,8 +146,8 @@ public class Signature {
 				SignatureOuterClass.Signature.SensorInfo.newBuilder();
 		if (sFirstSensorInfo) {
 			sFirstSensorInfo = false;
-			sensorInfoBuilder.setAccelRawX(-1.0 + sRandom.nextDouble())
-					.setTimestampSnapshot(System.currentTimeMillis() - startTime)
+			sensorInfoBuilder.setTimestampSnapshot(timestampSnapshot)
+					.setAccelRawX(-1.0 + sRandom.nextDouble())
 					.setAccelRawY(-1.0 + sRandom.nextDouble())
 					.setAccelRawZ(-1.0 + sRandom.nextDouble())
 					.setGyroscopeRawX(-10.0 + sRandom.nextDouble() * 5.0)
@@ -157,8 +158,8 @@ public class Signature {
 					.setAccelNormalizedZ(-1.0 + sRandom.nextDouble() * 2.0)
 					.setAccelerometerAxes(3);
 		} else {
-			sensorInfoBuilder.setAccelRawX(-1.0 + sRandom.nextDouble())
-					.setTimestampSnapshot(System.currentTimeMillis() - startTime)
+			sensorInfoBuilder.setTimestampSnapshot(timestampSnapshot)
+					.setAccelRawX(-1.0 + sRandom.nextDouble())
 					.setMagnetometerX(-1.0 + sRandom.nextDouble() * 2.0)
 					.setMagnetometerY(-1.0 + sRandom.nextDouble() * 2.0)
 					.setMagnetometerZ(-1.0 + sRandom.nextDouble() * 2.0)
