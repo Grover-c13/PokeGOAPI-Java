@@ -23,6 +23,7 @@ import com.pokegoapi.api.map.pokemon.EvolutionResult;
 import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.ServerRequest;
@@ -174,9 +175,26 @@ public class Pokemon extends PokemonDetails {
 	 */
 	public boolean canPowerUp() throws LoginFailedException, RemoteServerException {
 		return getCandy() >= getCandyCostsForPowerup() && api.getPlayerProfile()
-			.getCurrency(PlayerProfile.Currency.STARDUST) >= getStardustCostsForPowerup();
+				.getCurrency(PlayerProfile.Currency.STARDUST) >= getStardustCostsForPowerup();
 	}
-	
+
+	/**
+	 * Check if can powers up this pokemon, you can choose whether or not to consider the max cp limit for current
+	 * player level passing true to consider and false to not consider.
+	 *
+	 * @param considerMaxCPLimitForPlayerLevel Consider max cp limit for actual player level
+	 * @return the boolean
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws NoSuchItemException   If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
+	 */
+	public boolean canPowerUp(boolean considerMaxCPLimitForPlayerLevel)
+			throws LoginFailedException, RemoteServerException, NoSuchItemException {
+		return considerMaxCPLimitForPlayerLevel
+				? this.canPowerUp() && (this.getCp() < this.getMaxCpForPlayer())
+				: canPowerUp();
+	}
+
 	/**
 	 * Check if can evolve this pokemon
 	 *
@@ -185,7 +203,7 @@ public class Pokemon extends PokemonDetails {
 	 * @throws RemoteServerException the remote server exception
 	 */
 	public boolean canEvolve() throws LoginFailedException, RemoteServerException {
-		return getCandy() >= getCandiesToEvolve();
+		return !EvolutionInfo.isFullyEvolved(getPokemonId()) && (getCandy() >= getCandiesToEvolve());
 	}
 
 	/**
@@ -402,5 +420,44 @@ public class Pokemon extends PokemonDetails {
 
 	public EvolutionForm getEvolutionForm() {
 		return new EvolutionForm(getPokemonId());
+	}
+
+	/**
+	 * @return Actual stamina in percentage relative to the current maximum stamina (useful in ProgressBars)
+	 */
+	public int getStaminaInPercentage() {
+		return (getStamina() * 100) / getMaxStamina();
+	}
+
+	/**
+	 * Actual cp in percentage relative to the maximum cp that this pokemon can reach
+	 * at the actual player level (useful in ProgressBars)
+	 *
+	 * @return Actual cp in percentage
+	 * @throws NoSuchItemException   if threw from {@link #getMaxCpForPlayer()}
+	 * @throws LoginFailedException  if threw from {@link #getMaxCpForPlayer()}
+	 * @throws RemoteServerException if threw from {@link #getMaxCpForPlayer()}
+	 */
+	public int getCPInPercentageActualPlayerLevel()
+			throws NoSuchItemException, LoginFailedException, RemoteServerException {
+		return ((getCp() * 100) / getMaxCpForPlayer());
+	}
+
+	/**
+	 * Actual cp in percentage relative to the maximum cp that this pokemon can reach at player-level 40
+	 * (useful in ProgressBars)
+	 *
+	 * @return Actual cp in percentage
+	 * @throws NoSuchItemException if threw from {@link #getMaxCp()}
+	 */
+	public int getCPInPercentageMaxPlayerLevel() throws NoSuchItemException {
+		return ((getCp() * 100) / getMaxCp());
+	}
+
+	/**
+	 * @return IV in percentage
+	 */
+	public double getIvInPercentage() {
+		return ((Math.floor((this.getIvRatio() * 100) * 100)) / 100);
 	}
 }
