@@ -8,6 +8,8 @@ import POGOProtos.Networking.Requests.RequestOuterClass;
 
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.device.DeviceInfo;
+import com.pokegoapi.util.Crypto;
 
 import net.jpountz.xxhash.StreamingXXHash32;
 import net.jpountz.xxhash.StreamingXXHash64;
@@ -16,6 +18,11 @@ import net.jpountz.xxhash.XXHashFactory;
 import java.util.Random;
 
 public class Signature {
+
+	private static DeviceInfo sDeviceInfo;
+	private static Random sRandom;
+
+	private static boolean sFirstSensorInfo = true;
 
 	/**
 	 * Given a fully built request, set the signature correctly.
@@ -40,16 +47,24 @@ public class Signature {
 				.setTimestamp(api.currentTimeMillis())
 				.setTimestampSinceStart(curTime - api.startTime);
 
-		SignatureOuterClass.Signature.DeviceInfo deviceInfo = api.getDeviceInfo();
-		if (deviceInfo != null) {
-			sigBuilder.setDeviceInfo(deviceInfo);
+		if (sDeviceInfo != null) {
+			sigBuilder.setDeviceInfo(sDeviceInfo.getDeviceInfo());
+		} else {
+			if (api.getDeviceInfo() != null) {
+				sigBuilder.setDeviceInfo(api.getDeviceInfo());
+			} else {
+				sDeviceInfo = new DeviceInfo();
+				sigBuilder.setDeviceInfo(sDeviceInfo.getDeviceInfo());
+			}
 		}
 
-		SignatureOuterClass.Signature.SensorInfo sensorInfo = api.getSensorInfo();
-		if (sensorInfo != null) {
-			sigBuilder.setSensorInfo(sensorInfo);
+		if (api.getSensorInfo() != null) {
+			sigBuilder.setSensorInfo(api.getSensorInfo());
+		} else {
+			sigBuilder.setSensorInfo(buildSensorInfo(curTime - api.startTime));
 		}
 
+		sigBuilder.setActivityStatus(buildActivityStatus());
 
 		for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
 			byte[] request = serverRequest.toByteArray();
@@ -95,6 +110,7 @@ public class Signature {
 
 		xx32 = factory.newStreamingHash32(xx32.getValue());
 		xx32.update(bytes, 0, bytes.length);
+		Log.e("LocationHash", String.valueOf(xx32.getValue()));
 		return xx32.getValue();
 	}
 
@@ -119,5 +135,85 @@ public class Signature {
 		xx64 = factory.newStreamingHash64(xx64.getValue());
 		xx64.update(request, 0, request.length);
 		return xx64.getValue();
+	}
+
+	private static SignatureOuterClass.Signature.SensorInfo buildSensorInfo(long timestampSnapshot) {
+		if (sRandom == null) {
+			sRandom = new Random();
+		}
+
+		SignatureOuterClass.Signature.SensorInfo.Builder sensorInfoBuilder =
+				SignatureOuterClass.Signature.SensorInfo.newBuilder();
+		if (sFirstSensorInfo) {
+			sFirstSensorInfo = false;
+			sensorInfoBuilder.setTimestampSnapshot(timestampSnapshot)
+					.setAccelRawX(-1.0 + sRandom.nextDouble())
+					.setAccelRawY(-1.0 + sRandom.nextDouble())
+					.setAccelRawZ(-1.0 + sRandom.nextDouble())
+					.setGyroscopeRawX(-10.0 + sRandom.nextDouble() * 5.0)
+					.setGyroscopeRawY(-10.0 + sRandom.nextDouble() * 5.0)
+					.setGyroscopeRawZ(-10.0 + sRandom.nextDouble() * 5.0)
+					.setAccelNormalizedX(-1.0 + sRandom.nextDouble() * 2.0)
+					.setAccelNormalizedY(-1.0 + sRandom.nextDouble() * 2.0)
+					.setAccelNormalizedZ(-1.0 + sRandom.nextDouble() * 2.0)
+					.setAccelerometerAxes(3);
+		} else {
+			sensorInfoBuilder.setTimestampSnapshot(timestampSnapshot)
+					.setAccelRawX(-1.0 + sRandom.nextDouble())
+					.setMagnetometerX(-1.0 + sRandom.nextDouble() * 2.0)
+					.setMagnetometerY(-1.0 + sRandom.nextDouble() * 2.0)
+					.setMagnetometerZ(-1.0 + sRandom.nextDouble() * 2.0)
+					.setAngleNormalizedX(-55.0 + sRandom.nextDouble() * 110.0)
+					.setAngleNormalizedY(-55.0 + sRandom.nextDouble() * 110.0)
+					.setAngleNormalizedZ(-55.0 + sRandom.nextDouble() * 110.0)
+					.setAccelRawY(-1.0 + sRandom.nextDouble())
+					.setAccelRawZ(-1.0 + sRandom.nextDouble())
+					.setGyroscopeRawX(-10.0 + sRandom.nextDouble() * 5.0)
+					.setGyroscopeRawY(-10.0 + sRandom.nextDouble() * 5.0)
+					.setGyroscopeRawZ(-10.0 + sRandom.nextDouble() * 5.0)
+					.setAccelNormalizedX(-1.0 + sRandom.nextDouble() * 2.0)
+					.setAccelNormalizedY(-1.0 + sRandom.nextDouble() * 2.0)
+					.setAccelNormalizedZ(-1.0 + sRandom.nextDouble() * 2.0)
+					.setAccelerometerAxes(3);
+		}
+
+		SignatureOuterClass.Signature.SensorInfo sensorInfo = sensorInfoBuilder.build();
+
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getTimestampSnapshot()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getMagnetometerX()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getMagnetometerY()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getMagnetometerZ()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAngleNormalizedX()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAngleNormalizedY()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAngleNormalizedZ()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAccelRawX()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAccelRawY()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAccelRawZ()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getGyroscopeRawX()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getGyroscopeRawY()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getGyroscopeRawZ()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAccelNormalizedX()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAccelNormalizedY()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAccelNormalizedZ()));
+		Log.e("SensorInfo", String.valueOf(sensorInfo.getAccelerometerAxes()));
+
+		return sensorInfo;
+	}
+
+	private static SignatureOuterClass.Signature.ActivityStatus buildActivityStatus() {
+		SignatureOuterClass.Signature.ActivityStatus.Builder activityStatusBuilder =
+				SignatureOuterClass.Signature.ActivityStatus.newBuilder();
+		if (sRandom == null) {
+			sRandom = new Random();
+		}
+		boolean tilting = sRandom.nextInt() % 2 == 0;
+		activityStatusBuilder.setStationary(true);
+		if (tilting) {
+			activityStatusBuilder.setTilting(true);
+		}
+		SignatureOuterClass.Signature.ActivityStatus activityStatus = activityStatusBuilder.build();
+		Log.e("ActivityStatus", String.valueOf(activityStatus.getStationary()));
+		Log.e("ActivityStatus", String.valueOf(activityStatus.getTilting()));
+		return activityStatus;
 	}
 }
