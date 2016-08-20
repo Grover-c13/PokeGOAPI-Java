@@ -61,7 +61,7 @@ public class Signature {
 		if (api.getSensorInfo() != null) {
 			sigBuilder.setSensorInfo(api.getSensorInfo());
 		} else {
-			sigBuilder.setSensorInfo(buildSensorInfo(api.startTime - curTime));
+			sigBuilder.setSensorInfo(buildSensorInfo(curTime - api.startTime));
 		}
 
 		sigBuilder.setActivityStatus(buildActivityStatus());
