@@ -16,6 +16,7 @@
 package com.pokegoapi.api.inventory;
 
 import POGOProtos.Data.Player.PlayerStatsOuterClass;
+import POGOProtos.Data.Player.PlayerStatsOuterClass.PlayerStats;
 
 /**
  * Stats class
@@ -323,5 +324,17 @@ public class Stats {
 	@Deprecated
 	public int getSmallRattataCaught() {
 		return proto.getSmallRattataCaught();
+	}
+
+	/**
+	 * Get the proto.
+	 * 
+	 * @deprecated Please use {@link com.pokegoapi.api.player.Stats#getProto()}
+	 *             instead.
+	 * @return The proto.
+	 */
+	@Deprecated
+	public PlayerStats getProto() {
+		return this.proto;
 	}
 }
