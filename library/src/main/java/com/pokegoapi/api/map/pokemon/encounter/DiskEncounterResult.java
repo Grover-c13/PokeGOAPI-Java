@@ -22,6 +22,7 @@ import POGOProtos.Networking.Responses.DiskEncounterResponseOuterClass.DiskEncou
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.pokemon.PokemonDetails;
 
 import lombok.Getter;
@@ -29,9 +30,9 @@ import lombok.Getter;
 public class DiskEncounterResult extends PokemonDetails implements EncounterResult {
 	@Getter
 	private DiskEncounterResponse response;
-
-	public DiskEncounterResult(PokemonGo api, DiskEncounterResponse response) {
-		super(api, response.getPokemonData());
+	//
+	public DiskEncounterResult(DiskEncounterResponse response, Inventories inventories) {
+		super(response.getPokemonData(), inventories);
 		this.response = response;
 	}
 

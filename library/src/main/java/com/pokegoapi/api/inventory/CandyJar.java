@@ -15,67 +15,49 @@
 
 package com.pokegoapi.api.inventory;
 
+import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 
+import POGOProtos.Enums.PokemonIdOuterClass;
+import POGOProtos.Inventory.InventoryItemDataOuterClass;
+import POGOProtos.Inventory.InventoryItemOuterClass;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import com.pokegoapi.api.PokemonGo;
 
+import com.pokegoapi.api.pokemon.Pokemon;
 import lombok.ToString;
 
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @ToString
 public class CandyJar {
-	private PokemonGo pgo;
-	private HashMap<PokemonFamilyId, Integer> candies;
+	private final Map<PokemonFamilyId, Integer> candies = new EnumMap<>(PokemonFamilyId.class);
 
-	public CandyJar(PokemonGo pgo) {
-		reset(pgo);
+	CandyJar(GetInventoryResponse getInventoryResponse) {
+		update(getInventoryResponse);
 	}
 
-	public void reset(PokemonGo pgo) {
-		this.pgo = pgo;
-		candies = new HashMap<>();
-	}
-
-	/**
-	 * Sets the number of candies in the jar.
-	 *
-	 * @param family  Pokemon family id
-	 * @param candies Amount to set it to
-	 */
-	public void setCandy(PokemonFamilyId family, int candies) {
-		this.candies.put(family, candies);
-	}
-
-	/**
-	 * Adds a candy to the candy jar.
-	 *
-	 * @param family Pokemon family id
-	 * @param amount Amount of candies to add
-	 */
-	public void addCandy(PokemonFamilyId family, int amount) {
-		if (candies.containsKey(family)) {
-			candies.put(family, candies.get(family) + amount);
-		} else {
-			candies.put(family, amount);
-		}
-	}
-
-	/**
-	 * Remove a candy from the candy jar.
-	 *
-	 * @param family Pokemon family id
-	 * @param amount Amount of candies to remove
-	 */
-	public void removeCandy(PokemonFamilyId family, int amount) {
-		if (candies.containsKey(family)) {
-			if (candies.get(family) - amount < 0) {
-				candies.put(family, 0);
-			} else {
-				candies.put(family, candies.get(family) - amount);
+	final void update(GetInventoryResponse getInventoryResponse) {
+		List<PokemonFamilyId> currentItems = new LinkedList<>();
+		for (InventoryItemOuterClass.InventoryItem inventoryItem : getInventoryResponse.getInventoryDelta().getInventoryItemsList()) {
+			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
+			if (itemData.getCandy().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED
+					&& itemData.getCandy().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_UNSET) {
+				candies.put(itemData.getCandy().getFamilyId(), itemData.getCandy().getCandy());
+				currentItems.add(itemData.getCandy().getFamilyId());
 			}
-		} else {
-			candies.put(family, 0);
+		}
+		for (PokemonFamilyId pokemonFamilyId : PokemonFamilyId.values()) {
+			if (currentItems.contains(pokemonFamilyId)) {
+				continue;
+			}
+			candies.put(pokemonFamilyId, 0);
 		}
 	}
 
@@ -86,10 +68,6 @@ public class CandyJar {
 	 * @return number of candies in jar
 	 */
 	public int getCandies(PokemonFamilyId family) {
-		if (candies.containsKey(family)) {
-			return this.candies.get(family);
-		} else {
-			return 0;
-		}
+		return candies.get(family);
 	}
 }

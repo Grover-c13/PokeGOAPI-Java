@@ -15,9 +15,21 @@
 
 package com.pokegoapi.api.pokemon;
 
+import POGOProtos.Networking.Requests.RequestOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass;
+import POGOProtos.Networking.Responses.NicknamePokemonResponseOuterClass;
+import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
+import POGOProtos.Networking.Responses.SetFavoritePokemonResponseOuterClass;
+import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass;
+import POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass;
+import POGOProtos.Networking.Responses.UseItemReviveResponseOuterClass;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.internal.networking.Networking;
+import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.map.pokemon.EvolutionResult;
 import com.pokegoapi.api.player.PlayerProfile;
@@ -52,6 +64,9 @@ import lombok.Setter;
 import rx.Observable;
 import rx.functions.Func1;
 
+import static POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass.UseItemPotionResponse.Result.ERROR_CANNOT_USE;
+import static com.pokegoapi.api.player.PlayerProfile.Currency.STARDUST;
+
 /**
  * The type Pokemon.
  */
@@ -61,15 +76,20 @@ public class Pokemon extends PokemonDetails {
 	@Getter
 	@Setter
 	private int stamina;
+	private final Networking networking;
+	private final Inventories inventories;
+	private final PlayerProfile playerProfile;
 
 	/**
 	 * Creates a Pokemon object with helper functions around the proto.
 	 *
-	 * @param api   the api to use
 	 * @param proto the proto from the server
 	 */
-	public Pokemon(PokemonGo api, PokemonData proto) {
-		super(api, proto);
+	public Pokemon(Networking networking, Inventories inventories, PlayerProfile playerProfile, PokemonData proto) {
+		super(proto, inventories);
+		this.networking = networking;
+		this.inventories = inventories;
+		this.playerProfile = playerProfile;
 		this.stamina = proto.getStamina();
 	}
 
@@ -77,62 +97,40 @@ public class Pokemon extends PokemonDetails {
 	 * Transfers the pokemon.
 	 *
 	 * @return the result
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
 	 */
-	public Result transferPokemon() throws LoginFailedException, RemoteServerException {
-		ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
-
-		ServerRequest serverRequest = new ServerRequest(RequestType.RELEASE_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-
-		ReleasePokemonResponse response;
-		try {
-			response = ReleasePokemonResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			return ReleasePokemonResponse.Result.FAILED;
-		}
-
-		if (response.getResult() == Result.SUCCESS) {
-			api.getInventories().getPokebank().removePokemon(this);
-		}
-
-		api.getInventories().getPokebank().removePokemon(this);
-
-		api.getInventories().updateInventories();
-
-		return response.getResult();
+	public Observable<ReleasePokemonResponse.Result> transferPokemon() {
+		return networking
+				.queueRequest(RequestTypeOuterClass.RequestType.RELEASE_POKEMON,
+						ReleasePokemonMessage
+								.newBuilder()
+								.setPokemonId(getId())
+								.build(),
+						ReleasePokemonResponse.class)
+				.map(new Func1<ReleasePokemonResponse, ReleasePokemonResponse.Result>() {
+					@Override
+					public ReleasePokemonResponse.Result call(ReleasePokemonResponse releasePokemonResponse) {
+						return releasePokemonResponse.getResult();
+					}
+				});
 	}
-
 	/**
 	 * Rename pokemon nickname pokemon response . result.
 	 *
 	 * @param nickname the nickname
 	 * @return the nickname pokemon response . result
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
 	 */
-	public NicknamePokemonResponse.Result renamePokemon(String nickname)
-			throws LoginFailedException, RemoteServerException {
-		NicknamePokemonMessage reqMsg = NicknamePokemonMessage.newBuilder()
-				.setPokemonId(getId())
-				.setNickname(nickname)
-				.build();
-
-		ServerRequest serverRequest = new ServerRequest(RequestType.NICKNAME_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-
-		NicknamePokemonResponse response;
-		try {
-			response = NicknamePokemonResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-
-		api.getInventories().getPokebank().removePokemon(this);
-		api.getInventories().updateInventories();
-
-		return response.getResult();
+	public Observable<NicknamePokemonResponse.Result> renamePokemon(final String nickname) {
+		return networking.queueRequest(RequestType.NICKNAME_POKEMON,
+				NicknamePokemonMessage
+						.newBuilder()
+					.setPokemonId(getId())
+					.setNickname(nickname)
+					.build(), NicknamePokemonResponse.class).map(new Func1<NicknamePokemonResponse, NicknamePokemonResponse.Result>() {
+			@Override
+			public NicknamePokemonResponse.Result call(NicknamePokemonResponse nicknamePokemonResponse) {
+				return nicknamePokemonResponse.getResult();
+			}
+		});
 	}
 
 	/**
@@ -143,27 +141,17 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 */
-	public SetFavoritePokemonResponse.Result setFavoritePokemon(boolean markFavorite)
-			throws LoginFailedException, RemoteServerException {
-		SetFavoritePokemonMessage reqMsg = SetFavoritePokemonMessage.newBuilder()
+	public Observable<SetFavoritePokemonResponse.Result> setFavoritePokemon(boolean markFavorite) {
+		return networking.queueRequest(RequestType.SET_FAVORITE_POKEMON,
+				SetFavoritePokemonMessage.newBuilder()
 				.setPokemonId(getId())
 				.setIsFavorite(markFavorite)
-				.build();
-
-		ServerRequest serverRequest = new ServerRequest(RequestType.SET_FAVORITE_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-
-		SetFavoritePokemonResponse response;
-		try {
-			response = SetFavoritePokemonResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-
-		api.getInventories().getPokebank().removePokemon(this);
-		api.getInventories().updateInventories();
-
-		return response.getResult();
+				.build(), SetFavoritePokemonResponse.class).map(new Func1<SetFavoritePokemonResponse, SetFavoritePokemonResponse.Result>() {
+			@Override
+			public SetFavoritePokemonResponse.Result call(SetFavoritePokemonResponse setFavoritePokemonResponse) {
+				return setFavoritePokemonResponse.getResult();
+			}
+		});
 	}
 
 	/**
@@ -174,8 +162,9 @@ public class Pokemon extends PokemonDetails {
 	 * @throws RemoteServerException the remote server exception
 	 */
 	public boolean canPowerUp() throws LoginFailedException, RemoteServerException {
-		return getCandy() >= getCandyCostsForPowerup() && api.getPlayerProfile()
-				.getCurrency(PlayerProfile.Currency.STARDUST) >= getStardustCostsForPowerup();
+
+		return getCandy() >= getCandyCostsForPowerup() &&
+				playerProfile.getCurrency(STARDUST) >= getStardustCostsForPowerup();
 	}
 
 	/**
@@ -190,8 +179,9 @@ public class Pokemon extends PokemonDetails {
 	 */
 	public boolean canPowerUp(boolean considerMaxCPLimitForPlayerLevel)
 			throws LoginFailedException, RemoteServerException, NoSuchItemException {
+		// TODO: Get player level
 		return considerMaxCPLimitForPlayerLevel
-				? this.canPowerUp() && (this.getCp() < this.getMaxCpForPlayer())
+				? this.canPowerUp() && (this.getCp() < this.getMaxCpForPlayer(0))
 				: canPowerUp();
 	}
 
@@ -211,34 +201,16 @@ public class Pokemon extends PokemonDetails {
 	 * After powering up this pokemon object will reflect the new changes.
 	 *
 	 * @return The result
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	public UpgradePokemonResponse.Result powerUp() throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(powerUpAsync());
-	}
-
-	/**
-	 * Powers up a pokemon with candy and stardust.
-	 * After powering up this pokemon object will reflect the new changes.
-	 *
-	 * @return The result
 	 */
 	public Observable<UpgradePokemonResponse.Result> powerUpAsync() {
-		UpgradePokemonMessage reqMsg = UpgradePokemonMessage.newBuilder().setPokemonId(getId()).build();
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.UPGRADE_POKEMON, reqMsg);
-
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
-				new Func1<ByteString, UpgradePokemonResponse.Result>() {
+		return networking.queueRequest(RequestType.UPGRADE_POKEMON,
+				UpgradePokemonMessage
+						.newBuilder()
+						.setPokemonId(getId())
+						.build(), UpgradePokemonResponse.class)
+				.map(new Func1<UpgradePokemonResponse, UpgradePokemonResponse.Result>() {
 					@Override
-					public UpgradePokemonResponse.Result call(ByteString result) {
-						UpgradePokemonResponse response;
-						try {
-							response = UpgradePokemonResponse.parseFrom(result);
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
-						}
-						//set new pokemon details
+					public UpgradePokemonResponse.Result call(UpgradePokemonResponse response) {
 						setProto(response.getUpgradedPokemon());
 						return response.getResult();
 					}
@@ -250,29 +222,21 @@ public class Pokemon extends PokemonDetails {
 	 * Evolve evolution result.
 	 *
 	 * @return the evolution result
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
 	 */
-	public EvolutionResult evolve() throws LoginFailedException, RemoteServerException {
-		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
-
-		ServerRequest serverRequest = new ServerRequest(RequestType.EVOLVE_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-
-		EvolvePokemonResponse response;
-		try {
-			response = EvolvePokemonResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			return null;
-		}
-
-		EvolutionResult result = new EvolutionResult(api, response);
-
-		api.getInventories().getPokebank().removePokemon(this);
-
-		api.getInventories().updateInventories();
-
-		return result;
+	public Observable<EvolutionResult> evolve() {
+		return networking.queueRequest(RequestType.EVOLVE_POKEMON,
+		EvolvePokemonMessage
+				.newBuilder()
+				.setPokemonId(getId())
+				.build(),
+				EvolvePokemonResponse.class)
+				.map(new Func1<EvolvePokemonResponse, EvolutionResult>() {
+					@Override
+					public EvolutionResult call(EvolvePokemonResponse response) {
+						setProto(response.getEvolvedPokemonData());
+						return new EvolutionResult(networking, response);
+					}
+				});
 	}
 
 	/**
@@ -300,25 +264,25 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communication issues occurred.
 	 */
-	public UseItemPotionResponse.Result heal()
+	public Observable<UseItemPotionResponse.Result> heal()
 			throws LoginFailedException, RemoteServerException {
 
 		if (!isInjured())
-			return UseItemPotionResponse.Result.ERROR_CANNOT_USE;
+			return Observable.just(ERROR_CANNOT_USE);
 
-		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_POTION).getCount() > 0)
+		if (inventories.getItemBag().getItem(ItemId.ITEM_POTION).getCount() > 0)
 			return usePotion(ItemId.ITEM_POTION);
 
-		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_SUPER_POTION).getCount() > 0)
+		if (inventories.getItemBag().getItem(ItemId.ITEM_SUPER_POTION).getCount() > 0)
 			return usePotion(ItemId.ITEM_SUPER_POTION);
 
-		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_HYPER_POTION).getCount() > 0)
+		if (inventories.getItemBag().getItem(ItemId.ITEM_HYPER_POTION).getCount() > 0)
 			return usePotion(ItemId.ITEM_HYPER_POTION);
 
-		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_MAX_POTION).getCount() > 0)
+		if (inventories.getItemBag().getItem(ItemId.ITEM_MAX_POTION).getCount() > 0)
 			return usePotion(ItemId.ITEM_MAX_POTION);
 
-		return UseItemPotionResponse.Result.ERROR_CANNOT_USE;
+		return Observable.just(ERROR_CANNOT_USE);
 	}
 
 	/**
@@ -330,33 +294,26 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communications failed.
 	 */
-	public UseItemPotionResponse.Result usePotion(ItemId itemId)
-			throws LoginFailedException, RemoteServerException {
+	public Observable<UseItemPotionResponse.Result> usePotion(ItemId itemId) {
 
-		Item potion = api.getInventories().getItemBag().getItem(itemId);
+		Item potion = inventories.getItemBag().getItem(itemId);
 		//some sanity check, to prevent wrong use of this call
-		if (!potion.isPotion() || potion.getCount() < 1 || !isInjured())
-			return UseItemPotionResponse.Result.ERROR_CANNOT_USE;
-
-		UseItemPotionMessageOuterClass.UseItemPotionMessage reqMsg = UseItemPotionMessageOuterClass.UseItemPotionMessage
+		if (!potion.isPotion() || potion.getCount() < 1 || !isInjured()) {
+			return Observable.just(ERROR_CANNOT_USE);
+		}
+		return networking.queueRequest(RequestType.USE_ITEM_POTION, UseItemPotionMessageOuterClass.UseItemPotionMessage
 				.newBuilder()
 				.setItemId(itemId)
 				.setPokemonId(getId())
-				.build();
-
-		ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_POTION, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-
-		UseItemPotionResponse response;
-		try {
-			response = UseItemPotionResponse.parseFrom(serverRequest.getData());
-			if (response.getResult() == UseItemPotionResponse.Result.SUCCESS) {
-				setStamina(response.getStamina());
+				.build(), UseItemPotionResponse.class).map(new Func1<UseItemPotionResponse, UseItemPotionResponse.Result>() {
+			@Override
+			public UseItemPotionResponse.Result call(UseItemPotionResponse response) {
+				if (response.getResult() == UseItemPotionResponse.Result.SUCCESS) {
+					setStamina(response.getStamina());
+				}
+				return response.getResult();
 			}
-			return response.getResult();
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+		});
 	}
 
 	/**
@@ -366,19 +323,19 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communications failed.
 	 */
-	public UseItemReviveResponse.Result revive()
+	public Observable<UseItemReviveResponse.Result> revive()
 			throws LoginFailedException, RemoteServerException {
 
 		if (!isFainted())
-			return UseItemReviveResponse.Result.ERROR_CANNOT_USE;
+			return Observable.just(UseItemReviveResponse.Result.ERROR_CANNOT_USE);
 
-		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_REVIVE).getCount() > 0)
+		if (inventories.getItemBag().getItem(ItemId.ITEM_REVIVE).getCount() > 0)
 			return useRevive(ItemId.ITEM_REVIVE);
 
-		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_MAX_REVIVE).getCount() > 0)
+		if (inventories.getItemBag().getItem(ItemId.ITEM_MAX_REVIVE).getCount() > 0)
 			return useRevive(ItemId.ITEM_MAX_REVIVE);
 
-		return UseItemReviveResponse.Result.ERROR_CANNOT_USE;
+		return Observable.just(UseItemReviveResponse.Result.ERROR_CANNOT_USE);
 	}
 
 	/**
@@ -390,32 +347,26 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communications failed.
 	 */
-	public UseItemReviveResponse.Result useRevive(ItemId itemId)
+	public Observable<UseItemReviveResponse.Result> useRevive(ItemId itemId)
 			throws LoginFailedException, RemoteServerException {
 
-		Item item = api.getInventories().getItemBag().getItem(itemId);
+		Item item = inventories.getItemBag().getItem(itemId);
 		if (!item.isRevive() || item.getCount() < 1 || !isFainted())
-			return UseItemReviveResponse.Result.ERROR_CANNOT_USE;
+			return Observable.just(UseItemReviveResponse.Result.ERROR_CANNOT_USE);
 
-		UseItemReviveMessageOuterClass.UseItemReviveMessage reqMsg = UseItemReviveMessageOuterClass.UseItemReviveMessage
+		return networking.queueRequest(RequestType.USE_ITEM_REVIVE, UseItemReviveMessageOuterClass.UseItemReviveMessage
 				.newBuilder()
 				.setItemId(itemId)
 				.setPokemonId(getId())
-				.build();
-
-		ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_REVIVE, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-
-		UseItemReviveResponse response;
-		try {
-			response = UseItemReviveResponse.parseFrom(serverRequest.getData());
-			if (response.getResult() == UseItemReviveResponse.Result.SUCCESS) {
-				setStamina(response.getStamina());
+				.build(), UseItemReviveResponse.class).map(new Func1<UseItemReviveResponse, UseItemReviveResponse.Result>() {
+			@Override
+			public UseItemReviveResponse.Result call(UseItemReviveResponse response) {
+				if (response.getResult() == UseItemReviveResponse.Result.SUCCESS) {
+					setStamina(response.getStamina());
+				}
+				return response.getResult();
 			}
-			return response.getResult();
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+		});
 	}
 
 	public EvolutionForm getEvolutionForm() {
@@ -434,13 +385,10 @@ public class Pokemon extends PokemonDetails {
 	 * at the actual player level (useful in ProgressBars)
 	 *
 	 * @return Actual cp in percentage
-	 * @throws NoSuchItemException   if threw from {@link #getMaxCpForPlayer()}
-	 * @throws LoginFailedException  if threw from {@link #getMaxCpForPlayer()}
-	 * @throws RemoteServerException if threw from {@link #getMaxCpForPlayer()}
 	 */
-	public int getCPInPercentageActualPlayerLevel()
-			throws NoSuchItemException, LoginFailedException, RemoteServerException {
-		return ((getCp() * 100) / getMaxCpForPlayer());
+	public int getCPInPercentageActualPlayerLevel()  {
+		// TODO: Get player level
+		return ((getCp() * 100) / getMaxCpForPlayer(0));
 	}
 
 	/**

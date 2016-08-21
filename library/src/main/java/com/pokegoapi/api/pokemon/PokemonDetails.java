@@ -1,6 +1,7 @@
 package com.pokegoapi.api.pokemon;
 
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -22,19 +23,21 @@ import static java.util.Arrays.asList;
 
 public class PokemonDetails {
 	private static final String TAG = Pokemon.class.getSimpleName();
-	protected PokemonGo api;
 	@Getter
 	@Setter
 	private PokemonData proto;
-	private PokemonMeta meta;
+	@Getter
+	private final PokemonMeta meta;
+	private final Inventories inventories;
 
-	public PokemonDetails(PokemonGo api, PokemonData proto) {
-		this.api = api;
+	public PokemonDetails(PokemonData proto, Inventories inventories) {
 		this.proto = proto;
+		this.meta = PokemonMetaRegistry.getMeta(this.getPokemonId());
+		this.inventories = inventories;
 	}
 
 	public int getCandy() throws LoginFailedException, RemoteServerException {
-		return api.getInventories().getCandyjar().getCandies(getPokemonFamily());
+		return inventories.getCandyjar().getCandies(getPokemonFamily());
 	}
 
 	public PokemonFamilyIdOuterClass.PokemonFamilyId getPokemonFamily() {
@@ -205,19 +208,6 @@ public class PokemonDetails {
 	}
 
 	/**
-	 * Get the meta info for a pokemon.
-	 *
-	 * @return PokemonMeta
-	 */
-	public PokemonMeta getMeta() {
-		if (meta == null) {
-			meta = PokemonMetaRegistry.getMeta(this.getPokemonId());
-		}
-
-		return meta;
-	}
-
-	/**
 	 * Calculate the maximum CP for this individual pokemon when the player is at level 40
 	 *
 	 * @return The maximum CP for this pokemon
@@ -242,7 +232,7 @@ public class PokemonDetails {
 	 * @throws LoginFailedException  If login failed
 	 * @throws RemoteServerException If the server is causing issues
 	 */
-	public int getMaxCpForPlayer() throws NoSuchItemException, LoginFailedException, RemoteServerException {
+	public int getMaxCpForPlayer(int playerLevel) throws NoSuchItemException, LoginFailedException, RemoteServerException {
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
 		if (pokemonMeta == null) {
 			throw new NoSuchItemException("Cannot find meta data for " + proto.getPokemonId().name());
@@ -250,7 +240,6 @@ public class PokemonDetails {
 		int attack = getIndividualAttack() + pokemonMeta.getBaseAttack();
 		int defense = getIndividualDefense() + pokemonMeta.getBaseDefense();
 		int stamina = getIndividualStamina() + pokemonMeta.getBaseStamina();
-		int playerLevel = api.getPlayerProfile().getStats().getLevel();
 		return PokemonCpUtils.getMaxCpForPlayer(attack, defense, stamina, playerLevel);
 	}
 
@@ -282,8 +271,8 @@ public class PokemonDetails {
 	 * @throws LoginFailedException  If login failed
 	 * @throws RemoteServerException If the server is causing issues
 	 */
-	public int getMaxCpFullEvolveAndPowerupForPlayer() throws LoginFailedException, RemoteServerException {
-		return getMaxCpFullEvolveAndPowerup(api.getPlayerProfile().getStats().getLevel());
+	public int getMaxCpFullEvolveAndPowerupForPlayer(int playerLevel) throws LoginFailedException, RemoteServerException {
+		return getMaxCpFullEvolveAndPowerup(playerLevel);
 	}
 
 	/**

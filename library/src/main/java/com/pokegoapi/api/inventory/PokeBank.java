@@ -17,49 +17,71 @@ package com.pokegoapi.api.inventory;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
 
+import POGOProtos.Inventory.InventoryItemDataOuterClass;
+import POGOProtos.Inventory.InventoryItemDataOuterClass.InventoryItemData;
+import POGOProtos.Inventory.InventoryItemOuterClass;
+import POGOProtos.Inventory.InventoryItemOuterClass.InventoryItem;
+import POGOProtos.Inventory.Item.ItemDataOuterClass;
+import POGOProtos.Inventory.Item.ItemIdOuterClass;
+import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
+import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
+import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.annimon.stream.function.Function;
 import com.annimon.stream.function.Predicate;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.internal.networking.Networking;
+import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.api.pokemon.Pokemon;
 
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
+import rx.Observable;
+import rx.functions.Func1;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class PokeBank {
-	@Getter
-	List<Pokemon> pokemons = Collections.synchronizedList(new ArrayList<Pokemon>());
-	@Getter
-	PokemonGo instance;
+	private final Networking networking;
+	private final Inventories inventories;
+	private final PlayerProfile playerProfile;
+	private final Map<Long, Pokemon> pokemons = new ConcurrentHashMap<>();
 
-	public PokeBank(PokemonGo pgo) {
-		reset(pgo);
+	public PokeBank(GetInventoryResponse getInventoryResponse, Inventories inventories, Networking networking, PlayerProfile playerProfile) {
+		this.networking = networking;
+		this.inventories = inventories;
+		this.playerProfile = playerProfile;
+		update(getInventoryResponse);
 	}
 
-	public void reset(PokemonGo pgo) {
-		this.instance = pgo;
-		pokemons = new ArrayList<>();
-	}
-
-	/**
-	 * Add a pokemon to the pokebank inventory.  Will not add duplicates (pokemon with same id).
-	 *
-	 * @param pokemon Pokemon to add to the inventory
-	 */
-	public void addPokemon(final Pokemon pokemon) {
-		List<Pokemon> alreadyAdded = Stream.of(pokemons).filter(new Predicate<Pokemon>() {
-			@Override
-			public boolean test(Pokemon testPokemon) {
-				return pokemon.getId() == testPokemon.getId();
+	final void update(GetInventoryResponse getInventoryResponse) {
+		List<Long> currentItems = new LinkedList<>();
+		for (InventoryItem inventoryItem : getInventoryResponse.getInventoryDelta().getInventoryItemsList()) {
+			InventoryItemData itemData = inventoryItem.getInventoryItemData();
+			if (itemData.getPokemonData().getPokemonId() != PokemonIdOuterClass.PokemonId.MISSINGNO) {
+				Pokemon pokemon = new Pokemon(networking, inventories, playerProfile, inventoryItem.getInventoryItemData().getPokemonData());
+				pokemons.put(pokemon.getId(), pokemon);
+				currentItems.add(pokemon.getId());
 			}
-		}).collect(Collectors.<Pokemon>toList());
-		if (alreadyAdded.size() < 1) {
-			pokemons.add(pokemon);
 		}
+		pokemons.keySet().retainAll(currentItems);
 	}
 
 	/**
@@ -69,24 +91,10 @@ public class PokeBank {
 	 * @return the pokemon by pokemon id
 	 */
 	public List<Pokemon> getPokemonByPokemonId(final PokemonIdOuterClass.PokemonId id) {
-		return Stream.of(pokemons).filter(new Predicate<Pokemon>() {
+		return Stream.of(pokemons.values()).filter(new Predicate<Pokemon>() {
 			@Override
 			public boolean test(Pokemon pokemon) {
 				return pokemon.getPokemonId().equals(id);
-			}
-		}).collect(Collectors.<Pokemon>toList());
-	}
-
-	/**
-	 * Remove pokemon.
-	 *
-	 * @param pokemon the pokemon
-	 */
-	public void removePokemon(final Pokemon pokemon) {
-		pokemons = Stream.of(pokemons).filter(new Predicate<Pokemon>() {
-			@Override
-			public boolean test(Pokemon pokemn) {
-				return pokemn.getId() != pokemon.getId();
 			}
 		}).collect(Collectors.<Pokemon>toList());
 	}
@@ -97,12 +105,8 @@ public class PokeBank {
 	 * @param id the id
 	 * @return the pokemon
 	 */
-	public Pokemon getPokemonById(final Long id) {
-		for (Pokemon pokemon : pokemons) {
-			if (pokemon.getId() == id) {
-				return pokemon;
-			}
-		}
-		return null;
+	public Pokemon getPokemonById(final long id) {
+		return pokemons.get(id);
 	}
+
 }

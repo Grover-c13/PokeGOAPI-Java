@@ -24,13 +24,14 @@ import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.pokemon.PokemonDetails;
 
 public class NormalEncounterResult extends PokemonDetails implements EncounterResult {
 	private EncounterResponse response;
 
-	public NormalEncounterResult(PokemonGo api, EncounterResponse response) {
-		super(api, response.getWildPokemon().getPokemonData());
+	public NormalEncounterResult(EncounterResponse response, Inventories inventories) {
+		super(response.getWildPokemon().getPokemonData(), inventories);
 		this.response = response;
 	}
 

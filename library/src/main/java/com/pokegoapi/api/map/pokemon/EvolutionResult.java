@@ -18,6 +18,9 @@ package com.pokegoapi.api.map.pokemon;
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass;
 
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.internal.networking.Networking;
+import com.pokegoapi.api.inventory.Inventories;
+import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.api.pokemon.Pokemon;
 
 public class EvolutionResult {
@@ -28,12 +31,13 @@ public class EvolutionResult {
 	/**
 	 * The evolution result.
 	 *
-	 * @param api   PokemonGo api
-	 * @param proto Pokemon proto
+	 * @param networking Networking
+	 * @param proto      Pokemon proto
 	 */
-	public EvolutionResult(PokemonGo api, EvolvePokemonResponseOuterClass.EvolvePokemonResponse proto) {
+	public EvolutionResult(Networking networking, Inventories inventories, PlayerProfile playerProfile,
+						   EvolvePokemonResponseOuterClass.EvolvePokemonResponse proto) {
 		this.proto = proto;
-		this.pokemon = new Pokemon(api, proto.getEvolvedPokemonData());
+		this.pokemon = new Pokemon(networking, inventories, playerProfile, proto.getEvolvedPokemonData());
 	}
 
 	public EvolvePokemonResponseOuterClass.EvolvePokemonResponse.Result getResult() {

@@ -15,73 +15,71 @@
 
 package com.pokegoapi.api.inventory;
 
-import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Enums.PokemonIdOuterClass;
+import POGOProtos.Inventory.InventoryItemDataOuterClass;
+import POGOProtos.Inventory.InventoryItemOuterClass;
 import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
-
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.api.pokemon.HatchedEgg;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
+import lombok.Setter;
 
-import lombok.Getter;
-
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 
 public class Hatchery {
-	@Getter
-	Set<EggPokemon> eggs = new HashSet<EggPokemon>();
-	@Getter
-	PokemonGo api;
+	private final Map<Long, EggPokemon> eggMap = new ConcurrentHashMap<>();
+	private final Inventories inventories;
+	private final ExecutorService executorService;
+	@Setter
+	private Callback callback;
 
-	public Hatchery(PokemonGo pgo) {
-		reset(pgo);
+	Hatchery(GetInventoryResponse getInventoryResponse, Inventories inventories, ExecutorService executorService) {
+		update(getInventoryResponse);
+		this.executorService = executorService;
+		this.inventories = inventories;
 	}
 
-	public void reset(PokemonGo api) {
-		this.api = api;
-		eggs = new HashSet<>();
-	}
-
-	public void addEgg(EggPokemon egg) {
-		egg.setApi(api);
-		eggs.add(egg);
-	}
-
-
-	/**
-	 * Get if eggs has hatched.
-	 *
-	 * @return list of hatched eggs
-	 * @throws RemoteServerException e
-	 * @throws LoginFailedException  e
-	 */
-	public List<HatchedEgg> queryHatchedEggs() throws RemoteServerException, LoginFailedException {
-		GetHatchedEggsMessage msg = GetHatchedEggsMessage.newBuilder().build();
-		ServerRequest serverRequest = new ServerRequest(RequestType.GET_HATCHED_EGGS, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-
-		GetHatchedEggsResponse response = null;
-		try {
-			response = GetHatchedEggsResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+	final void update(GetInventoryResponse getInventoryResponse) {
+		List<Long> currentItems = new LinkedList<>();
+		for (InventoryItemOuterClass.InventoryItem inventoryItem : getInventoryResponse.getInventoryDelta().getInventoryItemsList()) {
+			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
+			if (itemData.getPokemonData().getPokemonId() == PokemonIdOuterClass.PokemonId.MISSINGNO && itemData.getPokemonData().getIsEgg()) {
+				eggMap.put(itemData.getPokemonData().getId(), new EggPokemon(itemData.getPokemonData(), inventories));
+				currentItems.add(itemData.getPokemonData().getId());
+			}
 		}
-		api.getInventories().updateInventories();
-		List<HatchedEgg> eggs = new ArrayList<HatchedEgg>();
+		eggMap.keySet().retainAll(currentItems);
+	}
+
+	final void update(GetHatchedEggsResponse response) {
+		if (callback == null) {
+			return;
+		}
 		for (int i = 0; i < response.getPokemonIdCount(); i++) {
-			eggs.add(new HatchedEgg(response.getPokemonId(i),
+			final HatchedEgg hatchedEgg = new HatchedEgg(response.getPokemonId(i),
 					response.getExperienceAwarded(i),
 					response.getCandyAwarded(i),
-					response.getStardustAwarded(i)));
+					response.getStardustAwarded(i));
+			executorService.submit(new Runnable() {
+				@Override
+				public void run() {
+					callback.hatchedEgg(hatchedEgg);
+				}
+			});
 		}
-		return eggs;
+	}
+
+	Collection<EggPokemon> getEggs() {
+		return eggMap.values();
+	}
+
+	public interface Callback {
+		void hatchedEgg(HatchedEgg hatchedEgg);
 	}
 
 }

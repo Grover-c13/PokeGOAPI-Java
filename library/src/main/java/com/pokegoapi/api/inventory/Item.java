@@ -62,4 +62,8 @@ public class Item {
 				|| getItemId() == ItemId.ITEM_MAX_REVIVE
 				;
 	}
+
+	void decrease() {
+		count -= 1;
+	}
 }

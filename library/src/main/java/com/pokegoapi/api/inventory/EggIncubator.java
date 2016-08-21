@@ -19,28 +19,35 @@ import POGOProtos.Inventory.EggIncubatorOuterClass;
 import POGOProtos.Inventory.EggIncubatorTypeOuterClass.EggIncubatorType;
 import POGOProtos.Networking.Requests.Messages.UseItemEggIncubatorMessageOuterClass.UseItemEggIncubatorMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.internal.networking.Networking;
+import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
+import rx.Observable;
+import rx.functions.Func1;
 
 public class EggIncubator {
+	private final Networking networking;
+	private final Inventories inventories;
 	private final EggIncubatorOuterClass.EggIncubator proto;
-	private final PokemonGo pgo;
 
 	/**
 	 * Create new EggIncubator with given proto.
 	 *
-	 * @param pgo   the api
 	 * @param proto the proto
 	 */
-	public EggIncubator(PokemonGo pgo, EggIncubatorOuterClass.EggIncubator proto) {
-		this.pgo = pgo;
+	EggIncubator(Networking networking, Inventories inventories, EggIncubatorOuterClass.EggIncubator proto) {
 		this.proto = proto;
+		this.networking = networking;
+		this.inventories = inventories;
 	}
 
 	/**
@@ -60,27 +67,19 @@ public class EggIncubator {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
-	public UseItemEggIncubatorResponse.Result hatchEgg(EggPokemon egg)
-			throws LoginFailedException, RemoteServerException {
-
-		UseItemEggIncubatorMessage reqMsg = UseItemEggIncubatorMessage.newBuilder()
-				.setItemId(proto.getId())
-				.setPokemonId(egg.getId())
-				.build();
-
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR, reqMsg);
-		pgo.getRequestHandler().sendServerRequests(serverRequest);
-
-		UseItemEggIncubatorResponse response;
-		try {
-			response = UseItemEggIncubatorResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-
-		pgo.getInventories().updateInventories(true);
-
-		return response.getResult();
+	public Observable<UseItemEggIncubatorResponse.Result> hatchEgg(EggPokemon egg) {
+		return networking.queueRequest(RequestType.USE_ITEM_EGG_INCUBATOR,
+				UseItemEggIncubatorMessage.
+						newBuilder()
+						.setItemId(proto.getId())
+						.setPokemonId(egg.getId())
+						.build(),
+				UseItemEggIncubatorResponse.class).map(new Func1<UseItemEggIncubatorResponse, UseItemEggIncubatorResponse.Result>() {
+			@Override
+			public UseItemEggIncubatorResponse.Result call(UseItemEggIncubatorResponse response) {
+				return response.getResult();
+			}
+		});
 	}
 
 	/**
@@ -142,32 +141,26 @@ public class EggIncubator {
 	 * Get the distance walked with the current incubated egg.
 	 *
 	 * @return distance walked with the current incubated egg (km)
-	 * @throws LoginFailedException  if there is an error with the token during retrieval of player stats
-	 * @throws RemoteServerException if the server responds badly during retrieval of player stats
 	 */
-	public double getKmCurrentlyWalked() throws LoginFailedException, RemoteServerException {
-		return pgo.getPlayerProfile().getStats().getKmWalked() - getKmStart();
+	public double getKmCurrentlyWalked() {
+		return inventories.getStats().getKmWalked() - getKmStart();
 	}
 
 	/**
 	 * Get the distance left to walk before this incubated egg will hatch.
 	 *
 	 * @return distance to walk before hatch (km)
-	 * @throws LoginFailedException  if there is an error with the token during retrieval of player stats
-	 * @throws RemoteServerException if the server responds badly during retrieval of player stats
 	 */
 	public double getKmLeftToWalk() throws LoginFailedException, RemoteServerException {
-		return getKmTarget() - pgo.getPlayerProfile().getStats().getKmWalked();
+		return getKmTarget() - inventories.getStats().getKmWalked();
 	}
 
 	/**
 	 * Is the incubator currently being used
 	 *
 	 * @return currently used or not
-	 * @throws LoginFailedException  if there is an error with the token during retrieval of player stats
-	 * @throws RemoteServerException if the server responds badly during retrieval of player stats
 	 */
 	public boolean isInUse() throws LoginFailedException, RemoteServerException {
-		return getKmTarget() > pgo.getPlayerProfile().getStats().getKmWalked();
+		return getKmTarget() > inventories.getStats().getKmWalked();
 	}
 }

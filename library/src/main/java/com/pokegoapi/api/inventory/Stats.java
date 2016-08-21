@@ -16,16 +16,31 @@
 package com.pokegoapi.api.inventory;
 
 import POGOProtos.Data.Player.PlayerStatsOuterClass;
+import POGOProtos.Data.Player.PlayerStatsOuterClass.PlayerStats;
+import POGOProtos.Inventory.InventoryItemDataOuterClass;
+import POGOProtos.Inventory.InventoryItemOuterClass;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
 import lombok.Getter;
 
 public class Stats {
 	@Getter
-	private PlayerStatsOuterClass.PlayerStats proto;
+	private PlayerStats proto;
 
-	public Stats(PlayerStatsOuterClass.PlayerStats proto) {
-		this.proto = proto;
+	Stats(GetInventoryResponseOuterClass.GetInventoryResponse getInventoryResponse) {
+		update(getInventoryResponse);
 	}
 
+	final void update(GetInventoryResponseOuterClass.GetInventoryResponse getInventoryResponse) {
+		for (InventoryItemOuterClass.InventoryItem inventoryItem
+				: getInventoryResponse.getInventoryDelta().getInventoryItemsList()) {
+			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
+
+			// player stats
+			if (itemData.hasPlayerStats()) {
+				proto = itemData.getPlayerStats();
+			}
+		}
+	}
 	public int getLevel() {
 		return proto.getLevel();
 	}

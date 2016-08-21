@@ -16,35 +16,33 @@
 package com.pokegoapi.api.inventory;
 
 import POGOProtos.Data.PokedexEntryOuterClass.PokedexEntry;
+import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 
+import POGOProtos.Inventory.InventoryItemDataOuterClass;
+import POGOProtos.Inventory.InventoryItemOuterClass;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
 import com.pokegoapi.api.PokemonGo;
 
 import java.util.EnumMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class Pokedex {
-
-	private PokemonGo api;
 	private Map<PokemonId, PokedexEntry> pokedexMap = new EnumMap<>(PokemonId.class);
 
-	public Pokedex(PokemonGo pgo) {
-		reset(pgo);
+	public Pokedex(GetInventoryResponseOuterClass.GetInventoryResponse getInventoryResponse) {
+		update(getInventoryResponse);
 	}
 
-	public void reset(PokemonGo pgo) {
-		this.api = pgo;
-		pokedexMap = new EnumMap<PokemonId, PokedexEntry>(PokemonId.class);
-	}
-
-	/**
-	 * Add/Update a PokdexEntry.
-	 *
-	 * @param entry The entry to add or update
-	 */
-	public void add(PokedexEntry entry) {
-		PokemonId id = PokemonId.forNumber(entry.getPokemonId().getNumber());
-		pokedexMap.put(id, entry);
+	public final void update(GetInventoryResponseOuterClass.GetInventoryResponse getInventoryResponse) {
+		for (InventoryItemOuterClass.InventoryItem inventoryItem : getInventoryResponse.getInventoryDelta().getInventoryItemsList()) {
+			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
+			if (itemData.hasPokedexEntry()) {
+				pokedexMap.put(itemData.getPokedexEntry().getPokemonId(), itemData.getPokedexEntry());
+			}
+		}
 	}
 
 	/**

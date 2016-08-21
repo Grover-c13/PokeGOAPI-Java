@@ -21,11 +21,15 @@ import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.Use
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.internal.networking.Networking;
 import com.pokegoapi.api.inventory.EggIncubator;
+import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 
 import lombok.Setter;
+import rx.Observable;
+import sun.nio.ch.Net;
 
 /**
  * The egg pokemon.
@@ -33,11 +37,13 @@ import lombok.Setter;
 public class EggPokemon {
 
 	private static final String TAG = EggPokemon.class.getSimpleName();
-	@Setter
-	PokemonGo api;
-	private PokemonData proto;
+	private final PokemonData proto;
+	private final Inventories inventories;
 
-	// API METHODS //
+	public EggPokemon(PokemonData proto, Inventories inventories) {
+		this.proto = proto;
+		this.inventories = inventories;
+	}
 
 	/**
 	 * Incubate this egg.
@@ -47,8 +53,7 @@ public class EggPokemon {
 	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 */
-	public UseItemEggIncubatorResponse.Result incubate(EggIncubator incubator)
-			throws LoginFailedException, RemoteServerException {
+	public Observable<UseItemEggIncubatorResponse.Result> incubate(EggIncubator incubator) {
 		if (incubator.isInUse()) {
 			throw new IllegalArgumentException("Incubator already used");
 		}
@@ -65,7 +70,8 @@ public class EggPokemon {
 	public double getEggKmWalked() throws LoginFailedException, RemoteServerException {
 		if (!isIncubate())
 			return 0;
-		EggIncubator incubator = Stream.of(api.getInventories().getIncubators())
+
+		EggIncubator incubator = Stream.of(inventories.getIncubators())
 				.filter(new Predicate<EggIncubator>() {
 					@Override
 					public boolean test(EggIncubator incub) {
@@ -73,25 +79,12 @@ public class EggPokemon {
 					}
 				}).findFirst().orElse(null);
 		// incubator should not be null but why not eh
-		if (incubator == null)
+		if (incubator == null) {
 			return 0;
+		}
 		else
 			return proto.getEggKmWalkedTarget()
-					- (incubator.getKmTarget() - api.getPlayerProfile().getStats().getKmWalked());
-	}
-
-	// DELEGATE METHODS BELOW //
-
-	/**
-	 * Build a EggPokemon wrapper from the proto.
-	 *
-	 * @param proto : the prototype
-	 */
-	public EggPokemon(PokemonData proto) {
-		if (!proto.getIsEgg()) {
-			throw new IllegalArgumentException("You cant build a EggPokemon without a valid PokemonData.");
-		}
-		this.proto = proto;
+					- (incubator.getKmTarget() - inventories.getStats().getKmWalked());
 	}
 
 	public long getId() {

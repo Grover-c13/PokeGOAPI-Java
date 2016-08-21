@@ -10,7 +10,6 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 
-import POGOProtos.Settings.GpsSettingsOuterClass;
 import lombok.Getter;
 
 /**
