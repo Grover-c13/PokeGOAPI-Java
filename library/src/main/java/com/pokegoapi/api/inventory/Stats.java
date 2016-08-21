@@ -16,39 +16,52 @@
 package com.pokegoapi.api.inventory;
 
 import POGOProtos.Data.Player.PlayerStatsOuterClass;
-import lombok.Getter;
 
+/**
+ * Stats class
+ *
+ * @deprecated Please use {@link com.pokegoapi.api.player.Stats} instead.
+ */
+@Deprecated
 public class Stats {
-	@Getter
+
+	@Deprecated
 	private PlayerStatsOuterClass.PlayerStats proto;
 
+	/**
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#Stats(POGOProtos.Data.Player.PlayerStatsOuterClass.PlayerStats)}
+	 *             instead.
+	 */
+	@Deprecated
 	public Stats(PlayerStatsOuterClass.PlayerStats proto) {
 		this.proto = proto;
 	}
 
 	/**
-	 * Get the current level of the player.
-	 *
-	 * @return Current level of the player.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getCurrentPlayerLevel()}
+	 *             instead.
 	 */
+	@Deprecated
 	public int getLevel() {
 		return proto.getLevel();
 	}
 
 	/**
-	 * Get the current total amount of experience earned.
-	 *
-	 * @return Current total amount of experience earned.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getTotalExperienceEarned()}
+	 *             instead.
 	 */
+	@Deprecated
 	public long getExperience() {
 		return proto.getExperience();
 	}
 
 	/**
-	 * Get the total experience required to reach the previous level.
-	 *
-	 * @deprecated use {@link #getTotExpToReachPreviousLevel()} instead.
-	 * @return Total experience required to reach the previous level.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getTotExpToReachPreviousLevel()}
+	 *             instead.
 	 */
 	@Deprecated
 	public long getPrevLevelXp() {
@@ -56,28 +69,9 @@ public class Stats {
 	}
 
 	/**
-	 * Get the total experience required to reach the previous level.
-	 *
-	 * @return Total experience required to reach the previous level.
-	 */
-	public int getTotExpToReachPreviousLevel() {
-		return LevelToExpUtils.getTotExpToReachPrevLevelOf(proto.getLevel());
-	}
-
-	/**
-	 * Get the total experience required to reach the current level.
-	 *
-	 * @return Total experience required to reach the current level.
-	 */
-	public int getTotExpToReachCurrentLevel() {
-		return LevelToExpUtils.getTotExpToReachLevel(proto.getLevel());
-	}
-
-	/**
-	 * Get the total experience required to reach the next level.
-	 *
-	 * @deprecated use {@link #getTotExpToReachNextLevel()} instead.
-	 * @return Total experience required to reach the next level.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getTotExpToReachNextLevel()}
+	 *             instead.
 	 */
 	@Deprecated
 	public long getNextLevelXp() {
@@ -85,219 +79,180 @@ public class Stats {
 	}
 
 	/**
-	 * Get the total experience required to reach the next level.
-	 *
-	 * @return Total experience required to reach the next level.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getKmWalked()} instead.
 	 */
-	public int getTotExpToReachNextLevel() {
-		return LevelToExpUtils.getTotExpToReachNextLevelOf(proto.getLevel());
-	}
-
-	/**
-	 * Get the experience interval from current level to next level.
-	 *
-	 * @return Experience interval from current level to next.
-	 */
-	public int getExpIntervalFromCurrentLevelToNext() {
-		return LevelToExpUtils.getExpIntervalFromLevelToNext(getLevel());
-	}
-
-	/**
-	 * Get the experience earned in current level.
-	 *
-	 * @return Experience earned in current level.
-	 */
-	public int getExpEarnedInCurrentLevel() {
-		return LevelToExpUtils.getExpEarnedInCurrentLevel(getLevel(), (int) getExperience());
-	}
-
-	/**
-	 * Get the experience earned in current level in percentage (usefull for
-	 * ProgressBars).
-	 *
-	 * @return Experience earned in current level in percentage.
-	 */
-	public int getExpEarnedInCurrentLevelInPercentage() {
-		return LevelToExpUtils.getExpEarnedInCurrentLevelInPercentage(getLevel(), (int) getExperience());
-	}
-
-	/**
-	 * Get the missing experience to level up.
-	 *
-	 * @return Missing experience to level up.
-	 */
-	public int getMissingExpToLevelUp() {
-		return LevelToExpUtils.getMissingExpToLevelUp(getLevel(), (int) getExperience());
-	}
-
-	/**
-	 * Get the missing experience to level up in percentage (usefull for
-	 * ProgressBars).
-	 *
-	 * @return Missing experience to level up in percentage.
-	 */
-	public int getMissingExpToLevelUpInPercentage() {
-		return LevelToExpUtils.getMissingExpToLevelUpInPercentage(getLevel(), (int) getExperience());
-	}
-
-	/**
-	 * Get the amount of kilometers walked.
-	 *
-	 * @return Amount of kilometers walked.
-	 */
+	@Deprecated
 	public float getKmWalked() {
 		return proto.getKmWalked();
 	}
 
 	/**
-	 * Get the amount of pokemons encountered.
-	 *
-	 * @return Amount of pokemons encountered.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getPokemonsEncountered()}
+	 *             instead.
 	 */
+	@Deprecated
 	public int getPokemonsEncountered() {
 		return proto.getPokemonsEncountered();
 	}
 
 	/**
-	 * Get the amount of pokemons registered in pokedex.
-	 *
-	 * @return Amount of pokemons registered in pokedex.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getUniquePokedexEntries()}
+	 *             instead.
 	 */
+	@Deprecated
 	public int getUniquePokedexEntries() {
 		return proto.getUniquePokedexEntries();
 	}
 
 	/**
-	 * Get the amount of pokemons captured.
-	 *
-	 * @return Amount of pokemons captured.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getPokemonsCaptured()}
+	 *             instead.
 	 */
+	@Deprecated
 	public int getPokemonsCaptured() {
 		return proto.getPokemonsCaptured();
 	}
 
 	/**
-	 * Get the amount of pokemons evolved.
-	 *
-	 * @return Amount of pokemons evolved.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getPokemonsEvolved()}
+	 *             instead.
 	 */
+	@Deprecated
 	public int getEvolutions() {
 		return proto.getEvolutions();
 	}
 
 	/**
-	 * Get the amount of pokestops visited.
-	 *
-	 * @return Amount of pokestops visited.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getVisitedPokestops()}
+	 *             instead.
 	 */
+	@Deprecated
 	public int getPokeStopVisits() {
 		return proto.getPokeStopVisits();
 	}
 
 	/**
-	 * Get the amount of pokeballs thrown.
-	 *
-	 * @return Amount of pokeballs thrown.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getPokeballsThrown()}
+	 *             instead.
 	 */
+	@Deprecated
 	public int getPokeballsThrown() {
 		return proto.getPokeballsThrown();
 	}
 
 	/**
-	 * Get the amount of eggs hatched.
-	 *
-	 * @return Amount of eggs hatched.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getEggsHatched()}
+	 *             instead.
 	 */
+	@Deprecated
 	public int getEggsHatched() {
 		return proto.getEggsHatched();
 	}
 
 	/**
-	 * Get the amount of big magikarps caught.
-	 *
-	 * @return Amount of big magikarps caught.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getBigMagikarpCaught()}
+	 *             instead.
 	 */
+	@Deprecated
 	public int getBigMagikarpCaught() {
 		return proto.getBigMagikarpCaught();
 	}
 
 	/**
-	 * Get the amount of battles won versus an opponent team's gym.
-	 *
-	 * @return Amount of battles won versus an opponent team's gym.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getBattlesVSOpponentTeamWon()}
+	 *             instead.
 	 */
+	@Deprecated
 	public int getBattleAttackWon() {
 		return proto.getBattleAttackWon();
 	}
 
 	/**
-	 * Get the total amount of battles undertaken versus an opponent team's gym.
-	 *
-	 * @return Total amount of battles undertaken versus an opponent team's gym.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getBattlesVSOpponentTeam()}
+	 *             instead.
 	 */
+	@Deprecated
 	public int getBattleAttackTotal() {
 		return proto.getBattleAttackTotal();
 	}
 
 	/**
-	 * Get the amount of battles won as defender of a gym.
-	 *
-	 * @return Amount of battles won as defender of a gym.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getBattlesDefendedWon()}
+	 *             instead.
 	 */
+	@Deprecated
 	public int getBattleDefendedWon() {
 		return proto.getBattleDefendedWon();
 	}
 
 	/**
-	 * Get the amount of battles won versus your team's gym.
-	 *
-	 * @return Amount of battles won versus your team's gym.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getBattlesVSSameTeamWon()}
+	 *             instead.
 	 */
+	@Deprecated
 	public int getBattleTrainingWon() {
 		return proto.getBattleTrainingWon();
 	}
 
 	/**
-	 * Get the total amount of battles undertaken versus your team's gym.
-	 *
-	 * @return Total amount of battles undertaken versus your team's gym.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getBattlesVSSameTeam()}
+	 *             instead.
 	 */
+	@Deprecated
 	public int getBattleTrainingTotal() {
 		return proto.getBattleTrainingTotal();
 	}
 
 	/**
-	 * Get the total prestige raised in gyms.
-	 *
-	 * @return Total prestige raised in gyms.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getGymPrestigeRaisedTotal()}
+	 *             instead.
 	 */
+	@Deprecated
 	public int getPrestigeRaisedTotal() {
 		return proto.getPrestigeRaisedTotal();
 	}
 
 	/**
-	 * Get the total prestige dropped in gyms.
-	 *
-	 * @return Total prestige dropped in gyms.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getGymPrestigeDroppedTotal()}
+	 *             instead.
 	 */
+	@Deprecated
 	public int getPrestigeDroppedTotal() {
 		return proto.getPrestigeDroppedTotal();
 	}
 
 	/**
-	 * Get the amount of pokemons deployed in gyms.
-	 *
-	 * @return Amount of pokemons deployed in gyms.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getPokemonsDeployedInGyms()}
+	 *             instead.
 	 */
+	@Deprecated
 	public int getPokemonDeployed() {
 		return proto.getPokemonDeployed();
 	}
 
 	/**
-	 * Get the amount of small rattatas caught.
-	 *
-	 * @return Amount of small rattatas caught.
+	 * @deprecated Please use
+	 *             {@link com.pokegoapi.api.player.Stats#getSmallRattataCaught()}
+	 *             instead.
 	 */
+	@Deprecated
 	public int getSmallRattataCaught() {
 		return proto.getSmallRattataCaught();
 	}
