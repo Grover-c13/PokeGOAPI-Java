@@ -16,7 +16,6 @@
 package com.pokegoapi.api.player;
 
 import POGOProtos.Data.Player.PlayerStatsOuterClass;
-import lombok.Getter;
 
 /**
  * Stats info
@@ -25,7 +24,7 @@ import lombok.Getter;
  *
  */
 public class Stats {
-	@Getter
+
 	private PlayerStatsOuterClass.PlayerStats proto;
 
 	public Stats(PlayerStatsOuterClass.PlayerStats proto) {
@@ -285,5 +284,14 @@ public class Stats {
 	 */
 	public int getSmallRattataCaught() {
 		return proto.getSmallRattataCaught();
+	}
+
+	/**
+	 * Get the proto
+	 * 
+	 * @return proto The proto
+	 */
+	public PlayerStatsOuterClass.PlayerStats getProto() {
+		return proto;
 	}
 }
