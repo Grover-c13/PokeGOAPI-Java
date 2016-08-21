@@ -32,6 +32,8 @@ public class Stats {
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#Stats(POGOProtos.Data.Player.PlayerStatsOuterClass.PlayerStats)}
 	 *             instead.
+	 * @param proto
+	 *            Proto
 	 */
 	@Deprecated
 	public Stats(PlayerStatsOuterClass.PlayerStats proto) {
@@ -39,9 +41,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the current level of the player.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getCurrentPlayerLevel()}
 	 *             instead.
+	 * @return Current level of the player.
 	 */
 	@Deprecated
 	public int getLevel() {
@@ -49,9 +54,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the current total amount of experience earned.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getTotalExperienceEarned()}
 	 *             instead.
+	 * @return Current total amount of experience earned.
 	 */
 	@Deprecated
 	public long getExperience() {
@@ -59,9 +67,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the total experience required to reach the previous level.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getTotExpToReachPreviousLevel()}
 	 *             instead.
+	 * @return Total experience required to reach the previous level.
 	 */
 	@Deprecated
 	public long getPrevLevelXp() {
@@ -69,9 +80,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the total experience required to reach the next level.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getTotExpToReachNextLevel()}
 	 *             instead.
+	 * @return Total experience required to reach the next level.
 	 */
 	@Deprecated
 	public long getNextLevelXp() {
@@ -79,8 +93,11 @@ public class Stats {
 	}
 
 	/**
+	 * Get the amount of kilometers walked.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getKmWalked()} instead.
+	 * @return Amount of kilometers walked.
 	 */
 	@Deprecated
 	public float getKmWalked() {
@@ -88,9 +105,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the amount of pokemons encountered.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getPokemonsEncountered()}
 	 *             instead.
+	 * @return Amount of pokemons encountered.
 	 */
 	@Deprecated
 	public int getPokemonsEncountered() {
@@ -98,9 +118,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the amount of pokemons registered in pokedex.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getUniquePokedexEntries()}
 	 *             instead.
+	 * @return Amount of pokemons registered in pokedex.
 	 */
 	@Deprecated
 	public int getUniquePokedexEntries() {
@@ -108,9 +131,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the amount of pokemons captured.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getPokemonsCaptured()}
 	 *             instead.
+	 * @return Amount of pokemons captured.
 	 */
 	@Deprecated
 	public int getPokemonsCaptured() {
@@ -118,9 +144,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the amount of pokemons evolved.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getPokemonsEvolved()}
 	 *             instead.
+	 * @return Amount of pokemons evolved.
 	 */
 	@Deprecated
 	public int getEvolutions() {
@@ -128,9 +157,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the amount of pokestops visited.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getVisitedPokestops()}
 	 *             instead.
+	 * @return Amount of pokestops visited.
 	 */
 	@Deprecated
 	public int getPokeStopVisits() {
@@ -138,9 +170,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the amount of pokeballs thrown.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getPokeballsThrown()}
 	 *             instead.
+	 * @return Amount of pokeballs thrown.
 	 */
 	@Deprecated
 	public int getPokeballsThrown() {
@@ -148,9 +183,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the amount of eggs hatched.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getEggsHatched()}
 	 *             instead.
+	 * @return Amount of eggs hatched.
 	 */
 	@Deprecated
 	public int getEggsHatched() {
@@ -158,9 +196,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the amount of big magikarps caught.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getBigMagikarpCaught()}
 	 *             instead.
+	 * @return Amount of big magikarps caught.
 	 */
 	@Deprecated
 	public int getBigMagikarpCaught() {
@@ -168,9 +209,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the amount of battles won versus an opponent team's gym.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getBattlesVSOpponentTeamWon()}
 	 *             instead.
+	 * @return Amount of battles won versus an opponent team's gym.
 	 */
 	@Deprecated
 	public int getBattleAttackWon() {
@@ -178,9 +222,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the total amount of battles undertaken versus an opponent team's gym.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getBattlesVSOpponentTeam()}
 	 *             instead.
+	 * @return Total amount of battles undertaken versus an opponent team's gym.
 	 */
 	@Deprecated
 	public int getBattleAttackTotal() {
@@ -188,9 +235,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the amount of battles won as defender of a gym.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getBattlesDefendedWon()}
 	 *             instead.
+	 * @return Amount of battles won as defender of a gym.
 	 */
 	@Deprecated
 	public int getBattleDefendedWon() {
@@ -198,9 +248,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the amount of battles won versus your team's gym.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getBattlesVSSameTeamWon()}
 	 *             instead.
+	 * @return Amount of battles won versus your team's gym.
 	 */
 	@Deprecated
 	public int getBattleTrainingWon() {
@@ -208,9 +261,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the total amount of battles undertaken versus your team's gym.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getBattlesVSSameTeam()}
 	 *             instead.
+	 * @return Total amount of battles undertaken versus your team's gym.
 	 */
 	@Deprecated
 	public int getBattleTrainingTotal() {
@@ -218,9 +274,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the total prestige raised in gyms.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getGymPrestigeRaisedTotal()}
 	 *             instead.
+	 * @return Total prestige raised in gyms.
 	 */
 	@Deprecated
 	public int getPrestigeRaisedTotal() {
@@ -228,9 +287,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the total prestige dropped in gyms.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getGymPrestigeDroppedTotal()}
 	 *             instead.
+	 * @return Total prestige dropped in gyms.
 	 */
 	@Deprecated
 	public int getPrestigeDroppedTotal() {
@@ -238,9 +300,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the amount of pokemons deployed in gyms.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getPokemonsDeployedInGyms()}
 	 *             instead.
+	 * @return Amount of pokemons deployed in gyms.
 	 */
 	@Deprecated
 	public int getPokemonDeployed() {
@@ -248,9 +313,12 @@ public class Stats {
 	}
 
 	/**
+	 * Get the amount of small rattatas caught.
+	 * 
 	 * @deprecated Please use
 	 *             {@link com.pokegoapi.api.player.Stats#getSmallRattataCaught()}
 	 *             instead.
+	 * @return Amount of small rattatas caught.
 	 */
 	@Deprecated
 	public int getSmallRattataCaught() {
