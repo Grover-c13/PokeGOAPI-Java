@@ -33,12 +33,12 @@ import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.api.player.Stats;
 
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class Inventories {
 

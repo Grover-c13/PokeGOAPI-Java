@@ -13,7 +13,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.api.inventory;
+package com.pokegoapi.api.player;
 
 import java.util.ArrayList;
 
@@ -23,6 +23,8 @@ import com.pokegoapi.exceptions.RemoteServerException;
 
 /**
  * This class can help you retriving informations about experience from level.
+ *
+ * @author gionata.bisciari
  */
 public final class LevelToExpUtils {
 
@@ -148,8 +150,8 @@ public final class LevelToExpUtils {
 	 */
 	public static int getExpEarnedInCurrentLevel(final PokemonGo api)
 			throws LoginFailedException, RemoteServerException {
-		return getExpEarnedInCurrentLevel(api.getPlayerProfile().getStats().getLevel(),
-				(int) api.getPlayerProfile().getStats().getExperience());
+		return getExpEarnedInCurrentLevel(api.getPlayerProfile().getStats().getCurrentPlayerLevel(),
+				api.getPlayerProfile().getStats().getTotalExperienceEarned());
 	}
 
 	/**
@@ -183,8 +185,8 @@ public final class LevelToExpUtils {
 	 */
 	public static int getExpEarnedInCurrentLevelInPercentage(final PokemonGo api)
 			throws LoginFailedException, RemoteServerException {
-		return getExpEarnedInCurrentLevelInPercentage(api.getPlayerProfile().getStats().getLevel(),
-				(int) api.getPlayerProfile().getStats().getExperience());
+		return getExpEarnedInCurrentLevelInPercentage(api.getPlayerProfile().getStats().getCurrentPlayerLevel(),
+				api.getPlayerProfile().getStats().getTotalExperienceEarned());
 	}
 
 	/**
@@ -215,8 +217,8 @@ public final class LevelToExpUtils {
 	 *             {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
 	 */
 	public static int getMissingExpToLevelUp(final PokemonGo api) throws LoginFailedException, RemoteServerException {
-		return getMissingExpToLevelUp(api.getPlayerProfile().getStats().getLevel(),
-				(int) api.getPlayerProfile().getStats().getExperience());
+		return getMissingExpToLevelUp(api.getPlayerProfile().getStats().getCurrentPlayerLevel(),
+				api.getPlayerProfile().getStats().getTotalExperienceEarned());
 	}
 
 	/**
@@ -249,7 +251,7 @@ public final class LevelToExpUtils {
 	 */
 	public static int getMissingExpToLevelUpInPercentage(final PokemonGo api)
 			throws LoginFailedException, RemoteServerException {
-		return getMissingExpToLevelUpInPercentage(api.getPlayerProfile().getStats().getLevel(),
-				(int) api.getPlayerProfile().getStats().getExperience());
+		return getMissingExpToLevelUpInPercentage(api.getPlayerProfile().getStats().getCurrentPlayerLevel(),
+				api.getPlayerProfile().getStats().getTotalExperienceEarned());
 	}
 }
