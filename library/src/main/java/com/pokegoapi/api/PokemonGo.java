@@ -39,8 +39,6 @@ import okhttp3.OkHttpClient;
 import java.util.Random;
 import java.util.UUID;
 
-import static com.pokegoapi.api.device.SensorInfo.getDefault;
-
 
 public class PokemonGo {
 
