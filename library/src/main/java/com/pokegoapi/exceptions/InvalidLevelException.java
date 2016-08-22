@@ -16,7 +16,7 @@
 package com.pokegoapi.exceptions;
 
 /**
- * Exeption for non valid level
+ * Exception for non valid level
  * 
  * @author gionata-bisciari
  *
