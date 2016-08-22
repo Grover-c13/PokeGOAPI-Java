@@ -16,7 +16,7 @@
 package com.pokegoapi.exceptions;
 
 /**
- * Exeption for non valid experience
+ * Exception for non valid experience
  * 
  * @author gionata-bisciari
  *

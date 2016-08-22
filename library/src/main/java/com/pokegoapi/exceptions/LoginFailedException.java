@@ -16,6 +16,9 @@
 package com.pokegoapi.exceptions;
 
 public class LoginFailedException extends Exception {
+
+	private static final long serialVersionUID = -7878733082697308116L;
+
 	public LoginFailedException() {
 		super();
 	}

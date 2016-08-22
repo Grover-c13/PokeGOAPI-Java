@@ -1,10 +1,16 @@
 /*
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
- * version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details. You should have received a copy of the GNU General Public License along with this program. If not, see
- * <http://www.gnu.org/licenses/>.
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.pokegoapi.util;
@@ -70,13 +76,15 @@ public abstract class LevelToExpUtil {
 	}
 
 	/**
-	 * Get the total experience required to reach the previous level of the level passed as parameter.
+	 * Get the total experience required to reach the previous level of the
+	 * level passed as parameter.
 	 *
 	 * @param lvl
 	 *            The level.
 	 * @return Total experience required to reach the previous level.
 	 * @throws InvalidLevelException
-	 *             Thrown if the value of level isn't valid, threw from {@link #checkLevel(int)}.
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link #checkLevel(int)}.
 	 */
 	public static int getTotExpToReachPrevLevelOf(final int lvl) throws InvalidLevelException {
 		return getTotExpToReachLevel(lvl - 1);
@@ -89,7 +97,8 @@ public abstract class LevelToExpUtil {
 	 *            The level.
 	 * @return Total experience required to reach the level.
 	 * @throws InvalidLevelException
-	 *             Thrown if the value of level isn't valid, threw from {@link #checkLevel(int)}.
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link #checkLevel(int)}.
 	 */
 	public static int getTotExpToReachLevel(final int lvl) throws InvalidLevelException {
 		checkLevel(lvl);
@@ -97,13 +106,15 @@ public abstract class LevelToExpUtil {
 	}
 
 	/**
-	 * Get the total experience required to reach the next level of the level passed as parameter.
+	 * Get the total experience required to reach the next level of the level
+	 * passed as parameter.
 	 *
 	 * @param lvl
 	 *            The level.
 	 * @return Total experience required to reach the next level.
 	 * @throws InvalidLevelException
-	 *             Thrown if the value of level isn't valid, threw from {@link #checkLevel(int)}.
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link #checkLevel(int)}.
 	 */
 	public static int getTotExpToReachNextLevelOf(final int lvl) throws InvalidLevelException {
 		checkLevel(lvl);
@@ -111,13 +122,15 @@ public abstract class LevelToExpUtil {
 	}
 
 	/**
-	 * Get the experience required to level up from the level passed as parameter to the next.
+	 * Get the experience required to level up from the level passed as
+	 * parameter to the next.
 	 *
 	 * @param lvl
 	 *            The level.
 	 * @return Experience required in level to reach the next level.
 	 * @throws InvalidLevelException
-	 *             Thrown if the value of level isn't valid, threw from {@link #checkLevel(int)}.
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link #checkLevel(int)}.
 	 */
 	public static int getExpIntervalFromLevelToNext(final int lvl) throws InvalidLevelException {
 		return getTotExpToReachNextLevelOf(lvl) - getTotExpToReachLevel(lvl);
@@ -132,9 +145,11 @@ public abstract class LevelToExpUtil {
 	 *            Total experience earned from the player.
 	 * @return Experience earned in current level.
 	 * @throws InvalidLevelException
-	 *             Thrown if the value of level isn't valid, threw from {@link #checkLevel(int)}.
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link #checkLevel(int)}.
 	 * @throws InvalidExperienceException
-	 *             Thrown if the value of experience isn't valid, threw from {@link #checkTotalExperience(int)}.
+	 *             Thrown if the value of experience isn't valid, threw from
+	 *             {@link #checkTotalExperience(int)}.
 	 */
 	public static int getExpEarnedInCurrentLevel(final int lvl, final int totExp)
 			throws InvalidLevelException, InvalidExperienceException {
@@ -148,14 +163,18 @@ public abstract class LevelToExpUtil {
 	 *            PokemonGo instance
 	 * @return Experience earned in current level.
 	 * @throws LoginFailedException
-	 *             When the auth is invalid. Threw from {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
+	 *             When the auth is invalid. Threw from
+	 *             {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
 	 * @throws RemoteServerException
-	 *             When the server is down/having issues or no internet connection. Threw from
+	 *             When the server is down/having issues or no internet
+	 *             connection. Threw from
 	 *             {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
 	 * @throws InvalidLevelException
-	 *             Thrown if the value of level isn't valid, threw from {@link #checkLevel(int)}.
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link #checkLevel(int)}.
 	 * @throws InvalidExperienceException
-	 *             Thrown if the value of experience isn't valid, threw from {@link #checkTotalExperience(int)}.
+	 *             Thrown if the value of experience isn't valid, threw from
+	 *             {@link #checkTotalExperience(int)}.
 	 */
 	public static int getExpEarnedInCurrentLevel(final PokemonGo api)
 			throws LoginFailedException, RemoteServerException, InvalidLevelException, InvalidExperienceException {
@@ -172,9 +191,11 @@ public abstract class LevelToExpUtil {
 	 *            Total experience earned from the player.
 	 * @return Experience earned in current level in percentage.
 	 * @throws InvalidLevelException
-	 *             Thrown if the value of level isn't valid, threw from {@link #checkLevel(int)}.
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link #checkLevel(int)}.
 	 * @throws InvalidExperienceException
-	 *             Thrown if the value of experience isn't valid, threw from {@link #checkTotalExperience(int)}.
+	 *             Thrown if the value of experience isn't valid, threw from
+	 *             {@link #checkTotalExperience(int)}.
 	 */
 	public static int getExpEarnedInCurrentLevelInPercentage(final int lvl, final int totExp)
 			throws InvalidLevelException, InvalidExperienceException {
@@ -188,14 +209,18 @@ public abstract class LevelToExpUtil {
 	 *            PokemonGo instance
 	 * @return Experience earned in current level in percentage.
 	 * @throws LoginFailedException
-	 *             When the auth is invalid. Threw from {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
+	 *             When the auth is invalid. Threw from
+	 *             {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
 	 * @throws RemoteServerException
-	 *             When the server is down/having issues or no internet connection. Threw from
+	 *             When the server is down/having issues or no internet
+	 *             connection. Threw from
 	 *             {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
 	 * @throws InvalidLevelException
-	 *             Thrown if the value of level isn't valid, threw from {@link #checkLevel(int)}.
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link #checkLevel(int)}.
 	 * @throws InvalidExperienceException
-	 *             Thrown if the value of experience isn't valid, threw from {@link #checkTotalExperience(int)}.
+	 *             Thrown if the value of experience isn't valid, threw from
+	 *             {@link #checkTotalExperience(int)}.
 	 */
 	public static int getExpEarnedInCurrentLevelInPercentage(final PokemonGo api)
 			throws InvalidLevelException, LoginFailedException, RemoteServerException, InvalidExperienceException {
@@ -212,9 +237,11 @@ public abstract class LevelToExpUtil {
 	 *            Total experience earned from the player.
 	 * @return Missing experience to level up.
 	 * @throws InvalidLevelException
-	 *             Thrown if the value of level isn't valid, threw from {@link #checkLevel(int)}.
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link #checkLevel(int)}.
 	 * @throws InvalidExperienceException
-	 *             Thrown if the value of experience isn't valid, threw from {@link #checkTotalExperience(int)}.
+	 *             Thrown if the value of experience isn't valid, threw from
+	 *             {@link #checkTotalExperience(int)}.
 	 */
 	public static int getMissingExpToLevelUp(final int lvl, final int totExp)
 			throws InvalidLevelException, InvalidExperienceException {
@@ -229,14 +256,18 @@ public abstract class LevelToExpUtil {
 	 *            PokemonGo instance
 	 * @return Experience missing to level up.
 	 * @throws LoginFailedException
-	 *             When the auth is invalid. Threw from {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
+	 *             When the auth is invalid. Threw from
+	 *             {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
 	 * @throws RemoteServerException
-	 *             When the server is down/having issues or no internet connection. Threw from
+	 *             When the server is down/having issues or no internet
+	 *             connection. Threw from
 	 *             {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
 	 * @throws InvalidLevelException
-	 *             Thrown if the value of level isn't valid, threw from {@link #checkLevel(int)}.
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link #checkLevel(int)}.
 	 * @throws InvalidExperienceException
-	 *             Thrown if the value of experience isn't valid, threw from {@link #checkTotalExperience(int)}.
+	 *             Thrown if the value of experience isn't valid, threw from
+	 *             {@link #checkTotalExperience(int)}.
 	 */
 	public static int getMissingExpToLevelUp(final PokemonGo api)
 			throws LoginFailedException, RemoteServerException, InvalidLevelException, InvalidExperienceException {
@@ -253,9 +284,11 @@ public abstract class LevelToExpUtil {
 	 *            Total experience earned from the player.
 	 * @return Missing experience to level up in percentage.
 	 * @throws InvalidLevelException
-	 *             Thrown if the value of level isn't valid, threw from {@link #checkLevel(int)}.
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link #checkLevel(int)}.
 	 * @throws InvalidExperienceException
-	 *             Thrown if the value of experience isn't valid, threw from {@link #checkTotalExperience(int)}.
+	 *             Thrown if the value of experience isn't valid, threw from
+	 *             {@link #checkTotalExperience(int)}.
 	 */
 	public static int getMissingExpToLevelUpInPercentage(final int lvl, final int totExp)
 			throws InvalidLevelException, InvalidExperienceException {
@@ -269,14 +302,18 @@ public abstract class LevelToExpUtil {
 	 *            PokemonGo instance
 	 * @return Missing experience to level up in percentage.
 	 * @throws LoginFailedException
-	 *             When the auth is invalid. Threw from {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
+	 *             When the auth is invalid. Threw from
+	 *             {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
 	 * @throws RemoteServerException
-	 *             When the server is down/having issues or no internet connection. Threw from
+	 *             When the server is down/having issues or no internet
+	 *             connection. Threw from
 	 *             {@link com.pokegoapi.api.player.PlayerProfile#getStats()}.
 	 * @throws InvalidLevelException
-	 *             Thrown if the value of level isn't valid, threw from {@link #checkLevel(int)}.
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link #checkLevel(int)}.
 	 * @throws InvalidExperienceException
-	 *             Thrown if the value of experience isn't valid, threw from {@link #checkTotalExperience(int)}.
+	 *             Thrown if the value of experience isn't valid, threw from
+	 *             {@link #checkTotalExperience(int)}.
 	 */
 	public static int getMissingExpToLevelUpInPercentage(final PokemonGo api)
 			throws LoginFailedException, RemoteServerException, InvalidLevelException, InvalidExperienceException {
