@@ -47,7 +47,6 @@ public class PokemonGo {
 	private final byte[] sessionHash;
 	@Getter
 	RequestHandler requestHandler;
-	@Getter
 	private PlayerProfile playerProfile;
 	private Inventories inventories;
 	@Getter
@@ -58,7 +57,6 @@ public class PokemonGo {
 	@Setter
 	private double altitude;
 	private CredentialProvider credentialProvider;
-	@Getter
 	private Settings settings;
 	private Map map;
 	@Setter
@@ -72,15 +70,12 @@ public class PokemonGo {
 	 * @param credentialProvider the credential provider
 	 * @param client             the http client
 	 * @param time               a time implementation
-	 * @throws LoginFailedException  When login fails
-	 * @throws RemoteServerException When server fails
 	 */
 
-	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time)
-			throws LoginFailedException, RemoteServerException {
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time) {
 
 		if (credentialProvider == null) {
-			throw new LoginFailedException("Credential Provider is null");
+			throw new NullPointerException("Credential Provider is null");
 		} else {
 			this.credentialProvider = credentialProvider;
 		}
@@ -88,10 +83,7 @@ public class PokemonGo {
 
 		sessionHash = new byte[32];
 		new Random().nextBytes(sessionHash);
-
 		requestHandler = new RequestHandler(this, client);
-		playerProfile = new PlayerProfile(this);
-		settings = new Settings(this);
 		map = new Map(this);
 		longitude = Double.NaN;
 		latitude = Double.NaN;
@@ -139,6 +131,34 @@ public class PokemonGo {
 
 	public long currentTimeMillis() {
 		return time.currentTimeMillis();
+	}
+
+	/**
+	 * Get the player profile
+	 *
+	 * @return the player profile
+	 * @throws RemoteServerException When server fails
+	 * @throws LoginFailedException When login fails
+	 */
+	public PlayerProfile getPlayerProfile() throws RemoteServerException, LoginFailedException {
+		if(playerProfile == null) {
+			playerProfile = new PlayerProfile(this);
+		}
+		return playerProfile;
+	}
+
+	/**
+	 * Get the settings
+	 *
+	 * @return the settings
+	 * @throws RemoteServerException When server fails
+	 * @throws LoginFailedException When login fails
+	 */
+	public Settings getSettings() throws RemoteServerException, LoginFailedException {
+		if(settings == null) {
+			settings = new Settings(this);
+		}
+		return settings;
 	}
 
 	/**

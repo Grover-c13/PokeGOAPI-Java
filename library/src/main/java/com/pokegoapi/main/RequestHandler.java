@@ -68,7 +68,7 @@ public class RequestHandler implements Runnable {
 	 * @throws LoginFailedException  When login fails
 	 * @throws RemoteServerException If request errors occur
 	 */
-	public RequestHandler(PokemonGo api, OkHttpClient client) throws LoginFailedException, RemoteServerException {
+	public RequestHandler(PokemonGo api, OkHttpClient client) {
 		this.api = api;
 		this.client = client;
 		apiEndpoint = ApiSettings.API_ENDPOINT;
