@@ -59,6 +59,7 @@ import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.MapUtil;
 
 import rx.Observable;
+import rx.exceptions.Exceptions;
 import rx.functions.Func1;
 
 import java.util.ArrayList;
@@ -121,14 +122,12 @@ public class Map {
 				}
 
 				for (Pokestop pokestop : mapObjects.getPokestops()) {
-					boolean inRange;
 					try {
-						inRange = pokestop.inRangeForLuredPokemon();
-					} catch (LoginFailedException | RemoteServerException ignore) {
-						inRange = false;
-					}
-					if (inRange && pokestop.getFortData().hasLureInfo()) {
-						catchablePokemon.add(new CatchablePokemon(api, pokestop.getFortData()));
+						if (pokestop.inRangeForLuredPokemon() && pokestop.getFortData().hasLureInfo()) {
+							catchablePokemon.add(new CatchablePokemon(api, pokestop.getFortData()));
+						}
+					} catch (LoginFailedException | RemoteServerException e) {
+						throw Exceptions.propagate(e);
 					}
 				}
 
