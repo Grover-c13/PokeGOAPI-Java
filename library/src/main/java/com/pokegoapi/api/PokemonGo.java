@@ -140,7 +140,7 @@ public class PokemonGo {
 	 * @throws LoginFailedException When login fails
 	 */
 	public PlayerProfile getPlayerProfile() throws RemoteServerException, LoginFailedException {
-		if(playerProfile == null) {
+		if (playerProfile == null) {
 			playerProfile = new PlayerProfile(this);
 		}
 		return playerProfile;
@@ -154,7 +154,7 @@ public class PokemonGo {
 	 * @throws LoginFailedException When login fails
 	 */
 	public Settings getSettings() throws RemoteServerException, LoginFailedException {
-		if(settings == null) {
+		if (settings == null) {
 			settings = new Settings(this);
 		}
 		return settings;

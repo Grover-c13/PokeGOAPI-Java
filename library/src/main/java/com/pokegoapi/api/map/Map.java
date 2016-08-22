@@ -93,7 +93,8 @@ public class Map {
 	 * @throws LoginFailedException  if the login failed
 	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync() throws LoginFailedException, RemoteServerException {
+	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync()
+			throws LoginFailedException, RemoteServerException {
 
 		if (!useCache()) {
 			// getMapObjects wont be called unless this is null
@@ -110,22 +111,28 @@ public class Map {
 		return getMapObjectsAsync(cellIds).map(new Func1<MapObjects, List<CatchablePokemon>>() {
 			@Override
 			public List<CatchablePokemon> call(MapObjects mapObjects) {
-				Set<CatchablePokemon> catchablePokemons = new HashSet<>();
+				Set<CatchablePokemon> catchablePokemon = new HashSet<>();
 				for (MapPokemon mapPokemon : mapObjects.getCatchablePokemons()) {
-					catchablePokemons.add(new CatchablePokemon(api, mapPokemon));
+					catchablePokemon.add(new CatchablePokemon(api, mapPokemon));
 				}
 
 				for (WildPokemonOuterClass.WildPokemon wildPokemon : mapObjects.getWildPokemons()) {
-					catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
+					catchablePokemon.add(new CatchablePokemon(api, wildPokemon));
 				}
 
 				for (Pokestop pokestop : mapObjects.getPokestops()) {
-					if (pokestop.inRangeForLuredPokemon() && pokestop.getFortData().hasLureInfo()) {
-						catchablePokemons.add(new CatchablePokemon(api, pokestop.getFortData()));
+					boolean inRange;
+					try {
+						inRange = pokestop.inRangeForLuredPokemon();
+					} catch (LoginFailedException | RemoteServerException ignore) {
+						inRange = false;
+					}
+					if (inRange && pokestop.getFortData().hasLureInfo()) {
+						catchablePokemon.add(new CatchablePokemon(api, pokestop.getFortData()));
 					}
 				}
 
-				cachedCatchable = Collections.synchronizedList(new CopyOnWriteArrayList<>(catchablePokemons));
+				cachedCatchable = Collections.synchronizedList(new CopyOnWriteArrayList<>(catchablePokemon));
 				return cachedCatchable;
 			}
 		});
@@ -351,7 +358,8 @@ public class Map {
 	 * @throws LoginFailedException  if the login failed
 	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public Observable<MapObjects> getMapObjectsAsync(List<Long> cellIds) throws LoginFailedException, RemoteServerException {
+	public Observable<MapObjects> getMapObjectsAsync(List<Long> cellIds)
+			throws LoginFailedException, RemoteServerException {
 
 		if (useCache()) {
 			return Observable.just(cachedMapObjects);
