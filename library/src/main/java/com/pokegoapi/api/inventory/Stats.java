@@ -226,7 +226,7 @@ public class Stats {
 	 * Get the total amount of battles undertaken versus an opponent team's gym.
 	 * 
 	 * @deprecated Please use
-	 *             {@link com.pokegoapi.api.player.Stats#getBattlesVSOpponentTeam()}
+	 *             {@link com.pokegoapi.api.player.Stats#getBattlesVSOpponentTeamTot()}
 	 *             instead.
 	 * @return Total amount of battles undertaken versus an opponent team's gym.
 	 */
@@ -265,7 +265,7 @@ public class Stats {
 	 * Get the total amount of battles undertaken versus your team's gym.
 	 * 
 	 * @deprecated Please use
-	 *             {@link com.pokegoapi.api.player.Stats#getBattlesVSSameTeam()}
+	 *             {@link com.pokegoapi.api.player.Stats#getBattlesVSSameTeamTot()}
 	 *             instead.
 	 * @return Total amount of battles undertaken versus your team's gym.
 	 */

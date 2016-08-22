@@ -1,27 +1,24 @@
 /*
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ * version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details. You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 
 package com.pokegoapi.api.player;
 
+import com.pokegoapi.exceptions.InvalidExperienceException;
+import com.pokegoapi.exceptions.InvalidLevelException;
+import com.pokegoapi.util.LevelToExpUtil;
+
 import POGOProtos.Data.Player.PlayerStatsOuterClass;
 
 /**
- * Stats info
+ * This class can help you retrieving informations about player stats.
  * 
  * @author gionata-bisciari
- *
  */
 public class Stats {
 
@@ -53,55 +50,78 @@ public class Stats {
 	 * Get the total experience required to reach the previous level.
 	 *
 	 * @return Total experience required to reach the previous level.
+	 * @throws InvalidLevelException
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link com.pokegoapi.util.LevelToExpUtil#getTotExpToReachPrevLevelOf(int)}.
 	 */
-	public int getTotExpToReachPreviousLevel() {
-		return LevelToExpUtils.getTotExpToReachPrevLevelOf(getCurrentPlayerLevel());
+	public int getTotExpToReachPreviousLevel() throws InvalidLevelException {
+		return LevelToExpUtil.getTotExpToReachPrevLevelOf(getCurrentPlayerLevel());
 	}
 
 	/**
 	 * Get the total experience required to reach the current level.
 	 *
 	 * @return Total experience required to reach the current level.
+	 * @throws InvalidLevelException
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link com.pokegoapi.util.LevelToExpUtil#getTotExpToReachLevel(int)}.
 	 */
-	public int getTotExpToReachCurrentLevel() {
-		return LevelToExpUtils.getTotExpToReachLevel(getCurrentPlayerLevel());
+	public int getTotExpToReachCurrentLevel() throws InvalidLevelException {
+		return LevelToExpUtil.getTotExpToReachLevel(getCurrentPlayerLevel());
 	}
 
 	/**
 	 * Get the total experience required to reach the next level.
 	 *
 	 * @return Total experience required to reach the next level.
+	 * @throws InvalidLevelException
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link com.pokegoapi.util.LevelToExpUtil#getTotExpToReachNextLevelOf(int)}.
 	 */
-	public int getTotExpToReachNextLevel() {
-		return LevelToExpUtils.getTotExpToReachNextLevelOf(getCurrentPlayerLevel());
+	public int getTotExpToReachNextLevel() throws InvalidLevelException {
+		return LevelToExpUtil.getTotExpToReachNextLevelOf(getCurrentPlayerLevel());
 	}
 
 	/**
 	 * Get the experience interval from current level to next level.
 	 *
 	 * @return Experience interval from current level to next.
+	 * @throws InvalidLevelException
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link com.pokegoapi.util.LevelToExpUtil#getExpIntervalFromLevelToNext(int)}.
 	 */
-	public int getExpIntervalFromCurrentLevelToNext() {
-		return LevelToExpUtils.getExpIntervalFromLevelToNext(getCurrentPlayerLevel());
+	public int getExpIntervalFromCurrentLevelToNext() throws InvalidLevelException {
+		return LevelToExpUtil.getExpIntervalFromLevelToNext(getCurrentPlayerLevel());
 	}
 
 	/**
 	 * Get the experience earned in current level.
 	 *
 	 * @return Experience earned in current level.
+	 * @throws InvalidExperienceException
+	 *             Thrown if the value of experience isn't valid, threw from
+	 *             {@link com.pokegoapi.util.LevelToExpUtil#getExpEarnedInCurrentLevel(int, int)}.
+	 * @throws InvalidLevelException
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link com.pokegoapi.util.LevelToExpUtil#getExpEarnedInCurrentLevel(int, int)}.
 	 */
-	public int getExpEarnedInCurrentLevel() {
-		return LevelToExpUtils.getExpEarnedInCurrentLevel(getCurrentPlayerLevel(), getTotalExperienceEarned());
+	public int getExpEarnedInCurrentLevel() throws InvalidLevelException, InvalidExperienceException {
+		return LevelToExpUtil.getExpEarnedInCurrentLevel(getCurrentPlayerLevel(), getTotalExperienceEarned());
 	}
 
 	/**
-	 * Get the experience earned in current level in percentage (usefull for
-	 * ProgressBars).
+	 * Get the experience earned in current level in percentage (useful for ProgressBars).
 	 *
 	 * @return Experience earned in current level in percentage.
+	 * @throws InvalidExperienceException
+	 *             Thrown if the value of experience isn't valid, threw from
+	 *             {@link com.pokegoapi.util.LevelToExpUtil#getExpEarnedInCurrentLevelInPercentage(int, int)}.
+	 * @throws InvalidLevelException
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link com.pokegoapi.util.LevelToExpUtil#getExpEarnedInCurrentLevelInPercentage(int, int)}.
 	 */
-	public int getExpEarnedInCurrentLevelInPercentage() {
-		return LevelToExpUtils.getExpEarnedInCurrentLevelInPercentage(getCurrentPlayerLevel(),
+	public int getExpEarnedInCurrentLevelInPercentage() throws InvalidLevelException, InvalidExperienceException {
+		return LevelToExpUtil.getExpEarnedInCurrentLevelInPercentage(getCurrentPlayerLevel(),
 				getTotalExperienceEarned());
 	}
 
@@ -109,19 +129,30 @@ public class Stats {
 	 * Get the missing experience to level up.
 	 *
 	 * @return Missing experience to level up.
+	 * @throws InvalidExperienceException
+	 *             Thrown if the value of experience isn't valid, threw from
+	 *             {@link com.pokegoapi.util.LevelToExpUtil#getMissingExpToLevelUp(int, int)}.
+	 * @throws InvalidLevelException
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link com.pokegoapi.util.LevelToExpUtil#getMissingExpToLevelUp(int, int)}.
 	 */
-	public int getMissingExpToLevelUp() {
-		return LevelToExpUtils.getMissingExpToLevelUp(getCurrentPlayerLevel(), getTotalExperienceEarned());
+	public int getMissingExpToLevelUp() throws InvalidLevelException, InvalidExperienceException {
+		return LevelToExpUtil.getMissingExpToLevelUp(getCurrentPlayerLevel(), getTotalExperienceEarned());
 	}
 
 	/**
-	 * Get the missing experience to level up in percentage (usefull for
-	 * ProgressBars).
+	 * Get the missing experience to level up in percentage (useful for ProgressBars).
 	 *
 	 * @return Missing experience to level up in percentage.
+	 * @throws InvalidExperienceException
+	 *             Thrown if the value of experience isn't valid, threw from
+	 *             {@link com.pokegoapi.util.LevelToExpUtil#getMissingExpToLevelUpInPercentage(int, int)}.
+	 * @throws InvalidLevelException
+	 *             Thrown if the value of level isn't valid, threw from
+	 *             {@link com.pokegoapi.util.LevelToExpUtil#getMissingExpToLevelUpInPercentage(int, int)}.
 	 */
-	public int getMissingExpToLevelUpInPercentage() {
-		return LevelToExpUtils.getMissingExpToLevelUpInPercentage(getCurrentPlayerLevel(), getTotalExperienceEarned());
+	public int getMissingExpToLevelUpInPercentage() throws InvalidLevelException, InvalidExperienceException {
+		return LevelToExpUtil.getMissingExpToLevelUpInPercentage(getCurrentPlayerLevel(), getTotalExperienceEarned());
 	}
 
 	/**
@@ -219,7 +250,7 @@ public class Stats {
 	 *
 	 * @return Total amount of battles undertaken versus an opponent team's gym.
 	 */
-	public int getBattlesVSOpponentTeam() {
+	public int getBattlesVSOpponentTeamTot() {
 		return proto.getBattleAttackTotal();
 	}
 
@@ -246,7 +277,7 @@ public class Stats {
 	 *
 	 * @return Total amount of battles undertaken versus your team's gym.
 	 */
-	public int getBattlesVSSameTeam() {
+	public int getBattlesVSSameTeamTot() {
 		return proto.getBattleTrainingTotal();
 	}
 
