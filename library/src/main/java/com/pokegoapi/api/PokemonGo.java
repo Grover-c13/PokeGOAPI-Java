@@ -73,7 +73,6 @@ public class PokemonGo {
 	 */
 
 	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time) {
-
 		if (credentialProvider == null) {
 			throw new NullPointerException("Credential Provider is null");
 		} else {
