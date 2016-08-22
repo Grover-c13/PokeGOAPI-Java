@@ -38,10 +38,12 @@ public class Hatchery {
 	@Setter
 	private Callback callback;
 
-	Hatchery(GetInventoryResponse getInventoryResponse, Inventories inventories, ExecutorService executorService) {
-		update(getInventoryResponse);
+	Hatchery(GetInventoryResponse getInventoryResponse, GetHatchedEggsResponse getHatchedEggsResponse,
+			 Inventories inventories, ExecutorService executorService) {
 		this.executorService = executorService;
 		this.inventories = inventories;
+		update(getInventoryResponse);
+		update(getHatchedEggsResponse);
 	}
 
 	final void update(GetInventoryResponse getInventoryResponse) {
