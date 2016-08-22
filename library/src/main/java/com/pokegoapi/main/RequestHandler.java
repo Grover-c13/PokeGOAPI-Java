@@ -22,7 +22,6 @@ import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelo
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.AsyncPokemonGoException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.AsyncHelper;
@@ -33,6 +32,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import rx.Observable;
+import rx.exceptions.Exceptions;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -281,7 +281,7 @@ public class RequestHandler implements Runnable {
 			try {
 				Thread.sleep(350);
 			} catch (InterruptedException e) {
-				throw new AsyncPokemonGoException("System shutdown", e);
+				throw Exceptions.propagate(e);
 			}
 			if (workQueue.isEmpty()) {
 				continue;

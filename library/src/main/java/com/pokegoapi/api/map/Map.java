@@ -47,7 +47,6 @@ import com.pokegoapi.api.map.fort.FortDetails;
 import com.pokegoapi.api.map.fort.Pokestop;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.NearbyPokemon;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.MutableInteger;
@@ -59,6 +58,7 @@ import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.MapUtil;
 
 import rx.Observable;
+import rx.exceptions.Exceptions;
 import rx.functions.Func1;
 
 import java.util.ArrayList;
@@ -365,7 +365,7 @@ public class Map {
 						try {
 							response = GetMapObjectsResponse.parseFrom(byteString);
 						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
+							throw Exceptions.propagate(e);
 						}
 
 						MapObjects result = new MapObjects(api);
@@ -552,7 +552,7 @@ public class Map {
 						try {
 							response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(byteString);
 						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
+							throw Exceptions.propagate(e);
 						}
 						return new FortDetails(response);
 					}
