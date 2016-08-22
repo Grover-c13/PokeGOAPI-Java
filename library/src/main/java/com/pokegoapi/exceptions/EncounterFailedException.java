@@ -15,7 +15,7 @@
 
 package com.pokegoapi.exceptions;
 
-public class EncounterFailedException extends Exception {
+public class EncounterFailedException extends RuntimeException {
 	public EncounterFailedException() {
 		super();
 	}

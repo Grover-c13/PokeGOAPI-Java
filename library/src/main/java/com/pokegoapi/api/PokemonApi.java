@@ -10,6 +10,7 @@ import com.pokegoapi.api.internal.Location;
 import com.pokegoapi.api.internal.networking.BootstrapResult;
 import com.pokegoapi.api.internal.networking.Networking;
 import com.pokegoapi.api.inventory.Inventories;
+import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.auth.CredentialProvider;
 import lombok.Data;
@@ -31,6 +32,7 @@ public class PokemonApi implements Networking.Callback {
 	private final Networking networking;
 	private final PlayerProfile playerProfile;
 	private final Inventories inventories;
+	private final Map map;
 
 	PokemonApi(ExecutorService executorService, CredentialProvider credentialProvider, OkHttpClient client, URL server,
 			   Location location, DeviceInfo deviceInfo, SensorInfo sensorInfo) {
@@ -45,7 +47,7 @@ public class PokemonApi implements Networking.Callback {
 		playerProfile = new PlayerProfile(bootstrapResult.getPlayerResponse());
 		inventories = new Inventories(executorService, bootstrapResult.getInventoryResponse(),
 				bootstrapResult.getHatchedEggsResponse(), networking, playerProfile);
-
+		map = new Map(location, bootstrapResult.getGetMapObjectsResponse());
 	}
 
 	@Override

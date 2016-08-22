@@ -149,7 +149,7 @@ Parameters for a capture now use a CatchOptions or AsyncCatchOptions object
 This object allows setting all parameters at once, or modifying them on-the-fly
 
 ```
-import com.pokegoapi.api.settings.AsyncCatchOptions;
+import com.pokegoapi.api.settings.CatchOptions;
 ```
 OR
 ```

@@ -15,42 +15,34 @@
 
 package com.pokegoapi.api.gym;
 
-import POGOProtos.Data.Gym.GymMembershipOuterClass.GymMembership;
-import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.TeamColorOuterClass;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Networking.Requests.Messages.GetGymDetailsMessageOuterClass.GetGymDetailsMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetGymDetailsResponseOuterClass.GetGymDetailsResponse;
-
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.protobuf.ProtocolStringList;
-import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.internal.Location;
+import com.pokegoapi.api.internal.networking.Networking;
 import com.pokegoapi.api.pokemon.Pokemon;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.MapPoint;
-
-import java.util.ArrayList;
-import java.util.List;
+import rx.Observable;
+import rx.functions.Func1;
 
 public class Gym implements MapPoint {
-	private FortData proto;
-	private GetGymDetailsResponse details;
-	private PokemonGo api;
+	private final Networking networking;
+	private final Location location;
+	private final FortData proto;
+	private GymDetails gymDetails = null;
 
 	/**
 	 * Gym object.
 	 *
-	 * @param api   The api object to use for requests.
 	 * @param proto The FortData to populate the Gym with.
 	 */
-	public Gym(PokemonGo api, FortData proto) {
-		this.api = api;
+	public Gym(Networking networking, Location location, FortData proto) {
+		this.networking = networking;
+		this.location = location;
 		this.proto = proto;
-		this.details = null;
 	}
 
 	public String getId() {
@@ -89,87 +81,35 @@ public class Gym implements MapPoint {
 		return proto.getIsInBattle();
 	}
 
-	public boolean isAttackable() throws LoginFailedException, RemoteServerException {
-		return this.getGymMembers().size() != 0;
+
+	public Observable<Battle> battle(final Pokemon[] team) {
+		final Gym gym = this;
+		return getGymDetails().map(new Func1<GymDetails, Battle>() {
+			@Override
+			public Battle call(GymDetails gymDetails) {
+				return new Battle(networking, location, team, gym, gymDetails);
+			}
+		});
 	}
 
-	public Battle battle(Pokemon[] team) {
-		return new Battle(api, team, this);
-	}
 
-
-	private GetGymDetailsResponse details() throws LoginFailedException, RemoteServerException {
-		if (details == null) {
-			GetGymDetailsMessage reqMsg = GetGymDetailsMessage
+	private Observable<GymDetails> getGymDetails() {
+		if (gymDetails != null) {
+			return Observable.just(gymDetails);
+		}
+		return networking.queueRequest(RequestType.GET_GYM_DETAILS, GetGymDetailsMessage
 					.newBuilder()
 					.setGymId(this.getId())
 					.setGymLatitude(this.getLatitude())
 					.setGymLongitude(this.getLongitude())
-					.setPlayerLatitude(api.getLatitude())
-					.setPlayerLongitude(api.getLongitude())
-					.build();
-
-
-			ServerRequest serverRequest = new ServerRequest(RequestType.GET_GYM_DETAILS, reqMsg);
-			api.getRequestHandler().sendServerRequests(serverRequest);
-
-			try {
-				details = GetGymDetailsResponse.parseFrom(serverRequest.getData());
-			} catch (InvalidProtocolBufferException e) {
-				throw new RemoteServerException();
+					.setPlayerLatitude(location.getLatitude())
+					.setPlayerLongitude(location.getLongitude())
+					.build(), GetGymDetailsResponse.class).map(new Func1<GetGymDetailsResponse, GymDetails>() {
+			@Override
+			public GymDetails call(GetGymDetailsResponse getGymDetailsResponse) {
+				gymDetails = new GymDetails(getGymDetailsResponse);
+				return gymDetails;
 			}
-
-		}
-
-		return details;
+		});
 	}
-
-	public String getName() throws LoginFailedException, RemoteServerException {
-		return details().getName();
-	}
-
-	public ProtocolStringList getUrlsList() throws LoginFailedException, RemoteServerException {
-		return details().getUrlsList();
-	}
-
-	public GetGymDetailsResponse.Result getResult() throws LoginFailedException, RemoteServerException {
-		return details().getResult();
-	}
-
-	public boolean inRange() throws LoginFailedException, RemoteServerException {
-		GetGymDetailsResponse.Result result = getResult();
-		return (result != GetGymDetailsResponse.Result.ERROR_NOT_IN_RANGE);
-	}
-
-	public String getDescription() throws LoginFailedException, RemoteServerException {
-		return details().getDescription();
-	}
-
-
-	public List<GymMembership> getGymMembers() throws LoginFailedException, RemoteServerException {
-		return details().getGymState().getMembershipsList();
-	}
-
-	/**
-	 * Get a list of pokemon defending this gym.
-	 *
-	 * @return List of pokemon
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
-	 */
-	public List<PokemonData> getDefendingPokemon() throws LoginFailedException, RemoteServerException {
-		List<PokemonData> data = new ArrayList<PokemonData>();
-
-		for (GymMembership gymMember : getGymMembers()) {
-			data.add(gymMember.getPokemonData());
-		}
-
-		return data;
-	}
-
-	protected PokemonGo getApi() {
-		return api;
-	}
-
-
 }

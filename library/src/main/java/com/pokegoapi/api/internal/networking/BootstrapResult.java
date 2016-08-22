@@ -1,8 +1,22 @@
 package com.pokegoapi.api.internal.networking;
 
+import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
+import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass;
+import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
+import POGOProtos.Networking.Responses.DownloadRemoteConfigVersionResponseOuterClass;
+import POGOProtos.Networking.Responses.DownloadRemoteConfigVersionResponseOuterClass.DownloadRemoteConfigVersionResponse;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
+import POGOProtos.Networking.Responses.GetAssetDigestResponseOuterClass;
+import POGOProtos.Networking.Responses.GetAssetDigestResponseOuterClass.GetAssetDigestResponse;
 import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
+import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
+import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
+import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass;
+import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import lombok.Data;
 
 /**
@@ -11,6 +25,12 @@ import lombok.Data;
 @Data
 public class BootstrapResult {
 	private final GetPlayerResponse playerResponse;
+	private final DownloadRemoteConfigVersionResponse downloadRemoteConfigVersionResponse;
 	private final GetInventoryResponse inventoryResponse;
 	private final GetHatchedEggsResponse hatchedEggsResponse;
+	private final CheckAwardedBadgesResponse checkAwardedBadgesResponse;
+	private final DownloadSettingsResponse downloadSettingsResponse;
+	private final GetAssetDigestResponse assetDigestResponse;
+	private final LevelUpRewardsResponse levelUpRewardsResponse;
+	private final GetMapObjectsResponse getMapObjectsResponse;
 }

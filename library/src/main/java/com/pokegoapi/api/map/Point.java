@@ -19,23 +19,16 @@ import POGOProtos.Map.SpawnPointOuterClass;
 
 import com.pokegoapi.util.MapPoint;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+@Data
 public class Point implements MapPoint {
-	@Getter
-	@Setter
-	private double longitude;
-	@Getter
-	@Setter
-	private double latitude;
+	private final double longitude;
+	private final double latitude;
 
-	public Point(double latitude, double longitude) {
-		this.latitude = latitude;
-		this.longitude = longitude;
-	}
-
-	public Point(SpawnPointOuterClass.SpawnPoint spawnpoint) {
+	Point(SpawnPointOuterClass.SpawnPoint spawnpoint) {
 		this.latitude = spawnpoint.getLatitude();
 		this.longitude = spawnpoint.getLongitude();
 	}

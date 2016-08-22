@@ -13,10 +13,12 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.util;
+package com.pokegoapi.api.map;
 
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.internal.Location;
 import com.pokegoapi.api.map.Point;
+import com.pokegoapi.util.MapPoint;
 
 import java.util.List;
 import java.util.Map;
@@ -27,14 +29,14 @@ import java.util.TreeMap;
  * @author Olaf Braun - Software Development
  * @version 1.0
  */
-public class MapUtil<K extends MapPoint> {
+class MapUtil {
 	/**
 	 * Random step to a coordinate object
 	 *
 	 * @param point the coordinate
 	 * @return the coordinate
 	 */
-	public static Point randomStep(Point point) {
+	static Point randomStep(Point point) {
 		point.setLongitude(point.getLongitude() + randomStep());
 		point.setLatitude(point.getLatitude() + randomStep());
 
@@ -46,7 +48,7 @@ public class MapUtil<K extends MapPoint> {
 	 *
 	 * @return the double
 	 */
-	public static double randomStep() {
+	static double randomStep() {
 		Random random = new Random();
 		return random.nextDouble() / 100000.0;
 	}
@@ -58,7 +60,7 @@ public class MapUtil<K extends MapPoint> {
 	 * @param end   the end coordinate
 	 * @return the double
 	 */
-	public static double distFrom(Point start, Point end) {
+	static double distFrom(Point start, Point end) {
 		return distFrom(start.getLatitude(), start.getLongitude(), end.getLatitude(), end.getLongitude());
 	}
 
@@ -71,7 +73,7 @@ public class MapUtil<K extends MapPoint> {
 	 * @param lng2 the end longitude coordinate
 	 * @return the double
 	 */
-	public static double distFrom(double lat1, double lng1, double lat2, double lng2) {
+	static double distFrom(double lat1, double lng1, double lat2, double lng2) {
 		double earthRadius = 6371000;
 		double lat = Math.toRadians(lat2 - lat1);
 		double lng = Math.toRadians(lng2 - lng1);
@@ -87,13 +89,12 @@ public class MapUtil<K extends MapPoint> {
 	 * Sort items map by distance
 	 *
 	 * @param items the items
-	 * @param api   the api
 	 * @return the map
 	 */
-	public Map<Double, K> sortItems(List<K> items, PokemonGo api) {
+	static <K extends MapPoint> Map<Double, K> sortItems(List<K> items, Location location) {
 		Map<Double, K> result = new TreeMap<>();
 		for (K point : items) {
-			result.put(distFrom(api.getLatitude(), api.getLongitude(), point.getLatitude(), point.getLongitude()), point);
+			result.put(distFrom(location.getLatitude(), location.getLongitude(), point.getLatitude(), point.getLongitude()), point);
 		}
 		return result;
 	}

@@ -15,32 +15,6 @@
 
 package com.pokegoapi.api.pokemon;
 
-import POGOProtos.Networking.Requests.RequestOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass;
-import POGOProtos.Networking.Responses.NicknamePokemonResponseOuterClass;
-import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
-import POGOProtos.Networking.Responses.SetFavoritePokemonResponseOuterClass;
-import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass;
-import POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass;
-import POGOProtos.Networking.Responses.UseItemReviveResponseOuterClass;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.GeneratedMessage;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.internal.networking.Networking;
-import com.pokegoapi.api.inventory.Inventories;
-import com.pokegoapi.api.inventory.Item;
-import com.pokegoapi.api.map.pokemon.EvolutionResult;
-import com.pokegoapi.api.player.PlayerProfile;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.NoSuchItemException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.AsyncHelper;
-
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.EvolvePokemonMessage;
@@ -50,15 +24,24 @@ import POGOProtos.Networking.Requests.Messages.SetFavoritePokemonMessageOuterCla
 import POGOProtos.Networking.Requests.Messages.UpgradePokemonMessageOuterClass.UpgradePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.UseItemPotionMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.UseItemReviveMessageOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass;
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass.EvolvePokemonResponse;
 import POGOProtos.Networking.Responses.NicknamePokemonResponseOuterClass.NicknamePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
-import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
 import POGOProtos.Networking.Responses.SetFavoritePokemonResponseOuterClass.SetFavoritePokemonResponse;
 import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass.UpgradePokemonResponse;
 import POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass.UseItemPotionResponse;
 import POGOProtos.Networking.Responses.UseItemReviveResponseOuterClass.UseItemReviveResponse;
+import com.pokegoapi.api.internal.networking.Networking;
+import com.pokegoapi.api.inventory.Inventories;
+import com.pokegoapi.api.inventory.Item;
+import com.pokegoapi.api.map.pokemon.EvolutionResult;
+import com.pokegoapi.api.player.PlayerProfile;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.NoSuchItemException;
+import com.pokegoapi.exceptions.RemoteServerException;
 import lombok.Getter;
 import lombok.Setter;
 import rx.Observable;
@@ -234,7 +217,7 @@ public class Pokemon extends PokemonDetails {
 					@Override
 					public EvolutionResult call(EvolvePokemonResponse response) {
 						setProto(response.getEvolvedPokemonData());
-						return new EvolutionResult(networking, response);
+						return new EvolutionResult(networking, inventories, playerProfile, response);
 					}
 				});
 	}

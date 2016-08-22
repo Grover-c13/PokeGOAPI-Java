@@ -16,6 +16,7 @@
 package com.pokegoapi.api.settings;
 
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -44,16 +45,14 @@ import lombok.ToString;
 @ToString
 public class CatchOptions {
 	
-	private final PokemonGo api;
+	private final Inventories inventories;
 	private boolean useBestPokeball;
 	private boolean skipMasterBall;
-	private boolean useRazzBerries;
-	private int maxRazzBerries;
+	@Getter
+	private int useRazzBerry;
 	private Pokeball pokeBall;
 	private boolean strictBallType;
 	private boolean smartSelect;
-	@Getter
-	private int maxPokeballs;
 	private double probability;
 	@Getter
 	private double normalizedHitPosition;
@@ -67,17 +66,15 @@ public class CatchOptions {
 	 *
 	 * @param api   the api
 	 */
-	public CatchOptions(PokemonGo api) {
-		this.api = api;
-		this.useRazzBerries = false;
-		this.maxRazzBerries = 0;
+	public CatchOptions(Inventories inventories) {
+		this.inventories = inventories;
+		this.useRazzBerry = 0;
 		this.useBestPokeball = false;
 		this.skipMasterBall = false;
 		this.pokeBall = POKEBALL;
 		this.strictBallType = false;
 		this.smartSelect = false;
-		this.maxPokeballs = 1;
-		this.probability = 0.50;
+		this.probability = 0;
 		this.normalizedHitPosition = 1.0;
 		this.normalizedReticleSize = 1.95 + Math.random() * 0.05;
 		this.spinModifier = 0.85 + Math.random() * 0.15;
@@ -93,7 +90,7 @@ public class CatchOptions {
 	 */
 	public Pokeball getItemBall() throws LoginFailedException,
 						RemoteServerException, NoSuchItemException {
-		ItemBag bag = api.getInventories().getItemBag();
+		ItemBag bag = inventories.getItemBag();
 		if (strictBallType) {
 			if (bag.getItem(pokeBall.getBallType()).getCount() > 0) {
 				return pokeBall;
@@ -109,7 +106,6 @@ public class CatchOptions {
 			if (bag.getItem(ITEM_POKE_BALL).getCount() > 0) {
 				return POKEBALL;
 			}
-			throw new NoSuchItemException();
 		} else {
 			int index = Arrays.asList(new ItemId[] { ITEM_MASTER_BALL, ITEM_ULTRA_BALL,
 					ITEM_GREAT_BALL, ITEM_POKE_BALL }).indexOf(pokeBall.getBallType());
@@ -137,6 +133,7 @@ public class CatchOptions {
 			}
 		}
 		if (smartSelect) {
+			strictBallType = false;
 			useBestPokeball = false;
 			skipMasterBall = false;
 			smartSelect = false;
@@ -165,33 +162,13 @@ public class CatchOptions {
 	}
 	
 	/**
-	 * Gets razzberries to catch a pokemon
-	 *
-	 * @return the number to use
-	 */
-	public int getRazzberries() {
-		return useRazzBerries && maxRazzBerries == 0 ? 1 : maxRazzBerries;
-	}
-	
-	/**
 	 * Enable or disable the use of razzberries
 	 *
 	 * @param useRazzBerries true or false
 	 * @return               the CatchOptions object
 	 */
 	public CatchOptions useRazzberries(boolean useRazzBerries) {
-		this.useRazzBerries = useRazzBerries;
-		return this;
-	}
-	
-	/**
-	 * Set a maximum number of razzberries
-	 *
-	 * @param maxRazzBerries maximum allowed
-	 * @return               the CatchOptions object
-	 */
-	public CatchOptions maxRazzberries(int maxRazzBerries) {
-		this.maxRazzBerries = maxRazzBerries;
+		this.useRazzBerry = useRazzBerries ? 1 : 0;
 		return this;
 	}
 	
@@ -257,24 +234,11 @@ public class CatchOptions {
 	}
 	
 	/**
-	 * Set a maximum number of pokeballs
-	 *
-	 * @param maxPokeballs maximum allowed
-	 * @return             the CatchOptions object
-	 */
-	public CatchOptions maxPokeballs(int maxPokeballs) {
-		if (maxPokeballs <= 1)
-			maxPokeballs = -1;
-		this.maxPokeballs = maxPokeballs;
-		return this;
-	}
-	
-	/**
 	 * Set a capture probability before switching balls
 	 *		or the minimum probability for a specific ball
 	 *
 	 * @param probability    the probability
-	 * @return               the AsyncCatchOptions object
+	 * @return               the CatchOptions object
 	 */
 	public CatchOptions withProbability(double probability) {
 		this.probability = probability;
@@ -285,7 +249,7 @@ public class CatchOptions {
 	 * Set the normalized hit position of a pokeball throw
 	 *
 	 * @param normalizedHitPosition the normalized position
-	 * @return                      the CatchOptions object
+	 * @return                      the AsynCatchOptions object
 	 */
 	public CatchOptions setNormalizedHitPosition(double normalizedHitPosition) {
 		this.normalizedHitPosition = normalizedHitPosition;
@@ -296,7 +260,7 @@ public class CatchOptions {
 	 * Set the normalized reticle for a pokeball throw
 	 *
 	 * @param normalizedReticleSize the normalized size
-	 * @return                      the CatchOptions object
+	 * @return                      the AsynCatchOptions object
 	 */
 	public CatchOptions setNormalizedReticleSize(double normalizedReticleSize) {
 		this.normalizedReticleSize = normalizedReticleSize;
@@ -307,7 +271,7 @@ public class CatchOptions {
 	 * Set the spin modifier of a pokeball throw
 	 *
 	 * @param spinModifier the spin modifier
-	 * @return             the CatchOptions object
+	 * @return             the AsynCatchOptions object
 	 */
 	public CatchOptions setSpinModifier(double spinModifier) {
 		this.spinModifier = spinModifier;

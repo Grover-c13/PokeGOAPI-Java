@@ -1,6 +1,7 @@
 package com.pokegoapi.api.internal.networking;
 
 import POGOProtos.Enums.PlatformOuterClass;
+import POGOProtos.Inventory.InventoryItemOuterClass;
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
@@ -8,22 +9,37 @@ import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelo
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.DownloadRemoteConfigVersionMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessage;
+import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessageOrBuilder;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
 import POGOProtos.Networking.Requests.RequestOuterClass;
 import POGOProtos.Networking.Requests.RequestOuterClass.Request.Builder;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
+import POGOProtos.Networking.Responses.DownloadRemoteConfigVersionResponseOuterClass;
+import POGOProtos.Networking.Responses.DownloadRemoteConfigVersionResponseOuterClass.DownloadRemoteConfigVersionResponse;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
+import POGOProtos.Networking.Responses.GetAssetDigestResponseOuterClass;
+import POGOProtos.Networking.Responses.GetAssetDigestResponseOuterClass.GetAssetDigestResponse;
 import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
+import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
+import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
+import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass;
+import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.internal.Location;
+import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.exceptions.AccountBannedException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -38,6 +54,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -91,7 +108,7 @@ public final class Networking {
 		Builder reqBuilder = RequestOuterClass.Request.newBuilder();
 		reqBuilder.setRequestMessage(getPlayerMessage.toByteString());
 		reqBuilder.setRequestType(RequestType.GET_PLAYER);
-		RequestEnvelope.Builder request = RequestEnvelope.newBuilder()
+		RequestEnvelope.Builder getPlayerRequest = RequestEnvelope.newBuilder()
 				.setStatusCode(2)
 				.setRequestId(requestId)
 				.setRequests(0, reqBuilder)
@@ -100,15 +117,15 @@ public final class Networking {
 				.setAltitude(location.getAltitude())
 				.setAuthInfo(authInfo)
 				.setUnknown12(getUnknown12());
-		signature.setSignature(request);
-		ResponseEnvelope response = doRequest(request.build());
+		signature.setSignature(getPlayerRequest);
+		ResponseEnvelope response = doRequest(getPlayerRequest.build());
 		try {
 			currentServer = new URL("https://" + response.getApiUrl() + "/rpc");
 		}
 		catch (MalformedURLException e) {
 			throw new RuntimeException("Received invalid URL from server. Giving up", e);
 		}
-		response = handleRequest(request.build());
+		response = handleRequest(getPlayerRequest.build());
 		GetPlayerResponse playerResponse;
 		try {
 			playerResponse = GetPlayerResponse.parseFrom(response.getReturns(0));
@@ -116,28 +133,91 @@ public final class Networking {
 		catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
 		}
-		try {
-			Thread.sleep(300);
-		}
-		catch (InterruptedException e) {
-			throw new RuntimeException("Can't wait. Shutting down?", e);
-		}
-		RequestEnvelope.Builder secondRequest = buildRequestEnvalope(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION, DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage
+		sleep(300);
+		RequestEnvelope.Builder remoteCondigRequest = buildRequestEnvalope(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION, DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage
 				.newBuilder()
 				.setPlatform(PlatformOuterClass.Platform.ANDROID)
 				.setAppVersion(3300)
 				.build());
-		response = handleRequest(secondRequest.build());
+		response = handleRequest(remoteCondigRequest.build());
+		DownloadRemoteConfigVersionResponse downloadRemoteConfigVersionResponse;
 		GetInventoryResponse inventoryResponse;
 		GetHatchedEggsResponse hatchedEggsResponse;
+		CheckAwardedBadgesResponse checkAwardedBadgesResponse;
+		DownloadSettingsResponse downloadSettingsResponse;
+		GetAssetDigestResponse assetDigestResponse;
+		LevelUpRewardsResponse levelUpRewardsResponse;
+		GetMapObjectsResponse getMapObjectsResponse;
 		try {
-			inventoryResponse = GetInventoryResponse.parseFrom(response.getReturns(2));
+			downloadRemoteConfigVersionResponse = DownloadRemoteConfigVersionResponse.parseFrom(response.getReturns(0));
 			hatchedEggsResponse = GetHatchedEggsResponse.parseFrom(response.getReturns(1));
+			inventoryResponse = GetInventoryResponse.parseFrom(response.getReturns(2));
+			checkAwardedBadgesResponse = CheckAwardedBadgesResponse.parseFrom(response.getReturns(3));
+			downloadSettingsResponse = DownloadSettingsResponse.parseFrom(response.getReturns(4));
 		}
 		catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
 		}
-		return new BootstrapResult(playerResponse, inventoryResponse, hatchedEggsResponse);
+		sleep(3000);
+		RequestEnvelope.Builder assetsRequest = buildRequestEnvalope(RequestType.GET_ASSET_DIGEST, GetAssetDigestMessageOuterClass.GetAssetDigestMessage
+				.newBuilder()
+				.setPlatform(PlatformOuterClass.Platform.ANDROID)
+				.setAppVersion(3300)
+				.build());
+		response = handleRequest(assetsRequest.build());
+		try {
+			assetDigestResponse = GetAssetDigestResponse.parseFrom(response.getReturns(0));
+		}
+		catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
+		}
+		int playerLevel = 1;
+		for (InventoryItemOuterClass.InventoryItem inventoryItem : inventoryResponse.getInventoryDelta().getInventoryItemsList()) {
+			if (inventoryItem.getInventoryItemData().hasPlayerStats()) {
+				playerLevel = inventoryItem.getInventoryItemData().getPlayerStats().getLevel();
+			}
+		}
+		sleep(3000);
+		RequestEnvelope.Builder levelUpRequest = buildRequestEnvalope(RequestType.LEVEL_UP_REWARDS, LevelUpRewardsMessage
+				.newBuilder()
+				.setLevel(playerLevel)
+				.build());
+		response = handleRequest(levelUpRequest.build());
+		try {
+			levelUpRewardsResponse = LevelUpRewardsResponse.parseFrom(response.getReturns(0));
+		}
+		catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
+		}
+
+		// Initial map request
+		List<Long> cellIds = com.pokegoapi.api.map.Map.getCellIds(location.getLatitude(), location.getLongitude(), com.pokegoapi.api.map.Map.CELL_WIDTH);
+
+		sleep(300);
+		GetMapObjectsMessage.Builder builder = GetMapObjectsMessage.newBuilder();
+		for (int i=0;i!=9;i++) {
+			builder.setCellId(i, cellIds.get(i));
+			builder.setSinceTimestampMs(i, 0);
+		}
+		RequestEnvelope.Builder initialMapRequest = buildRequestEnvalope(RequestType.GET_MAP_OBJECTS, builder.setLatitude(location.getLatitude()).setLongitude(location.getLongitude())
+				.build());
+		response = handleRequest(initialMapRequest.build());
+		try {
+			getMapObjectsResponse = GetMapObjectsResponse.parseFrom(response.getReturns(0));
+		}
+		catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
+		}
+
+		return new BootstrapResult(playerResponse, downloadRemoteConfigVersionResponse, inventoryResponse, hatchedEggsResponse, checkAwardedBadgesResponse, downloadSettingsResponse, assetDigestResponse, levelUpRewardsResponse, getMapObjectsResponse);
+	}
+	private static void sleep(long ms) {
+		try {
+			Thread.sleep(ms);
+		}
+		catch (InterruptedException e) {
+			throw new RuntimeException("Can't wait. Shutting down?", e);
+		}
 	}
 
 	private ResponseEnvelope doRequest(RequestEnvelope request) throws RemoteServerException {
@@ -210,12 +290,6 @@ public final class Networking {
 		}
 		lastRequest = System.currentTimeMillis();
 
-		long requestId = Math.abs(random.nextLong());
-		// After networking has been setup with get player, every network request will be appended with, except for one which sets unknown6 request type to 5
-		// - 126: GET_HATCHED_EGGS
-		// - 4: GET_INVENTORY
-		// - 129: CHECK_AWARDED_BADGES
-		// - 5: DOWNLOAD_SETTINGS
 		RequestEnvelope.Builder request = buildRequestEnvalope(requestType, message);
 		ResponseEnvelope responseEnvelope = doRequest(request.build());
 		try {
