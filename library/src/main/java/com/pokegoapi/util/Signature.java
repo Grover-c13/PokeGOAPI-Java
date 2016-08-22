@@ -34,22 +34,14 @@ public class Signature {
 		byte[] authTicketBA = builder.getAuthTicket().toByteArray();
 
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
-				.setLocationHash1(getLocationHash1(api, authTicketBA, builder))
-				.setLocationHash2(getLocationHash2(api, builder))
+				.setLocationHash1(getLocationHash1(api, authTicketBA))
+				.setLocationHash2(getLocationHash2(api))
 				.setSessionHash(ByteString.copyFrom(api.getSessionHash()))
 				.setTimestamp(api.currentTimeMillis())
-				.setTimestampSinceStart(curTime - api.startTime);
-
-		SignatureOuterClass.Signature.DeviceInfo deviceInfo = api.getDeviceInfo();
-		if (deviceInfo != null) {
-			sigBuilder.setDeviceInfo(deviceInfo);
-		}
-
-		SignatureOuterClass.Signature.SensorInfo sensorInfo = api.getSensorInfo();
-		if (sensorInfo != null) {
-			sigBuilder.setSensorInfo(sensorInfo);
-		}
-
+				.setTimestampSinceStart(curTime - api.getStartTime())
+				.setDeviceInfo(api.getDeviceInfo())
+				.setSensorInfo(api.getSensorInfo())
+				.setActivityStatus(api.getActivityStatus());
 
 		for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
 			byte[] request = serverRequest.toByteArray();
@@ -82,7 +74,7 @@ public class Signature {
 	}
 
 
-	private static int getLocationHash1(PokemonGo api, byte[] authTicket, RequestEnvelopeOuterClass.RequestEnvelope.Builder builder) {
+	private static int getLocationHash1(PokemonGo api, byte[] authTicket) {
 		XXHashFactory factory = XXHashFactory.safeInstance();
 		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x1B845238);
 		xx32.update(authTicket, 0, authTicket.length);
@@ -97,7 +89,7 @@ public class Signature {
 		return xx32.getValue();
 	}
 
-	private static int getLocationHash2(PokemonGo api, RequestEnvelopeOuterClass.RequestEnvelope.Builder builder) {
+	private static int getLocationHash2(PokemonGo api) {
 		XXHashFactory factory = XXHashFactory.safeInstance();
 		byte[] bytes = new byte[8 * 3];
 

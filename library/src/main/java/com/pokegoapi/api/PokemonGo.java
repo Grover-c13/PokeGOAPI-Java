@@ -18,6 +18,7 @@ package com.pokegoapi.api;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 
+import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.inventory.Inventories;
@@ -36,13 +37,17 @@ import lombok.Setter;
 import okhttp3.OkHttpClient;
 
 import java.util.Random;
+import java.util.UUID;
+
+import static com.pokegoapi.api.device.SensorInfo.getDefault;
 
 
 public class PokemonGo {
 
 	private static final java.lang.String TAG = PokemonGo.class.getSimpleName();
 	private final Time time;
-	public final long startTime;
+	@Getter
+	private final long startTime;
 	@Getter
 	private final byte[] sessionHash;
 	@Getter
@@ -65,6 +70,15 @@ public class PokemonGo {
 	private DeviceInfo deviceInfo;
 	@Setter
 	private SensorInfo sensorInfo;
+	@Setter
+	private ActivityStatus activityStatus;
+	@Setter
+	private String uuid;
+	@Setter
+	private Random random;
+	@Getter
+	@Setter
+	private boolean firstSensorInfo;
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -195,13 +209,37 @@ public class PokemonGo {
 	}
 
 	/**
+	 * Returns the Current UUID or generate a new one
+	 *
+	 * @return the current UUID
+	 */
+	public String getUuid() {
+		if (uuid == null) {
+			uuid = UUID.randomUUID().toString();
+		}
+		return uuid;
+	}
+
+	/**
+	 * Returns the current random or generate a new one
+	 *
+	 * @return the current random
+	 */
+	public Random getRandom() {
+		if (random == null) {
+			random = new Random(getUuid().hashCode());
+		}
+		return random;
+	}
+
+	/**
 	 * Gets the device info
 	 *
 	 * @return the device info
 	 */
 	public SignatureOuterClass.Signature.DeviceInfo getDeviceInfo() {
 		if (deviceInfo == null) {
-			return null;
+			deviceInfo = DeviceInfo.getDefault(this);
 		}
 		return deviceInfo.getDeviceInfo();
 	}
@@ -213,8 +251,20 @@ public class PokemonGo {
 	 */
 	public SignatureOuterClass.Signature.SensorInfo getSensorInfo() {
 		if (sensorInfo == null) {
-			return null;
+			sensorInfo = SensorInfo.getDefault(this);
 		}
 		return sensorInfo.getSensorInfo();
+	}
+
+	/**
+	 * Gets the activity status
+	 *
+	 * @return the activity status
+	 */
+	public SignatureOuterClass.Signature.ActivityStatus getActivityStatus() {
+		if (activityStatus == null) {
+			activityStatus = ActivityStatus.getDefault(this);
+		}
+		return activityStatus.getActivityStatus();
 	}
 }
