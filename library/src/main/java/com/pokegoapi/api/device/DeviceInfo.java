@@ -119,7 +119,7 @@ public class DeviceInfo {
 	}
 
 	/**
-	 * Gets the default device status for the given api
+	 * Gets the default device info for the given api
 	 *
 	 * @param api the api
 	 * @return the default device info for the given api
