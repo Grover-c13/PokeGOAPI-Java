@@ -689,6 +689,19 @@ public class Map {
 		return (api.currentTimeMillis() - lastMapUpdate) < api.getSettings().getMapSettings().getMinRefresh();
 	}
 
+	/**
+	 * Clear map objects cache
+	 *
+	 */
+	public void clearCache() {
+		cachedCatchable.clear();
+		cachedMapObjects.nearbyPokemons.clear();
+		cachedMapObjects.catchablePokemons.clear();
+		cachedMapObjects.wildPokemons.clear();
+		cachedMapObjects.decimatedSpawnPoints.clear();
+		cachedMapObjects.spawnPoints.clear();
+	}
+
 	private List<Long> getDefaultCells() {
 		return getCellIds(api.getLatitude(), api.getLongitude(), cellWidth);
 	}
