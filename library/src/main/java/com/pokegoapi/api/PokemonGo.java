@@ -250,6 +250,6 @@ public class PokemonGo {
 	 * @return the activity status
 	 */
 	public SignatureOuterClass.Signature.ActivityStatus getActivityStatus() {
-		return ActivityStatus.getDefault(this);
+		return ActivityStatus.getDefault();
 	}
 }

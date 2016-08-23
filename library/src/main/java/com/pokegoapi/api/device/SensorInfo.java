@@ -66,7 +66,7 @@ public class SensorInfo {
 	 */
 	public static SignatureOuterClass.Signature.SensorInfo getDefault(PokemonGo api) {
 		SensorInfo sensorInfo = new SensorInfo();
-		Random random = new Random(api.getUuid().hashCode());
+		Random random = new Random();
 		if (api.getSensorInfo() == null) {
 			sensorInfo.getBuilder().setTimestampSnapshot(api.currentTimeMillis() + api.getStartTime())
 					.setAccelRawX(0.1 + (0.7 - 0.1) * random.nextDouble())

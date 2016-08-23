@@ -40,8 +40,8 @@ public class ActivityStatus {
 	 * @param api the api
 	 * @return the default activity status for the given api
 	 */
-	public static SignatureOuterClass.Signature.ActivityStatus getDefault(PokemonGo api) {
-		Random random = api.getRandom();
+	public static SignatureOuterClass.Signature.ActivityStatus getDefault() {
+		Random random = new Random();
 		boolean tilting = random.nextInt() % 2 == 0;
 		ActivityStatus activityStatus = new ActivityStatus();
 		activityStatus.setStationary(true);
