@@ -16,7 +16,6 @@
 package com.pokegoapi.api.map;
 
 import POGOProtos.Map.SpawnPointOuterClass;
-import com.pokegoapi.util.MapPoint;
 import lombok.Data;
 
 @Data

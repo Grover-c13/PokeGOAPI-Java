@@ -54,7 +54,7 @@ import java.util.concurrent.ExecutorService;
 /**
  * Created by paul on 21-8-2016.
  */
-public final class Networking {
+public final class Networking implements Runnable {
 	private long lastRequest = System.currentTimeMillis();
 	private static final String HASH = "2788184af4004004d6ab0720f7612983332106f6";
 	private static final Map<String, Networking> INSTANCES = new HashMap<>();
@@ -212,6 +212,11 @@ public final class Networking {
 		}
 	}
 
+	@Override
+	public void run() {
+
+	}
+
 	private ResponseEnvelope doRequest(RequestEnvelope request) throws RemoteServerException {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		try {
@@ -273,6 +278,8 @@ public final class Networking {
 
 	public <T extends GeneratedMessage> Observable<T> queueRequest(RequestType requestType,
 																   GeneratedMessage message, Class<T> responseType) {
+
+		// TODO: Fix this, put in networking thread
 		long wait = Math.max(0, System.currentTimeMillis() - (lastRequest + 300));
 		try {
 			Thread.sleep(wait);
@@ -326,8 +333,7 @@ public final class Networking {
 	}
 
 
-	private static Builder wrap(RequestType requestType,
-														  GeneratedMessage message) {
+	private static Builder wrap(RequestType requestType, GeneratedMessage message) {
 		Builder reqBuilder = RequestOuterClass.Request.newBuilder();
 		reqBuilder.setRequestMessage(message.toByteString());
 		reqBuilder.setRequestType(requestType);

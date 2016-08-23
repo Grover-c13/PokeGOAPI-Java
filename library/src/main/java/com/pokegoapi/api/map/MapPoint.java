@@ -13,9 +13,24 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.main;
+package com.pokegoapi.api.map;
 
-public class ApiSettings {
-	public static final String API_ENDPOINT = "https://pgorelease.nianticlabs.com/plfe/rpc";
-	public static final String USER_AGENT = "Niantic App";
+/**
+ * @author Olaf Braun - Software Development
+ * @version 1.0
+ */
+public interface MapPoint {
+	/**
+	 * Gets latitude.
+	 *
+	 * @return the latitude
+	 */
+	double getLatitude();
+
+	/**
+	 * Gets longitude.
+	 *
+	 * @return the longitude
+	 */
+	double getLongitude();
 }

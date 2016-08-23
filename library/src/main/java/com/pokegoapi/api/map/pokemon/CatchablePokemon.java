@@ -42,7 +42,7 @@ import com.pokegoapi.exceptions.EncounterFailedException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.util.MapPoint;
+import com.pokegoapi.api.map.MapPoint;
 import lombok.Getter;
 import lombok.ToString;
 import rx.Observable;

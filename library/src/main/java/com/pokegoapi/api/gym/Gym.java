@@ -24,7 +24,7 @@ import POGOProtos.Networking.Responses.GetGymDetailsResponseOuterClass.GetGymDet
 import com.pokegoapi.api.internal.Location;
 import com.pokegoapi.api.internal.networking.Networking;
 import com.pokegoapi.api.pokemon.Pokemon;
-import com.pokegoapi.util.MapPoint;
+import com.pokegoapi.api.map.MapPoint;
 import rx.Observable;
 import rx.functions.Func1;
 

@@ -16,7 +16,6 @@
 package com.pokegoapi.api.map;
 
 import com.pokegoapi.api.internal.Location;
-import com.pokegoapi.util.MapPoint;
 
 import java.util.List;
 import java.util.Map;
