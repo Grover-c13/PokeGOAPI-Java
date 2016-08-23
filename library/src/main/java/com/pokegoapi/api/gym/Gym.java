@@ -45,206 +45,205 @@ import rx.Observable;
 import rx.functions.Func1;
 
 public class Gym implements MapPoint {
-	private FortData proto;
-	private GetGymDetailsResponse details;
-	private PokemonGo api;
+    private FortData proto;
+    private GetGymDetailsResponse details;
+    private PokemonGo api;
 
-	/**
-	 * Gym object.
-	 *
-	 * @param api   The api object to use for requests.
-	 * @param proto The FortData to populate the Gym with.
-	 */
-	public Gym(PokemonGo api, FortData proto) {
-		this.api = api;
-		this.proto = proto;
-		this.details = null;
-	}
+    /**
+     * Gym object.
+     *
+     * @param api The api object to use for requests.
+     * @param proto The FortData to populate the Gym with.
+     */
+    public Gym(PokemonGo api, FortData proto) {
+        this.api = api;
+        this.proto = proto;
+        this.details = null;
+    }
 
-	public String getId() {
-		return proto.getId();
-	}
+    public String getId() {
+        return proto.getId();
+    }
 
-	public double getLatitude() {
-		return proto.getLatitude();
-	}
+    public double getLatitude() {
+        return proto.getLatitude();
+    }
 
-	public double getLongitude() {
-		return proto.getLongitude();
-	}
+    public double getLongitude() {
+        return proto.getLongitude();
+    }
 
-	public boolean getEnabled() {
-		return proto.getEnabled();
-	}
+    public boolean getEnabled() {
+        return proto.getEnabled();
+    }
 
-	public TeamColorOuterClass.TeamColor getOwnedByTeam() {
-		return proto.getOwnedByTeam();
-	}
+    public TeamColorOuterClass.TeamColor getOwnedByTeam() {
+        return proto.getOwnedByTeam();
+    }
 
-	public PokemonIdOuterClass.PokemonId getGuardPokemonId() {
-		return proto.getGuardPokemonId();
-	}
+    public PokemonIdOuterClass.PokemonId getGuardPokemonId() {
+        return proto.getGuardPokemonId();
+    }
 
-	public int getGuardPokemonCp() {
-		return proto.getGuardPokemonCp();
-	}
+    public int getGuardPokemonCp() {
+        return proto.getGuardPokemonCp();
+    }
 
-	public long getPoints() {
-		return proto.getGymPoints();
-	}
+    public long getPoints() {
+        return proto.getGymPoints();
+    }
 
-	public boolean getIsInBattle() {
-		return proto.getIsInBattle();
-	}
+    public boolean getIsInBattle() {
+        return proto.getIsInBattle();
+    }
 
-	public boolean isAttackable() throws LoginFailedException, RemoteServerException {
-		return this.getGymMembers().size() != 0;
-	}
+    public boolean isAttackable() throws LoginFailedException, RemoteServerException {
+        return this.getGymMembers().size() != 0;
+    }
 
-	public Battle battle(Pokemon[] team) {
-		return new Battle(api, team, this);
-	}
+    public Battle battle(Pokemon[] team) {
+        return new Battle(api, team, this);
+    }
 
-	private GetGymDetailsResponse details() throws LoginFailedException, RemoteServerException {
-		if (details == null) {
-			GetGymDetailsMessage reqMsg = GetGymDetailsMessage
-					.newBuilder()
-					.setGymId(this.getId())
-					.setGymLatitude(this.getLatitude())
-					.setGymLongitude(this.getLongitude())
-					.setPlayerLatitude(api.getLatitude())
-					.setPlayerLongitude(api.getLongitude())
-					.build();
+    private GetGymDetailsResponse details() throws LoginFailedException, RemoteServerException {
+        if (details == null) {
+            GetGymDetailsMessage reqMsg = GetGymDetailsMessage.newBuilder()
+        	.setGymId(this.getId())
+        	.setGymLatitude(this.getLatitude())
+        	.setGymLongitude(this.getLongitude())
+        	.setPlayerLatitude(api.getLatitude())
+        	.setPlayerLongitude(api.getLongitude())
+        	.build();
 
+            ServerRequest serverRequest = new ServerRequest(RequestType.GET_GYM_DETAILS, reqMsg);
+            api.getRequestHandler().sendServerRequests(serverRequest);
 
-			ServerRequest serverRequest = new ServerRequest(RequestType.GET_GYM_DETAILS, reqMsg);
-			api.getRequestHandler().sendServerRequests(serverRequest);
+            try {
+                details = GetGymDetailsResponse.parseFrom(serverRequest.getData());
+            } catch (InvalidProtocolBufferException e) {
+                throw new RemoteServerException();
+            }
 
-			try {
-				details = GetGymDetailsResponse.parseFrom(serverRequest.getData());
-			} catch (InvalidProtocolBufferException e) {
-				throw new RemoteServerException();
-			}
+        }
 
-		}
+        return details;
+    }
 
-		return details;
-	}
+    public String getName() throws LoginFailedException, RemoteServerException {
+        return details().getName();
+    }
 
-	public String getName() throws LoginFailedException, RemoteServerException {
-		return details().getName();
-	}
+    public ProtocolStringList getUrlsList() throws LoginFailedException, RemoteServerException {
+        return details().getUrlsList();
+    }
 
-	public ProtocolStringList getUrlsList() throws LoginFailedException, RemoteServerException {
-		return details().getUrlsList();
-	}
+    public GetGymDetailsResponse.Result getResult() throws LoginFailedException, RemoteServerException {
+        return details().getResult();
+    }
 
-	public GetGymDetailsResponse.Result getResult() throws LoginFailedException, RemoteServerException {
-		return details().getResult();
-	}
+    public boolean inRange() throws LoginFailedException, RemoteServerException {
+        GetGymDetailsResponse.Result result = getResult();
+        return (result != GetGymDetailsResponse.Result.ERROR_NOT_IN_RANGE);
+    }
 
-	public boolean inRange() throws LoginFailedException, RemoteServerException {
-		GetGymDetailsResponse.Result result = getResult();
-		return (result != GetGymDetailsResponse.Result.ERROR_NOT_IN_RANGE);
-	}
+    public String getDescription() throws LoginFailedException, RemoteServerException {
+        return details().getDescription();
+    }
 
-	public String getDescription() throws LoginFailedException, RemoteServerException {
-		return details().getDescription();
-	}
+    public List<GymMembership> getGymMembers() throws LoginFailedException, RemoteServerException {
+        return details().getGymState().getMembershipsList();
+    }
 
+    /**
+     * Get a list of pokemon defending this gym.
+     *
+     * @return List of pokemon
+     * @throws LoginFailedException if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
+     */
+    public List<PokemonData> getDefendingPokemon() throws LoginFailedException, RemoteServerException {
+        List<PokemonData> data = new ArrayList<PokemonData>();
 
-	public List<GymMembership> getGymMembers() throws LoginFailedException, RemoteServerException {
-		return details().getGymState().getMembershipsList();
-	}
+        for (GymMembership gymMember : getGymMembers()) {
+            data.add(gymMember.getPokemonData());
+        }
 
-	/**
-	 * Get a list of pokemon defending this gym.
-	 *
-	 * @return List of pokemon
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
-	 */
-	public List<PokemonData> getDefendingPokemon() throws LoginFailedException, RemoteServerException {
-		List<PokemonData> data = new ArrayList<PokemonData>();
+        return data;
+    }
 
-		for (GymMembership gymMember : getGymMembers()) {
-			data.add(gymMember.getPokemonData());
-		}
+    /**
+     * Deploy pokemon
+     *
+     * @param pokemon The pokemon to deploy
+     * @return Result of attempt to deploy pokemon
+     * @throws LoginFailedException if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
+     */
+    public FortDeployPokemonResponse.Result deployPokemon(Pokemon pokemon)
+            throws LoginFailedException, RemoteServerException {
 
-		return data;
-	}
+        FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
+        	.setFortId(getId())
+                .setPlayerLatitude(api.getLatitude())
+                .setPlayerLongitude(api.getLongitude())
+                .setPokemonId(pokemon.getId())
+                .build();
 
-	/**
-	 * Deploy pokemon
-	 *
-	 * @param pokemon The pokemon to deploy
-	 * @return Result of attempt to deploy pokemon
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
-	 */
-	public FortDeployPokemonResponse.Result deployPokemon(Pokemon pokemon) throws LoginFailedException, RemoteServerException {
+        ServerRequest serverRequest = new ServerRequest(RequestType.FORT_DEPLOY_POKEMON, reqMsg);
+        api.getRequestHandler().sendServerRequests(serverRequest);
 
-		FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
-				.setFortId(getId())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
-				.setPokemonId(pokemon.getId())
-				.build();
+        FortDeployPokemonResponse deployResponse;
 
-		ServerRequest serverRequest = new ServerRequest(RequestType.FORT_DEPLOY_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+        try {
+            deployResponse = FortDeployPokemonResponse.parseFrom(serverRequest.getData());
+        } catch (InvalidProtocolBufferException e) {
+            throw new RemoteServerException();
+        }
 
-		FortDeployPokemonResponse deployResponse;
+        return deployResponse.getResult();
+    }
 
-		try {
-			deployResponse = FortDeployPokemonResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException();
-		}
+    /**
+     * Deploy pokemon
+     *
+     * @param pokemon The pokemon to deploy
+     * @return Result of attempt to deploy pokemon
+     * @throws LoginFailedException if the login failed
+     * @throws RemoteServerException When a buffer exception is thrown
+     */
+    public Observable<FortDeployPokemonResponse.Result> deployPokemonAsync(Pokemon pokemon)
+            throws RemoteServerException, LoginFailedException {
 
-		return deployResponse.getResult();
-	}
+        FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
+        	.setFortId(getId())
+                .setPlayerLatitude(api.getLatitude())
+                .setPlayerLongitude(api.getLongitude())
+                .setPokemonId(pokemon.getId())
+                .build();
 
-	/**
-	 * Deploy pokemon
-	 *
-	 * @param pokemon The pokemon to deploy
-	 * @return Result of attempt to deploy pokemon
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
-	 */
-	public Observable<FortDeployPokemonResponse.Result> deployPokemonAsync(Pokemon pokemon) throws RemoteServerException, LoginFailedException {
+        AsyncServerRequest asyncServerRequest = new AsyncServerRequest(RequestType.FORT_DEPLOY_POKEMON, reqMsg);
+        return api.getRequestHandler().sendAsyncServerRequests(asyncServerRequest)
+                .map(new Func1<ByteString, FortDeployPokemonResponse.Result>() {
 
-		FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
-				.setFortId(getId())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
-				.setPokemonId(pokemon.getId())
-				.build();
+                    @Override
+                    public FortDeployPokemonResponse.Result call(ByteString response) {
+                        FortDeployPokemonResponse deployResponse;
 
-		AsyncServerRequest asyncServerRequest = new AsyncServerRequest(RequestType.FORT_DEPLOY_POKEMON, reqMsg);
-		return api.getRequestHandler().sendAsyncServerRequests(asyncServerRequest).map(new Func1<ByteString, FortDeployPokemonResponse.Result>() {
+                        try {
+                            deployResponse = FortDeployPokemonResponse.parseFrom(response);
+                        } catch (InvalidProtocolBufferException e) {
+                            throw new AsyncRemoteServerException(e);
+                        }
 
-			@Override
-			public FortDeployPokemonResponse.Result call(ByteString response) {
-				
-				FortDeployPokemonResponse deployResponse;
+                        return deployResponse.getResult();
+                    }
 
-				try {
-					deployResponse = FortDeployPokemonResponse.parseFrom(response);
-				} catch (InvalidProtocolBufferException e) {
-					throw new AsyncRemoteServerException(e);
-				}
+                });
 
-				return deployResponse.getResult();
-			}
+    }
 
-		});
-
-	}
-
-	protected PokemonGo getApi() {
-		return api;
-	}
+    protected PokemonGo getApi() {
+        return api;
+    }
 
 }
