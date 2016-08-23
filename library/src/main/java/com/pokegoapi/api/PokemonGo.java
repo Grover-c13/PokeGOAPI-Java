@@ -69,12 +69,12 @@ public class PokemonGo {
 	private Map map;
 	@Setter
 	private DeviceInfo deviceInfo;
-	@Setter
-	@Getter
-	private long seed;
 	@Getter
 	@Setter
 	public SensorInfo sensorInfo;
+	@Setter
+	@Getter
+	private long seed;
 	@Getter
 	@Setter
 	public List<SignatureOuterClass.Signature.LocationFix> locationFixes;
