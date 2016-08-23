@@ -89,7 +89,7 @@ public class DeviceInfo {
 		}
 	};
 
-	private SignatureOuterClass.Signature.DeviceInfo.Builder deviceInfoBuilder;å
+	private SignatureOuterClass.Signature.DeviceInfo.Builder deviceInfoBuilder;
 
 	public DeviceInfo() {
 		deviceInfoBuilder = SignatureOuterClass.Signature.DeviceInfo.newBuilder();
