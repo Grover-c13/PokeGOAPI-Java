@@ -20,6 +20,7 @@ import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
+import com.pokegoapi.api.device.LocationFix;
 import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
@@ -36,6 +37,7 @@ import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
 
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -68,6 +70,12 @@ public class PokemonGo {
 	private DeviceInfo deviceInfo;
 	@Setter
 	private String uuid;
+	@Getter
+	@Setter
+	private boolean firstSensorInfo;
+	@Getter
+	@Setter
+	private boolean firstLocationFix;
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -237,5 +245,14 @@ public class PokemonGo {
 	 */
 	public SignatureOuterClass.Signature.ActivityStatus getActivityStatus() {
 		return ActivityStatus.getDefault();
+	}
+
+	/**
+	 * Gets the location fix
+	 *
+	 * @return the sensor info
+	 */
+	public List<SignatureOuterClass.Signature.LocationFix> getLocationFix() {
+		return LocationFix.getDefault(this);
 	}
 }

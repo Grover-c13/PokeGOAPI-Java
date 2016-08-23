@@ -37,7 +37,6 @@ public class ActivityStatus {
 	/**
 	 * Gets the default activity status for the given api
 	 *
-	 * @param api the api
 	 * @return the default activity status for the given api
 	 */
 	public static SignatureOuterClass.Signature.ActivityStatus getDefault() {
