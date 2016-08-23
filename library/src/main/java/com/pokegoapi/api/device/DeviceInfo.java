@@ -126,8 +126,8 @@ public class DeviceInfo {
 	 */
 	public static DeviceInfo getDefault(PokemonGo api) {
 		DeviceInfo deviceInfo = new DeviceInfo();
-		deviceInfo.setDeviceId(api.getUuid());
-		Random random = new Random(api.getUuid().hashCode());
+		deviceInfo.setDeviceId(UUID.nameUUIDFromBytes(String.valueOf(api.getSeed()).getBytes()).toString());
+		Random random = new Random(api.getSeed());
 		String[][] devices =
 				{
 						{"iPad3,1", "iPad", "J1AP"},

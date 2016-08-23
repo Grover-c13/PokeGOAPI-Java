@@ -70,7 +70,8 @@ public class PokemonGo {
 	@Setter
 	private DeviceInfo deviceInfo;
 	@Setter
-	private String uuid;
+	@Getter
+	private long seed;
 	@Getter
 	@Setter
 	public SensorInfo sensorInfo;
@@ -108,6 +109,7 @@ public class PokemonGo {
 		longitude = Double.NaN;
 		latitude = Double.NaN;
 		startTime = currentTimeMillis();
+		seed = playerProfile.getPlayerData().getUsername().length();
 	}
 
 	/**
@@ -204,18 +206,6 @@ public class PokemonGo {
 			throw new IllegalStateException("Attempt to get map without setting location first");
 		}
 		return map;
-	}
-
-	/**
-	 * Returns the Current UUID or generate a new one
-	 *
-	 * @return the current UUID
-	 */
-	public String getUuid() {
-		if (uuid == null) {
-			uuid = UUID.randomUUID().toString();
-		}
-		return uuid;
 	}
 
 	/**
