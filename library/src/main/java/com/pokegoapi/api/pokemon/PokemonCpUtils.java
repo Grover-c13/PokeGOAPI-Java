@@ -15,12 +15,11 @@
 
 package com.pokegoapi.api.pokemon;
 
+import POGOProtos.Enums.PokemonIdOuterClass;
 import com.pokegoapi.exceptions.NoSuchItemException;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import POGOProtos.Enums.PokemonIdOuterClass;
 
 /**
  * Information in this class is based on:

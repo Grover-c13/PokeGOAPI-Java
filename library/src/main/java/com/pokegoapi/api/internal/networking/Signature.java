@@ -6,7 +6,6 @@ import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
 import POGOProtos.Networking.Envelopes.Unknown6OuterClass.Unknown6.Unknown2;
 import POGOProtos.Networking.Requests.RequestOuterClass;
 import com.google.protobuf.ByteString;
-import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.internal.Location;

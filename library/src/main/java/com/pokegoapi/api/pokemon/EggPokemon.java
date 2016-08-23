@@ -17,19 +17,13 @@ package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
-
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.internal.networking.Networking;
 import com.pokegoapi.api.inventory.EggIncubator;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-
-import lombok.Setter;
 import rx.Observable;
-import sun.nio.ch.Net;
 
 /**
  * The egg pokemon.

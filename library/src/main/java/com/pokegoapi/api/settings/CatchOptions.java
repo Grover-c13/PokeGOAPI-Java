@@ -15,13 +15,16 @@
 
 package com.pokegoapi.api.settings;
 
-import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import lombok.Getter;
+import lombok.ToString;
+
+import java.util.Arrays;
 
 import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_GREAT_BALL;
@@ -32,11 +35,6 @@ import static com.pokegoapi.api.inventory.Pokeball.GREATBALL;
 import static com.pokegoapi.api.inventory.Pokeball.MASTERBALL;
 import static com.pokegoapi.api.inventory.Pokeball.POKEBALL;
 import static com.pokegoapi.api.inventory.Pokeball.ULTRABALL;
-
-import java.util.Arrays;
-
-import lombok.Getter;
-import lombok.ToString;
 
 /**
  * Created by LoungeKatt on 8/16/16.
@@ -84,12 +82,9 @@ public class CatchOptions {
 	 * Gets item ball to catch a pokemon
 	 *
 	 * @return the item ball
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
 	 * @throws NoSuchItemException   the no such item exception
 	 */
-	public Pokeball getItemBall() throws LoginFailedException,
-						RemoteServerException, NoSuchItemException {
+	public Pokeball getItemBall()  {
 		ItemBag bag = inventories.getItemBag();
 		if (strictBallType) {
 			if (bag.getItem(pokeBall.getBallType()).getCount() > 0) {

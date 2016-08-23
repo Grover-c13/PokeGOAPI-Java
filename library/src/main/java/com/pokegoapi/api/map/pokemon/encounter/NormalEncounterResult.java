@@ -17,13 +17,9 @@ package com.pokegoapi.api.map.pokemon.encounter;
 
 
 import POGOProtos.Data.Capture.CaptureProbabilityOuterClass.CaptureProbability;
-import POGOProtos.Data.PokemonDataOuterClass;
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
-import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
-
-import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.pokemon.PokemonDetails;
 

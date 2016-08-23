@@ -93,7 +93,7 @@ public class Gym implements MapPoint {
 	}
 
 
-	private Observable<GymDetails> getGymDetails() {
+	public Observable<GymDetails> getGymDetails() {
 		if (gymDetails != null) {
 			return Observable.just(gymDetails);
 		}

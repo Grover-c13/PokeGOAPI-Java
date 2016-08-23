@@ -16,46 +16,22 @@
 package com.pokegoapi.api.inventory;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
-
-import POGOProtos.Inventory.InventoryItemDataOuterClass;
 import POGOProtos.Inventory.InventoryItemDataOuterClass.InventoryItemData;
-import POGOProtos.Inventory.InventoryItemOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass.InventoryItem;
-import POGOProtos.Inventory.Item.ItemDataOuterClass;
-import POGOProtos.Inventory.Item.ItemIdOuterClass;
-import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
-import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
-import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.annimon.stream.function.Function;
 import com.annimon.stream.function.Predicate;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.internal.networking.Networking;
 import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.api.pokemon.Pokemon;
 
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
-import lombok.Getter;
-import rx.Observable;
-import rx.functions.Func1;
-
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class PokeBank {
@@ -109,4 +85,8 @@ public class PokeBank {
 		return pokemons.get(id);
 	}
 
+	public List<Pokemon> getPokemons() {
+		// For compatibility
+		return new ArrayList<>(pokemons.values());
+	}
 }

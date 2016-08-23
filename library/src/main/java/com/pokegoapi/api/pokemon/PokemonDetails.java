@@ -1,17 +1,15 @@
 package com.pokegoapi.api.pokemon;
 
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.Inventories;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.NoSuchItemException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.util.Log;
-
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
+import com.pokegoapi.api.inventory.Inventories;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.NoSuchItemException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.util.Log;
 import lombok.Getter;
 import lombok.Setter;
 

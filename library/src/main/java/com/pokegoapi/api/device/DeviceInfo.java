@@ -15,10 +15,10 @@
 
 package com.pokegoapi.api.device;
 
+import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+
 import java.util.Random;
 import java.util.UUID;
-
-import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 
 /**
  * Created by fabianterhorst on 08.08.16.

@@ -64,7 +64,10 @@ public class MapSettings {
 	 */
 	private double pokeNavRange;
 
-	protected void update(MapSettingsOuterClass.MapSettings mapSettings) {
+	MapSettings() {
+	}
+
+	final void update(MapSettingsOuterClass.MapSettings mapSettings) {
 		googleApiKey = mapSettings.getGoogleMapsApiKey();
 		minMapObjectDistance = mapSettings.getGetMapObjectsMinDistanceMeters();
 		maxRefresh = mapSettings.getGetMapObjectsMaxRefreshSeconds() * 1000;

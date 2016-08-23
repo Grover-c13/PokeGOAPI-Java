@@ -17,23 +17,15 @@ package com.pokegoapi.api.inventory;
 
 import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
-
-import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Inventory.InventoryItemDataOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
-import com.pokegoapi.api.PokemonGo;
-
-import com.pokegoapi.api.pokemon.Pokemon;
 import lombok.ToString;
 
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @ToString
 public class CandyJar {

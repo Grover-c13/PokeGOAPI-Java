@@ -16,17 +16,12 @@
 package com.pokegoapi.api.inventory;
 
 import POGOProtos.Data.PokedexEntryOuterClass.PokedexEntry;
-import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
-
 import POGOProtos.Inventory.InventoryItemDataOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
-import com.pokegoapi.api.PokemonGo;
 
 import java.util.EnumMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 public class Pokedex {

@@ -32,10 +32,11 @@ package com.pokegoapi.examples;
 
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
-import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.PokemonApi;
 import com.pokegoapi.api.map.pokemon.CatchResult;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
+import com.pokegoapi.api.settings.CatchOptions;
 import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
@@ -59,23 +60,26 @@ public class CatchPokemonAtAreaExample {
 			//new PokemonGo(GoogleCredentialProvider(http,listner));
 			//Subsiquently
 			//new PokemonGo(GoogleCredentialProvider(http,refreshtoken));
-			PokemonGo go = new PokemonGo(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN,
-					ExampleLoginDetails.PASSWORD), http);
-			// set location
-			go.setLocation(-32.058087, 115.744325, 0);
+			PokemonApi pokemonApi = PokemonApi.newBuilder().credentialProvider(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN,
+					ExampleLoginDetails.PASSWORD))
+					.withHttpClient(http)
+					.latitude(-32.058087)
+					.longitude(115.744325)
+					.altitude(0d)
+					.build();
 
-			List<CatchablePokemon> catchablePokemon = go.getMap().getCatchablePokemon();
+			List<CatchablePokemon> catchablePokemon = pokemonApi.getMap().getCatchablePokemon();
 			System.out.println("Pokemon in area:" + catchablePokemon.size());
 
 			for (CatchablePokemon cp : catchablePokemon) {
 				// You need to Encounter first.
-				EncounterResult encResult = cp.encounterPokemon();
+				EncounterResult encResult = cp.encounterPokemon().toBlocking().first();
 				// if encounter was succesful, catch
 				if (encResult.wasSuccessful()) {
 					System.out.println("Encounted:" + cp.getPokemonId());
-					CatchOptions options = new CatchOptions(go);
+					CatchOptions options = cp.newCatchOptions();
 					options.useRazzberries(true);
-					CatchResult result = cp.catchPokemon(options);
+					CatchResult result = cp.catchPokemon(options).toBlocking().first();
 					System.out.println("Attempt to catch:" + cp.getPokemonId() + " " + result.getStatus());
 				}
 

@@ -1,8 +1,8 @@
 package com.pokegoapi.api.pokemon;
 
-import java.util.List;
-
 import POGOProtos.Enums.PokemonIdOuterClass;
+
+import java.util.List;
 
 public class EvolutionForm {
 	private PokemonIdOuterClass.PokemonId pokemonId;

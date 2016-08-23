@@ -23,8 +23,11 @@ import lombok.Data;
 public class PlayerAvatar {
 	private PlayerAvatarOuterClass.PlayerAvatar avatar;
 
-	public PlayerAvatar(PlayerAvatarOuterClass.PlayerAvatar data) {
-		avatar = data;
+	PlayerAvatar() {
+	}
+
+	final void update(PlayerAvatarOuterClass.PlayerAvatar data) {
+		this.avatar = data;
 	}
 
 	public int getSkin() {

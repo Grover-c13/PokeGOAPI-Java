@@ -15,28 +15,22 @@
 
 package com.pokegoapi.api.map.fort;
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.google.common.geometry.S2LatLng;
-import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.util.AsyncHelper;
-
-import java.util.List;
-
 import POGOProtos.Inventory.Item.ItemIdOuterClass;
 import POGOProtos.Map.Fort.FortDataOuterClass;
 import POGOProtos.Map.Fort.FortModifierOuterClass;
 import POGOProtos.Networking.Requests.Messages.AddFortModifierMessageOuterClass.AddFortModifierMessage;
 import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
 import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass.FortSearchMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Responses.AddFortModifierResponseOuterClass;
-import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
-import POGOProtos.Networking.Responses.FortSearchResponseOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.AddFortModifierResponseOuterClass.AddFortModifierResponse;
+import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass.FortDetailsResponse;
+import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
+import com.pokegoapi.api.internal.Location;
+import com.pokegoapi.api.internal.networking.Networking;
+import com.pokegoapi.api.settings.Settings;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.google.common.geometry.S2LatLng;
 import lombok.Getter;
 import rx.Observable;
 import rx.functions.Func1;
@@ -45,8 +39,9 @@ import rx.functions.Func1;
  * Created by mjmfighter on 7/20/2016.
  */
 public class Pokestop {
-
-	private final PokemonGo api;
+	private final Networking networking;
+	private final Location location;
+	private final Settings settings;
 	@Getter
 	private final FortDataOuterClass.FortData fortData;
 	@Getter
@@ -56,11 +51,12 @@ public class Pokestop {
 	/**
 	 * Instantiates a new Pokestop.
 	 *
-	 * @param api      the api
 	 * @param fortData the fort data
 	 */
-	public Pokestop(PokemonGo api, FortDataOuterClass.FortData fortData) {
-		this.api = api;
+	public Pokestop(Networking networking, Location location, Settings settings, FortDataOuterClass.FortData fortData) {
+		this.networking = networking;
+		this.location = location;
+		this.settings = settings;
 		this.fortData = fortData;
 		this.cooldownCompleteTimestampMs = fortData.getCooldownCompleteTimestampMs();
 	}
@@ -72,7 +68,7 @@ public class Pokestop {
 	 */
 	public double getDistance() {
 		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
-		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
+		S2LatLng player = S2LatLng.fromDegrees(location.getLatitude(), location.getLongitude());
 		return pokestop.getEarthDistance(player);
 	}
 
@@ -82,7 +78,7 @@ public class Pokestop {
 	 * @return true when in range of player
 	 */
 	public boolean inRange() {
-		return getDistance() <= api.getSettings().getFortSettings().getInteractionRangeInMeters();
+		return getDistance() <= settings.getFortSettings().getInteractionRangeInMeters();
 	}
 
 	/**
@@ -91,7 +87,7 @@ public class Pokestop {
 	 * @return true when the lured pokemon is in range of player
 	 */
 	public boolean inRangeForLuredPokemon() {
-		return getDistance() <= api.getSettings().getMapSettings().getPokemonVisibilityRange();
+		return getDistance() <= settings.getMapSettings().getPokemonVisibilityRange();
 	}
 
 	/**
@@ -110,7 +106,7 @@ public class Pokestop {
 	 * @return the boolean
 	 */
 	public boolean canLoot(boolean ignoreDistance) {
-		boolean active = cooldownCompleteTimestampMs < api.currentTimeMillis();
+		boolean active = cooldownCompleteTimestampMs < System.currentTimeMillis();
 		if (!ignoreDistance) {
 			return active && inRange();
 		}
@@ -134,42 +130,20 @@ public class Pokestop {
 	 *
 	 * @return PokestopLootResult
 	 */
-	public Observable<PokestopLootResult> lootAsync() {
-		FortSearchMessage searchMessage = FortSearchMessage.newBuilder()
+	public Observable<PokestopLootResult> loot() {
+		return networking.queueRequest(RequestType.FORT_SEARCH, FortSearchMessage.newBuilder()
 				.setFortId(getId())
 				.setFortLatitude(getLatitude())
 				.setFortLongitude(getLongitude())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
-				.build();
-
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH,
-				searchMessage);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
-				new Func1<ByteString, PokestopLootResult>() {
-					@Override
-					public PokestopLootResult call(ByteString result) {
-						FortSearchResponseOuterClass.FortSearchResponse response;
-						try {
-							response = FortSearchResponseOuterClass.FortSearchResponse.parseFrom(result);
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
-						}
-						cooldownCompleteTimestampMs = response.getCooldownCompleteTimestampMs();
-						return new PokestopLootResult(response);
-					}
-				});
-	}
-
-	/**
-	 * Loots a pokestop for pokeballs and other items.
-	 *
-	 * @return PokestopLootResult
-	 * @throws LoginFailedException  if login failed
-	 * @throws RemoteServerException if the server failed to respond
-	 */
-	public PokestopLootResult loot() throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(lootAsync());
+				.setPlayerLatitude(location.getLatitude())
+				.setPlayerLongitude(location.getLongitude())
+				.build(), FortSearchResponse.class).map(new Func1<FortSearchResponse, PokestopLootResult>() {
+			@Override
+			public PokestopLootResult call(FortSearchResponse response) {
+				cooldownCompleteTimestampMs = response.getCooldownCompleteTimestampMs();
+				return new PokestopLootResult(response);
+			}
+		});
 	}
 
 	/**
@@ -178,37 +152,18 @@ public class Pokestop {
 	 * @param item the modifier to add to this pokestop
 	 * @return true if success
 	 */
-	public Observable<Boolean> addModifierAsync(ItemIdOuterClass.ItemId item) {
-		AddFortModifierMessage msg = AddFortModifierMessage.newBuilder()
+	public Observable<Boolean> addModifier(ItemIdOuterClass.ItemId item) {
+		return networking.queueRequest(RequestType.ADD_FORT_MODIFIER, AddFortModifierMessage.newBuilder()
 				.setModifierType(item)
 				.setFortId(getId())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
-				.build();
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.ADD_FORT_MODIFIER, msg);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, Boolean>() {
+				.setPlayerLatitude(location.getLatitude())
+				.setPlayerLongitude(location.getLongitude())
+				.build(), AddFortModifierResponse.class).map(new Func1<AddFortModifierResponse, Boolean>() {
 			@Override
-			public Boolean call(ByteString result) {
-				try {
-					//sadly the server response does not contain any information to verify if the request was successful
-					AddFortModifierResponseOuterClass.AddFortModifierResponse.parseFrom(result);
-				} catch (InvalidProtocolBufferException e) {
-					throw new AsyncRemoteServerException(e);
-				}
-				return Boolean.TRUE;
+			public Boolean call(AddFortModifierResponse addFortModifierResponse) {
+				return addFortModifierResponse.getResult() == AddFortModifierResponse.Result.SUCCESS;
 			}
 		});
-	}
-
-	/**
-	 * Adds a modifier to this pokestop. (i.e. add a lure module)
-	 *
-	 * @param item the modifier to add to this pokestop
-	 * @throws LoginFailedException  if login failed
-	 * @throws RemoteServerException if the server failed to respond or the modifier could not be added to this pokestop
-	 */
-	public void addModifier(ItemIdOuterClass.ItemId item) throws LoginFailedException, RemoteServerException {
-		AsyncHelper.toBlocking(addModifierAsync(item));
 	}
 
 	/**
@@ -216,48 +171,17 @@ public class Pokestop {
 	 *
 	 * @return FortDetails
 	 */
-	public Observable<FortDetails> getDetailsAsync() {
-		FortDetailsMessage reqMsg = FortDetailsMessage.newBuilder()
+	public Observable<FortDetails> getDetails() {
+		return networking.queueRequest(RequestType.FORT_DETAILS, FortDetailsMessage.newBuilder()
 				.setFortId(getId())
 				.setLatitude(getLatitude())
 				.setLongitude(getLongitude())
-				.build();
-
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS, reqMsg);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, FortDetails>() {
+				.build(), FortDetailsResponse.class).map(new Func1<FortDetailsResponse, FortDetails>() {
 			@Override
-			public FortDetails call(ByteString result) {
-				FortDetailsResponseOuterClass.FortDetailsResponse response = null;
-				try {
-					response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(result);
-				} catch (InvalidProtocolBufferException e) {
-					throw new AsyncRemoteServerException(e);
-				}
+			public FortDetails call(FortDetailsResponse response) {
 				return new FortDetails(response);
 			}
 		});
-	}
-
-
-	/**
-	 * Get more detailed information about a pokestop.
-	 *
-	 * @return FortDetails
-	 * @throws LoginFailedException  if login failed
-	 * @throws RemoteServerException if the server failed to respond
-	 */
-	public FortDetails getDetails() throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(getDetailsAsync());
-	}
-
-	/**
-	 * Returns whether this pokestop has an active lure.
-	 *
-	 * @return lure status
-	 */
-	@Deprecated
-	public boolean hasLurePokemon() {
-		return fortData.hasLureInfo() && fortData.getLureInfo().getLureExpiresTimestampMs() > api.currentTimeMillis();
 	}
 
 	/**
@@ -267,14 +191,17 @@ public class Pokestop {
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communications failed.
 	 */
-	public boolean hasLure() throws LoginFailedException, RemoteServerException {
-		List<FortModifierOuterClass.FortModifier> modifiers = getDetails().getModifier();
-		for (FortModifierOuterClass.FortModifier mod : modifiers) {
-			if (mod.getItemId() == ItemIdOuterClass.ItemId.ITEM_TROY_DISK) {
-				return true;
+	public Observable<Boolean> hasLure() throws LoginFailedException, RemoteServerException {
+		return getDetails().map(new Func1<FortDetails, Boolean>() {
+			@Override
+			public Boolean call(FortDetails fortDetails) {
+				for (FortModifierOuterClass.FortModifier mod : fortDetails.getModifier()) {
+					if (mod.getItemId() == ItemIdOuterClass.ItemId.ITEM_TROY_DISK) {
+						return true;
+					}
+				}
+				return false;
 			}
-		}
-
-		return false;
+		});
 	}
 }

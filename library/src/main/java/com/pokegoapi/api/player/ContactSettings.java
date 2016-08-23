@@ -22,7 +22,10 @@ import lombok.Data;
 public class ContactSettings {
 	private ContactSettingsOuterClass.ContactSettings proto;
 
-	public ContactSettings(ContactSettingsOuterClass.ContactSettings proto) {
+	ContactSettings() {
+	}
+
+	final void update(ContactSettingsOuterClass.ContactSettings proto) {
 		this.proto = proto;
 	}
 

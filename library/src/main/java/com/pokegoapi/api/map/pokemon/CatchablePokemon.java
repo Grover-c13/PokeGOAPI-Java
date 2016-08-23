@@ -145,7 +145,7 @@ public class CatchablePokemon implements MapPoint {
 	 *
 	 * @return the encounter result
 	 */
-	public Observable<EncounterResult> encounterPokemonAsync() {
+	public Observable<EncounterResult> encounterPokemon() {
 		if (encounterKind == EncounterKind.NORMAL) {
 			return encounterNormalPokemonAsync();
 		} else if (encounterKind == EncounterKind.DISK) {
@@ -368,5 +368,9 @@ public class CatchablePokemon implements MapPoint {
 	private enum EncounterKind {
 		NORMAL,
 		DISK;
+	}
+
+	public CatchOptions newCatchOptions() {
+		return new CatchOptions(inventories);
 	}
 }

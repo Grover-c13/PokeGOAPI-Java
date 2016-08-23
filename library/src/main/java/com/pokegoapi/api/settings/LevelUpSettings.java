@@ -6,8 +6,11 @@ import POGOProtos.Settings.InventorySettingsOuterClass;
  * Created by rama on 27/07/16.
  */
 public class LevelUpSettings {
+	LevelUpSettings() {
+	}
+
 	//TODO: parse & save data
-	protected void update(InventorySettingsOuterClass.InventorySettings mapSettings) {
+	void update(InventorySettingsOuterClass.InventorySettings mapSettings) {
 
 	}
 }

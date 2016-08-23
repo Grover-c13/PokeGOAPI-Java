@@ -17,11 +17,9 @@ package com.pokegoapi.examples;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
-import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.PokemonApi;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.auth.PtcCredentialProvider;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
 import okhttp3.OkHttpClient;
 
@@ -33,27 +31,27 @@ public class TransferOnePidgeyExample {
 	 */
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
-		try {
-			// check readme for other example
-			PokemonGo go = new PokemonGo(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN,
-					ExampleLoginDetails.PASSWORD), http);
 
-			List<Pokemon> pidgeys =
-					go.getInventories().getPokebank().getPokemonByPokemonId(PokemonIdOuterClass.PokemonId.PIDGEY);
+		PokemonApi pokemonApi = PokemonApi.newBuilder().credentialProvider(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN,
+				ExampleLoginDetails.PASSWORD))
+				.withHttpClient(http)
+				.latitude(45.817521)
+				.longitude(16.028199)
+				.altitude(0d)
+				.build();
+		// check readme for other example
 
-			if (pidgeys.size() > 0) {
-				Pokemon pest = pidgeys.get(0);
-				// print the pokemon data
-				pest.debug();
-				ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result result = pest.transferPokemon();
+		List<Pokemon> pidgeys = pokemonApi.getInventories().getPokebank()
+				.getPokemonByPokemonId(PokemonIdOuterClass.PokemonId.PIDGEY);
 
-				Log.i("Main", "Transfered Pidgey result:" + result);
-			} else {
-				Log.i("Main", "You have no pidgeys :O");
-			}
-		} catch (LoginFailedException | RemoteServerException e) {
-			// failed to login, invalid credentials, auth issue or server issue.
-			Log.e("Main", "Failed to login. Invalid credentials or server issue: ", e);
+		if (pidgeys.size() > 0) {
+			Pokemon pest = pidgeys.get(0);
+			// print the pokemon data
+			pest.debug();
+			ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result result = pest.transferPokemon().toBlocking().first();
+			Log.i("Main", "Transfered Pidgey result:" + result);
+		} else {
+			Log.i("Main", "You have no pidgeys :O");
 		}
 	}
 }

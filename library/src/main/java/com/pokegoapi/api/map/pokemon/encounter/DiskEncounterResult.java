@@ -20,11 +20,8 @@ import POGOProtos.Data.Capture.CaptureProbabilityOuterClass;
 import POGOProtos.Data.PokemonDataOuterClass;
 import POGOProtos.Networking.Responses.DiskEncounterResponseOuterClass.DiskEncounterResponse;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
-
-import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.pokemon.PokemonDetails;
-
 import lombok.Getter;
 
 public class DiskEncounterResult extends PokemonDetails implements EncounterResult {

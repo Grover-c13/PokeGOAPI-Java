@@ -17,25 +17,23 @@ package com.pokegoapi.api.player;
 
 import POGOProtos.Enums.TutorialStateOuterClass;
 
-import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 public class TutorialState {
-	private final ArrayList<TutorialStateOuterClass.TutorialState> tutorialStateList = new ArrayList<>();
+	private final Set<TutorialStateOuterClass.TutorialState> tutorialStateList = EnumSet.noneOf(TutorialStateOuterClass.TutorialState.class);
 
-	public TutorialState(List<TutorialStateOuterClass.TutorialState> tutorialStateList) {
+	TutorialState() {
+
+	}
+
+	final void update(List<TutorialStateOuterClass.TutorialState> tutorialStateList) {
+		this.tutorialStateList.clear();
 		this.tutorialStateList.addAll(tutorialStateList);
 	}
 
-	public ArrayList<TutorialStateOuterClass.TutorialState> getTutorialStates() {
+	public Set<TutorialStateOuterClass.TutorialState> getTutorialStates() {
 		return tutorialStateList;
-	}
-
-	public void addTutorialState(TutorialStateOuterClass.TutorialState state) {
-		tutorialStateList.add(state);
-	}
-
-	public void addTutorialStates(List<TutorialStateOuterClass.TutorialState> states) {
-		tutorialStateList.addAll(states);
 	}
 }

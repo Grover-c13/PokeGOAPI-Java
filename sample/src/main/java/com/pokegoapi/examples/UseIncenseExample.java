@@ -31,12 +31,8 @@
 package com.pokegoapi.examples;
 
 
-import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.PokemonApi;
 import com.pokegoapi.auth.GoogleAutoCredentialProvider;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.util.Log;
-import com.pokegoapi.util.SystemTimeImpl;
 import okhttp3.OkHttpClient;
 
 public class UseIncenseExample {
@@ -46,19 +42,15 @@ public class UseIncenseExample {
 	 */
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
-		try {
-			GoogleAutoCredentialProvider authProvider =
-					new GoogleAutoCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
-			//new PtcLogin(http).login(ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
-			PokemonGo go = new PokemonGo(authProvider, http, new SystemTimeImpl());
-			
-			go.setLocation(45.817521, 16.028199, 0);
-			go.getInventories().getItemBag().useIncense();
-
-		} catch (LoginFailedException | RemoteServerException e) {
-			// failed to login, invalid credentials, auth issue or server issue.
-			Log.e("Main", "Failed to login or server issue: ", e);
-
-		}
+		GoogleAutoCredentialProvider authProvider =
+				new GoogleAutoCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
+		//new PtcLogin(http).login(ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
+		PokemonApi pokemonApi = PokemonApi.newBuilder().credentialProvider(authProvider)
+				.withHttpClient(http)
+				.latitude(45.817521)
+				.longitude(16.028199)
+				.altitude(0d)
+				.build();
+		pokemonApi.getInventories().getItemBag().useIncense().toBlocking().first();
 	}
 }

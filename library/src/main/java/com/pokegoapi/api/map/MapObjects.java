@@ -26,8 +26,10 @@ import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObj
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
-import com.pokegoapi.api.gym.Gym;
+import com.pokegoapi.api.internal.Location;
+import com.pokegoapi.api.internal.networking.Networking;
 import com.pokegoapi.api.map.fort.Pokestop;
+import com.pokegoapi.api.settings.Settings;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -36,6 +38,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 class MapObjects {
+	private final Networking networking;
+	private final Location location;
+	private final Settings settings;
 	private final Map<Long, NearbyPokemon> nearbyPokemonMap = new ConcurrentHashMap<>();
 	private final Map<Long, MapPokemon> catchablePokemonMap = new ConcurrentHashMap<>();
 	private final Map<Long, WildPokemon> wildPokemonMap = new ConcurrentHashMap<>();
@@ -48,7 +53,10 @@ class MapObjects {
 	 * Instantiates a new Map objects.
 	 *
 	 */
-	MapObjects(GetMapObjectsResponse getMapObjectsResponse) {
+	MapObjects(Networking networking, Location location, Settings settings, GetMapObjectsResponse getMapObjectsResponse) {
+		this.networking = networking;
+		this.location = location;
+		this.settings = settings;
 		update(getMapObjectsResponse);
 	}
 
@@ -115,9 +123,8 @@ class MapObjects {
 		}
 		gymMap.keySet().retainAll(gymIds);
 		gymIds.clear();
-		for (Gym gym : pokestops) {
-			new Pokestop()
-			pokestopMap.put(gym.getId(), gym);
+		for (FortData gym : pokestops) {
+			pokestopMap.put(gym.getId(), new Pokestop(networking, location, settings, gym));
 			gymIds.add(gym.getId());
 		}
 		pokestopMap.keySet().retainAll(gymIds);

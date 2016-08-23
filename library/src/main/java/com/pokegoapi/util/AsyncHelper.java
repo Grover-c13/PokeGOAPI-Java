@@ -20,7 +20,6 @@ import com.pokegoapi.exceptions.AsyncPokemonGoException;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-
 import rx.Observable;
 
 public class AsyncHelper {

@@ -12,6 +12,8 @@ import com.pokegoapi.api.internal.networking.Networking;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
+import com.pokegoapi.api.settings.CatchOptions;
+import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
 import lombok.Data;
 import okhttp3.OkHttpClient;
@@ -33,6 +35,7 @@ public class PokemonApi implements Networking.Callback {
 	private final PlayerProfile playerProfile;
 	private final Inventories inventories;
 	private final Map map;
+	private final Settings settings;
 
 	PokemonApi(ExecutorService executorService, CredentialProvider credentialProvider, OkHttpClient client, URL server,
 			   Location location, DeviceInfo deviceInfo, SensorInfo sensorInfo) {
@@ -47,7 +50,13 @@ public class PokemonApi implements Networking.Callback {
 		playerProfile = new PlayerProfile(bootstrapResult.getPlayerResponse());
 		inventories = new Inventories(executorService, bootstrapResult.getInventoryResponse(),
 				bootstrapResult.getHatchedEggsResponse(), networking, playerProfile);
-		map = new Map(location, bootstrapResult.getGetMapObjectsResponse());
+		settings = new Settings(bootstrapResult.getDownloadSettingsResponse());
+		map = new Map(executorService, settings, networking,
+				location, inventories, bootstrapResult.getGetMapObjectsResponse());
+	}
+
+	public static PokemonApiBuilder newBuilder() {
+		return new PokemonApiBuilder();
 	}
 
 	@Override
@@ -57,5 +66,33 @@ public class PokemonApi implements Networking.Callback {
 					   DownloadSettingsResponse downloadSettingsResponse) {
 		inventories.update(getHatchedEggsResponse);
 		inventories.update(getInventoryResponse);
+		settings.update(downloadSettingsResponse);
+	}
+
+
+	/**
+	 * Validates and sets a given latitude value
+	 *
+	 * @param value the latitude
+	 * @throws IllegalArgumentException if value exceeds +-90
+	 */
+	public void setLatitude(double value) {
+		if (value > 90 || value < -90) {
+			throw new IllegalArgumentException("latittude can not exceed +/- 90");
+		}
+		location.setLatitude(value);
+	}
+
+	/**
+	 * Validates and sets a given longitude value
+	 *
+	 * @param value the longitude
+	 * @throws IllegalArgumentException if value exceeds +-180
+	 */
+	public void setLongitude(double value) {
+		if (value > 180 || value < -180) {
+			throw new IllegalArgumentException("longitude can not exceed +/- 180");
+		}
+		location.setLongitude(value);
 	}
 }

@@ -32,9 +32,10 @@ package com.pokegoapi.examples;
 
 
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse.Result;
-import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.PokemonApi;
 import com.pokegoapi.api.gym.Battle;
 import com.pokegoapi.api.gym.Gym;
+import com.pokegoapi.api.gym.GymDetails;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.auth.PtcCredentialProvider;
@@ -57,11 +58,16 @@ public class FightGymExample {
 			auth = new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
 			// or google
 			//auth = new GoogleCredentialProvider(http, token); // currently uses oauth flow so no user or pass needed
-			PokemonGo go = new PokemonGo(auth, http);
-			// set location
-			go.setLocation(-32.011011, 115.932831, 0);
+			PokemonApi pokemonApi = PokemonApi.newBuilder().credentialProvider(auth)
+					.withHttpClient(http)
+					.latitude(-32.011011)
+					.longitude(115.932831)
+					.altitude(0d)
+					.build();
 
-			List<Pokemon> pokemons = go.getInventories().getPokebank().getPokemons();
+			// set location
+
+			List<Pokemon> pokemons = pokemonApi.getInventories().getPokebank().getPokemons();
 			Pokemon[] attackers = new Pokemon[6];
 
 			for (int i = 0; i < 6; i++) {
@@ -69,11 +75,12 @@ public class FightGymExample {
 			}
 
 
-			for (Gym gym : go.getMap().getGyms()) {
-				if (gym.isAttackable()) {
-					Battle battle = gym.battle(attackers);
+			for (Gym gym : pokemonApi.getMap().getGyms()) {
+				GymDetails gymDetails = gym.getGymDetails().toBlocking().first();
+				if (gymDetails.isAttackable()) {
+					Battle battle = gym.battle(attackers).toBlocking().first();
 					// start the battle
-					Result result = battle.start();
+					Result result = battle.start().toBlocking().first();
 
 					if (result == Result.SUCCESS) {
 						// started battle successfully

@@ -1,5 +1,7 @@
 package com.pokegoapi.api;
 
+import com.pokegoapi.api.device.DeviceInfo;
+import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.internal.Location;
 import com.pokegoapi.auth.CredentialProvider;
 import okhttp3.OkHttpClient;
@@ -24,6 +26,12 @@ public class PokemonApiBuilder {
 	private Double longitude;
 	private Double altitude;
 	private URL server;
+	private DeviceInfo deviceInfo;
+	private SensorInfo sensorInfo;
+
+	PokemonApiBuilder() {
+		super();
+	}
 
 	public PokemonApiBuilder executorService(ExecutorService executorService) {
 		this.executorService = executorService;
@@ -35,7 +43,7 @@ public class PokemonApiBuilder {
 		return this;
 	}
 
-	public PokemonApiBuilder client(OkHttpClient client) {
+	public PokemonApiBuilder withHttpClient(OkHttpClient client) {
 		this.client = client;
 		return this;
 	}
@@ -52,6 +60,16 @@ public class PokemonApiBuilder {
 
 	public PokemonApiBuilder altitude(double altitude) {
 		this.altitude = altitude;
+		return this;
+	}
+
+	public PokemonApiBuilder deviceInfo(DeviceInfo deviceInfo) {
+		this.deviceInfo = deviceInfo;
+		return this;
+	}
+
+	public PokemonApiBuilder sensorInfo(SensorInfo sensorInfo) {
+		this.sensorInfo = sensorInfo;
 		return this;
 	}
 
@@ -82,7 +100,13 @@ public class PokemonApiBuilder {
 				throw new RuntimeException("The predefined url is not valid", e);
 			}
 		}
-		return new PokemonApi(executorService, credentialProvider, client, server, new Location(latitude, longitude, altitude));
+		if (deviceInfo == null) {
+			deviceInfo = DeviceInfo.DEFAULT;
+		}
+		if (sensorInfo == null) {
+			sensorInfo = new SensorInfo();
+		}
+		return new PokemonApi(executorService, credentialProvider, client, server, new Location(latitude, longitude, altitude), deviceInfo, sensorInfo);
 	}
 
 	private static class PokemonApiThreadFactory implements ThreadFactory {

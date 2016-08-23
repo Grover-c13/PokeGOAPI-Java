@@ -37,12 +37,15 @@ public class GpsSettings {
 	 */
 	private double drivingSpeedSampleCount;
 
+	GpsSettings() {
+	}
+
 	/**
 	 * Update the gps settings from the network response.
 	 *
 	 * @param gpsSettings the new gps settings
 	 */
-	public void update(GpsSettingsOuterClass.GpsSettings gpsSettings) {
+	void update(GpsSettingsOuterClass.GpsSettings gpsSettings) {
 		drivingWarningSpeedMetersPerSecond = gpsSettings.getDrivingWarningSpeedMetersPerSecond();
 		drivingWarningCooldownMinutes = gpsSettings.getDrivingWarningCooldownMinutes();
 		drivingSpeedSampleIntervalSeconds = gpsSettings.getDrivingSpeedSampleIntervalSeconds();

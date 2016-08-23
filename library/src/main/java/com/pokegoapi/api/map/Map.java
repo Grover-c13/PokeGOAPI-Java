@@ -37,6 +37,8 @@ import com.pokegoapi.api.map.fort.FortDetails;
 import com.pokegoapi.api.map.fort.Pokestop;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.NearbyPokemon;
+import com.pokegoapi.api.settings.MapSettings;
+import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.MutableInteger;
@@ -54,7 +56,7 @@ import java.util.concurrent.ExecutorService;
 public class Map implements Runnable {
 	public static final int CELL_WIDTH = 3;
 	private final ExecutorService executorService;
-	private final int updateInterval;
+	private final MapSettings mapSettings;
 	private final MapObjects mapObjects;
 	private final Networking networking;
 	private final Location location;
@@ -64,13 +66,14 @@ public class Map implements Runnable {
 	 * Instantiates a new Map.
 	 *
 	 */
-	public Map(ExecutorService executorService, int updateInterval, Networking networking, Location location, Inventories inventories, GetMapObjectsResponse getMapObjectsResponse)  {
+	public Map(ExecutorService executorService, Settings settings, Networking networking, Location location,
+			   Inventories inventories, GetMapObjectsResponse getMapObjectsResponse)  {
 		this.executorService = executorService;
-		this.updateInterval = updateInterval;
+		this.mapSettings = settings.getMapSettings();
 		this.networking = networking;
 		this.location = location;
 		this.inventories = inventories;
-		mapObjects = new MapObjects(getMapObjectsResponse);
+		mapObjects = new MapObjects(networking, location, settings, getMapObjectsResponse);
 		executorService.execute(this);
 	}
 
@@ -176,7 +179,7 @@ public class Map implements Runnable {
 	@Override
 	public void run() {
 		try {
-			Thread.sleep(updateInterval);
+			Thread.sleep(Math.round(mapSettings.getMinRefresh()));
 			GetMapObjectsMessage.Builder builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder()
 					.setLatitude(location.getLatitude())
 					.setLongitude(location.getLongitude());

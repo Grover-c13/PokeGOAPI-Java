@@ -1,5 +1,6 @@
 package com.pokegoapi.api.settings;
 
+import POGOProtos.Settings.FortSettingsOuterClass;
 import lombok.Getter;
 
 /**
@@ -55,12 +56,15 @@ public class FortSettings {
 	 */
 	private double farInteractionRangeMeters;
 
+	FortSettings() {
+	}
+
 	/**
 	 * Update the fort settings from the network response.
 	 *
 	 * @param fortSettings the new fort settings
 	 */
-	public void update(POGOProtos.Settings.FortSettingsOuterClass.FortSettings fortSettings) {
+	void update(FortSettingsOuterClass.FortSettings fortSettings) {
 		interactionRangeInMeters = fortSettings.getInteractionRangeMeters();
 		maxTotalDeployedPokemon = fortSettings.getMaxTotalDeployedPokemon();
 		maxPlayerDeployedPokemon = fortSettings.getMaxPlayerDeployedPokemon();

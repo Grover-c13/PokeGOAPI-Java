@@ -1,24 +1,12 @@
 package com.pokegoapi.api.settings;
 
-import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
-
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
-
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import lombok.Getter;
 
 /**
  * Created by rama on 27/07/16.
  */
 public class Settings {
-
-	private final PokemonGo api;
-
 
 	@Getter
 	/**
@@ -66,38 +54,21 @@ public class Settings {
 	 * Settings object that hold different configuration aspect of the game.
 	 * Can be used to simulate the real app behaviour.
 	 *
-	 * @param api api instance
-	 * @throws LoginFailedException  If login failed.
-	 * @throws RemoteServerException If server communications failed.
 	 */
-	public Settings(PokemonGo api) throws LoginFailedException, RemoteServerException {
-		this.api = api;
+	public Settings(DownloadSettingsResponse downloadSettingsResponse) {
 		this.mapSettings = new MapSettings();
 		this.levelUpSettings = new LevelUpSettings();
 		this.fortSettings = new FortSettings();
 		this.inventorySettings = new InventorySettings();
 		this.gpsSettings = new GpsSettings();
-		updateSettings();
+		update(downloadSettingsResponse);
 	}
 
 	/**
 	 * Updates settings latest data.
 	 *
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
 	 */
-	public void updateSettings() throws RemoteServerException, LoginFailedException {
-		DownloadSettingsMessageOuterClass.DownloadSettingsMessage msg =
-				DownloadSettingsMessageOuterClass.DownloadSettingsMessage.newBuilder().build();
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.DOWNLOAD_SETTINGS, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest); //here you marked everything as read
-		DownloadSettingsResponseOuterClass.DownloadSettingsResponse response;
-		try {
-			response = DownloadSettingsResponseOuterClass.DownloadSettingsResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-
+	public final void update(DownloadSettingsResponse response) {
 		mapSettings.update(response.getSettings().getMapSettings());
 		levelUpSettings.update(response.getSettings().getInventorySettings());
 		fortSettings.update(response.getSettings().getFortSettings());

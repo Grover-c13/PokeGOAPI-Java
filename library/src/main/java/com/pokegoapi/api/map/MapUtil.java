@@ -15,9 +15,7 @@
 
 package com.pokegoapi.api.map;
 
-import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.internal.Location;
-import com.pokegoapi.api.map.Point;
 import com.pokegoapi.util.MapPoint;
 
 import java.util.List;
@@ -30,18 +28,6 @@ import java.util.TreeMap;
  * @version 1.0
  */
 class MapUtil {
-	/**
-	 * Random step to a coordinate object
-	 *
-	 * @param point the coordinate
-	 * @return the coordinate
-	 */
-	static Point randomStep(Point point) {
-		point.setLongitude(point.getLongitude() + randomStep());
-		point.setLatitude(point.getLatitude() + randomStep());
-
-		return point;
-	}
 
 	/**
 	 * Random step double.

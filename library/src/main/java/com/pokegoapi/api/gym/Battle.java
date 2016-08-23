@@ -24,21 +24,14 @@ import POGOProtos.Networking.Requests.Messages.AttackGymMessageOuterClass.Attack
 import POGOProtos.Networking.Requests.Messages.StartGymBattleMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.StartGymBattleMessageOuterClass.StartGymBattleMessage.Builder;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.AttackGymResponseOuterClass;
 import POGOProtos.Networking.Responses.AttackGymResponseOuterClass.AttackGymResponse;
-import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse.Result;
-
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.internal.Location;
 import com.pokegoapi.api.internal.networking.Networking;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
-
 import lombok.Getter;
 import rx.Observable;
 import rx.functions.Func1;

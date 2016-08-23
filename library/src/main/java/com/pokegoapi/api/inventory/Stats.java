@@ -15,7 +15,6 @@
 
 package com.pokegoapi.api.inventory;
 
-import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import POGOProtos.Data.Player.PlayerStatsOuterClass.PlayerStats;
 import POGOProtos.Inventory.InventoryItemDataOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;

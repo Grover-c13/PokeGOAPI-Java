@@ -20,9 +20,13 @@ import lombok.Data;
 
 @Data
 public class DailyBonus {
-	private final DailyBonusOuterClass.DailyBonus proto;
+	private DailyBonusOuterClass.DailyBonus proto;
 
-	public DailyBonus(DailyBonusOuterClass.DailyBonus proto) {
+	DailyBonus() {
+
+	}
+
+	final void update(DailyBonusOuterClass.DailyBonus proto) {
 		this.proto = proto;
 	}
 

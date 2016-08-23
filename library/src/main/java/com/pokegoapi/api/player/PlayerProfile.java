@@ -18,8 +18,6 @@ package com.pokegoapi.api.player;
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
-import com.pokegoapi.exceptions.InvalidCurrencyException;
-import com.pokegoapi.util.Log;
 import lombok.Data;
 
 import java.util.EnumMap;
@@ -29,11 +27,11 @@ import java.util.Map;
 public class PlayerProfile {
 	private static final String TAG = PlayerProfile.class.getSimpleName();
 	private PlayerData playerData;
-	private PlayerAvatar avatar;
-	private DailyBonus dailyBonus;
-	private ContactSettings contactSettings;
-	private Map<Currency, Integer> currencies = new EnumMap<>(Currency.class);
-	private TutorialState tutorialState;
+	private final PlayerAvatar avatar = new PlayerAvatar();
+	private final DailyBonus dailyBonus = new DailyBonus();
+	private final ContactSettings contactSettings = new ContactSettings();
+	private final Map<Currency, Integer> currencies = new EnumMap<>(Currency.class);
+	private final TutorialState tutorialState = new TutorialState();
 
 	/**
 	 */
@@ -43,37 +41,16 @@ public class PlayerProfile {
 
 	public final void update(GetPlayerResponse getPlayerResponse) {
 		playerData = getPlayerResponse.getPlayerData();
+		avatar.update(playerData.getAvatar());
+		dailyBonus.update(playerData.getDailyBonus());
+		contactSettings.update(playerData.getContactSettings());
 
-		avatar = new PlayerAvatar(playerData.getAvatar());
-		dailyBonus = new DailyBonus(playerData.getDailyBonus());
-		contactSettings = new ContactSettings(playerData.getContactSettings());
-
-		// maybe something more graceful?
 		for (CurrencyOuterClass.Currency currency : getPlayerResponse.getPlayerData().getCurrenciesList()) {
-			try {
-				addCurrency(currency.getName(), currency.getAmount());
-			} catch (InvalidCurrencyException e) {
-				Log.w(TAG, "Error adding currency. You can probably ignore this.", e);
-			}
+			Currency currencyEnum = Currency.valueOf(currency.getName());
+			currencies.put(currencyEnum, currency.getAmount());
 		}
 
-		// Tutorial state
-		tutorialState = new TutorialState(playerData.getTutorialStateList());
-	}
-
-	/**
-	 * Add currency.
-	 *
-	 * @param name   the name
-	 * @param amount the amount
-	 * @throws InvalidCurrencyException the invalid currency exception
-	 */
-	private void addCurrency(String name, int amount) throws InvalidCurrencyException {
-		try {
-			currencies.put(Currency.valueOf(name), amount);
-		} catch (Exception e) {
-			throw new InvalidCurrencyException();
-		}
+		tutorialState.update(playerData.getTutorialStateList());
 	}
 
 	/**
