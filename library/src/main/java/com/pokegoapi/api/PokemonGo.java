@@ -81,7 +81,7 @@ public class PokemonGo {
 			this.credentialProvider = credentialProvider;
 		}
 		this.time = time;
-		this.deviceInfoId = deviceInfoId.replace("-", "");
+		this.deviceInfoId = deviceInfoId.replace("-", "").toLowerCase();
 
 		startTime = currentTimeMillis();
 
