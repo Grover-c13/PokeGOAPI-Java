@@ -65,10 +65,10 @@ public class SensorInfo {
 	 * @return the default sensor info for the given api
 	 */
 	public static SignatureOuterClass.Signature.SensorInfo getDefault(PokemonGo api) {
-		SensorInfo sensorInfo = new SensorInfo();
 		Random random = new Random();
-		if (api.isFirstSensorInfo()) {
-			api.setFirstSensorInfo(false);
+		SensorInfo sensorInfo;
+		if (api.getSensorInfo() == null) {
+			sensorInfo = new SensorInfo();
 			sensorInfo.getBuilder().setTimestampSnapshot(api.currentTimeMillis() + api.getStartTime())
 					.setAccelRawX(0.1 + (0.7 - 0.1) * random.nextDouble())
 					.setAccelRawY(0.1 + (0.8 - 0.1) * random.nextDouble())
@@ -81,6 +81,7 @@ public class SensorInfo {
 					.setAccelNormalizedZ(-1.0 + (8.0 - (-1.0)) * random.nextDouble())
 					.setAccelerometerAxes(3);
 		} else {
+			sensorInfo = api.getSensorInfo();
 			sensorInfo.getBuilder().setTimestampSnapshot(api.currentTimeMillis() + api.getStartTime())
 					.setMagnetometerX(-0.7 + random.nextDouble() * 1.4)
 					.setMagnetometerY(-0.7 + random.nextDouble() * 1.4)
@@ -99,6 +100,7 @@ public class SensorInfo {
 					.setAccelNormalizedZ(-1.0 + (8.0 - (-1.0)) * random.nextDouble())
 					.setAccelerometerAxes(3);
 		}
+		api.setSensorInfo(sensorInfo);
 		return sensorInfo.getSensorInfo();
 	}
 

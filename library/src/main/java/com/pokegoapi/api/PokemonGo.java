@@ -72,10 +72,10 @@ public class PokemonGo {
 	private String uuid;
 	@Getter
 	@Setter
-	private boolean firstSensorInfo;
+	private boolean firstLocationFix;
 	@Getter
 	@Setter
-	private boolean firstLocationFix;
+	public SensorInfo sensorInfo;
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -227,15 +227,6 @@ public class PokemonGo {
 			deviceInfo = DeviceInfo.getDefault(this);
 		}
 		return deviceInfo.getDeviceInfo();
-	}
-
-	/**
-	 * Gets the sensor info
-	 *
-	 * @return the sensor info
-	 */
-	public SignatureOuterClass.Signature.SensorInfo getSensorInfo() {
-		return SensorInfo.getDefault(this);
 	}
 
 	/**

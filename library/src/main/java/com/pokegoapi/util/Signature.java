@@ -8,6 +8,7 @@ import POGOProtos.Networking.Requests.RequestOuterClass;
 
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.device.SensorInfo;
 
 import net.jpountz.xxhash.StreamingXXHash32;
 import net.jpountz.xxhash.StreamingXXHash64;
@@ -40,7 +41,7 @@ public class Signature {
 				.setTimestamp(api.currentTimeMillis())
 				.setTimestampSinceStart(curTime - api.getStartTime())
 				.setDeviceInfo(api.getDeviceInfo())
-				.setSensorInfo(api.getSensorInfo())
+				.setSensorInfo(SensorInfo.getDefault(api))
 				.setActivityStatus(api.getActivityStatus())
 				.addAllLocationFix(api.getLocationFix());
 
