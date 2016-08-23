@@ -67,16 +67,9 @@ public class PokemonGo {
 	@Setter
 	private DeviceInfo deviceInfo;
 	@Setter
-	private SensorInfo sensorInfo;
-	@Setter
-	private ActivityStatus activityStatus;
-	@Setter
 	private String uuid;
 	@Setter
 	private Random random;
-	@Getter
-	@Setter
-	private boolean firstSensorInfo;
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -248,10 +241,7 @@ public class PokemonGo {
 	 * @return the sensor info
 	 */
 	public SignatureOuterClass.Signature.SensorInfo getSensorInfo() {
-		if (sensorInfo == null) {
-			sensorInfo = SensorInfo.getDefault(this);
-		}
-		return sensorInfo.getSensorInfo();
+		return SensorInfo.getDefault(this);
 	}
 
 	/**
@@ -260,9 +250,6 @@ public class PokemonGo {
 	 * @return the activity status
 	 */
 	public SignatureOuterClass.Signature.ActivityStatus getActivityStatus() {
-		if (activityStatus == null) {
-			activityStatus = ActivityStatus.getDefault(this);
-		}
-		return activityStatus.getActivityStatus();
+		return ActivityStatus.getDefault(this);
 	}
 }

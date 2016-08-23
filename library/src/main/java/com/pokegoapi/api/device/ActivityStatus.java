@@ -40,7 +40,7 @@ public class ActivityStatus {
 	 * @param api the api
 	 * @return the default activity status for the given api
 	 */
-	public static ActivityStatus getDefault(PokemonGo api) {
+	public static SignatureOuterClass.Signature.ActivityStatus getDefault(PokemonGo api) {
 		Random random = api.getRandom();
 		boolean tilting = random.nextInt() % 2 == 0;
 		ActivityStatus activityStatus = new ActivityStatus();
@@ -48,7 +48,7 @@ public class ActivityStatus {
 		if (tilting) {
 			activityStatus.setTilting(true);
 		}
-		return activityStatus;
+		return activityStatus.getActivityStatus();
 	}
 
 	public void setAutomotive(boolean automotive) {

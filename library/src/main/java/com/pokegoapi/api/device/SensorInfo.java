@@ -64,11 +64,10 @@ public class SensorInfo {
 	 * @param api the api
 	 * @return the default sensor info for the given api
 	 */
-	public static SensorInfo getDefault(PokemonGo api) {
+	public static SignatureOuterClass.Signature.SensorInfo getDefault(PokemonGo api) {
 		SensorInfo sensorInfo = new SensorInfo();
 		Random random = new Random(api.getUuid().hashCode());
-		if (api.isFirstSensorInfo()) {
-			api.setFirstSensorInfo(false);
+		if (api.getSensorInfo() == null) {
 			sensorInfo.getBuilder().setTimestampSnapshot(api.currentTimeMillis() + api.getStartTime())
 					.setAccelRawX(0.1 + (0.7 - 0.1) * random.nextDouble())
 					.setAccelRawY(0.1 + (0.8 - 0.1) * random.nextDouble())
@@ -99,7 +98,7 @@ public class SensorInfo {
 					.setAccelNormalizedZ(-1.0 + (8.0 - (-1.0)) * random.nextDouble())
 					.setAccelerometerAxes(3);
 		}
-		return sensorInfo;
+		return sensorInfo.getSensorInfo();
 	}
 
 	/**
