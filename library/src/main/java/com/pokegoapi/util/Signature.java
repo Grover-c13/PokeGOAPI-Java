@@ -58,6 +58,8 @@ public class Signature {
             sigBuilder.addRequestHash(getRequestHash(authTicketBA, request));
         }
 
+        sigBuilder.setUnknown25(7363665268261373700L);
+
         SignatureOuterClass.Signature signature = sigBuilder.build();
 
         // TODO: Call encrypt function on this
