@@ -34,36 +34,33 @@ public class LocationFix {
 	public static List<SignatureOuterClass.Signature.LocationFix> getDefault(PokemonGo api) {
 		Random random = new Random();
 		int pn = random.nextInt(100);
-		int nProviders;
+		int providerCount;
 		HashSet<String> negativeSnapshotProviders = new HashSet<>();
 
 		List<SignatureOuterClass.Signature.LocationFix> locationFixes;
 		if (api.getLocationFixes() == null) {
 			locationFixes = new ArrayList<>();
-			nProviders = pn < 75 ? 6 : pn < 95 ? 5 : 8;
+			providerCount = pn < 75 ? 6 : pn < 95 ? 5 : 8;
 
-			if (nProviders != 8) {
+			if (providerCount != 8) {
 				// a 5% chance that the second provider got a negative value else it should be the first only
-				int nChanche = random.nextInt(100);
-				negativeSnapshotProviders.add(nChanche < 95 ? "0" : "1");
+				int chance = random.nextInt(100);
+				negativeSnapshotProviders.add(chance < 95 ? "0" : "1");
 			} else {
-				int nChanche = random.nextInt(100);
-				if (nChanche >= 50) {
-					negativeSnapshotProviders.add("0");
-					negativeSnapshotProviders.add("1");
+				int chance = random.nextInt(100);
+				negativeSnapshotProviders.add("0");
+				negativeSnapshotProviders.add("1");
+				if (chance >= 50) {
 					negativeSnapshotProviders.add("2");
-				} else {
-					negativeSnapshotProviders.add("0");
-					negativeSnapshotProviders.add("1");
 				}
 			}
 		} else {
 			locationFixes = api.getLocationFixes();
 			locationFixes.clear();
-			nProviders = pn < 60 ? 1 : pn < 90 ? 2 : 3;
+			providerCount = pn < 60 ? 1 : pn < 90 ? 2 : 3;
 		}
 
-		for (int i = 0; i < nProviders; i++) {
+		for (int i = 0; i < providerCount; i++) {
 			float latitude = offsetOnLatLong(api.getLatitude(), random.nextInt(100) + 10);
 			float longitude = offsetOnLatLong(api.getLongitude(), random.nextInt(100) + 10);
 			float altitude = 65;
@@ -84,8 +81,10 @@ public class LocationFix {
 					SignatureOuterClass.Signature.LocationFix.newBuilder();
 
 			locationFixBuilder.setProvider("fused")
-					.setTimestampSnapshot(negativeSnapshotProviders.contains(String.valueOf(i)) ?
-							random.nextInt(1000) - 3000 : api.currentTimeMillis() - api.getStartTime())
+					.setTimestampSnapshot(
+							negativeSnapshotProviders.contains(String.valueOf(i))
+									? random.nextInt(1000) - 3000
+									: api.currentTimeMillis() - api.getStartTime())
 					.setLatitude(latitude)
 					.setLongitude(longitude)
 					.setHorizontalAccuracy(-1)
@@ -98,9 +97,9 @@ public class LocationFix {
 		return locationFixes;
 	}
 
-	private static float offsetOnLatLong(double l, double d) {
-		double r = 6378137;
-		double dl = d / (r * Math.cos(Math.PI * l / 180));
-		return (float) (l + dl * 180 / Math.PI);
+	private static float offsetOnLatLong(double lat, double ran) {
+		double round = 6378137;
+		double dl = ran / (round * Math.cos(Math.PI * lat / 180));
+		return (float) (lat + dl * 180 / Math.PI);
 	}
 }
