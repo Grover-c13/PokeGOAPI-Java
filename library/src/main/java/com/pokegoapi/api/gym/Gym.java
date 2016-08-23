@@ -182,7 +182,8 @@ public class Gym implements MapPoint {
 	 * @throws LoginFailedException  if the login failed
 	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public FortDeployPokemonResponse.Result deployPokemon(Pokemon pokemon) throws LoginFailedException, RemoteServerException {
+	public FortDeployPokemonResponse.Result deployPokemon(Pokemon pokemon)
+		throws LoginFailedException, RemoteServerException {
 
 		FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
 				.setFortId(getId())
@@ -213,7 +214,8 @@ public class Gym implements MapPoint {
 	 * @throws LoginFailedException  if the login failed
 	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public Observable<FortDeployPokemonResponse.Result> deployPokemonAsync(Pokemon pokemon) throws RemoteServerException, LoginFailedException {
+	public Observable<FortDeployPokemonResponse.Result> deployPokemonAsync(Pokemon pokemon)
+		throws RemoteServerException, LoginFailedException {
 
 		FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
 				.setFortId(getId())
@@ -223,7 +225,9 @@ public class Gym implements MapPoint {
 				.build();
 
 		AsyncServerRequest asyncServerRequest = new AsyncServerRequest(RequestType.FORT_DEPLOY_POKEMON, reqMsg);
-		return api.getRequestHandler().sendAsyncServerRequests(asyncServerRequest).map(new Func1<ByteString, FortDeployPokemonResponse.Result>() {
+		return api.getRequestHandler()
+			.sendAsyncServerRequests(asyncServerRequest)
+			.map(new Func1<ByteString, FortDeployPokemonResponse.Result>() {
 
 			@Override
 			public FortDeployPokemonResponse.Result call(ByteString response) {
