@@ -21,8 +21,10 @@ import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.TeamColorOuterClass;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Networking.Requests.Messages.GetGymDetailsMessageOuterClass.GetGymDetailsMessage;
+import POGOProtos.Networking.Requests.Messages.FortDeployPokemonMessageOuterClass.FortDeployPokemonMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetGymDetailsResponseOuterClass.GetGymDetailsResponse;
+import POGOProtos.Networking.Responses.FortDeployPokemonResponseOuterClass.FortDeployPokemonResponse;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.ProtocolStringList;
@@ -165,6 +167,29 @@ public class Gym implements MapPoint {
 		}
 
 		return data;
+	}
+
+	public FortDeployPokemonResponse.Result deployPokemon(Pokemon pokemon) throws LoginFailedException, RemoteServerException {
+
+		FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
+				.setFortId(getId())
+				.setPlayerLatitude(api.getLatitude())
+				.setPlayerLongitude(api.getLongitude())
+				.setPokemonId(pokemon.getId())
+				.build();
+
+		ServerRequest serverRequest = new ServerRequest(RequestType.FORT_DEPLOY_POKEMON, reqMsg);
+		api.getRequestHandler().sendServerRequests(serverRequest);
+
+		FortDeployPokemonResponse deployResponse;
+
+		try {
+			deployResponse = FortDeployPokemonResponse.parseFrom(serverRequest.getData());
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException();
+		}
+
+		return deployResponse.getResult();
 	}
 
 	protected PokemonGo getApi() {
