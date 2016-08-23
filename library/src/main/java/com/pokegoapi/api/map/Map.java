@@ -59,6 +59,7 @@ import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.MapUtil;
 
 import rx.Observable;
+import rx.exceptions.Exceptions;
 import rx.functions.Func1;
 
 import java.util.ArrayList;
@@ -79,10 +80,8 @@ public class Map {
 	 * Instantiates a new Map.
 	 *
 	 * @param api the api
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public Map(PokemonGo api) throws LoginFailedException, RemoteServerException {
+	public Map(PokemonGo api) {
 		this.api = api;
 		cachedMapObjects = new MapObjects(api);
 		lastMapUpdate = 0;
@@ -92,8 +91,11 @@ public class Map {
 	 * Returns a list of catchable pokemon around the current location.
 	 *
 	 * @return a List of CatchablePokemon at your current location
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync() {
+	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync()
+			throws LoginFailedException, RemoteServerException {
 
 		if (!useCache()) {
 			// getMapObjects wont be called unless this is null
@@ -110,22 +112,26 @@ public class Map {
 		return getMapObjectsAsync(cellIds).map(new Func1<MapObjects, List<CatchablePokemon>>() {
 			@Override
 			public List<CatchablePokemon> call(MapObjects mapObjects) {
-				Set<CatchablePokemon> catchablePokemons = new HashSet<>();
+				Set<CatchablePokemon> catchablePokemon = new HashSet<>();
 				for (MapPokemon mapPokemon : mapObjects.getCatchablePokemons()) {
-					catchablePokemons.add(new CatchablePokemon(api, mapPokemon));
+					catchablePokemon.add(new CatchablePokemon(api, mapPokemon));
 				}
 
 				for (WildPokemonOuterClass.WildPokemon wildPokemon : mapObjects.getWildPokemons()) {
-					catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
+					catchablePokemon.add(new CatchablePokemon(api, wildPokemon));
 				}
 
 				for (Pokestop pokestop : mapObjects.getPokestops()) {
-					if (pokestop.inRangeForLuredPokemon() && pokestop.getFortData().hasLureInfo()) {
-						catchablePokemons.add(new CatchablePokemon(api, pokestop.getFortData()));
+					try {
+						if (pokestop.inRangeForLuredPokemon() && pokestop.getFortData().hasLureInfo()) {
+							catchablePokemon.add(new CatchablePokemon(api, pokestop.getFortData()));
+						}
+					} catch (LoginFailedException | RemoteServerException e) {
+						throw Exceptions.propagate(e);
 					}
 				}
 
-				cachedCatchable = Collections.synchronizedList(new CopyOnWriteArrayList<>(catchablePokemons));
+				cachedCatchable = Collections.synchronizedList(new CopyOnWriteArrayList<>(catchablePokemon));
 				return cachedCatchable;
 			}
 		});
@@ -170,8 +176,10 @@ public class Map {
 	 * Returns a list of nearby pokemon (non-catchable).
 	 *
 	 * @return a List of NearbyPokemon at your current location
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public Observable<List<NearbyPokemon>> getNearbyPokemonAsync() {
+	public Observable<List<NearbyPokemon>> getNearbyPokemonAsync() throws LoginFailedException, RemoteServerException {
 		return getMapObjectsAsync(getDefaultCells()).map(new Func1<MapObjects, List<NearbyPokemon>>() {
 			@Override
 			public List<NearbyPokemon> call(MapObjects result) {
@@ -200,8 +208,10 @@ public class Map {
 	 * Returns a list of spawn points.
 	 *
 	 * @return list of spawn points
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public Observable<List<Point>> getSpawnPointsAsync() {
+	public Observable<List<Point>> getSpawnPointsAsync() throws LoginFailedException, RemoteServerException {
 		return getMapObjectsAsync(getDefaultCells()).map(new Func1<MapObjects, List<Point>>() {
 			@Override
 			public List<Point> call(MapObjects result) {
@@ -231,8 +241,10 @@ public class Map {
 	 * Get a list of gyms near the current location.
 	 *
 	 * @return List of gyms
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public Observable<List<Gym>> getGymsAsync() {
+	public Observable<List<Gym>> getGymsAsync() throws LoginFailedException, RemoteServerException {
 		return getMapObjectsAsync(getDefaultCells()).map(new Func1<MapObjects, List<Gym>>() {
 			@Override
 			public List<Gym> call(MapObjects result) {
@@ -274,8 +286,10 @@ public class Map {
 	 * Returns a list of decimated spawn points at current location.
 	 *
 	 * @return list of spawn points
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public Observable<List<Point>> getDecimatedSpawnPointsAsync() {
+	public Observable<List<Point>> getDecimatedSpawnPointsAsync() throws LoginFailedException, RemoteServerException {
 		return getMapObjectsAsync(getDefaultCells()).map(new Func1<MapObjects, List<Point>>() {
 			public List<Point> call(MapObjects result) {
 				List<Point> points = new ArrayList<>();
@@ -316,8 +330,10 @@ public class Map {
 	 * Returns MapObjects around your current location.
 	 *
 	 * @return MapObjects at your current location
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public Observable<MapObjects> getMapObjectsAsync() {
+	public Observable<MapObjects> getMapObjectsAsync() throws LoginFailedException, RemoteServerException {
 		return getMapObjectsAsync(getDefaultCells());
 	}
 
@@ -326,8 +342,10 @@ public class Map {
 	 *
 	 * @param width width
 	 * @return MapObjects at your current location
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public Observable<MapObjects> getMapObjectsAsync(int width) {
+	public Observable<MapObjects> getMapObjectsAsync(int width) throws LoginFailedException, RemoteServerException {
 		return getMapObjectsAsync(getCellIds(api.getLatitude(), api.getLongitude(), width));
 	}
 
@@ -336,8 +354,11 @@ public class Map {
 	 *
 	 * @param cellIds List of cellId
 	 * @return MapObjects in the given cells
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public Observable<MapObjects> getMapObjectsAsync(List<Long> cellIds) {
+	public Observable<MapObjects> getMapObjectsAsync(List<Long> cellIds)
+			throws LoginFailedException, RemoteServerException {
 
 		if (useCache()) {
 			return Observable.just(cachedMapObjects);
@@ -684,8 +705,10 @@ public class Map {
 	 * Wether or not to get a fresh copy or use cache;
 	 *
 	 * @return true if enough time has elapsed since the last request, false otherwise
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	private boolean useCache() {
+	private boolean useCache() throws LoginFailedException, RemoteServerException {
 		return (api.currentTimeMillis() - lastMapUpdate) < api.getSettings().getMapSettings().getMinRefresh();
 	}
 

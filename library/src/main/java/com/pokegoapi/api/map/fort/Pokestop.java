@@ -80,8 +80,10 @@ public class Pokestop {
 	 * Returns whether or not a pokestop is in range.
 	 *
 	 * @return true when in range of player
+	 * @throws LoginFailedException  If login failed.
+	 * @throws RemoteServerException If server communications failed.
 	 */
-	public boolean inRange() {
+	public boolean inRange() throws LoginFailedException, RemoteServerException {
 		return getDistance() <= api.getSettings().getFortSettings().getInteractionRangeInMeters();
 	}
 
@@ -89,8 +91,10 @@ public class Pokestop {
 	 * Returns whether or not the lured pokemon is in range.
 	 *
 	 * @return true when the lured pokemon is in range of player
+	 * @throws LoginFailedException  If login failed.
+	 * @throws RemoteServerException If server communications failed.
 	 */
-	public boolean inRangeForLuredPokemon() {
+	public boolean inRangeForLuredPokemon() throws LoginFailedException, RemoteServerException {
 		return getDistance() <= api.getSettings().getMapSettings().getPokemonVisibilityRange();
 	}
 
@@ -98,8 +102,10 @@ public class Pokestop {
 	 * can user loot this from current position.
 	 *
 	 * @return true when lootable
+	 * @throws LoginFailedException  If login failed.
+	 * @throws RemoteServerException If server communications failed.
 	 */
-	public boolean canLoot() {
+	public boolean canLoot() throws LoginFailedException, RemoteServerException {
 		return canLoot(false);
 	}
 
@@ -108,8 +114,10 @@ public class Pokestop {
 	 *
 	 * @param ignoreDistance the ignore distance
 	 * @return the boolean
+	 * @throws LoginFailedException  If login failed.
+	 * @throws RemoteServerException If server communications failed.
 	 */
-	public boolean canLoot(boolean ignoreDistance) {
+	public boolean canLoot(boolean ignoreDistance) throws LoginFailedException, RemoteServerException {
 		boolean active = cooldownCompleteTimestampMs < api.currentTimeMillis();
 		if (!ignoreDistance) {
 			return active && inRange();
