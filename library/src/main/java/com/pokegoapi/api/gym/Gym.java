@@ -169,6 +169,14 @@ public class Gym implements MapPoint {
 		return data;
 	}
 
+	/**
+	 * Deploy pokemon
+	 *
+	 * @param pokemon The pokemon to deploy
+	 * @return Result of attempt to deploy pokemon
+	 * @throws LoginFailedException  if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
+	 */
 	public FortDeployPokemonResponse.Result deployPokemon(Pokemon pokemon) throws LoginFailedException, RemoteServerException {
 
 		FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
