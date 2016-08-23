@@ -149,7 +149,7 @@ public class Signature {
                 .setDeviceModelBoot(device[0])
                 .setDeviceModel(device[1])
                 .setHardwareModel(device[2])
-                .setHardwareModel("iPhone OS")
+                .setFirmwareBrand("iPhone OS")
                 .setDeviceBrand("Apple")
                 .setHardwareManufacturer("Apple");
         sDeviceInfo = deviceInfoBuilder.build();
