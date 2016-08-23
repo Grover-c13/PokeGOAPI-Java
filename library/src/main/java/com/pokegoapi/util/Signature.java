@@ -21,9 +21,6 @@ public class Signature {
 
     private static Random sRandom = new Random();
 
-    private static boolean sFirstSensorInfo = true;
-    private static boolean sFirstLocationFix = true;
-
     /**
      * Given a fully built request, set the signature correctly.
      *
@@ -150,8 +147,7 @@ public class Signature {
     private static void buildSensorInfo(SignatureOuterClass.Signature.Builder sigBuilder, PokemonGo api) {
         SignatureOuterClass.Signature.SensorInfo.Builder sensorInfoBuilder =
                 SignatureOuterClass.Signature.SensorInfo.newBuilder();
-        if (sFirstSensorInfo) {
-            sFirstSensorInfo = false;
+        if (api.currentTimeMillis() - api.startTime < 0) {
             sensorInfoBuilder.setTimestampSnapshot(api.currentTimeMillis() - api.startTime)
                     .setAccelRawX(0.1 + (0.7 - 0.1) * sRandom.nextDouble())
                     .setAccelRawY(0.1 + (0.8 - 0.1) * sRandom.nextDouble())
@@ -203,8 +199,7 @@ public class Signature {
         int nProviders;
         HashSet<String> negativeSnapshotProviders = new HashSet<>();
 
-        if (sFirstLocationFix) {
-            sFirstLocationFix = false;
+        if (api.currentTimeMillis() - api.startTime < 0) {
             nProviders = pn < 75 ? 6 : pn < 95 ? 5 : 8;
 
             if (nProviders != 8) {
