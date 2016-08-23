@@ -134,6 +134,21 @@ public class PokemonGo {
 	 *
 	 * @param credentialProvider the credential provider
 	 * @param client             the http client
+	 * @param time               a time implementation
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+	 */
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time)
+			throws LoginFailedException, RemoteServerException {
+		this(credentialProvider, client, time, UUID.randomUUID().hashCode());
+	}
+
+	/**
+	 * Instantiates a new Pokemon go.
+	 * Deprecated: specify a time implementation
+	 *
+	 * @param credentialProvider the credential provider
+	 * @param client             the http client
 	 * @throws LoginFailedException  When login fails
 	 * @throws RemoteServerException When server fails
 	 */
