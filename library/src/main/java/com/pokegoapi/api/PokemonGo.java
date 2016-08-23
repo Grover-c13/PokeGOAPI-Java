@@ -85,11 +85,12 @@ public class PokemonGo {
 	 * @param credentialProvider the credential provider
 	 * @param client             the http client
 	 * @param time               a time implementation
+	 * @param seed               the seed to generate same device
 	 * @throws LoginFailedException  When login fails
 	 * @throws RemoteServerException When server fails
 	 */
 
-	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time)
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time, long seed)
 			throws LoginFailedException, RemoteServerException {
 
 		if (credentialProvider == null) {
@@ -98,6 +99,7 @@ public class PokemonGo {
 			this.credentialProvider = credentialProvider;
 		}
 		this.time = time;
+		this.seed = seed;
 
 		sessionHash = new byte[32];
 		new Random().nextBytes(sessionHash);
@@ -109,7 +111,21 @@ public class PokemonGo {
 		longitude = Double.NaN;
 		latitude = Double.NaN;
 		startTime = currentTimeMillis();
-		seed = playerProfile.getPlayerData().getUsername().length();
+	}
+
+	/**
+	 * Instantiates a new Pokemon go.
+	 * Deprecated: specify a time implementation
+	 *
+	 * @param credentialProvider the credential provider
+	 * @param client             the http client
+	 * @param seed               the seed to generate same device
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+	 */
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, long seed)
+			throws LoginFailedException, RemoteServerException {
+		this(credentialProvider, client, new SystemTimeImpl(), seed);
 	}
 
 	/**
@@ -123,7 +139,7 @@ public class PokemonGo {
 	 */
 	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client)
 			throws LoginFailedException, RemoteServerException {
-		this(credentialProvider, client, new SystemTimeImpl());
+		this(credentialProvider, client, new SystemTimeImpl(), UUID.randomUUID().hashCode());
 	}
 
 	/**
