@@ -77,7 +77,6 @@ public class Signature {
 		};
 	}
 
-
 	private static int getLocationHash1(PokemonGo api, byte[] authTicket) {
 		XXHashFactory factory = XXHashFactory.safeInstance();
 		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x1B845238);
