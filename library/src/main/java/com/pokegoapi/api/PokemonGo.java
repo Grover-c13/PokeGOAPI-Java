@@ -37,6 +37,7 @@ import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -72,10 +73,10 @@ public class PokemonGo {
 	private String uuid;
 	@Getter
 	@Setter
-	private boolean firstLocationFix;
+	public SensorInfo sensorInfo;
 	@Getter
 	@Setter
-	public SensorInfo sensorInfo;
+	public List<SignatureOuterClass.Signature.LocationFix> locationFixes;
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -227,23 +228,5 @@ public class PokemonGo {
 			deviceInfo = DeviceInfo.getDefault(this);
 		}
 		return deviceInfo.getDeviceInfo();
-	}
-
-	/**
-	 * Gets the activity status
-	 *
-	 * @return the activity status
-	 */
-	public SignatureOuterClass.Signature.ActivityStatus getActivityStatus() {
-		return ActivityStatus.getDefault();
-	}
-
-	/**
-	 * Gets the location fix
-	 *
-	 * @return the sensor info
-	 */
-	public List<SignatureOuterClass.Signature.LocationFix> getLocationFix() {
-		return LocationFix.getDefault(this);
 	}
 }

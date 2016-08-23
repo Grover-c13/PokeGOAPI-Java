@@ -37,8 +37,9 @@ public class LocationFix {
 		int nProviders;
 		HashSet<String> negativeSnapshotProviders = new HashSet<>();
 
-		if (api.isFirstLocationFix()) {
-			api.setFirstLocationFix(false);
+		List<SignatureOuterClass.Signature.LocationFix> locationFixes;
+		if (api.getLocationFixes() == null) {
+			locationFixes = new ArrayList<>();
 			nProviders = pn < 75 ? 6 : pn < 95 ? 5 : 8;
 
 			if (nProviders != 8) {
@@ -57,10 +58,10 @@ public class LocationFix {
 				}
 			}
 		} else {
+			locationFixes = api.getLocationFixes();
+			locationFixes.clear();
 			nProviders = pn < 60 ? 1 : pn < 90 ? 2 : 3;
 		}
-
-		List<SignatureOuterClass.Signature.LocationFix> locationFixes = new ArrayList<>(nProviders);
 
 		for (int i = 0; i < nProviders; i++) {
 			float latitude = offsetOnLatLong(api.getLatitude(), random.nextInt(100) + 10);
