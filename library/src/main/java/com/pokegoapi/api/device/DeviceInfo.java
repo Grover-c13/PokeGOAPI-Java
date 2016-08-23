@@ -89,7 +89,7 @@ public class DeviceInfo {
 		}
 	};
 
-	private SignatureOuterClass.Signature.DeviceInfo.Builder deviceInfoBuilder;
+	private SignatureOuterClass.Signature.DeviceInfo.Builder deviceInfoBuilder;å
 
 	public DeviceInfo() {
 		deviceInfoBuilder = SignatureOuterClass.Signature.DeviceInfo.newBuilder();
@@ -127,7 +127,7 @@ public class DeviceInfo {
 	public static DeviceInfo getDefault(PokemonGo api) {
 		DeviceInfo deviceInfo = new DeviceInfo();
 		deviceInfo.setDeviceId(api.getUuid());
-		Random random = api.getRandom();
+		Random random = new Random(api.getUuid().hashCode());
 		String[][] devices =
 				{
 						{"iPad3,1", "iPad", "J1AP"},

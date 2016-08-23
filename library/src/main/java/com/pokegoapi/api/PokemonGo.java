@@ -68,8 +68,6 @@ public class PokemonGo {
 	private DeviceInfo deviceInfo;
 	@Setter
 	private String uuid;
-	@Setter
-	private Random random;
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -209,18 +207,6 @@ public class PokemonGo {
 			uuid = UUID.randomUUID().toString();
 		}
 		return uuid;
-	}
-
-	/**
-	 * Returns the current random or generate a new one
-	 *
-	 * @return the current random
-	 */
-	public Random getRandom() {
-		if (random == null) {
-			random = new Random(getUuid().hashCode());
-		}
-		return random;
 	}
 
 	/**
