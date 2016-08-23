@@ -41,6 +41,7 @@ import java.util.Random;
 public class PokemonGo {
 
 	private static final java.lang.String TAG = PokemonGo.class.getSimpleName();
+	private static final int sleepTime = 800;
 	private final Time time;
 	public final long startTime;
 	@Getter
@@ -72,12 +73,14 @@ public class PokemonGo {
 	 * @param credentialProvider the credential provider
 	 * @param client             the http client
 	 * @param time               a time implementation
+	 * @param needSleep			 need sleep after creating settings
 	 * @throws LoginFailedException  When login fails
 	 * @throws RemoteServerException When server fails
+	 * @throws InterruptedException When Thread.sleep fails
 	 */
 
-	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time)
-			throws LoginFailedException, RemoteServerException {
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time, boolean needSleep)
+			throws LoginFailedException, RemoteServerException, InterruptedException {
 
 		if (credentialProvider == null) {
 			throw new LoginFailedException("Credential Provider is null");
@@ -91,12 +94,34 @@ public class PokemonGo {
 
 		requestHandler = new RequestHandler(this, client);
 		playerProfile = new PlayerProfile(this);
+		//Need to sleep after PlayerProfile's updateProfile()
+		if (needSleep) Thread.sleep(sleepTime);
+		
 		settings = new Settings(this);
+		//Need to sleep after Settings' updateSettings()
+		if (needSleep) Thread.sleep(sleepTime);
+		
 		map = new Map(this);
 		longitude = Double.NaN;
 		latitude = Double.NaN;
 		startTime = currentTimeMillis();
 	}
+
+	/**
+	 * Instantiates a new Pokemon go asking which will sleep after settings.
+	 *
+	 * @param credentialProvider the credential provider
+	 * @param client             the http client
+	 * @param needSleep			 need sleep after creating settings
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+	 * @throws InterruptedException When Thread.sleep fails
+	 */
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, boolean needSleep)
+			throws LoginFailedException, RemoteServerException, InterruptedException {
+		this(credentialProvider, client, new SystemTimeImpl(), needSleep);
+	}
+
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -106,10 +131,11 @@ public class PokemonGo {
 	 * @param client             the http client
 	 * @throws LoginFailedException  When login fails
 	 * @throws RemoteServerException When server fails
+	 * @throws InterruptedException When Thread.sleep fails
 	 */
 	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client)
-			throws LoginFailedException, RemoteServerException {
-		this(credentialProvider, client, new SystemTimeImpl());
+			throws LoginFailedException, RemoteServerException, InterruptedException {
+		this(credentialProvider, client, new SystemTimeImpl(), false);
 	}
 
 	/**
