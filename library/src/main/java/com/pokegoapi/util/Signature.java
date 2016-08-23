@@ -21,6 +21,10 @@ public class Signature {
 
     private static Random sRandom = new Random();
 
+    private static SignatureOuterClass.Signature.DeviceInfo sDeviceInfo;
+    // Hold it for multi account
+    private static String sDeviceId = "";
+
     /**
      * Given a fully built request, set the signature correctly.
      *
@@ -86,6 +90,13 @@ public class Signature {
             return;
         }
 
+        if (sDeviceInfo != null && api.deviceInfoId.equals(sDeviceId)) {
+            sigBuilder.setDeviceInfo(sDeviceInfo);
+            return;
+        }
+
+        sDeviceId = api.deviceInfoId;
+
         Random deviceRandom = new Random(api.deviceInfoId.hashCode());
         String[][] devices =
                 {
@@ -141,7 +152,8 @@ public class Signature {
                 .setHardwareModel("iPhone OS")
                 .setDeviceBrand("Apple")
                 .setHardwareManufacturer("Apple");
-        sigBuilder.setDeviceInfo(deviceInfoBuilder.build());
+        sDeviceInfo = deviceInfoBuilder.build();
+        sigBuilder.setDeviceInfo(sDeviceInfo);
     }
 
     private static void buildSensorInfo(SignatureOuterClass.Signature.Builder sigBuilder, PokemonGo api) {
