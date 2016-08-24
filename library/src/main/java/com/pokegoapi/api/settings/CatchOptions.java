@@ -51,6 +51,8 @@ public class CatchOptions {
 	private Pokeball pokeBall;
 	private boolean strictBallType;
 	private boolean smartSelect;
+	@Getter
+	private boolean hitPokemon;
 	private double probability;
 	@Getter
 	private double normalizedHitPosition;
@@ -61,8 +63,6 @@ public class CatchOptions {
 	
 	/**
 	 * Instantiates a new CatchOptions object.
-	 *
-	 * @param api   the api
 	 */
 	public CatchOptions(Inventories inventories) {
 		this.inventories = inventories;
@@ -72,6 +72,7 @@ public class CatchOptions {
 		this.pokeBall = POKEBALL;
 		this.strictBallType = false;
 		this.smartSelect = false;
+		this.hitPokemon = true;
 		this.probability = 0;
 		this.normalizedHitPosition = 1.0;
 		this.normalizedReticleSize = 1.95 + Math.random() * 0.05;
@@ -270,6 +271,11 @@ public class CatchOptions {
 	 */
 	public CatchOptions setSpinModifier(double spinModifier) {
 		this.spinModifier = spinModifier;
+		return this;
+	}
+
+	public CatchOptions setHitPokemon(boolean hitPokemon) {
+		this.hitPokemon = hitPokemon;
 		return this;
 	}
 

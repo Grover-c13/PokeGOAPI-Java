@@ -18,19 +18,24 @@ package com.pokegoapi.api.map;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Map.Fort.FortTypeOuterClass;
 import POGOProtos.Map.MapCellOuterClass;
-import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
-import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass.NearbyPokemon;
+import POGOProtos.Map.Pokemon.MapPokemonOuterClass;
+import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Map.SpawnPointOuterClass.SpawnPoint;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
+import com.pokegoapi.api.gym.Gym;
 import com.pokegoapi.api.internal.Location;
 import com.pokegoapi.api.internal.networking.Networking;
+import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.fort.Pokestop;
+import com.pokegoapi.api.map.pokemon.CatchablePokemon;
+import com.pokegoapi.api.map.pokemon.NearbyPokemon;
 import com.pokegoapi.api.settings.Settings;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,41 +45,90 @@ import java.util.concurrent.ConcurrentHashMap;
 class MapObjects {
 	private final Networking networking;
 	private final Location location;
+	private final Inventories inventories;
 	private final Settings settings;
-	private final Map<Long, NearbyPokemon> nearbyPokemonMap = new ConcurrentHashMap<>();
-	private final Map<Long, MapPokemon> catchablePokemonMap = new ConcurrentHashMap<>();
-	private final Map<Long, WildPokemon> wildPokemonMap = new ConcurrentHashMap<>();
-	private final Map<Long, SpawnPoint> decimatedSpawnPointMap = new ConcurrentHashMap<>();
-	private final Map<Long, SpawnPoint> spawnPointMap = new ConcurrentHashMap<>();
-	private final Map<String, FortData> gymMap = new ConcurrentHashMap<>();
+	private final MapOnSubscribe<NearbyPokemon> nearbyPokemonMapOnSubscribe = new MapOnSubscribe<>();
+	private final Map<String, NearbyPokemon> nearbyPokemonMap = new ConcurrentHashMap<>();
+	private final MapOnSubscribe<CatchablePokemon> catchablePokemonMapOnSubscribe = new MapOnSubscribe<>();
+	private final Map<String, CatchablePokemon> catchablePokemonMap = new ConcurrentHashMap<>();
+	private final MapOnSubscribe<Point> decimatedSpawnPointMapOnSubscribe = new MapOnSubscribe<>();
+	private final Map<String, Point> decimatedSpawnPointMap = new ConcurrentHashMap<>();
+	private final MapOnSubscribe<Point> spawnPointMapOnSubscribe = new MapOnSubscribe<>();
+	private final Map<String, Point> spawnPointMap = new ConcurrentHashMap<>();
+	private final MapOnSubscribe<Gym> gymMapOnSubscribe = new MapOnSubscribe<>();
+	private final Map<String, Gym> gymMap = new ConcurrentHashMap<>();
+	private final MapOnSubscribe<Pokestop> pokestopOnSubscribe = new MapOnSubscribe<>();
 	private final Map<String, Pokestop> pokestopMap = new ConcurrentHashMap<>();
+
+	private final GetKey<NearbyPokemon> nearbyPokemonGetKey = new GetKey<NearbyPokemon>() {
+		@Override
+		public String getKey(NearbyPokemon obj) {
+			return Long.toString(obj.getEncounterId());
+		}
+	};
+	private final GetKey<CatchablePokemon> catchablePokemonGetKey = new GetKey<CatchablePokemon>() {
+		@Override
+		public String getKey(CatchablePokemon obj) {
+			return Long.toString(obj.getEncounterId());
+		}
+	};
+	private final GetKey<Point> spawnPointGetKey = new GetKey<Point>() {
+		@Override
+		public String getKey(Point obj) {
+			long latitidue = (long)obj.getLatitude() * 100000L;
+			long longitude = (long)obj.getLatitude() * 10000000000L;
+			return Long.toString(latitidue + longitude);
+		}
+	};
+	private final GetKey<Gym> fortDataGetKey = new GetKey<Gym>() {
+		@Override
+		public String getKey(Gym obj) {
+			return obj.getId();
+		}
+	};
+	private final GetKey<Pokestop> pokestopGetKey = new GetKey<Pokestop>() {
+		@Override
+		public String getKey(Pokestop obj) {
+			return obj.getId();
+		}
+	};
 
 	/**
 	 * Instantiates a new Map objects.
 	 *
 	 */
-	MapObjects(Networking networking, Location location, Settings settings, GetMapObjectsResponse getMapObjectsResponse) {
+	MapObjects(Networking networking, Location location, Inventories inventories, Settings settings, GetMapObjectsResponse getMapObjectsResponse) {
 		this.networking = networking;
 		this.location = location;
+		this.inventories = inventories;
 		this.settings = settings;
 		update(getMapObjectsResponse);
 	}
 
 	final void update(GetMapObjectsResponse response) {
 		List<NearbyPokemon> nearbyPokemons = new LinkedList<>();
-		List<MapPokemon> catchablePokemons = new LinkedList<>();
-		List<WildPokemon> wildPokemons = new LinkedList<>();
-		List<SpawnPoint> decimatedSpawnPoints = new LinkedList<>();
-		List<SpawnPoint> spawnPoints = new LinkedList<>();
-		List<FortData> gyms = new LinkedList<>();
-		List<FortData> pokestops = new LinkedList<>();
+		List<CatchablePokemon> catchablePokemons = new LinkedList<>();
+		List<Point> decimatedSpawnPoints = new LinkedList<>();
+		List<Point> spawnPoints = new LinkedList<>();
+		List<Gym> gyms = new LinkedList<>();
+		List<Pokestop> pokestops = new LinkedList<>();
 
 		for (MapCellOuterClass.MapCell mapCell : response.getMapCellsList()) {
-			nearbyPokemons.addAll(mapCell.getNearbyPokemonsList());
-			catchablePokemons.addAll(mapCell.getCatchablePokemonsList());
-			wildPokemons.addAll(mapCell.getWildPokemonsList());
-			decimatedSpawnPoints.addAll(mapCell.getDecimatedSpawnPointsList());
-			spawnPoints.addAll(mapCell.getSpawnPointsList());
+			for (NearbyPokemonOuterClass.NearbyPokemon nearbyPokemon : mapCell.getNearbyPokemonsList()) {
+				nearbyPokemons.add(new NearbyPokemon(nearbyPokemon));
+			}
+			for (MapPokemonOuterClass.MapPokemon mapPokemon : mapCell.getCatchablePokemonsList()) {
+				catchablePokemons.add(new CatchablePokemon(networking, location, inventories, mapPokemon));
+			}
+			for (WildPokemon mapPokemon : mapCell.getWildPokemonsList()) {
+				catchablePokemons.add(new CatchablePokemon(networking, location, inventories, mapPokemon));
+			}
+			for (SpawnPoint spawnPoint : mapCell.getDecimatedSpawnPointsList()) {
+				decimatedSpawnPoints.add(new Point(spawnPoint));
+			}
+			for (SpawnPoint spawnPoint : mapCell.getSpawnPointsList()) {
+				spawnPoints.add(new Point(spawnPoint));
+			}
 
 			java.util.Map<FortTypeOuterClass.FortType, List<FortData>> groupedForts = Stream.of(mapCell.getFortsList())
 					.collect(Collectors.groupingBy(new Function<FortData, FortTypeOuterClass.FortType>() {
@@ -83,85 +137,92 @@ class MapObjects {
 							return fortData.getType();
 						}
 					}));
-			gyms.addAll(groupedForts.get(FortTypeOuterClass.FortType.GYM));
-			pokestops.addAll(groupedForts.get(FortTypeOuterClass.FortType.CHECKPOINT));
+			for (FortData fortData : groupedForts.get(FortTypeOuterClass.FortType.GYM)) {
+				gyms.add(new Gym(networking, location, fortData));
+			}
+			for (FortData fortData : groupedForts.get(FortTypeOuterClass.FortType.CHECKPOINT)) {
+				pokestops.add(new Pokestop(networking, location, settings, fortData));
+			}
+			for (Pokestop pokestop : pokestops) {
+				if (pokestop.inRangeForLuredPokemon() && pokestop.getFortData().hasLureInfo()) {
+					catchablePokemons.add(new CatchablePokemon(networking, location, inventories, pokestop.getFortData()));
+				}
+			}
 		}
-		List<Long> ids = new LinkedList<>();
-		for (NearbyPokemon pokemon : nearbyPokemons) {
-			nearbyPokemonMap.put(pokemon.getEncounterId(), pokemon);
-			ids.add(pokemon.getEncounterId());
-		}
-		nearbyPokemonMap.keySet().retainAll(ids);
-		ids.clear();
-		for (MapPokemon pokemon : catchablePokemons) {
-			catchablePokemonMap.put(pokemon.getEncounterId(), pokemon);
-			ids.add(pokemon.getEncounterId());
-		}
-		catchablePokemonMap.keySet().retainAll(ids);
-		ids.clear();
-		for (WildPokemon pokemon : wildPokemons) {
-			wildPokemonMap.put(pokemon.getEncounterId(), pokemon);
-			ids.add(pokemon.getEncounterId());
-		}
-		wildPokemonMap.keySet().retainAll(ids);
-		ids.clear();
-		for (SpawnPoint spawnPoint : decimatedSpawnPoints) {
-			decimatedSpawnPointMap.put(getId(spawnPoint), spawnPoint);
-			ids.add(getId(spawnPoint));
-		}
-		decimatedSpawnPointMap.keySet().retainAll(ids);
-		ids.clear();
-		for (SpawnPoint spawnPoint : spawnPoints) {
-			spawnPointMap.put(getId(spawnPoint), spawnPoint);
-			ids.add(getId(spawnPoint));
-		}
-		spawnPointMap.keySet().retainAll(ids);
-		List<String> gymIds = new LinkedList<>();
-		for (FortData gym : gyms) {
-			gymMap.put(gym.getId(), gym);
-			gymIds.add(gym.getId());
-		}
-		gymMap.keySet().retainAll(gymIds);
-		gymIds.clear();
-		for (FortData gym : pokestops) {
-			pokestopMap.put(gym.getId(), new Pokestop(networking, location, settings, gym));
-			gymIds.add(gym.getId());
-		}
-		pokestopMap.keySet().retainAll(gymIds);
-		gymIds.clear();
+		add(nearbyPokemons, nearbyPokemonMap, nearbyPokemonGetKey, nearbyPokemonMapOnSubscribe);
+		add(catchablePokemons, catchablePokemonMap, catchablePokemonGetKey, catchablePokemonMapOnSubscribe);
+		add(decimatedSpawnPoints, decimatedSpawnPointMap, spawnPointGetKey, decimatedSpawnPointMapOnSubscribe);
+		add(spawnPoints, spawnPointMap, spawnPointGetKey, spawnPointMapOnSubscribe);
+		add(gyms, gymMap, fortDataGetKey, gymMapOnSubscribe);
+		add(pokestops, pokestopMap, pokestopGetKey, pokestopOnSubscribe);
 	}
 
-	private static long getId(SpawnPoint spawnPoint) {
-		long latitidue = (long)spawnPoint.getLatitude() * 100000L;
-		long longitude = (long)spawnPoint.getLatitude() * 10000000000L;
-		return latitidue + longitude;
+	private static <T> void add(List<T> newList, Map<String, T> map, GetKey<T> getKey, MapOnSubscribe<T> subscribe) {
+		List<String> existingKeys = new ArrayList<>(newList.size());
+		List<T> newItems = new ArrayList<>(newList.size());
+		for (T obj : newList) {
+			String key = getKey.getKey(obj);
+			map.put(key, obj);
+			if (!existingKeys.contains(key)) {
+				newItems.add(obj);
+			}
+			existingKeys.add(key);
+		}
+		map.keySet().retainAll(existingKeys);
+		for (T newObj : newItems) {
+			subscribe.onNext(newObj);
+		}
+	}
+
+	Collection<CatchablePokemon> getCatchablePokemons() {
+		return catchablePokemonMap.values();
 	}
 
 	Collection<NearbyPokemon> getNearbyPokemons() {
 		return nearbyPokemonMap.values();
 	}
 
-	Collection<MapPokemon> getCatchablePokemons() {
-		return catchablePokemonMap.values();
-	}
-
-	Collection<WildPokemon> getWildPokemons() {
-		return wildPokemonMap.values();
-	}
-
-	Collection<SpawnPoint> getDecimatedSpawnPoints() {
+	Collection<Point> getDecimatedSpawnPoints() {
 		return decimatedSpawnPointMap.values();
 	}
 
-	Collection<SpawnPoint> getSpawnPoints() {
+	Collection<Point> getSpawnPoints() {
 		return spawnPointMap.values();
 	}
 
-	Collection<FortData> getGyms() {
+	Collection<Gym> getGyms() {
 		return gymMap.values();
 	}
 
 	Collection<Pokestop> getPokestops() {
 		return pokestopMap.values();
+	}
+
+	private interface GetKey<T> {
+		String getKey(T obj);
+	}
+
+	MapOnSubscribe<NearbyPokemon> getNearbyPokemonMapOnSubscribe() {
+		return nearbyPokemonMapOnSubscribe;
+	}
+
+	MapOnSubscribe<CatchablePokemon> getCatchablePokemonMapOnSubscribe() {
+		return catchablePokemonMapOnSubscribe;
+	}
+
+	MapOnSubscribe<Point> getDecimatedSpawnPointMapOnSubscribe() {
+		return decimatedSpawnPointMapOnSubscribe;
+	}
+
+	MapOnSubscribe<Point> getSpawnPointMapOnSubscribe() {
+		return spawnPointMapOnSubscribe;
+	}
+
+	MapOnSubscribe<Gym> getGymMapOnSubscribe() {
+		return gymMapOnSubscribe;
+	}
+
+	MapOnSubscribe<Pokestop> getPokestopOnSubscribe() {
+		return pokestopOnSubscribe;
 	}
 }

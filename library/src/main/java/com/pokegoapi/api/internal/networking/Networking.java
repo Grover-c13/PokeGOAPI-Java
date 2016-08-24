@@ -108,7 +108,7 @@ public final class Networking implements Runnable {
 				.setLongitude(location.getLongitude())
 				.setAltitude(location.getAltitude())
 				.setAuthInfo(authInfo)
-				.setUnknown12(getUnknown12());
+				.setMsSinceLastLocationfix(getUnknown12());
 		signature.setSignature(getPlayerRequest);
 		ResponseEnvelope response = doRequest(getPlayerRequest.build());
 		try {
@@ -327,7 +327,7 @@ public final class Networking implements Runnable {
 				.setLongitude(location.getLongitude())
 				.setAltitude(location.getAltitude())
 				.setAuthTicket(authTicket)
-				.setUnknown12(getUnknown12());
+				.setMsSinceLastLocationfix(getUnknown12());
 		signature.setSignature(request);
 		return request;
 	}

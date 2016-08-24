@@ -71,7 +71,7 @@ public class Signature {
 		byte[] iv = new byte[32];
 		new Random().nextBytes(iv);
 		byte[] encrypted = Crypto.encrypt(uk2, iv).toByteBuffer().array();
-		builder.setUnknown6(Unknown6OuterClass.Unknown6.newBuilder()
+		builder.setUnknown6(0, Unknown6OuterClass.Unknown6.newBuilder()
 				.setRequestType(6)
 				.setUnknown2(Unknown2.newBuilder().setEncryptedSignature(ByteString.copyFrom(encrypted))).build());
 	}

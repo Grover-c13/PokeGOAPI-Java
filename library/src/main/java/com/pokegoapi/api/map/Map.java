@@ -15,42 +15,30 @@
 
 package com.pokegoapi.api.map;
 
-import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
-import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
-import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
-import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
-import POGOProtos.Map.SpawnPointOuterClass;
 import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
 import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass.FortDetailsResponse;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
-import com.annimon.stream.Collectors;
-import com.annimon.stream.Stream;
-import com.annimon.stream.function.Function;
 import com.pokegoapi.api.gym.Gym;
 import com.pokegoapi.api.internal.Location;
 import com.pokegoapi.api.internal.networking.Networking;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.fort.FortDetails;
-import com.pokegoapi.api.map.fort.Pokestop;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.NearbyPokemon;
 import com.pokegoapi.api.settings.MapSettings;
 import com.pokegoapi.api.settings.Settings;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.MutableInteger;
 import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import rx.Observable;
+import rx.functions.Action1;
 import rx.functions.Func1;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 public class Map implements Runnable {
@@ -60,7 +48,7 @@ public class Map implements Runnable {
 	private final MapObjects mapObjects;
 	private final Networking networking;
 	private final Location location;
-	private final Inventories inventories;
+
 
 	/**
 	 * Instantiates a new Map.
@@ -72,8 +60,7 @@ public class Map implements Runnable {
 		this.mapSettings = settings.getMapSettings();
 		this.networking = networking;
 		this.location = location;
-		this.inventories = inventories;
-		mapObjects = new MapObjects(networking, location, settings, getMapObjectsResponse);
+		mapObjects = new MapObjects(networking, location, inventories, settings, getMapObjectsResponse);
 		executorService.execute(this);
 	}
 
@@ -83,31 +70,11 @@ public class Map implements Runnable {
 	 * @return a List of CatchablePokemon at your current location
 	 */
 	public List<CatchablePokemon> getCatchablePokemon() {
-		Set<CatchablePokemon> catchablePokemons = new HashSet<>();
-		for (MapPokemon mapPokemon : mapObjects.getCatchablePokemons()) {
-			catchablePokemons.add(new CatchablePokemon(networking, location, inventories, mapPokemon));
-		}
-		for (WildPokemonOuterClass.WildPokemon wildPokemon : mapObjects.getWildPokemons()) {
-			catchablePokemons.add(new CatchablePokemon(networking, location, inventories, wildPokemon));
-		}
-		for (Pokestop pokestop : mapObjects.getPokestops()) {
-			if (pokestop.inRangeForLuredPokemon() && pokestop.getFortData().hasLureInfo()) {
-				catchablePokemons.add(new CatchablePokemon(networking, location, inventories, pokestop.getFortData()));
-			}
-		}
-		return new ArrayList<>(catchablePokemons);
+		return new ArrayList<>(mapObjects.getCatchablePokemons());
 	}
 
-	/**
-	 * Gets catchable pokemon sort by distance.
-	 *
-	 * @return the catchable pokemon sort
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	public java.util.Map<Double, CatchablePokemon> getCatchablePokemonSort()
-			throws LoginFailedException, RemoteServerException {
-		return MapUtil.sortItems(getCatchablePokemon(), location);
+	public Observable<CatchablePokemon> createCatchablePokemonObservable() {
+		return mapObjects.getCatchablePokemonMapOnSubscribe().create();
 	}
 
 	/**
@@ -116,12 +83,11 @@ public class Map implements Runnable {
 	 * @return a List of NearbyPokemon at your current location
 	 */
 	public List<NearbyPokemon> getNearbyPokemon() {
-		return Stream.of(mapObjects.getNearbyPokemons()).map(new Function<NearbyPokemonOuterClass.NearbyPokemon, NearbyPokemon>() {
-			@Override
-			public NearbyPokemon apply(NearbyPokemonOuterClass.NearbyPokemon nearbyPokemon) {
-				return new NearbyPokemon(nearbyPokemon);
-			}
-		}).collect(Collectors.<NearbyPokemon>toList());
+		return new ArrayList<>(mapObjects.getNearbyPokemons());
+	}
+
+	public Observable<NearbyPokemon> createNearbyPokemonObservable() {
+		return mapObjects.getNearbyPokemonMapOnSubscribe().create();
 	}
 
 	/**
@@ -130,12 +96,11 @@ public class Map implements Runnable {
 	 * @return list of spawn points
 	 */
 	public List<Point> getSpawnPoints() {
-		return Stream.of(mapObjects.getSpawnPoints()).map(new Function<SpawnPointOuterClass.SpawnPoint, Point>() {
-			@Override
-			public Point apply(SpawnPointOuterClass.SpawnPoint spawnPoint) {
-				return new Point(spawnPoint);
-			}
-		}).collect(Collectors.<Point>toList());
+		return new ArrayList<>(mapObjects.getSpawnPoints());
+	}
+
+	public Observable<Point> createSpawnPointObservable() {
+		return mapObjects.getSpawnPointMapOnSubscribe().create();
 	}
 
 	/**
@@ -144,22 +109,11 @@ public class Map implements Runnable {
 	 * @return List of gyms
 	 */
 	public List<Gym> getGyms() {
-		return Stream.of(mapObjects.getGyms()).map(new Function<FortData, Gym>() {
-			@Override
-			public Gym apply(FortData fortData) {
-				return new Gym(networking, location, fortData);
-			}
-		}).collect(Collectors.<Gym>toList());
+		return new ArrayList<>(mapObjects.getGyms());
 	}
 
-
-	/**
-	 * Gets gym sort by distance.
-	 *
-	 * @return the gym sort
-	 */
-	public java.util.Map<Double, Gym> getGymSort() {
-		return MapUtil.sortItems(getGyms(), location);
+	public Observable<Gym> createGymObservable() {
+		return mapObjects.getGymMapOnSubscribe().create();
 	}
 
 	/**
@@ -168,12 +122,7 @@ public class Map implements Runnable {
 	 * @return list of spawn points
 	 */
 	public List<Point> getDecimatedSpawnPoints() {
-		return Stream.of(mapObjects.getDecimatedSpawnPoints()).map(new Function<SpawnPointOuterClass.SpawnPoint, Point>() {
-			@Override
-			public Point apply(SpawnPointOuterClass.SpawnPoint spawnPoint) {
-				return new Point(spawnPoint);
-			}
-		}).collect(Collectors.<Point>toList());
+		return new ArrayList<>(mapObjects.getDecimatedSpawnPoints());
 	}
 
 	@Override
@@ -189,7 +138,12 @@ public class Map implements Runnable {
 				builder.setCellId(i, cellIds.get(0));
 				builder.setSinceTimestampMs(i, 0);
 			}
-			mapObjects.update(networking.queueRequest(RequestType.GET_MAP_OBJECTS, builder.build(), GetMapObjectsResponse.class).toBlocking().first());
+			networking.queueRequest(RequestType.GET_MAP_OBJECTS, builder.build(), GetMapObjectsResponse.class).forEach(new Action1<GetMapObjectsResponse>() {
+				@Override
+				public void call(GetMapObjectsResponse mapObjectsResponse) {
+					update(mapObjectsResponse);
+				}
+			});
 		}
 		catch (InterruptedException e) {
 			// Shutdown detected
@@ -197,6 +151,10 @@ public class Map implements Runnable {
 		}
 		// Prevent pool exhaustion by rescheduling
 		executorService.execute(this);
+	}
+
+	private void update(GetMapObjectsResponse mapObjectsResponse) {
+		mapObjects.update(mapObjectsResponse);
 	}
 
 	/**

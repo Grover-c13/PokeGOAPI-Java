@@ -147,9 +147,9 @@ public class CatchablePokemon implements MapPoint {
 	 */
 	public Observable<EncounterResult> encounterPokemon() {
 		if (encounterKind == EncounterKind.NORMAL) {
-			return encounterNormalPokemonAsync();
+			return encounterNormalPokemon();
 		} else if (encounterKind == EncounterKind.DISK) {
-			return encounterDiskPokemonAsync();
+			return encounterDiskPokemon();
 		}
 
 		throw new IllegalStateException("Catchable pokemon missing encounter type");
@@ -160,7 +160,7 @@ public class CatchablePokemon implements MapPoint {
 	 *
 	 * @return the encounter result
 	 */
-	private Observable<EncounterResult> encounterNormalPokemonAsync() {
+	private Observable<EncounterResult> encounterNormalPokemon() {
 		return networking.queueRequest(RequestType.ENCOUNTER, EncounterMessage
 				.newBuilder().setEncounterId(getEncounterId())
 				.setPlayerLatitude(location.getLatitude())
@@ -180,7 +180,7 @@ public class CatchablePokemon implements MapPoint {
 	 *
 	 * @return the encounter result
 	 */
-	private Observable<EncounterResult> encounterDiskPokemonAsync() {
+	private Observable<EncounterResult> encounterDiskPokemon() {
 		return networking.queueRequest(RequestType.DISK_ENCOUNTER,
 				DiskEncounterMessage
 						.newBuilder().setEncounterId(getEncounterId())
@@ -208,8 +208,8 @@ public class CatchablePokemon implements MapPoint {
 	public Observable<CatchResult> catchPokemon(CatchOptions options) {
 		if (options != null) {
 			if (options.getUseRazzBerry() != 0) {
-				final CatchOptions asyncOptions = options;
-				final Pokeball asyncPokeball = asyncOptions.getItemBall();
+				final CatchOptions catchOptions = options;
+				final Pokeball pokeball = catchOptions.getItemBall();
 				return useItemAsync(ItemId.ITEM_RAZZ_BERRY).flatMap(
 						new Func1<CatchItemResult, Observable<CatchResult>>() {
 							@Override
@@ -217,20 +217,22 @@ public class CatchablePokemon implements MapPoint {
 								if (!result.getSuccess()) {
 									return Observable.just(new CatchResult());
 								}
-								return catchPokemonAsync(asyncOptions.getNormalizedHitPosition(),
-										asyncOptions.getNormalizedReticleSize(),
-										asyncOptions.getSpinModifier(),
-										asyncPokeball);
+								return catchPokemon(catchOptions.getNormalizedHitPosition(),
+										catchOptions.getNormalizedReticleSize(),
+										catchOptions.getSpinModifier(),
+										pokeball,
+										catchOptions.isHitPokemon());
 							}
 						});
 			}
 		} else {
 			options = new CatchOptions(inventories);
 		}
-		return catchPokemonAsync(options.getNormalizedHitPosition(),
+		return catchPokemon(options.getNormalizedHitPosition(),
 				options.getNormalizedReticleSize(),
 				options.getSpinModifier(),
-				options.getItemBall());
+				options.getItemBall(),
+				options.isHitPokemon());
 	}
 
 	/**
@@ -255,8 +257,8 @@ public class CatchablePokemon implements MapPoint {
 
 		if (options != null) {
 			if (options.getUseRazzBerry() != 0) {
-				final CatchOptions asyncOptions = options;
-				final Pokeball asyncPokeball = asyncOptions.getItemBall(probability);
+				final CatchOptions catchOptions = options;
+				final Pokeball asyncPokeball = catchOptions.getItemBall(probability);
 				return useItemAsync(ItemId.ITEM_RAZZ_BERRY).flatMap(
 						new Func1<CatchItemResult, Observable<CatchResult>>() {
 							@Override
@@ -264,20 +266,22 @@ public class CatchablePokemon implements MapPoint {
 								if (!result.getSuccess()) {
 									return Observable.just(new CatchResult());
 								}
-								return catchPokemonAsync(asyncOptions.getNormalizedHitPosition(),
-										asyncOptions.getNormalizedReticleSize(),
-										asyncOptions.getSpinModifier(),
-										asyncPokeball);
+								return catchPokemon(catchOptions.getNormalizedHitPosition(),
+										catchOptions.getNormalizedReticleSize(),
+										catchOptions.getSpinModifier(),
+										asyncPokeball,
+										catchOptions.isHitPokemon());
 							}
 						});
 			}
 		} else {
 			options = new CatchOptions(inventories);
 		}
-		return catchPokemonAsync(options.getNormalizedHitPosition(),
+		return catchPokemon(options.getNormalizedHitPosition(),
 				options.getNormalizedReticleSize(),
 				options.getSpinModifier(),
-				options.getItemBall(probability));
+				options.getItemBall(probability),
+				options.isHitPokemon());
 	}
 
 	/**
@@ -289,8 +293,8 @@ public class CatchablePokemon implements MapPoint {
 	 * @param type                  Type of pokeball to throw
 	 * @return CatchResult of resulted try to catch pokemon
 	 */
-	public Observable<CatchResult> catchPokemonAsync(
-			double normalizedHitPosition, double normalizedReticleSize, double spinModifier, Pokeball type) {
+	public Observable<CatchResult> catchPokemon(
+			double normalizedHitPosition, double normalizedReticleSize, double spinModifier, Pokeball type, boolean hitPokemon) {
 		if (!isEncountered()) {
 			return Observable.just(new CatchResult());
 		}
@@ -301,11 +305,13 @@ public class CatchablePokemon implements MapPoint {
 				.setNormalizedReticleSize(normalizedReticleSize)
 				.setSpawnPointId(getSpawnPointId())
 				.setSpinModifier(spinModifier)
-				.setPokeball(type.getBallType()).build();
-		return catchPokemonAsync(reqMsg);
+				.setHitPokemon(hitPokemon)
+				.setPokeball(type.getBallType())
+				.build();
+		return catchPokemon(reqMsg);
 	}
 
-	private Observable<CatchResult> catchPokemonAsync(CatchPokemonMessage catchPokemonMessage) {
+	private Observable<CatchResult> catchPokemon(CatchPokemonMessage catchPokemonMessage) {
 		return networking.queueRequest(RequestType.CATCH_POKEMON, catchPokemonMessage, CatchPokemonResponse.class)
 				.map(new Func1<CatchPokemonResponse, CatchResult>() {
 					@Override
