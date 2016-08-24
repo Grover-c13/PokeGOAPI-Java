@@ -99,7 +99,6 @@ public class DeviceInfo {
 	 *
 	 * @param deviceInfos the device infos interface
 	 */
-	@Deprecated
 	public DeviceInfo(DeviceInfos deviceInfos) {
 		this();
 		deviceInfoBuilder

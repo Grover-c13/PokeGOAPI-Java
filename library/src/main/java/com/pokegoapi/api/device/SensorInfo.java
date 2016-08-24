@@ -38,7 +38,6 @@ public class SensorInfo {
 	 *
 	 * @param sensorInfos the sensor infos interface
 	 */
-	@Deprecated
 	public SensorInfo(SensorInfos sensorInfos) {
 		this();
 		sensorInfoBuilder
