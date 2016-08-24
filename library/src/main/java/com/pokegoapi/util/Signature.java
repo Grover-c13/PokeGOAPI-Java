@@ -5,6 +5,7 @@ import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
 import POGOProtos.Networking.Envelopes.Unknown6OuterClass.Unknown6.Unknown2;
 import POGOProtos.Networking.Requests.RequestOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
@@ -46,19 +47,33 @@ public class Signature {
                 .setLocationHash2(getLocationHash2(api, builder))
                 .setSessionHash(ByteString.copyFrom(api.getSessionHash()))
                 .setTimestamp(api.currentTimeMillis())
-                .setTimestampSinceStart(curTime - api.startTime);
+                .setTimestampSinceStart(curTime - api.startTime)
+                .setUnknown25(7363665268261373700L);
+
 
         buildDeviceInfo(sigBuilder, api);
-        buildSensorInfo(sigBuilder, api);
-        buildLocationFix(sigBuilder, api);
+
+        if (curTime - api.timestampSinceLastSensorInfo > (sRandom.nextInt(10 * 1000) + 5 * 1000)) {
+            api.timestampSinceLastSensorInfo = curTime;
+            buildSensorInfo(sigBuilder, api);
+        }
+
+        if ((builder.getRequests(0) != null && builder.getRequests(0).getRequestType() ==
+                RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS)) {
+            // Always add loc fix to get map object
+            buildLocationFix(sigBuilder, api);
+        } else if (curTime - api.timestampSinceLastLocFix > (sRandom.nextInt(10 * 1000) + 5000)) {
+            buildLocationFix(sigBuilder, api);
+        } else {
+            buildEmptyLocationFix(sigBuilder);
+        }
+
         buildActivityStatus(sigBuilder);
 
         for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
             byte[] request = serverRequest.toByteArray();
             sigBuilder.addRequestHash(getRequestHash(authTicketBA, request));
         }
-
-        sigBuilder.setUnknown25(7363665268261373700L);
 
         SignatureOuterClass.Signature signature = sigBuilder.build();
 
@@ -161,7 +176,8 @@ public class Signature {
     private static void buildSensorInfo(SignatureOuterClass.Signature.Builder sigBuilder, PokemonGo api) {
         SignatureOuterClass.Signature.SensorInfo.Builder sensorInfoBuilder =
                 SignatureOuterClass.Signature.SensorInfo.newBuilder();
-        if (api.currentTimeMillis() - api.startTime < 0) {
+        if (api.loginRequest) {
+			api.loginRequest = false;
             sensorInfoBuilder.setTimestampSnapshot(api.currentTimeMillis() - api.startTime)
                     .setAccelRawX(0.1 + (0.7 - 0.1) * sRandom.nextDouble())
                     .setAccelRawY(0.1 + (0.8 - 0.1) * sRandom.nextDouble())
@@ -207,13 +223,19 @@ public class Signature {
         sigBuilder.setActivityStatus(activityStatusBuilder.build());
     }
 
+    private static void buildEmptyLocationFix(SignatureOuterClass.Signature.Builder sigBuilder) {
+        SignatureOuterClass.Signature.LocationFix.Builder locationFixBuilder =
+                SignatureOuterClass.Signature.LocationFix.newBuilder();
+        sigBuilder.addLocationFix(locationFixBuilder.build());
+    }
+
     private static void buildLocationFix(SignatureOuterClass.Signature.Builder sigBuilder, PokemonGo api) {
         // Random a value between 0 and 100 to have a % which we will use to random the numbers of providers
         int pn = sRandom.nextInt(100);
         int nProviders;
         HashSet<String> negativeSnapshotProviders = new HashSet<>();
 
-        if (api.currentTimeMillis() - api.startTime < 0) {
+        if (api.timestampSinceLastLocFix == 0) {
             nProviders = pn < 75 ? 6 : pn < 95 ? 5 : 8;
 
             if (nProviders != 8) {
@@ -267,6 +289,8 @@ public class Signature {
                     .setLocationType(1);
             sigBuilder.addLocationFix(locationFixBuilder.build());
         }
+
+        api.timestampSinceLastLocFix = api.currentTimeMillis();
     }
 
     private static float offsetOnLatLong(double l, double d) {

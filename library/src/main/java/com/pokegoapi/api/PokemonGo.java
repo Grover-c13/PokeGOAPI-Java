@@ -41,6 +41,9 @@ public class PokemonGo {
 	private final Time time;
 	public final long startTime;
 	public final String deviceInfoId;
+	public boolean loginRequest = true;
+	public long timestampSinceLastSensorInfo = 0;
+	public long timestampSinceLastLocFix = 0;
 	@Getter
 	private final byte[] sessionHash;
 	@Getter
