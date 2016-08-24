@@ -121,7 +121,7 @@ public class DeviceInfo {
 	private static String bytesToHex(byte[] bytes) {
 		char[] hexArray = "0123456789ABCDEF".toCharArray();
 		char[] hexChars = new char[bytes.length * 2];
-		for ( int index = 0; index < bytes.length; index++ ) {
+		for (int index = 0; index < bytes.length; index++) {
 			int var = bytes[index] & 0xFF;
 			hexChars[index * 2] = hexArray[var >>> 4];
 			hexChars[index * 2 + 1] = hexArray[var & 0x0F];
