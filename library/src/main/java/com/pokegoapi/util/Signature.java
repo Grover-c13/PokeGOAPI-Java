@@ -46,7 +46,7 @@ public class Signature {
 				.setSensorInfo(SensorInfo.getDefault(api))
 				.setActivityStatus(ActivityStatus.getDefault())
 				.addAllLocationFix(LocationFix.getDefault(api))
-				.setUnknown25(7363665268261373700L);
+				.setVersionCodeHash(0x898654dd2753a481L);
 
 		for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
 			byte[] request = serverRequest.toByteArray();
@@ -61,7 +61,7 @@ public class Signature {
 		Unknown6OuterClass.Unknown6 uk6 = Unknown6OuterClass.Unknown6.newBuilder()
 				.setRequestType(6)
 				.setUnknown2(Unknown2.newBuilder().setEncryptedSignature(ByteString.copyFrom(encrypted))).build();
-		builder.setUnknown6(uk6);
+		builder.addUnknown6(uk6);
 	}
 
 	private static byte[] getBytes(double input) {

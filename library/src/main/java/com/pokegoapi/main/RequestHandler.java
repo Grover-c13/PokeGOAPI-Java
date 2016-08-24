@@ -263,7 +263,7 @@ public class RequestHandler implements Runnable {
 			Log.d(TAG, "Authenticated with static token");
 			builder.setAuthInfo(api.getAuthInfo());
 		}
-		builder.setUnknown12(989);
+		builder.setMsSinceLastLocationfix(989);
 		builder.setLatitude(api.getLatitude());
 		builder.setLongitude(api.getLongitude());
 		builder.setAltitude(api.getAltitude());
