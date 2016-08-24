@@ -39,21 +39,6 @@ public class Signature {
 
 		byte[] authTicketBA = builder.getAuthTicket().toByteArray();
 
-		long versionCodeHash;
-
-		try {
-			MessageDigest crypt = MessageDigest.getInstance("SHA-1");
-			crypt.reset();
-			crypt.update(api.getVersionCode().getBytes("UTF-8"));
-			byte[] versionCodeSha1 = crypt.digest();
-			XXHashFactory factory = XXHashFactory.safeInstance();
-			StreamingXXHash64 xx64 = factory.newStreamingHash64(0x88533787);
-			xx64.update(versionCodeSha1, 0, versionCodeSha1.length);
-			versionCodeHash = xx64.getValue();
-		} catch (NoSuchAlgorithmException | UnsupportedEncodingException ignore) {
-			versionCodeHash = 0;
-		}
-
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
 				.setLocationHash1(getLocationHash1(api, authTicketBA))
 				.setLocationHash2(getLocationHash2(api))
@@ -64,7 +49,7 @@ public class Signature {
 				.setSensorInfo(SensorInfo.getDefault(api))
 				.setActivityStatus(ActivityStatus.getDefault())
 				.addAllLocationFix(LocationFix.getDefault(api))
-				.setVersionCodeHash(versionCodeHash);
+				.setVersionCodeHash(-8537042734809897855L);
 
 		for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
 			byte[] request = serverRequest.toByteArray();

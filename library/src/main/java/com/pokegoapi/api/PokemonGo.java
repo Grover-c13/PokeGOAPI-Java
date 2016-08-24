@@ -78,9 +78,6 @@ public class PokemonGo {
 	@Getter
 	@Setter
 	public List<SignatureOuterClass.Signature.LocationFix> locationFixes;
-	@Getter
-	@Setter
-	private String versionCode;
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -114,8 +111,6 @@ public class PokemonGo {
 		longitude = Double.NaN;
 		latitude = Double.NaN;
 		startTime = currentTimeMillis();
-
-		versionCode = "2016080700";
 	}
 
 	/**
