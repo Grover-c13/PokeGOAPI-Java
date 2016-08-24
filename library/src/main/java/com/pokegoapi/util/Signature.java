@@ -45,7 +45,8 @@ public class Signature {
 				.setDeviceInfo(api.getDeviceInfo())
 				.setSensorInfo(SensorInfo.getDefault(api))
 				.setActivityStatus(ActivityStatus.getDefault())
-				.addAllLocationFix(LocationFix.getDefault(api));
+				.addAllLocationFix(LocationFix.getDefault(api))
+				.setUnknown25(7363665268261373700L);
 
 		for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
 			byte[] request = serverRequest.toByteArray();
