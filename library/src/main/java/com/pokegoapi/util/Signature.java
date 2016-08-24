@@ -50,7 +50,7 @@ public class Signature {
 			StreamingXXHash64 xx64 = factory.newStreamingHash64(0x88533787);
 			xx64.update(versionCodeSha1, 0, versionCodeSha1.length);
 			versionCodeHash = xx64.getValue();
-		}catch (NoSuchAlgorithmException | UnsupportedEncodingException ignore) {
+		} catch (NoSuchAlgorithmException | UnsupportedEncodingException ignore) {
 		}
 
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
