@@ -7,9 +7,11 @@ import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.DownloadItemTemplatesMessageOuterClass.DownloadItemTemplatesMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadRemoteConfigVersionMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetDownloadUrlsMessageOuterClass.GetDownloadUrlsMessage;
 import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessage;
@@ -19,6 +21,7 @@ import POGOProtos.Networking.Requests.RequestOuterClass;
 import POGOProtos.Networking.Requests.RequestOuterClass.Request.Builder;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
+import POGOProtos.Networking.Responses.DownloadItemTemplatesResponseOuterClass.DownloadItemTemplatesResponse;
 import POGOProtos.Networking.Responses.DownloadRemoteConfigVersionResponseOuterClass.DownloadRemoteConfigVersionResponse;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import POGOProtos.Networking.Responses.GetAssetDigestResponseOuterClass.GetAssetDigestResponse;
@@ -35,6 +38,7 @@ import com.pokegoapi.api.internal.Location;
 import com.pokegoapi.exceptions.AccountBannedException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -45,8 +49,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -54,28 +60,34 @@ import java.util.concurrent.ExecutorService;
 /**
  * Created by paul on 21-8-2016.
  */
+@Slf4j
 public final class Networking implements Runnable {
 	private long lastRequest = System.currentTimeMillis();
 	private static final String HASH = "2788184af4004004d6ab0720f7612983332106f6";
 	private static final Map<String, Networking> INSTANCES = new HashMap<>();
+	private static final List<String> DOWNLOAD_URL_HASHES = Arrays.asList("d86c65f7-d521-4aa1-9324-d2690d8a61a0/1467337989725000",
+			"d86c65f7-d521-4aa1-9324-d2690d8a61a0/1467337989725000", "5cbcb961-13dc-440c-a474-50212e6ff120/1467338119418000",
+			"c918d441-8f37-4155-b824-0ed67f64cb5b/1467338237623000", "90f8eb5d-c398-4e9e-a53d-82c6367521db/1467338255908000",
+			"5be4c90f-8b4b-49ce-92a1-6e1ffd591fda/1467338152232000");
 	private final Random random = new Random();
 	private final ExecutorService executorService;
 	private final OkHttpClient client;
 	private final Location location;
 	private final Callback callback;
 	private final Signature signature;
+	private final Locale locale;
 	private URL currentServer;
 	private AuthTicket authTicket;
 	private Long lastInventoryCheck = null;
 
 	public static Networking getInstance(URL initialServer, ExecutorService executorService, OkHttpClient client, Location location, DeviceInfo deviceInfo,
-										 SensorInfo sensorInfo, Callback callback) {
+										 SensorInfo sensorInfo, Callback callback, Locale locale) {
 		String serverString = initialServer.toExternalForm();
 		if (!INSTANCES.containsKey(serverString)) {
 			synchronized (INSTANCES) {
 				if (!INSTANCES.containsKey(serverString)) {
 					INSTANCES.put(serverString, new Networking(initialServer, executorService, client, location, deviceInfo,
-							sensorInfo, callback));
+							sensorInfo, locale, callback));
 				}
 			}
 		}
@@ -83,27 +95,34 @@ public final class Networking implements Runnable {
 	}
 
 	private Networking(URL initialServer, ExecutorService executorService, OkHttpClient client, Location location, DeviceInfo deviceInfo,
-					   SensorInfo sensorInfo, Callback callback) {
+					   SensorInfo sensorInfo, Locale locale, Callback callback) {
 		this.executorService = executorService;
 		this.client = client;
 		this.location = location;
 		this.callback = callback;
 		this.signature = new Signature(location, deviceInfo, sensorInfo);
 		this.currentServer = initialServer;
+		this.locale = locale;
 	}
 
 	public BootstrapResult bootstrap(AuthInfo authInfo) {
 		long requestId = Math.abs(random.nextLong());
 		// First call to niantic is GET_PLAYER. This call will return the URL to use for future requests
 		// Also the auth ticket is returned
-		GetPlayerMessageOuterClass.GetPlayerMessage getPlayerMessage = GetPlayerMessageOuterClass.GetPlayerMessage.newBuilder().build();
+		log.info("Initial request, do a GET_PLAYER to get correct URL and auth ticket");
+		GetPlayerMessageOuterClass.GetPlayerMessage getPlayerMessage = GetPlayerMessageOuterClass.GetPlayerMessage.newBuilder()
+				.setPlayerLocale(GetPlayerMessageOuterClass.GetPlayerMessage.PlayerLocale.newBuilder().setCountry(locale.getCountry()).setLanguage(locale.getLanguage()))
+				.build();
+
 		Builder reqBuilder = RequestOuterClass.Request.newBuilder();
 		reqBuilder.setRequestMessage(getPlayerMessage.toByteString());
 		reqBuilder.setRequestType(RequestType.GET_PLAYER);
+
 		RequestEnvelope.Builder getPlayerRequest = RequestEnvelope.newBuilder()
 				.setStatusCode(2)
 				.setRequestId(requestId)
 				.setRequests(0, reqBuilder)
+				.setRequests(1, RequestOuterClass.Request.newBuilder().setRequestTypeValue(600).build())
 				.setLatitude(location.getLatitude())
 				.setLongitude(location.getLongitude())
 				.setAltitude(location.getAltitude())
@@ -118,6 +137,8 @@ public final class Networking implements Runnable {
 			throw new RuntimeException("Received invalid URL from server. Giving up", e);
 		}
 		response = handleRequest(getPlayerRequest.build());
+		// Retry with new
+		log.info("Do a GET_PLAYER to the new URL, and get player info");
 		GetPlayerResponse playerResponse;
 		try {
 			playerResponse = GetPlayerResponse.parseFrom(response.getReturns(0));
@@ -126,35 +147,41 @@ public final class Networking implements Runnable {
 			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
 		}
 		sleep(300);
-		RequestEnvelope.Builder remoteCondigRequest = buildRequestEnvalope(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION, DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage
-				.newBuilder()
-				.setPlatform(PlatformOuterClass.Platform.ANDROID)
-				.setAppVersion(3300)
-				.build());
-		response = handleRequest(remoteCondigRequest.build());
+
 		DownloadRemoteConfigVersionResponse downloadRemoteConfigVersionResponse;
 		GetInventoryResponse inventoryResponse;
 		GetHatchedEggsResponse hatchedEggsResponse;
 		CheckAwardedBadgesResponse checkAwardedBadgesResponse;
 		DownloadSettingsResponse downloadSettingsResponse;
 		GetAssetDigestResponse assetDigestResponse;
+		DownloadItemTemplatesResponse downloadItemTemplatesResponse;
 		LevelUpRewardsResponse levelUpRewardsResponse;
 		GetMapObjectsResponse getMapObjectsResponse;
+
+		// Do a 7, 600, 126, 4, 129 and 5
+		log.info("Do a DOWNLOAD_REMOTE_CONFIG_VERSION, 600, GET_HATCHED_EGGS, GET_INVENTORY, CHECK_AWARDED_BADGES and DOWNLOAD_SETTINGS");
+		RequestEnvelope.Builder remoteConfigRequest = buildRequestEnvalope(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION, DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage
+				.newBuilder()
+				.setPlatform(PlatformOuterClass.Platform.ANDROID)
+				.setAppVersion(3300)
+				.build());
+		response = handleRequest(remoteConfigRequest.build());
 		try {
 			downloadRemoteConfigVersionResponse = DownloadRemoteConfigVersionResponse.parseFrom(response.getReturns(0));
-			hatchedEggsResponse = GetHatchedEggsResponse.parseFrom(response.getReturns(1));
-			inventoryResponse = GetInventoryResponse.parseFrom(response.getReturns(2));
-			checkAwardedBadgesResponse = CheckAwardedBadgesResponse.parseFrom(response.getReturns(3));
-			downloadSettingsResponse = DownloadSettingsResponse.parseFrom(response.getReturns(4));
+			hatchedEggsResponse = GetHatchedEggsResponse.parseFrom(response.getReturns(2));
+			inventoryResponse = GetInventoryResponse.parseFrom(response.getReturns(3));
+			checkAwardedBadgesResponse = CheckAwardedBadgesResponse.parseFrom(response.getReturns(4));
+			downloadSettingsResponse = DownloadSettingsResponse.parseFrom(response.getReturns(5));
 		}
 		catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
 		}
 		sleep(3000);
+		log.info("Do a GET_ASSET_DIGEST, 600, GET_HATCHED_EGGS, GET_INVENTORY, CHECK_AWARDED_BADGES, DOWNLOAD_SETTINGS");
 		RequestEnvelope.Builder assetsRequest = buildRequestEnvalope(RequestType.GET_ASSET_DIGEST, GetAssetDigestMessageOuterClass.GetAssetDigestMessage
 				.newBuilder()
 				.setPlatform(PlatformOuterClass.Platform.ANDROID)
-				.setAppVersion(3300)
+				.setAppVersion(3500)
 				.build());
 		response = handleRequest(assetsRequest.build());
 		try {
@@ -170,6 +197,20 @@ public final class Networking implements Runnable {
 			}
 		}
 		sleep(3000);
+		log.info("Do a DOWNLOAD_ITEM_TEMPLATES, GET_HATCHED_EGGS, GET_INVENTORY, CHECK_AWARDED_BADGES, DOWNLOAD_SETTINGS");
+		RequestEnvelope.Builder downloadItemTemplatesRequest = buildRequestEnvalope(RequestType.DOWNLOAD_ITEM_TEMPLATES, DownloadItemTemplatesMessage
+				.newBuilder()
+				.build());
+		response = handleRequest(downloadItemTemplatesRequest.build());
+		try {
+			downloadItemTemplatesResponse = DownloadItemTemplatesResponse.parseFrom(response.getReturns(0));
+		}
+		catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
+		}
+
+		sleep(3000);
+		log.info("Do a LEVEL_UP_REWARDS, GET_HATCHED_EGGS, GET_INVENTORY, CHECK_AWARDED_BADGES, DOWNLOAD_SETTINGS");
 		RequestEnvelope.Builder levelUpRequest = buildRequestEnvalope(RequestType.LEVEL_UP_REWARDS, LevelUpRewardsMessage
 				.newBuilder()
 				.setLevel(playerLevel)
@@ -182,6 +223,7 @@ public final class Networking implements Runnable {
 			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
 		}
 
+		log.info("Do an unpacked GET_MAP_OBJECTS, GET_HATCHED_EGGS, GET_INVENTORY, CHECK_AWARDED_BADGES, DOWNLOAD_SETTINGS");
 		// Initial map request
 		List<Long> cellIds = com.pokegoapi.api.map.Map.getCellIds(location.getLatitude(), location.getLongitude(), com.pokegoapi.api.map.Map.CELL_WIDTH);
 
@@ -200,7 +242,24 @@ public final class Networking implements Runnable {
 		catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
 		}
-
+		sleep(300);
+		log.info("Do a GET_ASSET_DIGEST, 600, GET_HATCHED_EGGS, GET_INVENTORY, CHECK_AWARDED_BADGES, DOWNLOAD_SETTINGS");
+		assetsRequest = buildRequestEnvalope(RequestType.GET_ASSET_DIGEST, GetAssetDigestMessageOuterClass.GetAssetDigestMessage
+				.newBuilder()
+				.setPlatform(PlatformOuterClass.Platform.ANDROID)
+				.setAppVersion(3500)
+				.build());
+		response = handleRequest(assetsRequest.build());
+		try {
+			assetDigestResponse = GetAssetDigestResponse.parseFrom(response.getReturns(0));
+		}
+		catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
+		}
+		for (String hash : DOWNLOAD_URL_HASHES) {
+			RequestEnvelope.Builder downloadUrls = buildRequestEnvalope(RequestType.GET_DOWNLOAD_URLS, GetDownloadUrlsMessage.newBuilder().setAssetId(0, hash).build());
+			response = handleRequest(downloadUrls.build());
+		}
 		return new BootstrapResult(playerResponse, downloadRemoteConfigVersionResponse, inventoryResponse, hatchedEggsResponse, checkAwardedBadgesResponse, downloadSettingsResponse, assetDigestResponse, levelUpRewardsResponse, getMapObjectsResponse);
 	}
 	private static void sleep(long ms) {
@@ -293,10 +352,10 @@ public final class Networking implements Runnable {
 		ResponseEnvelope responseEnvelope = doRequest(request.build());
 		try {
 			T responseMessage = (T)responseType.newInstance().getParserForType().parseFrom(responseEnvelope.getReturns(0));
-			final GetHatchedEggsResponse getHatchedEggsResponse = GetHatchedEggsResponse.parseFrom(responseEnvelope.getReturns(1));
-			final GetInventoryResponse getInventoryResponse = GetInventoryResponse.parseFrom(responseEnvelope.getReturns(2));
-			final CheckAwardedBadgesResponse checkAwardedBadgesResponse = CheckAwardedBadgesResponse.parseFrom(responseEnvelope.getReturns(3));
-			final DownloadSettingsResponse downloadSettingsResponse = DownloadSettingsResponse.parseFrom(responseEnvelope.getReturns(4));
+			final GetHatchedEggsResponse getHatchedEggsResponse = GetHatchedEggsResponse.parseFrom(responseEnvelope.getReturns(2));
+			final GetInventoryResponse getInventoryResponse = GetInventoryResponse.parseFrom(responseEnvelope.getReturns(3));
+			final CheckAwardedBadgesResponse checkAwardedBadgesResponse = CheckAwardedBadgesResponse.parseFrom(responseEnvelope.getReturns(4));
+			final DownloadSettingsResponse downloadSettingsResponse = DownloadSettingsResponse.parseFrom(responseEnvelope.getReturns(5));
 			executorService.submit(new Runnable() {
 				@Override
 				public void run() {
@@ -319,6 +378,7 @@ public final class Networking implements Runnable {
 				.setStatusCode(2)
 				.setRequestId(requestId)
 				.addRequests(wrap(requestType, message))
+				.setRequests(1, RequestOuterClass.Request.newBuilder().setRequestTypeValue(600).build())
 				.addRequests(getHatchedEggs())
 				.addRequests(getInventory())
 				.addRequests(getCheckAwardedBAtches())
