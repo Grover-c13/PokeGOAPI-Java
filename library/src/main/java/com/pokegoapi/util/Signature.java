@@ -39,7 +39,7 @@ public class Signature {
 
 		byte[] authTicketBA = builder.getAuthTicket().toByteArray();
 
-		long versionCodeHash = 0;
+		long versionCodeHash;
 
 		try {
 			MessageDigest crypt = MessageDigest.getInstance("SHA-1");
@@ -51,6 +51,7 @@ public class Signature {
 			xx64.update(versionCodeSha1, 0, versionCodeSha1.length);
 			versionCodeHash = xx64.getValue();
 		} catch (NoSuchAlgorithmException | UnsupportedEncodingException ignore) {
+			versionCodeHash = 0;
 		}
 
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
