@@ -64,8 +64,6 @@ public class Signature {
             buildLocationFix(sigBuilder, api);
         } else if (curTime - api.timestampSinceLastLocFix > (sRandom.nextInt(10 * 1000) + 5000)) {
             buildLocationFix(sigBuilder, api);
-        } else {
-            buildEmptyLocationFix(sigBuilder);
         }
 
         buildActivityStatus(sigBuilder);
@@ -221,14 +219,6 @@ public class Signature {
             activityStatusBuilder.setTilting(true);
         }
         sigBuilder.setActivityStatus(activityStatusBuilder.build());
-    }
-
-    private static void buildEmptyLocationFix(SignatureOuterClass.Signature.Builder sigBuilder) {
-        // TODO: find a way to send an empty list of location fixes
-        // Adding an empty one without infos will return in location_fixes: [ {} ]
-        // The official client instead, send location_fixes: []
-        // This is supposed to be an empty array but since im not sure if the location_fixes: [ {} ] will be received
-        // empty from the server, i'll try later to figure out a better way to reach the score
     }
 
     private static void buildLocationFix(SignatureOuterClass.Signature.Builder sigBuilder, PokemonGo api) {
