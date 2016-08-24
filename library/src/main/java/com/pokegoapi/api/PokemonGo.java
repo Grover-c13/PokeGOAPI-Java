@@ -18,9 +18,7 @@ package com.pokegoapi.api;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 
-import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
-import com.pokegoapi.api.device.LocationFix;
 import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
@@ -37,7 +35,6 @@ import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;

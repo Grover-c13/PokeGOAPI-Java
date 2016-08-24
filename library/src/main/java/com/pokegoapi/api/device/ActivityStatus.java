@@ -16,7 +16,6 @@
 package com.pokegoapi.api.device;
 
 import com.google.protobuf.ByteString;
-import com.pokegoapi.api.PokemonGo;
 
 import java.util.Random;
 
