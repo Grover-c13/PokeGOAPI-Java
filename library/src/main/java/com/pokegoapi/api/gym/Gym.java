@@ -194,10 +194,8 @@ public class Gym implements MapPoint {
 		ServerRequest serverRequest = new ServerRequest(RequestType.FORT_DEPLOY_POKEMON, reqMsg);
 		api.getRequestHandler().sendServerRequests(serverRequest);
 
-		FortDeployPokemonResponse deployResponse;
-
 		try {
-			deployResponse = FortDeployPokemonResponse.parseFrom(serverRequest.getData());
+			FortDeployPokemonResponse deployResponse = FortDeployPokemonResponse.parseFrom(serverRequest.getData());
 			return deployResponse.getResult();
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException();
@@ -229,10 +227,9 @@ public class Gym implements MapPoint {
 
 				@Override
 				public FortDeployPokemonResponse.Result call(ByteString response) {
-					FortDeployPokemonResponse deployResponse;
 
 					try {
-						deployResponse = FortDeployPokemonResponse.parseFrom(response);
+						FortDeployPokemonResponse deployResponse = FortDeployPokemonResponse.parseFrom(response);
 						return deployResponse.getResult();
 					} catch (InvalidProtocolBufferException e) {
 						throw new AsyncRemoteServerException(e);
