@@ -13,14 +13,12 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.api.settings;
+package com.pokegoapi.api.map.pokemon;
 
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Pokeball;
-import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
-import com.pokegoapi.exceptions.RemoteServerException;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -63,8 +61,9 @@ public class CatchOptions {
 	
 	/**
 	 * Instantiates a new CatchOptions object.
+	 * @param inventories To check if the requested item is available
 	 */
-	public CatchOptions(Inventories inventories) {
+	CatchOptions(Inventories inventories) {
 		this.inventories = inventories;
 		this.useRazzBerry = 0;
 		this.useBestPokeball = false;
@@ -85,7 +84,7 @@ public class CatchOptions {
 	 * @return the item ball
 	 * @throws NoSuchItemException   the no such item exception
 	 */
-	public Pokeball getItemBall()  {
+	Pokeball getItemBall()  {
 		ItemBag bag = inventories.getItemBag();
 		if (strictBallType) {
 			if (bag.getItem(pokeBall.getBallType()).getCount() > 0) {
@@ -143,12 +142,9 @@ public class CatchOptions {
 	 *
 	 * @param  encounterProbability  the capture probability to compare
 	 * @return the item ball
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
 	 * @throws NoSuchItemException   the no such item exception
 	 */
-	public Pokeball getItemBall(double encounterProbability) throws LoginFailedException,
-						RemoteServerException, NoSuchItemException {
+	Pokeball getItemBall(double encounterProbability) {
 		if (encounterProbability >= probability) {
 			useBestPokeball = false;
 		} else {
