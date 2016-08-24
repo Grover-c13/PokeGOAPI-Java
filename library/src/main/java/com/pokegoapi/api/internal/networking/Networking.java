@@ -25,6 +25,7 @@ import POGOProtos.Networking.Responses.DownloadItemTemplatesResponseOuterClass.D
 import POGOProtos.Networking.Responses.DownloadRemoteConfigVersionResponseOuterClass.DownloadRemoteConfigVersionResponse;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import POGOProtos.Networking.Responses.GetAssetDigestResponseOuterClass.GetAssetDigestResponse;
+import POGOProtos.Networking.Responses.GetDownloadUrlsResponseOuterClass.GetDownloadUrlsResponse;
 import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
@@ -51,6 +52,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -62,6 +64,7 @@ import java.util.concurrent.ExecutorService;
  */
 @Slf4j
 public final class Networking implements Runnable {
+	private static final int VERSION = 3500;
 	private long lastRequest = System.currentTimeMillis();
 	private static final String HASH = "2788184af4004004d6ab0720f7612983332106f6";
 	private static final Map<String, Networking> INSTANCES = new HashMap<>();
@@ -157,6 +160,7 @@ public final class Networking implements Runnable {
 		DownloadItemTemplatesResponse downloadItemTemplatesResponse;
 		LevelUpRewardsResponse levelUpRewardsResponse;
 		GetMapObjectsResponse getMapObjectsResponse;
+		List<GetDownloadUrlsResponse> downloadUrlsResponses = new LinkedList<>();
 
 		// Do a 7, 600, 126, 4, 129 and 5
 		log.info("Do a DOWNLOAD_REMOTE_CONFIG_VERSION, 600, GET_HATCHED_EGGS, GET_INVENTORY, CHECK_AWARDED_BADGES and DOWNLOAD_SETTINGS");
@@ -181,15 +185,10 @@ public final class Networking implements Runnable {
 		RequestEnvelope.Builder assetsRequest = buildRequestEnvalope(RequestType.GET_ASSET_DIGEST, GetAssetDigestMessageOuterClass.GetAssetDigestMessage
 				.newBuilder()
 				.setPlatform(PlatformOuterClass.Platform.ANDROID)
-				.setAppVersion(3500)
+				.setAppVersion(VERSION)
 				.build());
-		response = handleRequest(assetsRequest.build());
-		try {
-			assetDigestResponse = GetAssetDigestResponse.parseFrom(response.getReturns(0));
-		}
-		catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
-		}
+		handleRequest(assetsRequest.build());
+
 		int playerLevel = 1;
 		for (InventoryItemOuterClass.InventoryItem inventoryItem : inventoryResponse.getInventoryDelta().getInventoryItemsList()) {
 			if (inventoryItem.getInventoryItemData().hasPlayerStats()) {
@@ -247,7 +246,7 @@ public final class Networking implements Runnable {
 		assetsRequest = buildRequestEnvalope(RequestType.GET_ASSET_DIGEST, GetAssetDigestMessageOuterClass.GetAssetDigestMessage
 				.newBuilder()
 				.setPlatform(PlatformOuterClass.Platform.ANDROID)
-				.setAppVersion(3500)
+				.setAppVersion(VERSION)
 				.build());
 		response = handleRequest(assetsRequest.build());
 		try {
@@ -259,8 +258,24 @@ public final class Networking implements Runnable {
 		for (String hash : DOWNLOAD_URL_HASHES) {
 			RequestEnvelope.Builder downloadUrls = buildRequestEnvalope(RequestType.GET_DOWNLOAD_URLS, GetDownloadUrlsMessage.newBuilder().setAssetId(0, hash).build());
 			response = handleRequest(downloadUrls.build());
+			try {
+				downloadUrlsResponses.add(GetDownloadUrlsResponse.parseFrom(response.toByteString()));
+			}
+			catch (InvalidProtocolBufferException e) {
+				throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
+			}
 		}
-		return new BootstrapResult(playerResponse, downloadRemoteConfigVersionResponse, inventoryResponse, hatchedEggsResponse, checkAwardedBadgesResponse, downloadSettingsResponse, assetDigestResponse, levelUpRewardsResponse, getMapObjectsResponse);
+		return new BootstrapResult(playerResponse,
+				downloadRemoteConfigVersionResponse,
+				inventoryResponse,
+				hatchedEggsResponse,
+				checkAwardedBadgesResponse,
+				downloadSettingsResponse,
+				assetDigestResponse,
+				levelUpRewardsResponse,
+				getMapObjectsResponse,
+				downloadItemTemplatesResponse,
+				downloadUrlsResponses);
 	}
 	private static void sleep(long ms) {
 		try {
