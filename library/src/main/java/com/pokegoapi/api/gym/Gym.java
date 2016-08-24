@@ -183,7 +183,7 @@ public class Gym implements MapPoint {
 	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public FortDeployPokemonResponse.Result deployPokemon(Pokemon pokemon)
-		throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, RemoteServerException {
 		FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
 				.setFortId(getId())
 				.setPlayerLatitude(api.getLatitude())
@@ -198,11 +198,11 @@ public class Gym implements MapPoint {
 
 		try {
 			deployResponse = FortDeployPokemonResponse.parseFrom(serverRequest.getData());
+			return deployResponse.getResult();
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException();
 		}
 
-		return deployResponse.getResult();
 	}
 
 	/**
@@ -214,7 +214,7 @@ public class Gym implements MapPoint {
 	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public Observable<FortDeployPokemonResponse.Result> deployPokemonAsync(Pokemon pokemon)
-		throws RemoteServerException, LoginFailedException {
+			throws RemoteServerException, LoginFailedException {
 		FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
 				.setFortId(getId())
 				.setPlayerLatitude(api.getLatitude())
@@ -227,20 +227,20 @@ public class Gym implements MapPoint {
 			.sendAsyncServerRequests(asyncServerRequest)
 			.map(new Func1<ByteString, FortDeployPokemonResponse.Result>() {
 
-			@Override
-			public FortDeployPokemonResponse.Result call(ByteString response) {
-				FortDeployPokemonResponse deployResponse;
+				@Override
+				public FortDeployPokemonResponse.Result call(ByteString response) {
+					FortDeployPokemonResponse deployResponse;
 
-				try {
-					deployResponse = FortDeployPokemonResponse.parseFrom(response);
-				} catch (InvalidProtocolBufferException e) {
-					throw new AsyncRemoteServerException(e);
+					try {
+						deployResponse = FortDeployPokemonResponse.parseFrom(response);
+						return deployResponse.getResult();
+					} catch (InvalidProtocolBufferException e) {
+						throw new AsyncRemoteServerException(e);
+					}
+
 				}
 
-				return deployResponse.getResult();
-			}
-
-		});
+			});
 
 	}
 
