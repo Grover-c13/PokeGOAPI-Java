@@ -16,7 +16,7 @@
 package com.pokegoapi.api.map.fort;
 
 import POGOProtos.Inventory.Item.ItemIdOuterClass;
-import POGOProtos.Map.Fort.FortDataOuterClass;
+import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Map.Fort.FortModifierOuterClass;
 import POGOProtos.Networking.Requests.Messages.AddFortModifierMessageOuterClass.AddFortModifierMessage;
 import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
@@ -43,17 +43,18 @@ public class Pokestop {
 	private final Location location;
 	private final Settings settings;
 	@Getter
-	private final FortDataOuterClass.FortData fortData;
+	private final FortData fortData;
 	@Getter
 	private long cooldownCompleteTimestampMs;
 
-
 	/**
-	 * Instantiates a new Pokestop.
-	 *
-	 * @param fortData the fort data
+	 * Instantiate new pokestop
+	 * @param networking Networking needed for all operations on this pokestop
+	 * @param location Current location of the user
+	 * @param settings Settings from the remote server, needed for checking if stop is in reach
+	 * @param fortData Response from server
 	 */
-	public Pokestop(Networking networking, Location location, Settings settings, FortDataOuterClass.FortData fortData) {
+	public Pokestop(Networking networking, Location location, Settings settings, FortData fortData) {
 		this.networking = networking;
 		this.location = location;
 		this.settings = settings;

@@ -50,6 +50,7 @@ public class FightGymExample {
 
 	/**
 	 * Catches a pokemon at an area.
+	 * @param args Not used
 	 */
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();

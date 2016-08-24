@@ -30,7 +30,7 @@ public class TranslatePokenameExample {
 	 *
 	 * @param args Not used
 	 */
-	public static void main(String[] args) {
+	public static void main(String ... args) {
 		// Translate English Pokemon name to Simplified Chinese
 		// Note:    You can use PokeDictionary.getDisplayName(int pokedexId, Locale locale)
 		//          instead, if you already know the Pokedex Id.

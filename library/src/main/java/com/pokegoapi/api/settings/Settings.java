@@ -53,7 +53,7 @@ public class Settings {
 	/**
 	 * Settings object that hold different configuration aspect of the game.
 	 * Can be used to simulate the real app behaviour.
-	 *
+	 * @param downloadSettingsResponse Response from server
 	 */
 	public Settings(DownloadSettingsResponse downloadSettingsResponse) {
 		this.mapSettings = new MapSettings();
@@ -66,7 +66,7 @@ public class Settings {
 
 	/**
 	 * Updates settings latest data.
-	 *
+	 * @param response Response from server
 	 */
 	public final void update(DownloadSettingsResponse response) {
 		mapSettings.update(response.getSettings().getMapSettings());

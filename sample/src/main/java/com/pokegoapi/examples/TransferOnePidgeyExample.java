@@ -28,6 +28,7 @@ import java.util.List;
 public class TransferOnePidgeyExample {
 	/**
 	 * Transfers one pidgey from the player's inventory.
+	 * @param args Not used
 	 */
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();

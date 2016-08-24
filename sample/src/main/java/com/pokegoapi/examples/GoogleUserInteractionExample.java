@@ -27,7 +27,7 @@ public class GoogleUserInteractionExample {
 
 	/**
 	 * Example on how to login with Google by asking a token from the user
-	 * @param args stuff
+	 * @param args Not used
 	 */
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();

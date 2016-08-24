@@ -32,7 +32,6 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	 * @param httpClient the client that will make http call
 	 * @param username   google username
 	 * @param password   google pwd
-	 * @param time       time instance used to refresh token
 	 * @throws LoginFailedException  login failed possibly due to invalid credentials
 	 * @throws RemoteServerException some server/network failure
 	 */
