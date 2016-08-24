@@ -16,7 +16,6 @@
 package com.pokegoapi.api.device;
 
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.pokemon.Pokemon;
 
 import java.util.Random;
 import java.util.UUID;
