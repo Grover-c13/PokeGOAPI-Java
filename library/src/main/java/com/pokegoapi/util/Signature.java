@@ -44,7 +44,7 @@ public class Signature {
 		try {
 			MessageDigest crypt = MessageDigest.getInstance("SHA-1");
 			crypt.reset();
-			crypt.update("2016080700".getBytes("UTF-8"));
+			crypt.update(api.getVersionCode().getBytes("UTF-8"));
 			byte[] versionCodeSha1 = crypt.digest();
 			XXHashFactory factory = XXHashFactory.safeInstance();
 			StreamingXXHash64 xx64 = factory.newStreamingHash64(0x88533787);
