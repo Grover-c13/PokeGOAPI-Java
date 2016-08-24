@@ -224,9 +224,11 @@ public class Signature {
     }
 
     private static void buildEmptyLocationFix(SignatureOuterClass.Signature.Builder sigBuilder) {
-        SignatureOuterClass.Signature.LocationFix.Builder locationFixBuilder =
-                SignatureOuterClass.Signature.LocationFix.newBuilder();
-        sigBuilder.addLocationFix(locationFixBuilder.build());
+        // TODO: find a way to send an empty list of location fixes
+        // Adding an empty one without infos will return in location_fixes: [ {} ]
+        // The official client instead, send location_fixes: []
+        // This is supposed to be an empty array but since im not sure if the location_fixes: [ {} ] will be received
+        // empty from the server, i'll try later to figure out a better way to reach the score
     }
 
     private static void buildLocationFix(SignatureOuterClass.Signature.Builder sigBuilder, PokemonGo api) {
@@ -279,7 +281,7 @@ public class Signature {
 
             locationFixBuilder.setProvider("fused")
                     .setTimestampSnapshot(negativeSnapshotProviders.contains(String.valueOf(i)) ?
-                            sRandom.nextInt(1000) - 3000  : api.currentTimeMillis() - api.startTime)
+                            sRandom.nextInt(1000) - 3000  : (api.currentTimeMillis() - api.startTime) + sRandom.nextInt(500 * (i + 1)))
                     .setLatitude(latitude)
                     .setLongitude(longitude)
                     .setHorizontalAccuracy(-1)
