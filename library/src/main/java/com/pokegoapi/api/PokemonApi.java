@@ -12,13 +12,13 @@ import com.pokegoapi.api.internal.networking.Networking;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
-import com.pokegoapi.api.settings.CatchOptions;
 import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
 import lombok.Data;
 import okhttp3.OkHttpClient;
 
 import java.net.URL;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -38,14 +38,14 @@ public class PokemonApi implements Networking.Callback {
 	private final Settings settings;
 
 	PokemonApi(ExecutorService executorService, CredentialProvider credentialProvider, OkHttpClient client, URL server,
-			   Location location, DeviceInfo deviceInfo, SensorInfo sensorInfo) {
+			   Location location, DeviceInfo deviceInfo, SensorInfo sensorInfo, Locale locale) {
 		this.executorService = executorService;
 		this.credentialProvider = credentialProvider;
 		this.client = client;
 		this.server = server;
 		this.location = location;
 
-		networking = Networking.getInstance(server, executorService, client, location, deviceInfo, sensorInfo, this);
+		networking = Networking.getInstance(server, executorService, client, location, deviceInfo, sensorInfo, this, locale);
 		BootstrapResult bootstrapResult = networking.bootstrap(credentialProvider.getAuthInfo());
 		playerProfile = new PlayerProfile(bootstrapResult.getPlayerResponse());
 		inventories = new Inventories(executorService, bootstrapResult.getInventoryResponse(),

@@ -9,6 +9,7 @@ import okhttp3.OkHttpClient;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -28,6 +29,7 @@ public class PokemonApiBuilder {
 	private URL server;
 	private DeviceInfo deviceInfo;
 	private SensorInfo sensorInfo;
+	private Locale locale;
 
 	PokemonApiBuilder() {
 		super();
@@ -73,6 +75,11 @@ public class PokemonApiBuilder {
 		return this;
 	}
 
+	public PokemonApiBuilder locale(Locale locale) {
+		this.locale = locale;
+		return this;
+	}
+
 	public PokemonApi build() {
 		if (latitude == null) {
 			throw new IllegalArgumentException("Latitude must be set");
@@ -92,6 +99,9 @@ public class PokemonApiBuilder {
 		if (client == null) {
 			client = new OkHttpClient.Builder().readTimeout(5, TimeUnit.SECONDS).writeTimeout(5, TimeUnit.SECONDS).build();
 		}
+		if (locale == null) {
+			locale = Locale.getDefault();
+		}
 		if (server == null) {
 			try {
 				server = URI.create("https://pgorelease.nianticlabs.com/plfe/rpc").toURL();
@@ -106,7 +116,7 @@ public class PokemonApiBuilder {
 		if (sensorInfo == null) {
 			sensorInfo = new SensorInfo();
 		}
-		return new PokemonApi(executorService, credentialProvider, client, server, new Location(latitude, longitude, altitude), deviceInfo, sensorInfo);
+		return new PokemonApi(executorService, credentialProvider, client, server, new Location(latitude, longitude, altitude), deviceInfo, sensorInfo, locale);
 	}
 
 	private static class PokemonApiThreadFactory implements ThreadFactory {
