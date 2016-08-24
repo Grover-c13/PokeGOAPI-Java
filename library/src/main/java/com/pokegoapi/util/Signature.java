@@ -16,6 +16,9 @@ import net.jpountz.xxhash.StreamingXXHash32;
 import net.jpountz.xxhash.StreamingXXHash64;
 import net.jpountz.xxhash.XXHashFactory;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
 public class Signature {
@@ -36,6 +39,20 @@ public class Signature {
 
 		byte[] authTicketBA = builder.getAuthTicket().toByteArray();
 
+		long versionCodeHash = 0;
+
+		try {
+			MessageDigest crypt = MessageDigest.getInstance("SHA-1");
+			crypt.reset();
+			crypt.update("2016080700".getBytes("UTF-8"));
+			byte[] versionCodeSha1 = crypt.digest();
+			XXHashFactory factory = XXHashFactory.safeInstance();
+			StreamingXXHash64 xx64 = factory.newStreamingHash64(0x88533787);
+			xx64.update(versionCodeSha1, 0, versionCodeSha1.length);
+			versionCodeHash = xx64.getValue();
+		}catch (NoSuchAlgorithmException | UnsupportedEncodingException ignore) {
+		}
+
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
 				.setLocationHash1(getLocationHash1(api, authTicketBA))
 				.setLocationHash2(getLocationHash2(api))
@@ -46,7 +63,7 @@ public class Signature {
 				.setSensorInfo(SensorInfo.getDefault(api))
 				.setActivityStatus(ActivityStatus.getDefault())
 				.addAllLocationFix(LocationFix.getDefault(api))
-				.setVersionCodeHash(0x898654dd2753a481L);
+				.setVersionCodeHash(versionCodeHash);
 
 		for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
 			byte[] request = serverRequest.toByteArray();
