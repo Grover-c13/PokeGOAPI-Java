@@ -43,7 +43,7 @@ public class Signature {
 		XXHashFactory factory = XXHashFactory.safeInstance();
 		StreamingXXHash64 xx64 = factory.newStreamingHash64(0x88533787);
 		xx64.update(unknown, 0, unknown.length);
-		long unknown24 = xx64.getValue();
+		long unknown25 = xx64.getValue();
 
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
 				.setLocationHash1(getLocationHash1(api, authTicketBA))
@@ -55,7 +55,7 @@ public class Signature {
 				.setSensorInfo(SensorInfo.getDefault(api))
 				.setActivityStatus(ActivityStatus.getDefault())
 				.addAllLocationFix(LocationFix.getDefault(api))
-				.setVersionCodeHash(unknown24);
+				.setUnknown25(unknown25);
 
 		for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
 			byte[] request = serverRequest.toByteArray();
