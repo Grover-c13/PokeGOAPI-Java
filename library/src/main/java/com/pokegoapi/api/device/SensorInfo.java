@@ -87,11 +87,9 @@ public class SensorInfo {
 					.setAccelNormalizedY(6.0 + (9.0 - 6.0) * random.nextDouble())
 					.setAccelNormalizedZ(-1.0 + (8.0 - (-1.0)) * random.nextDouble())
 					.setAccelerometerAxes(3);
+			api.setSensorInfo(sensorInfo);
 		} else {
 			sensorInfo = api.getSensorInfo();
-			if (currentTime - sensorInfo.getTimestampCreate() > (random.nextInt(10 * 1000) + 5 * 1000)) {
-				sensorInfo.setTimestampCreate(currentTime);
-			}
 			sensorInfo.getBuilder().setTimestampSnapshot(currentTime + api.getStartTime())
 					.setMagnetometerX(-0.7 + random.nextDouble() * 1.4)
 					.setMagnetometerY(-0.7 + random.nextDouble() * 1.4)
@@ -110,8 +108,11 @@ public class SensorInfo {
 					.setAccelNormalizedZ(-1.0 + (8.0 - (-1.0)) * random.nextDouble())
 					.setAccelerometerAxes(3);
 		}
-		api.setSensorInfo(sensorInfo);
-		return sensorInfo.getSensorInfo();
+		if (currentTime - sensorInfo.getTimestampCreate() > (random.nextInt(10 * 1000) + 5 * 1000)) {
+			sensorInfo.setTimestampCreate(currentTime);
+			return sensorInfo.getSensorInfo();
+		}
+		return null;
 	}
 
 	/**

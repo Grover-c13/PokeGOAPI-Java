@@ -52,10 +52,14 @@ public class Signature {
 				.setTimestamp(api.currentTimeMillis())
 				.setTimestampSinceStart(currentTime - api.getStartTime())
 				.setDeviceInfo(api.getDeviceInfo())
-				.setSensorInfo(SensorInfo.getDefault(api, currentTime))
 				.setActivityStatus(ActivityStatus.getDefault())
 				.addAllLocationFix(LocationFixes.getDefault(api, builder, currentTime))
 				.setUnknown25(7363665268261373700L);
+
+		SignatureOuterClass.Signature.SensorInfo sensorInfo = SensorInfo.getDefault(api, currentTime);
+		if (sensorInfo != null) {
+			sigBuilder.setSensorInfo(sensorInfo);
+		}
 
 		for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
 			byte[] request = serverRequest.toByteArray();
