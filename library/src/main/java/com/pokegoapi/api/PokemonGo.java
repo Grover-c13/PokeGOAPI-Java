@@ -158,24 +158,21 @@ public class PokemonGo {
 	}
 
 	/**
+	 * Hash the given string
+	 *
 	 * @param string string to hash
 	 * @return the hashed long
 	 */
 	private static long hash(String string) {
 		long upper = ((long) string.hashCode()) << 32;
-		long lower = ((long) reverse(string).hashCode()) - ((long) Integer.MIN_VALUE);
-		return upper + lower;
-	}
-
-	private static String reverse(String string) {
 		int len = string.length();
 		StringBuilder dest = new StringBuilder(len);
 
 		for (int index = (len - 1); index >= 0; index--) {
 			dest.append(string.charAt(index));
 		}
-
-		return dest.toString();
+		long lower = ((long) dest.toString().hashCode()) - ((long) Integer.MIN_VALUE);
+		return upper + lower;
 	}
 
 	/**
