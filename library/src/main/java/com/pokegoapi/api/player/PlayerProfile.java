@@ -18,6 +18,7 @@ package com.pokegoapi.api.player;
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
+import com.pokegoapi.api.internal.networking.Networking;
 import lombok.Data;
 
 import java.util.EnumMap;
@@ -28,14 +29,15 @@ public class PlayerProfile {
 	private static final String TAG = PlayerProfile.class.getSimpleName();
 	private PlayerData playerData;
 	private final PlayerAvatar avatar = new PlayerAvatar();
-	private final DailyBonus dailyBonus = new DailyBonus();
+	private final DailyBonus dailyBonus;
 	private final ContactSettings contactSettings = new ContactSettings();
 	private final Map<Currency, Integer> currencies = new EnumMap<>(Currency.class);
 	private final TutorialState tutorialState = new TutorialState();
 
 	/**
 	 */
-	public PlayerProfile(GetPlayerResponse getPlayerResponse) {
+	public PlayerProfile(GetPlayerResponse getPlayerResponse, Networking networking) {
+		dailyBonus = new DailyBonus(networking);
 		update(getPlayerResponse);
 	}
 

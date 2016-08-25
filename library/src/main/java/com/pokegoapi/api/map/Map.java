@@ -26,6 +26,7 @@ import com.pokegoapi.api.internal.Location;
 import com.pokegoapi.api.internal.networking.Networking;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.fort.FortDetails;
+import com.pokegoapi.api.map.fort.Pokestop;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.NearbyPokemon;
 import com.pokegoapi.api.settings.MapSettings;
@@ -125,6 +126,18 @@ public class Map implements Runnable {
 		return new ArrayList<>(mapObjects.getDecimatedSpawnPoints());
 	}
 
+	public Observable<Point> createDecimatedSpawnPointsObservable() {
+		return mapObjects.getDecimatedSpawnPointMapOnSubscribe().create();
+	}
+
+	public List<Pokestop> getPokestops() {
+		return new ArrayList<>(mapObjects.getPokestops());
+	}
+
+	public Observable<Pokestop> createPokestopObservable() {
+		return mapObjects.getPokestopOnSubscribe().create();
+	}
+
 	@Override
 	public void run() {
 		try {
@@ -155,15 +168,6 @@ public class Map implements Runnable {
 
 	private void update(GetMapObjectsResponse mapObjectsResponse) {
 		mapObjects.update(mapObjectsResponse);
-	}
-
-	/**
-	 * Returns MapObjects around your current location.
-	 *
-	 * @return MapObjects at your current location
-	 */
-	public MapObjects getMapObjects()  {
-		return mapObjects;
 	}
 
 	/**

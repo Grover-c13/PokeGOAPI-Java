@@ -66,7 +66,6 @@ public class Signature {
 			sigBuilder.addRequestHash(getRequestHash(authTicketBA, request));
 		}
 
-		// TODO: Call encrypt function on this
 		byte[] uk2 = sigBuilder.build().toByteArray();
 		byte[] iv = new byte[32];
 		new Random().nextBytes(iv);

@@ -117,6 +117,9 @@ public class CatchablePokemon implements MapPoint {
 	/**
 	 * Instantiates a new Catchable pokemon.
 	 *
+	 * @param networking Networking, for all actions on pokemon
+	 * @param location Current location of the user
+	 * @param inventories Inventories are needed to use an item
 	 * @param proto the proto
 	 */
 	public CatchablePokemon(Networking networking, Location location, Inventories inventories, FortData proto) {

@@ -14,7 +14,7 @@ import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
-import lombok.Data;
+import lombok.Getter;
 import okhttp3.OkHttpClient;
 
 import java.net.URL;
@@ -24,30 +24,26 @@ import java.util.concurrent.ExecutorService;
 /**
  * Created by paul on 20-8-2016.
  */
-@Data
 public class PokemonApi implements Networking.Callback {
-	private final ExecutorService executorService;
-	private final CredentialProvider credentialProvider;
-	private final OkHttpClient client;
-	private final URL server;
 	private final Location location;
+	@Getter
 	private final Networking networking;
+	@Getter
 	private final PlayerProfile playerProfile;
+	@Getter
 	private final Inventories inventories;
+	@Getter
 	private final Map map;
+	@Getter
 	private final Settings settings;
 
 	PokemonApi(ExecutorService executorService, CredentialProvider credentialProvider, OkHttpClient client, URL server,
 			   Location location, DeviceInfo deviceInfo, SensorInfo sensorInfo, Locale locale) {
-		this.executorService = executorService;
-		this.credentialProvider = credentialProvider;
-		this.client = client;
-		this.server = server;
 		this.location = location;
 
 		networking = Networking.getInstance(server, executorService, client, location, deviceInfo, sensorInfo, this, locale);
 		BootstrapResult bootstrapResult = networking.bootstrap(credentialProvider.getAuthInfo());
-		playerProfile = new PlayerProfile(bootstrapResult.getPlayerResponse());
+		playerProfile = new PlayerProfile(bootstrapResult.getPlayerResponse(), networking);
 		inventories = new Inventories(executorService, bootstrapResult.getInventoryResponse(),
 				bootstrapResult.getHatchedEggsResponse(), networking, playerProfile);
 		settings = new Settings(bootstrapResult.getDownloadSettingsResponse());
@@ -94,5 +90,27 @@ public class PokemonApi implements Networking.Callback {
 			throw new IllegalArgumentException("longitude can not exceed +/- 180");
 		}
 		location.setLongitude(value);
+	}
+
+	public void setAltitude(double value) {
+		location.setAltitude(value);
+	}
+
+	public double getLatitude() {
+		return location.getLatitude();
+	}
+
+	public double getLongitude() {
+		return location.getLongitude();
+	}
+
+	public double getAltitude() {
+		return location.getAltitude();
+	}
+
+	public void setLocation(double latitude, double longitude, double altitude) {
+		setLatitude(latitude);
+		setLongitude(longitude);
+		setAltitude(altitude);
 	}
 }

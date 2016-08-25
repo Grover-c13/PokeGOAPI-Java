@@ -76,7 +76,7 @@ public class Hatchery {
 		}
 	}
 
-	Collection<EggPokemon> getEggs() {
+	public Collection<EggPokemon> getEggs() {
 		return eggMap.values();
 	}
 

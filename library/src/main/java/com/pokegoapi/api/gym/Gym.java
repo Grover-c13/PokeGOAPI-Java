@@ -18,13 +18,15 @@ package com.pokegoapi.api.gym;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.TeamColorOuterClass;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
+import POGOProtos.Networking.Requests.Messages.FortDeployPokemonMessageOuterClass.FortDeployPokemonMessage;
 import POGOProtos.Networking.Requests.Messages.GetGymDetailsMessageOuterClass.GetGymDetailsMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.FortDeployPokemonResponseOuterClass.FortDeployPokemonResponse;
 import POGOProtos.Networking.Responses.GetGymDetailsResponseOuterClass.GetGymDetailsResponse;
 import com.pokegoapi.api.internal.Location;
 import com.pokegoapi.api.internal.networking.Networking;
-import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.api.map.MapPoint;
+import com.pokegoapi.api.pokemon.Pokemon;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -81,6 +83,20 @@ public class Gym implements MapPoint {
 		return proto.getIsInBattle();
 	}
 
+	public Observable<FortDeployPokemonResponse.Result> deploy(Pokemon pokemon) {
+		return networking.queueRequest(RequestType.FORT_DEPLOY_POKEMON,
+		FortDeployPokemonMessage.newBuilder()
+				.setFortId(getId())
+				.setPlayerLatitude(location.getLatitude())
+				.setPlayerLongitude(location.getLongitude())
+				.setPokemonId(pokemon.getId()).build(),
+				FortDeployPokemonResponse.class).map(new Func1<FortDeployPokemonResponse, FortDeployPokemonResponse.Result>() {
+			@Override
+			public FortDeployPokemonResponse.Result call(FortDeployPokemonResponse fortDeployPokemonResponse) {
+				return fortDeployPokemonResponse.getResult();
+			}
+		});
+	}
 
 	public Observable<Battle> battle(final Pokemon[] team) {
 		final Gym gym = this;

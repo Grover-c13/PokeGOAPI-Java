@@ -184,7 +184,7 @@ public class Pokemon extends PokemonDetails {
 	 *
 	 * @return The result
 	 */
-	public Observable<UpgradePokemonResponse.Result> powerUpAsync() {
+	public Observable<UpgradePokemonResponse.Result> powerUp() {
 		return networking.queueRequest(RequestType.UPGRADE_POKEMON,
 				UpgradePokemonMessage
 						.newBuilder()
