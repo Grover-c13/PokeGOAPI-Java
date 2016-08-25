@@ -18,6 +18,7 @@ package com.pokegoapi.api;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 
+import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.LocationFixes;
 import com.pokegoapi.api.device.SensorInfo;
@@ -69,6 +70,9 @@ public class PokemonGo {
 	@Getter
 	@Setter
 	public SensorInfo sensorInfo;
+	@Getter
+	@Setter
+	public ActivityStatus activityStatus;
 	@Setter
 	@Getter
 	private long seed;

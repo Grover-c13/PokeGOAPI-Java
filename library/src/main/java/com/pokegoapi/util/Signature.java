@@ -45,6 +45,8 @@ public class Signature {
 			long unknown25 = xx64.getValue();
 		*/
 
+		Random random = new Random();
+
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
 				.setLocationHash1(getLocationHash1(api, authTicketBA))
 				.setLocationHash2(getLocationHash2(api))
@@ -52,11 +54,11 @@ public class Signature {
 				.setTimestamp(api.currentTimeMillis())
 				.setTimestampSinceStart(currentTime - api.getStartTime())
 				.setDeviceInfo(api.getDeviceInfo())
-				.setActivityStatus(ActivityStatus.getDefault())
-				.addAllLocationFix(LocationFixes.getDefault(api, builder, currentTime))
+				.setActivityStatus(ActivityStatus.getDefault(api, random))
+				.addAllLocationFix(LocationFixes.getDefault(api, builder, currentTime, random))
 				.setUnknown25(7363665268261373700L);
 
-		SignatureOuterClass.Signature.SensorInfo sensorInfo = SensorInfo.getDefault(api, currentTime);
+		SignatureOuterClass.Signature.SensorInfo sensorInfo = SensorInfo.getDefault(api, currentTime, random);
 		if (sensorInfo != null) {
 			sigBuilder.setSensorInfo(sensorInfo);
 		}

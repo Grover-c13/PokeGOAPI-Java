@@ -16,6 +16,7 @@
 package com.pokegoapi.api.device;
 
 import com.google.protobuf.ByteString;
+import com.pokegoapi.api.PokemonGo;
 
 import java.util.Random;
 
@@ -36,12 +37,17 @@ public class ActivityStatus {
 	/**
 	 * Gets the default activity status for the given api
 	 *
+	 * @param api the api
+	 * @param random random object
 	 * @return the default activity status for the given api
 	 */
-	public static SignatureOuterClass.Signature.ActivityStatus getDefault() {
-		Random random = new Random();
+	public static SignatureOuterClass.Signature.ActivityStatus getDefault(PokemonGo api, Random random) {
 		boolean tilting = random.nextInt() % 2 == 0;
-		ActivityStatus activityStatus = new ActivityStatus();
+		ActivityStatus activityStatus = api.getActivityStatus();
+		if (activityStatus == null) {
+			activityStatus = new ActivityStatus();
+			api.setActivityStatus(activityStatus);
+		}
 		activityStatus.setStationary(true);
 		if (tilting) {
 			activityStatus.setTilting(true);
