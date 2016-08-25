@@ -71,7 +71,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Map {
 	private final PokemonGo api;
 	private MapObjects cachedMapObjects;
-	private List<CatchablePokemon> cachedCatchable;
+	private final List<CatchablePokemon> cachedCatchable = Collections.synchronizedList(new CopyOnWriteArrayList<CatchablePokemon>());
 	private int cellWidth = 3;
 	private long lastMapUpdate;
 
@@ -96,10 +96,10 @@ public class Map {
 		if (!useCache()) {
 			// getMapObjects wont be called unless this is null
 			// so need to force it if due for a refresh
-			cachedCatchable = null;
+			cachedCatchable.clear();
 		}
 
-		if (cachedCatchable != null) {
+		if (cachedCatchable.size() > 0) {
 			return Observable.just(cachedCatchable);
 		}
 
@@ -122,8 +122,8 @@ public class Map {
 						catchablePokemons.add(new CatchablePokemon(api, pokestop.getFortData()));
 					}
 				}
-
-				cachedCatchable = Collections.synchronizedList(new CopyOnWriteArrayList<>(catchablePokemons));
+				cachedCatchable.clear();
+				cachedCatchable.addAll(catchablePokemons);
 				return cachedCatchable;
 			}
 		});
@@ -135,7 +135,7 @@ public class Map {
 	 * @param pokemon the catchable pokemon
 	 */
 	public void removeCatchable(CatchablePokemon pokemon) {
-		if (cachedCatchable != null) {
+		if (cachedCatchable.size() > 0) {
 			cachedCatchable.remove(pokemon);
 		}
 	}
@@ -386,7 +386,7 @@ public class Map {
 							result.addPokestops(groupedForts.get(FortType.CHECKPOINT));
 						}
 
-						cachedCatchable = null;
+						cachedCatchable.clear();
 						return result;
 					}
 				});
@@ -685,6 +685,19 @@ public class Map {
 	 */
 	private boolean useCache() {
 		return (api.currentTimeMillis() - lastMapUpdate) < api.getSettings().getMapSettings().getMinRefresh();
+	}
+
+	/**
+	 * Clear map objects cache
+	 *
+	 */
+	public void clearCache() {
+		cachedCatchable.clear();
+		cachedMapObjects.getNearbyPokemons().clear();
+		cachedMapObjects.getCatchablePokemons().clear();
+		cachedMapObjects.getWildPokemons().clear();
+		cachedMapObjects.getDecimatedSpawnPoints().clear();
+		cachedMapObjects.getSpawnPoints().clear();
 	}
 
 	private List<Long> getDefaultCells() {
