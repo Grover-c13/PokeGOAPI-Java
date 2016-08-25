@@ -7,22 +7,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Created by fabianterhorst on 23.08.16.
  */
 
-public class LocationFix {
+public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.LocationFix> {
 
-	private SignatureOuterClass.Signature.LocationFix.Builder locationFixBuilder;
+	@Setter
+	@Getter
+	private long timestampCreate;
 
-	public LocationFix() {
-		locationFixBuilder = SignatureOuterClass.Signature.LocationFix.newBuilder();
-	}
-
-	public SignatureOuterClass.Signature.LocationFix.Builder getBuilder() {
-		return locationFixBuilder;
+	public LocationFixes() {
 	}
 
 	/**
@@ -31,15 +32,15 @@ public class LocationFix {
 	 * @param api the api
 	 * @return the default device info for the given api
 	 */
-	public static List<SignatureOuterClass.Signature.LocationFix> getDefault(PokemonGo api) {
+	public static LocationFixes getDefault(PokemonGo api, long currentTime, RequestEnvelopeOuterClass.RequestEnvelope.Builder builder) {
 		Random random = new Random();
 		int pn = random.nextInt(100);
 		int providerCount;
 		HashSet<String> negativeSnapshotProviders = new HashSet<>();
 
-		List<SignatureOuterClass.Signature.LocationFix> locationFixes;
+		LocationFixes locationFixes;
 		if (api.getLocationFixes() == null) {
-			locationFixes = new ArrayList<>();
+			locationFixes = new LocationFixes();
 			providerCount = pn < 75 ? 6 : pn < 95 ? 5 : 8;
 
 			if (providerCount != 8) {
@@ -57,8 +58,17 @@ public class LocationFix {
 		} else {
 			locationFixes = api.getLocationFixes();
 			locationFixes.clear();
+
+			if (builder.getRequests(0) == null
+					|| builder.getRequests(0).getRequestType() != RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS
+					|| (currentTime - locationFixes.getTimestampCreate() > (random.nextInt(10 * 1000) + 5000))) {
+				return locationFixes;
+			}
+
 			providerCount = pn < 60 ? 1 : pn < 90 ? 2 : 3;
 		}
+
+		locationFixes.setTimestampCreate(currentTime);
 
 		for (int i = 0; i < providerCount; i++) {
 			float latitude = offsetOnLatLong(api.getLatitude(), random.nextInt(100) + 10);
@@ -84,7 +94,7 @@ public class LocationFix {
 					.setTimestampSnapshot(
 							negativeSnapshotProviders.contains(String.valueOf(i))
 									? random.nextInt(1000) - 3000
-									: api.currentTimeMillis() - api.getStartTime())
+									: currentTime - api.getStartTime())
 					.setLatitude(latitude)
 					.setLongitude(longitude)
 					.setHorizontalAccuracy(-1)

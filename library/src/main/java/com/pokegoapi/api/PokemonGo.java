@@ -19,6 +19,7 @@ import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 
 import com.pokegoapi.api.device.DeviceInfo;
+import com.pokegoapi.api.device.LocationFixes;
 import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
@@ -74,7 +75,7 @@ public class PokemonGo {
 	private long seed;
 	@Getter
 	@Setter
-	public List<SignatureOuterClass.Signature.LocationFix> locationFixes;
+	public LocationFixes locationFixes;
 
 	/**
 	 * Instantiates a new Pokemon go.

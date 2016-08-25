@@ -20,6 +20,8 @@ import com.pokegoapi.api.PokemonGo;
 import java.util.Random;
 
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Created by fabianterhorst on 08.08.16.
@@ -28,6 +30,10 @@ import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 public class SensorInfo {
 
 	private SignatureOuterClass.Signature.SensorInfo.Builder sensorInfoBuilder;
+
+	@Setter
+	@Getter
+	private long timestampCreate;
 
 	public SensorInfo() {
 		sensorInfoBuilder = SignatureOuterClass.Signature.SensorInfo.newBuilder();
@@ -64,12 +70,12 @@ public class SensorInfo {
 	 * @param api the api
 	 * @return the default sensor info for the given api
 	 */
-	public static SignatureOuterClass.Signature.SensorInfo getDefault(PokemonGo api) {
+	public static SignatureOuterClass.Signature.SensorInfo getDefault(PokemonGo api, long currentTime) {
 		Random random = new Random();
 		SensorInfo sensorInfo;
 		if (api.getSensorInfo() == null) {
 			sensorInfo = new SensorInfo();
-			sensorInfo.getBuilder().setTimestampSnapshot(api.currentTimeMillis() + api.getStartTime())
+			sensorInfo.getBuilder().setTimestampSnapshot(currentTime + api.getStartTime())
 					.setAccelRawX(0.1 + (0.7 - 0.1) * random.nextDouble())
 					.setAccelRawY(0.1 + (0.8 - 0.1) * random.nextDouble())
 					.setAccelRawZ(0.1 + (0.8 - 0.1) * random.nextDouble())
@@ -82,7 +88,10 @@ public class SensorInfo {
 					.setAccelerometerAxes(3);
 		} else {
 			sensorInfo = api.getSensorInfo();
-			sensorInfo.getBuilder().setTimestampSnapshot(api.currentTimeMillis() + api.getStartTime())
+			if (currentTime - sensorInfo.getTimestampCreate() > (random.nextInt(10 * 1000) + 5 * 1000)) {
+				sensorInfo.setTimestampCreate(currentTime);
+			}
+			sensorInfo.getBuilder().setTimestampSnapshot(currentTime + api.getStartTime())
 					.setMagnetometerX(-0.7 + random.nextDouble() * 1.4)
 					.setMagnetometerY(-0.7 + random.nextDouble() * 1.4)
 					.setMagnetometerZ(-0.7 + random.nextDouble() * 1.4)

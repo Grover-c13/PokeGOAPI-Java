@@ -9,7 +9,7 @@ import POGOProtos.Networking.Requests.RequestOuterClass;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.device.ActivityStatus;
-import com.pokegoapi.api.device.LocationFix;
+import com.pokegoapi.api.device.LocationFixes;
 import com.pokegoapi.api.device.SensorInfo;
 
 import net.jpountz.xxhash.StreamingXXHash32;
@@ -32,27 +32,30 @@ public class Signature {
 			return;
 		}
 
-		long curTime = api.currentTimeMillis();
+		long currentTime = api.currentTimeMillis();
 
 		byte[] authTicketBA = builder.getAuthTicket().toByteArray();
 
-		byte[] unknown = "b8fa9757195897aae92c53dbcf8a60fb3d86d745".getBytes();
-		XXHashFactory factory = XXHashFactory.safeInstance();
-		StreamingXXHash64 xx64 = factory.newStreamingHash64(0x88533787);
-		xx64.update(unknown, 0, unknown.length);
-		long unknown25 = xx64.getValue();
+		/*
+			Todo : reuse this later when we know the input
+			byte[] unknown = "b8fa9757195897aae92c53dbcf8a60fb3d86d745".getBytes();
+			XXHashFactory factory = XXHashFactory.safeInstance();
+			StreamingXXHash64 xx64 = factory.newStreamingHash64(0x88533787);
+			xx64.update(unknown, 0, unknown.length);
+			long unknown25 = xx64.getValue();
+		*/
 
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
 				.setLocationHash1(getLocationHash1(api, authTicketBA))
 				.setLocationHash2(getLocationHash2(api))
 				.setSessionHash(ByteString.copyFrom(api.getSessionHash()))
 				.setTimestamp(api.currentTimeMillis())
-				.setTimestampSinceStart(curTime - api.getStartTime())
+				.setTimestampSinceStart(currentTime - api.getStartTime())
 				.setDeviceInfo(api.getDeviceInfo())
-				.setSensorInfo(SensorInfo.getDefault(api))
+				.setSensorInfo(SensorInfo.getDefault(api, currentTime))
 				.setActivityStatus(ActivityStatus.getDefault())
-				.addAllLocationFix(LocationFix.getDefault(api))
-				.setUnknown25(unknown25);
+				.addAllLocationFix(LocationFixes.getDefault(api, currentTime, builder))
+				.setUnknown25(7363665268261373700L);
 
 		for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
 			byte[] request = serverRequest.toByteArray();
