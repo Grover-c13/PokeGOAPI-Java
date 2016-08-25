@@ -79,10 +79,8 @@ public class Map {
 	 * Instantiates a new Map.
 	 *
 	 * @param api the api
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public Map(PokemonGo api) throws LoginFailedException, RemoteServerException {
+	public Map(PokemonGo api) {
 		this.api = api;
 		cachedMapObjects = new MapObjects(api);
 		lastMapUpdate = 0;
