@@ -13,27 +13,27 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.api.player.stats.exceptions;
 
 /**
- * Exception for non valid experience
+ * Exception for non valid level
  * 
  * @author gionata-bisciari
  *
  */
-public class InvalidExperienceException extends Exception {
+public class InvalidLevelException extends Exception {
 
-	private static final long serialVersionUID = 104154926999838049L;
+	private static final long serialVersionUID = 5487201246523954682L;
 
-	public InvalidExperienceException() {
+	public InvalidLevelException() {
 		super();
 	}
 
-	public InvalidExperienceException(String reason) {
+	public InvalidLevelException(String reason) {
 		super(reason);
 	}
 
-	public InvalidExperienceException(Throwable exception) {
+	public InvalidLevelException(Throwable exception) {
 		super(exception);
 	}
 }

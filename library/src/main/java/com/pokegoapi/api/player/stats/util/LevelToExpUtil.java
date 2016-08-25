@@ -13,13 +13,13 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.util;
+package com.pokegoapi.api.player.stats.util;
 
 import java.util.ArrayList;
 
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.InvalidExperienceException;
-import com.pokegoapi.exceptions.InvalidLevelException;
+import com.pokegoapi.api.player.stats.exceptions.InvalidExperienceException;
+import com.pokegoapi.api.player.stats.exceptions.InvalidLevelException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 

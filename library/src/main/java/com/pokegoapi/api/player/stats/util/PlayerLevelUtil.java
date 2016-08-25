@@ -13,7 +13,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.util;
+package com.pokegoapi.api.player.stats.util;
 
 /**
  * This class can help you retrieving informations about player level.

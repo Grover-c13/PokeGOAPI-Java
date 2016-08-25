@@ -13,27 +13,28 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.api.player.stats.util;
 
 /**
- * Exception for non valid level
+ * This class can help you retrieving informations about experience.
  * 
  * @author gionata-bisciari
- *
  */
-public class InvalidLevelException extends Exception {
+public abstract class TotalExperienceUtil {
 
-	private static final long serialVersionUID = 5487201246523954682L;
+	/**
+	 * Max experience
+	 */
+	public static final int MAX_EXP = 20000000;
 
-	public InvalidLevelException() {
-		super();
-	}
-
-	public InvalidLevelException(String reason) {
-		super(reason);
-	}
-
-	public InvalidLevelException(Throwable exception) {
-		super(exception);
+	/**
+	 * Checks if the value of total experience is valid.
+	 * 
+	 * @param totExp
+	 *            The total experience.
+	 * @return Validity of the value.
+	 */
+	public static boolean isValidTotalExperience(int totExp) {
+		return totExp >= 1 && totExp <= MAX_EXP;
 	}
 }
