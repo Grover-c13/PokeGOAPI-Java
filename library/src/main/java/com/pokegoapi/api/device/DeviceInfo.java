@@ -125,7 +125,7 @@ public class DeviceInfo {
 			hexChars[index * 2] = hexArray[var >>> 4];
 			hexChars[index * 2 + 1] = hexArray[var & 0x0F];
 		}
-		return new String(hexChars);
+		return new String(hexChars).toLowerCase();
 	}
 
 
