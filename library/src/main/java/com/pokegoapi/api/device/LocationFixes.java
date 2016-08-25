@@ -3,7 +3,6 @@ package com.pokegoapi.api.device;
 import com.pokegoapi.api.PokemonGo;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Random;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
@@ -38,7 +37,7 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 		Random random = new Random();
 		int pn = random.nextInt(100);
 		int providerCount;
-		HashSet<String> negativeSnapshotProviders = new HashSet<>();
+		int[] negativeSnapshotProviders = new int[0];
 
 		int chance = random.nextInt(100);
 		LocationFixes locationFixes;
@@ -48,12 +47,14 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 			providerCount = pn < 75 ? 6 : pn < 95 ? 5 : 8;
 			if (providerCount != 8) {
 				// a 5% chance that the second provider got a negative value else it should be the first only
-				negativeSnapshotProviders.add(chance < 95 ? "0" : "1");
+				negativeSnapshotProviders = new int[1];
+				negativeSnapshotProviders[0] = chance < 95 ? 0 : 1;
 			} else {
-				negativeSnapshotProviders.add("0");
-				negativeSnapshotProviders.add("1");
+				negativeSnapshotProviders = new int[chance >= 50 ? 3 : 2];
+				negativeSnapshotProviders[0] = 0;
+				negativeSnapshotProviders[1] = 1;
 				if (chance >= 50) {
-					negativeSnapshotProviders.add("2");
+					negativeSnapshotProviders[2] = 2;
 				}
 			}
 		} else {
@@ -96,10 +97,10 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 
 			locationFixBuilder.setProvider("fused")
 					.setTimestampSnapshot(
-							negativeSnapshotProviders.contains(String.valueOf(i))
+							contains(negativeSnapshotProviders, i)
 									? random.nextInt(1000) - 3000
 									: api.currentTimeMillis() - api.getStartTime()
-									+ random.nextInt(500 * (i + 1)))
+									+ (150 * (i + 1) + random.nextInt(250 * (i + 1) - (150 * (i + 1)))))
 					.setLatitude(latitude)
 					.setLongitude(longitude)
 					.setHorizontalAccuracy(-1)
@@ -110,6 +111,15 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 			locationFixes.add(locationFixBuilder.build());
 		}
 		return locationFixes;
+	}
+
+	private static boolean contains(int[] array, int value) {
+		for (final int i : array) {
+			if (i == value) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static float offsetOnLatLong(double lat, double ran) {
