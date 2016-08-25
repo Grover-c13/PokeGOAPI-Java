@@ -81,7 +81,7 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 			float verticalAccuracy = (float) (15 + (23 - 15) * random.nextDouble());
 
 			// Fake errors
-			if(builder.getRequests(0).getRequestType() != RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS) {
+			if (builder.getRequests(0).getRequestType() != RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS) {
 				if (random.nextInt(100) > 90) {
 					latitude = 360;
 					longitude = -360;
@@ -98,7 +98,8 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 					.setTimestampSnapshot(
 							negativeSnapshotProviders.contains(String.valueOf(i))
 									? random.nextInt(1000) - 3000
-									: api.currentTimeMillis() - api.getStartTime())
+									: api.currentTimeMillis() - api.getStartTime()
+									+ random.nextInt(500 * (i + 1)))
 					.setLatitude(latitude)
 					.setLongitude(longitude)
 					.setHorizontalAccuracy(-1)
