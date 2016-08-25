@@ -160,16 +160,15 @@ public class PokemonGo {
 	private static long hash(String string) {
 		long upper = ((long) string.hashCode()) << 32;
 		long lower = ((long) reverse(string).hashCode()) - ((long) Integer.MIN_VALUE);
-		long hash64 = upper + lower;
-		return hash64;
+		return upper + lower;
 	}
 
 	private static String reverse(String string) {
-		int i, len = string.length();
+		int index, len = string.length();
 		StringBuilder dest = new StringBuilder(len);
 
-		for (i = (len - 1); i >= 0; i--) {
-			dest.append(string.charAt(i));
+		for (index = (len - 1); index >= 0; index--) {
+			dest.append(string.charAt(index));
 		}
 
 		return dest.toString();
