@@ -15,8 +15,6 @@
 
 package com.pokegoapi.auth;
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
@@ -24,14 +22,15 @@ import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import com.squareup.moshi.Moshi;
 
+import java.io.IOException;
+
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import lombok.Getter;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import java.io.IOException;
 
 public class GoogleUserCredentialProvider extends CredentialProvider {
 
@@ -41,19 +40,19 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 	public static final String LOGIN_URL = "https://accounts.google.com/o/oauth2/auth?client_id=848232511240-73ri3t7plvk96pj4f85uj8otdat2alem.apps.googleusercontent.com&redirect_uri=urn%3Aietf%3Awg%3Aoauth%3A2.0%3Aoob&response_type=code&scope=openid%20email%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email";
 	private static final String TAG = GoogleUserCredentialProvider.class.getSimpleName();
 	//We try and refresh token 5 minutes before it actually expires
-	protected static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
-	protected final OkHttpClient client;
+	private static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
+	private OkHttpClient client;
 
-	protected final Time time;
+	private final Time time;
 
-	protected long expiresTimestamp;
+	private long expiresTimestamp;
 
-	protected String tokenId;
+	private String tokenId;
 
 	@Getter
-	protected String refreshToken;
+	private String refreshToken;
 
-	protected AuthInfo.Builder authbuilder;
+	private AuthInfo.Builder authBuilder;
 
 	/**
 	 * Used for logging in when one has a persisted refreshToken.
@@ -71,7 +70,7 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 		this.refreshToken = refreshToken;
 
 		refreshToken(refreshToken);
-		authbuilder = AuthInfo.newBuilder();
+		authBuilder = AuthInfo.newBuilder();
 	}
 
 	/**
@@ -89,7 +88,7 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 		this.refreshToken = refreshToken;
 
 		refreshToken(refreshToken);
-		authbuilder = AuthInfo.newBuilder();
+		authBuilder = AuthInfo.newBuilder();
 	}
 
 	/**
@@ -105,7 +104,7 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 		this.time = time;
 		this.client = client;
 
-		authbuilder = AuthInfo.newBuilder();
+		authBuilder = AuthInfo.newBuilder();
 	}
 
 	/**
@@ -120,7 +119,7 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 		this.time = new SystemTimeImpl();
 		this.client = client;
 
-		authbuilder = AuthInfo.newBuilder();
+		authBuilder = AuthInfo.newBuilder();
 	}
 
 
@@ -145,7 +144,7 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 				.method("POST", reqBody)
 				.build();
 
-		Response response = null;
+		Response response;
 		try {
 			response = client.newCall(request).execute();
 
@@ -170,6 +169,50 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 		}
 	}
 
+	@Override
+	public String getTokenId() throws LoginFailedException, RemoteServerException {
+		if (isTokenIdExpired()) {
+			refreshToken(refreshToken);
+		}
+		return tokenId;
+	}
+
+	/**
+	 * Refreshes tokenId if it has expired
+	 *
+	 * @return AuthInfo object
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException if the server failed to respond
+	 */
+	@Override
+	public AuthInfo getAuthInfo() throws LoginFailedException, RemoteServerException {
+		if (isTokenIdExpired()) {
+			refreshToken(refreshToken);
+		}
+		authBuilder.setProvider("google");
+		authBuilder.setToken(AuthInfo.JWT.newBuilder().setContents(tokenId).setUnknown2(59).build());
+		return authBuilder.build();
+	}
+
+	@Override
+	public boolean isTokenIdExpired() {
+		return time.currentTimeMillis() > expiresTimestamp;
+	}
+
+	@Override
+	public void setHttpClient(OkHttpClient client) {
+		this.client = client;
+	}
+
+	@Override
+	public OkHttpClient getHttpClient() {
+		return client;
+	}
+
+	@Override
+	public void login() throws LoginFailedException, RemoteServerException {
+
+	}
 
 	/**
 	 * Uses an access code to login and get tokens
@@ -196,7 +239,7 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 				.url(url)
 				.method("POST", reqBody)
 				.build();
-		Response response = null;
+		Response response;
 		try {
 			response = client.newCall(request).execute();
 		} catch (IOException e) {
@@ -205,7 +248,7 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 
 		Moshi moshi = new Moshi.Builder().build();
 
-		GoogleAuthTokenJson googleAuth = null;
+		GoogleAuthTokenJson googleAuth;
 		try {
 			googleAuth = moshi.adapter(GoogleAuthTokenJson.class).fromJson(response.body().string());
 			Log.d(TAG, "" + googleAuth.getExpiresIn());
@@ -219,35 +262,5 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 				+ (googleAuth.getExpiresIn() * 1000 - REFRESH_TOKEN_BUFFER_TIME);
 		tokenId = googleAuth.getIdToken();
 		refreshToken = googleAuth.getRefreshToken();
-	}
-
-	@Override
-	public String getTokenId() throws LoginFailedException, RemoteServerException {
-		if (isTokenIdExpired()) {
-			refreshToken(refreshToken);
-		}
-		return tokenId;
-	}
-
-	/**
-	 * Refreshes tokenId if it has expired
-	 *
-	 * @return AuthInfo object
-	 * @throws LoginFailedException  When login fails
-	 * @throws RemoteServerException if the server failed to respond
-	 */
-	@Override
-	public AuthInfo getAuthInfo() throws LoginFailedException, RemoteServerException {
-		if (isTokenIdExpired()) {
-			refreshToken(refreshToken);
-		}
-		authbuilder.setProvider("google");
-		authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(tokenId).setUnknown2(59).build());
-		return authbuilder.build();
-	}
-
-	@Override
-	public boolean isTokenIdExpired() {
-		return time.currentTimeMillis() > expiresTimestamp;
 	}
 }

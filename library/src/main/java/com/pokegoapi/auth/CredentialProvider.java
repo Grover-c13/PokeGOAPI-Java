@@ -15,10 +15,11 @@
 
 package com.pokegoapi.auth;
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+import okhttp3.OkHttpClient;
 
 /**
  * Any Credential Provider can extend this.
@@ -30,4 +31,10 @@ public abstract class CredentialProvider {
 	public abstract AuthInfo getAuthInfo() throws LoginFailedException, RemoteServerException;
 
 	public abstract boolean isTokenIdExpired();
+
+	public abstract void setHttpClient(OkHttpClient client);
+
+	public abstract OkHttpClient getHttpClient();
+
+	public abstract void login() throws LoginFailedException, RemoteServerException;
 }

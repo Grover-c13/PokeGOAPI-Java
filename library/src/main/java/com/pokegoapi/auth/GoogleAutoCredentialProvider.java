@@ -1,18 +1,17 @@
 package com.pokegoapi.auth;
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 
+import java.io.IOException;
+
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import lombok.Getter;
 import okhttp3.OkHttpClient;
 import svarzee.gps.gpsoauth.AuthToken;
 import svarzee.gps.gpsoauth.Gpsoauth;
-
-import java.io.IOException;
 
 /**
  * Use to login with google username and password
@@ -26,6 +25,7 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	private static String GOOGLE_LOGIN_APP = "com.nianticlabs.pokemongo";
 	private static String GOOGLE_LOGIN_CLIENT_SIG = "321187995bc7cdc2b5fc91b11a96e2baa8602c62";
 
+	private OkHttpClient client;
 	private final Gpsoauth gpsoauth;
 	private final String username;
 	private Time time;
@@ -36,48 +36,32 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	/**
 	 * Constructs credential provider using username and password
 	 *
-	 * @param httpClient OkHttp client
+	 * @param client OkHttp client
 	 * @param username   google username
 	 * @param password   google password
 	 * @throws LoginFailedException  - login failed possibly due to invalid credentials
 	 * @throws RemoteServerException - some server/network failure
 	 */
-	public GoogleAutoCredentialProvider(OkHttpClient httpClient, String username, String password)
+	public GoogleAutoCredentialProvider(OkHttpClient client, String username, String password)
 			throws LoginFailedException, RemoteServerException {
-		this.gpsoauth = new Gpsoauth(httpClient);
-		this.username = username;
-		this.tokenInfo = login(username, password);
-		this.time = new SystemTimeImpl();
+		this(client, username, password, new SystemTimeImpl());
 	}
 
 	/**
-	 * @param httpClient the client that will make http call
+	 * @param client the client that will make http call
 	 * @param username   google username
 	 * @param password   google pwd
 	 * @param time       time instance used to refresh token
 	 * @throws LoginFailedException  login failed possibly due to invalid credentials
 	 * @throws RemoteServerException some server/network failure
 	 */
-	public GoogleAutoCredentialProvider(OkHttpClient httpClient, String username, String password, Time time)
+	public GoogleAutoCredentialProvider(OkHttpClient client, String username, String password, Time time)
 			throws LoginFailedException, RemoteServerException {
-		this.gpsoauth = new Gpsoauth(httpClient);
+		this.client = client;
+		this.gpsoauth = new Gpsoauth(client);
 		this.username = username;
 		this.tokenInfo = login(username, password);
 		this.time = time;
-	}
-
-	private TokenInfo login(String username, String password)
-			throws RemoteServerException, LoginFailedException {
-		try {
-			String masterToken = gpsoauth.performMasterLoginForToken(username, password, GOOGLE_LOGIN_ANDROID_ID);
-			AuthToken authToken = gpsoauth.performOAuthForToken(username, masterToken, GOOGLE_LOGIN_ANDROID_ID,
-					GOOGLE_LOGIN_SERVICE, GOOGLE_LOGIN_APP, GOOGLE_LOGIN_CLIENT_SIG);
-			return new TokenInfo(authToken, masterToken);
-		} catch (IOException e) {
-			throw new RemoteServerException(e);
-		} catch (Gpsoauth.TokenRequestFailed e) {
-			throw new LoginFailedException(e);
-		}
 	}
 
 	/**
@@ -138,6 +122,35 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 		TokenInfo(AuthToken authToken, String refreshToken) {
 			this.authToken = authToken;
 			this.refreshToken = refreshToken;
+		}
+	}
+
+	@Override
+	public void setHttpClient(OkHttpClient client) {
+		this.client = client;
+	}
+
+	@Override
+	public OkHttpClient getHttpClient() {
+		return client;
+	}
+
+	@Override
+	public void login() throws LoginFailedException, RemoteServerException {
+
+	}
+
+	private TokenInfo login(String username, String password)
+			throws RemoteServerException, LoginFailedException {
+		try {
+			String masterToken = gpsoauth.performMasterLoginForToken(username, password, GOOGLE_LOGIN_ANDROID_ID);
+			AuthToken authToken = gpsoauth.performOAuthForToken(username, masterToken, GOOGLE_LOGIN_ANDROID_ID,
+					GOOGLE_LOGIN_SERVICE, GOOGLE_LOGIN_APP, GOOGLE_LOGIN_CLIENT_SIG);
+			return new TokenInfo(authToken, masterToken);
+		} catch (IOException e) {
+			throw new RemoteServerException(e);
+		} catch (Gpsoauth.TokenRequestFailed e) {
+			throw new LoginFailedException(e);
 		}
 	}
 }

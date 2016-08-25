@@ -15,9 +15,6 @@
 
 package com.pokegoapi.api;
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-import POGOProtos.Networking.Envelopes.SignatureOuterClass;
-
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.LocationFixes;
@@ -33,12 +30,14 @@ import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 
+import java.util.Random;
+import java.util.UUID;
+
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
-
-import java.util.Random;
-import java.util.UUID;
 
 
 public class PokemonGo {
@@ -49,6 +48,8 @@ public class PokemonGo {
 	private long startTime;
 	@Getter
 	private final byte[] sessionHash;
+	@Getter
+	private OkHttpClient client;
 	@Getter
 	RequestHandler requestHandler;
 	@Getter
@@ -90,12 +91,23 @@ public class PokemonGo {
 	public PokemonGo(OkHttpClient client, Time time, long seed) {
 		this.time = time;
 		this.seed = seed;
+		this.client = client;
 		sessionHash = new byte[32];
 		new Random().nextBytes(sessionHash);
 		requestHandler = new RequestHandler(this, client);
 		map = new Map(this);
 		longitude = Double.NaN;
 		latitude = Double.NaN;
+	}
+
+	/**
+	 * Instantiates a new Pokemon go.
+	 *
+	 * @param time a time implementation
+	 * @param seed the seed to generate same device
+	 */
+	public PokemonGo(Time time, long seed) {
+		this(new OkHttpClient(), time, seed);
 	}
 
 	/**
@@ -111,6 +123,15 @@ public class PokemonGo {
 
 	/**
 	 * Instantiates a new Pokemon go.
+	 *
+	 * @param seed the seed to generate same device
+	 */
+	public PokemonGo(long seed) {
+		this(new OkHttpClient(), new SystemTimeImpl(), seed);
+	}
+
+	/**
+	 * Instantiates a new Pokemon go.
 	 * Deprecated: specify a time implementation
 	 *
 	 * @param client the http client
@@ -122,12 +143,28 @@ public class PokemonGo {
 
 	/**
 	 * Instantiates a new Pokemon go.
+	 *
+	 * @param time a time implementation
+	 */
+	public PokemonGo(Time time) {
+		this(new OkHttpClient(), time, hash(UUID.randomUUID().toString()));
+	}
+
+	/**
+	 * Instantiates a new Pokemon go.
 	 * Deprecated: specify a time implementation
 	 *
 	 * @param client the http client
 	 */
 	public PokemonGo(OkHttpClient client) {
 		this(client, new SystemTimeImpl(), hash(UUID.randomUUID().toString()));
+	}
+
+	/**
+	 * Instantiates a new Pokemon go.
+	 */
+	public PokemonGo() {
+		this(new OkHttpClient(), new SystemTimeImpl(), hash(UUID.randomUUID().toString()));
 	}
 
 	/**
@@ -142,6 +179,9 @@ public class PokemonGo {
 			throw new NullPointerException("Credential Provider is null");
 		}
 		this.credentialProvider = credentialProvider;
+		if (credentialProvider.getHttpClient() == null) {
+			credentialProvider.setHttpClient(client);
+		}
 		startTime = currentTimeMillis();
 		playerProfile = new PlayerProfile(this);
 		settings = new Settings(this);
