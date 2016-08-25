@@ -40,17 +40,15 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 		int providerCount;
 		HashSet<String> negativeSnapshotProviders = new HashSet<>();
 
+		int chance = random.nextInt(100);
 		LocationFixes locationFixes;
 		if (api.getLocationFixes() == null) {
 			locationFixes = new LocationFixes();
 			providerCount = pn < 75 ? 6 : pn < 95 ? 5 : 8;
-
 			if (providerCount != 8) {
 				// a 5% chance that the second provider got a negative value else it should be the first only
-				int chance = random.nextInt(100);
 				negativeSnapshotProviders.add(chance < 95 ? "0" : "1");
 			} else {
-				int chance = random.nextInt(100);
 				negativeSnapshotProviders.add("0");
 				negativeSnapshotProviders.add("1");
 				if (chance >= 50) {
@@ -66,9 +64,11 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 					&& (currentTime - locationFixes.getTimestampCreate() < (random.nextInt(10 * 1000) + 5000)))) {
 				locationFixes.setTimestampCreate(currentTime);
 				return locationFixes;
+			} else if (builder.getRequests(0).getRequestType() == RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS) {
+				providerCount = chance >= 90 ? 2 : 1;
+			} else {
+				providerCount = pn < 60 ? 1 : pn < 90 ? 2 : 3;
 			}
-
-			providerCount = pn < 60 ? 1 : pn < 90 ? 2 : 3;
 		}
 
 		locationFixes.setTimestampCreate(currentTime);
