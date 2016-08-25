@@ -49,7 +49,7 @@ public class MapObjects {
 	@Getter
 	private final Collection<Pokestop> pokestops = Collections.synchronizedCollection(new ArrayList<Pokestop>());
 	boolean complete = false;
-	private PokemonGo api;
+	private final PokemonGo api;
 
 	/**
 	 * Instantiates a new Map objects.
