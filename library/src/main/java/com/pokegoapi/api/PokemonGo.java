@@ -89,7 +89,7 @@ public class PokemonGo {
 
 	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time, long seed)
 			throws LoginFailedException, RemoteServerException {
-
+		startTime = currentTimeMillis();
 		if (credentialProvider == null) {
 			throw new LoginFailedException("Credential Provider is null");
 		} else {
@@ -107,7 +107,6 @@ public class PokemonGo {
 		map = new Map(this);
 		longitude = Double.NaN;
 		latitude = Double.NaN;
-		startTime = currentTimeMillis();
 	}
 
 	/**
@@ -137,7 +136,7 @@ public class PokemonGo {
 	 */
 	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time)
 			throws LoginFailedException, RemoteServerException {
-		this(credentialProvider, client, time, UUID.randomUUID().hashCode());
+		this(credentialProvider, client, time, hash(UUID.randomUUID().toString()));
 	}
 
 	/**
@@ -151,7 +150,29 @@ public class PokemonGo {
 	 */
 	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client)
 			throws LoginFailedException, RemoteServerException {
-		this(credentialProvider, client, new SystemTimeImpl(), UUID.randomUUID().hashCode());
+		this(credentialProvider, client, new SystemTimeImpl(), hash(UUID.randomUUID().toString()));
+	}
+
+	/**
+	 * @param string string to hash
+	 * @return the hashed long
+	 */
+	private static long hash(String string) {
+		long upper = ((long) string.hashCode()) << 32;
+		long lower = ((long) reverse(string).hashCode()) - ((long) Integer.MIN_VALUE);
+		long hash64 = upper + lower;
+		return hash64;
+	}
+
+	private static String reverse(String string) {
+		int i, len = string.length();
+		StringBuilder dest = new StringBuilder(len);
+
+		for (i = (len - 1); i >= 0; i--) {
+			dest.append(string.charAt(i));
+		}
+
+		return dest.toString();
 	}
 
 	/**
