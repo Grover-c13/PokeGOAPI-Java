@@ -32,7 +32,8 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 	 * @param api the api
 	 * @return the default device info for the given api
 	 */
-	public static LocationFixes getDefault(PokemonGo api, long currentTime, RequestEnvelopeOuterClass.RequestEnvelope.Builder builder) {
+	public static LocationFixes getDefault(PokemonGo api, long currentTime,
+										   RequestEnvelopeOuterClass.RequestEnvelope.Builder builder) {
 		Random random = new Random();
 		int pn = random.nextInt(100);
 		int providerCount;
