@@ -36,7 +36,6 @@ import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
 
-import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
