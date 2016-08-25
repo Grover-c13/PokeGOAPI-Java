@@ -15,7 +15,13 @@
 
 package com.pokegoapi.api.device;
 
+import com.pokegoapi.api.PokemonGo;
+
+import java.util.Random;
+
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Created by fabianterhorst on 08.08.16.
@@ -24,6 +30,10 @@ import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 public class SensorInfo {
 
 	private SignatureOuterClass.Signature.SensorInfo.Builder sensorInfoBuilder;
+
+	@Setter
+	@Getter
+	private long timestampCreate;
 
 	public SensorInfo() {
 		sensorInfoBuilder = SignatureOuterClass.Signature.SensorInfo.newBuilder();
@@ -52,6 +62,57 @@ public class SensorInfo {
 				.setGyroscopeRawY(sensorInfos.getGyroscopeRawY())
 				.setGyroscopeRawZ(sensorInfos.getGyroscopeRawZ())
 				.build();
+	}
+
+	/**
+	 * Gets the default sensor info for the given api
+	 *
+	 * @param api the api
+	 * @param currentTime the current time
+	 * @param random random object
+	 * @return the default sensor info for the given api
+	 */
+	public static SignatureOuterClass.Signature.SensorInfo getDefault(PokemonGo api, long currentTime, Random random) {
+		SensorInfo sensorInfo;
+		if (api.getSensorInfo() == null) {
+			sensorInfo = new SensorInfo();
+			sensorInfo.getBuilder().setTimestampSnapshot(currentTime - api.getStartTime() + random.nextInt(500))
+					.setAccelRawX(0.1 + (0.7 - 0.1) * random.nextDouble())
+					.setAccelRawY(0.1 + (0.8 - 0.1) * random.nextDouble())
+					.setAccelRawZ(0.1 + (0.8 - 0.1) * random.nextDouble())
+					.setGyroscopeRawX(-1.0 + random.nextDouble() * 2.0)
+					.setGyroscopeRawY(-1.0 + random.nextDouble() * 2.0)
+					.setGyroscopeRawZ(-1.0 + random.nextDouble() * 2.0)
+					.setAccelNormalizedX(-1.0 + random.nextDouble() * 2.0)
+					.setAccelNormalizedY(6.0 + (9.0 - 6.0) * random.nextDouble())
+					.setAccelNormalizedZ(-1.0 + (8.0 - (-1.0)) * random.nextDouble())
+					.setAccelerometerAxes(3);
+			api.setSensorInfo(sensorInfo);
+		} else {
+			sensorInfo = api.getSensorInfo();
+			sensorInfo.getBuilder().setTimestampSnapshot(currentTime - api.getStartTime() + random.nextInt(500))
+					.setMagnetometerX(-0.7 + random.nextDouble() * 1.4)
+					.setMagnetometerY(-0.7 + random.nextDouble() * 1.4)
+					.setMagnetometerZ(-0.7 + random.nextDouble() * 1.4)
+					.setAngleNormalizedX(-55.0 + random.nextDouble() * 110.0)
+					.setAngleNormalizedY(-55.0 + random.nextDouble() * 110.0)
+					.setAngleNormalizedZ(-55.0 + random.nextDouble() * 110.0)
+					.setAccelRawX(0.1 + (0.7 - 0.1) * random.nextDouble())
+					.setAccelRawY(0.1 + (0.8 - 0.1) * random.nextDouble())
+					.setAccelRawZ(0.1 + (0.8 - 0.1) * random.nextDouble())
+					.setGyroscopeRawX(-1.0 + random.nextDouble() * 2.0)
+					.setGyroscopeRawY(-1.0 + random.nextDouble() * 2.0)
+					.setGyroscopeRawZ(-1.0 + random.nextDouble() * 2.0)
+					.setAccelNormalizedX(-1.0 + random.nextDouble() * 2.0)
+					.setAccelNormalizedY(6.0 + (9.0 - 6.0) * random.nextDouble())
+					.setAccelNormalizedZ(-1.0 + (8.0 - (-1.0)) * random.nextDouble())
+					.setAccelerometerAxes(3);
+		}
+		if (currentTime - sensorInfo.getTimestampCreate() > (random.nextInt(10 * 1000) + 5 * 1000)) {
+			sensorInfo.setTimestampCreate(currentTime);
+			return sensorInfo.getSensorInfo();
+		}
+		return null;
 	}
 
 	/**
@@ -178,6 +239,10 @@ public class SensorInfo {
 	 */
 	public void setGyroscopeRawZ(double gyroscopeRawZ) {
 		sensorInfoBuilder.setGyroscopeRawZ(gyroscopeRawZ);
+	}
+
+	public SignatureOuterClass.Signature.SensorInfo.Builder getBuilder() {
+		return sensorInfoBuilder;
 	}
 
 	/**
