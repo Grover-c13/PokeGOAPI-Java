@@ -35,15 +35,12 @@ import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass.UseItemC
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.map.pokemon.encounter.DiskEncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.NormalEncounterResult;
 import com.pokegoapi.api.settings.AsyncCatchOptions;
 import com.pokegoapi.api.settings.CatchOptions;
-import com.pokegoapi.exceptions.AsyncLoginFailedException;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.EncounterFailedException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
@@ -56,20 +53,11 @@ import com.pokegoapi.util.MapPoint;
 import lombok.Getter;
 import lombok.ToString;
 import rx.Observable;
+import rx.exceptions.Exceptions;
 import rx.functions.Func1;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.lang.NoSuchMethodException;
-
-import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_GREAT_BALL;
-import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_MASTER_BALL;
-import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_POKE_BALL;
-import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL;
-import static com.pokegoapi.api.inventory.Pokeball.GREATBALL;
-import static com.pokegoapi.api.inventory.Pokeball.MASTERBALL;
-import static com.pokegoapi.api.inventory.Pokeball.POKEBALL;
-import static com.pokegoapi.api.inventory.Pokeball.ULTRABALL;
 
 
 /**
@@ -206,7 +194,7 @@ public class CatchablePokemon implements MapPoint {
 							response = EncounterResponse
 									.parseFrom(result);
 						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
+							throw Exceptions.propagate(e);
 						}
 						encountered = response.getStatus() == EncounterResponse.Status.ENCOUNTER_SUCCESS;
 						return new NormalEncounterResult(api, response);
@@ -246,7 +234,7 @@ public class CatchablePokemon implements MapPoint {
 						try {
 							response = DiskEncounterResponse.parseFrom(result);
 						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
+							throw Exceptions.propagate(e);
 						}
 						encountered = response.getResult() == DiskEncounterResponse.Result.SUCCESS;
 						return new DiskEncounterResult(api, response);
@@ -884,7 +872,7 @@ public class CatchablePokemon implements MapPoint {
 				try {
 					response = CatchPokemonResponse.parseFrom(result);
 				} catch (InvalidProtocolBufferException e) {
-					throw new AsyncRemoteServerException(e);
+					throw Exceptions.propagate(e);
 				}
 				try {
 
@@ -898,12 +886,9 @@ public class CatchablePokemon implements MapPoint {
 					if (response.getStatus() == CatchStatus.CATCH_ESCAPE) {
 						api.getInventories().updateInventories();
 					}
-					CatchResult res = new CatchResult(response);
-					return res;
-				} catch (RemoteServerException e) {
-					throw new AsyncRemoteServerException(e);
-				} catch (LoginFailedException e) {
-					throw new AsyncLoginFailedException(e);
+					return new CatchResult(response);
+				} catch (LoginFailedException | RemoteServerException e) {
+					throw Exceptions.propagate(e);
 				}
 			}
 		});
@@ -934,7 +919,7 @@ public class CatchablePokemon implements MapPoint {
 						try {
 							response = UseItemCaptureResponse.parseFrom(result);
 						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
+							throw Exceptions.propagate(e);
 						}
 						return new CatchItemResult(response);
 					}

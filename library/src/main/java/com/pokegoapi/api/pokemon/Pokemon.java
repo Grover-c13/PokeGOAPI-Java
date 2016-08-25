@@ -21,7 +21,6 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.map.pokemon.EvolutionResult;
 import com.pokegoapi.api.player.PlayerProfile;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -50,6 +49,7 @@ import POGOProtos.Networking.Responses.UseItemReviveResponseOuterClass.UseItemRe
 import lombok.Getter;
 import lombok.Setter;
 import rx.Observable;
+import rx.exceptions.Exceptions;
 import rx.functions.Func1;
 
 /**
@@ -236,7 +236,7 @@ public class Pokemon extends PokemonDetails {
 						try {
 							response = UpgradePokemonResponse.parseFrom(result);
 						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
+							throw Exceptions.propagate(e);
 						}
 						//set new pokemon details
 						setProto(response.getUpgradedPokemon());
