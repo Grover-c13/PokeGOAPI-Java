@@ -15,14 +15,17 @@
 
 package com.pokegoapi.api.player;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Stats;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 
@@ -41,11 +44,14 @@ import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.L
 import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass.MarkTutorialCompleteMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
-import POGOProtos.Networking.Responses.EquipBadgeResponseOuterClass;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
+import POGOProtos.Networking.Responses.EquipBadgeResponseOuterClass.EquipBadgeResponse;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import POGOProtos.Networking.Responses.MarkTutorialCompleteResponseOuterClass.MarkTutorialCompleteResponse;
 import lombok.Setter;
+
+import rx.functions.Func1;
 
 public class PlayerProfile {
 	private static final String TAG = PlayerProfile.class.getSimpleName();
@@ -62,7 +68,7 @@ public class PlayerProfile {
 
 	/**
 	 * @param api the api
-	 * @throws LoginFailedException  when the auth is invalid
+	 * @throws LoginFailedException when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
 	public PlayerProfile(PokemonGo api) throws LoginFailedException, RemoteServerException {
@@ -76,7 +82,7 @@ public class PlayerProfile {
 	/**
 	 * Updates the player profile with the latest data.
 	 *
-	 * @throws LoginFailedException  when the auth is invalid
+	 * @throws LoginFailedException when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
 	public void updateProfile() throws RemoteServerException, LoginFailedException {
@@ -122,7 +128,7 @@ public class PlayerProfile {
 	 *
 	 * @param level the trainer level that you want to accept the rewards for
 	 * @return a PlayerLevelUpRewards object containing information about the items rewarded and unlocked for this level
-	 * @throws LoginFailedException  when the auth is invalid
+	 * @throws LoginFailedException when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 * @see PlayerLevelUpRewards
 	 */
@@ -153,9 +159,53 @@ public class PlayerProfile {
 	}
 
 	/**
+	 * Accept the rewards granted and the items unlocked by gaining a trainer
+	 * level up. Rewards are retained by the server until a player actively
+	 * accepts them. The rewarded items are automatically inserted into the
+	 * players item bag.
+	 *
+	 * @param level the trainer level that you want to accept the rewards for
+	 * @return a PlayerLevelUpRewards object containing information about the items rewarded and unlocked for this level
+	 * @throws LoginFailedException when the auth is invalid
+	 * @throws RemoteServerException when the server is down/having issues
+	 * @see PlayerLevelUpRewards
+	 */
+	public PlayerLevelUpRewards acceptLevelUpRewardsAsync(int level)
+				throws RemoteServerException, LoginFailedException {
+		// Check if we even have achieved this level yet
+		if (level > stats.getLevel()) {
+			return new PlayerLevelUpRewards(PlayerLevelUpRewards.Status.NOT_UNLOCKED_YET);
+		}
+		LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder().setLevel(level).build();
+		AsyncServerRequest asyncServerRequest = new AsyncServerRequest(RequestType.LEVEL_UP_REWARDS, msg);
+		LevelUpRewardsResponse response = api.getRequestHandler()
+				.sendAsyncServerRequests(asyncServerRequest)
+				.map(new Func1<ByteString, LevelUpRewardsResponse>() {
+
+					@Override
+					public LevelUpRewardsResponse call(ByteString response) {
+						try {
+							return LevelUpRewardsResponse.parseFrom(response);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+					}
+				}).toBlocking().first();
+		// Add the awarded items to our bag
+		ItemBag bag = api.getInventories().getItemBag();
+		for (ItemAward itemAward : response.getItemsAwardedList()) {
+			Item item = bag.getItem(itemAward.getItemId());
+			item.setCount(item.getCount() + itemAward.getItemCount());
+		}
+		// Build a new rewards object and return it
+		return new PlayerLevelUpRewards(response);
+
+	}
+
+	/**
 	 * Add currency.
 	 *
-	 * @param name   the name
+	 * @param name the name
 	 * @param amount the amount
 	 * @throws InvalidCurrencyException the invalid currency exception
 	 */
@@ -170,7 +220,7 @@ public class PlayerProfile {
 	/**
 	 * Check and equip badges.
 	 *
-	 * @throws LoginFailedException  when the auth is invalid
+	 * @throws LoginFailedException when the auth is invalid
 	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 
@@ -191,13 +241,62 @@ public class PlayerProfile {
 						.setBadgeTypeValue(response.getAwardedBadgeLevels(i)).build();
 				ServerRequest serverRequest1 = new ServerRequest(RequestType.EQUIP_BADGE, msg1);
 				api.getRequestHandler().sendServerRequests(serverRequest1);
-				EquipBadgeResponseOuterClass.EquipBadgeResponse response1;
+				EquipBadgeResponse response1;
 				try {
-					response1 = EquipBadgeResponseOuterClass.EquipBadgeResponse.parseFrom(serverRequest1.getData());
+					response1 = EquipBadgeResponse.parseFrom(serverRequest1.getData());
 					badge = response1.getEquipped();
 				} catch (InvalidProtocolBufferException e) {
 					throw new RemoteServerException(e);
 				}
+			}
+		}
+	}
+
+	/**
+	 * Check and equip badges.
+	 *
+	 * @throws LoginFailedException when the auth is invalid
+	 * @throws RemoteServerException When a buffer exception is thrown
+	 */
+
+	public void checkAndEquipBadgesAsync() throws LoginFailedException, RemoteServerException {
+		CheckAwardedBadgesMessage msg = CheckAwardedBadgesMessage.newBuilder().build();
+		AsyncServerRequest asyncServerRequest = new AsyncServerRequest(RequestType.CHECK_AWARDED_BADGES, msg);
+		CheckAwardedBadgesResponse response = api.getRequestHandler()
+				.sendAsyncServerRequests(asyncServerRequest)
+				.map(new Func1<ByteString, CheckAwardedBadgesResponse>() {
+
+					@Override
+					public CheckAwardedBadgesResponse call(ByteString response) {
+						try {
+							return CheckAwardedBadgesResponse.parseFrom(response);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+					}
+				}).toBlocking().first();
+
+		if (response.getSuccess()) {
+			for (int i = 0; i < response.getAwardedBadgesCount(); i++) {
+				EquipBadgeMessage msg1 = EquipBadgeMessage.newBuilder()
+						.setBadgeType(response.getAwardedBadges(i))
+						.setBadgeTypeValue(response.getAwardedBadgeLevels(i)).build();
+				AsyncServerRequest asyncServerRequest1 = new AsyncServerRequest(RequestType.EQUIP_BADGE, msg1);
+				EquipBadgeResponse response1 = api.getRequestHandler()
+						.sendAsyncServerRequests(asyncServerRequest1)
+						.map(new Func1<ByteString, EquipBadgeResponse>() {
+
+							@Override
+							public EquipBadgeResponse call(ByteString response) {
+								try {
+									return EquipBadgeResponse.parseFrom(response);
+								} catch (InvalidProtocolBufferException e) {
+									throw new AsyncRemoteServerException(e);
+								}
+							}
+
+						}).toBlocking().first();
+				badge = response1.getEquipped();
 			}
 		}
 	}
@@ -265,7 +364,7 @@ public class PlayerProfile {
 	 * Gets player stats
 	 *
 	 * @return stats API objet
-	 * @throws LoginFailedException  when the auth is invalid
+	 * @throws LoginFailedException when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
 	public Stats getStats() throws LoginFailedException, RemoteServerException {
@@ -287,25 +386,56 @@ public class PlayerProfile {
 	/**
 	 * Set the account to legal screen in order to receive valid response
 	 *
-	 * @throws LoginFailedException  when the auth is invalid
+	 * @throws LoginFailedException when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
 	public void enableAccount() throws LoginFailedException, RemoteServerException {
-		MarkTutorialCompleteMessage.Builder tutorialBuilder = MarkTutorialCompleteMessage.newBuilder();
-		tutorialBuilder.addTutorialsCompleted(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN)
+		MarkTutorialCompleteMessage msg = MarkTutorialCompleteMessage.newBuilder()
+				.addTutorialsCompleted(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN)
 				.setSendMarketingEmails(false)
-				.setSendPushNotifications(false);
+				.setSendPushNotifications(false)
+				.build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialBuilder.build());
+		ServerRequest serverRequest = new ServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, msg);
 		api.getRequestHandler().sendServerRequests(serverRequest);
-
-		MarkTutorialCompleteResponse response;
 		try {
-			response = MarkTutorialCompleteResponse.parseFrom(serverRequest.getData());
+			MarkTutorialCompleteResponse response = MarkTutorialCompleteResponse.parseFrom(serverRequest.getData());
 			playerData = response.getPlayerData();
 			tutorialState.addTutorialStates(playerData.getTutorialStateList());
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
+	}
+
+	/**
+	 * Set the account to legal screen in order to receive valid response
+	 *
+	 * @throws LoginFailedException when the auth is invalid
+	 * @throws RemoteServerException when the server is down/having issues
+	 */
+	public void asyncEnableAccount() throws LoginFailedException, RemoteServerException {
+		MarkTutorialCompleteMessage msg = MarkTutorialCompleteMessage.newBuilder()
+				.addTutorialsCompleted(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN)
+				.setSendMarketingEmails(false)
+				.setSendPushNotifications(false)
+				.build();
+
+		AsyncServerRequest asyncServerRequest = new AsyncServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, msg);
+		MarkTutorialCompleteResponse response = api.getRequestHandler()
+				.sendAsyncServerRequests(asyncServerRequest)
+				.map(new Func1<ByteString, MarkTutorialCompleteResponse>() {
+
+					@Override
+					public MarkTutorialCompleteResponse call(ByteString response) {
+						try {
+							return MarkTutorialCompleteResponse.parseFrom(response);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+					}
+
+				}).toBlocking().first();
+		playerData = response.getPlayerData();
+		tutorialState.addTutorialStates(playerData.getTutorialStateList());
 	}
 }
