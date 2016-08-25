@@ -80,15 +80,15 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 			float altitude = 65;
 			float verticalAccuracy = (float) (15 + (23 - 15) * random.nextDouble());
 
-			// Fake errors xD
-			if (random.nextInt(100) > 90) {
-				latitude = 360;
-				longitude = -360;
-			}
-
-			// Another fake error
-			if (random.nextInt(100) > 90) {
-				altitude = (float) (66 + (160 - 66) * random.nextDouble());
+			// Fake errors
+			if(builder.getRequests(0).getRequestType() != RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS) {
+				if (random.nextInt(100) > 90) {
+					latitude = 360;
+					longitude = -360;
+				}
+				if (random.nextInt(100) > 90) {
+					altitude = (float) (66 + (160 - 66) * random.nextDouble());
+				}
 			}
 
 			SignatureOuterClass.Signature.LocationFix.Builder locationFixBuilder =
