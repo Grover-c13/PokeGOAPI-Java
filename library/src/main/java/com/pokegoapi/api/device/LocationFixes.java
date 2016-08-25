@@ -44,6 +44,7 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 		LocationFixes locationFixes;
 		if (api.getLocationFixes() == null) {
 			locationFixes = new LocationFixes();
+			api.setLocationFixes(locationFixes);
 			providerCount = pn < 75 ? 6 : pn < 95 ? 5 : 8;
 			if (providerCount != 8) {
 				// a 5% chance that the second provider got a negative value else it should be the first only
