@@ -145,6 +145,7 @@ public class PokemonGo {
 		startTime = currentTimeMillis();
 		playerProfile = new PlayerProfile(this);
 		settings = new Settings(this);
+		inventories = new Inventories(this);
 	}
 
 	/**
@@ -198,13 +199,8 @@ public class PokemonGo {
 	 * Get the inventories API
 	 *
 	 * @return Inventories
-	 * @throws LoginFailedException  when login fails
-	 * @throws RemoteServerException when server down/issue
 	 */
-	public Inventories getInventories() throws LoginFailedException, RemoteServerException {
-		if (inventories == null) {
-			inventories = new Inventories(this);
-		}
+	public Inventories getInventories() {
 		return inventories;
 	}
 

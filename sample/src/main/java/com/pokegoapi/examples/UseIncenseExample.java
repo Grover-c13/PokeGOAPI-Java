@@ -48,7 +48,7 @@ public class UseIncenseExample {
 		OkHttpClient http = new OkHttpClient();
 
 		PokemonGo go = new PokemonGo(http, new SystemTimeImpl());
-		
+
 		try {
 			GoogleAutoCredentialProvider authProvider =
 					new GoogleAutoCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
