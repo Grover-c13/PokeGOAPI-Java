@@ -63,8 +63,8 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 
 			if (builder.getRequestsCount() == 0
 					|| builder.getRequests(0) == null
-					|| builder.getRequests(0).getRequestType() != RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS
-					|| (currentTime - locationFixes.getTimestampCreate() > (random.nextInt(10 * 1000) + 5000))) {
+					|| (builder.getRequests(0).getRequestType() != RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS
+					|| (currentTime - locationFixes.getTimestampCreate() > (random.nextInt(10 * 1000) + 5000)))) {
 				locationFixes.setTimestampCreate(currentTime);
 				return locationFixes;
 			}
