@@ -13,25 +13,27 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.api.player.stats.exceptions;
 
-public class LoginFailedException extends Exception {
+/**
+ * Exception for non valid experience
+ * 
+ * @author gionata-bisciari
+ *
+ */
+public class InvalidExperienceException extends Exception {
 
-	private static final long serialVersionUID = -7878733082697308116L;
+	private static final long serialVersionUID = 104154926999838049L;
 
-	public LoginFailedException() {
+	public InvalidExperienceException() {
 		super();
 	}
 
-	public LoginFailedException(String reason) {
+	public InvalidExperienceException(String reason) {
 		super(reason);
 	}
 
-	public LoginFailedException(Throwable exception) {
+	public InvalidExperienceException(Throwable exception) {
 		super(exception);
-	}
-
-	public LoginFailedException(String reason, Throwable exception) {
-		super(reason, exception);
 	}
 }

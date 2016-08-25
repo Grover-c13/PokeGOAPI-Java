@@ -28,6 +28,7 @@ import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInvento
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.player.stats.Stats;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -38,7 +39,6 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class Inventories {
 

@@ -13,25 +13,28 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.api.player.stats.util;
 
-public class LoginFailedException extends Exception {
+/**
+ * This class can help you retrieving informations about experience.
+ * 
+ * @author gionata-bisciari
+ */
+public abstract class TotalExperienceUtil {
 
-	private static final long serialVersionUID = -7878733082697308116L;
+	/**
+	 * Max experience
+	 */
+	public static final int MAX_EXP = 20000000;
 
-	public LoginFailedException() {
-		super();
-	}
-
-	public LoginFailedException(String reason) {
-		super(reason);
-	}
-
-	public LoginFailedException(Throwable exception) {
-		super(exception);
-	}
-
-	public LoginFailedException(String reason, Throwable exception) {
-		super(reason, exception);
+	/**
+	 * Checks if the value of total experience is valid.
+	 * 
+	 * @param totExp
+	 *            The total experience.
+	 * @return Validity of the value.
+	 */
+	public static boolean isValidTotalExperience(int totExp) {
+		return totExp >= 1 && totExp <= MAX_EXP;
 	}
 }

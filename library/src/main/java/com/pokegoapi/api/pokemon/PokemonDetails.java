@@ -250,7 +250,7 @@ public class PokemonDetails {
 		int attack = getIndividualAttack() + pokemonMeta.getBaseAttack();
 		int defense = getIndividualDefense() + pokemonMeta.getBaseDefense();
 		int stamina = getIndividualStamina() + pokemonMeta.getBaseStamina();
-		int playerLevel = api.getPlayerProfile().getStats().getLevel();
+		int playerLevel = api.getPlayerProfile().getStats().getCurrentPlayerLevel();
 		return PokemonCpUtils.getMaxCpForPlayer(attack, defense, stamina, playerLevel);
 	}
 
@@ -283,7 +283,7 @@ public class PokemonDetails {
 	 * @throws RemoteServerException If the server is causing issues
 	 */
 	public int getMaxCpFullEvolveAndPowerupForPlayer() throws LoginFailedException, RemoteServerException {
-		return getMaxCpFullEvolveAndPowerup(api.getPlayerProfile().getStats().getLevel());
+		return getMaxCpFullEvolveAndPowerup(api.getPlayerProfile().getStats().getCurrentPlayerLevel());
 	}
 
 	/**
