@@ -71,7 +71,7 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 			}
 		}
 
-		locationFixes.setTimestampCreate(currentTime);
+		locationFixes.setTimestampCreate(api.currentTimeMillis());
 
 		for (int i = 0; i < providerCount; i++) {
 			float latitude = offsetOnLatLong(api.getLatitude(), random.nextInt(100) + 10);
@@ -97,7 +97,7 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 					.setTimestampSnapshot(
 							negativeSnapshotProviders.contains(String.valueOf(i))
 									? random.nextInt(1000) - 3000
-									: currentTime - api.getStartTime())
+									: api.currentTimeMillis() - api.getStartTime())
 					.setLatitude(latitude)
 					.setLongitude(longitude)
 					.setHorizontalAccuracy(-1)
