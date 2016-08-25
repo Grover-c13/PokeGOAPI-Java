@@ -89,13 +89,13 @@ public class PokemonGo {
 
 	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time, long seed)
 			throws LoginFailedException, RemoteServerException {
-		startTime = currentTimeMillis();
 		if (credentialProvider == null) {
 			throw new LoginFailedException("Credential Provider is null");
 		} else {
 			this.credentialProvider = credentialProvider;
 		}
 		this.time = time;
+		startTime = currentTimeMillis();
 		this.seed = seed;
 
 		sessionHash = new byte[32];
@@ -164,10 +164,10 @@ public class PokemonGo {
 	}
 
 	private static String reverse(String string) {
-		int index, len = string.length();
+		int len = string.length();
 		StringBuilder dest = new StringBuilder(len);
 
-		for (index = (len - 1); index >= 0; index--) {
+		for (int index = (len - 1); index >= 0; index--) {
 			dest.append(string.charAt(index));
 		}
 
