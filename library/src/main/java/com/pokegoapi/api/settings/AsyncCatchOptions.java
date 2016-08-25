@@ -83,12 +83,9 @@ public class AsyncCatchOptions {
 	 * Gets item ball to catch a pokemon
 	 *
 	 * @return the item ball
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
 	 * @throws NoSuchItemException   the no such item exception
 	 */
-	public Pokeball getItemBall() throws LoginFailedException,
-						RemoteServerException, NoSuchItemException {
+	public Pokeball getItemBall() throws NoSuchItemException {
 		ItemBag bag = api.getInventories().getItemBag();
 		if (strictBallType) {
 			if (bag.getItem(pokeBall.getBallType()).getCount() > 0) {
@@ -146,12 +143,9 @@ public class AsyncCatchOptions {
 	 *
 	 * @param  encounterProbability  the capture probability to compare
 	 * @return the item ball
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
 	 * @throws NoSuchItemException   the no such item exception
 	 */
-	public Pokeball getItemBall(double encounterProbability) throws LoginFailedException,
-						RemoteServerException, NoSuchItemException {
+	public Pokeball getItemBall(double encounterProbability) throws NoSuchItemException {
 		if (encounterProbability >= probability) {
 			useBestPokeball = false;
 		} else {

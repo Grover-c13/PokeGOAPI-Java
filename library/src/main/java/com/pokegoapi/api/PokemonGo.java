@@ -46,7 +46,7 @@ public class PokemonGo {
 	private static final java.lang.String TAG = PokemonGo.class.getSimpleName();
 	private final Time time;
 	@Getter
-	private final long startTime;
+	private long startTime;
 	@Getter
 	private final byte[] sessionHash;
 	@Getter
@@ -83,31 +83,16 @@ public class PokemonGo {
 	/**
 	 * Instantiates a new Pokemon go.
 	 *
-	 * @param credentialProvider the credential provider
-	 * @param client             the http client
-	 * @param time               a time implementation
-	 * @param seed               the seed to generate same device
-	 * @throws LoginFailedException  When login fails
-	 * @throws RemoteServerException When server fails
+	 * @param client the http client
+	 * @param time   a time implementation
+	 * @param seed   the seed to generate same device
 	 */
-
-	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time, long seed)
-			throws LoginFailedException, RemoteServerException {
-		if (credentialProvider == null) {
-			throw new LoginFailedException("Credential Provider is null");
-		} else {
-			this.credentialProvider = credentialProvider;
-		}
+	public PokemonGo(OkHttpClient client, Time time, long seed) {
 		this.time = time;
-		startTime = currentTimeMillis();
 		this.seed = seed;
-
 		sessionHash = new byte[32];
 		new Random().nextBytes(sessionHash);
-
 		requestHandler = new RequestHandler(this, client);
-		playerProfile = new PlayerProfile(this);
-		settings = new Settings(this);
 		map = new Map(this);
 		longitude = Double.NaN;
 		latitude = Double.NaN;
@@ -117,44 +102,50 @@ public class PokemonGo {
 	 * Instantiates a new Pokemon go.
 	 * Deprecated: specify a time implementation
 	 *
-	 * @param credentialProvider the credential provider
-	 * @param client             the http client
-	 * @param seed               the seed to generate same device
-	 * @throws LoginFailedException  When login fails
-	 * @throws RemoteServerException When server fails
+	 * @param client the http client
+	 * @param seed   the seed to generate same device
 	 */
-	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, long seed)
-			throws LoginFailedException, RemoteServerException {
-		this(credentialProvider, client, new SystemTimeImpl(), seed);
+	public PokemonGo(OkHttpClient client, long seed) {
+		this(client, new SystemTimeImpl(), seed);
 	}
 
 	/**
 	 * Instantiates a new Pokemon go.
 	 * Deprecated: specify a time implementation
 	 *
-	 * @param credentialProvider the credential provider
-	 * @param client             the http client
-	 * @param time               a time implementation
-	 * @throws LoginFailedException  When login fails
-	 * @throws RemoteServerException When server fails
+	 * @param client the http client
+	 * @param time   a time implementation
 	 */
-	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time)
-			throws LoginFailedException, RemoteServerException {
-		this(credentialProvider, client, time, hash(UUID.randomUUID().toString()));
+	public PokemonGo(OkHttpClient client, Time time) {
+		this(client, time, hash(UUID.randomUUID().toString()));
 	}
 
 	/**
 	 * Instantiates a new Pokemon go.
 	 * Deprecated: specify a time implementation
 	 *
+	 * @param client the http client
+	 */
+	public PokemonGo(OkHttpClient client) {
+		this(client, new SystemTimeImpl(), hash(UUID.randomUUID().toString()));
+	}
+
+	/**
+	 * Login user with the provided provider
+	 *
 	 * @param credentialProvider the credential provider
-	 * @param client             the http client
 	 * @throws LoginFailedException  When login fails
 	 * @throws RemoteServerException When server fails
 	 */
-	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client)
-			throws LoginFailedException, RemoteServerException {
-		this(credentialProvider, client, new SystemTimeImpl(), hash(UUID.randomUUID().toString()));
+	public void login(CredentialProvider credentialProvider) throws LoginFailedException, RemoteServerException {
+		if (credentialProvider == null) {
+			throw new NullPointerException("Credential Provider is null");
+		}
+		this.credentialProvider = credentialProvider;
+		startTime = currentTimeMillis();
+		playerProfile = new PlayerProfile(this);
+		settings = new Settings(this);
+		inventories = new Inventories(this);
 	}
 
 	/**
@@ -208,13 +199,8 @@ public class PokemonGo {
 	 * Get the inventories API
 	 *
 	 * @return Inventories
-	 * @throws LoginFailedException  when login fails
-	 * @throws RemoteServerException when server down/issue
 	 */
-	public Inventories getInventories() throws LoginFailedException, RemoteServerException {
-		if (inventories == null) {
-			inventories = new Inventories(this);
-		}
+	public Inventories getInventories() {
 		return inventories;
 	}
 

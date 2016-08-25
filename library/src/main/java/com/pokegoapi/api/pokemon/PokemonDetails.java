@@ -33,7 +33,7 @@ public class PokemonDetails {
 		this.proto = proto;
 	}
 
-	public int getCandy() throws LoginFailedException, RemoteServerException {
+	public int getCandy() {
 		return api.getInventories().getCandyjar().getCandies(getPokemonFamily());
 	}
 
