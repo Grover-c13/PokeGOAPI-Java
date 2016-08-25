@@ -68,6 +68,7 @@ public class SensorInfo {
 	 * Gets the default sensor info for the given api
 	 *
 	 * @param api the api
+	 * @param currentTime the current time
 	 * @return the default sensor info for the given api
 	 */
 	public static SignatureOuterClass.Signature.SensorInfo getDefault(PokemonGo api, long currentTime) {

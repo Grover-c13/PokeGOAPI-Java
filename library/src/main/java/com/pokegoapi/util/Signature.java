@@ -54,7 +54,7 @@ public class Signature {
 				.setDeviceInfo(api.getDeviceInfo())
 				.setSensorInfo(SensorInfo.getDefault(api, currentTime))
 				.setActivityStatus(ActivityStatus.getDefault())
-				.addAllLocationFix(LocationFixes.getDefault(api, currentTime, builder))
+				.addAllLocationFix(LocationFixes.getDefault(api, builder, currentTime))
 				.setUnknown25(7363665268261373700L);
 
 		for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
