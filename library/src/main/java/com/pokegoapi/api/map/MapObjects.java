@@ -35,19 +35,19 @@ import java.util.Collections;
 public class MapObjects {
 
 	@Getter
-	Collection<NearbyPokemon> nearbyPokemons = Collections.synchronizedCollection(new ArrayList<NearbyPokemon>());
+	private final Collection<NearbyPokemon> nearbyPokemons = Collections.synchronizedCollection(new ArrayList<NearbyPokemon>());
 	@Getter
-	Collection<MapPokemon> catchablePokemons = Collections.synchronizedCollection(new ArrayList<MapPokemon>());
+	private final Collection<MapPokemon> catchablePokemons = Collections.synchronizedCollection(new ArrayList<MapPokemon>());
 	@Getter
-	Collection<WildPokemon> wildPokemons = Collections.synchronizedCollection(new ArrayList<WildPokemon>());
+	private final Collection<WildPokemon> wildPokemons = Collections.synchronizedCollection(new ArrayList<WildPokemon>());
 	@Getter
-	Collection<SpawnPoint> decimatedSpawnPoints = Collections.synchronizedCollection(new ArrayList<SpawnPoint>());
+	private final Collection<SpawnPoint> decimatedSpawnPoints = Collections.synchronizedCollection(new ArrayList<SpawnPoint>());
 	@Getter
-	Collection<SpawnPoint> spawnPoints = Collections.synchronizedCollection(new ArrayList<SpawnPoint>());
+	private final Collection<SpawnPoint> spawnPoints = Collections.synchronizedCollection(new ArrayList<SpawnPoint>());
 	@Getter
-	Collection<FortData> gyms = Collections.synchronizedCollection(new ArrayList<FortData>());
+	private final Collection<FortData> gyms = Collections.synchronizedCollection(new ArrayList<FortData>());
 	@Getter
-	Collection<Pokestop> pokestops = Collections.synchronizedCollection(new ArrayList<Pokestop>());
+	private final Collection<Pokestop> pokestops = Collections.synchronizedCollection(new ArrayList<Pokestop>());
 	boolean complete = false;
 	private PokemonGo api;
 
