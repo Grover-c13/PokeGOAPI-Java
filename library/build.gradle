@@ -1,0 +1,147 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.7.7'
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1"
+    }
+}
+
+apply plugin: 'idea'
+apply plugin: 'maven'
+apply plugin: 'com.google.protobuf'
+apply plugin: 'checkstyle'
+apply plugin: 'com.jfrog.bintray'
+
+archivesBaseName = archivesBaseName + '-library'
+
+sourceSets {
+    main {
+        proto {
+            // Need to use custom dir cause Gradle doesn't like us otherwise :(
+            srcDir 'src/resources/protobuf/src'
+            include '**/*.proto'
+        }
+    }
+}
+
+archivesBaseName = 'PokeGOAPI-library'
+
+// Remove all .proto definition from the final build
+processResources {
+    exclude('POGOProtos/')
+    exclude('signature/Signature.proto')
+}
+
+javadoc {
+    exclude "**/google/common/geometry/**"
+}
+
+// Run this task to bundle all needed dependency
+task bundle(type: Jar) {
+    baseName = archivesBaseName + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+jar.finalizedBy(bundle)
+
+protobuf {
+    // Configure the protoc executable
+    protoc {
+        // Download from repositories
+        artifact = 'com.google.protobuf:protoc:3.0.0-beta-3'
+    }
+}
+
+def checkstyleOutputDir = "${project.projectDir}/build/reports/checkstyle/"
+
+checkstyle {
+    toolVersion = '7.0'
+    configFile = file("${project.projectDir}/config/checkstyle.xml")
+    configProperties = [ "suppressionFile" : file("${project.projectDir}/config/suppressions.xml")]
+    reportsDir = file(checkstyleOutputDir)
+
+    ignoreFailures = false
+
+    checkstyleMain {
+        source = sourceSets.main.allSource
+    }
+
+    configurations {
+        checkstyle
+    }
+
+
+    dependencies {
+        checkstyle "com.puppycrawl.tools:checkstyle:${toolVersion}"
+    }
+}
+
+//Abort if any checkstyle warnings
+checkstyleMain.doLast {
+    def outputFile = file(checkstyleOutputDir + "main.xml")
+    if (outputFile.exists() && outputFile.text.contains("<error ")) {
+        logger.warn("!!!!-----------------------------------!!!!")
+        logger.warn("There were checkstyle warnings! For more info check $outputFile")
+        logger.warn("PLEASE CORRECT BEFORE SUBMITTING A PULLREQUEST")
+        logger.warn("!!!!-----------------------------------!!!!")
+    }
+}
+
+dependencies {
+    compile 'svarzee.gps:gpsoauth:0.3'
+    compile 'com.squareup.okio:okio:1.9.0'
+    compile 'com.squareup.moshi:moshi:1.2.0'
+    compile 'com.annimon:stream:1.1.1'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
+    compile 'com.google.protobuf:protobuf-java:3.0.0-beta-3'
+    compile 'io.reactivex:rxjava:1.1.8'
+    compile 'net.jpountz.lz4:lz4:1.3.0'
+    compileOnly 'org.projectlombok:lombok:1.16.10'
+}
+
+idea {
+    module {
+        sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/java");
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    javadoc.failOnError(false);
+    javadoc.source = sourceSets.main.allJava
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+Properties properties = new Properties()
+try {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+} catch (Exception ignore) {
+}
+
+bintray {
+    user = properties.getProperty('user')
+    key =  properties.getProperty('apiKey')
+    configurations = ['archives']
+    pkg {
+        repo = 'maven'
+        name = 'PokeGOAPI'
+        userOrg = user
+        licenses = ['GPL-3.0']
+        vcsUrl = 'https://github.com/Grover-c13/PokeGOAPI-Java.git'
+        publish = true
+    }
+}
+

@@ -1,0 +1,28 @@
+apply plugin:'application'
+
+mainClassName = "com.pokegoapi.examples.CatchPokemonAtAreaExample"
+
+archivesBaseName = archivesBaseName + '-sample'
+
+dependencies {
+    compile project(':library')
+}
+
+task runSample << {
+	if (sample == "1") {
+		mainClassName = "com.pokegoapi.examples.CatchPokemonAtAreaExample"
+	} else if (sample == "2") {
+		mainClassName = "com.pokegoapi.examples.DisplayPokenameExample"
+	} else if (sample == "3") {
+		mainClassName = "com.pokegoapi.examples.FightGymExample"
+	} else if (sample == "4") {
+		mainClassName = "com.pokegoapi.examples.GoogleUserInteractionExample"
+	} else if (sample == "5") {
+		mainClassName = "com.pokegoapi.examples.TransferOnePidgeyExample"
+	} else if (sample == "6") {
+		mainClassName = "com.pokegoapi.examples.UseIncenseExample"
+	} else if (sample == "7") {
+		mainClassName = "com.pokegoapi.examples.TranslatePokenameExample"
+	}
+    run.execute()
+}

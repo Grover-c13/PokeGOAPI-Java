@@ -27,35 +27,57 @@ ___
 
 # How to import
 
-  Import from Maven/Gradle/SBT/Leiningen using JitPack : [![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
-  
-  After you clicked on this link, jitpack will show you multiple build (try use the latest one since the api grow everyday).
-  JitPack will show an example for each dependency manager to include our API into your project.
+  ```groovy
+  allprojects {
+    repositories {
+        jcenter()
+    }
+  }
+
+  dependencies {
+    compile 'com.pokegoapi:PokeGOAPI-library:0.X.X'
+  }
+  ```
+Replace X.X with the version below:
+[ ![Download](https://api.bintray.com/packages/grover-c13/maven/PokeGOAPI/images/download.svg) ](https://bintray.com/grover-c13/maven/PokeGOAPI/_latestVersion)
 
 OR
 
-  Import JAR in Eclipse
-    - Right click on the project
-    - Select Build path > Java Build Path
-    - Select Libraries tab
-    - Select Add External JARs…
-    - Select `PokeGOAPI-Java/build/libs/PokeGOAPI-Java-0.0.1-SNAPSHOT.jar`
-    - Finish
+Import JAR with gradle
+  - Complete `Build from source` below
+  - Open the project gradle.build file
+  - Locate ``dependencies {`` 
+  - Add ``compile files('PATH_TO/PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.X.X.jar')``
+    - (PATH_TO is the exact path from root to the API folder, i.e. C:/MyGitProjects)
+    - (0.X.X refers to the version number provided in the JAR filename, ie. 0.3.0)
+
+OR
+
+Import JAR in Eclipse
+  - Complete `Build from source` below
+  - Right click on the project
+  - Select Build path > Java Build Path
+  - Select Libraries tab
+  - Select Add External JARs…
+  - Select ``PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.X.X.jar``
+    - (0.X.X refers to the version number provided in the JAR filename, ie. 0.3.0)
+  - Finish
 
 # Build from source
   - Clone the repo and cd into the folder
   - `` git submodule update --init ``
-  - `` ./gradlew build ``
-  - you should have the api jar in ``build/libs/PokeGOAPI-Java-0.0.1-SNAPSHOT.jar``
+  - `` ./gradlew :library:build ``
+  - you should have the api jar in ``library/build/libs/PokeGOAPI-library-all-0.X.X.jar``
+      - (0.X.X refers to the version number provided in the JAR filename, ie. 0.3.0)
 
 PS : for users who want to import the api into Eclipse IDE, you'll need to :
-  - build once : `` ./gradlew build ``
+  - build once : `` ./gradlew :library:build ``
   - Right click on the project
   - Select Build path > Configure Build Path > Source > Add Folder
-  - Select `build/generated/source/proto/main/java`
+  - Select `library/build/generated/source/proto/main/java`
   - Finish
 
-# Usage exemple (mostly how to login) :
+# Usage example (mostly how to login) :
 ```java
 OkHttpClient httpClient = new OkHttpClient();
 
@@ -120,6 +142,46 @@ try {
 }
 ```
 
+## (Async)CatchOptions
+
+Parameters for a capture now use a CatchOptions or AsyncCatchOptions object
+
+This object allows setting all parameters at once, or modifying them on-the-fly
+
+```
+import com.pokegoapi.api.settings.AsyncCatchOptions;
+```
+OR
+```
+import com.pokegoapi.api.settings.CatchOptions;
+```
+
+Usage:
+
+```
+CatchOptions options = new CatchOptions(go);
+options.maxRazzberries(5);
+options.useBestBall(true);
+options.noMasterBall(true);
+
+cp.catchPokemon(options);
+```
+
+OR
+
+```
+AsyncCatchOptions options = new AsyncCatchOptions(go);
+options.useRazzberries(true);
+options.useBestBall(true);
+options.noMasterBall(true);
+
+cp.catchPokemon(options);
+```
+
+Each option has a default and can override any with a similar functionality based on the most relevant option (for example, usePokeBall can be set as a minimum by using it with useBestBall, a maximum by using it alone, or exclusive by using with noFallback).
+
+Please see the javadocs for each item for further explanation. Replaced methods include examples of their CatchOptions or AsyncCatchOptions equivalent to simplify conversion.
+
 ##Android Dev FAQ
 
   - I can't use the sample code! It just throws a login exception!
@@ -149,5 +211,7 @@ You can't. The Google Identity Platform uses the SHA1 fingerprint and package na
   - @mjmfighter
   - @vmarchaud
   - @langerhans
+  - @fabianterhorst
+  - @LoungeKatt
 
 You can join us in the slack channel #javaapi on the pkre.slack.com ([you can get invited here](https://shielded-earth-81203.herokuapp.com/))
