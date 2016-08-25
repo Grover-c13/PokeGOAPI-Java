@@ -15,6 +15,8 @@
 
 package com.pokegoapi.api.device;
 
+import com.pokegoapi.api.PokemonGo;
+
 import java.util.Random;
 import java.util.UUID;
 
@@ -26,6 +28,7 @@ import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 
 public class DeviceInfo {
 
+	@Deprecated
 	public static final DeviceInfo DEFAULT = new DeviceInfo() {
 		{
 			String uuid = UUID.randomUUID().toString();
@@ -112,6 +115,84 @@ public class DeviceInfo {
 				.setFirmwareType(deviceInfos.getFirmwareType())
 				.setHardwareManufacturer(deviceInfos.getHardwareManufacturer())
 				.setHardwareModel(deviceInfos.getHardwareModel());
+	}
+
+	private static String bytesToHex(byte[] bytes) {
+		char[] hexArray = "0123456789abcdef".toCharArray();
+		char[] hexChars = new char[bytes.length * 2];
+		for (int index = 0; index < bytes.length; index++) {
+			int var = bytes[index] & 0xFF;
+			hexChars[index * 2] = hexArray[var >>> 4];
+			hexChars[index * 2 + 1] = hexArray[var & 0x0F];
+		}
+		return new String(hexChars).toLowerCase();
+	}
+
+
+	/**
+	 * Gets the default device info for the given api
+	 *
+	 * @param api the api
+	 * @return the default device info for the given api
+	 */
+	public static DeviceInfo getDefault(PokemonGo api) {
+		DeviceInfo deviceInfo = new DeviceInfo();
+		Random random = new Random(api.getSeed());
+		byte[] bytes = new byte[16];
+		random.nextBytes(bytes);
+		deviceInfo.setDeviceId(bytesToHex(bytes));
+		String[][] devices =
+				{
+						{"iPad3,1", "iPad", "J1AP"},
+						{"iPad3,2", "iPad", "J2AP"},
+						{"iPad3,3", "iPad", "J2AAP"},
+						{"iPad3,4", "iPad", "P101AP"},
+						{"iPad3,5", "iPad", "P102AP"},
+						{"iPad3,6", "iPad", "P103AP"},
+
+						{"iPad4,1", "iPad", "J71AP"},
+						{"iPad4,2", "iPad", "J72AP"},
+						{"iPad4,3", "iPad", "J73AP"},
+						{"iPad4,4", "iPad", "J85AP"},
+						{"iPad4,5", "iPad", "J86AP"},
+						{"iPad4,6", "iPad", "J87AP"},
+						{"iPad4,7", "iPad", "J85mAP"},
+						{"iPad4,8", "iPad", "J86mAP"},
+						{"iPad4,9", "iPad", "J87mAP"},
+
+						{"iPad5,1", "iPad", "J96AP"},
+						{"iPad5,2", "iPad", "J97AP"},
+						{"iPad5,3", "iPad", "J81AP"},
+						{"iPad5,4", "iPad", "J82AP"},
+
+						{"iPad6,7", "iPad", "J98aAP"},
+						{"iPad6,8", "iPad", "J99aAP"},
+
+						{"iPhone5,1", "iPhone", "N41AP"},
+						{"iPhone5,2", "iPhone", "N42AP"},
+						{"iPhone5,3", "iPhone", "N48AP"},
+						{"iPhone5,4", "iPhone", "N49AP"},
+
+						{"iPhone6,1", "iPhone", "N51AP"},
+						{"iPhone6,2", "iPhone", "N53AP"},
+
+						{"iPhone7,1", "iPhone", "N56AP"},
+						{"iPhone7,2", "iPhone", "N61AP"},
+
+						{"iPhone8,1", "iPhone", "N71AP"}
+
+				};
+		String[] osVersions = {"8.1.1", "8.1.2", "8.1.3", "8.2", "8.3", "8.4", "8.4.1",
+				"9.0", "9.0.1", "9.0.2", "9.1", "9.2", "9.2.1", "9.3", "9.3.1", "9.3.2", "9.3.3", "9.3.4"};
+		deviceInfo.setFirmwareType(osVersions[random.nextInt(osVersions.length)]);
+		String[] device = devices[random.nextInt(devices.length)];
+		deviceInfo.setDeviceModelBoot(device[0]);
+		deviceInfo.setDeviceModel(device[1]);
+		deviceInfo.setHardwareModel(device[2]);
+		deviceInfo.setFirmwareBrand("iPhone OS");
+		deviceInfo.setDeviceBrand("Apple");
+		deviceInfo.setHardwareManufacturer("Apple");
+		return deviceInfo;
 	}
 
 	/**
@@ -282,6 +363,15 @@ public class DeviceInfo {
 	 */
 	public void setHardwareModel(String hardwareModel) {
 		deviceInfoBuilder.setHardwareModel(hardwareModel);
+	}
+
+	/**
+	 * Gets the device info builder
+	 *
+	 * @return the device info builder
+	 */
+	public SignatureOuterClass.Signature.DeviceInfo.Builder getBuilder() {
+		return deviceInfoBuilder;
 	}
 
 	/**

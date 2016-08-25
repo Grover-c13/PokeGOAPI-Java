@@ -18,7 +18,9 @@ package com.pokegoapi.api;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 
+import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
+import com.pokegoapi.api.device.LocationFixes;
 import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
@@ -36,13 +38,15 @@ import lombok.Setter;
 import okhttp3.OkHttpClient;
 
 import java.util.Random;
+import java.util.UUID;
 
 
 public class PokemonGo {
 
 	private static final java.lang.String TAG = PokemonGo.class.getSimpleName();
 	private final Time time;
-	public final long startTime;
+	@Getter
+	private final long startTime;
 	@Getter
 	private final byte[] sessionHash;
 	@Getter
@@ -63,8 +67,18 @@ public class PokemonGo {
 	private Map map;
 	@Setter
 	private DeviceInfo deviceInfo;
+	@Getter
 	@Setter
-	private SensorInfo sensorInfo;
+	public SensorInfo sensorInfo;
+	@Getter
+	@Setter
+	public ActivityStatus activityStatus;
+	@Setter
+	@Getter
+	private long seed;
+	@Getter
+	@Setter
+	public LocationFixes locationFixes;
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -72,19 +86,21 @@ public class PokemonGo {
 	 * @param credentialProvider the credential provider
 	 * @param client             the http client
 	 * @param time               a time implementation
+	 * @param seed               the seed to generate same device
 	 * @throws LoginFailedException  When login fails
 	 * @throws RemoteServerException When server fails
 	 */
 
-	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time)
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time, long seed)
 			throws LoginFailedException, RemoteServerException {
-
 		if (credentialProvider == null) {
 			throw new LoginFailedException("Credential Provider is null");
 		} else {
 			this.credentialProvider = credentialProvider;
 		}
 		this.time = time;
+		startTime = currentTimeMillis();
+		this.seed = seed;
 
 		sessionHash = new byte[32];
 		new Random().nextBytes(sessionHash);
@@ -95,7 +111,36 @@ public class PokemonGo {
 		map = new Map(this);
 		longitude = Double.NaN;
 		latitude = Double.NaN;
-		startTime = currentTimeMillis();
+	}
+
+	/**
+	 * Instantiates a new Pokemon go.
+	 * Deprecated: specify a time implementation
+	 *
+	 * @param credentialProvider the credential provider
+	 * @param client             the http client
+	 * @param seed               the seed to generate same device
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+	 */
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, long seed)
+			throws LoginFailedException, RemoteServerException {
+		this(credentialProvider, client, new SystemTimeImpl(), seed);
+	}
+
+	/**
+	 * Instantiates a new Pokemon go.
+	 * Deprecated: specify a time implementation
+	 *
+	 * @param credentialProvider the credential provider
+	 * @param client             the http client
+	 * @param time               a time implementation
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+	 */
+	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client, Time time)
+			throws LoginFailedException, RemoteServerException {
+		this(credentialProvider, client, time, hash(UUID.randomUUID().toString()));
 	}
 
 	/**
@@ -109,7 +154,25 @@ public class PokemonGo {
 	 */
 	public PokemonGo(CredentialProvider credentialProvider, OkHttpClient client)
 			throws LoginFailedException, RemoteServerException {
-		this(credentialProvider, client, new SystemTimeImpl());
+		this(credentialProvider, client, new SystemTimeImpl(), hash(UUID.randomUUID().toString()));
+	}
+
+	/**
+	 * Hash the given string
+	 *
+	 * @param string string to hash
+	 * @return the hashed long
+	 */
+	private static long hash(String string) {
+		long upper = ((long) string.hashCode()) << 32;
+		int len = string.length();
+		StringBuilder dest = new StringBuilder(len);
+
+		for (int index = (len - 1); index >= 0; index--) {
+			dest.append(string.charAt(index));
+		}
+		long lower = ((long) dest.toString().hashCode()) - ((long) Integer.MIN_VALUE);
+		return upper + lower;
 	}
 
 	/**
@@ -201,20 +264,8 @@ public class PokemonGo {
 	 */
 	public SignatureOuterClass.Signature.DeviceInfo getDeviceInfo() {
 		if (deviceInfo == null) {
-			return null;
+			deviceInfo = DeviceInfo.getDefault(this);
 		}
 		return deviceInfo.getDeviceInfo();
-	}
-
-	/**
-	 * Gets the sensor info
-	 *
-	 * @return the sensor info
-	 */
-	public SignatureOuterClass.Signature.SensorInfo getSensorInfo() {
-		if (sensorInfo == null) {
-			return null;
-		}
-		return sensorInfo.getSensorInfo();
 	}
 }
