@@ -21,15 +21,19 @@ import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.api.pokemon.Pokemon;
 
+/**
+ * Result of an evolution, wrapped within the new pokemon received
+ */
 public class EvolutionResult {
-
-	private EvolvePokemonResponseOuterClass.EvolvePokemonResponse proto;
-	private Pokemon pokemon;
+	private final EvolvePokemonResponseOuterClass.EvolvePokemonResponse proto;
+	private final Pokemon pokemon;
 
 	/**
 	 * The evolution result.
 	 *
 	 * @param networking Networking
+	 * @param inventories Inventories are needed for the pokemon actions
+	 * @param playerProfile Player profile is needed for calulations of max cp and such
 	 * @param proto      Pokemon proto
 	 */
 	public EvolutionResult(Networking networking, Inventories inventories, PlayerProfile playerProfile,

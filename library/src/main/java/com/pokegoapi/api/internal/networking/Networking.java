@@ -2,7 +2,6 @@ package com.pokegoapi.api.internal.networking;
 
 import POGOProtos.Enums.PlatformOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
-import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
@@ -36,18 +35,12 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.internal.Location;
-import com.pokegoapi.exceptions.AccountBannedException;
-import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 import rx.Observable;
+import rx.functions.Func1;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -63,7 +56,7 @@ import java.util.concurrent.ExecutorService;
  * Created by paul on 21-8-2016.
  */
 @Slf4j
-public final class Networking implements Runnable {
+public final class Networking {
 	private static final int VERSION = 3500;
 	private long lastRequest = System.currentTimeMillis();
 	private static final String HASH = "2788184af4004004d6ab0720f7612983332106f6";
@@ -73,14 +66,13 @@ public final class Networking implements Runnable {
 			"c918d441-8f37-4155-b824-0ed67f64cb5b/1467338237623000", "90f8eb5d-c398-4e9e-a53d-82c6367521db/1467338255908000",
 			"5be4c90f-8b4b-49ce-92a1-6e1ffd591fda/1467338152232000");
 	private final Random random = new Random();
+	private final RequestScheduler requestScheduler;
 	private final ExecutorService executorService;
 	private final OkHttpClient client;
 	private final Location location;
 	private final Callback callback;
 	private final Signature signature;
 	private final Locale locale;
-	private URL currentServer;
-	private AuthTicket authTicket;
 	private Long lastInventoryCheck = null;
 
 	public static Networking getInstance(URL initialServer, ExecutorService executorService, OkHttpClient client, Location location, DeviceInfo deviceInfo,
@@ -104,8 +96,8 @@ public final class Networking implements Runnable {
 		this.location = location;
 		this.callback = callback;
 		this.signature = new Signature(location, deviceInfo, sensorInfo);
-		this.currentServer = initialServer;
 		this.locale = locale;
+		this.requestScheduler = new RequestScheduler(executorService, client, initialServer);
 	}
 
 	public BootstrapResult bootstrap(AuthInfo authInfo) {
@@ -132,14 +124,14 @@ public final class Networking implements Runnable {
 				.setAuthInfo(authInfo)
 				.setMsSinceLastLocationfix(getUnknown12());
 		signature.setSignature(getPlayerRequest);
-		ResponseEnvelope response = doRequest(getPlayerRequest.build());
+		ResponseEnvelope response = requestScheduler.queueRequest(getPlayerRequest.build()).toBlocking().first();
 		try {
-			currentServer = new URL("https://" + response.getApiUrl() + "/rpc");
+			requestScheduler.setCurrentServer(new URL("https://" + response.getApiUrl() + "/rpc"));
 		}
 		catch (MalformedURLException e) {
 			throw new RuntimeException("Received invalid URL from server. Giving up", e);
 		}
-		response = handleRequest(getPlayerRequest.build());
+		response = requestScheduler.queueRequest(getPlayerRequest.build()).toBlocking().first();
 		// Retry with new
 		log.info("Do a GET_PLAYER to the new URL, and get player info");
 		GetPlayerResponse playerResponse;
@@ -169,7 +161,7 @@ public final class Networking implements Runnable {
 				.setPlatform(PlatformOuterClass.Platform.ANDROID)
 				.setAppVersion(3300)
 				.build());
-		response = handleRequest(remoteConfigRequest.build());
+		response = requestScheduler.queueRequest(remoteConfigRequest.build()).toBlocking().first();
 		try {
 			downloadRemoteConfigVersionResponse = DownloadRemoteConfigVersionResponse.parseFrom(response.getReturns(0));
 			hatchedEggsResponse = GetHatchedEggsResponse.parseFrom(response.getReturns(2));
@@ -187,7 +179,7 @@ public final class Networking implements Runnable {
 				.setPlatform(PlatformOuterClass.Platform.ANDROID)
 				.setAppVersion(VERSION)
 				.build());
-		handleRequest(assetsRequest.build());
+		requestScheduler.queueRequest(assetsRequest.build()).toBlocking().first();
 
 		int playerLevel = 1;
 		for (InventoryItemOuterClass.InventoryItem inventoryItem : inventoryResponse.getInventoryDelta().getInventoryItemsList()) {
@@ -200,7 +192,7 @@ public final class Networking implements Runnable {
 		RequestEnvelope.Builder downloadItemTemplatesRequest = buildRequestEnvalope(RequestType.DOWNLOAD_ITEM_TEMPLATES, DownloadItemTemplatesMessage
 				.newBuilder()
 				.build());
-		response = handleRequest(downloadItemTemplatesRequest.build());
+		response = requestScheduler.queueRequest(downloadItemTemplatesRequest.build()).toBlocking().first();
 		try {
 			downloadItemTemplatesResponse = DownloadItemTemplatesResponse.parseFrom(response.getReturns(0));
 		}
@@ -214,7 +206,7 @@ public final class Networking implements Runnable {
 				.newBuilder()
 				.setLevel(playerLevel)
 				.build());
-		response = handleRequest(levelUpRequest.build());
+		response = requestScheduler.queueRequest(levelUpRequest.build()).toBlocking().first();
 		try {
 			levelUpRewardsResponse = LevelUpRewardsResponse.parseFrom(response.getReturns(0));
 		}
@@ -234,7 +226,7 @@ public final class Networking implements Runnable {
 		}
 		RequestEnvelope.Builder initialMapRequest = buildRequestEnvalope(RequestType.GET_MAP_OBJECTS, builder.setLatitude(location.getLatitude()).setLongitude(location.getLongitude())
 				.build());
-		response = handleRequest(initialMapRequest.build());
+		response = requestScheduler.queueRequest(initialMapRequest.build()).toBlocking().first();
 		try {
 			getMapObjectsResponse = GetMapObjectsResponse.parseFrom(response.getReturns(0));
 		}
@@ -248,7 +240,7 @@ public final class Networking implements Runnable {
 				.setPlatform(PlatformOuterClass.Platform.ANDROID)
 				.setAppVersion(VERSION)
 				.build());
-		response = handleRequest(assetsRequest.build());
+		response = requestScheduler.queueRequest(assetsRequest.build()).toBlocking().first();
 		try {
 			assetDigestResponse = GetAssetDigestResponse.parseFrom(response.getReturns(0));
 		}
@@ -257,7 +249,7 @@ public final class Networking implements Runnable {
 		}
 		for (String hash : DOWNLOAD_URL_HASHES) {
 			RequestEnvelope.Builder downloadUrls = buildRequestEnvalope(RequestType.GET_DOWNLOAD_URLS, GetDownloadUrlsMessage.newBuilder().setAssetId(0, hash).build());
-			response = handleRequest(downloadUrls.build());
+			response = requestScheduler.queueRequest(downloadUrls.build()).toBlocking().first();
 			try {
 				downloadUrlsResponses.add(GetDownloadUrlsResponse.parseFrom(response.toByteString()));
 			}
@@ -286,59 +278,6 @@ public final class Networking implements Runnable {
 		}
 	}
 
-	@Override
-	public void run() {
-
-	}
-
-	private ResponseEnvelope doRequest(RequestEnvelope request) throws RemoteServerException {
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		try {
-			request.writeTo(stream);
-		}
-		catch (IOException e) {
-			// If this happens we can just stop
-			throw new RuntimeException(e);
-		}
-		RequestBody body = RequestBody.create(null, stream.toByteArray());
-		okhttp3.Request httpRequest = new okhttp3.Request.Builder()
-				.url(currentServer)
-				.post(body)
-				.build();
-		try (Response response = client.newCall(httpRequest).execute()) {
-			if (response.code() != 200) {
-				throw new RemoteServerException("Got a unexpected http code : " + response.code());
-			}
-
-			ResponseEnvelope responseEnvelop;
-			try (InputStream content = response.body().byteStream()) {
-				responseEnvelop = ResponseEnvelope.parseFrom(content);
-			} catch (IOException e) {
-				// retrieved garbage from the server
-				throw new RemoteServerException("Received malformed response : " + e);
-			}
-			authTicket = responseEnvelop.getAuthTicket();
-			return responseEnvelop;
-		} catch (IOException e) {
-			throw new RemoteServerException(e);
-		}
-	}
-
-	private synchronized ResponseEnvelope handleRequest(RequestEnvelope request) {
-		ResponseEnvelope responseEnvelop = doRequest(request);
-		if (responseEnvelop.hasAuthTicket()) {
-			authTicket = responseEnvelop.getAuthTicket();
-		}
-
-		if (responseEnvelop.getStatusCode() == 102) {
-			throw new LoginFailedException(String.format("Invalid Auth status code recieved, token not refreshed? %s %s",
-					responseEnvelop.getApiUrl(), responseEnvelop.getError()));
-		} else if (responseEnvelop.getStatusCode() == 3) {
-			throw new AccountBannedException();
-		}
-		return responseEnvelop;
-	}
-
 	private long getUnknown12() {
 		return random.nextInt(6000);
 	}
@@ -350,9 +289,9 @@ public final class Networking implements Runnable {
 					DownloadSettingsResponse downloadSettingsResponse);
 	}
 
-	public <T extends GeneratedMessage> Observable<T> queueRequest(RequestType requestType,
-																   GeneratedMessage message, Class<T> responseType) {
-
+	public <T extends GeneratedMessage> Observable<T> queueRequest(final RequestType requestType,
+																   final GeneratedMessage message,
+																   final Class<T> responseType) {
 		// TODO: Fix this, put in networking thread
 		long wait = Math.max(0, System.currentTimeMillis() - (lastRequest + 300));
 		try {
@@ -364,26 +303,27 @@ public final class Networking implements Runnable {
 		lastRequest = System.currentTimeMillis();
 
 		RequestEnvelope.Builder request = buildRequestEnvalope(requestType, message);
-		ResponseEnvelope responseEnvelope = doRequest(request.build());
-		try {
-			T responseMessage = (T)responseType.newInstance().getParserForType().parseFrom(responseEnvelope.getReturns(0));
-			final GetHatchedEggsResponse getHatchedEggsResponse = GetHatchedEggsResponse.parseFrom(responseEnvelope.getReturns(2));
-			final GetInventoryResponse getInventoryResponse = GetInventoryResponse.parseFrom(responseEnvelope.getReturns(3));
-			final CheckAwardedBadgesResponse checkAwardedBadgesResponse = CheckAwardedBadgesResponse.parseFrom(responseEnvelope.getReturns(4));
-			final DownloadSettingsResponse downloadSettingsResponse = DownloadSettingsResponse.parseFrom(responseEnvelope.getReturns(5));
-			executorService.submit(new Runnable() {
-				@Override
-				public void run() {
-					callback.update(getHatchedEggsResponse, getInventoryResponse, checkAwardedBadgesResponse, downloadSettingsResponse);
+		return requestScheduler.queueRequest(request.build()).flatMap(new Func1<ResponseEnvelope, Observable<T>>() {
+			@Override
+			public Observable<T> call(ResponseEnvelope responseEnvelope) {
+				try {
+					T responseMessage = (T) responseType.newInstance().getParserForType().parseFrom(responseEnvelope.getReturns(0));
+					final GetHatchedEggsResponse getHatchedEggsResponse = GetHatchedEggsResponse.parseFrom(responseEnvelope.getReturns(2));
+					final GetInventoryResponse getInventoryResponse = GetInventoryResponse.parseFrom(responseEnvelope.getReturns(3));
+					final CheckAwardedBadgesResponse checkAwardedBadgesResponse = CheckAwardedBadgesResponse.parseFrom(responseEnvelope.getReturns(4));
+					final DownloadSettingsResponse downloadSettingsResponse = DownloadSettingsResponse.parseFrom(responseEnvelope.getReturns(5));
+					executorService.submit(new Runnable() {
+						@Override
+						public void run() {
+							callback.update(getHatchedEggsResponse, getInventoryResponse, checkAwardedBadgesResponse, downloadSettingsResponse);
+						}
+					});
+					return Observable.just(responseMessage);
+				} catch (IllegalAccessException | InvalidProtocolBufferException | InstantiationException e) {
+					return Observable.error(e);
 				}
-			});
-			return Observable.just(responseMessage);
-		} catch (IllegalAccessException | InstantiationException e) {
-			throw new RuntimeException("All hope is lost");
-		}
-		catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+			}
+		});
 	}
 
 	private RequestEnvelope.Builder buildRequestEnvalope(RequestType requestType,
@@ -401,7 +341,7 @@ public final class Networking implements Runnable {
 				.setLatitude(location.getLatitude())
 				.setLongitude(location.getLongitude())
 				.setAltitude(location.getAltitude())
-				.setAuthTicket(authTicket)
+				.setAuthTicket(requestScheduler.getAuthTicket())
 				.setMsSinceLastLocationfix(getUnknown12());
 		signature.setSignature(request);
 		return request;
