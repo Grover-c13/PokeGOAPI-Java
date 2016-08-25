@@ -76,7 +76,7 @@ public class SensorInfo {
 		SensorInfo sensorInfo;
 		if (api.getSensorInfo() == null) {
 			sensorInfo = new SensorInfo();
-			sensorInfo.getBuilder().setTimestampSnapshot(currentTime + api.getStartTime())
+			sensorInfo.getBuilder().setTimestampSnapshot(currentTime - api.getStartTime() + random.nextInt(500))
 					.setAccelRawX(0.1 + (0.7 - 0.1) * random.nextDouble())
 					.setAccelRawY(0.1 + (0.8 - 0.1) * random.nextDouble())
 					.setAccelRawZ(0.1 + (0.8 - 0.1) * random.nextDouble())
@@ -90,7 +90,7 @@ public class SensorInfo {
 			api.setSensorInfo(sensorInfo);
 		} else {
 			sensorInfo = api.getSensorInfo();
-			sensorInfo.getBuilder().setTimestampSnapshot(currentTime + api.getStartTime())
+			sensorInfo.getBuilder().setTimestampSnapshot(currentTime - api.getStartTime() + random.nextInt(500))
 					.setMagnetometerX(-0.7 + random.nextDouble() * 1.4)
 					.setMagnetometerY(-0.7 + random.nextDouble() * 1.4)
 					.setMagnetometerZ(-0.7 + random.nextDouble() * 1.4)
