@@ -33,10 +33,12 @@ public class TransferOnePidgeyExample {
 	 */
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
+
+		PokemonGo go = new PokemonGo(http);
 		try {
 			// check readme for other example
-			PokemonGo go = new PokemonGo(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN,
-					ExampleLoginDetails.PASSWORD), http);
+			go.login(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN,
+					ExampleLoginDetails.PASSWORD));
 
 			List<Pokemon> pidgeys =
 					go.getInventories().getPokebank().getPokemonByPokemonId(PokemonIdOuterClass.PokemonId.PIDGEY);

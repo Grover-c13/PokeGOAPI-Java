@@ -15,22 +15,21 @@
 
 package com.pokegoapi.auth;
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
 import com.squareup.moshi.Moshi;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import lombok.Getter;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 public class GoogleCredentialProvider extends CredentialProvider {
 
@@ -41,7 +40,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	private static final String TAG = GoogleCredentialProvider.class.getSimpleName();
 	//We try and refresh token 5 minutes before it actually expires
 	private static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
-	private final OkHttpClient client;
+	private OkHttpClient client;
 
 	private final OnGoogleLoginOAuthCompleteListener onGoogleLoginOAuthCompleteListener;
 
@@ -112,7 +111,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 				.method("POST", reqBody)
 				.build();
 
-		Response response = null;
+		Response response;
 		try {
 			response = client.newCall(request).execute();
 		} catch (IOException e) {
@@ -284,5 +283,15 @@ public class GoogleCredentialProvider extends CredentialProvider {
 		 * @param googleAuthTokenJson GoogleAuthToken object
 		 */
 		void onTokenIdReceived(GoogleAuthTokenJson googleAuthTokenJson);
+	}
+
+	@Override
+	public void setHttpClient(OkHttpClient client) {
+		this.client = client;
+	}
+
+	@Override
+	public OkHttpClient getHttpClient() {
+		return client;
 	}
 }

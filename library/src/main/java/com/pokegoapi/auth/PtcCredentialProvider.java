@@ -15,14 +15,18 @@
 
 package com.pokegoapi.auth;
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import com.squareup.moshi.Moshi;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
@@ -31,12 +35,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 
 public class PtcCredentialProvider extends CredentialProvider {
@@ -49,15 +47,15 @@ public class PtcCredentialProvider extends CredentialProvider {
 	public static final String USER_AGENT = "niantic";
 	private static final String TAG = PtcCredentialProvider.class.getSimpleName();
 	//We try and refresh token 5 minutes before it actually expires
-	protected static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
+	private static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
 
-	protected final OkHttpClient client;
-	protected final String username;
-	protected final String password;
+	private OkHttpClient client;
+	private final String username;
+	private final String password;
 	protected final Time time;
-	protected String tokenId;
-	protected long expiresTimestamp;
-	protected AuthInfo.Builder authbuilder;
+	private String tokenId;
+	private long expiresTimestamp;
+	private AuthInfo.Builder authBuilder;
 
 	/**
 	 * Instantiates a new Ptc login.
@@ -71,44 +69,34 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 */
 	public PtcCredentialProvider(OkHttpClient client, String username, String password, Time time)
 			throws LoginFailedException, RemoteServerException {
+		this(username, password, time);
+		setHttpClient(client);
+		login();
+	}
+
+	/**
+	 * Instantiates a new Ptc login.
+	 *
+	 * @param username Username
+	 * @param password password
+	 * @param time     a Time implementation
+	 */
+	public PtcCredentialProvider(String username, String password, Time time) {
 		this.time = time;
 		this.username = username;
 		this.password = password;
-		/*
-		This is a temporary, in-memory cookie jar.
-		We don't require any persistence outside of the scope of the login,
-		so it being discarded is completely fine
-		*/
-		CookieJar tempJar = new CookieJar() {
-			private final HashMap<String, List<Cookie>> cookieStore = new HashMap<String, List<Cookie>>();
 
-			@Override
-			public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-				cookieStore.put(url.host(), cookies);
-			}
+		authBuilder = AuthInfo.newBuilder();
+	}
 
-			@Override
-			public List<Cookie> loadForRequest(HttpUrl url) {
-				List<Cookie> cookies = cookieStore.get(url.host());
-				return cookies != null ? cookies : new ArrayList<Cookie>();
-			}
-		};
-
-		this.client = client.newBuilder()
-				.cookieJar(tempJar)
-				.addInterceptor(new Interceptor() {
-					@Override
-					public Response intercept(Chain chain) throws IOException {
-						//Makes sure the User-Agent is always set
-						Request req = chain.request();
-						req = req.newBuilder().header("User-Agent", USER_AGENT).build();
-						return chain.proceed(req);
-					}
-				})
-				.build();
-
-		authbuilder = AuthInfo.newBuilder();
-		login(username, password);
+	/**
+	 * Instantiates a new Ptc login.
+	 *
+	 * @param username Username
+	 * @param password password
+	 */
+	public PtcCredentialProvider(String username, String password) {
+		this(username, password, new SystemTimeImpl());
 	}
 
 	/**
@@ -130,19 +118,17 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 * Starts a login flow for pokemon.com (PTC) using a username and password,
 	 * this uses pokemon.com's oauth endpoint and returns a usable AuthInfo without user interaction
 	 *
-	 * @param username PTC username
-	 * @param password PTC password
 	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 */
-	private void login(String username, String password) throws LoginFailedException, RemoteServerException {
-		//TODO: stop creating an okhttp client per request
+	@Override
+	public void login() throws LoginFailedException, RemoteServerException {
 		Request get = new Request.Builder()
 				.url(LOGIN_URL)
 				.get()
 				.build();
 
-		Response getResponse = null;
+		Response getResponse;
 		try {
 			getResponse = client.newCall(get).execute();
 		} catch (IOException e) {
@@ -151,7 +137,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 
 		Moshi moshi = new Moshi.Builder().build();
 
-		PtcAuthJson ptcAuth = null;
+		PtcAuthJson ptcAuth;
 		try {
 			String response = getResponse.body().string();
 			ptcAuth = moshi.adapter(PtcAuthJson.class).fromJson(response);
@@ -175,7 +161,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 				.build();
 
 		// Need a new client for this to not follow redirects
-		Response response = null;
+		Response response;
 		try {
 			response = client.newBuilder()
 					.followRedirects(false)
@@ -187,7 +173,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 			throw new RemoteServerException("Network failure", e);
 		}
 
-		String body = null;
+		String body;
 		try {
 			body = response.body().string();
 		} catch (IOException e) {
@@ -195,7 +181,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 		}
 
 		if (body.length() > 0) {
-			PtcError ptcError = null;
+			PtcError ptcError;
 			try {
 				ptcError = moshi.adapter(PtcError.class).fromJson(body);
 			} catch (IOException e) {
@@ -250,7 +236,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 	@Override
 	public String getTokenId() throws LoginFailedException, RemoteServerException {
 		if (isTokenIdExpired()) {
-			login(username, password);
+			login();
 		}
 		return tokenId;
 	}
@@ -265,17 +251,58 @@ public class PtcCredentialProvider extends CredentialProvider {
 	@Override
 	public AuthInfo getAuthInfo() throws LoginFailedException, RemoteServerException {
 		if (isTokenIdExpired()) {
-			login(username, password);
+			login();
 		}
 
-		authbuilder.setProvider("ptc");
-		authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(tokenId).setUnknown2(59).build());
+		authBuilder.setProvider("ptc");
+		authBuilder.setToken(AuthInfo.JWT.newBuilder().setContents(tokenId).setUnknown2(59).build());
 
-		return authbuilder.build();
+		return authBuilder.build();
 	}
 
 	@Override
 	public boolean isTokenIdExpired() {
 		return time.currentTimeMillis() > expiresTimestamp;
+	}
+
+	@Override
+	public void setHttpClient(OkHttpClient client) {
+		/*
+		This is a temporary, in-memory cookie jar.
+		We don't require any persistence outside of the scope of the login,
+		so it being discarded is completely fine
+		*/
+		CookieJar tempJar = new CookieJar() {
+			private final HashMap<String, List<Cookie>> cookieStore = new HashMap<String, List<Cookie>>();
+
+			@Override
+			public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
+				cookieStore.put(url.host(), cookies);
+			}
+
+			@Override
+			public List<Cookie> loadForRequest(HttpUrl url) {
+				List<Cookie> cookies = cookieStore.get(url.host());
+				return cookies != null ? cookies : new ArrayList<Cookie>();
+			}
+		};
+
+		this.client = client.newBuilder()
+				.cookieJar(tempJar)
+				.addInterceptor(new Interceptor() {
+					@Override
+					public Response intercept(Chain chain) throws IOException {
+						//Makes sure the User-Agent is always set
+						Request req = chain.request();
+						req = req.newBuilder().header("User-Agent", USER_AGENT).build();
+						return chain.proceed(req);
+					}
+				})
+				.build();
+	}
+
+	@Override
+	public OkHttpClient getHttpClient() {
+		return client;
 	}
 }
