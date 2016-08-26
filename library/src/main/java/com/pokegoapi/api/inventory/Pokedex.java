@@ -15,26 +15,21 @@
 
 package com.pokegoapi.api.inventory;
 
-import POGOProtos.Data.PokedexEntryOuterClass.PokedexEntry;
-import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
-
-import com.pokegoapi.api.PokemonGo;
-
 import java.util.EnumMap;
 import java.util.Map;
 
+import POGOProtos.Data.PokedexEntryOuterClass.PokedexEntry;
+import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
+
 public class Pokedex {
 
-	private PokemonGo api;
-	private Map<PokemonId, PokedexEntry> pokedexMap = new EnumMap<>(PokemonId.class);
+	private final Map<PokemonId, PokedexEntry> pokedexMap = new EnumMap<>(PokemonId.class);
 
-	public Pokedex(PokemonGo pgo) {
-		reset(pgo);
+	public Pokedex() {
 	}
 
-	public void reset(PokemonGo pgo) {
-		this.api = pgo;
-		pokedexMap = new EnumMap<PokemonId, PokedexEntry>(PokemonId.class);
+	public void reset() {
+		pokedexMap.clear();
 	}
 
 	/**

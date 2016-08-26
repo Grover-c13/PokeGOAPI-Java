@@ -15,10 +15,6 @@
 
 package com.pokegoapi.api.inventory;
 
-import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
-
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.EggPokemon;
@@ -27,26 +23,28 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 
-import lombok.Getter;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
+import lombok.Getter;
+
 public class Hatchery {
 	@Getter
-	Set<EggPokemon> eggs = new HashSet<EggPokemon>();
+	private final Set<EggPokemon> eggs = new HashSet<EggPokemon>();
 	@Getter
-	PokemonGo api;
+	private PokemonGo api;
 
-	public Hatchery(PokemonGo pgo) {
-		reset(pgo);
+	public Hatchery(PokemonGo api) {
+		this.api = api;
 	}
 
-	public void reset(PokemonGo api) {
-		this.api = api;
-		eggs = new HashSet<>();
+	public void reset() {
+		eggs.clear();
 	}
 
 	public void addEgg(EggPokemon egg) {
