@@ -17,175 +17,59 @@ package com.pokegoapi.api.device;
 
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 
+import java.util.Random;
+
 /**
  * Created by fabianterhorst on 08.08.16.
  */
 
 public class SensorInfo {
+	private final long timestampCreate = System.currentTimeMillis();
+	private final SensorInfoProvider sensorInfoProvider;
+	private final Random random;
 
-	private SignatureOuterClass.Signature.SensorInfo.Builder sensorInfoBuilder;
-
-	public SensorInfo() {
-		sensorInfoBuilder = SignatureOuterClass.Signature.SensorInfo.newBuilder();
+	SensorInfo(SensorInfoProvider sensorInfoProvider) {
+		this.sensorInfoProvider = sensorInfoProvider;
+		random = null;
 	}
 
-	/**
-	 * Create a sensor info with already existing sensor infos
-	 *
-	 * @param sensorInfos the sensor infos interface
-	 */
-	public SensorInfo(SensorInfos sensorInfos) {
-		this();
-		sensorInfoBuilder
-				.setTimestampSnapshot(sensorInfos.getTimestampSnapshot())
-				.setAccelerometerAxes(sensorInfos.getAccelerometerAxes())
-				.setAccelNormalizedX(sensorInfos.getAccelNormalizedX())
-				.setAccelNormalizedY(sensorInfos.getAccelNormalizedY())
-				.setAccelNormalizedZ(sensorInfos.getAccelNormalizedZ())
-				.setAccelRawX(sensorInfos.getAccelRawX())
-				.setAccelRawY(sensorInfos.getAccelRawY())
-				.setAccelRawZ(sensorInfos.getAccelRawZ())
-				.setAngleNormalizedX(sensorInfos.getAngleNormalizedX())
-				.setAngleNormalizedY(sensorInfos.getAngleNormalizedY())
-				.setAngleNormalizedZ(sensorInfos.getAngleNormalizedZ())
-				.setGyroscopeRawX(sensorInfos.getGyroscopeRawX())
-				.setGyroscopeRawY(sensorInfos.getGyroscopeRawY())
-				.setGyroscopeRawZ(sensorInfos.getGyroscopeRawZ())
+	SensorInfo(Random random) {
+		this.sensorInfoProvider = null;
+		this.random = random;
+	}
+
+
+	SignatureOuterClass.Signature.SensorInfo getSensorInfo() {
+		if (this.sensorInfoProvider == null) {
+			return SignatureOuterClass.Signature.SensorInfo.newBuilder()
+					.setTimestampSnapshot(System.currentTimeMillis() - timestampCreate + random.nextInt(500))
+					.setAccelRawX(0.1 + (0.7 - 0.1) * random.nextDouble())
+					.setAccelRawY(0.1 + (0.8 - 0.1) * random.nextDouble())
+					.setAccelRawZ(0.1 + (0.8 - 0.1) * random.nextDouble())
+					.setGyroscopeRawX(-1.0 + random.nextDouble() * 2.0)
+					.setGyroscopeRawY(-1.0 + random.nextDouble() * 2.0)
+					.setGyroscopeRawZ(-1.0 + random.nextDouble() * 2.0)
+					.setAccelNormalizedX(-1.0 + random.nextDouble() * 2.0)
+					.setAccelNormalizedY(6.0 + (9.0 - 6.0) * random.nextDouble())
+					.setAccelNormalizedZ(-1.0 + (8.0 - (-1.0)) * random.nextDouble())
+					.setAccelerometerAxes(3)
+					.build();
+		}
+		return SignatureOuterClass.Signature.SensorInfo.newBuilder()
+				.setTimestampSnapshot(sensorInfoProvider.getTimestampSnapshot())
+				.setAccelerometerAxes(sensorInfoProvider.getAccelerometerAxes())
+				.setAccelNormalizedX(sensorInfoProvider.getAccelNormalizedX())
+				.setAccelNormalizedY(sensorInfoProvider.getAccelNormalizedY())
+				.setAccelNormalizedZ(sensorInfoProvider.getAccelNormalizedZ())
+				.setAccelRawX(sensorInfoProvider.getAccelRawX())
+				.setAccelRawY(sensorInfoProvider.getAccelRawY())
+				.setAccelRawZ(sensorInfoProvider.getAccelRawZ())
+				.setAngleNormalizedX(sensorInfoProvider.getAngleNormalizedX())
+				.setAngleNormalizedY(sensorInfoProvider.getAngleNormalizedY())
+				.setAngleNormalizedZ(sensorInfoProvider.getAngleNormalizedZ())
+				.setGyroscopeRawX(sensorInfoProvider.getGyroscopeRawX())
+				.setGyroscopeRawY(sensorInfoProvider.getGyroscopeRawY())
+				.setGyroscopeRawZ(sensorInfoProvider.getGyroscopeRawZ())
 				.build();
-	}
-
-	/**
-	 * Sets timestamp snapshot since start
-	 *
-	 * @param timestampSnapshot timestamp in ms since app start
-	 */
-	public void setTimestampSnapshot(long timestampSnapshot) {
-		sensorInfoBuilder.setTimestampSnapshot(timestampSnapshot);
-	}
-
-	/**
-	 * Sets accelerometer axes
-	 *
-	 * @param accelerometerAxes accelerometer axes (always 3)
-	 */
-	public void setAccelerometerAxes(long accelerometerAxes) {
-		sensorInfoBuilder.setAccelerometerAxes(accelerometerAxes);
-	}
-
-	/**
-	 * Sets accel normalized x
-	 *
-	 * @param accelNormalizedX accel normalized x
-	 */
-	public void setAccelNormalizedX(double accelNormalizedX) {
-		sensorInfoBuilder.setAccelNormalizedX(accelNormalizedX);
-	}
-
-	/**
-	 * Sets accel normalized y
-	 *
-	 * @param accelNormalizedY accel normalized y
-	 */
-	public void setAccelNormalizedY(double accelNormalizedY) {
-		sensorInfoBuilder.setAngleNormalizedY(accelNormalizedY);
-	}
-
-	/**
-	 * Sets accel normalized z
-	 *
-	 * @param accelNormalizedZ accel normalized z
-	 */
-	public void setAccelNormalizedZ(double accelNormalizedZ) {
-		sensorInfoBuilder.setAccelNormalizedZ(accelNormalizedZ);
-	}
-
-	/**
-	 * Sets accel raw x
-	 *
-	 * @param accelRawX accel raw x
-	 */
-	public void setAccelRawX(double accelRawX) {
-		sensorInfoBuilder.setAccelRawX(accelRawX);
-	}
-
-	/**
-	 * Sets accel raw y
-	 *
-	 * @param accelRawY accel raw y
-	 */
-	public void setAccelRawY(double accelRawY) {
-		sensorInfoBuilder.setAccelRawY(accelRawY);
-	}
-
-	/**
-	 * Sets accel raw z
-	 *
-	 * @param accelRawZ accel raw z
-	 */
-	public void setAccelRawZ(double accelRawZ) {
-		sensorInfoBuilder.setAccelRawZ(accelRawZ);
-	}
-
-	/**
-	 * Sets angel normalized x
-	 *
-	 * @param angleNormalizedX angel normalized x
-	 */
-	public void setAngleNormalizedX(double angleNormalizedX) {
-		sensorInfoBuilder.setAngleNormalizedX(angleNormalizedX);
-	}
-
-	/**
-	 * Sets angel normalized y
-	 *
-	 * @param angleNormalizedY angel normalized y
-	 */
-	public void setAngleNormalizedY(double angleNormalizedY) {
-		sensorInfoBuilder.setAngleNormalizedY(angleNormalizedY);
-	}
-
-	/**
-	 * Sets angel normalized z
-	 *
-	 * @param angleNormalizedZ angel normalized z
-	 */
-	public void setAngleNormalizedZ(double angleNormalizedZ) {
-		sensorInfoBuilder.setAngleNormalizedZ(angleNormalizedZ);
-	}
-
-	/**
-	 * Sets gyroscope raw x
-	 *
-	 * @param gyroscopeRawX gyroscope raw x
-	 */
-	public void setGyroscopeRawX(double gyroscopeRawX) {
-		sensorInfoBuilder.setGyroscopeRawX(gyroscopeRawX);
-	}
-
-	/**
-	 * Sets gyroscope raw y
-	 *
-	 * @param gyroscopeRawY gyroscope raw y
-	 */
-	public void setGyroscopeRawY(double gyroscopeRawY) {
-		sensorInfoBuilder.setGyroscopeRawY(gyroscopeRawY);
-	}
-
-	/**
-	 * Sets gyroscope raw z
-	 *
-	 * @param gyroscopeRawZ gyroscope raw z
-	 */
-	public void setGyroscopeRawZ(double gyroscopeRawZ) {
-		sensorInfoBuilder.setGyroscopeRawZ(gyroscopeRawZ);
-	}
-
-	/**
-	 * Gets SensorInfo.
-	 *
-	 * @return SensorInfo
-	 */
-	public SignatureOuterClass.Signature.SensorInfo getSensorInfo() {
-		return sensorInfoBuilder.build();
 	}
 }

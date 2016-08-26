@@ -373,6 +373,15 @@ public class CatchablePokemon implements MapPoint {
 		return encountered;
 	}
 
+	/**
+	 * Return true when the catchable pokemon is a lured pokemon
+	 *
+	 * @return true for lured pokemon
+	 */
+	public boolean isLured() {
+		return encounterKind == EncounterKind.DISK;
+	}
+
 	private enum EncounterKind {
 		NORMAL,
 		DISK;

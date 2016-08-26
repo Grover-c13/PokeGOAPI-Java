@@ -19,7 +19,7 @@ package com.pokegoapi.api.device;
  * Created by fabianterhorst on 08.08.16.
  */
 
-public interface DeviceInfos {
+public interface DeviceInfoProvider {
 	/**
 	 * adb.exe shell getprop ro.product.board
 	 *

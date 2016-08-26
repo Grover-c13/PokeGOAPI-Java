@@ -20,6 +20,7 @@ import POGOProtos.Enums.TeamColorOuterClass;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Networking.Requests.Messages.FortDeployPokemonMessageOuterClass.FortDeployPokemonMessage;
 import POGOProtos.Networking.Requests.Messages.GetGymDetailsMessageOuterClass.GetGymDetailsMessage;
+import POGOProtos.Networking.Requests.Messages.FortDeployPokemonMessageOuterClass.FortDeployPokemonMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.FortDeployPokemonResponseOuterClass.FortDeployPokemonResponse;
 import POGOProtos.Networking.Responses.GetGymDetailsResponseOuterClass.GetGymDetailsResponse;
@@ -27,6 +28,9 @@ import com.pokegoapi.api.internal.Location;
 import com.pokegoapi.api.internal.networking.Networking;
 import com.pokegoapi.api.map.MapPoint;
 import com.pokegoapi.api.pokemon.Pokemon;
+import rx.Observable;
+import rx.functions.Func1;
+
 import rx.Observable;
 import rx.functions.Func1;
 

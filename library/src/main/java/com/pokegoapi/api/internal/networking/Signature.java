@@ -6,7 +6,9 @@ import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
 import POGOProtos.Networking.Envelopes.Unknown6OuterClass.Unknown6.Unknown2;
 import POGOProtos.Networking.Requests.RequestOuterClass;
 import com.google.protobuf.ByteString;
+import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
+import com.pokegoapi.api.device.LocationFixes;
 import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.internal.Location;
 import net.jpountz.xxhash.StreamingXXHash32;
@@ -21,13 +23,17 @@ public class Signature {
 	private final Location location;
 	private final DeviceInfo deviceInfo;
 	private final SensorInfo sensorInfo;
+	private final ActivityStatus activityStatus;
+	private final LocationFixes locationFixes;
 
-	Signature(Location location, DeviceInfo deviceInfo, SensorInfo sensorInfo) {
+	Signature(Location location, DeviceInfo deviceInfo, SensorInfo sensorInfo, ActivityStatus activityStatus, LocationFixes locationFixes) {
 		this.sessionHash = new byte[32];
 		new Random().nextBytes(sessionHash);
 		this.location = location;
 		this.deviceInfo = deviceInfo;
 		this.sensorInfo = sensorInfo;
+		this.activityStatus = activityStatus;
+		this.locationFixes = locationFixes;
 	}
 	/**
 	 * Given a fully built request, set the signature correctly.
@@ -44,12 +50,27 @@ public class Signature {
 
 		byte[] authTicketBA = builder.getAuthTicket().toByteArray();
 
+		/*
+			Todo : reuse this later when we know the input
+			byte[] unknown = "b8fa9757195897aae92c53dbcf8a60fb3d86d745".getBytes();
+			XXHashFactory factory = XXHashFactory.safeInstance();
+			StreamingXXHash64 xx64 = factory.newStreamingHash64(0x88533787);
+			xx64.update(unknown, 0, unknown.length);
+			long unknown25 = xx64.getValue();
+		*/
+
+		Random random = new Random();
+
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
 				.setLocationHash1(getLocationHash1(authTicketBA))
 				.setLocationHash2(getLocationHash2())
 				.setSessionHash(ByteString.copyFrom(sessionHash))
 				.setTimestamp(curTime)
-				.setTimestampSinceStart(curTime - startTime);
+				.setTimestampSinceStart(curTime - startTime)
+				.setDeviceInfo(deviceInfo.getDeviceInfo())
+				.setActivityStatus(activityStatus.getActivityStatus())
+				.addAllLocationFix(locationFixes)
+				.setUnknown25(7363665268261373700L);
 
 		SignatureOuterClass.Signature.DeviceInfo deviceInfo = this.deviceInfo.getDeviceInfo();
 		if (deviceInfo != null) {
@@ -120,7 +141,7 @@ public class Signature {
 	}
 
 	private static long getRequestHash(byte[] authTicket, byte[] request) {
-		XXHashFactory factory = XXHashFactory.fastestInstance();
+		XXHashFactory factory = XXHashFactory.safeInstance();
 		StreamingXXHash64 xx64 = factory.newStreamingHash64(0x1B845238);
 		xx64.update(authTicket, 0, authTicket.length);
 		xx64 = factory.newStreamingHash64(xx64.getValue());
