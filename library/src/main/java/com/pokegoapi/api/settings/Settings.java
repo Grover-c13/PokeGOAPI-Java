@@ -9,6 +9,7 @@ import com.pokegoapi.main.ServerRequest;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import lombok.Getter;
 
 /**
@@ -59,7 +60,13 @@ public class Settings {
 	 * @return GpsSettings instance.
 	 */
 	private final GpsSettings gpsSettings;
-
+	@Getter
+    /**
+     * Settings for hash
+     *
+     * @return String hash.
+     */
+    private String hash;
 
 	/**
 	 * Settings object that hold different configuration aspect of the game.
@@ -76,7 +83,8 @@ public class Settings {
 		this.fortSettings = new FortSettings();
 		this.inventorySettings = new InventorySettings();
 		this.gpsSettings = new GpsSettings();
-		updateSettings();
+		this.hash = new String();
+
 	}
 
 	/**
@@ -97,11 +105,16 @@ public class Settings {
 			throw new RemoteServerException(e);
 		}
 
+		updateSettings(response);
+	}
+
+	public void updateSettings(DownloadSettingsResponse response){
 		mapSettings.update(response.getSettings().getMapSettings());
 		levelUpSettings.update(response.getSettings().getInventorySettings());
 		fortSettings.update(response.getSettings().getFortSettings());
 		inventorySettings.update(response.getSettings().getInventorySettings());
 		gpsSettings.update(response.getSettings().getGpsSettings());
+		this.hash = response.getHash();
 	}
 
 

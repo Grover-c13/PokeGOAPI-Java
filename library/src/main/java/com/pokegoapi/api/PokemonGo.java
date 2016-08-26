@@ -15,9 +15,19 @@
 
 package com.pokegoapi.api;
 
+import POGOProtos.Enums.PlatformOuterClass.Platform;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
+import POGOProtos.Networking.Requests.Messages.DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage;
+import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass.DownloadSettingsMessage;
+import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
+import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.LocationFixes;
@@ -30,6 +40,8 @@ import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.RequestHandler;
+import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.Constant;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 
@@ -146,6 +158,40 @@ public class PokemonGo {
 		playerProfile = new PlayerProfile(this);
 		settings = new Settings(this);
 		inventories = new Inventories(this);
+	}
+
+	private void initialize1() throws RemoteServerException, LoginFailedException{
+		ServerRequest[] requests = new ServerRequest[5];
+		DownloadRemoteConfigVersionMessage req0 = DownloadRemoteConfigVersionMessage
+				.newBuilder()
+				.setPlatform(Platform.IOS)
+				.setAppVersion(Constant.APP_VERSION)
+				.build();
+		GetHatchedEggsMessage req1 = GetHatchedEggsMessage
+				.newBuilder()
+				.build();
+		GetInventoryMessage req2 = GetInventoryMessage
+				.newBuilder()
+				.build();
+		CheckAwardedBadgesMessage req3 = CheckAwardedBadgesMessage
+				.newBuilder()
+				.build();
+		DownloadSettingsMessage req4 = DownloadSettingsMessage
+				.newBuilder()
+				.build();
+		requests[0] = new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION, req0);
+		requests[1] = new ServerRequest(RequestType.GET_HATCHED_EGGS, req1);
+		requests[2] = new ServerRequest(RequestType.GET_INVENTORY, req2);
+		requests[3] = new ServerRequest(RequestType.CHECK_AWARDED_BADGES, req3);
+		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS, req4);
+		getRequestHandler().sendServerRequests(requests);
+		try {
+			inventories.updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
+			settings.updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException();
+		}
+
 	}
 
 	/**
