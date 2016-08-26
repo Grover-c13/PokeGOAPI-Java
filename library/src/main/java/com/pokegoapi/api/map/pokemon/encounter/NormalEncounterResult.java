@@ -16,15 +16,13 @@
 package com.pokegoapi.api.map.pokemon.encounter;
 
 
-import POGOProtos.Data.Capture.CaptureProbabilityOuterClass.CaptureProbability;
-import POGOProtos.Data.PokemonDataOuterClass;
-import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
-import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
-import POGOProtos.Networking.Responses.EncounterResponseOuterClass;
-import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
-
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.PokemonDetails;
+
+import POGOProtos.Data.Capture.CaptureProbabilityOuterClass.CaptureProbability;
+import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
+import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
+import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 
 public class NormalEncounterResult extends PokemonDetails implements EncounterResult {
 	private EncounterResponse response;
