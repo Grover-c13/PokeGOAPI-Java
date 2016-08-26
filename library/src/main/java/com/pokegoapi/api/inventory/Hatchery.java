@@ -52,7 +52,6 @@ public class Hatchery {
 		eggs.add(egg);
 	}
 
-
 	/**
 	 * Get if eggs has hatched.
 	 *
@@ -65,7 +64,7 @@ public class Hatchery {
 		ServerRequest serverRequest = new ServerRequest(RequestType.GET_HATCHED_EGGS, msg);
 		api.getRequestHandler().sendServerRequests(serverRequest);
 
-		GetHatchedEggsResponse response = null;
+		GetHatchedEggsResponse response;
 		try {
 			response = GetHatchedEggsResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {

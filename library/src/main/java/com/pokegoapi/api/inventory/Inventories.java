@@ -107,7 +107,7 @@ public class Inventories {
 		ServerRequest inventoryRequest = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY, invReqMsg);
 		api.getRequestHandler().sendServerRequests(inventoryRequest);
 
-		GetInventoryResponse response = null;
+		GetInventoryResponse response;
 		try {
 			response = GetInventoryResponse.parseFrom(inventoryRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
