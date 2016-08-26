@@ -15,9 +15,16 @@
 
 package com.pokegoapi.api;
 
+import POGOProtos.Enums.PlatformOuterClass;
 import POGOProtos.Enums.PlatformOuterClass.Platform;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage;
@@ -158,6 +165,8 @@ public class PokemonGo {
 		playerProfile = new PlayerProfile(this);
 		settings = new Settings(this);
 		inventories = new Inventories(this);
+
+		initialize1();
 	}
 
 	private void initialize1() throws RemoteServerException, LoginFailedException{
@@ -192,6 +201,32 @@ public class PokemonGo {
 			throw new RemoteServerException();
 		}
 
+		requests = new ServerRequest[5];
+
+		GetAssetDigestMessageOuterClass.GetAssetDigestMessage.Builder getAssetDigestBuilder =
+				GetAssetDigestMessageOuterClass.GetAssetDigestMessage.newBuilder();
+		getAssetDigestBuilder.setPlatform(PlatformOuterClass.Platform.IOS)
+				.setAppVersion(Constant.APP_VERSION);
+
+		GetInventoryMessageOuterClass.GetInventoryMessage.Builder getInventoryBuilder =
+				GetInventoryMessageOuterClass.GetInventoryMessage.newBuilder();
+		getInventoryBuilder.setLastTimestampMs(inventories.getLastInventoryUpdate());
+
+		DownloadSettingsMessageOuterClass.DownloadSettingsMessage.Builder downloadSettingsBuilder =
+				DownloadSettingsMessageOuterClass.DownloadSettingsMessage.newBuilder();
+		downloadSettingsBuilder.setHash(settings.getHash());
+
+		requests[0] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
+				getAssetDigestBuilder.build());
+		requests[1] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_HATCHED_EGGS,
+				GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage.getDefaultInstance());
+		requests[2] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY,
+				getInventoryBuilder.build());
+		requests[3] = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES,
+				CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage.getDefaultInstance());
+		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
+				downloadSettingsBuilder.build());
+		getRequestHandler().sendServerRequests(requests);
 	}
 
 	/**
