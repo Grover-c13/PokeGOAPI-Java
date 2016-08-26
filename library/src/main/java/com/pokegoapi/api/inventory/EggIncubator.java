@@ -30,16 +30,16 @@ import com.pokegoapi.main.ServerRequest;
 
 public class EggIncubator {
 	private final EggIncubatorOuterClass.EggIncubator proto;
-	private final PokemonGo pgo;
+	private final PokemonGo api;
 
 	/**
 	 * Create new EggIncubator with given proto.
 	 *
-	 * @param pgo   the api
+	 * @param api   the api
 	 * @param proto the proto
 	 */
-	public EggIncubator(PokemonGo pgo, EggIncubatorOuterClass.EggIncubator proto) {
-		this.pgo = pgo;
+	public EggIncubator(PokemonGo api, EggIncubatorOuterClass.EggIncubator proto) {
+		this.api = api;
 		this.proto = proto;
 	}
 
@@ -69,7 +69,7 @@ public class EggIncubator {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR, reqMsg);
-		pgo.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest);
 
 		UseItemEggIncubatorResponse response;
 		try {
@@ -78,7 +78,7 @@ public class EggIncubator {
 			throw new RemoteServerException(e);
 		}
 
-		pgo.getInventories().updateInventories(true);
+		api.getInventories().updateInventories(true);
 
 		return response.getResult();
 	}
@@ -146,7 +146,7 @@ public class EggIncubator {
 	 * @throws RemoteServerException if the server responds badly during retrieval of player stats
 	 */
 	public double getKmCurrentlyWalked() throws LoginFailedException, RemoteServerException {
-		return pgo.getPlayerProfile().getStats().getKmWalked() - getKmStart();
+		return api.getPlayerProfile().getStats().getKmWalked() - getKmStart();
 	}
 
 	/**
@@ -157,7 +157,7 @@ public class EggIncubator {
 	 * @throws RemoteServerException if the server responds badly during retrieval of player stats
 	 */
 	public double getKmLeftToWalk() throws LoginFailedException, RemoteServerException {
-		return getKmTarget() - pgo.getPlayerProfile().getStats().getKmWalked();
+		return getKmTarget() - api.getPlayerProfile().getStats().getKmWalked();
 	}
 
 	/**
@@ -168,6 +168,6 @@ public class EggIncubator {
 	 * @throws RemoteServerException if the server responds badly during retrieval of player stats
 	 */
 	public boolean isInUse() throws LoginFailedException, RemoteServerException {
-		return getKmTarget() > pgo.getPlayerProfile().getStats().getKmWalked();
+		return getKmTarget() > api.getPlayerProfile().getStats().getKmWalked();
 	}
 }

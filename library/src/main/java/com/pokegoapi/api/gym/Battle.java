@@ -15,6 +15,16 @@
 
 package com.pokegoapi.api.gym;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.pokemon.Pokemon;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.ServerRequest;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import POGOProtos.Data.Battle.BattleActionOuterClass.BattleAction;
 import POGOProtos.Data.Battle.BattleActionTypeOuterClass;
 import POGOProtos.Data.Battle.BattlePokemonInfoOuterClass.BattlePokemonInfo;
@@ -27,26 +37,15 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.AttackGymResponseOuterClass.AttackGymResponse;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse.Result;
-
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.pokemon.Pokemon;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
-
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Battle {
-	private Gym gym;
-	private Pokemon[] team;
-	private List<BattlePokemonInfo> bteam;
+	private final Gym gym;
+	private final Pokemon[] team;
+	private final List<BattlePokemonInfo> bteam = new ArrayList<>();
 	private StartGymBattleResponse battleResponse;
-	private PokemonGo api;
-	private List<Integer> gymIndex;
+	private final PokemonGo api;
+	private final List<Integer> gymIndex = new ArrayList<>();
 	@Getter
 	private boolean concluded;
 	@Getter
@@ -64,11 +63,8 @@ public class Battle {
 		this.gym = gym;
 		this.api = api;
 
-		this.bteam = new ArrayList<BattlePokemonInfo>();
-		this.gymIndex = new ArrayList<>();
-
-		for (int i = 0; i < team.length; i++) {
-			bteam.add(this.createBattlePokemon(team[i]));
+		for (Pokemon aTeam : team) {
+			bteam.add(this.createBattlePokemon(aTeam));
 		}
 	}
 
@@ -83,8 +79,8 @@ public class Battle {
 
 		Builder builder = StartGymBattleMessageOuterClass.StartGymBattleMessage.newBuilder();
 
-		for (int i = 0; i < team.length; i++) {
-			builder.addAttackingPokemonIds(team[i].getId());
+		for (Pokemon aTeam : team) {
+			builder.addAttackingPokemonIds(aTeam.getId());
 		}
 
 
@@ -126,7 +122,7 @@ public class Battle {
 	 */
 	public AttackGymResponse attack(int times) throws LoginFailedException, RemoteServerException {
 
-		ArrayList<BattleAction> actions = new ArrayList<BattleAction>();
+		ArrayList<BattleAction> actions = new ArrayList<>();
 
 		for (int i = 0; i < times; i++) {
 			BattleAction action = BattleAction
@@ -139,27 +135,23 @@ public class Battle {
 			actions.add(action);
 		}
 
-		AttackGymResponse result = doActions(actions);
-
-
-		return result;
+		return doActions(actions);
 	}
 
 
 	/**
 	 * Creates a battle pokemon object to send with the request.
 	 *
+	 * @param pokemon the battle pokemon
 	 * @return BattlePokemonInfo
-	 * @Param Pokemon
 	 */
 	private BattlePokemonInfo createBattlePokemon(Pokemon pokemon) {
-		BattlePokemonInfo info = BattlePokemonInfo
+		return BattlePokemonInfo
 				.newBuilder()
 				.setCurrentEnergy(0)
 				.setCurrentHealth(100)
 				.setPokemonData(pokemon.getDefaultInstanceForType())
 				.build();
-		return info;
 	}
 
 	/**

@@ -80,10 +80,8 @@ public class Map {
 	 * Instantiates a new Map.
 	 *
 	 * @param api the api
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public Map(PokemonGo api) throws LoginFailedException, RemoteServerException {
+	public Map(PokemonGo api) {
 		this.api = api;
 		cachedMapObjects = new MapObjects(api);
 		lastMapUpdate = 0;
@@ -517,7 +515,7 @@ public class Map {
 		int size = 1 << (S2CellId.MAX_LEVEL - level);
 		int face = cellId.toFaceIJOrientation(index, jindex, null);
 
-		List<Long> cells = new ArrayList<Long>();
+		List<Long> cells = new ArrayList<>();
 
 		int halfWidth = (int) Math.floor(width / 2);
 		for (int x = -halfWidth; x <= halfWidth; x++) {

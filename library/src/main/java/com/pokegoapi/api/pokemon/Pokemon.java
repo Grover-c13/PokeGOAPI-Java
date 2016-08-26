@@ -170,10 +170,8 @@ public class Pokemon extends PokemonDetails {
 	 * Check if can powers up this pokemon
 	 *
 	 * @return the boolean
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
 	 */
-	public boolean canPowerUp() throws LoginFailedException, RemoteServerException {
+	public boolean canPowerUp() {
 		return getCandy() >= getCandyCostsForPowerup() && api.getPlayerProfile()
 				.getCurrency(PlayerProfile.Currency.STARDUST) >= getStardustCostsForPowerup();
 	}
@@ -184,12 +182,10 @@ public class Pokemon extends PokemonDetails {
 	 *
 	 * @param considerMaxCPLimitForPlayerLevel Consider max cp limit for actual player level
 	 * @return the boolean
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
 	 * @throws NoSuchItemException   If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
 	 */
 	public boolean canPowerUp(boolean considerMaxCPLimitForPlayerLevel)
-			throws LoginFailedException, RemoteServerException, NoSuchItemException {
+			throws NoSuchItemException {
 		return considerMaxCPLimitForPlayerLevel
 				? this.canPowerUp() && (this.getCp() < this.getMaxCpForPlayer())
 				: canPowerUp();
@@ -199,10 +195,8 @@ public class Pokemon extends PokemonDetails {
 	 * Check if can evolve this pokemon
 	 *
 	 * @return the boolean
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
 	 */
-	public boolean canEvolve() throws LoginFailedException, RemoteServerException {
+	public boolean canEvolve() {
 		return !EvolutionInfo.isFullyEvolved(getPokemonId()) && (getCandy() >= getCandiesToEvolve());
 	}
 
@@ -435,11 +429,9 @@ public class Pokemon extends PokemonDetails {
 	 *
 	 * @return Actual cp in percentage
 	 * @throws NoSuchItemException   if threw from {@link #getMaxCpForPlayer()}
-	 * @throws LoginFailedException  if threw from {@link #getMaxCpForPlayer()}
-	 * @throws RemoteServerException if threw from {@link #getMaxCpForPlayer()}
 	 */
 	public int getCPInPercentageActualPlayerLevel()
-			throws NoSuchItemException, LoginFailedException, RemoteServerException {
+			throws NoSuchItemException {
 		return ((getCp() * 100) / getMaxCpForPlayer());
 	}
 

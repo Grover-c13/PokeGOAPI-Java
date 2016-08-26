@@ -30,6 +30,7 @@ import java.util.Map;
 
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.Player.EquippedBadgeOuterClass.EquippedBadge;
+import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
 import POGOProtos.Enums.TutorialStateOuterClass;
 import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
@@ -268,12 +269,10 @@ public class PlayerProfile {
 	 * Gets player stats
 	 *
 	 * @return stats API objet
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public Stats getStats() throws LoginFailedException, RemoteServerException {
+	public Stats getStats() {
 		if (stats == null) {
-			api.getInventories().updateInventories();
+			return new Stats(PlayerStatsOuterClass.PlayerStats.newBuilder().build());
 		}
 		return stats;
 	}

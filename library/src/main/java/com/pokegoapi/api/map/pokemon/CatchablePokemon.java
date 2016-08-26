@@ -16,26 +16,9 @@
 package com.pokegoapi.api.map.pokemon;
 
 
-import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
-import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
-import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
-import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
-import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
-import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.CatchPokemonMessage;
-import POGOProtos.Networking.Requests.Messages.DiskEncounterMessageOuterClass.DiskEncounterMessage;
-import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass.EncounterMessage;
-import POGOProtos.Networking.Requests.Messages.UseItemCaptureMessageOuterClass.UseItemCaptureMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
-import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus;
-import POGOProtos.Networking.Responses.DiskEncounterResponseOuterClass.DiskEncounterResponse;
-import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
-import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass.UseItemCaptureResponse;
-
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.map.pokemon.encounter.DiskEncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
@@ -53,23 +36,27 @@ import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.MapPoint;
 
+import java.util.List;
+
+import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
+import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
+import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
+import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
+import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
+import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.CatchPokemonMessage;
+import POGOProtos.Networking.Requests.Messages.DiskEncounterMessageOuterClass.DiskEncounterMessage;
+import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass.EncounterMessage;
+import POGOProtos.Networking.Requests.Messages.UseItemCaptureMessageOuterClass.UseItemCaptureMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
+import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus;
+import POGOProtos.Networking.Responses.DiskEncounterResponseOuterClass.DiskEncounterResponse;
+import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
+import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass.UseItemCaptureResponse;
 import lombok.Getter;
 import lombok.ToString;
 import rx.Observable;
 import rx.functions.Func1;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.lang.NoSuchMethodException;
-
-import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_GREAT_BALL;
-import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_MASTER_BALL;
-import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_POKE_BALL;
-import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL;
-import static com.pokegoapi.api.inventory.Pokeball.GREATBALL;
-import static com.pokegoapi.api.inventory.Pokeball.MASTERBALL;
-import static com.pokegoapi.api.inventory.Pokeball.POKEBALL;
-import static com.pokegoapi.api.inventory.Pokeball.ULTRABALL;
 
 
 /**
@@ -255,15 +242,14 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	/**
+	 * @return the catch result
+	 * @throws NoSuchMethodException method removal notice
 	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
 	 * options.withProbability(probability);
 	 * cp.catchPokemon(options);
 	 * </pre>
-	 *
-	 * @return the catch result
-	 * @throws NoSuchMethodException method removal notice
 	 */
 	@Deprecated
 	public CatchResult catchPokemonBestBallToUse() throws NoSuchMethodException {
@@ -271,16 +257,15 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	/**
+	 * @param encounter the encounter
+	 * @return the catch result
+	 * @throws NoSuchMethodException method removal notice
 	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
 	 * options.withProbability(probability);
 	 * cp.catchPokemon(options);
 	 * </pre>
-	 *
-	 * @param encounter              the encounter
-	 * @return the catch result
-	 * @throws NoSuchMethodException method removal notice
 	 */
 	@Deprecated
 	public CatchResult catchPokemonBestBallToUse(EncounterResult encounter)
@@ -290,6 +275,10 @@ public class CatchablePokemon implements MapPoint {
 
 
 	/**
+	 * @param encounter the encounter
+	 * @param amount    the amount
+	 * @return the catch result
+	 * @throws NoSuchMethodException method removal notice
 	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
@@ -297,11 +286,6 @@ public class CatchablePokemon implements MapPoint {
 	 * options.withProbability(probability);
 	 * cp.catchPokemon(options);
 	 * </pre>
-	 *
-	 * @param encounter              the encounter
-	 * @param amount                 the amount
-	 * @return the catch result
-	 * @throws NoSuchMethodException method removal notice
 	 */
 	@Deprecated
 	public CatchResult catchPokemonBestBallToUse(EncounterResult encounter, int amount)
@@ -310,6 +294,10 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	/**
+	 * @param encounter the encounter
+	 * @param notUse    the not use
+	 * @return the catch result
+	 * @throws NoSuchMethodException method removal notice
 	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
@@ -317,11 +305,6 @@ public class CatchablePokemon implements MapPoint {
 	 * options.withProbability(probability);
 	 * cp.catchPokemon(options);
 	 * </pre>
-	 *
-	 * @param encounter              the encounter
-	 * @param notUse                 the not use
-	 * @return the catch result
-	 * @throws NoSuchMethodException method removal notice
 	 */
 	@Deprecated
 	public CatchResult catchPokemonBestBallToUse(EncounterResult encounter, List<ItemId> notUse)
@@ -330,6 +313,11 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	/**
+	 * @param encounter the encounter
+	 * @param notUse    the not use
+	 * @param amount    the amount
+	 * @return the catch result
+	 * @throws NoSuchMethodException method removal notice
 	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
@@ -338,12 +326,6 @@ public class CatchablePokemon implements MapPoint {
 	 * options.withProbability(probability);
 	 * cp.catchPokemon(options);
 	 * </pre>
-	 *
-	 * @param encounter              the encounter
-	 * @param notUse                 the not use
-	 * @param amount                 the amount
-	 * @return the catch result
-	 * @throws NoSuchMethodException method removal notice
 	 */
 	@Deprecated
 	public CatchResult catchPokemonBestBallToUse(EncounterResult encounter, List<ItemId> notUse, int amount)
@@ -352,6 +334,12 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	/**
+	 * @param encounter     the encounter
+	 * @param notUse        the not use
+	 * @param amount        the amount
+	 * @param razberryLimit the razberry limit
+	 * @return the catch result
+	 * @throws NoSuchMethodException method removal notice
 	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
@@ -361,13 +349,6 @@ public class CatchablePokemon implements MapPoint {
 	 * options.withProbability(probability);
 	 * cp.catchPokemon(options);
 	 * </pre>
-	 *
-	 * @param encounter              the encounter
-	 * @param notUse                 the not use
-	 * @param amount                 the amount
-	 * @param razberryLimit          the razberry limit
-	 * @return the catch result
-	 * @throws NoSuchMethodException method removal notice
 	 */
 	@Deprecated
 	public CatchResult catchPokemonBestBallToUse(
@@ -377,6 +358,13 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	/**
+	 * @param encounter             the encounter
+	 * @param notUse                the not use
+	 * @param normalizedHitPosition the normalized hit position
+	 * @param normalizedReticleSize the normalized hit reticle
+	 * @param spinModifier          the spin modifier
+	 * @return the catch result
+	 * @throws NoSuchMethodException method removal notice
 	 * @deprecated Please use {@link AsyncCatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
@@ -386,14 +374,6 @@ public class CatchablePokemon implements MapPoint {
 	 * options.withProbability(probability);
 	 * cp.catchPokemon(options);
 	 * </pre>
-	 *
-	 * @param encounter              the encounter
-	 * @param notUse                 the not use
-	 * @param normalizedHitPosition  the normalized hit position
-	 * @param normalizedReticleSize  the normalized hit reticle
-	 * @param spinModifier           the spin modifier
-	 * @return the catch result
-	 * @throws NoSuchMethodException method removal notice
 	 */
 	@Deprecated
 	public Observable<CatchResult> catchPokemonBestBallToUseAsync(
@@ -402,23 +382,26 @@ public class CatchablePokemon implements MapPoint {
 			throws NoSuchMethodException {
 		throw new NoSuchMethodException("catchPokemonBestBallToUseAsync no longer supported");
 	}
-	
+
 	/**
+	 * @return CatchResult
+	 * @throws NoSuchMethodException method removal notice
 	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
 	 * options.useRazzberries(true);
 	 * cp.catchPokemon(options);
 	 * </pre>
-	 * @return CatchResult
-	 * @throws NoSuchMethodException method removal notice
 	 */
 	@Deprecated
 	public CatchResult catchPokemonWithRazzBerry() throws NoSuchMethodException {
 		throw new NoSuchMethodException("catchPokemonWithRazzBerry no longer supported");
 	}
-	
+
 	/**
+	 * @param pokeball deprecated parameter
+	 * @return CatchResult
+	 * @throws NoSuchMethodException method removal notice
 	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
@@ -426,32 +409,32 @@ public class CatchablePokemon implements MapPoint {
 	 * options.usePokeball(pokeball);
 	 * cp.catchPokemon(options);
 	 * </pre>
-	 * @param  pokeball              deprecated parameter
-	 * @return CatchResult
-	 * @throws NoSuchMethodException method removal notice
 	 */
 	@Deprecated
 	public CatchResult catchPokemonWithRazzBerry(Pokeball pokeball)
-						throws NoSuchMethodException {
+			throws NoSuchMethodException {
 		throw new NoSuchMethodException("catchPokemonWithRazzBerry no longer supported");
 	}
-	
+
 	/**
+	 * @return CatchResult
+	 * @throws NoSuchMethodException method removal notice
 	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
 	 * options.useBestBall(true);
 	 * cp.catchPokemon(options);
 	 * </pre>
-	 * @return CatchResult
-	 * @throws NoSuchMethodException method removal notice
 	 */
 	@Deprecated
 	public CatchResult catchPokemonWithBestBall() throws NoSuchMethodException {
 		throw new NoSuchMethodException("catchPokemonWithBestBall no longer supported");
 	}
-	
+
 	/**
+	 * @param noMasterBall deprecated parameter
+	 * @return CatchResult
+	 * @throws NoSuchMethodException method removal notice
 	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
@@ -459,17 +442,18 @@ public class CatchablePokemon implements MapPoint {
 	 * options.noMasterBall(noMasterBall);
 	 * cp.catchPokemon(options);
 	 * </pre>
-	 * @param  noMasterBall          deprecated parameter
-	 * @return CatchResult
-	 * @throws NoSuchMethodException method removal notice
 	 */
 	@Deprecated
 	public CatchResult catchPokemonWithBestBall(boolean noMasterBall)
-						throws NoSuchMethodException {
+			throws NoSuchMethodException {
 		throw new NoSuchMethodException("catchPokemonWithBestBall no longer supported");
 	}
-	
+
 	/**
+	 * @param noMasterBall deprecated parameter
+	 * @param amount       deprecated parameter
+	 * @return CatchResult
+	 * @throws NoSuchMethodException method removal notice
 	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
@@ -478,18 +462,19 @@ public class CatchablePokemon implements MapPoint {
 	 * options.maxPokeballs(amount);
 	 * cp.catchPokemon(options);
 	 * </pre>
-	 * @param  noMasterBall          deprecated parameter
-	 * @param  amount                deprecated parameter
-	 * @return CatchResult
-	 * @throws NoSuchMethodException method removal notice
 	 */
 	@Deprecated
 	public CatchResult catchPokemonWithBestBall(boolean noMasterBall, int amount)
-						throws NoSuchMethodException {
+			throws NoSuchMethodException {
 		throw new NoSuchMethodException("catchPokemonWithBestBall no longer supported");
 	}
-	
+
 	/**
+	 * @param noMasterBall   deprecated parameter
+	 * @param amount         deprecated parameter
+	 * @param razzberryLimit deprecated parameter
+	 * @return CatchResult
+	 * @throws NoSuchMethodException method removal notice
 	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
@@ -499,35 +484,34 @@ public class CatchablePokemon implements MapPoint {
 	 * options.maxRazzberries(razzberryLimit);
 	 * cp.catchPokemon(options);
 	 * </pre>
-	 * @param  noMasterBall          deprecated parameter
-	 * @param  amount                deprecated parameter
-	 * @param  razzberryLimit        deprecated parameter
-	 * @return CatchResult
-	 * @throws NoSuchMethodException method removal notice
 	 */
 	@Deprecated
 	public CatchResult catchPokemonWithBestBall(boolean noMasterBall, int amount, int razzberryLimit)
-						throws NoSuchMethodException {
+			throws NoSuchMethodException {
 		throw new NoSuchMethodException("catchPokemonWithBestBall no longer supported");
 	}
-	
+
 	/**
+	 * @param pokeball deprecated parameter
+	 * @return CatchResult
+	 * @throws NoSuchMethodException method removal notice
 	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
 	 * options.usePokeball(pokeball);
 	 * cp.catchPokemon(options);
 	 * </pre>
-	 * @param  pokeball              deprecated parameter
-	 * @return CatchResult
-	 * @throws NoSuchMethodException method removal notice
 	 */
 	@Deprecated
 	public CatchResult catchPokemon(Pokeball pokeball) throws NoSuchMethodException {
 		throw new NoSuchMethodException("catchPokemon(pokeball) no longer supported");
 	}
-	
+
 	/**
+	 * @param pokeball deprecated parameter
+	 * @param amount   deprecated parameter
+	 * @return CatchResult
+	 * @throws NoSuchMethodException method removal notice
 	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
@@ -535,18 +519,19 @@ public class CatchablePokemon implements MapPoint {
 	 * options.maxPokeballs(amount);
 	 * cp.catchPokemon(options);
 	 * </pre>
-	 * @param  pokeball              deprecated parameter
-	 * @param  amount                deprecated parameter
-	 * @return CatchResult
-	 * @throws NoSuchMethodException method removal notice
 	 */
 	@Deprecated
 	public CatchResult catchPokemon(Pokeball pokeball, int amount)
-						throws NoSuchMethodException {
+			throws NoSuchMethodException {
 		throw new NoSuchMethodException("catchPokemon(pokeball) no longer supported");
 	}
-	
+
 	/**
+	 * @param pokeball       deprecated parameter
+	 * @param amount         deprecated parameter
+	 * @param razzberryLimit deprecated parameter
+	 * @return CatchResult
+	 * @throws NoSuchMethodException method removal notice
 	 * @deprecated Please use {@link CatchOptions} instead
 	 * <pre>
 	 * CatchOptions options = new CatchOptions(go);
@@ -555,29 +540,24 @@ public class CatchablePokemon implements MapPoint {
 	 * options.maxRazzberries(razzberryLimit);
 	 * cp.catchPokemon(options);
 	 * </pre>
-	 * @param  pokeball              deprecated parameter
-	 * @param  amount                deprecated parameter
-	 * @param  razzberryLimit        deprecated parameter
-	 * @return CatchResult
-	 * @throws NoSuchMethodException method removal notice
 	 */
 	@Deprecated
 	public CatchResult catchPokemon(Pokeball pokeball, int amount, int razzberryLimit)
-						throws NoSuchMethodException {
+			throws NoSuchMethodException {
 		throw new NoSuchMethodException("catchPokemon(pokeball) no longer supported");
 	}
-	
+
 	/**
 	 * Tries to catch a pokemon (using defined {@link CatchOptions}).
 	 *
-	 * @param  options               the CatchOptions object
+	 * @param options the CatchOptions object
 	 * @return CatchResult
 	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws NoSuchItemException   the no such item exception
 	 */
 	public CatchResult catchPokemon(CatchOptions options) throws LoginFailedException,
-						RemoteServerException, NoSuchItemException {
+			RemoteServerException, NoSuchItemException {
 		if (options != null) {
 			if (options.getRazzberries() == 1) {
 				useItem(ItemId.ITEM_RAZZ_BERRY);
@@ -587,21 +567,21 @@ public class CatchablePokemon implements MapPoint {
 		} else {
 			options = new CatchOptions(api);
 		}
-		
+
 		return catchPokemon(options.getNormalizedHitPosition(),
-							options.getNormalizedReticleSize(),
-							options.getSpinModifier(),
-							options.getItemBall(),
-							options.getMaxPokeballs(),
-							options.getRazzberries());
+				options.getNormalizedReticleSize(),
+				options.getSpinModifier(),
+				options.getItemBall(),
+				options.getMaxPokeballs(),
+				options.getRazzberries());
 	}
-	
+
 	/**
 	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 50%, if you have
 	 * none will use greatball etc).
 	 *
-	 * @param  encounter                the encounter to compare
-	 * @param  options                  the CatchOptions object
+	 * @param encounter the encounter to compare
+	 * @param options   the CatchOptions object
 	 * @return the catch result
 	 * @throws LoginFailedException     the login failed exception
 	 * @throws RemoteServerException    the remote server exception
@@ -611,10 +591,10 @@ public class CatchablePokemon implements MapPoint {
 	public CatchResult catchPokemon(EncounterResult encounter, CatchOptions options)
 			throws LoginFailedException, RemoteServerException,
 			NoSuchItemException, EncounterFailedException {
-		
+
 		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
 		double probability = encounter.getCaptureProbability().getCaptureProbability(0);
-		
+
 		if (options != null) {
 			if (options.getRazzberries() == 1) {
 				useItem(ItemId.ITEM_RAZZ_BERRY);
@@ -624,13 +604,13 @@ public class CatchablePokemon implements MapPoint {
 		} else {
 			options = new CatchOptions(api);
 		}
-		
+
 		return catchPokemon(options.getNormalizedHitPosition(),
-							options.getNormalizedReticleSize(),
-							options.getSpinModifier(),
-							options.getItemBall(probability),
-							options.getMaxPokeballs(),
-							options.getRazzberries());
+				options.getNormalizedReticleSize(),
+				options.getSpinModifier(),
+				options.getItemBall(probability),
+				options.getMaxPokeballs(),
+				options.getRazzberries());
 	}
 
 	/**
@@ -667,18 +647,18 @@ public class CatchablePokemon implements MapPoint {
 
 		return catchPokemon(normalizedHitPosition, normalizedReticleSize, spinModifier, type, amount, 0);
 	}
-	
+
 	/**
 	 * Tries to catch a pokemon (using defined {@link AsyncCatchOptions}).
 	 *
-	 * @param  options                the AsyncCatchOptions object
+	 * @param options the AsyncCatchOptions object
 	 * @return Observable CatchResult
-	 * @throws LoginFailedException   if failed to login
-	 * @throws RemoteServerException  if the server failed to respond
-	 * @throws NoSuchItemException    the no such item exception
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
+	 * @throws NoSuchItemException   the no such item exception
 	 */
 	public Observable<CatchResult> catchPokemon(AsyncCatchOptions options)
-						throws LoginFailedException, RemoteServerException, NoSuchItemException {
+			throws LoginFailedException, RemoteServerException, NoSuchItemException {
 		if (options != null) {
 			if (options.getUseRazzBerry() != 0) {
 				final AsyncCatchOptions asyncOptions = options;
@@ -691,9 +671,9 @@ public class CatchablePokemon implements MapPoint {
 									return Observable.just(new CatchResult());
 								}
 								return catchPokemonAsync(asyncOptions.getNormalizedHitPosition(),
-														asyncOptions.getNormalizedReticleSize(),
-														asyncOptions.getSpinModifier(),
-														asyncPokeball);
+										asyncOptions.getNormalizedReticleSize(),
+										asyncOptions.getSpinModifier(),
+										asyncPokeball);
 							}
 						});
 			}
@@ -701,17 +681,17 @@ public class CatchablePokemon implements MapPoint {
 			options = new AsyncCatchOptions(api);
 		}
 		return catchPokemonAsync(options.getNormalizedHitPosition(),
-								options.getNormalizedReticleSize(),
-								options.getSpinModifier(),
-								options.getItemBall());
+				options.getNormalizedReticleSize(),
+				options.getSpinModifier(),
+				options.getItemBall());
 	}
-	
+
 	/**
 	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 50%, if you have
 	 * none will use greatball etc).
 	 *
-	 * @param  encounter                the encounter to compare
-	 * @param  options                  the CatchOptions object
+	 * @param encounter the encounter to compare
+	 * @param options   the CatchOptions object
 	 * @return the catch result
 	 * @throws LoginFailedException     the login failed exception
 	 * @throws RemoteServerException    the remote server exception
@@ -719,13 +699,13 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws EncounterFailedException the encounter failed exception
 	 */
 	public Observable<CatchResult> catchPokemon(EncounterResult encounter,
-						AsyncCatchOptions options)
-						throws LoginFailedException, RemoteServerException,
-						NoSuchItemException, EncounterFailedException {
-		
+												AsyncCatchOptions options)
+			throws LoginFailedException, RemoteServerException,
+			NoSuchItemException, EncounterFailedException {
+
 		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
 		double probability = encounter.getCaptureProbability().getCaptureProbability(0);
-		
+
 		if (options != null) {
 			if (options.getUseRazzBerry() != 0) {
 				final AsyncCatchOptions asyncOptions = options;
@@ -738,9 +718,9 @@ public class CatchablePokemon implements MapPoint {
 									return Observable.just(new CatchResult());
 								}
 								return catchPokemonAsync(asyncOptions.getNormalizedHitPosition(),
-														asyncOptions.getNormalizedReticleSize(),
-														asyncOptions.getSpinModifier(),
-														asyncPokeball);
+										asyncOptions.getNormalizedReticleSize(),
+										asyncOptions.getSpinModifier(),
+										asyncPokeball);
 							}
 						});
 			}
@@ -748,9 +728,9 @@ public class CatchablePokemon implements MapPoint {
 			options = new AsyncCatchOptions(api);
 		}
 		return catchPokemonAsync(options.getNormalizedHitPosition(),
-								options.getNormalizedReticleSize(),
-								options.getSpinModifier(),
-								options.getItemBall(probability));
+				options.getNormalizedReticleSize(),
+				options.getSpinModifier(),
+				options.getItemBall(probability));
 	}
 
 	/**
@@ -814,33 +794,33 @@ public class CatchablePokemon implements MapPoint {
 
 		return result;
 	}
-	
+
 	/**
+	 * @return Observable CatchResult
+	 * @throws NoSuchMethodException method removal notice
 	 * @deprecated Please use {@link AsyncCatchOptions} instead
 	 * <pre>
 	 * AsyncCatchOptions options = new AsyncCatchOptions(go);
 	 * options.useRazzberries(true);
 	 * cp.catchPokemon(options);
 	 * </pre>
-	 * @return Observable CatchResult
-	 * @throws NoSuchMethodException method removal notice
 	 */
 	@Deprecated
 	public Observable<CatchResult> catchPokemonWithRazzBerryAsync()
-						throws NoSuchMethodException {
+			throws NoSuchMethodException {
 		throw new NoSuchMethodException("catchPokemonWithRazzBerryAsync no longer supported");
 	}
-	
+
 	/**
+	 * @param type deprecated parameter
+	 * @return Observable CatchResult
+	 * @throws NoSuchMethodException method removal notice
 	 * @deprecated Please use {@link AsyncCatchOptions} instead
 	 * <pre>
 	 * AsyncCatchOptions options = new AsyncCatchOptions(go);
 	 * options.usePokeball(pokeball);
 	 * cp.catchPokemon(options);
 	 * </pre>
-	 * @param  type                   deprecated parameter
-	 * @return Observable CatchResult
-	 * @throws NoSuchMethodException  method removal notice
 	 */
 	@Deprecated
 	public Observable<CatchResult> catchPokemonAsync(Pokeball type) throws NoSuchMethodException {
