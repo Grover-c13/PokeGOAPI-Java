@@ -1,6 +1,8 @@
 package com.pokegoapi.api;
 
+import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
+import com.pokegoapi.api.device.LocationFixes;
 import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.internal.Location;
 import com.pokegoapi.auth.CredentialProvider;
@@ -10,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Locale;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -29,7 +32,10 @@ public class PokemonApiBuilder {
 	private URL server;
 	private DeviceInfo deviceInfo;
 	private SensorInfo sensorInfo;
+	private ActivityStatus activityStatus;
+	private LocationFixes locationFixes;
 	private Locale locale;
+	private Random random;
 
 	PokemonApiBuilder() {
 		super();
@@ -75,8 +81,23 @@ public class PokemonApiBuilder {
 		return this;
 	}
 
+	public PokemonApiBuilder activityStatus(ActivityStatus activityStatus) {
+		this.activityStatus = activityStatus;
+		return this;
+	}
+
+	public PokemonApiBuilder locationFixes(LocationFixes locationFixes) {
+		this.locationFixes = locationFixes;
+		return this;
+	}
+
 	public PokemonApiBuilder locale(Locale locale) {
 		this.locale = locale;
+		return this;
+	}
+
+	public PokemonApiBuilder random(Random random) {
+		this.random = random;
 		return this;
 	}
 
@@ -102,6 +123,9 @@ public class PokemonApiBuilder {
 		if (locale == null) {
 			locale = Locale.getDefault();
 		}
+		if (random == null) {
+			random = new Random();
+		}
 		if (server == null) {
 			try {
 				server = URI.create("https://pgorelease.nianticlabs.com/plfe/rpc").toURL();
@@ -111,12 +135,19 @@ public class PokemonApiBuilder {
 			}
 		}
 		if (deviceInfo == null) {
-			deviceInfo = DeviceInfo.DEFAULT;
+			deviceInfo = DeviceInfo.getDefault(random);
 		}
 		if (sensorInfo == null) {
-			sensorInfo = new SensorInfo();
+			sensorInfo = SensorInfo.getDefault(random);
 		}
-		return new PokemonApi(executorService, credentialProvider, client, server, new Location(latitude, longitude, altitude), deviceInfo, sensorInfo, locale);
+		if (activityStatus == null) {
+			activityStatus = ActivityStatus.getDefault(random);
+		}
+		if (locationFixes == null) {
+			locationFixes = LocationFixes.getDefault(random);
+		}
+		return new PokemonApi(executorService, credentialProvider, client, server, new Location(latitude, longitude, altitude),
+				deviceInfo, sensorInfo, activityStatus, locationFixes, locale);
 	}
 
 	private static class PokemonApiThreadFactory implements ThreadFactory {

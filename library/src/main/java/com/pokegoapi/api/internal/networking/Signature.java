@@ -5,6 +5,9 @@ import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
 import POGOProtos.Networking.Envelopes.Unknown6OuterClass.Unknown6.Unknown2;
 import POGOProtos.Networking.Requests.RequestOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import com.annimon.stream.Stream;
+import com.annimon.stream.function.Predicate;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
@@ -58,8 +61,12 @@ public class Signature {
 			xx64.update(unknown, 0, unknown.length);
 			long unknown25 = xx64.getValue();
 		*/
-
-		Random random = new Random();
+		boolean getMapRequest = Stream.of(builder.getRequestsList()).filter(new Predicate<RequestOuterClass.Request>() {
+			@Override
+			public boolean test(RequestOuterClass.Request value) {
+				return value.getRequestType() == RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS;
+			}
+		}).count() > 1;
 
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
 				.setLocationHash1(getLocationHash1(authTicketBA))
@@ -69,7 +76,7 @@ public class Signature {
 				.setTimestampSinceStart(curTime - startTime)
 				.setDeviceInfo(deviceInfo.getDeviceInfo())
 				.setActivityStatus(activityStatus.getActivityStatus())
-				.addAllLocationFix(locationFixes)
+				.addAllLocationFix(locationFixes.getLocationFixes(location, getMapRequest))
 				.setUnknown25(7363665268261373700L);
 
 		SignatureOuterClass.Signature.DeviceInfo deviceInfo = this.deviceInfo.getDeviceInfo();

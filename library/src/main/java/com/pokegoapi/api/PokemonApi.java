@@ -4,7 +4,9 @@ import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.Chec
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
+import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
+import com.pokegoapi.api.device.LocationFixes;
 import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.internal.Location;
 import com.pokegoapi.api.internal.networking.BootstrapResult;
@@ -38,10 +40,12 @@ public class PokemonApi implements Networking.Callback {
 	private final Settings settings;
 
 	PokemonApi(ExecutorService executorService, CredentialProvider credentialProvider, OkHttpClient client, URL server,
-			   Location location, DeviceInfo deviceInfo, SensorInfo sensorInfo, Locale locale) {
+			   Location location, DeviceInfo deviceInfo, SensorInfo sensorInfo, ActivityStatus activityStatus,
+			   LocationFixes locationFixes, Locale locale) {
 		this.location = location;
 
-		networking = Networking.getInstance(server, executorService, client, location, deviceInfo, sensorInfo, this, locale);
+		networking = Networking.getInstance(server, executorService, client, location, deviceInfo, sensorInfo,
+				activityStatus, locationFixes, this, locale);
 		BootstrapResult bootstrapResult = networking.bootstrap(credentialProvider.getAuthInfo());
 		playerProfile = new PlayerProfile(bootstrapResult.getPlayerResponse(), networking);
 		inventories = new Inventories(executorService, bootstrapResult.getInventoryResponse(),

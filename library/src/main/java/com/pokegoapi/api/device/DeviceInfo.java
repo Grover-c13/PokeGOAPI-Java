@@ -16,6 +16,7 @@
 package com.pokegoapi.api.device;
 
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import com.pokegoapi.api.device.DeviceInfoProvider.Info;
 
 import java.util.Random;
 
@@ -27,30 +28,27 @@ public class DeviceInfo {
 
 	private final SignatureOuterClass.Signature.DeviceInfo deviceInfo;
 
-	private DeviceInfo(SignatureOuterClass.Signature.DeviceInfo deviceInfo) {
-		this.deviceInfo = deviceInfo;
-	}
-
 	/**
 	 * Create a device info with already existing device infos
 	 *
 	 * @param deviceInfoProvider the device infos interface
 	 */
 	public DeviceInfo(DeviceInfoProvider deviceInfoProvider) {
+		Info info = deviceInfoProvider.getInfo();
 		deviceInfo = SignatureOuterClass.Signature.DeviceInfo.newBuilder()
-				.setAndroidBoardName(deviceInfoProvider.getAndroidBoardName())
-				.setAndroidBootloader(deviceInfoProvider.getAndroidBootloader())
-				.setDeviceBrand(deviceInfoProvider.getDeviceBrand())
-				.setDeviceId(deviceInfoProvider.getDeviceId())
-				.setDeviceModel(deviceInfoProvider.getDeviceModel())
-				.setDeviceModelBoot(deviceInfoProvider.getDeviceModelBoot())
-				.setDeviceModelIdentifier(deviceInfoProvider.getDeviceModelIdentifier())
-				.setFirmwareBrand(deviceInfoProvider.getFirmwareBrand())
-				.setFirmwareFingerprint(deviceInfoProvider.getFirmwareFingerprint())
-				.setFirmwareTags(deviceInfoProvider.getFirmwareTags())
-				.setFirmwareType(deviceInfoProvider.getFirmwareType())
-				.setHardwareManufacturer(deviceInfoProvider.getHardwareManufacturer())
-				.setHardwareModel(deviceInfoProvider.getHardwareModel())
+				.setAndroidBoardName(info.getAndroidBoardName())
+				.setAndroidBootloader(info.getAndroidBootloader())
+				.setDeviceBrand(info.getDeviceBrand())
+				.setDeviceId(info.getDeviceId())
+				.setDeviceModel(info.getDeviceModel())
+				.setDeviceModelBoot(info.getDeviceModelBoot())
+				.setDeviceModelIdentifier(info.getDeviceModelIdentifier())
+				.setFirmwareBrand(info.getFirmwareBrand())
+				.setFirmwareFingerprint(info.getFirmwareFingerprint())
+				.setFirmwareTags(info.getFirmwareTags())
+				.setFirmwareType(info.getFirmwareType())
+				.setHardwareManufacturer(info.getHardwareManufacturer())
+				.setHardwareModel(info.getHardwareModel())
 				.build();
 	}
 
@@ -73,10 +71,8 @@ public class DeviceInfo {
 	 * @return the default device info for the given api
 	 */
 	public static DeviceInfo getDefault(Random random) {
-		SignatureOuterClass.Signature.DeviceInfo.Builder builder = SignatureOuterClass.Signature.DeviceInfo.newBuilder();
 		byte[] bytes = new byte[16];
 		random.nextBytes(bytes);
-		builder.setDeviceId(bytesToHex(bytes));
 		String[][] devices =
 				{
 						{"iPad3,1", "iPad", "J1AP"},
@@ -120,15 +116,22 @@ public class DeviceInfo {
 				};
 		String[] osVersions = {"8.1.1", "8.1.2", "8.1.3", "8.2", "8.3", "8.4", "8.4.1",
 				"9.0", "9.0.1", "9.0.2", "9.1", "9.2", "9.2.1", "9.3", "9.3.1", "9.3.2", "9.3.3", "9.3.4"};
-		builder.setFirmwareType(osVersions[random.nextInt(osVersions.length)]);
+		final Info info = new Info();
+		info.setFirmwareType(osVersions[random.nextInt(osVersions.length)]);
+		info.setDeviceId(bytesToHex(bytes));
 		String[] device = devices[random.nextInt(devices.length)];
-		builder.setDeviceModelBoot(device[0]);
-		builder.setDeviceModel(device[1]);
-		builder.setHardwareModel(device[2]);
-		builder.setFirmwareBrand("iPhone OS");
-		builder.setDeviceBrand("Apple");
-		builder.setHardwareManufacturer("Apple");
-		return new DeviceInfo(builder.build());
+		info.setDeviceModelBoot(device[0]);
+		info.setDeviceModel(device[1]);
+		info.setHardwareModel(device[2]);
+		info.setFirmwareBrand("iPhone OS");
+		info.setDeviceBrand("Apple");
+		info.setHardwareManufacturer("Apple");
+		return new DeviceInfo(new DeviceInfoProvider() {
+			@Override
+			public Info getInfo() {
+				return info;
+			}
+		});
 	}
 
 	public SignatureOuterClass.Signature.DeviceInfo getDeviceInfo() {

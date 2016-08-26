@@ -32,7 +32,9 @@ import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResp
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
+import com.pokegoapi.api.device.LocationFixes;
 import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.internal.Location;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -68,7 +70,6 @@ public final class Networking {
 	private final Random random = new Random();
 	private final RequestScheduler requestScheduler;
 	private final ExecutorService executorService;
-	private final OkHttpClient client;
 	private final Location location;
 	private final Callback callback;
 	private final Signature signature;
@@ -76,13 +77,13 @@ public final class Networking {
 	private Long lastInventoryCheck = null;
 
 	public static Networking getInstance(URL initialServer, ExecutorService executorService, OkHttpClient client, Location location, DeviceInfo deviceInfo,
-										 SensorInfo sensorInfo, Callback callback, Locale locale) {
+										 SensorInfo sensorInfo, ActivityStatus activityStatus, LocationFixes locationFixes, Callback callback, Locale locale) {
 		String serverString = initialServer.toExternalForm();
 		if (!INSTANCES.containsKey(serverString)) {
 			synchronized (INSTANCES) {
 				if (!INSTANCES.containsKey(serverString)) {
 					INSTANCES.put(serverString, new Networking(initialServer, executorService, client, location, deviceInfo,
-							sensorInfo, locale, callback));
+							sensorInfo, activityStatus, locationFixes, locale, callback));
 				}
 			}
 		}
@@ -90,12 +91,11 @@ public final class Networking {
 	}
 
 	private Networking(URL initialServer, ExecutorService executorService, OkHttpClient client, Location location, DeviceInfo deviceInfo,
-					   SensorInfo sensorInfo, Locale locale, Callback callback) {
+					   SensorInfo sensorInfo, ActivityStatus activityStatus, LocationFixes locationFixes, Locale locale, Callback callback) {
 		this.executorService = executorService;
-		this.client = client;
 		this.location = location;
 		this.callback = callback;
-		this.signature = new Signature(location, deviceInfo, sensorInfo);
+		this.signature = new Signature(location, deviceInfo, sensorInfo, activityStatus, locationFixes);
 		this.locale = locale;
 		this.requestScheduler = new RequestScheduler(executorService, client, initialServer);
 	}

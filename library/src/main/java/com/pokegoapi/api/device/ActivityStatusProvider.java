@@ -15,21 +15,22 @@
 
 package com.pokegoapi.api.device;
 
+import lombok.Data;
+
 /**
  * Created by fabianterhorst on 22.08.16.
  */
 
 public interface ActivityStatusProvider {
 
-	boolean isAutomotive();
+	@Data
+	class Status {
+		enum Activity {
+			AUTOMOTIVE, CYCLING, RUNNING, STATIONARY, WALKING;
+		}
+		private final Activity activity;
+		private final boolean tilting;
 
-	boolean isCycling();
-
-	boolean isTilting();
-
-	boolean isRunning();
-
-	boolean isStationary();
-
-	boolean isWalking();
+	}
+	Status getActivity();
 }

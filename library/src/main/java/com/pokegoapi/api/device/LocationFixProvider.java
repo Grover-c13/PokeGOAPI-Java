@@ -1,15 +1,25 @@
 package com.pokegoapi.api.device;
 
+import com.pokegoapi.api.internal.Location;
+import lombok.Data;
+
+import java.util.Collection;
+
 /**
  * @author Paul van Assen
  */
 public interface LocationFixProvider {
-	long getTimestampSnapshot();
-	double getLatitude();
-	double getLongitude();
-	double getAltitude();
-	int getHorizontalAccuracy();
-	float getVerticalAccurary();
-	int getProviderStatus();
-	int getLocationType();
+	Collection<LocationFix> getLocationFixes(Location location, boolean getMapObjectRequest);
+
+	@Data
+	class LocationFix {
+		private final long timestampSnapshot;
+		private final float latitude;
+		private final float longitude;
+		private final float altitude;
+		private final int horizontalAccuracy;
+		private final float verticalAccurary;
+		private final int providerStatus;
+		private final int locationType;
+	}
 }

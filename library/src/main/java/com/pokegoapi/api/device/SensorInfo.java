@@ -38,8 +38,11 @@ public class SensorInfo {
 		this.random = random;
 	}
 
+	public static SensorInfo getDefault(Random random) {
+		return new SensorInfo(random);
+	}
 
-	SignatureOuterClass.Signature.SensorInfo getSensorInfo() {
+	public SignatureOuterClass.Signature.SensorInfo getSensorInfo() {
 		if (this.sensorInfoProvider == null) {
 			return SignatureOuterClass.Signature.SensorInfo.newBuilder()
 					.setTimestampSnapshot(System.currentTimeMillis() - timestampCreate + random.nextInt(500))

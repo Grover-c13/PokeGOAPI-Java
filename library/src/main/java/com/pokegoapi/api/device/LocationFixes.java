@@ -1,50 +1,66 @@
 package com.pokegoapi.api.device;
 
-import com.pokegoapi.api.PokemonGo;
+import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
+import com.annimon.stream.function.Function;
+import com.pokegoapi.api.internal.Location;
+import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Random;
-
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
-import POGOProtos.Networking.Envelopes.SignatureOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Created by fabianterhorst on 23.08.16.
  */
+@RequiredArgsConstructor
+public class LocationFixes  {
+	private final LocationFixProvider locationFixProvider;
 
-public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.LocationFix> {
+	public Collection<SignatureOuterClass.Signature.LocationFix> getLocationFixes(final Location location,
+																				  final boolean getMapObjectRequest) {
+		return Stream.of(locationFixProvider.getLocationFixes(location, getMapObjectRequest)).map(new Function<LocationFixProvider.LocationFix, SignatureOuterClass.Signature.LocationFix>() {
+			@Override
+			public SignatureOuterClass.Signature.LocationFix apply(LocationFixProvider.LocationFix locationFix) {
+				SignatureOuterClass.Signature.LocationFix.Builder locationFixBuilder =
+						SignatureOuterClass.Signature.LocationFix.newBuilder();
 
-	@Setter
-	@Getter
-	private long timestampCreate;
-
-	public LocationFixes() {
+				return locationFixBuilder.setProvider("fused")
+						.setAltitude(locationFix.getAltitude())
+						.setHorizontalAccuracy(locationFix.getHorizontalAccuracy())
+						.setVerticalAccuracy(locationFix.getVerticalAccurary())
+						.setLatitude(locationFix.getLatitude())
+						.setLongitude(locationFix.getLongitude())
+						.setLocationType(locationFix.getLocationType())
+						.setTimestampSnapshot(locationFix.getTimestampSnapshot())
+						.build();
+			}
+		}).collect(Collectors.<SignatureOuterClass.Signature.LocationFix>toList());
 	}
 
 	/**
 	 * Gets the default device info for the given api
 	 *
-	 * @param api         the api
-	 * @param builder     the request builder
-	 * @param currentTime the current time
 	 * @param random random object
 	 * @return the default device info for the given api
 	 */
-	public static LocationFixes getDefault(PokemonGo api, RequestEnvelopeOuterClass.RequestEnvelope.Builder builder,
-											long currentTime, Random random) {
-		int pn = random.nextInt(100);
-		int providerCount;
-		int[] negativeSnapshotProviders = new int[0];
+	public static LocationFixes getDefault(Random random) {
+		return new LocationFixes(new DefaultLocationFixProvider(random));
+	}
 
-		int chance = random.nextInt(100);
-		LocationFixes locationFixes;
-		if (api.getLocationFixes() == null) {
-			locationFixes = new LocationFixes();
-			api.setLocationFixes(locationFixes);
-			providerCount = pn < 75 ? 6 : pn < 95 ? 5 : 8;
+	@RequiredArgsConstructor
+	private static class DefaultLocationFixProvider implements LocationFixProvider {
+		private final long startTime = System.currentTimeMillis();
+		private final Random random;
+
+		@Override
+		public Collection<LocationFix> getLocationFixes(Location location, boolean getMapObjectRequest) {
+			int pn = random.nextInt(100);
+			int chance = random.nextInt(100);
+			int providerCount = pn < 75 ? 6 : pn < 95 ? 5 : 8;
+			int[] negativeSnapshotProviders;
 			if (providerCount != 8) {
 				// a 5% chance that the second provider got a negative value else it should be the first only
 				negativeSnapshotProviders = new int[1];
@@ -57,74 +73,47 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 					negativeSnapshotProviders[2] = 2;
 				}
 			}
-		} else {
-			locationFixes = api.getLocationFixes();
-			locationFixes.clear();
+			List<LocationFix> locationFixes = new ArrayList<>(providerCount);
+			for (int i = 0; i < providerCount; i++) {
+				float latitude = offsetOnLatLong(location.getLatitude(), random.nextInt(100) + 10);
+				float longitude = offsetOnLatLong(location.getLongitude(), random.nextInt(100) + 10);
+				float altitude = 65;
+				float verticalAccuracy = (float) (15 + (23 - 15) * random.nextDouble());
 
-			if (builder.getRequestsCount() == 0 || builder.getRequests(0) == null
-					|| (builder.getRequests(0).getRequestType() != RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS
-					&& (currentTime - locationFixes.getTimestampCreate() < (random.nextInt(10 * 1000) + 5000)))) {
-				locationFixes.setTimestampCreate(currentTime);
-				return locationFixes;
-			} else if (builder.getRequests(0).getRequestType() == RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS) {
-				providerCount = chance >= 90 ? 2 : 1;
-			} else {
-				providerCount = pn < 60 ? 1 : pn < 90 ? 2 : 3;
-			}
-		}
-
-		locationFixes.setTimestampCreate(api.currentTimeMillis());
-
-		for (int i = 0; i < providerCount; i++) {
-			float latitude = offsetOnLatLong(api.getLatitude(), random.nextInt(100) + 10);
-			float longitude = offsetOnLatLong(api.getLongitude(), random.nextInt(100) + 10);
-			float altitude = 65;
-			float verticalAccuracy = (float) (15 + (23 - 15) * random.nextDouble());
-
-			// Fake errors
-			if (builder.getRequests(0).getRequestType() != RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS) {
-				if (random.nextInt(100) > 90) {
-					latitude = 360;
-					longitude = -360;
+				// Fake errors
+				if (getMapObjectRequest) {
+					if (random.nextInt(100) > 90) {
+						latitude = 360;
+						longitude = -360;
+					}
+					if (random.nextInt(100) > 90) {
+						altitude = (float) (66 + (160 - 66) * random.nextDouble());
+					}
 				}
-				if (random.nextInt(100) > 90) {
-					altitude = (float) (66 + (160 - 66) * random.nextDouble());
+				long timestampSnapshot = contains(negativeSnapshotProviders, i)
+						? random.nextInt(1000) - 3000
+						: System.currentTimeMillis() - startTime
+						+ (150 * (i + 1) + random.nextInt(250 * (i + 1) - (150 * (i + 1))));
+				locationFixes.add(new LocationFixProvider.LocationFix(
+						timestampSnapshot, latitude, longitude, altitude, -1, verticalAccuracy, 3, 1));
+			}
+			return locationFixes;
+		}
+
+		private static boolean contains(int[] array, int value) {
+			for (final int i : array) {
+				if (i == value) {
+					return true;
 				}
 			}
-
-			SignatureOuterClass.Signature.LocationFix.Builder locationFixBuilder =
-					SignatureOuterClass.Signature.LocationFix.newBuilder();
-
-			locationFixBuilder.setProvider("fused")
-					.setTimestampSnapshot(
-							contains(negativeSnapshotProviders, i)
-									? random.nextInt(1000) - 3000
-									: api.currentTimeMillis() - api.getStartTime()
-									+ (150 * (i + 1) + random.nextInt(250 * (i + 1) - (150 * (i + 1)))))
-					.setLatitude(latitude)
-					.setLongitude(longitude)
-					.setHorizontalAccuracy(-1)
-					.setAltitude(altitude)
-					.setVerticalAccuracy(verticalAccuracy)
-					.setProviderStatus(3)
-					.setLocationType(1);
-			locationFixes.add(locationFixBuilder.build());
+			return false;
 		}
-		return locationFixes;
-	}
 
-	private static boolean contains(int[] array, int value) {
-		for (final int i : array) {
-			if (i == value) {
-				return true;
-			}
+		private static float offsetOnLatLong(double lat, double ran) {
+			double round = 6378137;
+			double dl = ran / (round * Math.cos(Math.PI * lat / 180));
+			return (float) (lat + dl * 180 / Math.PI);
 		}
-		return false;
 	}
 
-	private static float offsetOnLatLong(double lat, double ran) {
-		double round = 6378137;
-		double dl = ran / (round * Math.cos(Math.PI * lat / 180));
-		return (float) (lat + dl * 180 / Math.PI);
-	}
 }
