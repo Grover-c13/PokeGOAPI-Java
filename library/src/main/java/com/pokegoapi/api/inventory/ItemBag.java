@@ -71,6 +71,9 @@ public class ItemBag {
 			if (currentItems.contains(itemId)) {
 				continue;
 			}
+			if (itemId == ItemId.UNRECOGNIZED) {
+				continue;
+			}
 			items.put(itemId, new Item(ItemData.newBuilder().setCount(0).setItemId(itemId).build()));
 		}
 	}
