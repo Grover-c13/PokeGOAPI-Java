@@ -63,10 +63,8 @@ public class Inventories {
 	 * Creates Inventories and initializes content.
 	 *
 	 * @param api PokemonGo api
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
 	 */
-	public Inventories(PokemonGo api) throws LoginFailedException, RemoteServerException {
+	public Inventories(PokemonGo api) {
 		this.api = api;
 		itemBag = new ItemBag(api);
 		pokebank = new PokeBank(api);
@@ -119,6 +117,9 @@ public class Inventories {
 		updateInventories(response);
 	}
 
+	/**
+	 * Updates the inventories with the latest data.
+	 */
 	public void updateInventories(GetInventoryResponse response) {
 		for (InventoryItemOuterClass.InventoryItem inventoryItem
 				: response.getInventoryDelta().getInventoryItemsList()) {

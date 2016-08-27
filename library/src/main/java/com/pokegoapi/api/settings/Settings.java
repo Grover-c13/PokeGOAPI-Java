@@ -66,17 +66,15 @@ public class Settings {
      *
      * @return String hash.
      */
-    private String hash;
+	private String hash;
 
 	/**
 	 * Settings object that hold different configuration aspect of the game.
 	 * Can be used to simulate the real app behaviour.
 	 *
 	 * @param api api instance
-	 * @throws LoginFailedException  If login failed.
-	 * @throws RemoteServerException If server communications failed.
 	 */
-	public Settings(PokemonGo api) throws LoginFailedException, RemoteServerException {
+	public Settings(PokemonGo api) {
 		this.api = api;
 		this.mapSettings = new MapSettings();
 		this.levelUpSettings = new LevelUpSettings();
@@ -84,7 +82,6 @@ public class Settings {
 		this.inventorySettings = new InventorySettings();
 		this.gpsSettings = new GpsSettings();
 		this.hash = new String();
-
 	}
 
 	/**
@@ -108,6 +105,9 @@ public class Settings {
 		updateSettings(response);
 	}
 
+	/**
+	 * Updates settings latest data.
+	 */
 	public void updateSettings(DownloadSettingsResponse response) {
 		mapSettings.update(response.getSettings().getMapSettings());
 		levelUpSettings.update(response.getSettings().getInventorySettings());
@@ -116,5 +116,4 @@ public class Settings {
 		gpsSettings.update(response.getSettings().getGpsSettings());
 		this.hash = response.getHash();
 	}
-
 }
