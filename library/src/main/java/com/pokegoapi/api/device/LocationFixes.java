@@ -57,8 +57,8 @@ public class LocationFixes  {
 		private final Random random;
 
 		@Override
-		public Collection<LocationFix> getLocationFixes(double latitude, double longitude, double altitude,
-														boolean getMapObjectRequest) {
+		public Collection<LocationFix> getLocationFixes(final double latitude, final double longitude,
+														final double altitude, boolean getMapObjectRequest) {
 			int pn = random.nextInt(100);
 			int chance = random.nextInt(100);
 			int providerCount = pn < 75 ? 6 : pn < 95 ? 5 : 8;
@@ -85,11 +85,11 @@ public class LocationFixes  {
 				// Fake errors
 				if (getMapObjectRequest) {
 					if (random.nextInt(100) > 90) {
-						latitude = 360;
-						longitude = -360;
+						latitudef = 360;
+						longitudef = -360;
 					}
 					if (random.nextInt(100) > 90) {
-						altitude = (float) (66 + (160 - 66) * random.nextDouble());
+						altitudef = (float) (66 + (160 - 66) * random.nextDouble());
 					}
 				}
 				long timestampSnapshot = contains(negativeSnapshotProviders, i)
