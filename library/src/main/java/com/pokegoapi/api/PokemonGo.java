@@ -201,14 +201,8 @@ public class PokemonGo {
 
 		requests[0] = new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
 				CommonRequest.getDownloadRemoteConfigVersionMessageRequest());
-		requests[1] = new ServerRequest(RequestType.GET_HATCHED_EGGS,
-				GetHatchedEggsMessage.getDefaultInstance());
-		requests[2] = new ServerRequest(RequestType.GET_INVENTORY,
-				GetInventoryMessage.getDefaultInstance());
-		requests[3] = new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
-				CheckAwardedBadgesMessage.getDefaultInstance());
-		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
-				DownloadSettingsMessage.getDefaultInstance());
+		CommonRequest.fillRequests(requests, this);
+
 		getRequestHandler().sendServerRequests(requests);
 		try {
 			inventories.updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
@@ -226,16 +220,10 @@ public class PokemonGo {
      */
 	public void fireRequestBlockTwo() throws RemoteServerException, LoginFailedException {
 		ServerRequest[] requests = new ServerRequest[5];
+
 		requests[0] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
 				CommonRequest.getGetAssetDigestMessageRequest());
-		requests[1] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_HATCHED_EGGS,
-				GetHatchedEggsMessage.getDefaultInstance());
-		requests[2] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY,
-				CommonRequest.getDefaultGetInventoryMessage(this));
-		requests[3] = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES,
-				CheckAwardedBadgesMessage.getDefaultInstance());
-		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
-				CommonRequest.getDownloadSettingsMessageRequest(this));
+		CommonRequest.fillRequests(requests, this);
 
 		getRequestHandler().sendServerRequests(requests);
 		try {

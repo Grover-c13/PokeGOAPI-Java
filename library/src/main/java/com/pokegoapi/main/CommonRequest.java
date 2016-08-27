@@ -18,11 +18,14 @@ package com.pokegoapi.main;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.util.Constant;
 
-import POGOProtos.Enums.PlatformOuterClass;
+import POGOProtos.Enums.PlatformOuterClass.Platform;
+import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass.DownloadSettingsMessage;
 import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.GetAssetDigestMessage;
-import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
+import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 
 /**
  * Created by iGio90 on 27/08/16.
@@ -33,14 +36,14 @@ public class CommonRequest {
 	public static DownloadRemoteConfigVersionMessage getDownloadRemoteConfigVersionMessageRequest() {
 		return DownloadRemoteConfigVersionMessage
 				.newBuilder()
-				.setPlatform(PlatformOuterClass.Platform.IOS)
+				.setPlatform(Platform.IOS)
 				.setAppVersion(Constant.APP_VERSION)
 				.build();
 	}
 
 	public static GetAssetDigestMessage getGetAssetDigestMessageRequest() {
 		return GetAssetDigestMessage.newBuilder()
-				.setPlatform(PlatformOuterClass.Platform.IOS)
+				.setPlatform(Platform.IOS)
 				.setAppVersion(Constant.APP_VERSION)
 				.build();
 	}
@@ -51,9 +54,20 @@ public class CommonRequest {
 				.build();
 	}
 
-	public static GetInventoryMessageOuterClass.GetInventoryMessage getDefaultGetInventoryMessage(PokemonGo api) {
-		return GetInventoryMessageOuterClass.GetInventoryMessage.newBuilder()
+	public static GetInventoryMessage getDefaultGetInventoryMessage(PokemonGo api) {
+		return GetInventoryMessage.newBuilder()
 				.setLastTimestampMs(api.getInventories().getLastInventoryUpdate())
 				.build();
 	}
+
+    public static void fillRequests(ServerRequest[] requests, PokemonGo api) {
+        requests[requests.length] = new ServerRequest(RequestType.GET_HATCHED_EGGS,
+                GetHatchedEggsMessage.getDefaultInstance());
+        requests[requests.length] = new ServerRequest(RequestType.GET_INVENTORY,
+                CommonRequest.getDefaultGetInventoryMessage(api));
+        requests[requests.length] = new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
+                CheckAwardedBadgesMessage.getDefaultInstance());
+        requests[requests.length] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
+                CommonRequest.getDownloadSettingsMessageRequest(api));
+    }
 }

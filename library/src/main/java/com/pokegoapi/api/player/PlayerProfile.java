@@ -351,19 +351,10 @@ public class PlayerProfile {
 		final SetAvatarMessage setAvatarMessage = SetAvatarMessage.newBuilder()
 				.setPlayerAvatar(playerAvatarBuilder.build())
 				.build();
-		final DownloadSettingsMessage downloadSettingsReq = DownloadSettingsMessage.newBuilder()
-				.setHash(api.getSettings().getHash())
-				.build();
 
 		ServerRequest[] requests = new ServerRequest[5];
 		requests[0] = new ServerRequest(RequestType.SET_AVATAR, setAvatarMessage);
-		requests[1] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_HATCHED_EGGS,
-				GetHatchedEggsMessage.getDefaultInstance());
-		requests[2] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY,
-				CommonRequest.getDefaultGetInventoryMessage(api));
-		requests[3] = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES,
-				CheckAwardedBadgesMessage.getDefaultInstance());
-		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS, downloadSettingsReq);
+		CommonRequest.fillRequests(requests, api);
 
 		api.getRequestHandler().sendServerRequests(requests);
 
@@ -403,14 +394,7 @@ public class PlayerProfile {
 
 		requests[0] = new ServerRequest(RequestType.ENCOUNTER_TUTORIAL_COMPLETE,
 				encounterTutorialCompleteBuilder.build());
-		requests[1] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_HATCHED_EGGS,
-				GetHatchedEggsMessage.getDefaultInstance());
-		requests[2] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY,
-				CommonRequest.getDefaultGetInventoryMessage(api));
-		requests[3] = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES,
-				CheckAwardedBadgesMessage.getDefaultInstance());
-		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
-				CommonRequest.getDownloadSettingsMessageRequest(api));
+		CommonRequest.fillRequests(requests, api);
 
 		api.getRequestHandler().sendServerRequests(requests);
 
@@ -427,16 +411,8 @@ public class PlayerProfile {
 
 		requests = new ServerRequest[5];
 
-		requests[0] = new ServerRequest(RequestType.GET_PLAYER,
-				encounterTutorialCompleteBuilder.build());
-		requests[1] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_HATCHED_EGGS,
-				GetHatchedEggsMessage.getDefaultInstance());
-		requests[2] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY,
-				CommonRequest.getDefaultGetInventoryMessage(api));
-		requests[3] = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES,
-				CheckAwardedBadgesMessage.getDefaultInstance());
-		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
-				CommonRequest.getDownloadSettingsMessageRequest(api));
+		requests[0] = new ServerRequest(RequestType.GET_PLAYER, encounterTutorialCompleteBuilder.build());
+		CommonRequest.fillRequests(requests, api);
 
 		api.getRequestHandler().sendServerRequests(requests);
 
@@ -458,15 +434,9 @@ public class PlayerProfile {
 				.setSendPushNotifications(false).build();
 
 		ServerRequest[] requests = new ServerRequest[5];
+
 		requests[0] = new ServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialMessage);
-		requests[1] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_HATCHED_EGGS,
-				GetHatchedEggsMessage.getDefaultInstance());
-		requests[2] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY,
-				CommonRequest.getDefaultGetInventoryMessage(api));
-		requests[3] = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES,
-				CheckAwardedBadgesMessage.getDefaultInstance());
-		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
-				CommonRequest.getDownloadSettingsMessageRequest(api));
+		CommonRequest.fillRequests(requests, api);
 
 		api.getRequestHandler().sendServerRequests(requests);
 
