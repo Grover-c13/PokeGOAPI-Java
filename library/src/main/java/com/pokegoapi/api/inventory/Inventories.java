@@ -24,6 +24,7 @@ import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -55,17 +56,15 @@ public class Inventories {
 	private List<EggIncubator> incubators;
 	@Getter
 	private Hatchery hatchery;
-
+	@Getter
 	private long lastInventoryUpdate = 0;
 
 	/**
 	 * Creates Inventories and initializes content.
 	 *
 	 * @param api PokemonGo api
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
 	 */
-	public Inventories(PokemonGo api) throws LoginFailedException, RemoteServerException {
+	public Inventories(PokemonGo api) {
 		this.api = api;
 		itemBag = new ItemBag(api);
 		pokebank = new PokeBank(api);
@@ -73,7 +72,6 @@ public class Inventories {
 		pokedex = new Pokedex(api);
 		incubators = new ArrayList<>();
 		hatchery = new Hatchery(api);
-		updateInventories();
 	}
 
 	/**
@@ -116,6 +114,13 @@ public class Inventories {
 			throw new RemoteServerException(e);
 		}
 
+		updateInventories(response);
+	}
+
+	/**
+	 * Updates the inventories with the latest data.
+	 */
+	public void updateInventories(GetInventoryResponse response) {
 		for (InventoryItemOuterClass.InventoryItem inventoryItem
 				: response.getInventoryDelta().getInventoryItemsList()) {
 			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
