@@ -39,6 +39,7 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
@@ -146,11 +147,8 @@ public class Map implements Runnable {
 					.setLatitude(location.getLatitude())
 					.setLongitude(location.getLongitude());
 
-			List<Long> cellIds = getCellIds(location.getLatitude(), location.getLongitude(), CELL_WIDTH);
-			for (int i=0;i!=9;i++) {
-				builder.setCellId(i, cellIds.get(0));
-				builder.setSinceTimestampMs(i, 0);
-			}
+			builder.addAllCellId(getCellIds(location.getLatitude(), location.getLongitude(), CELL_WIDTH));
+			builder.addAllSinceTimestampMs(Arrays.asList(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L));
 			networking.queueRequest(RequestType.GET_MAP_OBJECTS, builder.build(), GetMapObjectsResponse.class).forEach(new Action1<GetMapObjectsResponse>() {
 				@Override
 				public void call(GetMapObjectsResponse mapObjectsResponse) {

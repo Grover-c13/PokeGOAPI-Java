@@ -3,6 +3,7 @@ package com.pokegoapi.api.internal.networking;
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
+import com.google.protobuf.ByteString;
 import com.pokegoapi.exceptions.RemoteServerException;
 import lombok.Data;
 import okhttp3.OkHttpClient;
@@ -106,7 +107,9 @@ class RequestScheduler {
 						request.getSubscriber().onError(new RemoteServerException("Received malformed response : " + e));
 						continue;
 					}
-					authTicket = responseEnvelop.getAuthTicket();
+					if (responseEnvelop.getAuthTicket().getExpireTimestampMs() > 0L && responseEnvelop.getAuthTicket().getStart() != ByteString.EMPTY) {
+						authTicket = responseEnvelop.getAuthTicket();
+					}
 					request.getSubscriber().onNext(responseEnvelop);
 					request.getSubscriber().onCompleted();
 				} catch (IOException e) {

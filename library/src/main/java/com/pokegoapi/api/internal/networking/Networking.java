@@ -131,6 +131,7 @@ public final class Networking {
 		catch (MalformedURLException e) {
 			throw new RuntimeException("Received invalid URL from server. Giving up", e);
 		}
+		sleep(300);
 		response = requestScheduler.queueRequest(getPlayerRequest.build()).toBlocking().first();
 		// Retry with new
 		log.info("Do a GET_PLAYER to the new URL, and get player info");
@@ -141,7 +142,7 @@ public final class Networking {
 		catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
 		}
-		sleep(300);
+		sleep(400);
 
 		DownloadRemoteConfigVersionResponse downloadRemoteConfigVersionResponse;
 		GetInventoryResponse inventoryResponse;
@@ -185,6 +186,7 @@ public final class Networking {
 		for (InventoryItemOuterClass.InventoryItem inventoryItem : inventoryResponse.getInventoryDelta().getInventoryItemsList()) {
 			if (inventoryItem.getInventoryItemData().hasPlayerStats()) {
 				playerLevel = inventoryItem.getInventoryItemData().getPlayerStats().getLevel();
+				break;
 			}
 		}
 		sleep(3000);
@@ -220,10 +222,8 @@ public final class Networking {
 
 		sleep(300);
 		GetMapObjectsMessage.Builder builder = GetMapObjectsMessage.newBuilder();
-		for (int i=0;i!=9;i++) {
-			builder.setCellId(i, cellIds.get(i));
-			builder.setSinceTimestampMs(i, 0);
-		}
+		builder.addAllCellId(cellIds);
+		builder.addAllSinceTimestampMs(Arrays.asList(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L));
 		RequestEnvelope.Builder initialMapRequest = buildRequestEnvalope(RequestType.GET_MAP_OBJECTS, builder.setLatitude(location.getLatitude()).setLongitude(location.getLongitude())
 				.build());
 		response = requestScheduler.queueRequest(initialMapRequest.build()).toBlocking().first();
@@ -248,7 +248,7 @@ public final class Networking {
 			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
 		}
 		for (String hash : DOWNLOAD_URL_HASHES) {
-			RequestEnvelope.Builder downloadUrls = buildRequestEnvalope(RequestType.GET_DOWNLOAD_URLS, GetDownloadUrlsMessage.newBuilder().setAssetId(0, hash).build());
+			RequestEnvelope.Builder downloadUrls = buildRequestEnvalope(RequestType.GET_DOWNLOAD_URLS, GetDownloadUrlsMessage.newBuilder().addAssetId(hash).build());
 			response = requestScheduler.queueRequest(downloadUrls.build()).toBlocking().first();
 			try {
 				downloadUrlsResponses.add(GetDownloadUrlsResponse.parseFrom(response.toByteString()));
