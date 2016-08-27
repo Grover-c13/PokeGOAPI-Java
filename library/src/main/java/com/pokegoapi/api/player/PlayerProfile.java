@@ -116,8 +116,10 @@ public class PlayerProfile {
 
 		// Check if we are allowed to receive valid responses
 		if (tutorialState.getTutorialStates().isEmpty()) {
-			enableAccount();
+			fillTutorial(false);
 		}
+
+		Log.e("avatar", avatar.isAvatarCreated() ? "created!" : "not created!");
 	}
 
 	/**
@@ -293,7 +295,7 @@ public class PlayerProfile {
 	 * @throws LoginFailedException  when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public void enableAccount() throws LoginFailedException, RemoteServerException {
+	public void fillTutorial(boolean full) throws LoginFailedException, RemoteServerException {
 		MarkTutorialCompleteMessage.Builder tutorialBuilder = MarkTutorialCompleteMessage.newBuilder();
 		tutorialBuilder.addTutorialsCompleted(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN)
 				.setSendMarketingEmails(false)

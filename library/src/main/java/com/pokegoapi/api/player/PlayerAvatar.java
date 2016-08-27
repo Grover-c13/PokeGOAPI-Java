@@ -66,4 +66,13 @@ public class PlayerAvatar {
 	public int getBackpack() {
 		return avatar.getBackpack();
 	}
+
+	public boolean isAvatarCreated() {
+		return getSkin() != 0 ||
+				getHair() != 0 ||
+				getShirt() != 0 ||
+				getPants() != 0 ||
+				getHat() != 0 ||
+				getShoes() != 0;
+	}
 }
