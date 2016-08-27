@@ -33,6 +33,7 @@ import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpR
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Parser;
+import com.google.protobuf.TextFormat;
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.LocationFixes;
@@ -226,6 +227,7 @@ public final class Networking {
 		builder.addAllCellId(cellIds);
 		builder.addAllSinceTimestampMs(Arrays.asList(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L));
 		builder.setLatitude(location.getLatitude()).setLongitude(location.getLongitude());
+		log.info(TextFormat.printToString(builder));
 		RequestEnvelope.Builder initialMapRequest = buildRequestEnvelope(RequestType.GET_MAP_OBJECTS, builder.setLatitude(location.getLatitude()).setLongitude(location.getLongitude())
 				.build());
 		response = requestScheduler.queueRequest(initialMapRequest.build()).toBlocking().first();

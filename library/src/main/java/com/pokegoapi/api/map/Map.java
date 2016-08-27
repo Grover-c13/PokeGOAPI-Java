@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 public class Map implements Runnable {
-	public static final int CELL_WIDTH = 5;
+	public static final int CELL_WIDTH = 3;
 	private final ExecutorService executorService;
 	private final MapSettings mapSettings;
 	private final MapObjects mapObjects;
@@ -152,6 +152,7 @@ public class Map implements Runnable {
 			for (int i=0;i!=20;i++) {
 				builder.addSinceTimestampMs(0L);
 			}
+
 			networking.queueRequest(RequestType.GET_MAP_OBJECTS, builder.build(), GetMapObjectsResponse.class).forEach(new Action1<GetMapObjectsResponse>() {
 				@Override
 				public void call(GetMapObjectsResponse mapObjectsResponse) {

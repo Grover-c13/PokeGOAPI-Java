@@ -4,6 +4,7 @@ import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.TextFormat;
 import com.pokegoapi.exceptions.RemoteServerException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
