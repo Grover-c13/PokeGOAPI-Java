@@ -15,26 +15,24 @@
 
 package com.pokegoapi.api.inventory;
 
-import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
-
 import com.pokegoapi.api.PokemonGo;
-
-import lombok.ToString;
 
 import java.util.HashMap;
 
+import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
+import lombok.ToString;
+
 @ToString
 public class CandyJar {
-	private PokemonGo pgo;
-	private HashMap<PokemonFamilyId, Integer> candies;
+	private final PokemonGo api;
+	private final HashMap<PokemonFamilyId, Integer> candies = new HashMap<>();
 
-	public CandyJar(PokemonGo pgo) {
-		reset(pgo);
+	public CandyJar(PokemonGo api) {
+		this.api = api;
 	}
 
-	public void reset(PokemonGo pgo) {
-		this.pgo = pgo;
-		candies = new HashMap<>();
+	public void reset() {
+		candies.clear();
 	}
 
 	/**
