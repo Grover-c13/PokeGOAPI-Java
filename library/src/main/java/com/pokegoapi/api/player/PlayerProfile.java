@@ -17,12 +17,14 @@ package com.pokegoapi.api.player;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Stats;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 
@@ -36,10 +38,12 @@ import POGOProtos.Data.Player.PlayerAvatarOuterClass;
 import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
 import POGOProtos.Enums.GenderOuterClass.Gender;
+import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Enums.TutorialStateOuterClass;
 import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass.DownloadSettingsMessage;
+import POGOProtos.Networking.Requests.Messages.EncounterTutorialCompleteMessageOuterClass.EncounterTutorialCompleteMessage;
 import POGOProtos.Networking.Requests.Messages.EquipBadgeMessageOuterClass.EquipBadgeMessage;
 import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
@@ -321,13 +325,12 @@ public class PlayerProfile {
 	}
 
 	/**
-	 * Initialize the account with a valid avatar, nickname and all the common things
-	 * that the official clients is doing before firing requests
+	 * Setup an avatar for the current account
 	 *
 	 * @throws LoginFailedException  when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public void initializeAccount() throws LoginFailedException, RemoteServerException {
+	public void setupAvatar() throws LoginFailedException, RemoteServerException {
 		Random random = new Random();
 
 		final PlayerAvatarOuterClass.PlayerAvatar.Builder playerAvatarBuilder =
@@ -349,9 +352,6 @@ public class PlayerProfile {
 		final SetAvatarMessage setAvatarMessage = SetAvatarMessage.newBuilder()
 				.setPlayerAvatar(playerAvatarBuilder.build())
 				.build();
-		final GetInventoryMessage getInventoryReq = GetInventoryMessage.newBuilder()
-				.setLastTimestampMs(api.getInventories().getLastInventoryUpdate())
-				.build();
 		final DownloadSettingsMessage downloadSettingsReq = DownloadSettingsMessage.newBuilder()
 				.setHash(api.getSettings().getHash())
 				.build();
@@ -361,7 +361,7 @@ public class PlayerProfile {
 		requests[1] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_HATCHED_EGGS,
 				GetHatchedEggsMessage.getDefaultInstance());
 		requests[2] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY,
-				getInventoryReq);
+				CommonRequest.getDefaultGetInventoryMessage(api));
 		requests[3] = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES,
 				CheckAwardedBadgesMessage.getDefaultInstance());
 		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS, downloadSettingsReq);
@@ -385,26 +385,39 @@ public class PlayerProfile {
 		api.fireRequestBlockTwo();
 	}
 
+	/**
+	 * Encounter tutorial complete. In other words, catch the first Pokémon
+	 *
+	 * @throws LoginFailedException  when the auth is invalid
+	 * @throws RemoteServerException when the server is down/having issues
+	 */
+	public void encounterTutorialComplete() throws LoginFailedException, RemoteServerException {
+		Random random = new Random();
+		int pokemonId = random.nextInt(4);
+
+		final EncounterTutorialCompleteMessage.Builder encounterTutorialCompleteBuilder =
+				EncounterTutorialCompleteMessage.newBuilder()
+				.setPokemonId(pokemonId == 1 ? PokemonId.BULBASAUR :
+					pokemonId == 2 ? PokemonId.CHARMANDER : PokemonId.SQUIRTLE);
+
+	}
+
 	private void markTutorial(TutorialStateOuterClass.TutorialState state) throws LoginFailedException, RemoteServerException {
 		final MarkTutorialCompleteMessage tutorialMessage = MarkTutorialCompleteMessage.newBuilder()
 				.addTutorialsCompleted(state)
 				.setSendMarketingEmails(false)
 				.setSendPushNotifications(false).build();
-		final GetInventoryMessage getInventoryReq = GetInventoryMessage.newBuilder()
-				.setLastTimestampMs(api.getInventories().getLastInventoryUpdate())
-				.build();
-		final DownloadSettingsMessage downloadSettingsReq = DownloadSettingsMessage
-				.newBuilder().setHash(api.getSettings().getHash()).build();
 
 		ServerRequest[] requests = new ServerRequest[5];
 		requests[0] = new ServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialMessage);
 		requests[1] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_HATCHED_EGGS,
 				GetHatchedEggsMessage.getDefaultInstance());
 		requests[2] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY,
-				getInventoryReq);
+				CommonRequest.getDefaultGetInventoryMessage(api));
 		requests[3] = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES,
 				CheckAwardedBadgesMessage.getDefaultInstance());
-		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS, downloadSettingsReq);
+		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
+				CommonRequest.getDownloadSettingsMessageRequest(api));
 
 		api.getRequestHandler().sendServerRequests(requests);
 
