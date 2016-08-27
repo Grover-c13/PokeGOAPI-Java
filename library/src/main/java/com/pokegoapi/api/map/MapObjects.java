@@ -17,6 +17,7 @@ package com.pokegoapi.api.map;
 
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Map.Fort.FortTypeOuterClass;
+import POGOProtos.Map.Fort.FortTypeOuterClass.FortType;
 import POGOProtos.Map.MapCellOuterClass;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
@@ -130,18 +131,22 @@ class MapObjects {
 				spawnPoints.add(new Point(spawnPoint));
 			}
 
-			java.util.Map<FortTypeOuterClass.FortType, List<FortData>> groupedForts = Stream.of(mapCell.getFortsList())
-					.collect(Collectors.groupingBy(new Function<FortData, FortTypeOuterClass.FortType>() {
+			java.util.Map<FortType, List<FortData>> groupedForts = Stream.of(mapCell.getFortsList())
+					.collect(Collectors.groupingBy(new Function<FortData, FortType>() {
 						@Override
-						public FortTypeOuterClass.FortType apply(FortData fortData) {
+						public FortType apply(FortData fortData) {
 							return fortData.getType();
 						}
 					}));
-			for (FortData fortData : groupedForts.get(FortTypeOuterClass.FortType.GYM)) {
-				gyms.add(new Gym(networking, location, fortData));
+			if (groupedForts.containsKey(FortType.GYM)) {
+				for (FortData fortData : groupedForts.get(FortType.GYM)) {
+					gyms.add(new Gym(networking, location, fortData));
+				}
 			}
-			for (FortData fortData : groupedForts.get(FortTypeOuterClass.FortType.CHECKPOINT)) {
-				pokestops.add(new Pokestop(networking, location, settings, fortData));
+			if (groupedForts.containsKey(FortType.CHECKPOINT)) {
+				for (FortData fortData : groupedForts.get(FortType.CHECKPOINT)) {
+					pokestops.add(new Pokestop(networking, location, settings, fortData));
+				}
 			}
 			for (Pokestop pokestop : pokestops) {
 				if (pokestop.inRangeForLuredPokemon() && pokestop.getFortData().hasLureInfo()) {
