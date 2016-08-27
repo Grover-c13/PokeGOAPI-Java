@@ -60,7 +60,6 @@ import java.util.concurrent.ExecutorService;
 @Slf4j
 public final class Networking {
 	private static final int VERSION = 3500;
-	private long lastRequest = System.currentTimeMillis();
 	private static final String HASH = "2788184af4004004d6ab0720f7612983332106f6";
 	private static final Map<String, Networking> INSTANCES = new HashMap<>();
 	private static final List<String> DOWNLOAD_URL_HASHES = Arrays.asList("d86c65f7-d521-4aa1-9324-d2690d8a61a0/1467337989725000",
@@ -292,16 +291,6 @@ public final class Networking {
 	public <T extends GeneratedMessage> Observable<T> queueRequest(final RequestType requestType,
 																   final GeneratedMessage message,
 																   final Class<T> responseType) {
-		// TODO: Fix this, put in networking thread
-		long wait = Math.max(0, System.currentTimeMillis() - (lastRequest + 300));
-		try {
-			Thread.sleep(wait);
-		}
-		catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
-		lastRequest = System.currentTimeMillis();
-
 		RequestEnvelope.Builder request = buildRequestEnvalope(requestType, message);
 		return requestScheduler.queueRequest(request.build()).flatMap(new Func1<ResponseEnvelope, Observable<T>>() {
 			@Override
