@@ -158,7 +158,7 @@ public final class Networking {
 
 		// Do a 7, 600, 126, 4, 129 and 5
 		log.info("Do a DOWNLOAD_REMOTE_CONFIG_VERSION, 600, GET_HATCHED_EGGS, GET_INVENTORY, CHECK_AWARDED_BADGES and DOWNLOAD_SETTINGS");
-		RequestEnvelope.Builder remoteConfigRequest = buildRequestEnvalope(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION, DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage
+		RequestEnvelope.Builder remoteConfigRequest = buildRequestEnvelope(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION, DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage
 				.newBuilder()
 				.setPlatform(PlatformOuterClass.Platform.ANDROID)
 				.setAppVersion(3300)
@@ -176,7 +176,7 @@ public final class Networking {
 		}
 		sleep(3000);
 		log.info("Do a GET_ASSET_DIGEST, 600, GET_HATCHED_EGGS, GET_INVENTORY, CHECK_AWARDED_BADGES, DOWNLOAD_SETTINGS");
-		RequestEnvelope.Builder assetsRequest = buildRequestEnvalope(RequestType.GET_ASSET_DIGEST, GetAssetDigestMessageOuterClass.GetAssetDigestMessage
+		RequestEnvelope.Builder assetsRequest = buildRequestEnvelope(RequestType.GET_ASSET_DIGEST, GetAssetDigestMessageOuterClass.GetAssetDigestMessage
 				.newBuilder()
 				.setPlatform(PlatformOuterClass.Platform.ANDROID)
 				.setAppVersion(VERSION)
@@ -192,7 +192,7 @@ public final class Networking {
 		}
 		sleep(3000);
 		log.info("Do a DOWNLOAD_ITEM_TEMPLATES, GET_HATCHED_EGGS, GET_INVENTORY, CHECK_AWARDED_BADGES, DOWNLOAD_SETTINGS");
-		RequestEnvelope.Builder downloadItemTemplatesRequest = buildRequestEnvalope(RequestType.DOWNLOAD_ITEM_TEMPLATES, DownloadItemTemplatesMessage
+		RequestEnvelope.Builder downloadItemTemplatesRequest = buildRequestEnvelope(RequestType.DOWNLOAD_ITEM_TEMPLATES, DownloadItemTemplatesMessage
 				.newBuilder()
 				.build());
 		response = requestScheduler.queueRequest(downloadItemTemplatesRequest.build()).toBlocking().first();
@@ -205,7 +205,7 @@ public final class Networking {
 
 		sleep(3000);
 		log.info("Do a LEVEL_UP_REWARDS, GET_HATCHED_EGGS, GET_INVENTORY, CHECK_AWARDED_BADGES, DOWNLOAD_SETTINGS");
-		RequestEnvelope.Builder levelUpRequest = buildRequestEnvalope(RequestType.LEVEL_UP_REWARDS, LevelUpRewardsMessage
+		RequestEnvelope.Builder levelUpRequest = buildRequestEnvelope(RequestType.LEVEL_UP_REWARDS, LevelUpRewardsMessage
 				.newBuilder()
 				.setLevel(playerLevel)
 				.build());
@@ -218,14 +218,15 @@ public final class Networking {
 		}
 
 		log.info("Do an unpacked GET_MAP_OBJECTS, GET_HATCHED_EGGS, GET_INVENTORY, CHECK_AWARDED_BADGES, DOWNLOAD_SETTINGS");
-		// Initial map request
-		List<Long> cellIds = com.pokegoapi.api.map.Map.getCellIds(location.getLatitude(), location.getLongitude(), com.pokegoapi.api.map.Map.CELL_WIDTH);
 
 		sleep(300);
+		// Initial map request
+		List<Long> cellIds = com.pokegoapi.api.map.Map.getCellIds(location.getLatitude(), location.getLongitude(), com.pokegoapi.api.map.Map.CELL_WIDTH);
 		GetMapObjectsMessage.Builder builder = GetMapObjectsMessage.newBuilder();
 		builder.addAllCellId(cellIds);
-		builder.addAllSinceTimestampMs(Arrays.asList(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L));
-		RequestEnvelope.Builder initialMapRequest = buildRequestEnvalope(RequestType.GET_MAP_OBJECTS, builder.setLatitude(location.getLatitude()).setLongitude(location.getLongitude())
+		builder.addAllSinceTimestampMs(Arrays.asList(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L));
+		builder.setLatitude(location.getLatitude()).setLongitude(location.getLongitude());
+		RequestEnvelope.Builder initialMapRequest = buildRequestEnvelope(RequestType.GET_MAP_OBJECTS, builder.setLatitude(location.getLatitude()).setLongitude(location.getLongitude())
 				.build());
 		response = requestScheduler.queueRequest(initialMapRequest.build()).toBlocking().first();
 		try {
@@ -236,7 +237,7 @@ public final class Networking {
 		}
 		sleep(300);
 		log.info("Do a GET_ASSET_DIGEST, 600, GET_HATCHED_EGGS, GET_INVENTORY, CHECK_AWARDED_BADGES, DOWNLOAD_SETTINGS");
-		assetsRequest = buildRequestEnvalope(RequestType.GET_ASSET_DIGEST, GetAssetDigestMessageOuterClass.GetAssetDigestMessage
+		assetsRequest = buildRequestEnvelope(RequestType.GET_ASSET_DIGEST, GetAssetDigestMessageOuterClass.GetAssetDigestMessage
 				.newBuilder()
 				.setPlatform(PlatformOuterClass.Platform.ANDROID)
 				.setAppVersion(VERSION)
@@ -249,7 +250,7 @@ public final class Networking {
 			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
 		}
 		for (String hash : DOWNLOAD_URL_HASHES) {
-			RequestEnvelope.Builder downloadUrls = buildRequestEnvalope(RequestType.GET_DOWNLOAD_URLS, GetDownloadUrlsMessage.newBuilder().addAssetId(hash).build());
+			RequestEnvelope.Builder downloadUrls = buildRequestEnvelope(RequestType.GET_DOWNLOAD_URLS, GetDownloadUrlsMessage.newBuilder().addAssetId(hash).build());
 			response = requestScheduler.queueRequest(downloadUrls.build()).toBlocking().first();
 			try {
 				downloadUrlsResponses.add(GetDownloadUrlsResponse.parseFrom(response.toByteString()));
@@ -293,7 +294,7 @@ public final class Networking {
 	public <T extends GeneratedMessage> Observable<T> queueRequest(final RequestType requestType,
 																   final GeneratedMessage message,
 																   final Class<T> responseType) {
-		RequestEnvelope.Builder request = buildRequestEnvalope(requestType, message);
+		RequestEnvelope.Builder request = buildRequestEnvelope(requestType, message);
 		return requestScheduler.queueRequest(request.build()).flatMap(new Func1<ResponseEnvelope, Observable<T>>() {
 			@Override
 			public Observable<T> call(ResponseEnvelope responseEnvelope) {
@@ -321,8 +322,8 @@ public final class Networking {
 		return (Parser<T>) clz.getDeclaredMethod("parser").invoke(null);
 	}
 
-	private RequestEnvelope.Builder buildRequestEnvalope(RequestType requestType,
-									  GeneratedMessage message) {
+	private RequestEnvelope.Builder buildRequestEnvelope(RequestType requestType,
+														 GeneratedMessage message) {
 		long requestId = Math.abs(random.nextLong());
 		RequestEnvelope.Builder request = RequestEnvelope.newBuilder()
 				.setStatusCode(2)

@@ -93,6 +93,7 @@ class RequestScheduler {
 					okhttp3.Request httpRequest = new okhttp3.Request.Builder()
 							.url(currentServer)
 							.post(body)
+							.addHeader("Content-Type", "application/x-www-form-urlencoded")
 							.build();
 					try (Response response = client.newCall(httpRequest).execute()) {
 						if (response.code() != 200) {
