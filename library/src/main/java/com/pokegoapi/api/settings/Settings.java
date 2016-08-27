@@ -61,7 +61,7 @@ public class Settings {
 	 */
 	private final GpsSettings gpsSettings;
 	@Getter
-    /**
+	/**
      * Settings for hash
      *
      * @return String hash.
@@ -108,7 +108,7 @@ public class Settings {
 		updateSettings(response);
 	}
 
-	public void updateSettings(DownloadSettingsResponse response){
+	public void updateSettings(DownloadSettingsResponse response) {
 		mapSettings.update(response.getSettings().getMapSettings());
 		levelUpSettings.update(response.getSettings().getInventorySettings());
 		fortSettings.update(response.getSettings().getFortSettings());
@@ -116,6 +116,5 @@ public class Settings {
 		gpsSettings.update(response.getSettings().getGpsSettings());
 		this.hash = response.getHash();
 	}
-
 
 }

@@ -119,7 +119,7 @@ public class Inventories {
 		updateInventories(response);
 	}
 
-	public void updateInventories(GetInventoryResponse response){
+	public void updateInventories(GetInventoryResponse response) {
 		for (InventoryItemOuterClass.InventoryItem inventoryItem
 				: response.getInventoryDelta().getInventoryItemsList()) {
 			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();

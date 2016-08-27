@@ -19,11 +19,7 @@ import POGOProtos.Enums.PlatformOuterClass;
 import POGOProtos.Enums.PlatformOuterClass.Platform;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
-import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.GetAssetDigestMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
@@ -166,33 +162,22 @@ public class PokemonGo {
 		settings = new Settings(this);
 		inventories = new Inventories(this);
 
-		initialize1();
+		initialize();
 	}
 
-	private void initialize1() throws RemoteServerException, LoginFailedException{
+	private void initialize() throws RemoteServerException, LoginFailedException{
 		ServerRequest[] requests = new ServerRequest[5];
-		DownloadRemoteConfigVersionMessage req0 = DownloadRemoteConfigVersionMessage
+		DownloadRemoteConfigVersionMessage downloadRemoteConfigReq = DownloadRemoteConfigVersionMessage
 				.newBuilder()
 				.setPlatform(Platform.IOS)
 				.setAppVersion(Constant.APP_VERSION)
 				.build();
-		GetHatchedEggsMessage req1 = GetHatchedEggsMessage
-				.newBuilder()
-				.build();
-		GetInventoryMessage req2 = GetInventoryMessage
-				.newBuilder()
-				.build();
-		CheckAwardedBadgesMessage req3 = CheckAwardedBadgesMessage
-				.newBuilder()
-				.build();
-		DownloadSettingsMessage req4 = DownloadSettingsMessage
-				.newBuilder()
-				.build();
-		requests[0] = new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION, req0);
-		requests[1] = new ServerRequest(RequestType.GET_HATCHED_EGGS, req1);
-		requests[2] = new ServerRequest(RequestType.GET_INVENTORY, req2);
-		requests[3] = new ServerRequest(RequestType.CHECK_AWARDED_BADGES, req3);
-		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS, req4);
+
+		requests[0] = new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION, downloadRemoteConfigReq);
+		requests[1] = new ServerRequest(RequestType.GET_HATCHED_EGGS, GetHatchedEggsMessage.getDefaultInstance());
+		requests[2] = new ServerRequest(RequestType.GET_INVENTORY, GetInventoryMessage.getDefaultInstance());
+		requests[3] = new ServerRequest(RequestType.CHECK_AWARDED_BADGES, CheckAwardedBadgesMessage.getDefaultInstance());
+		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS, DownloadSettingsMessage.getDefaultInstance());
 		getRequestHandler().sendServerRequests(requests);
 		try {
 			inventories.updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
@@ -201,31 +186,28 @@ public class PokemonGo {
 			throw new RemoteServerException();
 		}
 
-		requests = new ServerRequest[5];
 
-		GetAssetDigestMessageOuterClass.GetAssetDigestMessage.Builder getAssetDigestBuilder =
-				GetAssetDigestMessageOuterClass.GetAssetDigestMessage.newBuilder();
-		getAssetDigestBuilder.setPlatform(PlatformOuterClass.Platform.IOS)
-				.setAppVersion(Constant.APP_VERSION);
+		GetAssetDigestMessage getAssetDigestReq = GetAssetDigestMessage.newBuilder()
+				.setPlatform(PlatformOuterClass.Platform.IOS)
+				.setAppVersion(Constant.APP_VERSION)
+				.build();
 
-		GetInventoryMessageOuterClass.GetInventoryMessage.Builder getInventoryBuilder =
-				GetInventoryMessageOuterClass.GetInventoryMessage.newBuilder();
-		getInventoryBuilder.setLastTimestampMs(inventories.getLastInventoryUpdate());
+		GetInventoryMessage getInventoryReq = GetInventoryMessage.newBuilder()
+				.setLastTimestampMs(inventories.getLastInventoryUpdate())
+				.build();
 
-		DownloadSettingsMessageOuterClass.DownloadSettingsMessage.Builder downloadSettingsBuilder =
-				DownloadSettingsMessageOuterClass.DownloadSettingsMessage.newBuilder();
-		downloadSettingsBuilder.setHash(settings.getHash());
+		DownloadSettingsMessage downloadSettingsReq = DownloadSettingsMessage.newBuilder()
+				.setHash(settings.getHash())
+				.build();
 
 		requests[0] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
-				getAssetDigestBuilder.build());
-		requests[1] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_HATCHED_EGGS,
-				GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage.getDefaultInstance());
-		requests[2] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY,
-				getInventoryBuilder.build());
-		requests[3] = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES,
-				CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage.getDefaultInstance());
-		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
-				downloadSettingsBuilder.build());
+				getAssetDigestReq);
+		requests[1] = 
+				new ServerRequest(RequestTypeOuterClass.RequestType.GET_HATCHED_EGGS, GetHatchedEggsMessage.getDefaultInstance());
+		requests[2] = 
+				new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY, getInventoryReq);
+		requests[3] = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES, CheckAwardedBadgesMessage.getDefaultInstance());
+		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS, downloadSettingsReq);
 		getRequestHandler().sendServerRequests(requests);
 	}
 
