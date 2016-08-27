@@ -32,6 +32,7 @@ import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResp
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.Parser;
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.LocationFixes;
@@ -43,6 +44,7 @@ import okhttp3.OkHttpClient;
 import rx.Observable;
 import rx.functions.Func1;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -296,7 +298,7 @@ public final class Networking {
 			@Override
 			public Observable<T> call(ResponseEnvelope responseEnvelope) {
 				try {
-					T responseMessage = (T) responseType.newInstance().getParserForType().parseFrom(responseEnvelope.getReturns(0));
+					T responseMessage = getParser(responseType).parseFrom(responseEnvelope.getReturns(0));
 					final GetHatchedEggsResponse getHatchedEggsResponse = GetHatchedEggsResponse.parseFrom(responseEnvelope.getReturns(2));
 					final GetInventoryResponse getInventoryResponse = GetInventoryResponse.parseFrom(responseEnvelope.getReturns(3));
 					final CheckAwardedBadgesResponse checkAwardedBadgesResponse = CheckAwardedBadgesResponse.parseFrom(responseEnvelope.getReturns(4));
@@ -308,11 +310,15 @@ public final class Networking {
 						}
 					});
 					return Observable.just(responseMessage);
-				} catch (IllegalAccessException | InvalidProtocolBufferException | InstantiationException e) {
+				} catch (IllegalAccessException | InvalidProtocolBufferException | NoSuchMethodException | InvocationTargetException e) {
 					return Observable.error(e);
 				}
 			}
 		});
+	}
+
+	static <T> Parser<T> getParser(Class<T> clz) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+		return (Parser<T>) clz.getDeclaredMethod("parser").invoke(null);
 	}
 
 	private RequestEnvelope.Builder buildRequestEnvalope(RequestType requestType,

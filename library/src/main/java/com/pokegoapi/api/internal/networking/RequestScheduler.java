@@ -6,6 +6,7 @@ import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelo
 import com.google.protobuf.ByteString;
 import com.pokegoapi.exceptions.RemoteServerException;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -48,6 +49,7 @@ class RequestScheduler {
 		this.requestExecutor.currentServer = currentServer;
 	}
 
+	@Slf4j
 	private static class RequestExecutor implements Runnable {
 		private long lastRequest = 0;
 		private final BlockingQueue<RequestWrap> requestQueue;
@@ -67,53 +69,59 @@ class RequestScheduler {
 			RequestWrap request = null;
 			while (run) {
 				try {
-					request = requestQueue.poll(1, TimeUnit.HOURS);
-					while (System.currentTimeMillis() < lastRequest + MINIMUM_WAIT_TIME) {
-						Thread.sleep(10);
+					try {
+						request = requestQueue.poll(1, TimeUnit.HOURS);
+						while (System.currentTimeMillis() < lastRequest + MINIMUM_WAIT_TIME) {
+							Thread.sleep(10);
+						}
+					} catch (InterruptedException e) {
+						run = false;
 					}
-				}
-				catch (InterruptedException e) {
-					run = false;
-				}
-				if (request == null) {
-					continue;
-				}
-				request.getSubscriber().onStart();
-				// Do request
-				ByteArrayOutputStream stream = new ByteArrayOutputStream();
-				try {
-					request.getRequestEnvelope().writeTo(stream);
-				}
-				catch (IOException e) {
-					request.getSubscriber().onError(e);
-					continue;
-				}
-				RequestBody body = RequestBody.create(null, stream.toByteArray());
-				okhttp3.Request httpRequest = new okhttp3.Request.Builder()
-						.url(currentServer)
-						.post(body)
-						.build();
-				try (Response response = client.newCall(httpRequest).execute()) {
-					if (response.code() != 200) {
-						request.getSubscriber().onError(new RemoteServerException("Got a unexpected http code : " + response.code()));
+					if (request == null) {
 						continue;
 					}
-
-					ResponseEnvelope responseEnvelop;
-					try (InputStream content = response.body().byteStream()) {
-						responseEnvelop = ResponseEnvelope.parseFrom(content);
+					request.getSubscriber().onStart();
+					// Do request
+					ByteArrayOutputStream stream = new ByteArrayOutputStream();
+					try {
+						request.getRequestEnvelope().writeTo(stream);
 					} catch (IOException e) {
-						// retrieved garbage from the server
-						request.getSubscriber().onError(new RemoteServerException("Received malformed response : " + e));
+						request.getSubscriber().onError(e);
 						continue;
 					}
-					if (responseEnvelop.getAuthTicket().getExpireTimestampMs() > 0L && responseEnvelop.getAuthTicket().getStart() != ByteString.EMPTY) {
-						authTicket = responseEnvelop.getAuthTicket();
+					RequestBody body = RequestBody.create(null, stream.toByteArray());
+					okhttp3.Request httpRequest = new okhttp3.Request.Builder()
+							.url(currentServer)
+							.post(body)
+							.build();
+					try (Response response = client.newCall(httpRequest).execute()) {
+						if (response.code() != 200) {
+							request.getSubscriber().onError(new RemoteServerException("Got a unexpected http code : " + response.code()));
+							continue;
+						}
+
+						ResponseEnvelope responseEnvelop;
+						try (InputStream content = response.body().byteStream()) {
+							responseEnvelop = ResponseEnvelope.parseFrom(content);
+						} catch (IOException e) {
+							// retrieved garbage from the server
+							request.getSubscriber().onError(new RemoteServerException("Received malformed response : " + e));
+							continue;
+						}
+						if (responseEnvelop.getAuthTicket().getExpireTimestampMs() > 0L && responseEnvelop.getAuthTicket().getStart() != ByteString.EMPTY) {
+							authTicket = responseEnvelop.getAuthTicket();
+						}
+						request.getSubscriber().onNext(responseEnvelop);
+						request.getSubscriber().onCompleted();
+					} catch (IOException e) {
+						request.getSubscriber().onError(new RemoteServerException(e));
 					}
-					request.getSubscriber().onNext(responseEnvelop);
-					request.getSubscriber().onCompleted();
-				} catch (IOException e) {
-					request.getSubscriber().onError(new RemoteServerException(e));
+				}
+				catch (RuntimeException e) {
+					log.error("Dramatic crash!", e);
+					if (request != null) {
+						request.getSubscriber().onError(new RemoteServerException(e));
+					}
 				}
 			}
 		}
