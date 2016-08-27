@@ -17,7 +17,6 @@ package com.pokegoapi.api.player;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Stats;
@@ -28,6 +27,7 @@ import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 
+import java.security.SecureRandom;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Random;
@@ -42,20 +42,17 @@ import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Enums.TutorialStateOuterClass;
 import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
-import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass.DownloadSettingsMessage;
+import POGOProtos.Networking.Requests.Messages.ClaimCodenameMessageOuterClass.ClaimCodenameMessage;
 import POGOProtos.Networking.Requests.Messages.EncounterTutorialCompleteMessageOuterClass.EncounterTutorialCompleteMessage;
 import POGOProtos.Networking.Requests.Messages.EquipBadgeMessageOuterClass.EquipBadgeMessage;
-import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
-import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
 import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass.MarkTutorialCompleteMessage;
 import POGOProtos.Networking.Requests.Messages.SetAvatarMessageOuterClass.SetAvatarMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
+import POGOProtos.Networking.Responses.ClaimCodenameResponseOuterClass.ClaimCodenameResponse;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
-import POGOProtos.Networking.Responses.EncounterTutorialCompleteResponseOuterClass.EncounterTutorialCompleteResponse;
 import POGOProtos.Networking.Responses.EquipBadgeResponseOuterClass;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
@@ -352,9 +349,8 @@ public class PlayerProfile {
 				.setPlayerAvatar(playerAvatarBuilder.build())
 				.build();
 
-		ServerRequest[] requests = new ServerRequest[5];
-		requests[0] = new ServerRequest(RequestType.SET_AVATAR, setAvatarMessage);
-		CommonRequest.fillRequests(requests, api);
+		ServerRequest[] requests = CommonRequest.fillRequest(
+				new ServerRequest(RequestType.SET_AVATAR, setAvatarMessage), api);
 
 		api.getRequestHandler().sendServerRequests(requests);
 
@@ -390,11 +386,9 @@ public class PlayerProfile {
 				.setPokemonId(pokemonId == 1 ? PokemonId.BULBASAUR :
 					pokemonId == 2 ? PokemonId.CHARMANDER : PokemonId.SQUIRTLE);
 
-		ServerRequest[] requests = new ServerRequest[5];
-
-		requests[0] = new ServerRequest(RequestType.ENCOUNTER_TUTORIAL_COMPLETE,
-				encounterTutorialCompleteBuilder.build());
-		CommonRequest.fillRequests(requests, api);
+		ServerRequest[] requests = CommonRequest.fillRequest(
+				new ServerRequest(RequestType.ENCOUNTER_TUTORIAL_COMPLETE,
+				encounterTutorialCompleteBuilder.build()), api);
 
 		api.getRequestHandler().sendServerRequests(requests);
 
@@ -408,11 +402,8 @@ public class PlayerProfile {
 		final GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
 				.setPlayerLocale(playerLocale.getPlayerLocale())
 				.build();
-
-		requests = new ServerRequest[5];
-
-		requests[0] = new ServerRequest(RequestType.GET_PLAYER, encounterTutorialCompleteBuilder.build());
-		CommonRequest.fillRequests(requests, api);
+		requests = CommonRequest.fillRequest(
+				new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg), api);
 
 		api.getRequestHandler().sendServerRequests(requests);
 
@@ -426,6 +417,57 @@ public class PlayerProfile {
 		}
 	}
 
+	public void claimCodeName() throws LoginFailedException, RemoteServerException {
+		ClaimCodenameMessage claimCodenameMessage = ClaimCodenameMessage.newBuilder()
+				.setCodename(randomCodenameGenerator())
+				.build();
+
+		ServerRequest[] requests = CommonRequest.fillRequest(
+				new ServerRequest(RequestType.CLAIM_CODENAME,
+						claimCodenameMessage), api);
+
+		api.getRequestHandler().sendServerRequests(requests);
+
+		String updatedCodename = null;
+		try {
+			api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
+			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
+
+			ClaimCodenameResponse claimCodenameResponse = ClaimCodenameResponse.parseFrom(requests[0].getData());
+			if (claimCodenameResponse.getStatus() != ClaimCodenameResponse.Status.SUCCESS) {
+				if (claimCodenameResponse.getUpdatedPlayer().getRemainingCodenameClaims() > 0) {
+					claimCodeName();
+				}
+			} else {
+				updatedCodename = claimCodenameResponse.getCodename();
+				updateProfile(claimCodenameResponse.getUpdatedPlayer());
+			}
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
+
+		if (updatedCodename != null) {
+			markTutorial(TutorialStateOuterClass.TutorialState.NAME_SELECTION);
+
+			final GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
+					.setPlayerLocale(playerLocale.getPlayerLocale())
+					.build();
+			requests = CommonRequest.fillRequest(
+					new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg), api);
+
+			api.getRequestHandler().sendServerRequests(requests);
+
+			try {
+				updateProfile(GetPlayerResponse.parseFrom(requests[0].getData()));
+
+				api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
+				api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
+			} catch (InvalidProtocolBufferException e) {
+				throw new RemoteServerException(e);
+			}
+		}
+	}
+
 	private void markTutorial(TutorialStateOuterClass.TutorialState state)
 				throws LoginFailedException, RemoteServerException {
 		final MarkTutorialCompleteMessage tutorialMessage = MarkTutorialCompleteMessage.newBuilder()
@@ -433,10 +475,8 @@ public class PlayerProfile {
 				.setSendMarketingEmails(false)
 				.setSendPushNotifications(false).build();
 
-		ServerRequest[] requests = new ServerRequest[5];
-
-		requests[0] = new ServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialMessage);
-		CommonRequest.fillRequests(requests, api);
+		ServerRequest[] requests = CommonRequest.fillRequest(
+				new ServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialMessage), api);
 
 		api.getRequestHandler().sendServerRequests(requests);
 
@@ -450,5 +490,15 @@ public class PlayerProfile {
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
+	}
+
+	private static String randomCodenameGenerator() {
+		final String a = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+		final SecureRandom r = new SecureRandom();
+		final int l = new Random().nextInt(15 - 10) + 10;
+		StringBuilder sb = new StringBuilder(l);
+		for(int i=0;i<l;i++)
+			sb.append(a.charAt(r.nextInt(a.length())));
+		return sb.toString();
 	}
 }

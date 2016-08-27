@@ -15,15 +15,11 @@
 
 package com.pokegoapi.api;
 
-import POGOProtos.Enums.TutorialStateOuterClass;
+import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
-import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass.DownloadSettingsMessage;
-import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
-import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 
@@ -35,7 +31,6 @@ import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
-import com.pokegoapi.api.player.TutorialState;
 import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -180,13 +175,18 @@ public class PokemonGo {
 		}
 
 		if (!playerProfile.getTutorialState().getTutorialStates()
-				.contains(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION)) {
+				.contains(TutorialState.AVATAR_SELECTION)) {
 			playerProfile.setupAvatar();
 		}
 
 		if (!playerProfile.getTutorialState().getTutorialStates()
-				.contains(TutorialStateOuterClass.TutorialState.POKEMON_CAPTURE)) {
+				.contains(TutorialState.POKEMON_CAPTURE)) {
 			playerProfile.encounterTutorialComplete();
+		}
+
+		if (!playerProfile.getTutorialState().getTutorialStates()
+				.contains(TutorialState.NAME_SELECTION)) {
+			playerProfile.claimCodeName();
 		}
 	}
 
@@ -197,11 +197,8 @@ public class PokemonGo {
 	 * @throws RemoteServerException When server fails
      */
 	private void fireRequestBlockOne() throws RemoteServerException, LoginFailedException {
-		ServerRequest[] requests = new ServerRequest[5];
-
-		requests[0] = new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
-				CommonRequest.getDownloadRemoteConfigVersionMessageRequest());
-		CommonRequest.fillRequests(requests, this);
+		ServerRequest[] requests = CommonRequest.fillRequest(new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
+				CommonRequest.getDownloadRemoteConfigVersionMessageRequest()), this);
 
 		getRequestHandler().sendServerRequests(requests);
 		try {
@@ -219,11 +216,8 @@ public class PokemonGo {
 	 * @throws RemoteServerException When server fails
      */
 	public void fireRequestBlockTwo() throws RemoteServerException, LoginFailedException {
-		ServerRequest[] requests = new ServerRequest[5];
-
-		requests[0] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
-				CommonRequest.getGetAssetDigestMessageRequest());
-		CommonRequest.fillRequests(requests, this);
+		ServerRequest[] requests = CommonRequest.fillRequest(new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
+				CommonRequest.getGetAssetDigestMessageRequest()), this);
 
 		getRequestHandler().sendServerRequests(requests);
 		try {

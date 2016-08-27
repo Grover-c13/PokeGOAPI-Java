@@ -60,14 +60,17 @@ public class CommonRequest {
 				.build();
 	}
 
-    public static void fillRequests(ServerRequest[] requests, PokemonGo api) {
-        requests[requests.length] = new ServerRequest(RequestType.GET_HATCHED_EGGS,
+    public static ServerRequest[] fillRequest(ServerRequest request, PokemonGo api) {
+        ServerRequest[] serverRequests = new ServerRequest[5];
+        serverRequests[0] = request;
+        serverRequests[1] = new ServerRequest(RequestType.GET_HATCHED_EGGS,
                 GetHatchedEggsMessage.getDefaultInstance());
-        requests[requests.length] = new ServerRequest(RequestType.GET_INVENTORY,
+        serverRequests[2] = new ServerRequest(RequestType.GET_INVENTORY,
                 CommonRequest.getDefaultGetInventoryMessage(api));
-        requests[requests.length] = new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
+        serverRequests[3] = new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
                 CheckAwardedBadgesMessage.getDefaultInstance());
-        requests[requests.length] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
+        serverRequests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
                 CommonRequest.getDownloadSettingsMessageRequest(api));
+        return serverRequests;
     }
 }
