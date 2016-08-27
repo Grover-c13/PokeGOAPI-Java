@@ -38,6 +38,7 @@ import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
+import com.pokegoapi.api.player.TutorialState;
 import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -68,6 +69,7 @@ public class PokemonGo {
 	RequestHandler requestHandler;
 	@Getter
 	private PlayerProfile playerProfile;
+	@Getter
 	private Inventories inventories;
 	@Getter
 	private double latitude;
@@ -213,6 +215,11 @@ public class PokemonGo {
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException();
 		}
+
+		// Check if we are allowed to receive valid responses
+		if (playerProfile.getTutorialState().getTutorialStates().isEmpty()) {
+			playerProfile.activateAccount();
+		}
 	}
 
 	/**
@@ -265,15 +272,6 @@ public class PokemonGo {
 
 	public long currentTimeMillis() {
 		return time.currentTimeMillis();
-	}
-
-	/**
-	 * Get the inventories API
-	 *
-	 * @return Inventories
-	 */
-	public Inventories getInventories() {
-		return inventories;
 	}
 
 	/**

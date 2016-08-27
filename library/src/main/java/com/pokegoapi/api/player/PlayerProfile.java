@@ -36,13 +36,19 @@ import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
 import POGOProtos.Enums.TutorialStateOuterClass;
 import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
+import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.EquipBadgeMessageOuterClass.EquipBadgeMessage;
+import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
 import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass.MarkTutorialCompleteMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
 import POGOProtos.Networking.Responses.EquipBadgeResponseOuterClass;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import POGOProtos.Networking.Responses.MarkTutorialCompleteResponseOuterClass.MarkTutorialCompleteResponse;
@@ -113,13 +119,6 @@ public class PlayerProfile {
 
 		// Tutorial state
 		tutorialState = new TutorialState(playerData.getTutorialStateList());
-
-		// Check if we are allowed to receive valid responses
-		if (tutorialState.getTutorialStates().isEmpty()) {
-			fillTutorial(false);
-		}
-
-		Log.e("avatar", avatar.isAvatarCreated() ? "created!" : "not created!");
 	}
 
 	/**
@@ -295,20 +294,35 @@ public class PlayerProfile {
 	 * @throws LoginFailedException  when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public void fillTutorial(boolean full) throws LoginFailedException, RemoteServerException {
-		MarkTutorialCompleteMessage.Builder tutorialBuilder = MarkTutorialCompleteMessage.newBuilder();
-		tutorialBuilder.addTutorialsCompleted(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN)
+	public void activateAccount() throws LoginFailedException, RemoteServerException {
+		final MarkTutorialCompleteMessage tutorialMessage = MarkTutorialCompleteMessage.newBuilder()
+				.addTutorialsCompleted(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN)
 				.setSendMarketingEmails(false)
-				.setSendPushNotifications(false);
+				.setSendPushNotifications(false).build();
+		final GetInventoryMessageOuterClass.GetInventoryMessage getInventoryReq = GetInventoryMessageOuterClass.GetInventoryMessage.newBuilder()
+				.setLastTimestampMs(api.getInventories().getLastInventoryUpdate())
+				.build();
+		final DownloadSettingsMessageOuterClass.DownloadSettingsMessage downloadSettingsReq = DownloadSettingsMessageOuterClass.DownloadSettingsMessage
+				.newBuilder().setHash(api.getSettings().getHash()).build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialBuilder.build());
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		ServerRequest[] requests = new ServerRequest[5];
+		requests[0] = new ServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialMessage);
+		requests[1] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_HATCHED_EGGS,
+				GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage.getDefaultInstance());
+		requests[2] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY,
+				getInventoryReq);
+		requests[3] = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES,
+				CheckAwardedBadgesMessage.getDefaultInstance());
+		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS, downloadSettingsReq);
 
-		MarkTutorialCompleteResponse response;
+		api.getRequestHandler().sendServerRequests(requests);
+
 		try {
-			response = MarkTutorialCompleteResponse.parseFrom(serverRequest.getData());
-			playerData = response.getPlayerData();
+			playerData = MarkTutorialCompleteResponse.parseFrom(requests[0].getData()).getPlayerData();
 			tutorialState.addTutorialStates(playerData.getTutorialStateList());
+
+			api.getInventories().updateInventories(GetInventoryResponseOuterClass.GetInventoryResponse.parseFrom(requests[2].getData()));
+			api.getSettings().updateSettings(DownloadSettingsResponseOuterClass.DownloadSettingsResponse.parseFrom(requests[4].getData()));
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
