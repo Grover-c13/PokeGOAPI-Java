@@ -55,13 +55,14 @@ public class CatchPokemonAtAreaExample {
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
 		RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth = null;
+		PokemonGo go = new PokemonGo(http);
 		try {
+			go.login(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN,
+					ExampleLoginDetails.PASSWORD));
 			//or google
 			//new PokemonGo(GoogleCredentialProvider(http,listner));
 			//Subsiquently
 			//new PokemonGo(GoogleCredentialProvider(http,refreshtoken));
-			PokemonGo go = new PokemonGo(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN,
-					ExampleLoginDetails.PASSWORD), http);
 			// set location
 			go.setLocation(-32.058087, 115.744325, 0);
 
