@@ -33,6 +33,11 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 
 public class CommonRequest {
 
+	/**
+	 * Constant for repetitive usage of DownloadRemoteConfigVersionMessage request
+	 *
+	 * @return DownloadRemoteConfigVersionMessage
+	 */
 	public static DownloadRemoteConfigVersionMessage getDownloadRemoteConfigVersionMessageRequest() {
 		return DownloadRemoteConfigVersionMessage
 				.newBuilder()
@@ -41,6 +46,11 @@ public class CommonRequest {
 				.build();
 	}
 
+	/**
+	 * Constant for repetitive usage of GetAssetDigestMessage request
+	 *
+	 * @return GetAssetDigestMessage
+	 */
 	public static GetAssetDigestMessage getGetAssetDigestMessageRequest() {
 		return GetAssetDigestMessage.newBuilder()
 				.setPlatform(Platform.IOS)
@@ -48,29 +58,50 @@ public class CommonRequest {
 				.build();
 	}
 
+	/**
+	 * Constant for repetitive usage of DownloadSettingsMessage request
+	 *
+	 * @param api The current instance of PokemonGO
+	 * @return DownloadSettingsMessage
+	 */
 	public static DownloadSettingsMessage getDownloadSettingsMessageRequest(PokemonGo api) {
 		return DownloadSettingsMessage.newBuilder()
 				.setHash(api.getSettings().getHash())
 				.build();
 	}
 
+	/**
+	 * Constant for repetitive usage of GetInventoryMessage request
+	 *
+	 * @param api The current instance of PokemonGO
+	 * @return GetInventoryMessage
+	 */
 	public static GetInventoryMessage getDefaultGetInventoryMessage(PokemonGo api) {
 		return GetInventoryMessage.newBuilder()
 				.setLastTimestampMs(api.getInventories().getLastInventoryUpdate())
 				.build();
 	}
 
-    public static ServerRequest[] fillRequest(ServerRequest request, PokemonGo api) {
-        ServerRequest[] serverRequests = new ServerRequest[5];
-        serverRequests[0] = request;
-        serverRequests[1] = new ServerRequest(RequestType.GET_HATCHED_EGGS,
-                GetHatchedEggsMessage.getDefaultInstance());
-        serverRequests[2] = new ServerRequest(RequestType.GET_INVENTORY,
-                CommonRequest.getDefaultGetInventoryMessage(api));
-        serverRequests[3] = new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
-                CheckAwardedBadgesMessage.getDefaultInstance());
-        serverRequests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
-                CommonRequest.getDownloadSettingsMessageRequest(api));
-        return serverRequests;
-    }
+	/**
+	 * Most of the requests from the official client are fired together with the following
+	 * requests. We will append our request on top of the array and we will send it
+	 * together with the others.
+	 *
+	 * @param request The main request we want to fire
+	 * @param api The current instance of PokemonGO
+	 * @return an array of ServerRequest
+	 */
+	public static ServerRequest[] fillRequest(ServerRequest request, PokemonGo api) {
+		ServerRequest[] serverRequests = new ServerRequest[5];
+		serverRequests[0] = request;
+		serverRequests[1] = new ServerRequest(RequestType.GET_HATCHED_EGGS,
+				GetHatchedEggsMessage.getDefaultInstance());
+		serverRequests[2] = new ServerRequest(RequestType.GET_INVENTORY,
+				CommonRequest.getDefaultGetInventoryMessage(api));
+		serverRequests[3] = new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
+				CheckAwardedBadgesMessage.getDefaultInstance());
+		serverRequests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
+				CommonRequest.getDownloadSettingsMessageRequest(api));
+		return serverRequests;
+	}
 }

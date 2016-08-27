@@ -45,6 +45,7 @@ import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
 
@@ -170,27 +171,24 @@ public class PokemonGo {
 		// Following, we are going to check if the account binded to this session
 		// have an avatar, a nickname, and all the other things that are usually filled
 		// on the official client BEFORE sending any requests such as the getMapObject etc.
-		if (playerProfile.getTutorialState().getTutorialStates().isEmpty()) {
+		ArrayList<TutorialState> tutorialStates = playerProfile.getTutorialState().getTutorialStates();
+		if (tutorialStates.isEmpty()) {
 			playerProfile.activateAccount();
 		}
 
-		if (!playerProfile.getTutorialState().getTutorialStates()
-				.contains(TutorialState.AVATAR_SELECTION)) {
+		if (!tutorialStates.contains(TutorialState.AVATAR_SELECTION)) {
 			playerProfile.setupAvatar();
 		}
 
-		if (!playerProfile.getTutorialState().getTutorialStates()
-				.contains(TutorialState.POKEMON_CAPTURE)) {
+		if (!tutorialStates.contains(TutorialState.POKEMON_CAPTURE)) {
 			playerProfile.encounterTutorialComplete();
 		}
 
-		if (!playerProfile.getTutorialState().getTutorialStates()
-				.contains(TutorialState.NAME_SELECTION)) {
+		if (!tutorialStates.contains(TutorialState.NAME_SELECTION)) {
 			playerProfile.claimCodeName();
 		}
 
-		if (!playerProfile.getTutorialState().getTutorialStates()
-				.contains(TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
+		if (!tutorialStates.contains(TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
 			playerProfile.firstTimeExperienceComplete();
 		}
 	}
@@ -215,13 +213,14 @@ public class PokemonGo {
 	}
 
 	/**
-	 * Second request block. Public since it could be re-fired at any time
+	 * Second requests block. Public since it could be re-fired at any time
 	 *
 	 * @throws LoginFailedException  When login fails
 	 * @throws RemoteServerException When server fails
      */
 	public void fireRequestBlockTwo() throws RemoteServerException, LoginFailedException {
-		ServerRequest[] requests = CommonRequest.fillRequest(new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
+		ServerRequest[] requests = CommonRequest.fillRequest(
+				new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
 				CommonRequest.getGetAssetDigestMessageRequest()), this);
 
 		getRequestHandler().sendServerRequests(requests);

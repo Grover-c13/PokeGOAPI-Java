@@ -417,6 +417,12 @@ public class PlayerProfile {
 		}
 	}
 
+	/**
+	 * Setup an user name for our account
+	 *
+	 * @throws LoginFailedException  when the auth is invalid
+	 * @throws RemoteServerException when the server is down/having issues
+	 */
 	public void claimCodeName() throws LoginFailedException, RemoteServerException {
 		ClaimCodenameMessage claimCodenameMessage = ClaimCodenameMessage.newBuilder()
 				.setCodename(randomCodenameGenerator())
@@ -468,6 +474,12 @@ public class PlayerProfile {
 		}
 	}
 
+	/**
+	 * The last step, mark the last tutorial state as completed
+	 *
+	 * @throws LoginFailedException  when the auth is invalid
+	 * @throws RemoteServerException when the server is down/having issues
+	 */
 	public void firstTimeExperienceComplete()
 			throws LoginFailedException, RemoteServerException {
 		markTutorial(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE);
@@ -502,8 +514,9 @@ public class PlayerProfile {
 		final SecureRandom r = new SecureRandom();
 		final int l = new Random().nextInt(15 - 10) + 10;
 		StringBuilder sb = new StringBuilder(l);
-		for(int i=0;i<l;i++)
+		for (int i = 0;i < l;i++) {
 			sb.append(a.charAt(r.nextInt(a.length())));
+		}
 		return sb.toString();
 	}
 }
