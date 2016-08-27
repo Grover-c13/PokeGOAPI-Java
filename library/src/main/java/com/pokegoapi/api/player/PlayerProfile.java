@@ -55,6 +55,7 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
+import POGOProtos.Networking.Responses.EncounterTutorialCompleteResponseOuterClass.EncounterTutorialCompleteResponse;
 import POGOProtos.Networking.Responses.EquipBadgeResponseOuterClass;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
@@ -105,9 +106,7 @@ public class PlayerProfile {
 		api.getRequestHandler().sendServerRequests(getPlayerServerRequest);
 
 		try {
-			GetPlayerResponse playerResponse = GetPlayerResponse.parseFrom(getPlayerServerRequest.getData());
-
-			updateProfile(playerResponse);
+			updateProfile(GetPlayerResponse.parseFrom(getPlayerServerRequest.getData()));
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
@@ -400,6 +399,55 @@ public class PlayerProfile {
 				.setPokemonId(pokemonId == 1 ? PokemonId.BULBASAUR :
 					pokemonId == 2 ? PokemonId.CHARMANDER : PokemonId.SQUIRTLE);
 
+		ServerRequest[] requests = new ServerRequest[5];
+
+		requests[0] = new ServerRequest(RequestType.ENCOUNTER_TUTORIAL_COMPLETE,
+				encounterTutorialCompleteBuilder.build());
+		requests[1] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_HATCHED_EGGS,
+				GetHatchedEggsMessage.getDefaultInstance());
+		requests[2] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY,
+				CommonRequest.getDefaultGetInventoryMessage(api));
+		requests[3] = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES,
+				CheckAwardedBadgesMessage.getDefaultInstance());
+		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
+				CommonRequest.getDownloadSettingsMessageRequest(api));
+
+		api.getRequestHandler().sendServerRequests(requests);
+
+		try {
+			api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
+			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
+
+		final GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
+				.setPlayerLocale(playerLocale.getPlayerLocale())
+				.build();
+
+		requests = new ServerRequest[5];
+
+		requests[0] = new ServerRequest(RequestType.GET_PLAYER,
+				encounterTutorialCompleteBuilder.build());
+		requests[1] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_HATCHED_EGGS,
+				GetHatchedEggsMessage.getDefaultInstance());
+		requests[2] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY,
+				CommonRequest.getDefaultGetInventoryMessage(api));
+		requests[3] = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES,
+				CheckAwardedBadgesMessage.getDefaultInstance());
+		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
+				CommonRequest.getDownloadSettingsMessageRequest(api));
+
+		api.getRequestHandler().sendServerRequests(requests);
+
+		try {
+			updateProfile(GetPlayerResponse.parseFrom(requests[0].getData()));
+
+			api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
+			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
 	}
 
 	private void markTutorial(TutorialStateOuterClass.TutorialState state)
@@ -424,7 +472,8 @@ public class PlayerProfile {
 
 		try {
 			playerData = MarkTutorialCompleteResponse.parseFrom(requests[0].getData()).getPlayerData();
-			tutorialState.addTutorialStates(playerData.getTutorialStateList());
+
+			updateProfile(playerData);
 
 			api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
 			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
