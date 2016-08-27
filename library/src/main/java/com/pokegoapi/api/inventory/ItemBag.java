@@ -15,6 +15,16 @@
 
 package com.pokegoapi.api.inventory;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.Log;
+
+import java.util.Collection;
+import java.util.HashMap;
+
 import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.RecycleInventoryItemMessageOuterClass.RecycleInventoryItemMessage;
@@ -26,31 +36,20 @@ import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass.Re
 import POGOProtos.Networking.Responses.UseIncenseResponseOuterClass.UseIncenseResponse;
 import POGOProtos.Networking.Responses.UseItemXpBoostResponseOuterClass.UseItemXpBoostResponse;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.Log;
-
-import java.util.Collection;
-import java.util.HashMap;
-
 
 /**
  * The type Bag.
  */
 public class ItemBag {
-	private PokemonGo pgo;
-	private HashMap<ItemId, Item> items;
+	private final PokemonGo api;
+	private final HashMap<ItemId, Item> items = new HashMap<>();
 
-	public ItemBag(PokemonGo pgo) {
-		reset(pgo);
+	public ItemBag(PokemonGo api) {
+		this.api = api;
 	}
 
-	public void reset(PokemonGo pgo) {
-		this.pgo = pgo;
-		items = new HashMap<>();
+	public void reset() {
+		items.clear();
 	}
 
 	public void addItem(Item item) {
@@ -76,7 +75,7 @@ public class ItemBag {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.RECYCLE_INVENTORY_ITEM, msg);
-		pgo.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest);
 
 		RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse response;
 		try {
@@ -169,11 +168,10 @@ public class ItemBag {
 
 		ServerRequest useIncenseRequest = new ServerRequest(RequestType.USE_INCENSE,
 				useIncenseMessage);
-		pgo.getRequestHandler().sendServerRequests(useIncenseRequest);
+		api.getRequestHandler().sendServerRequests(useIncenseRequest);
 
-		UseIncenseResponse response = null;
 		try {
-			response = UseIncenseResponse.parseFrom(useIncenseRequest.getData());
+			UseIncenseResponse response = UseIncenseResponse.parseFrom(useIncenseRequest.getData());
 			Log.i("Main", "Use incense result: " + response.getResult());
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
@@ -206,17 +204,15 @@ public class ItemBag {
 
 		ServerRequest req = new ServerRequest(RequestType.USE_ITEM_XP_BOOST,
 				xpMsg);
-		pgo.getRequestHandler().sendServerRequests(req);
+		api.getRequestHandler().sendServerRequests(req);
 
-		UseItemXpBoostResponse response = null;
 		try {
-			response = UseItemXpBoostResponse.parseFrom(req.getData());
+			UseItemXpBoostResponse response = UseItemXpBoostResponse.parseFrom(req.getData());
 			Log.i("Main", "Use incense result: " + response.getResult());
+			return response;
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
-
-		return response;
 	}
 
 }

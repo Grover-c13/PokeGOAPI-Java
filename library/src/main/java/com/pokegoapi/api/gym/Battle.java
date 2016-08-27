@@ -41,7 +41,7 @@ import lombok.Getter;
 
 public class Battle {
 	private final Gym gym;
-	private final Pokemon[] team;
+	private final Pokemon[] teams;
 	private final List<BattlePokemonInfo> bteam = new ArrayList<>();
 	private StartGymBattleResponse battleResponse;
 	private final PokemonGo api;
@@ -55,16 +55,16 @@ public class Battle {
 	 * New battle to track the state of a battle.
 	 *
 	 * @param api  The api instance to submit requests with.
-	 * @param team The Pokemon to use for attacking in the battle.
+	 * @param teams The Pokemon to use for attacking in the battle.
 	 * @param gym  The Gym to fight at.
 	 */
-	public Battle(PokemonGo api, Pokemon[] team, Gym gym) {
-		this.team = team;
+	public Battle(PokemonGo api, Pokemon[] teams, Gym gym) {
+		this.teams = teams;
 		this.gym = gym;
 		this.api = api;
 
-		for (Pokemon aTeam : team) {
-			bteam.add(this.createBattlePokemon(aTeam));
+		for (Pokemon team : teams) {
+			bteam.add(this.createBattlePokemon(team));
 		}
 	}
 
@@ -79,8 +79,8 @@ public class Battle {
 
 		Builder builder = StartGymBattleMessageOuterClass.StartGymBattleMessage.newBuilder();
 
-		for (Pokemon aTeam : team) {
-			builder.addAttackingPokemonIds(aTeam.getId());
+		for (Pokemon team : teams) {
+			builder.addAttackingPokemonIds(team.getId());
 		}
 
 

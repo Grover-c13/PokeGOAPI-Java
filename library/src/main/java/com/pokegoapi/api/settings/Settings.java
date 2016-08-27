@@ -108,7 +108,7 @@ public class Settings {
 	/**
 	 * Updates settings latest data.
 	 *
-	 * @param response the response to parse
+	 * @param response the settings download response
 	 */
 	public void updateSettings(DownloadSettingsResponse response) {
 		mapSettings.update(response.getSettings().getMapSettings());
