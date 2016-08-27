@@ -188,6 +188,11 @@ public class PokemonGo {
 				.contains(TutorialState.NAME_SELECTION)) {
 			playerProfile.claimCodeName();
 		}
+
+		if (!playerProfile.getTutorialState().getTutorialStates()
+				.contains(TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
+			playerProfile.firstTimeExperienceComplete();
+		}
 	}
 
 	/**

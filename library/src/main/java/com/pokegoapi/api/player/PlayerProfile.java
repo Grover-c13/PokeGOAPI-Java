@@ -468,6 +468,11 @@ public class PlayerProfile {
 		}
 	}
 
+	public void firstTimeExperienceComplete()
+			throws LoginFailedException, RemoteServerException {
+		markTutorial(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE);
+	}
+
 	private void markTutorial(TutorialStateOuterClass.TutorialState state)
 				throws LoginFailedException, RemoteServerException {
 		final MarkTutorialCompleteMessage tutorialMessage = MarkTutorialCompleteMessage.newBuilder()
