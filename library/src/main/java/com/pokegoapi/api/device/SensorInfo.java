@@ -24,55 +24,59 @@ import java.util.Random;
  */
 
 public class SensorInfo {
-	private final long timestampCreate = System.currentTimeMillis();
 	private final SensorInfoProvider sensorInfoProvider;
-	private final Random random;
 
 	SensorInfo(SensorInfoProvider sensorInfoProvider) {
 		this.sensorInfoProvider = sensorInfoProvider;
-		random = null;
 	}
 
-	SensorInfo(Random random) {
-		this.sensorInfoProvider = null;
-		this.random = random;
-	}
-
-	public static SensorInfo getDefault(Random random) {
-		return new SensorInfo(random);
+	public static SensorInfo getDefault(final Random random) {
+		return new SensorInfo(new DefaultSensorInfoProvider(random));
 	}
 
 	public SignatureOuterClass.Signature.SensorInfo getSensorInfo() {
-		if (this.sensorInfoProvider == null) {
-			return SignatureOuterClass.Signature.SensorInfo.newBuilder()
-					.setTimestampSnapshot(System.currentTimeMillis() - timestampCreate + random.nextInt(500))
-					.setAccelRawX(0.1 + (0.7 - 0.1) * random.nextDouble())
-					.setAccelRawY(0.1 + (0.8 - 0.1) * random.nextDouble())
-					.setAccelRawZ(0.1 + (0.8 - 0.1) * random.nextDouble())
-					.setGyroscopeRawX(-1.0 + random.nextDouble() * 2.0)
-					.setGyroscopeRawY(-1.0 + random.nextDouble() * 2.0)
-					.setGyroscopeRawZ(-1.0 + random.nextDouble() * 2.0)
-					.setAccelNormalizedX(-1.0 + random.nextDouble() * 2.0)
-					.setAccelNormalizedY(6.0 + (9.0 - 6.0) * random.nextDouble())
-					.setAccelNormalizedZ(-1.0 + (8.0 - (-1.0)) * random.nextDouble())
-					.setAccelerometerAxes(3)
-					.build();
-		}
+		SensorInfoProvider.Info info = sensorInfoProvider.getInfo();
 		return SignatureOuterClass.Signature.SensorInfo.newBuilder()
-				.setTimestampSnapshot(sensorInfoProvider.getTimestampSnapshot())
-				.setAccelerometerAxes(sensorInfoProvider.getAccelerometerAxes())
-				.setAccelNormalizedX(sensorInfoProvider.getAccelNormalizedX())
-				.setAccelNormalizedY(sensorInfoProvider.getAccelNormalizedY())
-				.setAccelNormalizedZ(sensorInfoProvider.getAccelNormalizedZ())
-				.setAccelRawX(sensorInfoProvider.getAccelRawX())
-				.setAccelRawY(sensorInfoProvider.getAccelRawY())
-				.setAccelRawZ(sensorInfoProvider.getAccelRawZ())
-				.setAngleNormalizedX(sensorInfoProvider.getAngleNormalizedX())
-				.setAngleNormalizedY(sensorInfoProvider.getAngleNormalizedY())
-				.setAngleNormalizedZ(sensorInfoProvider.getAngleNormalizedZ())
-				.setGyroscopeRawX(sensorInfoProvider.getGyroscopeRawX())
-				.setGyroscopeRawY(sensorInfoProvider.getGyroscopeRawY())
-				.setGyroscopeRawZ(sensorInfoProvider.getGyroscopeRawZ())
+				.setTimestampSnapshot(info.getTimestampSnapshot())
+				.setAccelerometerAxes(info.getAccelerometerAxes())
+				.setAccelNormalizedX(info.getAccelNormalizedX())
+				.setAccelNormalizedY(info.getAccelNormalizedY())
+				.setAccelNormalizedZ(info.getAccelNormalizedZ())
+				.setAccelRawX(info.getAccelRawX())
+				.setAccelRawY(info.getAccelRawY())
+				.setAccelRawZ(info.getAccelRawZ())
+				.setAngleNormalizedX(info.getAngleNormalizedX())
+				.setAngleNormalizedY(info.getAngleNormalizedY())
+				.setAngleNormalizedZ(info.getAngleNormalizedZ())
+				.setGyroscopeRawX(info.getGyroscopeRawX())
+				.setGyroscopeRawY(info.getGyroscopeRawY())
+				.setGyroscopeRawZ(info.getGyroscopeRawZ())
 				.build();
+	}
+
+	private static class DefaultSensorInfoProvider implements SensorInfoProvider {
+		private final long timestampCreate = System.currentTimeMillis();
+		private final Random random;
+
+		DefaultSensorInfoProvider(Random random) {
+			this.random = random;
+		}
+
+		@Override
+		public Info getInfo() {
+			Info info = new Info();
+			info.setTimestampSnapshot(System.currentTimeMillis() - timestampCreate + random.nextInt(500));
+			info.setAccelRawX(0.1 + (0.7 - 0.1) * random.nextDouble());
+			info.setAccelRawY(0.1 + (0.8 - 0.1) * random.nextDouble());
+			info.setAccelRawZ(0.1 + (0.8 - 0.1) * random.nextDouble());
+			info.setGyroscopeRawX(-1.0 + random.nextDouble() * 2.0);
+			info.setGyroscopeRawY(-1.0 + random.nextDouble() * 2.0);
+			info.setGyroscopeRawZ(-1.0 + random.nextDouble() * 2.0);
+			info.setAccelNormalizedX(-1.0 + random.nextDouble() * 2.0);
+			info.setAccelNormalizedY(6.0 + (9.0 - 6.0) * random.nextDouble());
+			info.setAccelNormalizedZ(-1.0 + (8.0 - (-1.0)) * random.nextDouble());
+			info.setAccelerometerAxes(3);
+			return info;
+		}
 	}
 }

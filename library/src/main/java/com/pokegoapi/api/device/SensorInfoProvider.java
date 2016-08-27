@@ -10,97 +10,91 @@
  *     GNU General Public License for more details.
  *
  *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *     aprivate long  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.pokegoapi.api.device;
+
+import lombok.Data;
 
 /**
  * Created by fabianterhorst on 08.08.16.
  */
 
 public interface SensorInfoProvider {
-	/**
-	 *
-	 * @return timestamp snapshot in ms since start
-	 */
-	long getTimestampSnapshot();
+	Info getInfo();
 
-	/**
-	 *
-	 * @return accelerometer axes, always 3
-	 */
-	long getAccelerometerAxes();
+	@Data
+	class Info {
+		/**
+		 * timestamp snapshot in ms since start
+		 */
+		private long timestampSnapshot;
 
-	/**
-	 *
-	 * @return accel normalized x
-	 */
-	double getAccelNormalizedX();
+		/**
+		 * accelerometer axes, always 3
+		 */
+		private long accelerometerAxes;
 
-	/**
-	 *
-	 * @return accel normalized y
-	 */
-	double getAccelNormalizedY();
+		/**
+		 * accel normalized x
+		 */
+		private double accelNormalizedX;
 
-	/**
-	 *
-	 * @return accel normalized z
-	 */
-	double getAccelNormalizedZ();
+		/**
+		 * accel normalized y
+		 */
+		private double accelNormalizedY;
 
-	/**
-	 *
-	 * @return accel raw x
-	 */
-	double getAccelRawX();
+		/**
+		 * accel normalized z
+		 */
+		private double accelNormalizedZ;
 
-	/**
-	 *
-	 * @return accel raw y
-	 */
-	double getAccelRawY();
+		/**
+		 * accel raw x
+		 */
+		private double accelRawX;
 
-	/**
-	 *
-	 * @return accel raw z
-	 */
-	double getAccelRawZ();
+		/**
+		 * accel raw y
+		 */
+		private double accelRawY;
 
-	/**
-	 *
-	 * @return angel normalized x
-	 */
-	double getAngleNormalizedX();
+		/**
+		 * accel raw z
+		 */
+		private double accelRawZ;
 
-	/**
-	 *
-	 * @return angel normalized y
-	 */
-	double getAngleNormalizedY();
+		/**
+		 * angel normalized x
+		 */
+		private double angleNormalizedX;
 
-	/**
-	 *
-	 * @return angel normalized z
-	 */
-	double getAngleNormalizedZ();
+		/**
+		 * angel normalized y
+		 */
+		private double angleNormalizedY;
 
-	/**
-	 *
-	 * @return gyroscope raw x
-	 */
-	double getGyroscopeRawX();
+		/**
+		 * angel normalized z
+		 */
+		private double angleNormalizedZ;
 
-	/**
-	 *
-	 * @return gyroscope raw y
-	 */
-	double getGyroscopeRawY();
+		/**
+		 * gyroscope raw x
+		 */
+		private double gyroscopeRawX;
 
-	/**
-	 *
-	 * @return gyroscope raw z
-	 */
-	double getGyroscopeRawZ();
+		/**
+		 * gyroscope raw y
+		 */
+		private double gyroscopeRawY;
+
+		/**
+		 * gyroscope raw z
+		 */
+		private double gyroscopeRawZ;
+	}
+
 }
