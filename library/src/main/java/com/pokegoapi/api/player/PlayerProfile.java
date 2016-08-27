@@ -12,7 +12,6 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.pokegoapi.api.player;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -31,6 +30,7 @@ import java.util.Map;
 
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.Player.EquippedBadgeOuterClass.EquippedBadge;
+import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
 import POGOProtos.Enums.TutorialStateOuterClass;
 import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
@@ -50,6 +50,7 @@ import lombok.Setter;
 public class PlayerProfile {
 	private static final String TAG = PlayerProfile.class.getSimpleName();
 	private final PokemonGo api;
+	private final PlayerLocale playerLocale;
 	private PlayerData playerData;
 	private EquippedBadge badge;
 	private PlayerAvatar avatar;
@@ -67,6 +68,7 @@ public class PlayerProfile {
 	 */
 	public PlayerProfile(PokemonGo api) throws LoginFailedException, RemoteServerException {
 		this.api = api;
+		this.playerLocale = new PlayerLocale();
 
 		if (playerData == null) {
 			updateProfile();
@@ -80,7 +82,9 @@ public class PlayerProfile {
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
 	public void updateProfile() throws RemoteServerException, LoginFailedException {
-		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder().build();
+		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
+				.setPlayerLocale(playerLocale.getPlayerLocale())
+				.build();
 		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
 		api.getRequestHandler().sendServerRequests(getPlayerServerRequest);
 
@@ -265,12 +269,10 @@ public class PlayerProfile {
 	 * Gets player stats
 	 *
 	 * @return stats API objet
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public Stats getStats() throws LoginFailedException, RemoteServerException {
+	public Stats getStats() {
 		if (stats == null) {
-			api.getInventories().updateInventories();
+			return new Stats(PlayerStatsOuterClass.PlayerStats.newBuilder().build());
 		}
 		return stats;
 	}
