@@ -21,7 +21,8 @@ public class LocationFixes  {
 
 	public Collection<SignatureOuterClass.Signature.LocationFix> getLocationFixes(final Location location,
 																				  final boolean getMapObjectRequest) {
-		return Stream.of(locationFixProvider.getLocationFixes(location, getMapObjectRequest)).map(new Function<LocationFixProvider.LocationFix, SignatureOuterClass.Signature.LocationFix>() {
+		return Stream.of(locationFixProvider.getLocationFixes(location.getLatitude(), location.getLongitude(),
+				location.getAltitude(), getMapObjectRequest)).map(new Function<LocationFixProvider.LocationFix, SignatureOuterClass.Signature.LocationFix>() {
 			@Override
 			public SignatureOuterClass.Signature.LocationFix apply(LocationFixProvider.LocationFix locationFix) {
 				SignatureOuterClass.Signature.LocationFix.Builder locationFixBuilder =
@@ -56,7 +57,8 @@ public class LocationFixes  {
 		private final Random random;
 
 		@Override
-		public Collection<LocationFix> getLocationFixes(Location location, boolean getMapObjectRequest) {
+		public Collection<LocationFix> getLocationFixes(double latitude, double longitude, double altitude,
+														boolean getMapObjectRequest) {
 			int pn = random.nextInt(100);
 			int chance = random.nextInt(100);
 			int providerCount = pn < 75 ? 6 : pn < 95 ? 5 : 8;
@@ -75,9 +77,9 @@ public class LocationFixes  {
 			}
 			List<LocationFix> locationFixes = new ArrayList<>(providerCount);
 			for (int i = 0; i < providerCount; i++) {
-				float latitude = offsetOnLatLong(location.getLatitude(), random.nextInt(100) + 10);
-				float longitude = offsetOnLatLong(location.getLongitude(), random.nextInt(100) + 10);
-				float altitude = 65;
+				float latitudef = offsetOnLatLong(latitude, random.nextInt(100) + 10);
+				float longitudef = offsetOnLatLong(longitude, random.nextInt(100) + 10);
+				float altitudef = 65;
 				float verticalAccuracy = (float) (15 + (23 - 15) * random.nextDouble());
 
 				// Fake errors
@@ -95,7 +97,7 @@ public class LocationFixes  {
 						: System.currentTimeMillis() - startTime
 						+ (150 * (i + 1) + random.nextInt(250 * (i + 1) - (150 * (i + 1))));
 				locationFixes.add(new LocationFixProvider.LocationFix(
-						timestampSnapshot, latitude, longitude, altitude, -1, verticalAccuracy, 3, 1));
+						timestampSnapshot, latitudef, longitudef, altitudef, -1, verticalAccuracy, 3, 1));
 			}
 			return locationFixes;
 		}

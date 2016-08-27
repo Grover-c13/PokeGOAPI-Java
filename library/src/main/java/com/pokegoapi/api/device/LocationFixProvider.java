@@ -9,7 +9,7 @@ import java.util.Collection;
  * @author Paul van Assen
  */
 public interface LocationFixProvider {
-	Collection<LocationFix> getLocationFixes(Location location, boolean getMapObjectRequest);
+	Collection<LocationFix> getLocationFixes(double latitude, double longitude, double altitude, boolean getMapObjectRequest);
 
 	@Data
 	class LocationFix {
