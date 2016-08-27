@@ -26,7 +26,7 @@ import java.util.Random;
 public class SensorInfo {
 	private final SensorInfoProvider sensorInfoProvider;
 
-	SensorInfo(SensorInfoProvider sensorInfoProvider) {
+	public SensorInfo(SensorInfoProvider sensorInfoProvider) {
 		this.sensorInfoProvider = sensorInfoProvider;
 	}
 
