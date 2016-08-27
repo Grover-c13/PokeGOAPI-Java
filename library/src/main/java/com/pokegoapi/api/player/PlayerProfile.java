@@ -28,30 +28,35 @@ import com.pokegoapi.util.Log;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Random;
 
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.Player.EquippedBadgeOuterClass.EquippedBadge;
+import POGOProtos.Data.Player.PlayerAvatarOuterClass;
 import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
+import POGOProtos.Enums.GenderOuterClass.Gender;
 import POGOProtos.Enums.TutorialStateOuterClass;
 import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
-import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass.DownloadSettingsMessage;
 import POGOProtos.Networking.Requests.Messages.EquipBadgeMessageOuterClass.EquipBadgeMessage;
-import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
+import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
 import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass.MarkTutorialCompleteMessage;
+import POGOProtos.Networking.Requests.Messages.SetAvatarMessageOuterClass.SetAvatarMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
-import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import POGOProtos.Networking.Responses.EquipBadgeResponseOuterClass;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import POGOProtos.Networking.Responses.MarkTutorialCompleteResponseOuterClass.MarkTutorialCompleteResponse;
+import POGOProtos.Networking.Responses.SetAvatarResponseOuterClass.SetAvatarResponse;
 import lombok.Setter;
 
 public class PlayerProfile {
@@ -95,21 +100,38 @@ public class PlayerProfile {
 		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
 		api.getRequestHandler().sendServerRequests(getPlayerServerRequest);
 
-		GetPlayerResponse playerResponse;
 		try {
-			playerResponse = GetPlayerResponse.parseFrom(getPlayerServerRequest.getData());
+			GetPlayerResponse playerResponse = GetPlayerResponse.parseFrom(getPlayerServerRequest.getData());
+
+			updateProfile(playerResponse);
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
+	}
 
-		playerData = playerResponse.getPlayerData();
+	/**
+	 * Update the profile with the given response
+	 *
+	 * @param playerResponse the response
+     */
+	public void updateProfile(GetPlayerResponse playerResponse) {
+		updateProfile(playerResponse.getPlayerData());
+	}
+
+	/**
+	 * Update the profile with the given player data
+	 *
+	 * @param playerData the data for update
+     */
+	public void updateProfile(PlayerData playerData) {
+		this.playerData = playerData;
 
 		avatar = new PlayerAvatar(playerData.getAvatar());
 		dailyBonus = new DailyBonus(playerData.getDailyBonus());
 		contactSettings = new ContactSettings(playerData.getContactSettings());
 
 		// maybe something more graceful?
-		for (CurrencyOuterClass.Currency currency : playerResponse.getPlayerData().getCurrenciesList()) {
+		for (CurrencyOuterClass.Currency currency : playerData.getCurrenciesList()) {
 			try {
 				addCurrency(currency.getName(), currency.getAmount());
 			} catch (InvalidCurrencyException e) {
@@ -295,20 +317,89 @@ public class PlayerProfile {
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
 	public void activateAccount() throws LoginFailedException, RemoteServerException {
-		final MarkTutorialCompleteMessage tutorialMessage = MarkTutorialCompleteMessage.newBuilder()
-				.addTutorialsCompleted(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN)
-				.setSendMarketingEmails(false)
-				.setSendPushNotifications(false).build();
-		final GetInventoryMessageOuterClass.GetInventoryMessage getInventoryReq = GetInventoryMessageOuterClass.GetInventoryMessage.newBuilder()
+		markTutorial(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN);
+	}
+
+	/**
+	 * Initialize the account with a valid avatar, nickname and all the common things
+	 * that the official clients is doing before firing requests
+	 *
+	 * @throws LoginFailedException  when the auth is invalid
+	 * @throws RemoteServerException when the server is down/having issues
+	 */
+	public void initializeAccount() throws LoginFailedException, RemoteServerException {
+		Random random = new Random();
+
+		final PlayerAvatarOuterClass.PlayerAvatar.Builder playerAvatarBuilder =
+				PlayerAvatarOuterClass.PlayerAvatar.newBuilder();
+		final boolean female = random.nextInt(100) % 2 == 0;
+		if (female) {
+			playerAvatarBuilder.setGender(Gender.FEMALE);
+		}
+
+		playerAvatarBuilder.setSkin(random.nextInt(PlayerAvatar.getAvailableSkins()))
+				.setHair(random.nextInt(PlayerAvatar.getAvailableHair()))
+				.setEyes(random.nextInt(PlayerAvatar.getAvailableEyes()))
+				.setHat(random.nextInt(PlayerAvatar.getAvailableHats()))
+				.setShirt(random.nextInt(PlayerAvatar.getAvailableShirts(female ? Gender.FEMALE : Gender.MALE)))
+				.setPants(random.nextInt(PlayerAvatar.getAvailablePants(female ? Gender.FEMALE : Gender.MALE)))
+				.setShoes(random.nextInt(PlayerAvatar.getAvailableShoes()))
+				.setBackpack(random.nextInt(PlayerAvatar.getAvailableShoes()));
+
+		final SetAvatarMessage setAvatarMessage = SetAvatarMessage.newBuilder()
+				.setPlayerAvatar(playerAvatarBuilder.build())
+				.build();
+		final GetInventoryMessage getInventoryReq = GetInventoryMessage.newBuilder()
 				.setLastTimestampMs(api.getInventories().getLastInventoryUpdate())
 				.build();
-		final DownloadSettingsMessageOuterClass.DownloadSettingsMessage downloadSettingsReq = DownloadSettingsMessageOuterClass.DownloadSettingsMessage
+		final DownloadSettingsMessage downloadSettingsReq = DownloadSettingsMessage.newBuilder()
+				.setHash(api.getSettings().getHash())
+				.build();
+
+		ServerRequest[] requests = new ServerRequest[5];
+		requests[0] = new ServerRequest(RequestType.SET_AVATAR, setAvatarMessage);
+		requests[1] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_HATCHED_EGGS,
+				GetHatchedEggsMessage.getDefaultInstance());
+		requests[2] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY,
+				getInventoryReq);
+		requests[3] = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES,
+				CheckAwardedBadgesMessage.getDefaultInstance());
+		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS, downloadSettingsReq);
+
+		api.getRequestHandler().sendServerRequests(requests);
+
+		try {
+			SetAvatarResponse setAvatarResponse = SetAvatarResponse.parseFrom(requests[0].getData());
+			playerData = setAvatarResponse.getPlayerData();
+
+			updateProfile(playerData);
+
+			api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
+			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
+
+		markTutorial(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION);
+
+		api.fireRequestBlockTwo();
+	}
+
+	private void markTutorial(TutorialStateOuterClass.TutorialState state) throws LoginFailedException, RemoteServerException {
+		final MarkTutorialCompleteMessage tutorialMessage = MarkTutorialCompleteMessage.newBuilder()
+				.addTutorialsCompleted(state)
+				.setSendMarketingEmails(false)
+				.setSendPushNotifications(false).build();
+		final GetInventoryMessage getInventoryReq = GetInventoryMessage.newBuilder()
+				.setLastTimestampMs(api.getInventories().getLastInventoryUpdate())
+				.build();
+		final DownloadSettingsMessage downloadSettingsReq = DownloadSettingsMessage
 				.newBuilder().setHash(api.getSettings().getHash()).build();
 
 		ServerRequest[] requests = new ServerRequest[5];
 		requests[0] = new ServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialMessage);
 		requests[1] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_HATCHED_EGGS,
-				GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage.getDefaultInstance());
+				GetHatchedEggsMessage.getDefaultInstance());
 		requests[2] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY,
 				getInventoryReq);
 		requests[3] = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES,
@@ -321,8 +412,8 @@ public class PlayerProfile {
 			playerData = MarkTutorialCompleteResponse.parseFrom(requests[0].getData()).getPlayerData();
 			tutorialState.addTutorialStates(playerData.getTutorialStateList());
 
-			api.getInventories().updateInventories(GetInventoryResponseOuterClass.GetInventoryResponse.parseFrom(requests[2].getData()));
-			api.getSettings().updateSettings(DownloadSettingsResponseOuterClass.DownloadSettingsResponse.parseFrom(requests[4].getData()));
+			api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
+			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}

@@ -168,6 +168,29 @@ public class PokemonGo {
 	}
 
 	private void initialize() throws RemoteServerException, LoginFailedException {
+		fireRequestBlockOne();
+
+		fireRequestBlockTwo();
+
+		// Check if we are allowed to receive valid responses
+		if (playerProfile.getTutorialState().getTutorialStates().isEmpty()) {
+			playerProfile.activateAccount();
+		}
+
+		// We are going to set this a-side instead of inside the previous check for
+		// backward compatibility
+		if (!playerProfile.getAvatar().isAvatarCreated()) {
+			playerProfile.initializeAccount();
+		}
+	}
+
+	/**
+	 * First requests block
+	 *
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+     */
+	public void fireRequestBlockOne() throws RemoteServerException, LoginFailedException {
 		ServerRequest[] requests = new ServerRequest[5];
 		final DownloadRemoteConfigVersionMessage downloadRemoteConfigReq = DownloadRemoteConfigVersionMessage
 				.newBuilder()
@@ -187,8 +210,16 @@ public class PokemonGo {
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException();
 		}
+	}
 
-
+	/**
+	 * Second request block
+	 *
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+     */
+	public void fireRequestBlockTwo() throws RemoteServerException, LoginFailedException {
+		ServerRequest[] requests = new ServerRequest[5];
 		final GetAssetDigestMessage getAssetDigestReq = GetAssetDigestMessage.newBuilder()
 				.setPlatform(PlatformOuterClass.Platform.IOS)
 				.setAppVersion(Constant.APP_VERSION)
@@ -214,11 +245,6 @@ public class PokemonGo {
 			settings.updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException();
-		}
-
-		// Check if we are allowed to receive valid responses
-		if (playerProfile.getTutorialState().getTutorialStates().isEmpty()) {
-			playerProfile.activateAccount();
 		}
 	}
 
