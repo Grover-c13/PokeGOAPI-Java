@@ -119,6 +119,8 @@ public class Inventories {
 
 	/**
 	 * Updates the inventories with the latest data.
+	 *
+	 * @param response the get inventory response
 	 */
 	public void updateInventories(GetInventoryResponse response) {
 		for (InventoryItemOuterClass.InventoryItem inventoryItem
