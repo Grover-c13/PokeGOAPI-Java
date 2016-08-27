@@ -30,30 +30,30 @@ import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass;
 
 public class CommonRequest {
 
-    public static DownloadRemoteConfigVersionMessage getDownloadRemoteConfigVersionMessageRequest() {
-        return DownloadRemoteConfigVersionMessage
-                .newBuilder()
-                .setPlatform(PlatformOuterClass.Platform.IOS)
-                .setAppVersion(Constant.APP_VERSION)
-                .build();
-    }
+	public static DownloadRemoteConfigVersionMessage getDownloadRemoteConfigVersionMessageRequest() {
+		return DownloadRemoteConfigVersionMessage
+				.newBuilder()
+				.setPlatform(PlatformOuterClass.Platform.IOS)
+				.setAppVersion(Constant.APP_VERSION)
+				.build();
+	}
 
-    public static GetAssetDigestMessage getGetAssetDigestMessageRequest() {
-        return GetAssetDigestMessage.newBuilder()
-                .setPlatform(PlatformOuterClass.Platform.IOS)
-                .setAppVersion(Constant.APP_VERSION)
-                .build();
-    }
+	public static GetAssetDigestMessage getGetAssetDigestMessageRequest() {
+		return GetAssetDigestMessage.newBuilder()
+				.setPlatform(PlatformOuterClass.Platform.IOS)
+				.setAppVersion(Constant.APP_VERSION)
+				.build();
+	}
 
-    public static DownloadSettingsMessage getDownloadSettingsMessageRequest(PokemonGo api) {
-        return DownloadSettingsMessage.newBuilder()
-                .setHash(api.getSettings().getHash())
-                .build();
-    }
+	public static DownloadSettingsMessage getDownloadSettingsMessageRequest(PokemonGo api) {
+		return DownloadSettingsMessage.newBuilder()
+				.setHash(api.getSettings().getHash())
+				.build();
+	}
 
-    public static GetInventoryMessageOuterClass.GetInventoryMessage getDefaultGetInventoryMessage(PokemonGo api) {
-        return GetInventoryMessageOuterClass.GetInventoryMessage.newBuilder()
-                .setLastTimestampMs(api.getInventories().getLastInventoryUpdate())
-                .build();
-    }
+	public static GetInventoryMessageOuterClass.GetInventoryMessage getDefaultGetInventoryMessage(PokemonGo api) {
+		return GetInventoryMessageOuterClass.GetInventoryMessage.newBuilder()
+				.setLastTimestampMs(api.getInventories().getLastInventoryUpdate())
+				.build();
+	}
 }

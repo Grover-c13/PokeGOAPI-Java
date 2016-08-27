@@ -402,7 +402,8 @@ public class PlayerProfile {
 
 	}
 
-	private void markTutorial(TutorialStateOuterClass.TutorialState state) throws LoginFailedException, RemoteServerException {
+	private void markTutorial(TutorialStateOuterClass.TutorialState state)
+				throws LoginFailedException, RemoteServerException {
 		final MarkTutorialCompleteMessage tutorialMessage = MarkTutorialCompleteMessage.newBuilder()
 				.addTutorialsCompleted(state)
 				.setSendMarketingEmails(false)

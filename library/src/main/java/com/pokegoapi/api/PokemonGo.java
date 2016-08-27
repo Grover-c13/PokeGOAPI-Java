@@ -179,13 +179,13 @@ public class PokemonGo {
 			playerProfile.activateAccount();
 		}
 
-		if (!playerProfile.getTutorialState().getTutorialStates().
-				contains(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION)) {
+		if (!playerProfile.getTutorialState().getTutorialStates()
+				.contains(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION)) {
 			playerProfile.setupAvatar();
 		}
 
-		if (!playerProfile.getTutorialState().getTutorialStates().
-				contains(TutorialStateOuterClass.TutorialState.POKEMON_CAPTURE)) {
+		if (!playerProfile.getTutorialState().getTutorialStates()
+				.contains(TutorialStateOuterClass.TutorialState.POKEMON_CAPTURE)) {
 			playerProfile.encounterTutorialComplete();
 		}
 	}
