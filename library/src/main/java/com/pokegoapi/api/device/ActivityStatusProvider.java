@@ -25,7 +25,7 @@ public interface ActivityStatusProvider {
 
 	@Data
 	class Status {
-		enum Activity {
+		public enum Activity {
 			AUTOMOTIVE, CYCLING, RUNNING, STATIONARY, WALKING;
 		}
 		private final Activity activity;
