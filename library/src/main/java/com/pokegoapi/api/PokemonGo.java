@@ -17,6 +17,7 @@ package com.pokegoapi.api;
 
 import POGOProtos.Enums.PlatformOuterClass;
 import POGOProtos.Enums.PlatformOuterClass.Platform;
+import POGOProtos.Enums.TutorialStateOuterClass;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.GetAssetDigestMessage;
@@ -179,7 +180,8 @@ public class PokemonGo {
 
 		// We are going to set this a-side instead of inside the previous check for
 		// backward compatibility
-		if (!playerProfile.getAvatar().isAvatarCreated()) {
+		if (!playerProfile.getTutorialState().getTutorialStates().
+				contains(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION)) {
 			playerProfile.initializeAccount();
 		}
 	}

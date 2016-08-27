@@ -67,21 +67,6 @@ public class PlayerAvatar {
 		return avatar.getBackpack();
 	}
 
-	/**
-	 * Check if the avatar has been created on the current account
-	 * @return true, if we have an avatar
-     */
-	public boolean isAvatarCreated() {
-		return getSkin() != 0
-				|| getHair() != 0
-				|| getShirt() != 0
-				|| getPants() != 0
-				|| getHat() != 0
-				|| getShoes() != 0
-				|| getBackpack() != 0
-				|| getEyes() != 0;
-	}
-
 	public static int getAvailableSkins() {
 		return 4;
 	}
