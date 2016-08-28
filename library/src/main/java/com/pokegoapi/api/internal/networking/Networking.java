@@ -162,7 +162,7 @@ public final class Networking {
 		RequestEnvelope.Builder remoteConfigRequest = buildRequestEnvelope(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION, DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage
 				.newBuilder()
 				.setPlatform(PlatformOuterClass.Platform.ANDROID)
-				.setAppVersion(3300)
+				.setAppVersion(VERSION)
 				.build());
 		response = requestScheduler.queueRequest(remoteConfigRequest.build()).toBlocking().first();
 		try {
@@ -222,7 +222,7 @@ public final class Networking {
 
 		sleep(300);
 		// Initial map request
-		List<Long> cellIds = com.pokegoapi.api.map.Map.getCellIds(location.getLatitude(), location.getLongitude(), com.pokegoapi.api.map.Map.CELL_WIDTH);
+		List<Long> cellIds = com.pokegoapi.api.map.Map.getCellIds(location.getLatitude(), location.getLongitude());
 		GetMapObjectsMessage.Builder builder = GetMapObjectsMessage.newBuilder();
 		builder.addAllCellId(cellIds);
 		builder.addAllSinceTimestampMs(Arrays.asList(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L));

@@ -39,11 +39,13 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 public class Map implements Runnable {
-	public static final int CELL_WIDTH = 3;
+	public static final int CELL_WIDTH = 4;
 	private final ExecutorService executorService;
 	private final MapSettings mapSettings;
 	private final MapObjects mapObjects;
@@ -146,10 +148,8 @@ public class Map implements Runnable {
 					.setLatitude(location.getLatitude())
 					.setLongitude(location.getLongitude());
 
-			for (long cellId : getCellIds(location.getLatitude(), location.getLongitude(), CELL_WIDTH)) {
+			for (long cellId : getCellIds(location.getLatitude(), location.getLongitude())) {
 				builder.addCellId(cellId);
-			}
-			for (int i=0;i!=20;i++) {
 				builder.addSinceTimestampMs(0L);
 			}
 
@@ -177,10 +177,9 @@ public class Map implements Runnable {
 	 *
 	 * @param latitude  latitude
 	 * @param longitude longitude
-	 * @param width     width
 	 * @return List of Cells
 	 */
-	public static List<Long> getCellIds(double latitude, double longitude, int width) {
+	public static List<Long> getCellIds(double latitude, double longitude) {
 		S2LatLng latLng = S2LatLng.fromDegrees(latitude, longitude);
 		S2CellId cellId = S2CellId.fromLatLng(latLng).parent(15);
 
@@ -194,13 +193,16 @@ public class Map implements Runnable {
 
 		List<Long> cells = new ArrayList<>();
 
-		int halfWidth = (int) Math.floor(width / 2);
+		int halfHeight = 2;
+		int halfWidth = 2;
 		for (int x = -halfWidth; x <= halfWidth; x++) {
-			for (int y = -halfWidth; y <= halfWidth; y++) {
+			for (int y = -halfHeight; y <= halfHeight; y++) {
 				cells.add(S2CellId.fromFaceIJ(face, index.intValue() + x * size, jindex.intValue() + y * size).parent(15).id());
 			}
 		}
-		return cells;
+		List<Long> cellIdsToSort = cells.subList(1, Math.min(20, cells.size()));
+		Collections.sort(cellIdsToSort);
+		return cellIdsToSort;
 	}
 
 	/**
