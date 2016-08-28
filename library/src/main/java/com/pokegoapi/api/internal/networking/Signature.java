@@ -9,6 +9,7 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.TextFormat;
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.LocationFixes;
@@ -91,6 +92,7 @@ public class Signature {
 			byte[] request = serverRequest.toByteArray();
 			sigBuilder.addRequestHash(getRequestHash(authTicketBA, request));
 		}
+		System.out.println(TextFormat.printToString(sigBuilder));
 
 		// TODO: Call encrypt function on this
 		byte[] uk2 = sigBuilder.build().toByteArray();

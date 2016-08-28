@@ -31,21 +31,21 @@ public interface DeviceInfoProvider {
 		 *
 		 * @return android board name, for example: "angler"
 		 */
-		private String androidBoardName;
+		private String androidBoardName = "";
 
 		/**
 		 * adb.exe shell getprop ro.boot.bootloader
 		 *
 		 * @return android bootloader, for example: "angler-03.58"
 		 */
-		private String androidBootloader;
+		private String androidBootloader = "";
 
 		/**
 		 * adb.exe shell getprop ro.product.brand
 		 *
 		 * @return device brand, for example: "google"
 		 */
-		private String deviceBrand;
+		private String deviceBrand = "";
 
 		/**
 		 *  adb.exe shell settings get secure android_id
@@ -53,69 +53,69 @@ public interface DeviceInfoProvider {
 		 *
 		 * @return device id, for example: "****************"
 		 */
-		private String deviceId;
+		private String deviceId = "";
 
 		/**
 		 *  adb.exe shell getprop ro.product.model
 		 *
 		 * @return device model, for example: "Nexus 6P"
 		 */
-		private String deviceModel;
+		private String deviceModel = "";
 
 		/**
 		 *  adb.exe shell getprop ro.product.name
 		 *
 		 * @return device model identifier, for example: "angler"
 		 */
-		private String deviceModelIdentifier;
+		private String deviceModelIdentifier = "";
 
 		/**
 		 *  Always qcom
 		 *
 		 * @return device boot model, for example: "qcom"
 		 */
-		private String deviceModelBoot;
+		private String deviceModelBoot = "";
 
 		/**
 		 *  adb.exe shell getprop ro.product.manufacturer
 		 *
 		 * @return hardware manufacturer, for example: "Huawei"
 		 */
-		private String hardwareManufacturer;
+		private String hardwareManufacturer = "";
 
 		/**
 		 *  adb.exe shell getprop ro.product.model
 		 *
 		 * @return hardware model, for example: "Nexus 6P"
 		 */
-		private String hardwareModel;
+		private String hardwareModel = "";
 
 		/**
 		 *  adb.exe shell getprop ro.product.name
 		 *
 		 * @return firmware brand, for example: "angler"
 		 */
-		private String firmwareBrand;
+		private String firmwareBrand = "";
 
 		/**
 		 *  adb.exe shell getprop ro.build.tags
 		 *
 		 * @return firmware tags, for example: "release-keys"
 		 */
-		private String firmwareTags;
+		private String firmwareTags = "";
 
 		/**
 		 *  adb.exe shell getprop ro.build.type
 		 *
 		 * @return firmware type, for example: "user"
 		 */
-		private String firmwareType;
+		private String firmwareType = "";
 
 		/**
 		 *  adb.exe shell getprop ro.build.fingerprint
 		 *
 		 * @return firmware fingerprint, for example: "google/angler/angler:7.0/NPD90G/3051502:user/release-keys"
 		 */
-		private String firmwareFingerprint;
+		private String firmwareFingerprint = "";
 	}
 }
