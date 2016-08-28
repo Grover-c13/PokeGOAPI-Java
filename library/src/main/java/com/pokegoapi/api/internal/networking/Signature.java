@@ -68,7 +68,7 @@ public class Signature {
 			public boolean test(RequestOuterClass.Request value) {
 				return value.getRequestType() == RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS;
 			}
-		}).count() > 1;
+		}).count() >= 1;
 
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
 				.setLocationHash1(getLocationHash1(authTicketBA))
@@ -81,16 +81,18 @@ public class Signature {
 				.addAllLocationFix(locationFixes.getLocationFixes(location, getMapRequest))
 				.setUnknown25(7363665268261373700L);
 
-		SignatureOuterClass.Signature.SensorInfo sensorInfo = this.sensorInfo.getSensorInfo();
+/*		SignatureOuterClass.Signature.SensorInfo sensorInfo = this.sensorInfo.getSensorInfo();
 		if (sensorInfo != null) {
 			sigBuilder.setSensorInfo(sensorInfo);
-		}
+		}*/
 
 		for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
 			byte[] request = serverRequest.toByteArray();
 			sigBuilder.addRequestHash(getRequestHash(authTicketBA, request));
 		}
-		System.out.println(TextFormat.printToString(sigBuilder));
+		if (getMapRequest) {
+			System.out.println(TextFormat.printToString(sigBuilder));
+		}
 
 		// TODO: Call encrypt function on this
 		byte[] uk2 = sigBuilder.build().toByteArray();
