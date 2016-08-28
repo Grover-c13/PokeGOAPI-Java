@@ -94,13 +94,7 @@ public class Map {
 	 */
 	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync() {
 
-		if (!useCache()) {
-			// getMapObjects wont be called unless this is null
-			// so need to force it if due for a refresh
-			cachedCatchable.clear();
-		}
-
-		if (cachedCatchable.size() > 0) {
+		if (useCache() && cachedCatchable.size() > 0) {
 			return Observable.just(cachedCatchable);
 		}
 
@@ -338,7 +332,7 @@ public class Map {
 	 */
 	public Observable<MapObjects> getMapObjectsAsync(List<Long> cellIds) {
 
-		if (useCache()) {
+		if (useCache() && cachedCatchable.size() > 0) {
 			return Observable.just(cachedMapObjects);
 		}
 
