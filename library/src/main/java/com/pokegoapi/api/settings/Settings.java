@@ -111,11 +111,21 @@ public class Settings {
 	 * @param response the settings download response
 	 */
 	public void updateSettings(DownloadSettingsResponse response) {
-		mapSettings.update(response.getSettings().getMapSettings());
-		levelUpSettings.update(response.getSettings().getInventorySettings());
-		fortSettings.update(response.getSettings().getFortSettings());
-		inventorySettings.update(response.getSettings().getInventorySettings());
-		gpsSettings.update(response.getSettings().getGpsSettings());
+		if (response.getSettings().hasMapSettings()) {
+			mapSettings.update(response.getSettings().getMapSettings());
+		}
+		if (response.getSettings().hasLevelSettings()) {
+			levelUpSettings.update(response.getSettings().getInventorySettings());
+		}
+		if (response.getSettings().hasFortSettings()) {
+			fortSettings.update(response.getSettings().getFortSettings());
+		}
+		if (response.getSettings().hasInventorySettings()) {
+			inventorySettings.update(response.getSettings().getInventorySettings());
+		}
+		if (response.getSettings().hasGpsSettings()) {
+			gpsSettings.update(response.getSettings().getGpsSettings());
+		}
 		this.hash = response.getHash();
 	}
 }
