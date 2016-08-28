@@ -77,6 +77,7 @@ public final class Networking {
 	private final Signature signature;
 	private final Locale locale;
 	private Long lastInventoryCheck = null;
+	private AuthInfo authInfo;
 
 	public static Networking getInstance(URL initialServer, ExecutorService executorService, OkHttpClient client, Location location, DeviceInfo deviceInfo,
 										 SensorInfo sensorInfo, ActivityStatus activityStatus, LocationFixes locationFixes, Callback callback, Locale locale) {
@@ -103,6 +104,7 @@ public final class Networking {
 	}
 
 	public BootstrapResult bootstrap(AuthInfo authInfo) {
+		this.authInfo = authInfo;
 		long requestId = Math.abs(random.nextLong());
 		// First call to niantic is GET_PLAYER. This call will return the URL to use for future requests
 		// Also the auth ticket is returned
@@ -340,10 +342,8 @@ public final class Networking {
 					.addRequests(wrap(requestType, message))
 					.setLatitude(location.getLatitude())
 					.setLongitude(location.getLongitude())
-					.setAltitude(location.getAltitude())
-					.setAuthTicket(requestScheduler.getAuthTicket())
+//					.setAltitude(location.getAltitude())
 					.setMsSinceLastLocationfix(getUnknown12());
-			System.out.println(TextFormat.printToString(request));
 		}
 		else {
 			request = RequestEnvelope.newBuilder()
@@ -358,8 +358,18 @@ public final class Networking {
 					.setLatitude(location.getLatitude())
 					.setLongitude(location.getLongitude())
 					.setAltitude(location.getAltitude())
-					.setAuthTicket(requestScheduler.getAuthTicket())
 					.setMsSinceLastLocationfix(getUnknown12());
+		}
+		//builder.setAuthInfo(api.getAuthInfo());
+		if (requestScheduler.getAuthTicket() != null
+				&& requestScheduler.getAuthTicket().getExpireTimestampMs() > 0
+				&& requestScheduler.getAuthTicket().getExpireTimestampMs() > System.currentTimeMillis()) {
+			request.setAuthTicket(requestScheduler.getAuthTicket());
+		} else {
+			request.setAuthInfo(authInfo);
+		}
+		if (requestType == RequestType.GET_MAP_OBJECTS) {
+			System.out.println(TextFormat.printToString(request));
 		}
 		signature.setSignature(request);
 		return request;
