@@ -198,7 +198,7 @@ public class PokemonGo {
 	 *
 	 * @throws LoginFailedException  When login fails
 	 * @throws RemoteServerException When server fails
-     */
+	 */
 	private void fireRequestBlockOne() throws RemoteServerException, LoginFailedException {
 		ServerRequest[] requests = CommonRequest.fillRequest(new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
 				CommonRequest.getDownloadRemoteConfigVersionMessageRequest()), this);
@@ -217,7 +217,7 @@ public class PokemonGo {
 	 *
 	 * @throws LoginFailedException  When login fails
 	 * @throws RemoteServerException When server fails
-     */
+	 */
 	public void fireRequestBlockTwo() throws RemoteServerException, LoginFailedException {
 		ServerRequest[] requests = CommonRequest.fillRequest(
 				new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,

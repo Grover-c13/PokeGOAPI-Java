@@ -113,7 +113,7 @@ public class PlayerProfile {
 	 * Update the profile with the given response
 	 *
 	 * @param playerResponse the response
-     */
+	 */
 	public void updateProfile(GetPlayerResponse playerResponse) {
 		updateProfile(playerResponse.getPlayerData());
 	}
@@ -122,7 +122,7 @@ public class PlayerProfile {
 	 * Update the profile with the given player data
 	 *
 	 * @param playerData the data for update
-     */
+	 */
 	public void updateProfile(PlayerData playerData) {
 		this.playerData = playerData;
 
@@ -201,7 +201,6 @@ public class PlayerProfile {
 	 * @throws LoginFailedException  when the auth is invalid
 	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-
 	public void checkAndEquipBadges() throws LoginFailedException, RemoteServerException {
 		CheckAwardedBadgesMessage msg = CheckAwardedBadgesMessage.newBuilder().build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.CHECK_AWARDED_BADGES, msg);
