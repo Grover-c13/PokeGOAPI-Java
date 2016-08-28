@@ -64,7 +64,7 @@ public class Signature {
 		Unknown6OuterClass.Unknown6 uk6 = Unknown6OuterClass.Unknown6.newBuilder()
 				.setRequestType(6)
 				.setUnknown2(Unknown2.newBuilder().setEncryptedSignature(ByteString.copyFrom(encrypted))).build();
-		builder.setUnknown6(uk6);
+		builder.addUnknown6(uk6);
 	}
 
 	private static byte[] getBytes(double input) {
