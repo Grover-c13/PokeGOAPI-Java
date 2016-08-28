@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -31,11 +32,12 @@ public class LocationFixes  {
 				return locationFixBuilder.setProvider("fused")
 						.setAltitude(locationFix.getAltitude())
 						.setHorizontalAccuracy(locationFix.getHorizontalAccuracy())
-						.setVerticalAccuracy(locationFix.getVerticalAccurary())
+						.setVerticalAccuracy(locationFix.getVerticalAccuracy())
 						.setLatitude(locationFix.getLatitude())
 						.setLongitude(locationFix.getLongitude())
 						.setLocationType(locationFix.getLocationType())
 						.setTimestampSnapshot(locationFix.getTimestampSnapshot())
+						.setProviderStatus(3)
 						.build();
 			}
 		}).collect(Collectors.<SignatureOuterClass.Signature.LocationFix>toList());
@@ -55,49 +57,80 @@ public class LocationFixes  {
 	private static class DefaultLocationFixProvider implements LocationFixProvider {
 		private final long startTime = System.currentTimeMillis();
 		private final Random random;
+		private long previousTimestamp;
+		private List<LocationFix> previousLocationFixes;
 
 		@Override
-		public Collection<LocationFix> getLocationFixes(final double latitude, final double longitude,
-														final double altitude, boolean getMapObjectRequest) {
+		public Collection<LocationFix> getLocationFixes(final double lat, final double lng,
+														final double alt, boolean getMapObjectRequest) {
+			long currentTime = System.currentTimeMillis();
 			int pn = random.nextInt(100);
+			int providerCount;
+			int[] negativeSnapshotProviders = new int[0];
+			List<LocationFix> locationFixes = new LinkedList<>();
 			int chance = random.nextInt(100);
-			int providerCount = pn < 75 ? 6 : pn < 95 ? 5 : 8;
-			int[] negativeSnapshotProviders;
-			if (providerCount != 8) {
-				// a 5% chance that the second provider got a negative value else it should be the first only
-				negativeSnapshotProviders = new int[1];
-				negativeSnapshotProviders[0] = chance < 95 ? 0 : 1;
+			if (previousLocationFixes == null) {
+				previousLocationFixes = locationFixes;
+				providerCount = pn < 75 ? 6 : pn < 95 ? 5 : 8;
+				if (providerCount != 8) {
+					// a 5% chance that the second provider got a negative value else it should be the first only
+					negativeSnapshotProviders = new int[1];
+					negativeSnapshotProviders[0] = chance < 95 ? 0 : 1;
+				} else {
+					negativeSnapshotProviders = new int[chance >= 50 ? 3 : 2];
+					negativeSnapshotProviders[0] = 0;
+					negativeSnapshotProviders[1] = 1;
+					if (chance >= 50) {
+						negativeSnapshotProviders[2] = 2;
+					}
+				}
 			} else {
-				negativeSnapshotProviders = new int[chance >= 50 ? 3 : 2];
-				negativeSnapshotProviders[0] = 0;
-				negativeSnapshotProviders[1] = 1;
-				if (chance >= 50) {
-					negativeSnapshotProviders[2] = 2;
+				locationFixes = previousLocationFixes;
+				locationFixes.clear();
+
+				if (!getMapObjectRequest && (currentTime - previousTimestamp < (random.nextInt(10 * 1000) + 5000))) {
+					previousTimestamp = currentTime;
+					return locationFixes;
+				} else if (getMapObjectRequest) {
+					providerCount = chance >= 90 ? 2 : 1;
+				} else {
+					providerCount = pn < 60 ? 1 : pn < 90 ? 2 : 3;
 				}
 			}
-			List<LocationFix> locationFixes = new ArrayList<>(providerCount);
+
+//			locationFixes.setTimestampCreate(api.currentTimeMillis());
+
 			for (int i = 0; i < providerCount; i++) {
-				float latitudef = offsetOnLatLong(latitude, random.nextInt(100) + 10);
-				float longitudef = offsetOnLatLong(longitude, random.nextInt(100) + 10);
-				float altitudef = 65;
+				float latitude = offsetOnLatLong(lat, random.nextInt(100) + 10);
+				float longitude = offsetOnLatLong(lng, random.nextInt(100) + 10);
+				float altitude = 65;
 				float verticalAccuracy = (float) (15 + (23 - 15) * random.nextDouble());
 
 				// Fake errors
-				if (getMapObjectRequest) {
+				if (!getMapObjectRequest) {
 					if (random.nextInt(100) > 90) {
-						latitudef = 360;
-						longitudef = -360;
+						latitude = 360;
+						longitude = -360;
 					}
 					if (random.nextInt(100) > 90) {
-						altitudef = (float) (66 + (160 - 66) * random.nextDouble());
+						altitude = (float) (66 + (160 - 66) * random.nextDouble());
 					}
 				}
-				long timestampSnapshot = contains(negativeSnapshotProviders, i)
-						? random.nextInt(1000) - 3000
-						: System.currentTimeMillis() - startTime
-						+ (150 * (i + 1) + random.nextInt(250 * (i + 1) - (150 * (i + 1))));
-				locationFixes.add(new LocationFixProvider.LocationFix(
-						timestampSnapshot, latitudef, longitudef, altitudef, -1, verticalAccuracy, 3, 1));
+
+				LocationFix locationFix = new LocationFix();
+				locationFix.setTimestampSnapshot(
+								contains(negativeSnapshotProviders, i)
+										? random.nextInt(1000) - 3000
+										: currentTime - startTime
+										+ (150 * (i + 1) + random.nextInt(250 * (i + 1) - (150 * (i + 1)))));
+				locationFix.setLatitude(latitude);
+				locationFix.setLongitude(longitude);
+				locationFix.setHorizontalAccuracy(-1);
+				locationFix.setAltitude(altitude);
+				locationFix.setVerticalAccuracy(verticalAccuracy);
+				locationFix.setProviderStatus(3);
+				locationFix.setLocationType(1);
+				locationFixes.add(locationFix);
 			}
 			return locationFixes;
 		}

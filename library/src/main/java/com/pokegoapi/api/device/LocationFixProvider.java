@@ -1,7 +1,8 @@
 package com.pokegoapi.api.device;
 
-import com.pokegoapi.api.internal.Location;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Collection;
 
@@ -12,14 +13,16 @@ public interface LocationFixProvider {
 	Collection<LocationFix> getLocationFixes(double latitude, double longitude, double altitude, boolean getMapObjectRequest);
 
 	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
 	class LocationFix {
-		private final long timestampSnapshot;
-		private final float latitude;
-		private final float longitude;
-		private final float altitude;
-		private final int horizontalAccuracy;
-		private final float verticalAccurary;
-		private final int providerStatus;
-		private final int locationType;
+		private long timestampSnapshot;
+		private float latitude;
+		private float longitude;
+		private float altitude;
+		private int horizontalAccuracy;
+		private float verticalAccuracy;
+		private int providerStatus;
+		private int locationType;
 	}
 }
