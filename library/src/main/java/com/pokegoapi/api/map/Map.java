@@ -33,6 +33,7 @@ import com.pokegoapi.google.common.geometry.MutableInteger;
 import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.MapUtil;
@@ -60,9 +61,11 @@ import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
 import rx.Observable;
 import rx.functions.Func1;
@@ -350,7 +353,7 @@ public class Map {
 
 		final AsyncServerRequest asyncServerRequest = new AsyncServerRequest(
 				RequestType.GET_MAP_OBJECTS, builder.build());
-		return api.getRequestHandler()
+		Observable<MapObjects> mapObjects = api.getRequestHandler()
 				.sendAsyncServerRequests(asyncServerRequest).map(new Func1<ByteString, MapObjects>() {
 					@Override
 					public MapObjects call(ByteString byteString) {
@@ -385,6 +388,25 @@ public class Map {
 						return result;
 					}
 				});
+
+		ServerRequest[] requests = CommonRequest.commonRequests(api);
+
+		try {
+			api.getRequestHandler().sendServerRequests(requests);
+		} catch (RemoteServerException e) {
+			throw new AsyncRemoteServerException(e);
+		} catch (LoginFailedException e) {
+			throw new AsyncRemoteServerException(e);
+		}
+
+		try {
+			api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[1].getData()));
+			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[3].getData()));
+		} catch (InvalidProtocolBufferException e) {
+			throw new AsyncRemoteServerException(e);
+		}
+
+		return mapObjects;
 	}
 
 	/**
@@ -684,7 +706,6 @@ public class Map {
 
 	/**
 	 * Clear map objects cache
-	 *
 	 */
 	public void clearCache() {
 		cachedCatchable.clear();
@@ -695,7 +716,7 @@ public class Map {
 		cachedMapObjects.getSpawnPoints().clear();
 	}
 
-	private List<Long> getDefaultCells() {
+	public List<Long> getDefaultCells() {
 		return getCellIds(api.getLatitude(), api.getLongitude(), cellWidth);
 	}
 }
