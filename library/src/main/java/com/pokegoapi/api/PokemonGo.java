@@ -15,18 +15,11 @@
 
 package com.pokegoapi.api;
 
-import POGOProtos.Enums.PlatformOuterClass;
-import POGOProtos.Enums.PlatformOuterClass.Platform;
+import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
-import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.GetAssetDigestMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
-import POGOProtos.Networking.Requests.Messages.DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage;
-import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass.DownloadSettingsMessage;
-import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
-import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 
@@ -42,9 +35,9 @@ import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.Constant;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 
@@ -52,6 +45,7 @@ import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
 
@@ -68,6 +62,7 @@ public class PokemonGo {
 	RequestHandler requestHandler;
 	@Getter
 	private PlayerProfile playerProfile;
+	@Getter
 	private Inventories inventories;
 	@Getter
 	private double latitude;
@@ -166,18 +161,48 @@ public class PokemonGo {
 	}
 
 	private void initialize() throws RemoteServerException, LoginFailedException {
-		ServerRequest[] requests = new ServerRequest[5];
-		final DownloadRemoteConfigVersionMessage downloadRemoteConfigReq = DownloadRemoteConfigVersionMessage
-				.newBuilder()
-				.setPlatform(Platform.IOS)
-				.setAppVersion(Constant.APP_VERSION)
-				.build();
+		fireRequestBlockOne();
 
-		requests[0] = new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION, downloadRemoteConfigReq);
-		requests[1] = new ServerRequest(RequestType.GET_HATCHED_EGGS, GetHatchedEggsMessage.getDefaultInstance());
-		requests[2] = new ServerRequest(RequestType.GET_INVENTORY, GetInventoryMessage.getDefaultInstance());
-		requests[3] = new ServerRequest(RequestType.CHECK_AWARDED_BADGES, CheckAwardedBadgesMessage.getDefaultInstance());
-		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS, DownloadSettingsMessage.getDefaultInstance());
+		fireRequestBlockTwo();
+
+		// From now one we will start to check our accounts is ready to fire requests.
+		// Actually, we can receive valid responses even with this first check,
+		// that mark the tutorial state into LEGAL_SCREEN.
+		// Following, we are going to check if the account binded to this session
+		// have an avatar, a nickname, and all the other things that are usually filled
+		// on the official client BEFORE sending any requests such as the getMapObject etc.
+		ArrayList<TutorialState> tutorialStates = playerProfile.getTutorialState().getTutorialStates();
+		if (tutorialStates.isEmpty()) {
+			playerProfile.activateAccount();
+		}
+
+		if (!tutorialStates.contains(TutorialState.AVATAR_SELECTION)) {
+			playerProfile.setupAvatar();
+		}
+
+		if (!tutorialStates.contains(TutorialState.POKEMON_CAPTURE)) {
+			playerProfile.encounterTutorialComplete();
+		}
+
+		if (!tutorialStates.contains(TutorialState.NAME_SELECTION)) {
+			playerProfile.claimCodeName();
+		}
+
+		if (!tutorialStates.contains(TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
+			playerProfile.firstTimeExperienceComplete();
+		}
+	}
+
+	/**
+	 * First requests block. Private since we will use this only at initialization!
+	 *
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+	 */
+	private void fireRequestBlockOne() throws RemoteServerException, LoginFailedException {
+		ServerRequest[] requests = CommonRequest.fillRequest(new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
+				CommonRequest.getDownloadRemoteConfigVersionMessageRequest()), this);
+
 		getRequestHandler().sendServerRequests(requests);
 		try {
 			inventories.updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
@@ -185,27 +210,19 @@ public class PokemonGo {
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException();
 		}
+	}
 
+	/**
+	 * Second requests block. Public since it could be re-fired at any time
+	 *
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+	 */
+	public void fireRequestBlockTwo() throws RemoteServerException, LoginFailedException {
+		ServerRequest[] requests = CommonRequest.fillRequest(
+				new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
+				CommonRequest.getGetAssetDigestMessageRequest()), this);
 
-		final GetAssetDigestMessage getAssetDigestReq = GetAssetDigestMessage.newBuilder()
-				.setPlatform(PlatformOuterClass.Platform.IOS)
-				.setAppVersion(Constant.APP_VERSION)
-				.build();
-		final GetInventoryMessage getInventoryReq = GetInventoryMessage.newBuilder()
-				.setLastTimestampMs(inventories.getLastInventoryUpdate())
-				.build();
-		final DownloadSettingsMessage downloadSettingsReq = DownloadSettingsMessage
-				.newBuilder().setHash(settings.getHash()).build();
-
-		requests[0] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
-				getAssetDigestReq);
-		requests[1] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_HATCHED_EGGS,
-				GetHatchedEggsMessage.getDefaultInstance());
-		requests[2] = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY,
-				getInventoryReq);
-		requests[3] = new ServerRequest(RequestTypeOuterClass.RequestType.CHECK_AWARDED_BADGES,
-				CheckAwardedBadgesMessage.getDefaultInstance());
-		requests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS, downloadSettingsReq);
 		getRequestHandler().sendServerRequests(requests);
 		try {
 			inventories.updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
@@ -265,15 +282,6 @@ public class PokemonGo {
 
 	public long currentTimeMillis() {
 		return time.currentTimeMillis();
-	}
-
-	/**
-	 * Get the inventories API
-	 *
-	 * @return Inventories
-	 */
-	public Inventories getInventories() {
-		return inventories;
 	}
 
 	/**
