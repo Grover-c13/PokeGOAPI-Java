@@ -227,9 +227,9 @@ public final class Networking {
 		builder.addAllCellId(cellIds);
 		builder.addAllSinceTimestampMs(Arrays.asList(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L));
 		builder.setLatitude(location.getLatitude()).setLongitude(location.getLongitude());
-		log.info(TextFormat.printToString(builder));
 		RequestEnvelope.Builder initialMapRequest = buildRequestEnvelope(RequestType.GET_MAP_OBJECTS, builder.setLatitude(location.getLatitude()).setLongitude(location.getLongitude())
 				.build());
+		log.info(TextFormat.printToString(initialMapRequest));
 		response = requestScheduler.queueRequest(initialMapRequest.build()).toBlocking().first();
 		try {
 			getMapObjectsResponse = GetMapObjectsResponse.parseFrom(response.getReturns(0));
@@ -283,7 +283,7 @@ public final class Networking {
 	}
 
 	private long getUnknown12() {
-		return random.nextInt(6000);
+		return 400 + random.nextInt(500);
 	}
 
 	public interface Callback {
