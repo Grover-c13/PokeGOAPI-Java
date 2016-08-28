@@ -224,9 +224,12 @@ public final class Networking {
 		// Initial map request
 		List<Long> cellIds = com.pokegoapi.api.map.Map.getCellIds(location.getLatitude(), location.getLongitude());
 		GetMapObjectsMessage.Builder builder = GetMapObjectsMessage.newBuilder();
-		builder.addAllCellId(cellIds);
-		builder.addAllSinceTimestampMs(Arrays.asList(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L));
+		for (Long cellId : cellIds) {
+			builder.addCellId(cellId);
+			builder.addSinceTimestampMs(0L);
+		}
 		builder.setLatitude(location.getLatitude()).setLongitude(location.getLongitude());
+		System.out.println(TextFormat.printToString(builder));
 		RequestEnvelope.Builder initialMapRequest = buildRequestEnvelope(RequestType.GET_MAP_OBJECTS, builder.setLatitude(location.getLatitude()).setLongitude(location.getLongitude())
 				.build());
 		log.info(TextFormat.printToString(initialMapRequest));
@@ -302,16 +305,18 @@ public final class Networking {
 			public Observable<T> call(ResponseEnvelope responseEnvelope) {
 				try {
 					T responseMessage = getParser(responseType).parseFrom(responseEnvelope.getReturns(0));
-					final GetHatchedEggsResponse getHatchedEggsResponse = GetHatchedEggsResponse.parseFrom(responseEnvelope.getReturns(2));
-					final GetInventoryResponse getInventoryResponse = GetInventoryResponse.parseFrom(responseEnvelope.getReturns(3));
-					final CheckAwardedBadgesResponse checkAwardedBadgesResponse = CheckAwardedBadgesResponse.parseFrom(responseEnvelope.getReturns(4));
-					final DownloadSettingsResponse downloadSettingsResponse = DownloadSettingsResponse.parseFrom(responseEnvelope.getReturns(5));
-					executorService.submit(new Runnable() {
-						@Override
-						public void run() {
-							callback.update(getHatchedEggsResponse, getInventoryResponse, checkAwardedBadgesResponse, downloadSettingsResponse);
-						}
-					});
+					if (responseEnvelope.getReturnsCount() > 1) {
+						final GetHatchedEggsResponse getHatchedEggsResponse = GetHatchedEggsResponse.parseFrom(responseEnvelope.getReturns(2));
+						final GetInventoryResponse getInventoryResponse = GetInventoryResponse.parseFrom(responseEnvelope.getReturns(3));
+						final CheckAwardedBadgesResponse checkAwardedBadgesResponse = CheckAwardedBadgesResponse.parseFrom(responseEnvelope.getReturns(4));
+						final DownloadSettingsResponse downloadSettingsResponse = DownloadSettingsResponse.parseFrom(responseEnvelope.getReturns(5));
+						executorService.submit(new Runnable() {
+							@Override
+							public void run() {
+								callback.update(getHatchedEggsResponse, getInventoryResponse, checkAwardedBadgesResponse, downloadSettingsResponse);
+							}
+						});
+					}
 					return Observable.just(responseMessage);
 				} catch (IllegalAccessException | InvalidProtocolBufferException | NoSuchMethodException | InvocationTargetException e) {
 					return Observable.error(e);
@@ -327,20 +332,34 @@ public final class Networking {
 	private RequestEnvelope.Builder buildRequestEnvelope(RequestType requestType,
 														 GeneratedMessage message) {
 		long requestId = Math.abs(random.nextLong());
-		RequestEnvelope.Builder request = RequestEnvelope.newBuilder()
-				.setStatusCode(2)
-				.setRequestId(requestId)
-				.addRequests(wrap(requestType, message))
-				.addRequests(RequestOuterClass.Request.newBuilder().setRequestTypeValue(600).build())
-				.addRequests(getHatchedEggs())
-				.addRequests(getInventory())
-				.addRequests(getCheckAwardedBAtches())
-				.addRequests(getDownloadSettings())
-				.setLatitude(location.getLatitude())
-				.setLongitude(location.getLongitude())
-				.setAltitude(location.getAltitude())
-				.setAuthTicket(requestScheduler.getAuthTicket())
-				.setMsSinceLastLocationfix(getUnknown12());
+		RequestEnvelope.Builder request;
+		if (requestType == RequestType.GET_MAP_OBJECTS) {
+			request = RequestEnvelope.newBuilder()
+					.setStatusCode(2)
+					.setRequestId(requestId)
+					.addRequests(wrap(requestType, message))
+					.setLatitude(location.getLatitude())
+					.setLongitude(location.getLongitude())
+					.setAltitude(location.getAltitude())
+					.setAuthTicket(requestScheduler.getAuthTicket())
+					.setMsSinceLastLocationfix(getUnknown12());
+		}
+		else {
+			request = RequestEnvelope.newBuilder()
+					.setStatusCode(2)
+					.setRequestId(requestId)
+					.addRequests(wrap(requestType, message))
+					.addRequests(RequestOuterClass.Request.newBuilder().setRequestTypeValue(600).build())
+					.addRequests(getHatchedEggs())
+					.addRequests(getInventory())
+					.addRequests(getCheckAwardedBAtches())
+					.addRequests(getDownloadSettings())
+					.setLatitude(location.getLatitude())
+					.setLongitude(location.getLongitude())
+					.setAltitude(location.getAltitude())
+					.setAuthTicket(requestScheduler.getAuthTicket())
+					.setMsSinceLastLocationfix(getUnknown12());
+		}
 		signature.setSignature(request);
 		return request;
 	}
