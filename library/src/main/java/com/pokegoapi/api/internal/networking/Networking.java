@@ -343,6 +343,7 @@ public final class Networking {
 					.setAltitude(location.getAltitude())
 					.setAuthTicket(requestScheduler.getAuthTicket())
 					.setMsSinceLastLocationfix(getUnknown12());
+			System.out.println(TextFormat.printToString(request));
 		}
 		else {
 			request = RequestEnvelope.newBuilder()
