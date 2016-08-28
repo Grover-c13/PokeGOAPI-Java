@@ -38,6 +38,7 @@ public class Signature {
 		this.activityStatus = activityStatus;
 		this.locationFixes = locationFixes;
 	}
+
 	/**
 	 * Given a fully built request, set the signature correctly.
 	 *
@@ -46,10 +47,10 @@ public class Signature {
 	void setSignature(RequestEnvelopeOuterClass.RequestEnvelope.Builder builder) {
 		if (builder.getAuthTicket() == null) {
 			//System.out.println("Ticket == null");
-			throw new RuntimeException("Missing auth ticket");
+			return;
 		}
 
-		long curTime = System.currentTimeMillis();
+		long currentTime = System.currentTimeMillis();
 
 		byte[] authTicketBA = builder.getAuthTicket().toByteArray();
 
@@ -68,23 +69,20 @@ public class Signature {
 			}
 		}).count() > 1;
 
+		Random random = new Random();
+
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
 				.setLocationHash1(getLocationHash1(authTicketBA))
 				.setLocationHash2(getLocationHash2())
 				.setSessionHash(ByteString.copyFrom(sessionHash))
-				.setTimestamp(curTime)
-				.setTimestampSinceStart(curTime - startTime)
+				.setTimestamp(System.currentTimeMillis())
+				.setTimestampSinceStart(currentTime - startTime)
 				.setDeviceInfo(deviceInfo.getDeviceInfo())
-				.setActivityStatus(activityStatus.getActivityStatus())
-				.addAllLocationFix(locationFixes.getLocationFixes(location, getMapRequest))
+				.setActivityStatus(ActivityStatus.getDefault(random).getActivityStatus())
+				.addAllLocationFix(LocationFixes.getDefault(random).getLocationFixes(location, getMapRequest))
 				.setUnknown25(7363665268261373700L);
 
-		SignatureOuterClass.Signature.DeviceInfo deviceInfo = this.deviceInfo.getDeviceInfo();
-		if (deviceInfo != null) {
-			sigBuilder.setDeviceInfo(deviceInfo);
-		}
-
-		SignatureOuterClass.Signature.SensorInfo sensorInfo = this.sensorInfo.getSensorInfo();
+		SignatureOuterClass.Signature.SensorInfo sensorInfo = SensorInfo.getDefault(random).getSensorInfo();
 		if (sensorInfo != null) {
 			sigBuilder.setSensorInfo(sensorInfo);
 		}
@@ -94,17 +92,19 @@ public class Signature {
 			sigBuilder.addRequestHash(getRequestHash(authTicketBA, request));
 		}
 
+		// TODO: Call encrypt function on this
 		byte[] uk2 = sigBuilder.build().toByteArray();
 		byte[] iv = new byte[32];
 		new Random().nextBytes(iv);
 		byte[] encrypted = Crypto.encrypt(uk2, iv).toByteBuffer().array();
-		builder.addUnknown6(Unknown6OuterClass.Unknown6.newBuilder()
+		Unknown6OuterClass.Unknown6 uk6 = Unknown6OuterClass.Unknown6.newBuilder()
 				.setRequestType(6)
-				.setUnknown2(Unknown2.newBuilder().setEncryptedSignature(ByteString.copyFrom(encrypted))).build());
+				.setUnknown2(Unknown2.newBuilder().setEncryptedSignature(ByteString.copyFrom(encrypted))).build();
+		builder.addUnknown6(uk6);
 	}
 
-	private static byte[] getBytes(double input) {
-		long rawDouble = Double.doubleToRawLongBits(input);
+	private static byte[] getBytes(float input) {
+		long rawDouble = Double.doubleToRawLongBits((double)input);
 		return new byte[]{
 				(byte) (rawDouble >>> 56),
 				(byte) (rawDouble >>> 48),
@@ -117,9 +117,8 @@ public class Signature {
 		};
 	}
 
-
 	private int getLocationHash1(byte[] authTicket) {
-		XXHashFactory factory = XXHashFactory.fastestInstance();
+		XXHashFactory factory = XXHashFactory.safeInstance();
 		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x1B845238);
 		xx32.update(authTicket, 0, authTicket.length);
 		byte[] bytes = new byte[8 * 3];
@@ -134,7 +133,7 @@ public class Signature {
 	}
 
 	private int getLocationHash2() {
-		XXHashFactory factory = XXHashFactory.fastestInstance();
+		XXHashFactory factory = XXHashFactory.safeInstance();
 		byte[] bytes = new byte[8 * 3];
 
 		System.arraycopy(getBytes(location.getLatitude()), 0, bytes, 0, 8);
