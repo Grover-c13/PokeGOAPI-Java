@@ -15,41 +15,54 @@
 
 package com.pokegoapi.api.map;
 
-import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
-import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
-import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass.NearbyPokemon;
-import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
-import POGOProtos.Map.SpawnPointOuterClass.SpawnPoint;
-
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.fort.Pokestop;
-
-import lombok.Getter;
-import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
+import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
+import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass.NearbyPokemon;
+import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
+import POGOProtos.Map.SpawnPointOuterClass.SpawnPoint;
+import lombok.Getter;
+import lombok.ToString;
+
 @ToString
 public class MapObjects {
 
 	@Getter
-	Collection<NearbyPokemon> nearbyPokemons = Collections.synchronizedCollection(new ArrayList<NearbyPokemon>());
+	private final Collection<NearbyPokemon> nearbyPokemons = Collections.synchronizedCollection(
+			new ArrayList<NearbyPokemon>()
+	);
 	@Getter
-	Collection<MapPokemon> catchablePokemons = Collections.synchronizedCollection(new ArrayList<MapPokemon>());
+	private final Collection<MapPokemon> catchablePokemons = Collections.synchronizedCollection(
+			new ArrayList<MapPokemon>()
+	);
 	@Getter
-	Collection<WildPokemon> wildPokemons = Collections.synchronizedCollection(new ArrayList<WildPokemon>());
+	private final Collection<WildPokemon> wildPokemons = Collections.synchronizedCollection(
+			new ArrayList<WildPokemon>()
+	);
 	@Getter
-	Collection<SpawnPoint> decimatedSpawnPoints = Collections.synchronizedCollection(new ArrayList<SpawnPoint>());
+	private final Collection<SpawnPoint> decimatedSpawnPoints = Collections.synchronizedCollection(
+			new ArrayList<SpawnPoint>()
+	);
 	@Getter
-	Collection<SpawnPoint> spawnPoints = Collections.synchronizedCollection(new ArrayList<SpawnPoint>());
+	private final Collection<SpawnPoint> spawnPoints = Collections.synchronizedCollection(
+			new ArrayList<SpawnPoint>()
+	);
 	@Getter
-	Collection<FortData> gyms = Collections.synchronizedCollection(new ArrayList<FortData>());
+	private final Collection<FortData> gyms = Collections.synchronizedCollection(
+			new ArrayList<FortData>()
+	);
 	@Getter
-	Collection<Pokestop> pokestops = Collections.synchronizedCollection(new ArrayList<Pokestop>());
+	private final Collection<Pokestop> pokestops = Collections.synchronizedCollection(
+			new ArrayList<Pokestop>()
+	);
 	boolean complete = false;
-	private PokemonGo api;
+	private final PokemonGo api;
 
 	/**
 	 * Instantiates a new Map objects.

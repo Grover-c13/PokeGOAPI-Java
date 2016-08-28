@@ -46,12 +46,16 @@ public class UseIncenseExample {
 	 */
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
+
+		PokemonGo go = new PokemonGo(http, new SystemTimeImpl());
+
 		try {
 			GoogleAutoCredentialProvider authProvider =
 					new GoogleAutoCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
 			//new PtcLogin(http).login(ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
-			PokemonGo go = new PokemonGo(authProvider, http, new SystemTimeImpl());
-			
+
+			go.login(authProvider);
+
 			go.setLocation(45.817521, 16.028199, 0);
 			go.getInventories().getItemBag().useIncense();
 

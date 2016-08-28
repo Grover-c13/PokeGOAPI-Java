@@ -15,12 +15,10 @@
 
 package com.pokegoapi.main;
 
+import com.google.protobuf.GeneratedMessage;
+
 import POGOProtos.Networking.Requests.RequestOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-
-import com.google.protobuf.GeneratedMessage;
-import com.pokegoapi.util.Signature;
-
 import lombok.Getter;
 
 /**

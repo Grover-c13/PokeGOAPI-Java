@@ -53,11 +53,12 @@ public class FightGymExample {
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
 		CredentialProvider auth = null;
+		PokemonGo go = new PokemonGo(http);
 		try {
 			auth = new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
+			go.login(auth);
 			// or google
 			//auth = new GoogleCredentialProvider(http, token); // currently uses oauth flow so no user or pass needed
-			PokemonGo go = new PokemonGo(auth, http);
 			// set location
 			go.setLocation(-32.011011, 115.932831, 0);
 

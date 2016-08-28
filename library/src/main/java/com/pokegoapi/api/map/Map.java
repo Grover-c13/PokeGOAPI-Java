@@ -15,27 +15,6 @@
 
 package com.pokegoapi.api.map;
 
-import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
-import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
-import POGOProtos.Map.Fort.FortTypeOuterClass.FortType;
-import POGOProtos.Map.MapCellOuterClass.MapCell;
-import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
-import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
-import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
-import POGOProtos.Map.SpawnPointOuterClass;
-import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.CatchPokemonMessage;
-import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
-import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass.FortSearchMessage;
-import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
-import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
-import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
-import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
-import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
-
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
@@ -59,9 +38,6 @@ import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.MapUtil;
 
-import rx.Observable;
-import rx.functions.Func1;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -69,10 +45,35 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
+import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
+import POGOProtos.Map.Fort.FortTypeOuterClass.FortType;
+import POGOProtos.Map.MapCellOuterClass.MapCell;
+import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
+import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
+import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
+import POGOProtos.Map.SpawnPointOuterClass;
+import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.CatchPokemonMessage;
+import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
+import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass.FortSearchMessage;
+import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
+import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
+import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
+import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
+import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
+import rx.Observable;
+import rx.functions.Func1;
+
 public class Map {
 	private final PokemonGo api;
 	private MapObjects cachedMapObjects;
-	private List<CatchablePokemon> cachedCatchable;
+	private final List<CatchablePokemon> cachedCatchable = Collections.synchronizedList(
+			new CopyOnWriteArrayList<CatchablePokemon>()
+	);
 	private int cellWidth = 3;
 	private long lastMapUpdate;
 
@@ -80,10 +81,8 @@ public class Map {
 	 * Instantiates a new Map.
 	 *
 	 * @param api the api
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public Map(PokemonGo api) throws LoginFailedException, RemoteServerException {
+	public Map(PokemonGo api) {
 		this.api = api;
 		cachedMapObjects = new MapObjects(api);
 		lastMapUpdate = 0;
@@ -99,10 +98,10 @@ public class Map {
 		if (!useCache()) {
 			// getMapObjects wont be called unless this is null
 			// so need to force it if due for a refresh
-			cachedCatchable = null;
+			cachedCatchable.clear();
 		}
 
-		if (cachedCatchable != null) {
+		if (cachedCatchable.size() > 0) {
 			return Observable.just(cachedCatchable);
 		}
 		Log.i("MAP", "Catchable: live data");
@@ -126,8 +125,8 @@ public class Map {
 						catchablePokemons.add(new CatchablePokemon(api, pokestop.getFortData()));
 					}
 				}
-
-				cachedCatchable = Collections.synchronizedList(new CopyOnWriteArrayList<>(catchablePokemons));
+				cachedCatchable.clear();
+				cachedCatchable.addAll(catchablePokemons);
 				return cachedCatchable;
 			}
 		});
@@ -139,7 +138,7 @@ public class Map {
 	 * @param pokemon the catchable pokemon
 	 */
 	public void removeCatchable(CatchablePokemon pokemon) {
-		if (cachedCatchable != null) {
+		if (cachedCatchable.size() > 0) {
 			cachedCatchable.remove(pokemon);
 		}
 	}
@@ -393,7 +392,7 @@ public class Map {
 							result.addPokestops(groupedForts.get(FortType.CHECKPOINT));
 						}
 
-						cachedCatchable = null;
+						cachedCatchable.clear();
 						return result;
 					}
 				});
@@ -521,7 +520,7 @@ public class Map {
 		int size = 1 << (S2CellId.MAX_LEVEL - level);
 		int face = cellId.toFaceIJOrientation(index, jindex, null);
 
-		List<Long> cells = new ArrayList<Long>();
+		List<Long> cells = new ArrayList<>();
 
 		int halfWidth = (int) Math.floor(width / 2);
 		for (int x = -halfWidth; x <= halfWidth; x++) {
@@ -692,6 +691,19 @@ public class Map {
 	 */
 	private boolean useCache() {
 		return (api.currentTimeMillis() - lastMapUpdate) < api.getSettings().getMapSettings().getMinRefresh();
+	}
+
+	/**
+	 * Clear map objects cache
+	 *
+	 */
+	public void clearCache() {
+		cachedCatchable.clear();
+		cachedMapObjects.getNearbyPokemons().clear();
+		cachedMapObjects.getCatchablePokemons().clear();
+		cachedMapObjects.getWildPokemons().clear();
+		cachedMapObjects.getDecimatedSpawnPoints().clear();
+		cachedMapObjects.getSpawnPoints().clear();
 	}
 
 	private List<Long> getDefaultCells() {
