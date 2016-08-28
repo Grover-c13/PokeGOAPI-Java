@@ -45,7 +45,6 @@ public class ActivityStatus {
 
 	public SignatureOuterClass.Signature.ActivityStatus getActivityStatus() {
 		Builder builder = SignatureOuterClass.Signature.ActivityStatus.newBuilder();
-		builder.setStartTimeMs(1);
 		builder.setTilting(activityStatusProvider.getActivity().isTilting());
 		builder.setStationary(activityStatusProvider.getActivity().getActivity() == Activity.STATIONARY);
 		builder.setAutomotive(activityStatusProvider.getActivity().getActivity() == Activity.AUTOMOTIVE);
