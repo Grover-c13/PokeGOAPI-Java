@@ -46,6 +46,24 @@ public class SensorInfo {
 	 */
 	public SensorInfo(SensorInfos sensorInfos) {
 		this();
+		sensorInfoBuilder.
+				setTimestampSnapshot(sensorInfos.getTimestampSnapshot())
+				.setLinearAccelerationX(sensorInfos.getLinearAccelerationX())
+				.setLinearAccelerationY(sensorInfos.getLinearAccelerationY())
+				.setLinearAccelerationZ(sensorInfos.getLinearAccelerationZ())
+				.setMagneticFieldX(sensorInfos.getMagneticFieldX())
+				.setMagneticFieldY(sensorInfos.getMagneticFieldY())
+				.setMagneticFieldZ(sensorInfos.getMagneticFieldZ())
+				.setRotationVectorX(sensorInfos.getRotationVectorX())
+				.setRotationVectorY(sensorInfos.getRotationVectorY())
+				.setRotationVectorZ(sensorInfos.getRotationVectorZ())
+				.setGyroscopeRawX(sensorInfos.getGyroscopeRawX())
+				.setGyroscopeRawY(sensorInfos.getGyroscopeRawY())
+				.setGyroscopeRawZ(sensorInfos.getGyroscopeRawZ())
+				.setGravityX(sensorInfos.getGravityX())
+				.setGravityY(sensorInfos.getGravityY())
+				.setGravityZ(sensorInfos.getGravityZ())
+				.setAccelerometerAxes(sensorInfos.getAccelerometerAxes());
 	}
 
 	/**
