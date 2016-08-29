@@ -18,17 +18,16 @@ package com.pokegoapi.main;
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
-
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.AsyncPokemonGoException;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.Signature;
-
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -49,6 +48,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
 
 public class RequestHandler implements Runnable {
 	private static final String TAG = RequestHandler.class.getSimpleName();
@@ -285,19 +285,43 @@ public class RequestHandler implements Runnable {
 				continue;
 			}
 			workQueue.drainTo(requests);
-			ServerRequest[] serverRequests = new ServerRequest[requests.size()];
-			for (int i = 0; i != requests.size(); i++) {
-				serverRequests[i] = new ServerRequest(requests.get(i).getType(), requests.get(i).getRequest());
+			ArrayList<ServerRequest> serverRequests = new ArrayList();
+			boolean addCommon = false;
+			for (AsyncServerRequest request : requests) {
+				serverRequests.add(new ServerRequest(request.getType(), request.getRequest()));
+				if (request.isAutoBundle())
+					addCommon = true;
 			}
+
+			ServerRequest[] commonRequests = new ServerRequest[0];
+
+			if (addCommon) {
+				commonRequests = CommonRequest.commonRequests(api);
+				for (ServerRequest commonRequest : commonRequests) {
+					serverRequests.add(commonRequest);
+				}
+			}
+
+			ServerRequest[] arrayServerRequests = serverRequests.toArray(new ServerRequest[serverRequests.size()]);
+
 			try {
-				authTicket = internalSendServerRequests(authTicket, serverRequests);
+				authTicket = internalSendServerRequests(authTicket, arrayServerRequests);
 				for (int i = 0; i != requests.size(); i++) {
 					try {
-						resultMap.put(requests.get(i).getId(), ResultOrException.getResult(serverRequests[i].getData()));
+						resultMap.put(requests.get(i).getId(), ResultOrException.getResult(arrayServerRequests[i].getData()));
 					} catch (InvalidProtocolBufferException e) {
 						resultMap.put(requests.get(i).getId(), ResultOrException.getError(e));
 					}
 				}
+
+				for (int i = 0; i != commonRequests.length; i++) {
+					try {
+						CommonRequest.parse(api, i, arrayServerRequests[requests.size()+i].getData());
+					} catch (InvalidProtocolBufferException e) {
+						//TODO: notify error even in case of common requests?
+					}
+				}
+
 				continue;
 			} catch (RemoteServerException | LoginFailedException e) {
 				for (AsyncServerRequest request : requests) {
@@ -309,6 +333,5 @@ public class RequestHandler implements Runnable {
 			}
 		}
 	}
-
 
 }

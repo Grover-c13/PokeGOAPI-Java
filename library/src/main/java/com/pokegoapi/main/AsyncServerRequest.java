@@ -15,10 +15,9 @@
 
 package com.pokegoapi.main;
 
-import com.google.protobuf.GeneratedMessage;
-
 import POGOProtos.Networking.Requests.RequestOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import com.google.protobuf.GeneratedMessage;
 import lombok.Getter;
 
 /**
@@ -31,6 +30,8 @@ public class AsyncServerRequest {
 	private final RequestTypeOuterClass.RequestType type;
 	@Getter
 	private final RequestOuterClass.Request request;
+	@Getter
+	private final boolean autoBundle;
 
 	/**
 	 * Instantiates a new Server request.
@@ -39,21 +40,24 @@ public class AsyncServerRequest {
 	 * @param req  the req
 	 */
 	public AsyncServerRequest(RequestTypeOuterClass.RequestType type, GeneratedMessage req) {
-		RequestOuterClass.Request.Builder reqBuilder = RequestOuterClass.Request.newBuilder();
-		reqBuilder.setRequestMessage(req.toByteString());
-		reqBuilder.setRequestType(type);
-		this.type = type;
-		this.request = reqBuilder.build();
+		this(type, req, false);
 	}
 
 	/**
 	 * Instantiates a new Server request.
 	 *
-	 * @param type the type
-	 * @param req  the req
+	 * @param type       the type
+	 * @param req        the req
+	 * @param autoBundle add common requests and bundle them into a single call
 	 */
-	AsyncServerRequest(RequestTypeOuterClass.RequestType type, RequestOuterClass.Request req) {
+	public AsyncServerRequest(RequestTypeOuterClass.RequestType type, GeneratedMessage req, boolean autoBundle) {
+		RequestOuterClass.Request.Builder reqBuilder = RequestOuterClass.Request.newBuilder();
+		reqBuilder.setRequestMessage(req.toByteString());
+		reqBuilder.setRequestType(type);
 		this.type = type;
-		this.request = req;
+		this.request = reqBuilder.build();
+		this.autoBundle = autoBundle;
 	}
+
+
 }
