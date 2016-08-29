@@ -109,6 +109,7 @@ public class PokemonGo {
 		map = new Map(this);
 		longitude = Double.NaN;
 		latitude = Double.NaN;
+		altitude = Double.NaN;
 	}
 
 	/**

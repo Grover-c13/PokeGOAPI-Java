@@ -79,6 +79,9 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 			float latitude = offsetOnLatLong(api.getLatitude(), random.nextInt(100) + 10);
 			float longitude = offsetOnLatLong(api.getLongitude(), random.nextInt(100) + 10);
 			float altitude = 65;
+			if (api.getAltitude() != Double.NaN) {
+				altitude = (float) api.getAltitude();
+			}
 			float verticalAccuracy = (float) (15 + (23 - 15) * random.nextDouble());
 
 			// Fake errors
