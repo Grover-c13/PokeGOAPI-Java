@@ -15,8 +15,16 @@
 
 package com.pokegoapi.main;
 
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
+import com.pokegoapi.util.Constant;
+
 import POGOProtos.Enums.PlatformOuterClass.Platform;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
+import POGOProtos.Networking.Requests.Messages.CheckChallenge;
+import POGOProtos.Networking.Requests.Messages.CheckChallenge.CheckChallengeMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass.DownloadSettingsMessage;
 import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.GetAssetDigestMessage;
@@ -26,11 +34,6 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
-import com.pokegoapi.util.Constant;
 
 /**
  * Created by iGio90 on 27/08/16.
@@ -88,30 +91,6 @@ public class CommonRequest {
 	}
 
 	/**
-	 * Most of the requests from the official client are fired together with the following
-	 * requests. We will append our request on top of the array and we will send it
-	 * together with the others.
-	 *
-	 * @param request The main request we want to fire
-	 * @param api     The current instance of PokemonGO
-	 * @return an array of ServerRequest
-	 */
-	public static ServerRequest[] fillRequest(ServerRequest request, PokemonGo api) {
-		ServerRequest[] serverRequests = new ServerRequest[5];
-		serverRequests[0] = request;
-		serverRequests[1] = new ServerRequest(RequestType.GET_HATCHED_EGGS,
-				GetHatchedEggsMessage.getDefaultInstance());
-		serverRequests[2] = new ServerRequest(RequestType.GET_INVENTORY,
-				CommonRequest.getDefaultGetInventoryMessage(api));
-		serverRequests[3] = new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
-				CheckAwardedBadgesMessage.getDefaultInstance());
-		serverRequests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
-				CommonRequest.getDownloadSettingsMessageRequest(api));
-		return serverRequests;
-	}
-
-
-	/**
 	 * List of common requests
 	 *
 	 * @param api The current instance of PokemonGO
@@ -119,6 +98,45 @@ public class CommonRequest {
 	 */
 	public static ServerRequest[] commonRequests(PokemonGo api) {
 		return new ServerRequest[] {
+				new ServerRequest(RequestType.CHECK_CHALLENGE,
+						CheckChallengeMessage.getDefaultInstance()),
+				new ServerRequest(RequestType.GET_HATCHED_EGGS,
+						GetHatchedEggsMessage.getDefaultInstance()),
+				new ServerRequest(RequestType.GET_INVENTORY,
+						CommonRequest.getDefaultGetInventoryMessage(api)),
+				new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
+						CheckAwardedBadgesMessage.getDefaultInstance()),
+				new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
+						CommonRequest.getDownloadSettingsMessageRequest(api))
+		};
+	}
+
+	/**
+	 * Append CheckChallenge request to the given ServerRequest
+	 *
+	 * @param request The main request we want to fire
+	 * @return an array of ServerRequest
+	 */
+	public static ServerRequest[] appendCheckChallenge(ServerRequest request) {
+		return new ServerRequest[] {
+				request,
+				new ServerRequest(RequestType.CHECK_CHALLENGE,
+						CheckChallengeMessage.getDefaultInstance())
+		};
+	}
+
+	/**
+	 * Most of the requests from the official client are fired together with the following
+	 * requests. We will append our request on top of the array and we will send it
+	 * together with the others.
+	 *
+	 * @param request The main request we want to fire
+	 * @param api The current instance of PokemonGO
+	 * @return an array of ServerRequest
+	 */
+	public static ServerRequest[] fillRequest(ServerRequest request, PokemonGo api) {
+		return new ServerRequest[] {
+				request,
 				new ServerRequest(RequestType.GET_HATCHED_EGGS,
 						GetHatchedEggsMessage.getDefaultInstance()),
 				new ServerRequest(RequestType.GET_INVENTORY,
