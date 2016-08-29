@@ -32,7 +32,6 @@ import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpR
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Parser;
-import com.google.protobuf.TextFormat;
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.LocationFixes;
@@ -52,6 +51,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
+
+import static com.pokegoapi.api.map.Map.getNewCellIds;
 
 /**
  * Created by paul on 21-8-2016.
@@ -246,7 +247,7 @@ public final class Networking {
 				.setLatitude(location.getLatitude())
 				.setLongitude(location.getLongitude());
 
-		for (Long cellId : com.pokegoapi.api.map.Map.getNewCellIds(location.getLatitude(), location.getLongitude())) {
+		for (Long cellId : getNewCellIds(location.getLatitude(), location.getLongitude())) {
 			initialMapRequest.addCellId(cellId);
 			initialMapRequest.addSinceTimestampMs(0);
 		}
@@ -339,9 +340,6 @@ public final class Networking {
 			request.setAuthTicket(requestScheduler.getAuthTicket());
 		} else {
 			request.setAuthInfo(authInfo);
-		}
-		if (requestType == RequestType.GET_MAP_OBJECTS) {
-			System.out.println(TextFormat.printToString(request));
 		}
 		signature.setSignature(request);
 		return request;

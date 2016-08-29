@@ -9,7 +9,6 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.TextFormat;
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.LocationFixes;
@@ -90,9 +89,6 @@ public class Signature {
 			byte[] request = serverRequest.toByteArray();
 			sigBuilder.addRequestHash(getRequestHash(authTicketBA, request));
 		}
-		if (getMapRequest) {
-			System.out.println(TextFormat.printToString(sigBuilder));
-		}
 
 		// TODO: Call encrypt function on this
 		byte[] uk2 = sigBuilder.build().toByteArray();
@@ -155,9 +151,5 @@ public class Signature {
 		xx64 = factory.newStreamingHash64(xx64.getValue());
 		xx64.update(request, 0, request.length);
 		return xx64.getValue();
-	}
-
-	public byte[] getSessionHash() {
-		return sessionHash;
 	}
 }
