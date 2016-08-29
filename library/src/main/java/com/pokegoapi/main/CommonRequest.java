@@ -104,4 +104,24 @@ public class CommonRequest {
 				CommonRequest.getDownloadSettingsMessageRequest(api));
 		return serverRequests;
 	}
+
+	/**
+	 * List of common requests
+	 *
+	 * @param api The current instance of PokemonGO
+	 * @return an array of ServerRequest
+	 *
+	 */
+	public static ServerRequest[] commonRequests(PokemonGo api) {
+		ServerRequest[] serverRequests = new ServerRequest[4];
+		serverRequests[0] = new ServerRequest(RequestType.GET_HATCHED_EGGS,
+				GetHatchedEggsMessage.getDefaultInstance());
+		serverRequests[1] = new ServerRequest(RequestType.GET_INVENTORY,
+				CommonRequest.getDefaultGetInventoryMessage(api));
+		serverRequests[2] = new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
+				CheckAwardedBadgesMessage.getDefaultInstance());
+		serverRequests[3] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
+				CommonRequest.getDownloadSettingsMessageRequest(api));
+		return serverRequests;
+	}
 }
