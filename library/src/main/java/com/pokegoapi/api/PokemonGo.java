@@ -38,6 +38,7 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.ClientInterceptor;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 
@@ -102,6 +103,9 @@ public class PokemonGo {
 		this.seed = seed;
 		sessionHash = new byte[32];
 		new Random().nextBytes(sessionHash);
+		client = client.newBuilder()
+				.addNetworkInterceptor(new ClientInterceptor())
+				.build();
 		requestHandler = new RequestHandler(this, client);
 		map = new Map(this);
 		longitude = Double.NaN;
