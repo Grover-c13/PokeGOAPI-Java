@@ -181,9 +181,7 @@ options.noMasterBall(true);
 cp.catchPokemon(options);
 ```
 
-Each option has a default and can override any with a similar functionality based on the most relevant option (for example, usePokeBall can be set as a minimum by using it with useBestBall, a maximum by using it alone, or exclusive by using with noFallback).
-
-Please see the javadocs for each item for further explanation. Replaced methods include examples of their CatchOptions or AsyncCatchOptions equivalent to simplify conversion.
+Each option has a default and the most relevant option will override others with similar functionality (for example, usePokeBall will set the minimum of useBestBall, a maximum by using it alone, or the specific value with noFallback). See the javadocs for more info.
 
 ##Android Dev FAQ
 
