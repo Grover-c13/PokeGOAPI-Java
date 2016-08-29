@@ -168,7 +168,8 @@ public class PokemonGo {
 	}
 
 	private void initialize() throws RemoteServerException, LoginFailedException {
-		fireRequestBlockOne();
+		fireRequestBlock(new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
+				CommonRequest.getDownloadRemoteConfigVersionMessageRequest()));
 
 		fireRequestBlockTwo();
 
@@ -201,14 +202,14 @@ public class PokemonGo {
 	}
 
 	/**
-	 * First requests block. Private since we will use this only at initialization!
+	 * Fire requests block.
 	 *
+	 * @param request server request
 	 * @throws LoginFailedException  When login fails
 	 * @throws RemoteServerException When server fails
 	 */
-	private void fireRequestBlockOne() throws RemoteServerException, LoginFailedException {
-		ServerRequest[] requests = CommonRequest.fillRequest(new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
-				CommonRequest.getDownloadRemoteConfigVersionMessageRequest()), this);
+	private void fireRequestBlock(ServerRequest request) throws RemoteServerException, LoginFailedException {
+		ServerRequest[] requests = CommonRequest.fillRequest(request, this);
 
 		getRequestHandler().sendServerRequests(requests);
 		try {
@@ -226,17 +227,8 @@ public class PokemonGo {
 	 * @throws RemoteServerException When server fails
 	 */
 	public void fireRequestBlockTwo() throws RemoteServerException, LoginFailedException {
-		ServerRequest[] requests = CommonRequest.fillRequest(
-				new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
-						CommonRequest.getGetAssetDigestMessageRequest()), this);
-
-		getRequestHandler().sendServerRequests(requests);
-		try {
-			inventories.updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
-			settings.updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException();
-		}
+		fireRequestBlock(new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
+				CommonRequest.getGetAssetDigestMessageRequest()));
 	}
 
 	/**
