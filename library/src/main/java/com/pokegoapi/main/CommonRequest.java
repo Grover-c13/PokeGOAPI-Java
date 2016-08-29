@@ -20,12 +20,14 @@ import com.pokegoapi.util.Constant;
 
 import POGOProtos.Enums.PlatformOuterClass.Platform;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
+import POGOProtos.Networking.Requests.Messages.CheckChallenge;
 import POGOProtos.Networking.Requests.Messages.CheckChallenge.CheckChallengeMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass.DownloadSettingsMessage;
 import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.GetAssetDigestMessage;
 import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 
 /**
@@ -90,11 +92,11 @@ public class CommonRequest {
 	 * @return an array of ServerRequest
 	 */
 	public static ServerRequest[] appendCheckChallenge(ServerRequest request) {
-		ServerRequest[] serverRequests = new ServerRequest[2];
-		serverRequests[0] = request;
-		serverRequests[1] = new ServerRequest(RequestType.CHECK_CHALLENGE,
-				CheckChallengeMessage.getDefaultInstance());
-		return serverRequests;
+		return new ServerRequest[] {
+				request,
+				new ServerRequest(RequestType.CHECK_CHALLENGE,
+						CheckChallengeMessage.getDefaultInstance())
+		};
 	}
 
 	/**
@@ -107,16 +109,16 @@ public class CommonRequest {
 	 * @return an array of ServerRequest
 	 */
 	public static ServerRequest[] fillRequest(ServerRequest request, PokemonGo api) {
-		ServerRequest[] serverRequests = new ServerRequest[5];
-		serverRequests[0] = request;
-		serverRequests[1] = new ServerRequest(RequestType.GET_HATCHED_EGGS,
-				GetHatchedEggsMessage.getDefaultInstance());
-		serverRequests[2] = new ServerRequest(RequestType.GET_INVENTORY,
-				CommonRequest.getDefaultGetInventoryMessage(api));
-		serverRequests[3] = new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
-				CheckAwardedBadgesMessage.getDefaultInstance());
-		serverRequests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
-				CommonRequest.getDownloadSettingsMessageRequest(api));
-		return serverRequests;
+		return new ServerRequest[] {
+				request,
+				new ServerRequest(RequestType.GET_HATCHED_EGGS,
+						GetHatchedEggsMessage.getDefaultInstance()),
+				new ServerRequest(RequestType.GET_INVENTORY,
+						CommonRequest.getDefaultGetInventoryMessage(api)),
+				new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
+						CheckAwardedBadgesMessage.getDefaultInstance()),
+				new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
+						CommonRequest.getDownloadSettingsMessageRequest(api))
+		};
 	}
 }
