@@ -15,14 +15,6 @@
 
 package com.pokegoapi.api;
 
-import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-import POGOProtos.Networking.Envelopes.SignatureOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
-
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
@@ -42,13 +34,20 @@ import com.pokegoapi.util.ClientInterceptor;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 
-import lombok.Getter;
-import lombok.Setter;
-import okhttp3.OkHttpClient;
-
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
+
+import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
+import lombok.Getter;
+import lombok.Setter;
+import okhttp3.OkHttpClient;
 
 
 public class PokemonGo {
@@ -71,7 +70,10 @@ public class PokemonGo {
 	private double longitude;
 	@Getter
 	@Setter
-	private double altitude;
+	private float altitude;
+	@Getter
+	@Setter
+	private double accuracy;
 	private CredentialProvider credentialProvider;
 	@Getter
 	private Settings settings;
@@ -271,15 +273,28 @@ public class PokemonGo {
 	 *
 	 * @param latitude  the latitude
 	 * @param longitude the longitude
-	 * @param altitude  the altitude
+	 * @param altitude the altitude
+	 * @param accuracy  the accuracy
 	 */
-	public void setLocation(double latitude, double longitude, double altitude) {
+	public void setLocation(double latitude, double longitude, float altitude, double accuracy) {
 		if (latitude != this.latitude || longitude != this.longitude) {
 			getMap().clearCache();
 		}
 		setLatitude(latitude);
 		setLongitude(longitude);
 		setAltitude(altitude);
+		setAccuracy(accuracy);
+	}
+
+	/**
+	 * Sets location.
+	 *
+	 * @param latitude the latitude
+	 * @param longitude the longitude
+	 * @param altitude the altitude
+	 */
+	public void setLocation(double latitude, double longitude, float altitude) {
+		setLocation(latitude, longitude, altitude, 10);
 	}
 
 	public long currentTimeMillis() {
