@@ -15,9 +15,6 @@
 
 package com.pokegoapi.main;
 
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.util.Constant;
-
 import POGOProtos.Enums.PlatformOuterClass.Platform;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
 import POGOProtos.Networking.Requests.Messages.CheckChallenge;
@@ -29,6 +26,13 @@ import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.G
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
+import com.pokegoapi.util.Constant;
 
 /**
  * Created by iGio90 on 27/08/16.
@@ -105,7 +109,7 @@ public class CommonRequest {
 	 * together with the others.
 	 *
 	 * @param request The main request we want to fire
-	 * @param api The current instance of PokemonGO
+	 * @param api     The current instance of PokemonGO
 	 * @return an array of ServerRequest
 	 */
 	public static ServerRequest[] fillRequest(ServerRequest request, PokemonGo api) {
@@ -120,5 +124,49 @@ public class CommonRequest {
 				new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
 						CommonRequest.getDownloadSettingsMessageRequest(api))
 		};
+	}
+
+
+	/**
+	 * List of common requests
+	 *
+	 * @param api The current instance of PokemonGO
+	 * @return an array of ServerRequest
+	 */
+	public static ServerRequest[] commonRequests(PokemonGo api) {
+		return new ServerRequest[] {
+				new ServerRequest(RequestType.GET_HATCHED_EGGS,
+						GetHatchedEggsMessage.getDefaultInstance()),
+				new ServerRequest(RequestType.GET_INVENTORY,
+						CommonRequest.getDefaultGetInventoryMessage(api)),
+				new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
+						CheckAwardedBadgesMessage.getDefaultInstance()),
+				new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
+						CommonRequest.getDownloadSettingsMessageRequest(api))
+		};
+	}
+
+	/**
+	 * parse the response received during commonRequest
+	 *
+	 * @param api The current instance of PokemonGO
+	 * @param requestType The requestType of the current common request
+	 * @param data The data received from server
+	 */
+	public static void parse(PokemonGo api, RequestTypeOuterClass.RequestType requestType, ByteString data) {
+		try {
+			switch (requestType) {
+				case GET_INVENTORY:
+					api.getInventories().updateInventories(GetInventoryResponseOuterClass.GetInventoryResponse.parseFrom(data));
+					break;
+				case DOWNLOAD_SETTINGS:
+					api.getSettings().updateSettings(DownloadSettingsResponseOuterClass.DownloadSettingsResponse.parseFrom(data));
+					break;
+				default:
+					break;
+			}
+		} catch (InvalidProtocolBufferException e) {
+			throw new AsyncRemoteServerException(e);
+		}
 	}
 }

@@ -349,7 +349,7 @@ public class Map {
 		}
 
 		final AsyncServerRequest asyncServerRequest = new AsyncServerRequest(
-				RequestType.GET_MAP_OBJECTS, builder.build());
+				RequestType.GET_MAP_OBJECTS, builder.build(), true);
 		return api.getRequestHandler()
 				.sendAsyncServerRequests(asyncServerRequest).map(new Func1<ByteString, MapObjects>() {
 					@Override
@@ -536,7 +536,7 @@ public class Map {
 				.build();
 
 		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.FORT_DETAILS,
-				reqMsg);
+				reqMsg, true);
 		return api.getRequestHandler()
 				.sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, FortDetails>() {
 					@Override
