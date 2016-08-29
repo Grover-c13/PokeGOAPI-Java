@@ -91,15 +91,16 @@ GoogleUserCredentialProvider provider = new GoogleUserCredentialProvider(http);
 
 // in this url, you will get a code for the google account that is logged
 System.out.println("Please go to " + GoogleUserCredentialProvider.LOGIN_URL);
-System.out.println("Enter authorisation code:");
+System.out.println("Enter authorization code:");
 			
-// Ask the user to enter it in the standart input
+// Ask the user to enter it in the standard input
 Scanner sc = new Scanner(System.in);
 String access = sc.nextLine();
 			
 // we should be able to login with this token
 provider.login(access);
-PokemonGo go = new PokemonGo(provider, httpClient);
+PokemonGo go = new PokemonGo(httpClient);
+go.login(provider);
 
 /**
 * After this, if you do not want to re-authorize the google account every time, 
@@ -107,7 +108,8 @@ PokemonGo go = new PokemonGo(provider, httpClient);
 * ! The API does not store the refresh token for you !
 * log in using the refresh token like this :
 */
-PokemonGo go = new PokemonGo(new GoogleUserCredentialProvider(httpClient, refreshToken), httpClient);
+PokemonGo go = new PokemonGo(httpClient);
+go.login(new GoogleUserCredentialProvider(httpClient, refreshToken));
 
 /**
 * PTC is much simpler, but less secure.
@@ -115,7 +117,8 @@ PokemonGo go = new PokemonGo(new GoogleUserCredentialProvider(httpClient, refres
 * This account does not currently support a refresh_token. 
 * Example log in :
 */
-PokemonGo go = new PokemonGo(new PtcCredentialProvider(httpClient,username,password),httpClient);
+PokemonGo go = new PokemonGo(httpClient);
+go.login(new PtcCredentialProvider(httpClient, username, password));
 
 // After this you can access the api from the PokemonGo instance :
 go.getPlayerProfile(); // to get the user profile
