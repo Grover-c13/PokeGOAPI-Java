@@ -20,6 +20,7 @@ import com.pokegoapi.util.Constant;
 
 import POGOProtos.Enums.PlatformOuterClass.Platform;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
+import POGOProtos.Networking.Requests.Messages.CheckChallenge.CheckChallengeMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass.DownloadSettingsMessage;
 import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.GetAssetDigestMessage;
@@ -80,6 +81,20 @@ public class CommonRequest {
 		return GetInventoryMessage.newBuilder()
 				.setLastTimestampMs(api.getInventories().getLastInventoryUpdate())
 				.build();
+	}
+
+	/**
+	 * Append CheckChallenge request to the given ServerRequest
+	 *
+	 * @param request The main request we want to fire
+	 * @return an array of ServerRequest
+     */
+	public static ServerRequest[] appendCheckChallenge(ServerRequest request) {
+		ServerRequest[] serverRequests = new ServerRequest[2];
+		serverRequests[0] = request;
+		serverRequests[1] = new ServerRequest(RequestType.CHECK_CHALLENGE,
+				CheckChallengeMessage.getDefaultInstance());
+		return serverRequests;
 	}
 
 	/**
