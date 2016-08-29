@@ -58,7 +58,7 @@ public class Signature {
 				.addAllLocationFix(LocationFixes.getDefault(api, builder, currentTime, random))
 				.setUnknown25(Constant.UNK25);
 
-		SignatureOuterClass.Signature.SensorInfo sensorInfo = SensorInfo.getDefault(api, currentTime, random);
+		SignatureOuterClass.Signature.SensorInfo sensorInfo = api.getSensorSignature(currentTime, random);
 		if (sensorInfo != null) {
 			sigBuilder.setSensorInfo(sensorInfo);
 		}
