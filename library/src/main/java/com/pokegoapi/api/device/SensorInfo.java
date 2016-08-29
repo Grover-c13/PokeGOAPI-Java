@@ -39,6 +39,11 @@ public class SensorInfo {
 		sensorInfoBuilder = SignatureOuterClass.Signature.SensorInfo.newBuilder();
 	}
 
+	/**
+	 * Create a sensor info with already existing sensor infos
+	 *
+	 * @param sensorInfos the sensor infos interface
+	 */
 	public SensorInfo(SensorInfos sensorInfos) {
 		this();
 	}
@@ -46,9 +51,9 @@ public class SensorInfo {
 	/**
 	 * Gets the default sensor info for the given api
 	 *
-	 * @param api the api
+	 * @param api         the api
 	 * @param currentTime the current time
-	 * @param random random object
+	 * @param random      random object
 	 * @return the default sensor info for the given api
 	 */
 	public static SignatureOuterClass.Signature.SensorInfo getDefault(PokemonGo api, long currentTime, Random random) {
