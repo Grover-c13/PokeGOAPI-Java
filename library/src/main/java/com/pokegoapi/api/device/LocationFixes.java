@@ -109,8 +109,8 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 					.setProviderStatus(3)
 					.setLocationType(1)
 					.setAltitude(api.getAltitude())
-					.setSpeed(/*Todo : speed iOS only (-1 for no reading available, speed in m/s)*/0)
-					.setCourse(/*Todo : iOS only (range seems to be -1 for not reading, and 0 to 360 for reading*/0)
+					.setSpeed(api.getSpeed())
+					.setCourse(random.nextInt(360))
 					.setFloor(/*Todo : The floor of the building this person is on*/0);
 			locationFixes.add(locationFixBuilder.build());
 		}

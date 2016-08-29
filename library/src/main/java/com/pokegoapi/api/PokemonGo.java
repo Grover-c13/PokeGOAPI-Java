@@ -92,6 +92,7 @@ public class PokemonGo {
 	@Getter
 	@Setter
 	public LocationFixes locationFixes;
+	private float distance;
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -227,7 +228,7 @@ public class PokemonGo {
 	public void fireRequestBlockTwo() throws RemoteServerException, LoginFailedException {
 		ServerRequest[] requests = CommonRequest.fillRequest(
 				new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
-				CommonRequest.getGetAssetDigestMessageRequest()), this);
+						CommonRequest.getGetAssetDigestMessageRequest()), this);
 
 		getRequestHandler().sendServerRequests(requests);
 		try {
@@ -236,6 +237,26 @@ public class PokemonGo {
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException();
 		}
+	}
+
+	/**
+	 * Calculate distance between two points in meters
+	 *
+	 * @param sourceLat      source latitude
+	 * @param sourceLng      source longitude
+	 * @param destinationLat destination latitude
+	 * @param destinationLng destination longitude
+	 * @return the distance in meters
+	 */
+	private static float distFrom(double sourceLat, double sourceLng, double destinationLat, double destinationLng) {
+		double earthRadius = 6371000; //meters
+		destinationLat = Math.toRadians(destinationLat - sourceLat);
+		destinationLng = Math.toRadians(destinationLng - sourceLng);
+		double valueA = Math.sin(destinationLat / 2) * Math.sin(destinationLat / 2)
+				+ Math.cos(Math.toRadians(sourceLat)) * Math.cos(Math.toRadians(destinationLat))
+				* Math.sin(destinationLng / 2) * Math.sin(destinationLng / 2);
+		double valueC = 2 * Math.atan2(Math.sqrt(valueA), Math.sqrt(1 - valueA));
+		return (float) (earthRadius * valueC);
 	}
 
 	/**
@@ -273,11 +294,14 @@ public class PokemonGo {
 	 *
 	 * @param latitude  the latitude
 	 * @param longitude the longitude
-	 * @param altitude the altitude
+	 * @param altitude  the altitude
 	 * @param accuracy  the accuracy
 	 */
 	public void setLocation(double latitude, double longitude, float altitude, double accuracy) {
 		if (latitude != this.latitude || longitude != this.longitude) {
+			if (this.latitude != Double.NaN && this.longitude != Double.NaN) {
+				this.distance += distFrom(this.latitude, this.longitude, latitude, longitude);
+			}
 			getMap().clearCache();
 		}
 		setLatitude(latitude);
@@ -289,12 +313,21 @@ public class PokemonGo {
 	/**
 	 * Sets location.
 	 *
-	 * @param latitude the latitude
+	 * @param latitude  the latitude
 	 * @param longitude the longitude
-	 * @param altitude the altitude
+	 * @param altitude  the altitude
 	 */
 	public void setLocation(double latitude, double longitude, float altitude) {
 		setLocation(latitude, longitude, altitude, 10);
+	}
+
+	/**
+	 * Get speed
+	 *
+	 * @return speed in m/s
+	 */
+	public float getSpeed() {
+		return this.distance / startTime * 1000;
 	}
 
 	public long currentTimeMillis() {
