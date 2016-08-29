@@ -22,6 +22,7 @@ import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass
 import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.GetAssetDigestMessage;
 import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
@@ -117,34 +118,32 @@ public class CommonRequest {
 	 * @return an array of ServerRequest
 	 */
 	public static ServerRequest[] commonRequests(PokemonGo api) {
-		ServerRequest[] serverRequests = new ServerRequest[4];
-		serverRequests[0] = new ServerRequest(RequestType.GET_HATCHED_EGGS,
-				GetHatchedEggsMessage.getDefaultInstance());
-		serverRequests[1] = new ServerRequest(RequestType.GET_INVENTORY,
-				CommonRequest.getDefaultGetInventoryMessage(api));
-		serverRequests[2] = new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
-				CheckAwardedBadgesMessage.getDefaultInstance());
-		serverRequests[3] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
-				CommonRequest.getDownloadSettingsMessageRequest(api));
-		return serverRequests;
+		return new ServerRequest[] {
+				new ServerRequest(RequestType.GET_HATCHED_EGGS,
+						GetHatchedEggsMessage.getDefaultInstance()),
+				new ServerRequest(RequestType.GET_INVENTORY,
+						CommonRequest.getDefaultGetInventoryMessage(api)),
+				new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
+						CheckAwardedBadgesMessage.getDefaultInstance()),
+				new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
+						CommonRequest.getDownloadSettingsMessageRequest(api))
+		};
 	}
 
 	/**
 	 * parse the response received during commonRequest
 	 *
 	 * @param api The current instance of PokemonGO
-	 * @param id The id of the current common request
+	 * @param requestType The requestType of the current common request
 	 * @param data The data received from server
 	 */
-	public static void parse(PokemonGo api, int id, ByteString data) {
+	public static void parse(PokemonGo api, RequestTypeOuterClass.RequestType requestType, ByteString data) {
 		try {
-			switch (id) {
-				case 1:
+			switch (requestType) {
+				case GET_INVENTORY:
 					api.getInventories().updateInventories(GetInventoryResponseOuterClass.GetInventoryResponse.parseFrom(data));
 					break;
-				case 2:
-
-				case 3:
+				case DOWNLOAD_SETTINGS:
 					api.getSettings().updateSettings(DownloadSettingsResponseOuterClass.DownloadSettingsResponse.parseFrom(data));
 					break;
 				default:

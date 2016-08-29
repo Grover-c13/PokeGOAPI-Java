@@ -22,7 +22,6 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.AsyncPokemonGoException;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.AsyncHelper;
@@ -37,6 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -297,15 +297,14 @@ public class RequestHandler implements Runnable {
 
 			if (addCommon) {
 				commonRequests = CommonRequest.commonRequests(api);
-				for (ServerRequest commonRequest : commonRequests) {
-					serverRequests.add(commonRequest);
-				}
+				Collections.addAll(serverRequests, commonRequests);
 			}
 
 			ServerRequest[] arrayServerRequests = serverRequests.toArray(new ServerRequest[serverRequests.size()]);
 
 			try {
 				authTicket = internalSendServerRequests(authTicket, arrayServerRequests);
+
 				for (int i = 0; i != requests.size(); i++) {
 					try {
 						resultMap.put(requests.get(i).getId(), ResultOrException.getResult(arrayServerRequests[i].getData()));
@@ -316,7 +315,8 @@ public class RequestHandler implements Runnable {
 
 				for (int i = 0; i != commonRequests.length; i++) {
 					try {
-						CommonRequest.parse(api, i, arrayServerRequests[requests.size()+i].getData());
+						CommonRequest.parse(api, arrayServerRequests[requests.size() + i].getType(),
+								arrayServerRequests[requests.size() + i].getData());
 					} catch (InvalidProtocolBufferException e) {
 						//TODO: notify error even in case of common requests?
 					}
