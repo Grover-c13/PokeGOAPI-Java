@@ -47,9 +47,9 @@ Import JAR with gradle
   - Complete `Build from source` below
   - Open the project gradle.build file
   - Locate ``dependencies {`` 
-  - Add ``compile files('PATH_TO/PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.X.X.jar')``
+  - Add ``compile fileTree(include: ['PokeGOAPI-library-all-*.jar'], dir: 'PATH_TO/PokeGOAPI-Java/library/build/libs')``
     - (PATH_TO is the exact path from root to the API folder, i.e. C:/MyGitProjects)
-    - (0.X.X refers to the version number provided in the JAR filename, ie. 0.3.0)
+    - (Make sure to perform a clean build to avoid multiple versions being included)
 
 OR
 
