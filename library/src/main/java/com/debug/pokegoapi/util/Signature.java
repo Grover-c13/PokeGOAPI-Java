@@ -1,4 +1,4 @@
-package com.pokegoapi.api.internal.networking;
+package com.debug.pokegoapi.util;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
@@ -6,15 +6,12 @@ import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
 import POGOProtos.Networking.Envelopes.Unknown6OuterClass.Unknown6.Unknown2;
 import POGOProtos.Networking.Requests.RequestOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import com.annimon.stream.Stream;
-import com.annimon.stream.function.Predicate;
+import com.debug.pokegoapi.api.device.ActivityStatus;
+import com.debug.pokegoapi.api.device.LocationFixes;
+import com.debug.pokegoapi.api.device.SensorInfo;
+import com.debug.pokegoapi.main.InfoHolder;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.TextFormat;
-import com.pokegoapi.api.device.ActivityStatus;
-import com.pokegoapi.api.device.DeviceInfo;
-import com.pokegoapi.api.device.LocationFixes;
-import com.pokegoapi.api.device.SensorInfo;
-import com.pokegoapi.api.internal.Location;
 import net.jpountz.xxhash.StreamingXXHash32;
 import net.jpountz.xxhash.StreamingXXHash64;
 import net.jpountz.xxhash.XXHashFactory;
@@ -22,30 +19,14 @@ import net.jpountz.xxhash.XXHashFactory;
 import java.util.Random;
 
 public class Signature {
-	private final byte[] sessionHash;
-	private final long startTime = System.currentTimeMillis();
-	private final Location location;
-	private final DeviceInfo deviceInfo;
-	private final SensorInfo sensorInfo;
-	private final ActivityStatus activityStatus;
-	private final LocationFixes locationFixes;
-
-	public Signature(Location location, DeviceInfo deviceInfo, SensorInfo sensorInfo, ActivityStatus activityStatus, LocationFixes locationFixes) {
-		this.sessionHash = new byte[32];
-		new Random().nextBytes(sessionHash);
-		this.location = location;
-		this.deviceInfo = deviceInfo;
-		this.sensorInfo = sensorInfo;
-		this.activityStatus = activityStatus;
-		this.locationFixes = locationFixes;
-	}
 
 	/**
 	 * Given a fully built request, set the signature correctly.
 	 *
+	 * @param api     the api
 	 * @param builder the requestenvelop builder
 	 */
-	void setSignature(RequestEnvelopeOuterClass.RequestEnvelope.Builder builder) {
+	public static void setSignature(InfoHolder infoHolder, RequestEnvelopeOuterClass.RequestEnvelope.Builder builder) {
 		if (builder.getAuthTicket() == null) {
 			//System.out.println("Ticket == null");
 			return;
@@ -63,37 +44,35 @@ public class Signature {
 			xx64.update(unknown, 0, unknown.length);
 			long unknown25 = xx64.getValue();
 		*/
-		boolean getMapRequest = Stream.of(builder.getRequestsList()).filter(new Predicate<RequestOuterClass.Request>() {
-			@Override
-			public boolean test(RequestOuterClass.Request value) {
-				return value.getRequestType() == RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS;
-			}
-		}).count() >= 1;
+
+		Random random = new Random();
 
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
-				.setLocationHash1(getLocationHash1(authTicketBA))
-				.setLocationHash2(getLocationHash2())
-				.setSessionHash(ByteString.copyFrom(sessionHash))
+				.setLocationHash1(getLocationHash1(infoHolder, authTicketBA))
+				.setLocationHash2(getLocationHash2(infoHolder))
+				.setSessionHash(ByteString.copyFrom(infoHolder.getSessionHash()))
 				.setTimestamp(System.currentTimeMillis())
-				.setTimestampSinceStart(currentTime - startTime)
-				.setDeviceInfo(deviceInfo.getDeviceInfo())
-				.setActivityStatus(activityStatus.getActivityStatus())
-				.addAllLocationFix(locationFixes.getLocationFixes(location, getMapRequest))
+				.setTimestampSinceStart(currentTime - infoHolder.getStartTime())
+				.setDeviceInfo(infoHolder.getDeviceInfo())
+				.setActivityStatus(ActivityStatus.getDefault(infoHolder, random))
+				.addAllLocationFix(LocationFixes.getDefault(infoHolder, builder, currentTime, random))
 				.setUnknown25(7363665268261373700L);
 
-/*		SignatureOuterClass.Signature.SensorInfo sensorInfo = this.sensorInfo.getSensorInfo();
+		SignatureOuterClass.Signature.SensorInfo sensorInfo = SensorInfo.getDefault(infoHolder, currentTime, random);
 		if (sensorInfo != null) {
 			sigBuilder.setSensorInfo(sensorInfo);
-		}*/
-
+		}
+		boolean map = false;
 		for (RequestOuterClass.Request serverRequest : builder.getRequestsList()) {
 			byte[] request = serverRequest.toByteArray();
+			if (serverRequest.getRequestType() == RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS) {
+				map = true;
+			}
 			sigBuilder.addRequestHash(getRequestHash(authTicketBA, request));
 		}
-		if (getMapRequest) {
+		if(map) {
 			System.out.println(TextFormat.printToString(sigBuilder));
 		}
-
 		// TODO: Call encrypt function on this
 		byte[] uk2 = sigBuilder.build().toByteArray();
 		byte[] iv = new byte[32];
@@ -105,8 +84,8 @@ public class Signature {
 		builder.addUnknown6(uk6);
 	}
 
-	private static byte[] getBytes(float input) {
-		long rawDouble = Double.doubleToRawLongBits((double)input);
+	private static byte[] getBytes(double input) {
+		long rawDouble = Double.doubleToRawLongBits(input);
 		return new byte[]{
 				(byte) (rawDouble >>> 56),
 				(byte) (rawDouble >>> 48),
@@ -119,28 +98,28 @@ public class Signature {
 		};
 	}
 
-	private int getLocationHash1(byte[] authTicket) {
+	private static int getLocationHash1(InfoHolder infoHolder, byte[] authTicket) {
 		XXHashFactory factory = XXHashFactory.safeInstance();
 		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x1B845238);
 		xx32.update(authTicket, 0, authTicket.length);
 		byte[] bytes = new byte[8 * 3];
 
-		System.arraycopy(getBytes(location.getLatitude()), 0, bytes, 0, 8);
-		System.arraycopy(getBytes(location.getLongitude()), 0, bytes, 8, 8);
-		System.arraycopy(getBytes(location.getAltitude()), 0, bytes, 16, 8);
+		System.arraycopy(getBytes(infoHolder.getLatitude()), 0, bytes, 0, 8);
+		System.arraycopy(getBytes(infoHolder.getLongitude()), 0, bytes, 8, 8);
+		System.arraycopy(getBytes(infoHolder.getAltitude()), 0, bytes, 16, 8);
 
 		xx32 = factory.newStreamingHash32(xx32.getValue());
 		xx32.update(bytes, 0, bytes.length);
 		return xx32.getValue();
 	}
 
-	private int getLocationHash2() {
+	private static int getLocationHash2(InfoHolder infoHolder) {
 		XXHashFactory factory = XXHashFactory.safeInstance();
 		byte[] bytes = new byte[8 * 3];
 
-		System.arraycopy(getBytes(location.getLatitude()), 0, bytes, 0, 8);
-		System.arraycopy(getBytes(location.getLongitude()), 0, bytes, 8, 8);
-		System.arraycopy(getBytes(location.getAltitude()), 0, bytes, 16, 8);
+		System.arraycopy(getBytes(infoHolder.getLatitude()), 0, bytes, 0, 8);
+		System.arraycopy(getBytes(infoHolder.getLongitude()), 0, bytes, 8, 8);
+		System.arraycopy(getBytes(infoHolder.getAltitude()), 0, bytes, 16, 8);
 
 		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x1B845238);
 		xx32.update(bytes, 0, bytes.length);
@@ -155,9 +134,5 @@ public class Signature {
 		xx64 = factory.newStreamingHash64(xx64.getValue());
 		xx64.update(request, 0, request.length);
 		return xx64.getValue();
-	}
-
-	public byte[] getSessionHash() {
-		return sessionHash;
 	}
 }

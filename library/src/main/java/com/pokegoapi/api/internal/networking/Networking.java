@@ -10,9 +10,9 @@ import POGOProtos.Networking.Requests.Messages.DownloadItemTemplatesMessageOuter
 import POGOProtos.Networking.Requests.Messages.DownloadRemoteConfigVersionMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.GetDownloadUrlsMessageOuterClass.GetDownloadUrlsMessage;
 import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessage;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
@@ -24,7 +24,6 @@ import POGOProtos.Networking.Responses.DownloadItemTemplatesResponseOuterClass.D
 import POGOProtos.Networking.Responses.DownloadRemoteConfigVersionResponseOuterClass.DownloadRemoteConfigVersionResponse;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import POGOProtos.Networking.Responses.GetAssetDigestResponseOuterClass.GetAssetDigestResponse;
-import POGOProtos.Networking.Responses.GetDownloadUrlsResponseOuterClass.GetDownloadUrlsResponse;
 import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
@@ -48,10 +47,7 @@ import rx.functions.Func1;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
@@ -65,10 +61,6 @@ public final class Networking {
 	private static final int VERSION = 3500;
 	private static final String HASH = "2788184af4004004d6ab0720f7612983332106f6";
 	private static final Map<String, Networking> INSTANCES = new HashMap<>();
-	private static final List<String> DOWNLOAD_URL_HASHES = Arrays.asList("d86c65f7-d521-4aa1-9324-d2690d8a61a0/1467337989725000",
-			"d86c65f7-d521-4aa1-9324-d2690d8a61a0/1467337989725000", "5cbcb961-13dc-440c-a474-50212e6ff120/1467338119418000",
-			"c918d441-8f37-4155-b824-0ed67f64cb5b/1467338237623000", "90f8eb5d-c398-4e9e-a53d-82c6367521db/1467338255908000",
-			"5be4c90f-8b4b-49ce-92a1-6e1ffd591fda/1467338152232000");
 	private final Random random = new Random();
 	private final RequestScheduler requestScheduler;
 	private final ExecutorService executorService;
@@ -78,6 +70,17 @@ public final class Networking {
 	private final Locale locale;
 	private Long lastInventoryCheck = null;
 	private AuthInfo authInfo;
+	// private final RequestHandler oldRequestHandler;
+
+	private Networking(URL initialServer, ExecutorService executorService, OkHttpClient client, final Location location, final DeviceInfo deviceInfo,
+					   final SensorInfo sensorInfo, final ActivityStatus activityStatus, final LocationFixes locationFixes, final Locale locale, Callback callback) {
+		this.executorService = executorService;
+		this.location = location;
+		this.callback = callback;
+		this.signature = new Signature(location, deviceInfo, sensorInfo, activityStatus, locationFixes);
+		this.locale = locale;
+		this.requestScheduler = new RequestScheduler(executorService, client, initialServer);
+	}
 
 	public static Networking getInstance(URL initialServer, ExecutorService executorService, OkHttpClient client, Location location, DeviceInfo deviceInfo,
 										 SensorInfo sensorInfo, ActivityStatus activityStatus, LocationFixes locationFixes, Callback callback, Locale locale) {
@@ -93,14 +96,35 @@ public final class Networking {
 		return INSTANCES.get(serverString);
 	}
 
-	private Networking(URL initialServer, ExecutorService executorService, OkHttpClient client, Location location, DeviceInfo deviceInfo,
-					   SensorInfo sensorInfo, ActivityStatus activityStatus, LocationFixes locationFixes, Locale locale, Callback callback) {
-		this.executorService = executorService;
-		this.location = location;
-		this.callback = callback;
-		this.signature = new Signature(location, deviceInfo, sensorInfo, activityStatus, locationFixes);
-		this.locale = locale;
-		this.requestScheduler = new RequestScheduler(executorService, client, initialServer);
+	private static void sleep(long ms) {
+		try {
+			Thread.sleep(ms);
+		} catch (InterruptedException e) {
+			throw new RuntimeException("Can't wait. Shutting down?", e);
+		}
+	}
+
+	static <T> Parser<T> getParser(Class<T> clz) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+		return (Parser<T>) clz.getDeclaredMethod("parser").invoke(null);
+	}
+
+	private static Builder wrap(RequestType requestType, GeneratedMessage message) {
+		Builder reqBuilder = RequestOuterClass.Request.newBuilder();
+		reqBuilder.setRequestMessage(message.toByteString());
+		reqBuilder.setRequestType(requestType);
+		return reqBuilder;
+	}
+
+	private static Builder getHatchedEggs() {
+		return wrap(RequestType.GET_HATCHED_EGGS, GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage.newBuilder().build());
+	}
+
+	private static Builder getCheckAwardedBAtches() {
+		return wrap(RequestType.CHECK_AWARDED_BADGES, CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage.newBuilder().build());
+	}
+
+	private static Builder getDownloadSettings() {
+		return wrap(RequestType.DOWNLOAD_SETTINGS, DownloadSettingsMessageOuterClass.DownloadSettingsMessage.newBuilder().setHash(HASH).build());
 	}
 
 	public BootstrapResult bootstrap(AuthInfo authInfo) {
@@ -131,8 +155,7 @@ public final class Networking {
 		ResponseEnvelope response = requestScheduler.queueRequest(getPlayerRequest.build()).toBlocking().first();
 		try {
 			requestScheduler.setCurrentServer(new URL("https://" + response.getApiUrl() + "/rpc"));
-		}
-		catch (MalformedURLException e) {
+		} catch (MalformedURLException e) {
 			throw new RuntimeException("Received invalid URL from server. Giving up", e);
 		}
 		sleep(300);
@@ -142,22 +165,20 @@ public final class Networking {
 		GetPlayerResponse playerResponse;
 		try {
 			playerResponse = GetPlayerResponse.parseFrom(response.getReturns(0));
-		}
-		catch (InvalidProtocolBufferException e) {
+		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
 		}
 		sleep(400);
 
 		DownloadRemoteConfigVersionResponse downloadRemoteConfigVersionResponse;
-		GetInventoryResponse inventoryResponse;
-		GetHatchedEggsResponse hatchedEggsResponse;
-		CheckAwardedBadgesResponse checkAwardedBadgesResponse;
-		DownloadSettingsResponse downloadSettingsResponse;
+		GetInventoryResponse inventoryResponse = null;
+		GetHatchedEggsResponse hatchedEggsResponse = null;
+		CheckAwardedBadgesResponse checkAwardedBadgesResponse = null;
+		DownloadSettingsResponse downloadSettingsResponse = null;
 		GetAssetDigestResponse assetDigestResponse;
 		DownloadItemTemplatesResponse downloadItemTemplatesResponse;
 		LevelUpRewardsResponse levelUpRewardsResponse;
 		GetMapObjectsResponse getMapObjectsResponse;
-		List<GetDownloadUrlsResponse> downloadUrlsResponses = new LinkedList<>();
 
 		// Do a 7, 600, 126, 4, 129 and 5
 		log.info("Do a DOWNLOAD_REMOTE_CONFIG_VERSION, 600, GET_HATCHED_EGGS, GET_INVENTORY, CHECK_AWARDED_BADGES and DOWNLOAD_SETTINGS");
@@ -173,8 +194,7 @@ public final class Networking {
 			inventoryResponse = GetInventoryResponse.parseFrom(response.getReturns(3));
 			checkAwardedBadgesResponse = CheckAwardedBadgesResponse.parseFrom(response.getReturns(4));
 			downloadSettingsResponse = DownloadSettingsResponse.parseFrom(response.getReturns(5));
-		}
-		catch (InvalidProtocolBufferException e) {
+		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
 		}
 		sleep(3000);
@@ -185,7 +205,6 @@ public final class Networking {
 				.setAppVersion(VERSION)
 				.build());
 		requestScheduler.queueRequest(assetsRequest.build()).toBlocking().first();
-
 		int playerLevel = 1;
 		for (InventoryItemOuterClass.InventoryItem inventoryItem : inventoryResponse.getInventoryDelta().getInventoryItemsList()) {
 			if (inventoryItem.getInventoryItemData().hasPlayerStats()) {
@@ -201,8 +220,7 @@ public final class Networking {
 		response = requestScheduler.queueRequest(downloadItemTemplatesRequest.build()).toBlocking().first();
 		try {
 			downloadItemTemplatesResponse = DownloadItemTemplatesResponse.parseFrom(response.getReturns(0));
-		}
-		catch (InvalidProtocolBufferException e) {
+		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
 		}
 
@@ -215,8 +233,7 @@ public final class Networking {
 		response = requestScheduler.queueRequest(levelUpRequest.build()).toBlocking().first();
 		try {
 			levelUpRewardsResponse = LevelUpRewardsResponse.parseFrom(response.getReturns(0));
-		}
-		catch (InvalidProtocolBufferException e) {
+		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
 		}
 
@@ -224,22 +241,20 @@ public final class Networking {
 
 		sleep(300);
 		// Initial map request
-		List<Long> cellIds = com.pokegoapi.api.map.Map.getCellIds(location.getLatitude(), location.getLongitude());
-		GetMapObjectsMessage.Builder builder = GetMapObjectsMessage.newBuilder();
-		for (Long cellId : cellIds) {
-			builder.addCellId(cellId);
-			builder.addSinceTimestampMs(0L);
+
+		GetMapObjectsMessage.Builder initialMapRequest = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder()
+				.setLatitude(location.getLatitude())
+				.setLongitude(location.getLongitude());
+
+		for (Long cellId : com.pokegoapi.api.map.Map.getNewCellIds(location.getLatitude(), location.getLongitude())) {
+			initialMapRequest.addCellId(cellId);
+			initialMapRequest.addSinceTimestampMs(0);
 		}
-		builder.setLatitude(location.getLatitude()).setLongitude(location.getLongitude());
-		System.out.println(TextFormat.printToString(builder));
-		RequestEnvelope.Builder initialMapRequest = buildRequestEnvelope(RequestType.GET_MAP_OBJECTS, builder.setLatitude(location.getLatitude()).setLongitude(location.getLongitude())
-				.build());
-		log.info(TextFormat.printToString(initialMapRequest));
-		response = requestScheduler.queueRequest(initialMapRequest.build()).toBlocking().first();
+		RequestEnvelope.Builder initialMapRequestEnvelope = buildRequestEnvelope(RequestType.GET_MAP_OBJECTS, initialMapRequest.build());
+		response = requestScheduler.queueRequest(initialMapRequestEnvelope.build()).toBlocking().first();
 		try {
 			getMapObjectsResponse = GetMapObjectsResponse.parseFrom(response.getReturns(0));
-		}
-		catch (InvalidProtocolBufferException e) {
+		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
 		}
 		sleep(300);
@@ -252,20 +267,10 @@ public final class Networking {
 		response = requestScheduler.queueRequest(assetsRequest.build()).toBlocking().first();
 		try {
 			assetDigestResponse = GetAssetDigestResponse.parseFrom(response.getReturns(0));
-		}
-		catch (InvalidProtocolBufferException e) {
+		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
 		}
-		for (String hash : DOWNLOAD_URL_HASHES) {
-			RequestEnvelope.Builder downloadUrls = buildRequestEnvelope(RequestType.GET_DOWNLOAD_URLS, GetDownloadUrlsMessage.newBuilder().addAssetId(hash).build());
-			response = requestScheduler.queueRequest(downloadUrls.build()).toBlocking().first();
-			try {
-				downloadUrlsResponses.add(GetDownloadUrlsResponse.parseFrom(response.toByteString()));
-			}
-			catch (InvalidProtocolBufferException e) {
-				throw new RemoteServerException("Initial setup of request handler failed. Can't parse player response: " + e);
-			}
-		}
+
 		return new BootstrapResult(playerResponse,
 				downloadRemoteConfigVersionResponse,
 				inventoryResponse,
@@ -275,27 +280,11 @@ public final class Networking {
 				assetDigestResponse,
 				levelUpRewardsResponse,
 				getMapObjectsResponse,
-				downloadItemTemplatesResponse,
-				downloadUrlsResponses);
-	}
-	private static void sleep(long ms) {
-		try {
-			Thread.sleep(ms);
-		}
-		catch (InterruptedException e) {
-			throw new RuntimeException("Can't wait. Shutting down?", e);
-		}
+				downloadItemTemplatesResponse);
 	}
 
 	private long getUnknown12() {
 		return 400 + random.nextInt(500);
-	}
-
-	public interface Callback {
-		void update(GetHatchedEggsResponse getHatchedEggsResponse,
-					GetInventoryResponse getInventoryResponse,
-					CheckAwardedBadgesResponse checkAwardedBadgesResponse,
-					DownloadSettingsResponse downloadSettingsResponse);
 	}
 
 	public <T extends GeneratedMessage> Observable<T> queueRequest(final RequestType requestType,
@@ -327,39 +316,22 @@ public final class Networking {
 		});
 	}
 
-	static <T> Parser<T> getParser(Class<T> clz) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-		return (Parser<T>) clz.getDeclaredMethod("parser").invoke(null);
-	}
-
 	private RequestEnvelope.Builder buildRequestEnvelope(RequestType requestType,
 														 GeneratedMessage message) {
 		long requestId = Math.abs(random.nextLong());
-		RequestEnvelope.Builder request;
-		if (requestType == RequestType.GET_MAP_OBJECTS) {
-			request = RequestEnvelope.newBuilder()
-					.setStatusCode(2)
-					.setRequestId(requestId)
-					.addRequests(wrap(requestType, message))
-					.setLatitude(location.getLatitude())
-					.setLongitude(location.getLongitude())
-//					.setAltitude(location.getAltitude())
-					.setMsSinceLastLocationfix(getUnknown12());
-		}
-		else {
-			request = RequestEnvelope.newBuilder()
-					.setStatusCode(2)
-					.setRequestId(requestId)
-					.addRequests(wrap(requestType, message))
-					.addRequests(RequestOuterClass.Request.newBuilder().setRequestTypeValue(600).build())
-					.addRequests(getHatchedEggs())
-					.addRequests(getInventory())
-					.addRequests(getCheckAwardedBAtches())
-					.addRequests(getDownloadSettings())
-					.setLatitude(location.getLatitude())
-					.setLongitude(location.getLongitude())
-					.setAltitude(location.getAltitude())
-					.setMsSinceLastLocationfix(getUnknown12());
-		}
+		RequestEnvelope.Builder request = RequestEnvelope.newBuilder()
+				.setStatusCode(2)
+				.setRequestId(requestId)
+				.addRequests(wrap(requestType, message))
+				.addRequests(RequestOuterClass.Request.newBuilder().setRequestTypeValue(600).build())
+				.addRequests(getHatchedEggs())
+				.addRequests(getInventory())
+				.addRequests(getCheckAwardedBAtches())
+				.addRequests(getDownloadSettings())
+				.setLatitude(location.getLatitude())
+				.setLongitude(location.getLongitude())
+				.setAltitude(location.getAltitude())
+				.setMsSinceLastLocationfix(getUnknown12());
 		//builder.setAuthInfo(api.getAuthInfo());
 		if (requestScheduler.getAuthTicket() != null
 				&& requestScheduler.getAuthTicket().getExpireTimestampMs() > 0
@@ -375,35 +347,21 @@ public final class Networking {
 		return request;
 	}
 
-
-	private static Builder wrap(RequestType requestType, GeneratedMessage message) {
-		Builder reqBuilder = RequestOuterClass.Request.newBuilder();
-		reqBuilder.setRequestMessage(message.toByteString());
-		reqBuilder.setRequestType(requestType);
-		return reqBuilder;
-	}
-
-	private static Builder getHatchedEggs() {
-		return wrap(RequestType.GET_HATCHED_EGGS, GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage.newBuilder().build());
-	}
-
 	private Builder getInventory() {
 		Builder inventory;
 		if (lastInventoryCheck == null) {
 			inventory = wrap(RequestType.GET_INVENTORY, GetInventoryMessageOuterClass.GetInventoryMessage.newBuilder().build());
-		}
-		else {
+		} else {
 			inventory = wrap(RequestType.GET_INVENTORY, GetInventoryMessageOuterClass.GetInventoryMessage.newBuilder().setLastTimestampMs(lastInventoryCheck).build());
 		}
 		lastInventoryCheck = System.currentTimeMillis();
 		return inventory;
 	}
 
-	private static Builder getCheckAwardedBAtches() {
-		return wrap(RequestType.CHECK_AWARDED_BADGES, CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage.newBuilder().build());
-	}
-
-	private static Builder getDownloadSettings() {
-		return wrap(RequestType.DOWNLOAD_SETTINGS, DownloadSettingsMessageOuterClass.DownloadSettingsMessage.newBuilder().setHash(HASH).build());
+	public interface Callback {
+		void update(GetHatchedEggsResponse getHatchedEggsResponse,
+					GetInventoryResponse getInventoryResponse,
+					CheckAwardedBadgesResponse checkAwardedBadgesResponse,
+					DownloadSettingsResponse downloadSettingsResponse);
 	}
 }

@@ -30,5 +30,4 @@ public class BootstrapResult {
 	private final LevelUpRewardsResponse levelUpRewardsResponse;
 	private final GetMapObjectsResponse getMapObjectsResponse;
 	private final DownloadItemTemplatesResponse downloadItemTemplatesResponse;
-	private final List<GetDownloadUrlsResponse> downloadUrlsResponses;
 }

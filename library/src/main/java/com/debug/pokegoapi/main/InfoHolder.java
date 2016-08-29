@@ -1,5 +1,6 @@
 package com.debug.pokegoapi.main;
 
+import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass.Signature.DeviceInfo;
 import com.debug.pokegoapi.api.device.ActivityStatus;
@@ -22,4 +23,6 @@ public class InfoHolder {
 	private ActivityStatus activityStatus;
 	private LocationFixes locationFixes;
 	private SensorInfo sensorInfo;
+	private AuthTicket authTicket;
+	private String urlEndpoint;
 }
