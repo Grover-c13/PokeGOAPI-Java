@@ -149,7 +149,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 
 		Moshi moshi = new Moshi.Builder().build();
 
-		PtcAuthJson ptcAuth = null;
+		PtcAuthJson ptcAuth;
 		try {
 			String response = getResponse.body().string();
 			ptcAuth = moshi.adapter(PtcAuthJson.class).fromJson(response);
