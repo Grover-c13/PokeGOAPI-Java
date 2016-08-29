@@ -39,7 +39,6 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -172,6 +171,29 @@ public class Map implements Runnable {
 		mapObjects.update(mapObjectsResponse);
 	}
 
+	public static List<Long> getCellIds(double latitude, double longitude) {
+		final int width = 3;
+		S2LatLng latLng = S2LatLng.fromDegrees(latitude, longitude);
+		S2CellId cellId = S2CellId.fromLatLng(latLng).parent(15);
+
+		MutableInteger index = new MutableInteger(0);
+		MutableInteger jindex = new MutableInteger(0);
+
+
+		int level = cellId.level();
+		int size = 1 << (S2CellId.MAX_LEVEL - level);
+		int face = cellId.toFaceIJOrientation(index, jindex, null);
+
+		List<Long> cells = new ArrayList<>();
+
+		int halfWidth = (int) Math.floor(width / 2);
+		for (int x = -halfWidth; x <= halfWidth; x++) {
+			for (int y = -halfWidth; y <= halfWidth; y++) {
+				cells.add(S2CellId.fromFaceIJ(face, index.intValue() + x * size, jindex.intValue() + y * size).parent(15).id());
+			}
+		}
+		return cells;
+	}
 	/**
 	 * Get a list of all the Cell Ids.
 	 *
@@ -179,7 +201,7 @@ public class Map implements Runnable {
 	 * @param longitude longitude
 	 * @return List of Cells
 	 */
-	public static List<Long> getCellIds(double latitude, double longitude) {
+	public static List<Long> getNewCellIds(double latitude, double longitude) {
 		S2LatLng latLng = S2LatLng.fromDegrees(latitude, longitude);
 		S2CellId cellId = S2CellId.fromLatLng(latLng).parent(15);
 
