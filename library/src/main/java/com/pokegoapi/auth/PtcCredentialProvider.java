@@ -212,7 +212,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 			}
 		}
 
-		if(ticket == null) {
+		if (ticket == null) {
 			throw new LoginFailedException("Failed to fetch token, body:" + body);
 		}
 
