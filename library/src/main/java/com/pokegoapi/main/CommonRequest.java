@@ -88,7 +88,7 @@ public class CommonRequest {
 	 *
 	 * @param request The main request we want to fire
 	 * @return an array of ServerRequest
-     */
+	 */
 	public static ServerRequest[] appendCheckChallenge(ServerRequest request) {
 		ServerRequest[] serverRequests = new ServerRequest[2];
 		serverRequests[0] = request;
