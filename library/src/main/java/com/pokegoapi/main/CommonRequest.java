@@ -15,13 +15,13 @@
 
 package com.pokegoapi.main;
 
-import POGOProtos.Networking.Requests.Messages.CheckChallenge;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.util.Constant;
 
 import POGOProtos.Enums.PlatformOuterClass.Platform;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage;
+import POGOProtos.Networking.Requests.Messages.CheckChallenge;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass.DownloadSettingsMessage;
 import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.GetAssetDigestMessage;
 import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
