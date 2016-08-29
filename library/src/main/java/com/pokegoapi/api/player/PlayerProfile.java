@@ -99,8 +99,10 @@ public class PlayerProfile {
 		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
 				.setPlayerLocale(playerLocale.getPlayerLocale())
 				.build();
+
 		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
-		api.getRequestHandler().sendServerRequests(getPlayerServerRequest);
+		api.getRequestHandler().sendServerRequests(
+				CommonRequest.appendCheckChallenge(getPlayerServerRequest));
 
 		try {
 			updateProfile(GetPlayerResponse.parseFrom(getPlayerServerRequest.getData()));
