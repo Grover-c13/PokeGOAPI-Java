@@ -72,7 +72,8 @@ public class Signature {
 		byte[] iv = new byte[32];
 		new Random().nextBytes(iv);
 		byte[] encrypted = Crypto.encrypt(uk2, iv).toByteBuffer().array();
-		RequestEnvelopeOuterClass.RequestEnvelope.PlatformRequest platformRequest = RequestEnvelopeOuterClass.RequestEnvelope.PlatformRequest.newBuilder()
+		RequestEnvelopeOuterClass.RequestEnvelope.PlatformRequest platformRequest = RequestEnvelopeOuterClass.
+				RequestEnvelope.PlatformRequest.newBuilder()
 				.setType(PlatformRequestTypeOuterClass.PlatformRequestType.SEND_ENCRYPTED_SIGNATURE)
 				.setRequestMessage(ByteString.copyFrom(encrypted))
 				.build();

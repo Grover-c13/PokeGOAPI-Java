@@ -46,8 +46,8 @@ public class SensorInfo {
 	 */
 	public SensorInfo(SensorInfos sensorInfos) {
 		this();
-		sensorInfoBuilder.
-				setTimestampSnapshot(sensorInfos.getTimestampSnapshot())
+		sensorInfoBuilder
+				.setTimestampSnapshot(sensorInfos.getTimestampSnapshot())
 				.setLinearAccelerationX(sensorInfos.getLinearAccelerationX())
 				.setLinearAccelerationY(sensorInfos.getLinearAccelerationY())
 				.setLinearAccelerationZ(sensorInfos.getLinearAccelerationZ())
