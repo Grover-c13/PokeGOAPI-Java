@@ -15,14 +15,6 @@
 
 package com.pokegoapi.api;
 
-import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-import POGOProtos.Networking.Envelopes.SignatureOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
-
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
@@ -42,13 +34,20 @@ import com.pokegoapi.util.ClientInterceptor;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 
-import lombok.Getter;
-import lombok.Setter;
-import okhttp3.OkHttpClient;
-
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
+
+import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
+import lombok.Getter;
+import lombok.Setter;
+import okhttp3.OkHttpClient;
 
 
 public class PokemonGo {
@@ -165,7 +164,8 @@ public class PokemonGo {
 	}
 
 	private void initialize() throws RemoteServerException, LoginFailedException {
-		fireRequestBlockOne();
+		fireRequestBlock(new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
+				CommonRequest.getDownloadRemoteConfigVersionMessageRequest()));
 
 		fireRequestBlockTwo();
 
@@ -198,14 +198,14 @@ public class PokemonGo {
 	}
 
 	/**
-	 * First requests block. Private since we will use this only at initialization!
+	 * Fire requests block.
 	 *
+	 * @param request server request
 	 * @throws LoginFailedException  When login fails
 	 * @throws RemoteServerException When server fails
 	 */
-	private void fireRequestBlockOne() throws RemoteServerException, LoginFailedException {
-		ServerRequest[] requests = CommonRequest.fillRequest(new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
-				CommonRequest.getDownloadRemoteConfigVersionMessageRequest()), this);
+	private void fireRequestBlock(ServerRequest request) throws RemoteServerException, LoginFailedException {
+		ServerRequest[] requests = CommonRequest.fillRequest(request, this);
 
 		getRequestHandler().sendServerRequests(requests);
 		try {
@@ -223,17 +223,8 @@ public class PokemonGo {
 	 * @throws RemoteServerException When server fails
 	 */
 	public void fireRequestBlockTwo() throws RemoteServerException, LoginFailedException {
-		ServerRequest[] requests = CommonRequest.fillRequest(
-				new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
-				CommonRequest.getGetAssetDigestMessageRequest()), this);
-
-		getRequestHandler().sendServerRequests(requests);
-		try {
-			inventories.updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
-			settings.updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException();
-		}
+		fireRequestBlock(new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
+				CommonRequest.getGetAssetDigestMessageRequest()));
 	}
 
 	/**
