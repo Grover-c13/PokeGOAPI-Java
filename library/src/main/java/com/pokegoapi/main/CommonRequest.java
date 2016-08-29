@@ -15,6 +15,7 @@
 
 package com.pokegoapi.main;
 
+import POGOProtos.Networking.Requests.Messages.CheckChallenge;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.util.Constant;
 
@@ -83,6 +84,16 @@ public class CommonRequest {
 	}
 
 	/**
+	 * Constant for repetitive usage of GetInventoryMessage request
+	 *
+	 * @param api The current instance of PokemonGO
+	 * @return GetInventoryMessage
+	 */
+	public static CheckChallenge.CheckChallengeMessage getCheckChallengeMessage(PokemonGo api) {
+		return CheckChallenge.CheckChallengeMessage.newBuilder().build();
+	}
+
+	/**
 	 * Most of the requests from the official client are fired together with the following
 	 * requests. We will append our request on top of the array and we will send it
 	 * together with the others.
@@ -92,15 +103,17 @@ public class CommonRequest {
 	 * @return an array of ServerRequest
 	 */
 	public static ServerRequest[] fillRequest(ServerRequest request, PokemonGo api) {
-		ServerRequest[] serverRequests = new ServerRequest[5];
+		ServerRequest[] serverRequests = new ServerRequest[6];
 		serverRequests[0] = request;
-		serverRequests[1] = new ServerRequest(RequestType.GET_HATCHED_EGGS,
+		serverRequests[1] = new ServerRequest(RequestType.CHECK_CHALLENGE,
+				CheckChallenge.CheckChallengeMessage.getDefaultInstance());
+		serverRequests[2] = new ServerRequest(RequestType.GET_HATCHED_EGGS,
 				GetHatchedEggsMessage.getDefaultInstance());
-		serverRequests[2] = new ServerRequest(RequestType.GET_INVENTORY,
+		serverRequests[3] = new ServerRequest(RequestType.GET_INVENTORY,
 				CommonRequest.getDefaultGetInventoryMessage(api));
-		serverRequests[3] = new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
+		serverRequests[4] = new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
 				CheckAwardedBadgesMessage.getDefaultInstance());
-		serverRequests[4] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
+		serverRequests[5] = new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
 				CommonRequest.getDownloadSettingsMessageRequest(api));
 		return serverRequests;
 	}
