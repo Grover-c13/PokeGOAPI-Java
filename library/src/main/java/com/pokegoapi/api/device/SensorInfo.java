@@ -112,21 +112,18 @@ public class SensorInfo {
 		}
 		if (currentTime - sensorInfo.getTimestampCreate() > (random.nextInt(10 * 1000) + 5 * 1000)) {
 			sensorInfo.setTimestampCreate(currentTime);
-			return sensorInfo.getSensorInfo();
+			return sensorInfo.getBuilder().build();
 		}
 		return null;
 	}
 
+	/**
+	 * Gets the scene info builder
+	 *
+	 * @return the scene info builder
+	 */
 	public SignatureOuterClass.Signature.SensorInfo.Builder getBuilder() {
 		return sensorInfoBuilder;
 	}
 
-	/**
-	 * Gets SensorInfo.
-	 *
-	 * @return SensorInfo
-	 */
-	public SignatureOuterClass.Signature.SensorInfo getSensorInfo() {
-		return sensorInfoBuilder.build();
-	}
 }
