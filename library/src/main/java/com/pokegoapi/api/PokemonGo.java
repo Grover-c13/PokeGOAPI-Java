@@ -93,6 +93,8 @@ public class PokemonGo {
 	@Setter
 	public LocationFixes locationFixes;
 	private float distance;
+	@Setter
+	private float speed;
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -113,7 +115,8 @@ public class PokemonGo {
 		map = new Map(this);
 		longitude = Double.NaN;
 		latitude = Double.NaN;
-		altitude = Double.NaN;
+		altitude = Float.NaN;
+		speed = Float.NaN;
 	}
 
 	/**
@@ -292,7 +295,7 @@ public class PokemonGo {
 	 */
 	public void setLocation(double latitude, double longitude, float altitude, double accuracy) {
 		if (latitude != this.latitude || longitude != this.longitude) {
-			if (this.latitude != Double.NaN && this.longitude != Double.NaN) {
+			if (this.latitude != Double.NaN) {
 				this.distance += distFrom(this.latitude, this.longitude, latitude, longitude);
 			}
 			getMap().clearCache();
@@ -320,6 +323,9 @@ public class PokemonGo {
 	 * @return speed in m/s
 	 */
 	public float getSpeed() {
+		if (speed != Float.NaN) {
+			return speed;
+		}
 		return this.distance / startTime * 1000;
 	}
 
@@ -360,7 +366,7 @@ public class PokemonGo {
 	 * @throws IllegalStateException if location has not been set
 	 */
 	public Map getMap() {
-		if (this.latitude == Double.NaN || this.longitude == Double.NaN) {
+		if (this.latitude == Double.NaN) {
 			throw new IllegalStateException("Attempt to get map without setting location first");
 		}
 		return map;
