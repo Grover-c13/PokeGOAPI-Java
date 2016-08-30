@@ -54,7 +54,7 @@ public class Signature {
 				.setTimestamp(api.currentTimeMillis())
 				.setTimestampSinceStart(currentTime - api.getStartTime())
 				.setDeviceInfo(api.getDeviceInfo())
-				.setActivityStatus(ActivityStatus.getDefault(api, random))
+				.setActivityStatus(api.getActivitySignature(random))
 				.addAllLocationFix(LocationFixes.getDefault(api, builder, currentTime, random))
 				.setUnknown25(Constant.UNK25);
 
