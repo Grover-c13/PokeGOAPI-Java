@@ -113,6 +113,7 @@ public class PokemonGo {
 		map = new Map(this);
 		longitude = Double.NaN;
 		latitude = Double.NaN;
+		altitude = Double.NaN;
 	}
 
 	/**
@@ -375,5 +376,32 @@ public class PokemonGo {
 			deviceInfo = DeviceInfo.getDefault(this);
 		}
 		return deviceInfo.getDeviceInfo();
+	}
+	
+	/**
+	 * Gets the sensor info
+	 *
+	 * @param currentTime the current time
+	 * @param random      the random object
+	 * @return the sensor info
+	 */
+	public SignatureOuterClass.Signature.SensorInfo getSensorSignature(long currentTime, Random random) {
+		if (sensorInfo == null || sensorInfo.getTimestampCreate() != 0L) {
+			return SensorInfo.getDefault(this, currentTime, random);
+		}
+		return sensorInfo.getSensorInfo();
+	}
+	
+	/**
+	 * Gets the activity status
+	 *
+	 * @param random the random object
+	 * @return the activity status
+	 */
+	public SignatureOuterClass.Signature.ActivityStatus getActivitySignature(Random random) {
+		if (activityStatus == null) {
+			return ActivityStatus.getDefault(this, random);
+		}
+		return activityStatus.getActivityStatus();
 	}
 }
