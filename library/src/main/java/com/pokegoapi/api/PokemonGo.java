@@ -27,6 +27,7 @@ import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
@@ -165,66 +166,27 @@ public class PokemonGo {
 	}
 
 	private void initialize() throws RemoteServerException, LoginFailedException {
-		fireRequestBlock(new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
+		fireRequestBlock(new AsyncServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
 				CommonRequest.getDownloadRemoteConfigVersionMessageRequest()));
 
 		fireRequestBlockTwo();
-
-		// From now one we will start to check our accounts is ready to fire requests.
-		// Actually, we can receive valid responses even with this first check,
-		// that mark the tutorial state into LEGAL_SCREEN.
-		// Following, we are going to check if the account binded to this session
-		// have an avatar, a nickname, and all the other things that are usually filled
-		// on the official client BEFORE sending any requests such as the getMapObject etc.
-		ArrayList<TutorialState> tutorialStates = playerProfile.getTutorialState().getTutorialStates();
-		if (tutorialStates.isEmpty()) {
-			playerProfile.activateAccount();
-		}
-
-		if (!tutorialStates.contains(TutorialState.AVATAR_SELECTION)) {
-			playerProfile.setupAvatar();
-		}
-
-		if (!tutorialStates.contains(TutorialState.POKEMON_CAPTURE)) {
-			playerProfile.encounterTutorialComplete();
-		}
-
-		if (!tutorialStates.contains(TutorialState.NAME_SELECTION)) {
-			playerProfile.claimCodeName();
-		}
-
-		if (!tutorialStates.contains(TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
-			playerProfile.firstTimeExperienceComplete();
-		}
 	}
 
 	/**
 	 * Fire requests block.
 	 *
 	 * @param request server request
-	 * @throws LoginFailedException  When login fails
-	 * @throws RemoteServerException When server fails
 	 */
-	private void fireRequestBlock(ServerRequest request) throws RemoteServerException, LoginFailedException {
-		ServerRequest[] requests = CommonRequest.fillRequest(request, this);
-
-		getRequestHandler().sendServerRequests(requests);
-		try {
-			inventories.updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
-			settings.updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException();
-		}
+	private void fireRequestBlock(AsyncServerRequest request) {
+		request.addCommonRequest(CommonRequest.getCommonRequests(this));
+		getRequestHandler().sendAsyncServerRequests(request);
 	}
 
 	/**
 	 * Second requests block. Public since it could be re-fired at any time
-	 *
-	 * @throws LoginFailedException  When login fails
-	 * @throws RemoteServerException When server fails
 	 */
-	public void fireRequestBlockTwo() throws RemoteServerException, LoginFailedException {
-		fireRequestBlock(new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
+	public void fireRequestBlockTwo() {
+		fireRequestBlock(new AsyncServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
 				CommonRequest.getGetAssetDigestMessageRequest()));
 	}
 

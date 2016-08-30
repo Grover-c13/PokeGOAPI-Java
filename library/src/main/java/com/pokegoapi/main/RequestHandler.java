@@ -274,33 +274,24 @@ public class RequestHandler implements Runnable {
 
 	@Override
 	public void run() {
-		List<AsyncServerRequest> requests = new LinkedList<>();
+		AsyncServerRequest request = null;
 		AuthTicket authTicket = null;
 		while (true) {
 			try {
-				Thread.sleep(350);
-			} catch (InterruptedException e) {
-				throw new AsyncPokemonGoException("System shutdown", e);
-			}
-			if (workQueue.isEmpty()) {
-				continue;
+				request = workQueue.take();
+			} catch (Throwable e) {
+
 			}
 
-			workQueue.drainTo(requests);
+			if (request == null)
+				continue;
 
 			ArrayList<ServerRequest> serverRequests = new ArrayList();
-			boolean addCommon = false;
-			for (AsyncServerRequest request : requests) {
-				serverRequests.add(new ServerRequest(request.getType(), request.getRequest()));
-				if (request.isRequireCommonRequest())
-					addCommon = true;
-			}
 
-			ServerRequest[] commonRequests = new ServerRequest[0];
+			serverRequests.add(new ServerRequest(request.getType(), request.getRequest()));
 
-			if (addCommon) {
-				commonRequests = CommonRequest.getCommonRequests(api);
-				Collections.addAll(serverRequests, commonRequests);
+			for (ServerRequest extra : request.getCommonRequests()) {
+				serverRequests.add(extra);
 			}
 
 			ServerRequest[] arrayServerRequests = serverRequests.toArray(new ServerRequest[serverRequests.size()]);
@@ -308,31 +299,33 @@ public class RequestHandler implements Runnable {
 			try {
 				authTicket = internalSendServerRequests(authTicket, arrayServerRequests);
 
-				for (int i = 0; i != requests.size(); i++) {
-					try {
-						resultMap.put(requests.get(i).getId(), ResultOrException.getResult(arrayServerRequests[i].getData()));
-					} catch (InvalidProtocolBufferException e) {
-						resultMap.put(requests.get(i).getId(), ResultOrException.getError(e));
-					}
-				}
-
-				for (int i = 0; i != commonRequests.length; i++) {
-					try {
-						CommonRequest.parse(api, arrayServerRequests[requests.size() + i].getType(),
-								arrayServerRequests[requests.size() + i].getData());
-					} catch (InvalidProtocolBufferException e) {
-						//TODO: notify error even in case of common requests?
-					}
-				}
-
-				continue;
-			} catch (RemoteServerException | LoginFailedException e) {
-				for (AsyncServerRequest request : requests) {
+				try {
+					resultMap.put(request.getId(), ResultOrException.getResult(arrayServerRequests[0].getData()));
+				} catch (InvalidProtocolBufferException e) {
 					resultMap.put(request.getId(), ResultOrException.getError(e));
 				}
+
+				// Assuming all the bunded requests are commons
+				if (arrayServerRequests.length > 1) {
+					for (int i = 1; i != arrayServerRequests.length; i++) {
+						try {
+							CommonRequest.parse(api, arrayServerRequests[i].getType(),
+									arrayServerRequests[i].getData());
+						} catch (InvalidProtocolBufferException e) {
+							//TODO: notify error even in case of common requests?
+						}
+					}
+				}
+				continue;
+			} catch (RemoteServerException | LoginFailedException e) {
+				resultMap.put(request.getId(), ResultOrException.getError(e));
 				continue;
 			} finally {
-				requests.clear();
+				try {
+					Thread.sleep(500);
+				} catch (Throwable e) {
+
+				}
 			}
 		}
 	}

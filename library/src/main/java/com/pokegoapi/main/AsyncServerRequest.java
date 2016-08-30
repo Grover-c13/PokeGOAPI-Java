@@ -17,6 +17,9 @@ package com.pokegoapi.main;
 
 import com.google.protobuf.GeneratedMessage;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import POGOProtos.Networking.Requests.RequestOuterClass.Request;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import lombok.Getter;
@@ -32,23 +35,7 @@ public class AsyncServerRequest {
 	@Getter
 	private final Request request;
 	@Getter
-	private final boolean requireCommonRequest;
-
-	/**
-	 * Instantiates a new Server request.
-	 *
-	 * @param type the type
-	 * @param req  the req
-	 * @param requireCommonRequest indicate if this request require common requests
-	 */
-	public AsyncServerRequest(RequestType type, GeneratedMessage req, boolean requireCommonRequest) {
-		Request.Builder reqBuilder = Request.newBuilder();
-		reqBuilder.setRequestMessage(req.toByteString());
-		reqBuilder.setRequestType(type);
-		this.type = type;
-		this.request = reqBuilder.build();
-		this.requireCommonRequest = requireCommonRequest;
-	}
+	private final ArrayList<ServerRequest> commonRequests;
 
 	/**
 	 * Instantiates a new Server request.
@@ -57,18 +44,16 @@ public class AsyncServerRequest {
 	 * @param req  the req
 	 */
 	public AsyncServerRequest(RequestType type, GeneratedMessage req) {
-		this(type, req, false);
+		Request.Builder reqBuilder = Request.newBuilder();
+		reqBuilder.setRequestMessage(req.toByteString());
+		reqBuilder.setRequestType(type);
+		this.type = type;
+		this.request = reqBuilder.build();
+		this.commonRequests = new ArrayList<ServerRequest>();
 	}
 
-	/**
-	 * Instantiates a new Server request.
-	 *
-	 * @param type the type
-	 * @param req  the req
-	 */
-	AsyncServerRequest(RequestType type, Request req) {
-		this.type = type;
-		this.request = req;
-		this.requireCommonRequest = false;
+	public AsyncServerRequest addCommonRequest(ServerRequest... requests) {
+		Collections.addAll(commonRequests, requests);
+		return this;
 	}
 }

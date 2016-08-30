@@ -105,31 +105,6 @@ public class CommonRequest {
 	}
 
 	/**
-	 * Most of the requests from the official client are fired together with the following
-	 * requests. We will append our request on top of the array and we will send it
-	 * together with the others.
-	 *
-	 * @param request The main request we want to fire
-	 * @param api The current instance of PokemonGO
-	 * @return an array of ServerRequest
-	 */
-	public static ServerRequest[] fillRequest(ServerRequest request, PokemonGo api) {
-		return new ServerRequest[] {
-				request,
-				new ServerRequest(RequestType.CHECK_CHALLENGE,
-						CheckChallengeMessage.getDefaultInstance()),
-				new ServerRequest(RequestType.GET_HATCHED_EGGS,
-						GetHatchedEggsMessage.getDefaultInstance()),
-				new ServerRequest(RequestType.GET_INVENTORY,
-						CommonRequest.getDefaultGetInventoryMessage(api)),
-				new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
-						CheckAwardedBadgesMessage.getDefaultInstance()),
-				new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
-						CommonRequest.getDownloadSettingsMessageRequest(api))
-		};
-	}
-
-	/**
 	 * Construct a List of common requests
 	 *
 	 * @param api The current instance of PokemonGO

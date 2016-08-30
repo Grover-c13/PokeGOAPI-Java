@@ -33,6 +33,7 @@ import com.pokegoapi.google.common.geometry.MutableInteger;
 import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.MapUtil;
@@ -349,7 +350,8 @@ public class Map {
 		}
 
 		final AsyncServerRequest asyncServerRequest = new AsyncServerRequest(
-				RequestType.GET_MAP_OBJECTS, builder.build(), true);
+				RequestType.GET_MAP_OBJECTS, builder.build());
+		asyncServerRequest.addCommonRequest(CommonRequest.getCommonRequests(api));
 		return api.getRequestHandler()
 				.sendAsyncServerRequests(asyncServerRequest).map(new Func1<ByteString, MapObjects>() {
 					@Override

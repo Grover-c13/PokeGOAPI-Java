@@ -15,19 +15,23 @@
 
 package com.pokegoapi.api.player;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Stats;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Random;
@@ -42,6 +46,7 @@ import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Enums.TutorialStateOuterClass;
 import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
+import POGOProtos.Networking.Requests.Messages.CheckChallenge;
 import POGOProtos.Networking.Requests.Messages.ClaimCodenameMessageOuterClass.ClaimCodenameMessage;
 import POGOProtos.Networking.Requests.Messages.EncounterTutorialCompleteMessageOuterClass.EncounterTutorialCompleteMessage;
 import POGOProtos.Networking.Requests.Messages.EquipBadgeMessageOuterClass.EquipBadgeMessage;
@@ -55,11 +60,13 @@ import POGOProtos.Networking.Responses.ClaimCodenameResponseOuterClass.ClaimCode
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import POGOProtos.Networking.Responses.EquipBadgeResponseOuterClass;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
+import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import POGOProtos.Networking.Responses.MarkTutorialCompleteResponseOuterClass.MarkTutorialCompleteResponse;
 import POGOProtos.Networking.Responses.SetAvatarResponseOuterClass.SetAvatarResponse;
 import lombok.Setter;
+import rx.functions.Func1;
 
 public class PlayerProfile {
 	private static final String TAG = PlayerProfile.class.getSimpleName();
@@ -91,24 +98,57 @@ public class PlayerProfile {
 
 	/**
 	 * Updates the player profile with the latest data.
-	 *
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public void updateProfile() throws RemoteServerException, LoginFailedException {
+	public void updateProfile() {
 		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
 				.setPlayerLocale(playerLocale.getPlayerLocale())
 				.build();
 
-		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
-		api.getRequestHandler().sendServerRequests(
-				CommonRequest.appendCheckChallenge(getPlayerServerRequest));
+		AsyncServerRequest getPlayerServerRequest = new AsyncServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg)
+				.addCommonRequest(new ServerRequest(RequestType.CHECK_CHALLENGE,
+						CheckChallenge.CheckChallengeMessage.getDefaultInstance()));
 
-		try {
-			updateProfile(GetPlayerResponse.parseFrom(getPlayerServerRequest.getData()));
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+		api.getRequestHandler().sendAsyncServerRequests(getPlayerServerRequest)
+				.map(new Func1<ByteString, Void>() {
+					@Override
+					public Void call(ByteString byteString) {
+						try {
+							GetPlayerResponse getPlayerResponse = GetPlayerResponse.parseFrom(byteString);
+							updateProfile(getPlayerResponse);
+
+							// From now one we will start to check our accounts is ready to fire requests.
+							// Actually, we can receive valid responses even with this first check,
+							// that mark the tutorial state into LEGAL_SCREEN.
+							// Following, we are going to check if the account binded to this session
+							// have an avatar, a nickname, and all the other things that are usually filled
+							// on the official client BEFORE sending any requests such as the getMapObject etc.
+							ArrayList<TutorialStateOuterClass.TutorialState> tutorialStates =
+									getTutorialState().getTutorialStates();
+							if (tutorialStates.isEmpty()) {
+								activateAccount();
+							}
+
+							if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION)) {
+								setupAvatar();
+							}
+
+							if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.POKEMON_CAPTURE)) {
+								encounterTutorialComplete();
+							}
+
+							if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.NAME_SELECTION)) {
+								claimCodeName();
+							}
+
+							if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
+								firstTimeExperienceComplete();
+							}
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+						return null;
+					}
+				});
 	}
 
 	/**
@@ -313,21 +353,15 @@ public class PlayerProfile {
 
 	/**
 	 * Set the account to legal screen in order to receive valid response
-	 *
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public void activateAccount() throws LoginFailedException, RemoteServerException {
+	public void activateAccount() {
 		markTutorial(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN);
 	}
 
 	/**
 	 * Setup an avatar for the current account
-	 *
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public void setupAvatar() throws LoginFailedException, RemoteServerException {
+	public void setupAvatar() {
 		Random random = new Random();
 
 		final PlayerAvatarOuterClass.PlayerAvatar.Builder playerAvatarBuilder =
@@ -350,164 +384,129 @@ public class PlayerProfile {
 				.setPlayerAvatar(playerAvatarBuilder.build())
 				.build();
 
-		ServerRequest[] requests = CommonRequest.fillRequest(
-				new ServerRequest(RequestType.SET_AVATAR, setAvatarMessage), api);
+		AsyncServerRequest request = new AsyncServerRequest(RequestType.SET_AVATAR, setAvatarMessage)
+				.addCommonRequest(CommonRequest.getCommonRequests(api));
 
-		api.getRequestHandler().sendServerRequests(requests);
+		api.getRequestHandler().sendAsyncServerRequests(request)
+				.map(new Func1<ByteString, Void>() {
+					@Override
+					public Void call(ByteString byteString) {
+						try {
+							SetAvatarResponse setAvatarResponse = SetAvatarResponse.parseFrom(byteString);
+							playerData = setAvatarResponse.getPlayerData();
 
-		try {
-			SetAvatarResponse setAvatarResponse = SetAvatarResponse.parseFrom(requests[0].getData());
-			playerData = setAvatarResponse.getPlayerData();
+							updateProfile(playerData);
 
-			updateProfile(playerData);
+							markTutorial(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION);
 
-			api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
-			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-
-		markTutorial(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION);
-
-		api.fireRequestBlockTwo();
+							api.fireRequestBlockTwo();
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+						return null;
+					}
+				});
 	}
 
 	/**
 	 * Encounter tutorial complete. In other words, catch the first Pokémon
-	 *
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public void encounterTutorialComplete() throws LoginFailedException, RemoteServerException {
+	public void encounterTutorialComplete() {
 		Random random = new Random();
 		int pokemonId = random.nextInt(4);
 
 		final EncounterTutorialCompleteMessage.Builder encounterTutorialCompleteBuilder =
 				EncounterTutorialCompleteMessage.newBuilder()
-				.setPokemonId(pokemonId == 1 ? PokemonId.BULBASAUR :
-					pokemonId == 2 ? PokemonId.CHARMANDER : PokemonId.SQUIRTLE);
+						.setPokemonId(pokemonId == 1 ? PokemonId.BULBASAUR :
+								pokemonId == 2 ? PokemonId.CHARMANDER : PokemonId.SQUIRTLE);
 
-		ServerRequest[] requests = CommonRequest.fillRequest(
-				new ServerRequest(RequestType.ENCOUNTER_TUTORIAL_COMPLETE,
-				encounterTutorialCompleteBuilder.build()), api);
+		AsyncServerRequest encounterTutorialRequest = new AsyncServerRequest(
+				RequestType.ENCOUNTER_TUTORIAL_COMPLETE, encounterTutorialCompleteBuilder.build())
+				.addCommonRequest(new ServerRequest(RequestType.CHECK_CHALLENGE,
+						CheckChallenge.CheckChallengeMessage.getDefaultInstance()));
 
-		api.getRequestHandler().sendServerRequests(requests);
+		api.getRequestHandler().sendAsyncServerRequests(encounterTutorialRequest)
+				.map(new Func1<ByteString, Void>() {
+					@Override
+					public Void call(ByteString byteString) {
+						return null;
+					}
+				});
 
-		try {
-			api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
-			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-
-		final GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
-				.setPlayerLocale(playerLocale.getPlayerLocale())
-				.build();
-		requests = CommonRequest.fillRequest(
-				new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg), api);
-
-		api.getRequestHandler().sendServerRequests(requests);
-
-		try {
-			updateProfile(GetPlayerResponse.parseFrom(requests[0].getData()));
-
-			api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
-			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+		updateProfileAsync();
 	}
 
 	/**
 	 * Setup an user name for our account
-	 *
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public void claimCodeName() throws LoginFailedException, RemoteServerException {
+	public void claimCodeName() {
 		ClaimCodenameMessage claimCodenameMessage = ClaimCodenameMessage.newBuilder()
 				.setCodename(randomCodenameGenerator())
 				.build();
 
-		ServerRequest[] requests = CommonRequest.fillRequest(
-				new ServerRequest(RequestType.CLAIM_CODENAME,
-						claimCodenameMessage), api);
+		AsyncServerRequest getPlayerRequest = new AsyncServerRequest(
+				RequestType.CLAIM_CODENAME, claimCodenameMessage)
+				.addCommonRequest(CommonRequest.getCommonRequests(api));
 
-		api.getRequestHandler().sendServerRequests(requests);
+		api.getRequestHandler().sendAsyncServerRequests(getPlayerRequest)
+				.map(new Func1<ByteString, Void>() {
+					@Override
+					public Void call(ByteString byteString) {
+						String updatedCodename = null;
 
-		String updatedCodename = null;
-		try {
-			api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
-			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
+						try {
+							ClaimCodenameResponse claimCodenameResponse = ClaimCodenameResponse.parseFrom(byteString);
+							if (claimCodenameResponse.getStatus() != ClaimCodenameResponse.Status.SUCCESS) {
+								if (claimCodenameResponse.getUpdatedPlayer().getRemainingCodenameClaims() > 0) {
+									claimCodeName();
+								}
+							} else {
+								updatedCodename = claimCodenameResponse.getCodename();
+								updateProfile(claimCodenameResponse.getUpdatedPlayer());
+							}
 
-			ClaimCodenameResponse claimCodenameResponse = ClaimCodenameResponse.parseFrom(requests[0].getData());
-			if (claimCodenameResponse.getStatus() != ClaimCodenameResponse.Status.SUCCESS) {
-				if (claimCodenameResponse.getUpdatedPlayer().getRemainingCodenameClaims() > 0) {
-					claimCodeName();
-				}
-			} else {
-				updatedCodename = claimCodenameResponse.getCodename();
-				updateProfile(claimCodenameResponse.getUpdatedPlayer());
-			}
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-
-		if (updatedCodename != null) {
-			markTutorial(TutorialStateOuterClass.TutorialState.NAME_SELECTION);
-
-			final GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
-					.setPlayerLocale(playerLocale.getPlayerLocale())
-					.build();
-			requests = CommonRequest.fillRequest(
-					new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg), api);
-
-			api.getRequestHandler().sendServerRequests(requests);
-
-			try {
-				updateProfile(GetPlayerResponse.parseFrom(requests[0].getData()));
-
-				api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
-				api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
-			} catch (InvalidProtocolBufferException e) {
-				throw new RemoteServerException(e);
-			}
-		}
+							if (updatedCodename != null) {
+								markTutorial(TutorialStateOuterClass.TutorialState.NAME_SELECTION);
+								updateProfileAsync();
+							}
+						} catch (InvalidProtocolBufferException e) {
+							e.printStackTrace();
+						}
+						return null;
+					}
+				});
 	}
 
 	/**
 	 * The last step, mark the last tutorial state as completed
-	 *
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public void firstTimeExperienceComplete()
-			throws LoginFailedException, RemoteServerException {
+	public void firstTimeExperienceComplete() {
 		markTutorial(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE);
 	}
 
-	private void markTutorial(TutorialStateOuterClass.TutorialState state)
-				throws LoginFailedException, RemoteServerException {
+	private void markTutorial(TutorialStateOuterClass.TutorialState state) {
 		final MarkTutorialCompleteMessage tutorialMessage = MarkTutorialCompleteMessage.newBuilder()
 				.addTutorialsCompleted(state)
 				.setSendMarketingEmails(false)
 				.setSendPushNotifications(false).build();
 
-		ServerRequest[] requests = CommonRequest.fillRequest(
-				new ServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialMessage), api);
+		AsyncServerRequest request = new AsyncServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialMessage)
+				.addCommonRequest(CommonRequest.getCommonRequests(api));
 
-		api.getRequestHandler().sendServerRequests(requests);
+		api.getRequestHandler().sendAsyncServerRequests(request)
+				.map(new Func1<ByteString, Void>() {
+					@Override
+					public Void call(ByteString byteString) {
+						try {
+							playerData = MarkTutorialCompleteResponse.parseFrom(byteString).getPlayerData();
 
-		try {
-			playerData = MarkTutorialCompleteResponse.parseFrom(requests[0].getData()).getPlayerData();
-
-			updateProfile(playerData);
-
-			api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
-			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+							updateProfile(playerData);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+						return null;
+					}
+				});
 	}
 
 	private static String randomCodenameGenerator() {
@@ -519,5 +518,28 @@ public class PlayerProfile {
 			sb.append(a.charAt(r.nextInt(a.length())));
 		}
 		return sb.toString();
+	}
+
+	private void updateProfileAsync() {
+		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
+				.setPlayerLocale(playerLocale.getPlayerLocale())
+				.build();
+
+		AsyncServerRequest getPlayerServerRequest = new AsyncServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg)
+				.addCommonRequest(CommonRequest.getCommonRequests(api));
+
+		api.getRequestHandler().sendAsyncServerRequests(getPlayerServerRequest)
+				.map(new Func1<ByteString, Void>() {
+					@Override
+					public Void call(ByteString byteString) {
+						try {
+							GetPlayerResponse getPlayerResponse = GetPlayerResponse.parseFrom(byteString);
+							updateProfile(getPlayerResponse);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+						return null;
+					}
+				});
 	}
 }
