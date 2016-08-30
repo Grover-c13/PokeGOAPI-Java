@@ -318,6 +318,17 @@ public class PokemonGo {
 	}
 
 	/**
+	 * Set the device info
+	 *
+	 * @param deviceInfo the device info
+	 */
+	public void setDeviceInfo(DeviceInfo deviceInfo) {
+		if (deviceInfo != null) {
+			this.deviceInfo = deviceInfo
+		}
+	}
+	
+	/**
 	 * Gets the device info
 	 *
 	 * @return the device info
