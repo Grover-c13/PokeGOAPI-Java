@@ -337,7 +337,7 @@ public class PokemonGo {
 	 * @return the sensor info
 	 */
 	public SignatureOuterClass.Signature.SensorInfo getSensorSignature(long currentTime, Random random) {
-		if (sensorInfo == null || sensorInfo.getTimestampCreate() != 0L) {
+		if (this.sensorInfo == null || sensorInfo.getTimestampCreate() != 0L) {
 			return SensorInfo.getDefault(this, currentTime, random);
 		}
 		return sensorInfo.getSensorInfo();
@@ -350,7 +350,7 @@ public class PokemonGo {
 	 * @return the activity status
 	 */
 	public SignatureOuterClass.Signature.ActivityStatus getActivitySignature(Random random) {
-		if (activityStatus == null) {
+		if (this.activityStatus == null) {
 			return ActivityStatus.getDefault(this, random);
 		}
 		return activityStatus.getActivityStatus();
