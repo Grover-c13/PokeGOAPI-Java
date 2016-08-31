@@ -15,21 +15,6 @@
 
 package com.pokegoapi.api.inventory;
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.AsyncHelper;
-import com.pokegoapi.util.Log;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
-
 import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.RecycleInventoryItemMessageOuterClass.RecycleInventoryItemMessage;
@@ -40,7 +25,19 @@ import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass;
 import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result;
 import POGOProtos.Networking.Responses.UseIncenseResponseOuterClass.UseIncenseResponse;
 import POGOProtos.Networking.Responses.UseItemXpBoostResponseOuterClass.UseItemXpBoostResponse;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.util.AsyncHelper;
+import com.pokegoapi.util.Log;
 import rx.functions.Func1;
+
+import java.util.Collection;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -171,23 +168,30 @@ public class ItemBag {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
-	public void useIncense(ItemId type) throws RemoteServerException, LoginFailedException {
+	public UseIncenseResponse.Result useIncense(ItemId type) throws RemoteServerException, LoginFailedException {
 		UseIncenseMessage useIncenseMessage =
 				UseIncenseMessage.newBuilder()
 						.setIncenseType(type)
 						.setIncenseTypeValue(type.getNumber())
 						.build();
 
-		ServerRequest useIncenseRequest = new ServerRequest(RequestType.USE_INCENSE,
-				useIncenseMessage);
-		api.getRequestHandler().sendServerRequests(useIncenseRequest);
 
-		try {
-			UseIncenseResponse response = UseIncenseResponse.parseFrom(useIncenseRequest.getData());
-			Log.i("Main", "Use incense result: " + response.getResult());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.USE_INCENSE,
+				useIncenseMessage, api);
+		return AsyncHelper.toBlocking(
+				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, UseIncenseResponse.Result>() {
+
+					@Override
+					public UseIncenseResponse.Result call(ByteString bytes) {
+						try {
+							UseIncenseResponse response = UseIncenseResponse.parseFrom(bytes);
+							Log.i("Main", "Use incense result: " + response.getResult());
+							return response.getResult();
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+					}
+				}));
 	}
 
 
@@ -214,17 +218,23 @@ public class ItemBag {
 				.setItemId(ItemId.ITEM_LUCKY_EGG)
 				.build();
 
-		ServerRequest req = new ServerRequest(RequestType.USE_ITEM_XP_BOOST,
-				xpMsg);
-		api.getRequestHandler().sendServerRequests(req);
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.USE_ITEM_XP_BOOST,
+				xpMsg, api);
+		return AsyncHelper.toBlocking(
+				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, UseItemXpBoostResponse>() {
 
-		try {
-			UseItemXpBoostResponse response = UseItemXpBoostResponse.parseFrom(req.getData());
-			Log.i("Main", "Use incense result: " + response.getResult());
-			return response;
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+					@Override
+					public UseItemXpBoostResponse call(ByteString bytes) {
+						try {
+							UseItemXpBoostResponse response = UseItemXpBoostResponse.parseFrom(bytes);
+							Log.i("Main", "Use incense result: " + response.getResult());
+							return response;
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+					}
+				})
+		);
 	}
 
 }

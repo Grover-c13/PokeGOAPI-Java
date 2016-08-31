@@ -82,24 +82,26 @@ public class Pokemon extends PokemonDetails {
 	public Result transferPokemon() throws LoginFailedException, RemoteServerException {
 		ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestType.RELEASE_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		final Pokemon me = this;
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.RELEASE_POKEMON, reqMsg, api);
+		return AsyncHelper.toBlocking(
+				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, Result>() {
 
-		ReleasePokemonResponse response;
-		try {
-			response = ReleasePokemonResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			return ReleasePokemonResponse.Result.FAILED;
-		}
+					@Override
+					public Result call(ByteString bytes) {
+						ReleasePokemonResponse response;
+						try {
+							response = ReleasePokemonResponse.parseFrom(bytes);
+						} catch (InvalidProtocolBufferException e) {
+							return ReleasePokemonResponse.Result.FAILED;
+						}
 
-		if (response.getResult() == Result.SUCCESS) {
-			api.getInventories().getPokebank().removePokemon(this);
-		}
+						api.getInventories().getPokebank().removePokemon(me);
+						return response.getResult();
+					}
+				})
+		);
 
-		api.getInventories().getPokebank().removePokemon(this);
-
-
-		return response.getResult();
 	}
 
 	/**
@@ -117,19 +119,24 @@ public class Pokemon extends PokemonDetails {
 				.setNickname(nickname)
 				.build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestType.NICKNAME_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.NICKNAME_POKEMON, reqMsg, api);
+		return AsyncHelper.toBlocking(
+				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, NicknamePokemonResponse.Result>() {
 
-		NicknamePokemonResponse response;
-		try {
-			response = NicknamePokemonResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+					@Override
+					public NicknamePokemonResponse.Result call(ByteString bytes) {
+						NicknamePokemonResponse response;
+						try {
+							response = NicknamePokemonResponse.parseFrom(bytes);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
 
-		api.getInventories().getPokebank().removePokemon(this);
 
-		return response.getResult();
+						return response.getResult();
+					}
+				})
+		);
 	}
 
 	/**
@@ -147,19 +154,25 @@ public class Pokemon extends PokemonDetails {
 				.setIsFavorite(markFavorite)
 				.build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestType.SET_FAVORITE_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.SET_FAVORITE_POKEMON, reqMsg, api);
+		return AsyncHelper.toBlocking(
+				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, SetFavoritePokemonResponse.Result>() {
 
-		SetFavoritePokemonResponse response;
-		try {
-			response = SetFavoritePokemonResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+					@Override
+					public SetFavoritePokemonResponse.Result call(ByteString bytes) {
+						SetFavoritePokemonResponse response;
+						try {
+							response = SetFavoritePokemonResponse.parseFrom(bytes);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
 
-		api.getInventories().getPokebank().removePokemon(this);
 
-		return response.getResult();
+						return response.getResult();
+					}
+				})
+		);
+
 	}
 
 	/**
