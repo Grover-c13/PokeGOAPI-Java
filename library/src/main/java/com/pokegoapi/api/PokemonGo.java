@@ -228,9 +228,6 @@ public class PokemonGo {
 	 * @param altitude  the altitude
 	 */
 	public void setLocation(double latitude, double longitude, double altitude) {
-		if (latitude != this.latitude || longitude != this.longitude) {
-			getMap().clearCache();
-		}
 		setLatitude(latitude);
 		setLongitude(longitude);
 		setAltitude(altitude);

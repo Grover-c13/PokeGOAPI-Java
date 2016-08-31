@@ -180,56 +180,6 @@ public class MapObjects {
 		return complete;
 	}
 
-
-	/**
-	 * updates the object.
-	 *
-	 * @param other Update this {@link MapObjects} data with the provided data.
-	 */
-	@Deprecated
-	public void update(MapObjects other) {
-
-		nearbyPokemons.clear();
-		addNearbyPokemons(other.getNearbyPokemons());
-
-		catchablePokemons.clear();
-		addCatchablePokemons(other.getCatchablePokemons());
-
-		wildPokemons.clear();
-		addWildPokemons(other.getWildPokemons());
-
-		decimatedSpawnPoints.clear();
-		addDecimatedSpawnPoints(other.getDecimatedSpawnPoints());
-
-		spawnPoints.clear();
-		addSpawnPoints(other.getSpawnPoints());
-
-
-		/* for (FortData otherGym: other.getGyms()) {
-			Iterator<FortData> iterator = gyms.iterator();
-			while (iterator.hasNext()) {
-				FortData gym = iterator.next();
-				if (otherGym.getId().equals(gym.getId())) {
-					gyms.remove(gym);
-					break;
-				}
-			}
-			gyms.add(otherGym);
-		}
-
-		/*for (Pokestop otherPokestop: other.getPokestops()) {
-			Iterator<Pokestop> iterator = pokestops.iterator();
-			while (iterator.hasNext()) {
-				Pokestop pokestop = iterator.next();
-				if (otherPokestop.getId().equals(pokestop.getId())) {
-					pokestops.remove(pokestop);
-					break;
-				}
-			}
-			pokestops.add(otherPokestop);
-		}*/
-	}
-
 	public Set<CatchablePokemon> getAllCatchablePokemons() {
 		Set<CatchablePokemon> catchablePokemons = new HashSet<>();
 		for (MapPokemon mapPokemon : getCatchablePokemons()) {

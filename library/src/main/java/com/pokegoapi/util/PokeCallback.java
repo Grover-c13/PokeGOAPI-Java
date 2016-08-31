@@ -14,9 +14,8 @@ public abstract class PokeCallback<T> {
 
 	public Subscriber<T> getSubscriber() {
 		return new Subscriber<T>() {
-			public void onCompleted() {
-
-			}
+			@Override
+			public void onCompleted() {}
 
 			@Override
 			public void onError(Throwable e) {
@@ -24,8 +23,8 @@ public abstract class PokeCallback<T> {
 			}
 
 			@Override
-			public void onNext(T mapObjects) {
-				onResponse(mapObjects);
+			public void onNext(T object) {
+				onResponse(object);
 			}
 		};
 	}
