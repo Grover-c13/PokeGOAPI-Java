@@ -395,7 +395,7 @@ public class Map {
 	 * Request a MapObjects around your current location.
 	 */
 	public void getMapObjects(final PokeCallback<MapObjects> callback) {
-		getMapObjectsAsync().subscribe(getSubscriber(callback));
+		getMapObjectsAsync().subscribe(callback.getSubscriber());
 	}
 
 	/**
@@ -404,7 +404,7 @@ public class Map {
 	 * @param width width
 	 */
 	public void getMapObjects(int width, final PokeCallback<MapObjects> callback) {
-		getMapObjectsAsync(width).subscribe(getSubscriber(callback));
+		getMapObjectsAsync(width).subscribe(callback.getSubscriber());
 	}
 
 	/**
@@ -414,7 +414,7 @@ public class Map {
 	 * @return MapObjects in the given cells
 	 */
 	public void getMapObjects(List<Long> cellIds, PokeCallback<MapObjects> callback) {
-		getMapObjectsAsync(cellIds).subscribe(getSubscriber(callback));
+		getMapObjectsAsync(cellIds).subscribe(callback.getSubscriber());
 	}
 
 	/**
@@ -561,22 +561,5 @@ public class Map {
 		return getCellIds(api.getLatitude(), api.getLongitude(), cellWidth);
 	}
 
-	private Subscriber<MapObjects> getSubscriber(final PokeCallback<MapObjects> callback) {
-		return new Subscriber<MapObjects>() {
-			@Override
-			public void onCompleted() {
 
-			}
-
-			@Override
-			public void onError(Throwable e) {
-				callback.onError(e);
-			}
-
-			@Override
-			public void onNext(MapObjects mapObjects) {
-				callback.onResponse(mapObjects);
-			}
-		};
-	}
 }
