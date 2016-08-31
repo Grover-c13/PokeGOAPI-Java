@@ -149,7 +149,7 @@ public final class Networking {
 				.addRequests(RequestOuterClass.Request.newBuilder().setRequestTypeValue(600).build())
 				.setLatitude(location.getLatitude())
 				.setLongitude(location.getLongitude())
-				.setAltitude(location.getAltitude())
+				.setAccuracy(location.getAccuracy())
 				.setAuthInfo(authInfo)
 				.setMsSinceLastLocationfix(getUnknown12());
 		signature.setSignature(getPlayerRequest);
@@ -331,9 +331,9 @@ public final class Networking {
 				.addRequests(getDownloadSettings())
 				.setLatitude(location.getLatitude())
 				.setLongitude(location.getLongitude())
-				.setAltitude(location.getAltitude())
+				.setAccuracy(location.getAccuracy())
 				.setMsSinceLastLocationfix(getUnknown12());
-		//builder.setAuthInfo(api.getAuthInfo());
+
 		if (requestScheduler.getAuthTicket() != null
 				&& requestScheduler.getAuthTicket().getExpireTimestampMs() > 0
 				&& requestScheduler.getAuthTicket().getExpireTimestampMs() > System.currentTimeMillis()) {

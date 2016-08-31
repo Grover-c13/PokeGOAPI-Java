@@ -39,47 +39,47 @@ public interface SensorInfoProvider {
 		/**
 		 * accel normalized x
 		 */
-		private double accelNormalizedX;
+		private double linearAccelerationX;
 
 		/**
 		 * accel normalized y
 		 */
-		private double accelNormalizedY;
+		private double linearAccelerationY;
 
 		/**
 		 * accel normalized z
 		 */
-		private double accelNormalizedZ;
+		private double linearAccelerationZ;
 
 		/**
 		 * accel raw x
 		 */
-		private double accelRawX;
+		private double magneticFieldX;
 
 		/**
 		 * accel raw y
 		 */
-		private double accelRawY;
+		private double magneticFieldY;
 
 		/**
 		 * accel raw z
 		 */
-		private double accelRawZ;
+		private double magneticFieldZ;
 
 		/**
 		 * angel normalized x
 		 */
-		private double angleNormalizedX;
+		private double rotationVectorX;
 
 		/**
 		 * angel normalized y
 		 */
-		private double angleNormalizedY;
+		private double rotationVectorY;
 
 		/**
 		 * angel normalized z
 		 */
-		private double angleNormalizedZ;
+		private double rotationVectorZ;
 
 		/**
 		 * gyroscope raw x
@@ -95,6 +95,10 @@ public interface SensorInfoProvider {
 		 * gyroscope raw z
 		 */
 		private double gyroscopeRawZ;
+
+		private double gravityX;
+		private double gravityY;
+		private double gravityZ;
 	}
 
 }

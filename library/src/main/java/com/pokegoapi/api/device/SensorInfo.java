@@ -38,19 +38,22 @@ public class SensorInfo {
 		SensorInfoProvider.Info info = sensorInfoProvider.getInfo();
 		return SignatureOuterClass.Signature.SensorInfo.newBuilder()
 				.setTimestampSnapshot(info.getTimestampSnapshot())
+				.setLinearAccelerationX(info.getLinearAccelerationX())
+				.setLinearAccelerationY(info.getLinearAccelerationY())
+				.setLinearAccelerationZ(info.getLinearAccelerationZ())
 				.setAccelerometerAxes(info.getAccelerometerAxes())
-				.setAccelNormalizedX(info.getAccelNormalizedX())
-				.setAccelNormalizedY(info.getAccelNormalizedY())
-				.setAccelNormalizedZ(info.getAccelNormalizedZ())
-				.setAccelRawX(info.getAccelRawX())
-				.setAccelRawY(info.getAccelRawY())
-				.setAccelRawZ(info.getAccelRawZ())
-				.setAngleNormalizedX(info.getAngleNormalizedX())
-				.setAngleNormalizedY(info.getAngleNormalizedY())
-				.setAngleNormalizedZ(info.getAngleNormalizedZ())
+				.setMagneticFieldX(info.getMagneticFieldX())
+				.setMagneticFieldY(info.getMagneticFieldY())
+				.setMagneticFieldZ(info.getMagneticFieldZ())
+				.setRotationVectorX(info.getRotationVectorX())
+				.setRotationVectorY(info.getRotationVectorY())
+				.setRotationVectorZ(info.getRotationVectorZ())
 				.setGyroscopeRawX(info.getGyroscopeRawX())
 				.setGyroscopeRawY(info.getGyroscopeRawY())
 				.setGyroscopeRawZ(info.getGyroscopeRawZ())
+				.setGravityX(info.getGravityX())
+				.setGravityY(info.getGravityX())
+				.setGravityZ(info.getGravityZ())
 				.build();
 	}
 
@@ -66,15 +69,21 @@ public class SensorInfo {
 		public Info getInfo() {
 			Info info = new Info();
 			info.setTimestampSnapshot(System.currentTimeMillis() - timestampCreate + random.nextInt(500));
-			info.setAccelRawX(0.1 + (0.7 - 0.1) * random.nextDouble());
-			info.setAccelRawY(0.1 + (0.8 - 0.1) * random.nextDouble());
-			info.setAccelRawZ(0.1 + (0.8 - 0.1) * random.nextDouble());
+			info.setMagneticFieldX(0.1 + (0.7 - 0.1) * random.nextDouble());
+			info.setMagneticFieldY(0.1 + (0.8 - 0.1) * random.nextDouble());
+			info.setMagneticFieldZ(0.1 + (0.8 - 0.1) * random.nextDouble());
 			info.setGyroscopeRawX(-1.0 + random.nextDouble() * 2.0);
 			info.setGyroscopeRawY(-1.0 + random.nextDouble() * 2.0);
 			info.setGyroscopeRawZ(-1.0 + random.nextDouble() * 2.0);
-			info.setAccelNormalizedX(-1.0 + random.nextDouble() * 2.0);
-			info.setAccelNormalizedY(6.0 + (9.0 - 6.0) * random.nextDouble());
-			info.setAccelNormalizedZ(-1.0 + (8.0 - (-1.0)) * random.nextDouble());
+			info.setLinearAccelerationX(-1.0 + random.nextDouble() * 2.0);
+			info.setLinearAccelerationY(6.0 + (9.0 - 6.0) * random.nextDouble());
+			info.setLinearAccelerationZ(-1.0 + (8.0 - (-1.0)) * random.nextDouble());
+			info.setRotationVectorX(-1.0 + random.nextDouble() * 2.0);
+			info.setRotationVectorY(-1.0 + random.nextDouble() * 2.0);
+			info.setRotationVectorZ(-1.0 + random.nextDouble() * 2.0);
+			info.setGyroscopeRawX(-1.0 + random.nextDouble() * 2.0);
+			info.setGyroscopeRawY(-1.0 + random.nextDouble() * 2.0);
+			info.setGyroscopeRawZ(-1.0 + random.nextDouble() * 2.0);
 			info.setAccelerometerAxes(3);
 			return info;
 		}

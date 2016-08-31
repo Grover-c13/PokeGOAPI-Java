@@ -7,7 +7,6 @@ import com.annimon.stream.function.Function;
 import com.pokegoapi.api.internal.Location;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +22,7 @@ public class LocationFixes  {
 	public Collection<SignatureOuterClass.Signature.LocationFix> getLocationFixes(final Location location,
 																				  final boolean getMapObjectRequest) {
 		return Stream.of(locationFixProvider.getLocationFixes(location.getLatitude(), location.getLongitude(),
-				location.getAltitude(), getMapObjectRequest)).map(new Function<LocationFixProvider.LocationFix, SignatureOuterClass.Signature.LocationFix>() {
+				location.getAccuracy(), getMapObjectRequest)).map(new Function<LocationFixProvider.LocationFix, SignatureOuterClass.Signature.LocationFix>() {
 			@Override
 			public SignatureOuterClass.Signature.LocationFix apply(LocationFixProvider.LocationFix locationFix) {
 				SignatureOuterClass.Signature.LocationFix.Builder locationFixBuilder =

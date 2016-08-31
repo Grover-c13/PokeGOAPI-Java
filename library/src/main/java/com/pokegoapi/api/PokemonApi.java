@@ -76,7 +76,7 @@ public class PokemonApi implements Networking.Callback {
 	 * @param value the latitude
 	 * @throws IllegalArgumentException if value exceeds +-90
 	 */
-	public void setLatitude(double value) {
+	private void setLatitude(double value) {
 		if (value > 90 || value < -90) {
 			throw new IllegalArgumentException("latittude can not exceed +/- 90");
 		}
@@ -89,15 +89,15 @@ public class PokemonApi implements Networking.Callback {
 	 * @param value the longitude
 	 * @throws IllegalArgumentException if value exceeds +-180
 	 */
-	public void setLongitude(double value) {
+	private void setLongitude(double value) {
 		if (value > 180 || value < -180) {
 			throw new IllegalArgumentException("longitude can not exceed +/- 180");
 		}
 		location.setLongitude(value);
 	}
 
-	public void setAltitude(double value) {
-		location.setAltitude(value);
+	private void setAltitude(double value) {
+		location.setAccuracy(value);
 	}
 
 	public double getLatitude() {
@@ -109,7 +109,7 @@ public class PokemonApi implements Networking.Callback {
 	}
 
 	public double getAltitude() {
-		return location.getAltitude();
+		return location.getAccuracy();
 	}
 
 	public void setLocation(double latitude, double longitude, double altitude) {

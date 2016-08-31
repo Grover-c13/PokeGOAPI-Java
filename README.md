@@ -120,7 +120,7 @@ PokemonGo go = new PokemonGo(new PtcCredentialProvider(httpClient,username,passw
 // After this you can access the api from the PokemonGo instance :
 go.getPlayerProfile(); // to get the user profile
 go.getInventories(); // to get all his inventories (Pokemon, backpack, egg, incubator)
-go.setLocation(lat, long, alt); // set your position to get stuff around (altitude is not needed, you can use 1 for example)
+go.setLocation(lat, long, alt); // set your position to get stuff around (accuracy is not needed, you can use 1 for example)
 go.getMap().getCatchablePokemon(); // get all currently Catchable Pokemon around you
 
 // If you want to go deeper, you can directly send your request with our RequestHandler

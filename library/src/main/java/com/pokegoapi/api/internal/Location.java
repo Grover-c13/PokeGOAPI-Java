@@ -11,13 +11,13 @@ import lombok.Data;
 public class Location {
 	private float latitude;
 	private float longitude;
-	private float altitude;
+	private float accuracy;
 
 
-	public Location(double latitiude, double longitude, double altitude) {
+	public Location(double latitiude, double longitude, double accuracy) {
 		this.latitude = (float)latitiude;
 		this.longitude = (float)longitude;
-		this.altitude = (float)altitude;
+		this.accuracy = (float) accuracy;
 	}
 
 	public void setLatitude(double value) {
@@ -28,7 +28,7 @@ public class Location {
 		longitude = (float)value;
 	}
 
-	public void setAltitude(double value) {
-		altitude = (float)value;
+	public void setAccuracy(double value) {
+		accuracy = (float)value;
 	}
 }
