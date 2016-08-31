@@ -38,6 +38,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -78,11 +79,11 @@ public class RequestHandler implements Runnable {
 	/**
 	 * Make an async server request. The answer will be provided in the future
 	 *
-	 * @param serverRequest Request to make
+	 * @param asyncServerRequest Request to make
 	 * @return ByteString response to be processed in the future
 	 */
-	public Observable<ByteString> sendAsyncServerRequests(final AsyncServerRequest serverRequest) {
-		workQueue.offer(serverRequest);
+	public Observable<ByteString> sendAsyncServerRequests(final AsyncServerRequest asyncServerRequest) {
+		workQueue.offer(asyncServerRequest);
 		return Observable.from(new Future<ByteString>() {
 			@Override
 			public boolean cancel(boolean mayInterruptIfRunning) {
@@ -96,7 +97,7 @@ public class RequestHandler implements Runnable {
 
 			@Override
 			public boolean isDone() {
-				return resultMap.containsKey(serverRequest.getId());
+				return resultMap.containsKey(asyncServerRequest.getId());
 			}
 
 			@Override
@@ -133,7 +134,7 @@ public class RequestHandler implements Runnable {
 						return null;
 					}
 				}
-				return resultMap.remove(serverRequest.getId());
+				return resultMap.remove(asyncServerRequest.getId());
 			}
 		});
 	}
@@ -284,20 +285,46 @@ public class RequestHandler implements Runnable {
 			if (workQueue.isEmpty()) {
 				continue;
 			}
+
 			workQueue.drainTo(requests);
-			ServerRequest[] serverRequests = new ServerRequest[requests.size()];
-			for (int i = 0; i != requests.size(); i++) {
-				serverRequests[i] = new ServerRequest(requests.get(i).getType(), requests.get(i).getRequest());
+
+			ArrayList<ServerRequest> serverRequests = new ArrayList();
+			boolean addCommon = false;
+			for (AsyncServerRequest request : requests) {
+				serverRequests.add(new ServerRequest(request.getType(), request.getRequest()));
+				if (request.isRequireCommonRequest())
+					addCommon = true;
 			}
+
+			ServerRequest[] commonRequests = new ServerRequest[0];
+
+			if (addCommon) {
+				commonRequests = CommonRequest.getCommonRequests(api);
+				Collections.addAll(serverRequests, commonRequests);
+			}
+
+			ServerRequest[] arrayServerRequests = serverRequests.toArray(new ServerRequest[serverRequests.size()]);
+
 			try {
-				authTicket = internalSendServerRequests(authTicket, serverRequests);
+				authTicket = internalSendServerRequests(authTicket, arrayServerRequests);
+
 				for (int i = 0; i != requests.size(); i++) {
 					try {
-						resultMap.put(requests.get(i).getId(), ResultOrException.getResult(serverRequests[i].getData()));
+						resultMap.put(requests.get(i).getId(), ResultOrException.getResult(arrayServerRequests[i].getData()));
 					} catch (InvalidProtocolBufferException e) {
 						resultMap.put(requests.get(i).getId(), ResultOrException.getError(e));
 					}
 				}
+
+				for (int i = 0; i != commonRequests.length; i++) {
+					try {
+						CommonRequest.parse(api, arrayServerRequests[requests.size() + i].getType(),
+								arrayServerRequests[requests.size() + i].getData());
+					} catch (InvalidProtocolBufferException e) {
+						//TODO: notify error even in case of common requests?
+					}
+				}
+
 				continue;
 			} catch (RemoteServerException | LoginFailedException e) {
 				for (AsyncServerRequest request : requests) {

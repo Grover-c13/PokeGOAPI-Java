@@ -15,9 +15,7 @@
 
 package com.pokegoapi.api;
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-import POGOProtos.Networking.Envelopes.SignatureOuterClass;
-
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.LocationFixes;
@@ -29,16 +27,27 @@ import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.RequestHandler;
+import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.ClientInterceptor;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.UUID;
+
+import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
-
-import java.util.Random;
-import java.util.UUID;
 
 
 public class PokemonGo {
@@ -53,6 +62,7 @@ public class PokemonGo {
 	RequestHandler requestHandler;
 	@Getter
 	private PlayerProfile playerProfile;
+	@Getter
 	private Inventories inventories;
 	@Getter
 	private double latitude;
@@ -92,10 +102,14 @@ public class PokemonGo {
 		this.seed = seed;
 		sessionHash = new byte[32];
 		new Random().nextBytes(sessionHash);
+		client = client.newBuilder()
+				.addNetworkInterceptor(new ClientInterceptor())
+				.build();
 		requestHandler = new RequestHandler(this, client);
 		map = new Map(this);
 		longitude = Double.NaN;
 		latitude = Double.NaN;
+		altitude = Double.NaN;
 	}
 
 	/**
@@ -146,6 +160,72 @@ public class PokemonGo {
 		playerProfile = new PlayerProfile(this);
 		settings = new Settings(this);
 		inventories = new Inventories(this);
+
+		initialize();
+	}
+
+	private void initialize() throws RemoteServerException, LoginFailedException {
+		fireRequestBlock(new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
+				CommonRequest.getDownloadRemoteConfigVersionMessageRequest()));
+
+		fireRequestBlockTwo();
+
+		// From now one we will start to check our accounts is ready to fire requests.
+		// Actually, we can receive valid responses even with this first check,
+		// that mark the tutorial state into LEGAL_SCREEN.
+		// Following, we are going to check if the account binded to this session
+		// have an avatar, a nickname, and all the other things that are usually filled
+		// on the official client BEFORE sending any requests such as the getMapObject etc.
+		ArrayList<TutorialState> tutorialStates = playerProfile.getTutorialState().getTutorialStates();
+		if (tutorialStates.isEmpty()) {
+			playerProfile.activateAccount();
+		}
+
+		if (!tutorialStates.contains(TutorialState.AVATAR_SELECTION)) {
+			playerProfile.setupAvatar();
+		}
+
+		if (!tutorialStates.contains(TutorialState.POKEMON_CAPTURE)) {
+			playerProfile.encounterTutorialComplete();
+		}
+
+		if (!tutorialStates.contains(TutorialState.NAME_SELECTION)) {
+			playerProfile.claimCodeName();
+		}
+
+		if (!tutorialStates.contains(TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
+			playerProfile.firstTimeExperienceComplete();
+		}
+	}
+
+	/**
+	 * Fire requests block.
+	 *
+	 * @param request server request
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+	 */
+	private void fireRequestBlock(ServerRequest request) throws RemoteServerException, LoginFailedException {
+		ServerRequest[] requests = CommonRequest.fillRequest(request, this);
+
+		getRequestHandler().sendServerRequests(requests);
+		try {
+			inventories.updateInventories(GetInventoryResponse.parseFrom(requests[3].getData()));
+			settings.updateSettings(DownloadSettingsResponse.parseFrom(requests[5].getData()));
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException();
+		}
+	}
+
+	/**
+	 * Second requests block. Public since it could be re-fired at any time
+	 *
+	 * @throws LoginFailedException  When login fails
+	 * @throws RemoteServerException When server fails
+	 */
+	public void fireRequestBlockTwo() throws RemoteServerException, LoginFailedException {
+		fireRequestBlock(new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
+				CommonRequest.getGetAssetDigestMessageRequest()));
 	}
 
 	/**
@@ -186,9 +266,7 @@ public class PokemonGo {
 	 * @param altitude  the altitude
 	 */
 	public void setLocation(double latitude, double longitude, double altitude) {
-		if (latitude != this.latitude
-				|| longitude != this.longitude
-				|| altitude != this.altitude) {
+		if (latitude != this.latitude || longitude != this.longitude) {
 			getMap().clearCache();
 		}
 		setLatitude(latitude);
@@ -198,15 +276,6 @@ public class PokemonGo {
 
 	public long currentTimeMillis() {
 		return time.currentTimeMillis();
-	}
-
-	/**
-	 * Get the inventories API
-	 *
-	 * @return Inventories
-	 */
-	public Inventories getInventories() {
-		return inventories;
 	}
 
 	/**
@@ -258,5 +327,32 @@ public class PokemonGo {
 			deviceInfo = DeviceInfo.getDefault(this);
 		}
 		return deviceInfo.getDeviceInfo();
+	}
+	
+	/**
+	 * Gets the sensor info
+	 *
+	 * @param currentTime the current time
+	 * @param random      the random object
+	 * @return the sensor info
+	 */
+	public SignatureOuterClass.Signature.SensorInfo getSensorSignature(long currentTime, Random random) {
+		if (this.sensorInfo == null || sensorInfo.getTimestampCreate() != 0L) {
+			return SensorInfo.getDefault(this, currentTime, random);
+		}
+		return sensorInfo.getSensorInfo();
+	}
+	
+	/**
+	 * Gets the activity status
+	 *
+	 * @param random the random object
+	 * @return the activity status
+	 */
+	public SignatureOuterClass.Signature.ActivityStatus getActivitySignature(Random random) {
+		if (this.activityStatus == null) {
+			return ActivityStatus.getDefault(this, random);
+		}
+		return activityStatus.getActivityStatus();
 	}
 }

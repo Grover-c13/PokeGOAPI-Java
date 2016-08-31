@@ -9,6 +9,7 @@ import com.pokegoapi.main.ServerRequest;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import lombok.Getter;
 
 /**
@@ -59,24 +60,28 @@ public class Settings {
 	 * @return GpsSettings instance.
 	 */
 	private final GpsSettings gpsSettings;
-
+	@Getter
+	/**
+     * Settings for hash
+     *
+     * @return String hash.
+     */
+	private String hash;
 
 	/**
 	 * Settings object that hold different configuration aspect of the game.
 	 * Can be used to simulate the real app behaviour.
 	 *
 	 * @param api api instance
-	 * @throws LoginFailedException  If login failed.
-	 * @throws RemoteServerException If server communications failed.
 	 */
-	public Settings(PokemonGo api) throws LoginFailedException, RemoteServerException {
+	public Settings(PokemonGo api) {
 		this.api = api;
 		this.mapSettings = new MapSettings();
 		this.levelUpSettings = new LevelUpSettings();
 		this.fortSettings = new FortSettings();
 		this.inventorySettings = new InventorySettings();
 		this.gpsSettings = new GpsSettings();
-		updateSettings();
+		this.hash = new String();
 	}
 
 	/**
@@ -97,12 +102,30 @@ public class Settings {
 			throw new RemoteServerException(e);
 		}
 
-		mapSettings.update(response.getSettings().getMapSettings());
-		levelUpSettings.update(response.getSettings().getInventorySettings());
-		fortSettings.update(response.getSettings().getFortSettings());
-		inventorySettings.update(response.getSettings().getInventorySettings());
-		gpsSettings.update(response.getSettings().getGpsSettings());
+		updateSettings(response);
 	}
 
-
+	/**
+	 * Updates settings latest data.
+	 *
+	 * @param response the settings download response
+	 */
+	public void updateSettings(DownloadSettingsResponse response) {
+		if (response.getSettings().hasMapSettings()) {
+			mapSettings.update(response.getSettings().getMapSettings());
+		}
+		if (response.getSettings().hasLevelSettings()) {
+			levelUpSettings.update(response.getSettings().getInventorySettings());
+		}
+		if (response.getSettings().hasFortSettings()) {
+			fortSettings.update(response.getSettings().getFortSettings());
+		}
+		if (response.getSettings().hasInventorySettings()) {
+			inventorySettings.update(response.getSettings().getInventorySettings());
+		}
+		if (response.getSettings().hasGpsSettings()) {
+			gpsSettings.update(response.getSettings().getGpsSettings());
+		}
+		this.hash = response.getHash();
+	}
 }
