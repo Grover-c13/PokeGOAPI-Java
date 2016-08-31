@@ -2,8 +2,8 @@ package com.pokegoapi.api.internal.networking;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
-import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
-import POGOProtos.Networking.Envelopes.Unknown6OuterClass.Unknown6.Unknown2;
+import POGOProtos.Networking.Platform.PlatformRequestTypeOuterClass;
+import POGOProtos.Networking.Platform.Requests.SendEncryptedSignatureRequestOuterClass;
 import POGOProtos.Networking.Requests.RequestOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import com.annimon.stream.Stream;
@@ -95,10 +95,14 @@ public class Signature {
 		byte[] iv = new byte[32];
 		new Random().nextBytes(iv);
 		byte[] encrypted = Crypto.encrypt(uk2, iv).toByteBuffer().array();
-		Unknown6OuterClass.Unknown6 uk6 = Unknown6OuterClass.Unknown6.newBuilder()
-				.setRequestType(6)
-				.setUnknown2(Unknown2.newBuilder().setEncryptedSignature(ByteString.copyFrom(encrypted))).build();
-		builder.addUnknown6(uk6);
+		RequestEnvelopeOuterClass.RequestEnvelope.PlatformRequest platformRequest = RequestEnvelopeOuterClass
+				.RequestEnvelope
+				.PlatformRequest.newBuilder()
+				.setType(PlatformRequestTypeOuterClass.PlatformRequestType.SEND_ENCRYPTED_SIGNATURE)
+				// TODO: Check this code
+				.setRequestMessage(SendEncryptedSignatureRequestOuterClass.SendEncryptedSignatureRequest.newBuilder().setEncryptedSignature(ByteString.copyFrom(encrypted)).build().toByteString())
+			.build();
+		builder.addPlatformRequests(platformRequest);
 	}
 
 	private static byte[] getBytes(float input) {
@@ -123,7 +127,7 @@ public class Signature {
 
 		System.arraycopy(getBytes(location.getLatitude()), 0, bytes, 0, 8);
 		System.arraycopy(getBytes(location.getLongitude()), 0, bytes, 8, 8);
-		System.arraycopy(getBytes(location.getAltitude()), 0, bytes, 16, 8);
+		System.arraycopy(getBytes(location.getAccuracy()), 0, bytes, 16, 8);
 
 		xx32 = factory.newStreamingHash32(xx32.getValue());
 		xx32.update(bytes, 0, bytes.length);
@@ -136,7 +140,7 @@ public class Signature {
 
 		System.arraycopy(getBytes(location.getLatitude()), 0, bytes, 0, 8);
 		System.arraycopy(getBytes(location.getLongitude()), 0, bytes, 8, 8);
-		System.arraycopy(getBytes(location.getAltitude()), 0, bytes, 16, 8);
+		System.arraycopy(getBytes(location.getAccuracy()), 0, bytes, 16, 8);
 
 		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x1B845238);
 		xx32.update(bytes, 0, bytes.length);
@@ -146,7 +150,7 @@ public class Signature {
 
 	private static long getRequestHash(byte[] authTicket, byte[] request) {
 		XXHashFactory factory = XXHashFactory.safeInstance();
-		StreamingXXHash64 xx64 = factory.newStreamingHash64(0x1B845238);
+		StreamingXXHash64 xx64 = factory.newStreamingHash64(0x61656632);
 		xx64.update(authTicket, 0, authTicket.length);
 		xx64 = factory.newStreamingHash64(xx64.getValue());
 		xx64.update(request, 0, request.length);
