@@ -71,7 +71,7 @@ public class ItemBag {
 	 * @throws LoginFailedException  the login failed exception
 	 */
 	public Result removeItem(ItemId id, int quantity) throws RemoteServerException, LoginFailedException {
-		Item item = getItem(id);
+		final Item item = getItem(id);
 		if (item.getCount() < quantity) {
 			throw new IllegalArgumentException("You cannont remove more quantity than you have");
 		}

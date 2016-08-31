@@ -249,7 +249,7 @@ public class Pokemon extends PokemonDetails {
 	public EvolutionResult evolve() throws LoginFailedException, RemoteServerException {
 		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
-		Pokemon me = this;
+		final Pokemon me = this;
 		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.EVOLVE_POKEMON, reqMsg, api);
 		return AsyncHelper.toBlocking(
 				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, EvolutionResult>() {
