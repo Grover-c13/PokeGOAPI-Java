@@ -30,9 +30,6 @@ public class CandyJar {
 		this.api = api;
 	}
 
-	public void reset() {
-		candies.clear();
-	}
 
 	/**
 	 * Sets the number of candies in the jar.

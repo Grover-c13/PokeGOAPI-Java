@@ -32,22 +32,20 @@ import lombok.Getter;
 import rx.functions.Func1;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Hatchery {
 	@Getter
-	private final Set<EggPokemon> eggs = new HashSet<EggPokemon>();
+	private final Set<EggPokemon> eggs = Collections.newSetFromMap(new ConcurrentHashMap<EggPokemon, Boolean>());
+
 	@Getter
 	private PokemonGo api;
 
 	public Hatchery(PokemonGo api) {
 		this.api = api;
-	}
-
-	public void reset() {
-		eggs.clear();
 	}
 
 	public void addEgg(EggPokemon egg) {
@@ -92,4 +90,10 @@ public class Hatchery {
 
 	}
 
+	public void setEggs(List<EggPokemon> eggs) {
+		synchronized (eggs) {
+			eggs.clear();
+			eggs.addAll(eggs);
+		}
+	}
 }

@@ -28,6 +28,7 @@ import POGOProtos.Networking.Responses.UseItemXpBoostResponseOuterClass.UseItemX
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -37,6 +38,7 @@ import com.pokegoapi.util.Log;
 import rx.functions.Func1;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -49,10 +51,6 @@ public class ItemBag {
 
 	public ItemBag(PokemonGo api) {
 		this.api = api;
-	}
-
-	public void reset() {
-		items.clear();
 	}
 
 	public void addItem(Item item) {
@@ -237,4 +235,11 @@ public class ItemBag {
 		);
 	}
 
+	public void setItems(List<Item> items) {
+		synchronized (this.items) {
+			this.items.clear();
+			for (Item p : items)
+				addItem(p);
+		}
+	}
 }

@@ -35,9 +35,6 @@ public class PokeBank {
 	public PokeBank() {
 	}
 
-	public void reset() {
-		pokemons.clear();
-	}
 
 	/**
 	 * Add a pokemon to the pokebank inventory.  Will not add duplicates (pokemon with same id).
@@ -81,5 +78,13 @@ public class PokeBank {
 	 */
 	public Pokemon getPokemonById(final Long id) {
 		return pokemons.get(id);
+	}
+
+	public void setPokemons(List<Pokemon> pokemons) {
+		synchronized (this.pokemons) {
+			this.pokemons.clear();
+			for (Pokemon p : pokemons)
+				addPokemon(p);
+		}
 	}
 }
