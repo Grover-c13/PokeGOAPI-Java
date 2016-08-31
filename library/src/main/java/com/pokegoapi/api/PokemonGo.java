@@ -210,8 +210,8 @@ public class PokemonGo {
 
 		getRequestHandler().sendServerRequests(requests);
 		try {
-			inventories.updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
-			settings.updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
+			inventories.updateInventories(GetInventoryResponse.parseFrom(requests[3].getData()));
+			settings.updateSettings(DownloadSettingsResponse.parseFrom(requests[5].getData()));
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException();
 		}
