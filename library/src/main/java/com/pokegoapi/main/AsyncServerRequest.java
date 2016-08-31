@@ -17,8 +17,8 @@ package com.pokegoapi.main;
 
 import com.google.protobuf.GeneratedMessage;
 
-import POGOProtos.Networking.Requests.RequestOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.RequestOuterClass.Request;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import lombok.Getter;
 
 /**
@@ -28,22 +28,26 @@ public class AsyncServerRequest {
 	@Getter
 	private final long id = System.nanoTime();
 	@Getter
-	private final RequestTypeOuterClass.RequestType type;
+	private final RequestType type;
 	@Getter
-	private final RequestOuterClass.Request request;
+	private final Request request;
+	@Getter
+	private final boolean requireCommonRequest;
 
 	/**
 	 * Instantiates a new Server request.
 	 *
 	 * @param type the type
 	 * @param req  the req
+	 * @param requireCommonRequest indicate if this request require common requests
 	 */
-	public AsyncServerRequest(RequestTypeOuterClass.RequestType type, GeneratedMessage req) {
-		RequestOuterClass.Request.Builder reqBuilder = RequestOuterClass.Request.newBuilder();
+	public AsyncServerRequest(RequestType type, GeneratedMessage req, boolean requireCommonRequest) {
+		Request.Builder reqBuilder = Request.newBuilder();
 		reqBuilder.setRequestMessage(req.toByteString());
 		reqBuilder.setRequestType(type);
 		this.type = type;
 		this.request = reqBuilder.build();
+		this.requireCommonRequest = requireCommonRequest;
 	}
 
 	/**
@@ -52,8 +56,19 @@ public class AsyncServerRequest {
 	 * @param type the type
 	 * @param req  the req
 	 */
-	AsyncServerRequest(RequestTypeOuterClass.RequestType type, RequestOuterClass.Request req) {
+	public AsyncServerRequest(RequestType type, GeneratedMessage req) {
+		this(type, req, false);
+	}
+
+	/**
+	 * Instantiates a new Server request.
+	 *
+	 * @param type the type
+	 * @param req  the req
+	 */
+	AsyncServerRequest(RequestType type, Request req) {
 		this.type = type;
 		this.request = req;
+		this.requireCommonRequest = false;
 	}
 }

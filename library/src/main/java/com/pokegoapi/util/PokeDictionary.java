@@ -46,12 +46,7 @@ public class PokeDictionary {
 
 	private static ResourceBundle getPokeBundle(String bundleBaseName, Locale locale)
 			throws MissingResourceException {
-		return ResourceBundle.getBundle(bundleBaseName, locale, new ResourceBundle.Control() {
-			@Override
-			public Locale getFallbackLocale(String baseName, Locale locale) {
-				return Locale.ENGLISH;
-			}
-		});
+		return ResourceBundle.getBundle(bundleBaseName, locale);
 	}
 
 	/**

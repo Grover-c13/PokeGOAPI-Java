@@ -15,18 +15,18 @@
 
 package com.pokegoapi.api.inventory;
 
-import POGOProtos.Inventory.EggIncubatorOuterClass;
-import POGOProtos.Inventory.EggIncubatorTypeOuterClass.EggIncubatorType;
-import POGOProtos.Networking.Requests.Messages.UseItemEggIncubatorMessageOuterClass.UseItemEggIncubatorMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
-
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
+
+import POGOProtos.Inventory.EggIncubatorOuterClass;
+import POGOProtos.Inventory.EggIncubatorTypeOuterClass.EggIncubatorType;
+import POGOProtos.Networking.Requests.Messages.UseItemEggIncubatorMessageOuterClass.UseItemEggIncubatorMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
 
 public class EggIncubator {
 	private final EggIncubatorOuterClass.EggIncubator proto;
@@ -142,10 +142,8 @@ public class EggIncubator {
 	 * Get the distance walked with the current incubated egg.
 	 *
 	 * @return distance walked with the current incubated egg (km)
-	 * @throws LoginFailedException  if there is an error with the token during retrieval of player stats
-	 * @throws RemoteServerException if the server responds badly during retrieval of player stats
 	 */
-	public double getKmCurrentlyWalked() throws LoginFailedException, RemoteServerException {
+	public double getKmCurrentlyWalked() {
 		return api.getPlayerProfile().getStats().getKmWalked() - getKmStart();
 	}
 
@@ -153,10 +151,8 @@ public class EggIncubator {
 	 * Get the distance left to walk before this incubated egg will hatch.
 	 *
 	 * @return distance to walk before hatch (km)
-	 * @throws LoginFailedException  if there is an error with the token during retrieval of player stats
-	 * @throws RemoteServerException if the server responds badly during retrieval of player stats
 	 */
-	public double getKmLeftToWalk() throws LoginFailedException, RemoteServerException {
+	public double getKmLeftToWalk() {
 		return getKmTarget() - api.getPlayerProfile().getStats().getKmWalked();
 	}
 
@@ -164,10 +160,8 @@ public class EggIncubator {
 	 * Is the incubator currently being used
 	 *
 	 * @return currently used or not
-	 * @throws LoginFailedException  if there is an error with the token during retrieval of player stats
-	 * @throws RemoteServerException if the server responds badly during retrieval of player stats
 	 */
-	public boolean isInUse() throws LoginFailedException, RemoteServerException {
+	public boolean isInUse() {
 		return getKmTarget() > api.getPlayerProfile().getStats().getKmWalked();
 	}
 }

@@ -94,13 +94,7 @@ public class Map {
 	 */
 	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync() {
 
-		if (!useCache()) {
-			// getMapObjects wont be called unless this is null
-			// so need to force it if due for a refresh
-			cachedCatchable.clear();
-		}
-
-		if (cachedCatchable.size() > 0) {
+		if (useCache() && cachedCatchable.size() > 0) {
 			return Observable.just(cachedCatchable);
 		}
 
@@ -338,7 +332,7 @@ public class Map {
 	 */
 	public Observable<MapObjects> getMapObjectsAsync(List<Long> cellIds) {
 
-		if (useCache()) {
+		if (useCache() && cachedCatchable.size() > 0) {
 			return Observable.just(cachedMapObjects);
 		}
 
@@ -355,7 +349,7 @@ public class Map {
 		}
 
 		final AsyncServerRequest asyncServerRequest = new AsyncServerRequest(
-				RequestType.GET_MAP_OBJECTS, builder.build());
+				RequestType.GET_MAP_OBJECTS, builder.build(), true);
 		return api.getRequestHandler()
 				.sendAsyncServerRequests(asyncServerRequest).map(new Func1<ByteString, MapObjects>() {
 					@Override
