@@ -62,13 +62,7 @@ public class EggPokemon {
 	public double getEggKmWalked() {
 		if (!isIncubate())
 			return 0;
-		EggIncubator incubator = Stream.of(api.getInventories().getIncubators())
-				.filter(new Predicate<EggIncubator>() {
-					@Override
-					public boolean test(EggIncubator incub) {
-						return incub.getId().equals(proto.getEggIncubatorId());
-					}
-				}).findFirst().orElse(null);
+		EggIncubator incubator = api.getInventories().getIncubators().get(proto.getEggIncubatorId());
 		// incubator should not be null but why not eh
 		if (incubator == null)
 			return 0;
