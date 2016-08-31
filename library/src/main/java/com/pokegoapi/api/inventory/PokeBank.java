@@ -15,22 +15,22 @@
 
 package com.pokegoapi.api.inventory;
 
+import POGOProtos.Enums.PokemonIdOuterClass;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
 import com.pokegoapi.api.pokemon.Pokemon;
+import lombok.Getter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-
-import POGOProtos.Enums.PokemonIdOuterClass;
-import lombok.Getter;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class PokeBank {
 	@Getter
-	private final List<Pokemon> pokemons = Collections.synchronizedList(new ArrayList<Pokemon>());
+	private final ConcurrentHashMap<Long, Pokemon> pokemons = new ConcurrentHashMap<Long, Pokemon>();
 
 	public PokeBank() {
 	}
@@ -45,15 +45,7 @@ public class PokeBank {
 	 * @param pokemon Pokemon to add to the inventory
 	 */
 	public void addPokemon(final Pokemon pokemon) {
-		List<Pokemon> alreadyAdded = Stream.of(pokemons).filter(new Predicate<Pokemon>() {
-			@Override
-			public boolean test(Pokemon testPokemon) {
-				return pokemon.getId() == testPokemon.getId();
-			}
-		}).collect(Collectors.<Pokemon>toList());
-		if (alreadyAdded.size() < 1) {
-			pokemons.add(pokemon);
-		}
+		pokemons.put(pokemon.getId(), pokemon);
 	}
 
 	/**
@@ -62,13 +54,14 @@ public class PokeBank {
 	 * @param id the id
 	 * @return the pokemon by pokemon id
 	 */
+
 	public List<Pokemon> getPokemonByPokemonId(final PokemonIdOuterClass.PokemonId id) {
-		return Stream.of(pokemons).filter(new Predicate<Pokemon>() {
-			@Override
-			public boolean test(Pokemon pokemon) {
-				return pokemon.getPokemonId().equals(id);
-			}
-		}).collect(Collectors.<Pokemon>toList());
+		List<Pokemon> ret = new ArrayList<>();
+		for (Pokemon p : pokemons.values()) {
+			if (p.getPokemonId() == id)
+				ret.add(p);
+		}
+		return ret;
 	}
 
 	/**
@@ -77,13 +70,7 @@ public class PokeBank {
 	 * @param pokemon the pokemon
 	 */
 	public void removePokemon(final Pokemon pokemon) {
-		pokemons.clear();
-		pokemons.addAll(Stream.of(pokemons).filter(new Predicate<Pokemon>() {
-			@Override
-			public boolean test(Pokemon pokemn) {
-				return pokemn.getId() != pokemon.getId();
-			}
-		}).collect(Collectors.<Pokemon>toList()));
+		pokemons.remove(pokemon.getId());
 	}
 
 	/**
@@ -93,11 +80,6 @@ public class PokeBank {
 	 * @return the pokemon
 	 */
 	public Pokemon getPokemonById(final Long id) {
-		for (Pokemon pokemon : pokemons) {
-			if (pokemon.getId() == id) {
-				return pokemon;
-			}
-		}
-		return null;
+		return pokemons.get(id);
 	}
 }

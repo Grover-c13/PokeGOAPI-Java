@@ -28,6 +28,7 @@ import com.pokegoapi.util.Log;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
@@ -47,7 +48,7 @@ import rx.functions.Func1;
  */
 public class ItemBag {
 	private final PokemonGo api;
-	private final HashMap<ItemId, Item> items = new HashMap<>();
+	private final ConcurrentHashMap<ItemId, Item> items = new ConcurrentHashMap<>();
 
 	public ItemBag(PokemonGo api) {
 		this.api = api;

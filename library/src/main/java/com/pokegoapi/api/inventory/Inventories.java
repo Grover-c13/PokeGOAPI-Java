@@ -69,48 +69,6 @@ public class Inventories {
 		hatchery = new Hatchery(api);
 	}
 
-	/**
-	 * Updates the inventories with latest data.
-	 *
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	public void updateInventories() throws LoginFailedException, RemoteServerException {
-		updateInventories(false);
-	}
-
-	/**
-	 * Updates the inventories with the latest data.
-	 *
-	 * @param forceUpdate For a full update if true
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	public void updateInventories(boolean forceUpdate) throws LoginFailedException, RemoteServerException {
-		if (forceUpdate) {
-			lastInventoryUpdate = 0;
-			itemBag.reset();
-			pokebank.reset();
-			candyjar.reset();
-			pokedex.reset();
-			incubators.clear();
-			hatchery.reset();
-		}
-		GetInventoryMessage invReqMsg = GetInventoryMessage.newBuilder()
-				.setLastTimestampMs(lastInventoryUpdate)
-				.build();
-		ServerRequest inventoryRequest = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY, invReqMsg);
-		api.getRequestHandler().sendServerRequests(inventoryRequest);
-
-		GetInventoryResponse response;
-		try {
-			response = GetInventoryResponse.parseFrom(inventoryRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-
-		updateInventories(response);
-	}
 
 	/**
 	 * Updates the inventories with the latest data.
@@ -159,7 +117,7 @@ public class Inventories {
 
 			if (itemData.hasEggIncubators()) {
 				for (EggIncubatorOuterClass.EggIncubator incubator : itemData.getEggIncubators().getEggIncubatorList()) {
-					incubators.putIfAbsent(incubator.getId(), new EggIncubator(api, incubator));
+					incubators.put(incubator.getId(), new EggIncubator(api, incubator));
 				}
 			}
 

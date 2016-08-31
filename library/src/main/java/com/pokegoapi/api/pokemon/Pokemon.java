@@ -98,7 +98,6 @@ public class Pokemon extends PokemonDetails {
 
 		api.getInventories().getPokebank().removePokemon(this);
 
-		api.getInventories().updateInventories();
 
 		return response.getResult();
 	}
@@ -129,7 +128,6 @@ public class Pokemon extends PokemonDetails {
 		}
 
 		api.getInventories().getPokebank().removePokemon(this);
-		api.getInventories().updateInventories();
 
 		return response.getResult();
 	}
@@ -160,7 +158,6 @@ public class Pokemon extends PokemonDetails {
 		}
 
 		api.getInventories().getPokebank().removePokemon(this);
-		api.getInventories().updateInventories();
 
 		return response.getResult();
 	}
