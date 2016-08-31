@@ -108,22 +108,8 @@ public class Map {
 		return getMapObjectsAsync(cellIds).map(new Func1<MapObjects, List<CatchablePokemon>>() {
 			@Override
 			public List<CatchablePokemon> call(MapObjects mapObjects) {
-				Set<CatchablePokemon> catchablePokemons = new HashSet<>();
-				for (MapPokemon mapPokemon : mapObjects.getCatchablePokemons()) {
-					catchablePokemons.add(new CatchablePokemon(api, mapPokemon));
-				}
-
-				for (WildPokemonOuterClass.WildPokemon wildPokemon : mapObjects.getWildPokemons()) {
-					catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
-				}
-
-				for (Pokestop pokestop : mapObjects.getPokestops()) {
-					if (pokestop.inRangeForLuredPokemon() && pokestop.getFortData().hasLureInfo()) {
-						catchablePokemons.add(new CatchablePokemon(api, pokestop.getFortData()));
-					}
-				}
 				cachedCatchable.clear();
-				cachedCatchable.addAll(catchablePokemons);
+				cachedCatchable.addAll(mapObjects.getAllCatchablePokemons());
 				return cachedCatchable;
 			}
 		});

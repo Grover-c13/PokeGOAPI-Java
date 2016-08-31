@@ -15,18 +15,22 @@
 
 package com.pokegoapi.api.map;
 
+import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.fort.Pokestop;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass.NearbyPokemon;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Map.SpawnPointOuterClass.SpawnPoint;
+import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -224,5 +228,23 @@ public class MapObjects {
 			}
 			pokestops.add(otherPokestop);
 		}*/
+	}
+
+	public Set<CatchablePokemon> getAllCatchablePokemons() {
+		Set<CatchablePokemon> catchablePokemons = new HashSet<>();
+		for (MapPokemon mapPokemon : getCatchablePokemons()) {
+			catchablePokemons.add(new CatchablePokemon(api, mapPokemon));
+		}
+
+		for (WildPokemonOuterClass.WildPokemon wildPokemon : getWildPokemons()) {
+			catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
+		}
+
+		for (Pokestop pokestop : getPokestops()) {
+			if (pokestop.inRangeForLuredPokemon() && pokestop.getFortData().hasLureInfo()) {
+				catchablePokemons.add(new CatchablePokemon(api, pokestop.getFortData()));
+			}
+		}
+		return catchablePokemons;
 	}
 }
