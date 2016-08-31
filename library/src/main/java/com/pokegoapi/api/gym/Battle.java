@@ -76,7 +76,7 @@ public class Battle {
 	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public Result start() throws LoginFailedException, RemoteServerException {
-
+/*
 		Builder builder = StartGymBattleMessageOuterClass.StartGymBattleMessage.newBuilder();
 
 		for (Pokemon team : teams) {
@@ -108,7 +108,8 @@ public class Battle {
 			gymIndex.add(action.getTargetIndex());
 		}
 
-		return battleResponse.getResult();
+		return battleResponse.getResult();*/
+		return null;
 	}
 
 
@@ -182,7 +183,7 @@ public class Battle {
 	 * @return AttackGymResponse
 	 */
 	private AttackGymResponse sendBlankAction() throws LoginFailedException, RemoteServerException {
-		AttackGymMessage message = AttackGymMessage
+		/*AttackGymMessage message = AttackGymMessage
 				.newBuilder()
 				.setGymId(gym.getId())
 				.setPlayerLatitude(api.getLatitude())
@@ -198,7 +199,8 @@ public class Battle {
 			return AttackGymResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException();
-		}
+		}*/
+		return null;
 	}
 
 
@@ -210,7 +212,7 @@ public class Battle {
 	 */
 	private AttackGymResponse doActions(List<BattleAction> actions) throws LoginFailedException, RemoteServerException {
 
-
+/*
 		AttackGymMessage.Builder message = AttackGymMessage
 				.newBuilder()
 				.setGymId(gym.getId())
@@ -242,8 +244,9 @@ public class Battle {
 			return response;
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException();
-		}
+		}*/
 
+		return null;
 	}
 
 }

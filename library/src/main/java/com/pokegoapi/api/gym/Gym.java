@@ -106,7 +106,7 @@ public class Gym implements MapPoint {
 	}
 
 	private GetGymDetailsResponse details() throws LoginFailedException, RemoteServerException {
-		if (details == null) {
+		/*if (details == null) {
 			GetGymDetailsMessage reqMsg = GetGymDetailsMessage
 					.newBuilder()
 					.setGymId(this.getId())
@@ -128,7 +128,8 @@ public class Gym implements MapPoint {
 
 		}
 
-		return details;
+		return details;*/
+		return null;
 	}
 
 	public String getName() throws LoginFailedException, RemoteServerException {
@@ -184,7 +185,7 @@ public class Gym implements MapPoint {
 	 */
 	public FortDeployPokemonResponse.Result deployPokemon(Pokemon pokemon)
 			throws LoginFailedException, RemoteServerException {
-		FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
+		/*FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
 				.setFortId(getId())
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
@@ -198,7 +199,8 @@ public class Gym implements MapPoint {
 			return FortDeployPokemonResponse.parseFrom(serverRequest.getData()).getResult();
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException();
-		}
+		}*/
+		return null;
 
 	}
 

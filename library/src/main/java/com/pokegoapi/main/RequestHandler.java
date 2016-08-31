@@ -139,23 +139,6 @@ public class RequestHandler implements Runnable {
 		});
 	}
 
-	/**
-	 * Sends multiple ServerRequests in a thread safe manner.
-	 *
-	 * @param serverRequests list of ServerRequests to be sent
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
-	 */
-	public void sendServerRequests(ServerRequest... serverRequests) throws RemoteServerException, LoginFailedException {
-		List<Observable<ByteString>> observables = new ArrayList<>(serverRequests.length);
-		for (ServerRequest request : serverRequests) {
-			AsyncServerRequest asyncServerRequest = new AsyncServerRequest(request.getType(), request.getRequest());
-			observables.add(sendAsyncServerRequests(asyncServerRequest));
-		}
-		for (int i = 0; i != serverRequests.length; i++) {
-			serverRequests[i].handleData(AsyncHelper.toBlocking(observables.get(i)));
-		}
-	}
 
 	/**
 	 * Sends multiple ServerRequests in a thread safe manner.
