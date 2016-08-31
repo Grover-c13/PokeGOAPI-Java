@@ -70,8 +70,6 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 	 */
 	public GoogleUserCredentialProvider(OkHttpClient client) {
 		this.client = client;
-
-		authbuilder = AuthInfo.newBuilder();
 	}
 
 
@@ -168,6 +166,8 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 				+ (googleAuth.getExpiresIn() * 1000 - REFRESH_TOKEN_BUFFER_TIME);
 		tokenId = googleAuth.getIdToken();
 		refreshToken = googleAuth.getRefreshToken();
+
+		authbuilder = AuthInfo.newBuilder();
 	}
 
 	@Override
