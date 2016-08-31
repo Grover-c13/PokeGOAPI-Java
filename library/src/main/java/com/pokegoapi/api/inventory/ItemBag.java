@@ -15,11 +15,15 @@
 
 package com.pokegoapi.api.inventory;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
 
 import java.util.Collection;
@@ -35,6 +39,7 @@ import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass;
 import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result;
 import POGOProtos.Networking.Responses.UseIncenseResponseOuterClass.UseIncenseResponse;
 import POGOProtos.Networking.Responses.UseItemXpBoostResponseOuterClass.UseItemXpBoostResponse;
+import rx.functions.Func1;
 
 
 /**
@@ -74,22 +79,28 @@ public class ItemBag {
 		RecycleInventoryItemMessage msg = RecycleInventoryItemMessage.newBuilder().setItemId(id).setCount(quantity)
 				.build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestType.RECYCLE_INVENTORY_ITEM, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.RECYCLE_INVENTORY_ITEM, msg, api);
+		return AsyncHelper.toBlocking(
+				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, Result>() {
 
-		RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse response;
-		try {
-			response = RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse
-					.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+					@Override
+					public Result call(ByteString bytes) {
+						RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse response;
+						try {
+							response = RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse
+									.parseFrom(bytes);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
 
-		if (response
-				.getResult() == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
-			item.setCount(response.getNewCount());
-		}
-		return response.getResult();
+						if (response
+								.getResult() == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
+							item.setCount(response.getNewCount());
+						}
+						return response.getResult();
+					}
+				})
+		);
 	}
 
 	/**

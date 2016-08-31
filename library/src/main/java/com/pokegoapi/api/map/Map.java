@@ -586,90 +586,30 @@ public class Map {
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
 				.build();
-		ServerRequest serverRequest = new ServerRequest(RequestType.FORT_SEARCH, reqMsg);
 
-		api.getRequestHandler().sendServerRequests(serverRequest);
 
-		FortSearchResponse response;
-		try {
-			response = FortSearchResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-		return response;
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.LEVEL_UP_REWARDS, reqMsg, api);
+		return AsyncHelper.toBlocking(
+				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, FortSearchResponse>() {
+
+					@Override
+					public FortSearchResponse call(ByteString bytes) {
+						FortSearchResponse response;
+						try {
+							response = FortSearchResponse.parseFrom(bytes);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+
+						return response;
+					}
+				})
+		);
+
 	}
 
-	/**
-	 * Encounter pokemon encounter response.
-	 *
-	 * @param catchablePokemon the catchable pokemon
-	 * @return the encounter response
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	@Deprecated
-	public EncounterResponse encounterPokemon(MapPokemon catchablePokemon)
-			throws LoginFailedException, RemoteServerException {
 
-		EncounterMessageOuterClass.EncounterMessage reqMsg = EncounterMessageOuterClass.EncounterMessage.newBuilder()
-				.setEncounterId(catchablePokemon.getEncounterId())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
-				.setSpawnPointId(catchablePokemon.getSpawnPointId())
-				.build();
-		ServerRequest serverRequest = new ServerRequest(RequestType.ENCOUNTER, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
 
-		EncounterResponse response;
-		try {
-			response = EncounterResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-		return response;
-	}
-
-	/**
-	 * Catch pokemon catch pokemon response.
-	 *
-	 * @param catchablePokemon      the catchable pokemon
-	 * @param normalizedHitPosition the normalized hit position
-	 * @param normalizedReticleSize the normalized reticle size
-	 * @param spinModifier          the spin modifier
-	 * @param pokeball              the pokeball
-	 * @return the catch pokemon response
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	@Deprecated
-	public CatchPokemonResponse catchPokemon(
-			MapPokemon catchablePokemon,
-			double normalizedHitPosition,
-			double normalizedReticleSize,
-			double spinModifier,
-			ItemId pokeball)
-			throws LoginFailedException, RemoteServerException {
-
-		CatchPokemonMessage reqMsg = CatchPokemonMessage.newBuilder()
-				.setEncounterId(catchablePokemon.getEncounterId())
-				.setHitPokemon(true)
-				.setNormalizedHitPosition(normalizedHitPosition)
-				.setNormalizedReticleSize(normalizedReticleSize)
-				.setSpawnPointId(catchablePokemon.getSpawnPointId())
-				.setSpinModifier(spinModifier)
-				.setPokeball(pokeball)
-				.build();
-		ServerRequest serverRequest = new ServerRequest(RequestType.CATCH_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-
-		CatchPokemonResponse response;
-		try {
-			response = CatchPokemonResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-		return response;
-	}
 
 	public void setDefaultWidth(int width) {
 		cellWidth = width;

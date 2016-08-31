@@ -84,26 +84,7 @@ public class Settings {
 		this.hash = new String();
 	}
 
-	/**
-	 * Updates settings latest data.
-	 *
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	public void updateSettings() throws RemoteServerException, LoginFailedException {
-		DownloadSettingsMessageOuterClass.DownloadSettingsMessage msg =
-				DownloadSettingsMessageOuterClass.DownloadSettingsMessage.newBuilder().build();
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.DOWNLOAD_SETTINGS, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest); //here you marked everything as read
-		DownloadSettingsResponseOuterClass.DownloadSettingsResponse response;
-		try {
-			response = DownloadSettingsResponseOuterClass.DownloadSettingsResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
 
-		updateSettings(response);
-	}
 
 	/**
 	 * Updates settings latest data.

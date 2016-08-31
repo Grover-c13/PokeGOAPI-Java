@@ -15,20 +15,6 @@
 
 package com.pokegoapi.api.pokemon;
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.Item;
-import com.pokegoapi.api.map.pokemon.EvolutionResult;
-import com.pokegoapi.api.player.PlayerProfile;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.NoSuchItemException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.AsyncHelper;
-
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.EvolvePokemonMessage;
@@ -47,6 +33,19 @@ import POGOProtos.Networking.Responses.SetFavoritePokemonResponseOuterClass.SetF
 import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass.UpgradePokemonResponse;
 import POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass.UseItemPotionResponse;
 import POGOProtos.Networking.Responses.UseItemReviveResponseOuterClass.UseItemReviveResponse;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Item;
+import com.pokegoapi.api.map.pokemon.EvolutionResult;
+import com.pokegoapi.api.player.PlayerProfile;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.NoSuchItemException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.AsyncHelper;
 import lombok.Getter;
 import lombok.Setter;
 import rx.Observable;
@@ -182,7 +181,7 @@ public class Pokemon extends PokemonDetails {
 	 *
 	 * @param considerMaxCPLimitForPlayerLevel Consider max cp limit for actual player level
 	 * @return the boolean
-	 * @throws NoSuchItemException   If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
+	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
 	 */
 	public boolean canPowerUp(boolean considerMaxCPLimitForPlayerLevel)
 			throws NoSuchItemException {
@@ -250,23 +249,25 @@ public class Pokemon extends PokemonDetails {
 	public EvolutionResult evolve() throws LoginFailedException, RemoteServerException {
 		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestType.EVOLVE_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		Pokemon me = this;
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.EVOLVE_POKEMON, reqMsg, api);
+		return AsyncHelper.toBlocking(
+				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, EvolutionResult>() {
+					@Override
+					public EvolutionResult call(ByteString bytes) {
+						EvolvePokemonResponse response;
+						try {
+							response = EvolvePokemonResponse.parseFrom(bytes);
+						} catch (InvalidProtocolBufferException e) {
+							return null;
+						}
+						EvolutionResult result = new EvolutionResult(api, response);
+						api.getInventories().getPokebank().removePokemon(me);
+						return result;
+					}
+				})
+		);
 
-		EvolvePokemonResponse response;
-		try {
-			response = EvolvePokemonResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			return null;
-		}
-
-		EvolutionResult result = new EvolutionResult(api, response);
-
-		api.getInventories().getPokebank().removePokemon(this);
-
-		api.getInventories().updateInventories();
-
-		return result;
 	}
 
 	/**
@@ -338,19 +339,25 @@ public class Pokemon extends PokemonDetails {
 				.setPokemonId(getId())
 				.build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_POTION, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.USE_ITEM_POTION, reqMsg, api);
+		return AsyncHelper.toBlocking(
+				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, UseItemPotionResponse.Result>() {
 
-		UseItemPotionResponse response;
-		try {
-			response = UseItemPotionResponse.parseFrom(serverRequest.getData());
-			if (response.getResult() == UseItemPotionResponse.Result.SUCCESS) {
-				setStamina(response.getStamina());
-			}
-			return response.getResult();
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+					@Override
+					public UseItemPotionResponse.Result call(ByteString bytes) {
+						UseItemPotionResponse response;
+						try {
+							response = UseItemPotionResponse.parseFrom(bytes);
+							if (response.getResult() == UseItemPotionResponse.Result.SUCCESS) {
+								setStamina(response.getStamina());
+							}
+							return response.getResult();
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+					}
+				})
+		);
 	}
 
 	/**
@@ -397,19 +404,25 @@ public class Pokemon extends PokemonDetails {
 				.setPokemonId(getId())
 				.build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_REVIVE, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.USE_ITEM_REVIVE, reqMsg, api);
+		return AsyncHelper.toBlocking(
+				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, UseItemReviveResponse.Result>() {
 
-		UseItemReviveResponse response;
-		try {
-			response = UseItemReviveResponse.parseFrom(serverRequest.getData());
-			if (response.getResult() == UseItemReviveResponse.Result.SUCCESS) {
-				setStamina(response.getStamina());
-			}
-			return response.getResult();
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+					@Override
+					public UseItemReviveResponse.Result call(ByteString bytes) {
+						UseItemReviveResponse response;
+						try {
+							response = UseItemReviveResponse.parseFrom(bytes);
+							if (response.getResult() == UseItemReviveResponse.Result.SUCCESS) {
+								setStamina(response.getStamina());
+							}
+							return response.getResult();
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+					}
+				})
+		);
 	}
 
 	public EvolutionForm getEvolutionForm() {
@@ -428,7 +441,7 @@ public class Pokemon extends PokemonDetails {
 	 * at the actual player level (useful in ProgressBars)
 	 *
 	 * @return Actual cp in percentage
-	 * @throws NoSuchItemException   if threw from {@link #getMaxCpForPlayer()}
+	 * @throws NoSuchItemException if threw from {@link #getMaxCpForPlayer()}
 	 */
 	public int getCPInPercentageActualPlayerLevel()
 			throws NoSuchItemException {
