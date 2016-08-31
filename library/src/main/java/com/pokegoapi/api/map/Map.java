@@ -37,6 +37,7 @@ import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.MapUtil;
+import com.pokegoapi.util.PokeCallback;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,11 +62,14 @@ import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
 import rx.Observable;
+import rx.Subscriber;
 import rx.functions.Func1;
 
 public class Map {
@@ -293,7 +297,6 @@ public class Map {
 		return AsyncHelper.toBlocking(getDecimatedSpawnPointsAsync());
 	}
 
-
 	/**
 	 * Gets decimated spawn points sort by distance.
 	 *
@@ -311,7 +314,7 @@ public class Map {
 	 *
 	 * @return MapObjects at your current location
 	 */
-	public Observable<MapObjects> getMapObjectsAsync() {
+	private Observable<MapObjects> getMapObjectsAsync() {
 		return getMapObjectsAsync(getDefaultCells());
 	}
 
@@ -321,7 +324,7 @@ public class Map {
 	 * @param width width
 	 * @return MapObjects at your current location
 	 */
-	public Observable<MapObjects> getMapObjectsAsync(int width) {
+	private Observable<MapObjects> getMapObjectsAsync(int width) {
 		return getMapObjectsAsync(getCellIds(api.getLatitude(), api.getLongitude(), width));
 	}
 
@@ -331,8 +334,7 @@ public class Map {
 	 * @param cellIds List of cellId
 	 * @return MapObjects in the given cells
 	 */
-	public Observable<MapObjects> getMapObjectsAsync(List<Long> cellIds) {
-
+	private Observable<MapObjects> getMapObjectsAsync(List<Long> cellIds) {
 		if (useCache() && cachedCatchable.size() > 0) {
 			return Observable.just(cachedMapObjects);
 		}
@@ -390,93 +392,19 @@ public class Map {
 	}
 
 	/**
-	 * Returns MapObjects around your current location.
-	 *
-	 * @return MapObjects at your current location
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
+	 * Request a MapObjects around your current location.
 	 */
-	public MapObjects getMapObjects() throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(getMapObjectsAsync());
+	public void getMapObjects(final PokeCallback<MapObjects> callback) {
+		getMapObjectsAsync().subscribe(getSubscriber(callback));
 	}
 
 	/**
-	 * Returns MapObjects around your current location within a given width.
+	 * Request a MapObjects around your current location within a given width.
 	 *
 	 * @param width width
-	 * @return MapObjects at your current location
-	 * @throws LoginFailedException  If login fails.
-	 * @throws RemoteServerException If request errors occurred.
 	 */
-	public MapObjects getMapObjects(int width) throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(getMapObjectsAsync(width));
-	}
-
-	/**
-	 * Returns 5x5 cells with the requested lattitude/longitude in the center cell.
-	 *
-	 * @param latitude  latitude
-	 * @param longitude longitude
-	 * @return MapObjects in the given cells
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
-	 */
-	@Deprecated
-	public MapObjects getMapObjects(double latitude, double longitude)
-			throws LoginFailedException, RemoteServerException {
-		return getMapObjects(latitude, longitude, cellWidth);
-	}
-
-	/**
-	 * Returns the cells requested, you should send a latitude/longitude to fake a near location.
-	 *
-	 * @param cellIds   List of cellIds
-	 * @param latitude  latitude
-	 * @param longitude longitude
-	 * @return MapObjects in the given cells
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
-	 */
-	@Deprecated
-	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude)
-			throws LoginFailedException, RemoteServerException {
-		return getMapObjects(cellIds, latitude, longitude, 0);
-	}
-
-	/**
-	 * Returns `width` * `width` cells with the requested latitude/longitude in the center.
-	 *
-	 * @param latitude  latitude
-	 * @param longitude longitude
-	 * @param width     width
-	 * @return MapObjects in the given cells
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
-	 */
-	@Deprecated
-	public MapObjects getMapObjects(double latitude, double longitude, int width)
-			throws LoginFailedException, RemoteServerException {
-		return getMapObjects(getCellIds(latitude, longitude, width), latitude, longitude);
-	}
-
-	/**
-	 * Returns the cells requested.
-	 *
-	 * @param cellIds   cellIds
-	 * @param latitude  latitude
-	 * @param longitude longitude
-	 * @param altitude  altitude
-	 * @return MapObjects in the given cells
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
-	 */
-	@Deprecated
-	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude, double altitude)
-			throws LoginFailedException, RemoteServerException {
-		api.setLatitude(latitude);
-		api.setLongitude(longitude);
-		api.setAltitude(altitude);
-		return getMapObjects(cellIds);
+	public void getMapObjects(int width, final PokeCallback<MapObjects> callback) {
+		getMapObjectsAsync(width).subscribe(getSubscriber(callback));
 	}
 
 	/**
@@ -484,11 +412,9 @@ public class Map {
 	 *
 	 * @param cellIds List of cellId
 	 * @return MapObjects in the given cells
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public MapObjects getMapObjects(List<Long> cellIds) throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(getMapObjectsAsync(cellIds));
+	public void getMapObjects(List<Long> cellIds, PokeCallback<MapObjects> callback) {
+		getMapObjectsAsync(cellIds).subscribe(getSubscriber(callback));
 	}
 
 	/**
@@ -505,7 +431,6 @@ public class Map {
 
 		MutableInteger index = new MutableInteger(0);
 		MutableInteger jindex = new MutableInteger(0);
-
 
 		int level = cellId.level();
 		int size = 1 << (S2CellId.MAX_LEVEL - level);
@@ -587,7 +512,6 @@ public class Map {
 				.setPlayerLongitude(api.getLongitude())
 				.build();
 
-
 		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.LEVEL_UP_REWARDS, reqMsg, api);
 		return AsyncHelper.toBlocking(
 				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, FortSearchResponse>() {
@@ -608,9 +532,6 @@ public class Map {
 
 	}
 
-
-
-
 	public void setDefaultWidth(int width) {
 		cellWidth = width;
 	}
@@ -626,7 +547,6 @@ public class Map {
 
 	/**
 	 * Clear map objects cache
-	 *
 	 */
 	public void clearCache() {
 		cachedCatchable.clear();
@@ -637,7 +557,26 @@ public class Map {
 		cachedMapObjects.getSpawnPoints().clear();
 	}
 
-	private List<Long> getDefaultCells() {
+	public List<Long> getDefaultCells() {
 		return getCellIds(api.getLatitude(), api.getLongitude(), cellWidth);
+	}
+
+	private Subscriber<MapObjects> getSubscriber(final PokeCallback<MapObjects> callback) {
+		return new Subscriber<MapObjects>() {
+			@Override
+			public void onCompleted() {
+
+			}
+
+			@Override
+			public void onError(Throwable e) {
+				callback.onError(e);
+			}
+
+			@Override
+			public void onNext(MapObjects mapObjects) {
+				callback.onResponse(mapObjects);
+			}
+		};
 	}
 }
