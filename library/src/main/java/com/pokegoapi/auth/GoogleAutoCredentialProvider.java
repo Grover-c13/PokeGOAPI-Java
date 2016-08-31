@@ -128,7 +128,7 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 
 	@Override
 	public boolean isTokenIdExpired() {
-		return tokenInfo.authToken.getExpiry() > time.currentTimeMillis() / 1000 - 60;
+		return tokenInfo.authToken.getExpiry() < time.currentTimeMillis() / 1000;
 	}
 
 	private static class TokenInfo {

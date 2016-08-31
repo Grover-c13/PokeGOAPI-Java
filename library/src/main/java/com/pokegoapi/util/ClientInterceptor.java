@@ -32,7 +32,7 @@ public class ClientInterceptor implements Interceptor {
 		Request originalRequest = chain.request();
 		Request requestWithUserAgent = originalRequest.newBuilder()
 				.removeHeader("User-Agent")
-				.addHeader("User-Agent", "niantic")
+				.addHeader("User-Agent", "Niantic App")
 				.build();
 
 		return chain.proceed(requestWithUserAgent);
