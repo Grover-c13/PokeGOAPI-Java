@@ -323,7 +323,7 @@ public class RequestHandler implements Runnable {
 			} finally {
 				try {
 					Thread.sleep(500);
-				} catch (Throwable e) {
+				} catch (InterruptedException e) {
 
 				}
 			}
