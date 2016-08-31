@@ -22,6 +22,7 @@ import java.util.Collections;
 
 import POGOProtos.Networking.Requests.RequestOuterClass.Request;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import com.pokegoapi.api.PokemonGo;
 import lombok.Getter;
 
 /**
@@ -50,6 +51,16 @@ public class AsyncServerRequest {
 		this.type = type;
 		this.request = reqBuilder.build();
 		this.commonRequests = new ArrayList<ServerRequest>();
+	}
+
+	public AsyncServerRequest(RequestType type, GeneratedMessage req, PokemonGo api) {
+		Request.Builder reqBuilder = Request.newBuilder();
+		reqBuilder.setRequestMessage(req.toByteString());
+		reqBuilder.setRequestType(type);
+		this.type = type;
+		this.request = reqBuilder.build();
+		this.commonRequests = new ArrayList<>();
+		addCommonRequest(CommonRequest.getCommonRequests(api));
 	}
 
 	public AsyncServerRequest addCommonRequest(ServerRequest... requests) {

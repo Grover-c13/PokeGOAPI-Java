@@ -15,6 +15,7 @@
 
 package com.pokegoapi.main;
 
+import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -141,6 +142,8 @@ public class CommonRequest {
 				case DOWNLOAD_SETTINGS:
 					api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(data));
 					break;
+				case CHECK_AWARDED_BADGES:
+					api.getPlayerProfile().equipBadgeAsync(CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse.parseFrom(data));
 				default:
 					break;
 			}

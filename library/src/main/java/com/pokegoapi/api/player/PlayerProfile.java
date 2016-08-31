@@ -15,27 +15,6 @@
 
 package com.pokegoapi.api.player;
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.Item;
-import com.pokegoapi.api.inventory.ItemBag;
-import com.pokegoapi.api.inventory.Stats;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
-import com.pokegoapi.exceptions.InvalidCurrencyException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.main.CommonRequest;
-import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.Log;
-
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Random;
-
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.Player.EquippedBadgeOuterClass.EquippedBadge;
 import POGOProtos.Data.Player.PlayerAvatarOuterClass;
@@ -49,7 +28,7 @@ import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterCla
 import POGOProtos.Networking.Requests.Messages.CheckChallenge;
 import POGOProtos.Networking.Requests.Messages.ClaimCodenameMessageOuterClass.ClaimCodenameMessage;
 import POGOProtos.Networking.Requests.Messages.EncounterTutorialCompleteMessageOuterClass.EncounterTutorialCompleteMessage;
-import POGOProtos.Networking.Requests.Messages.EquipBadgeMessageOuterClass.EquipBadgeMessage;
+import POGOProtos.Networking.Requests.Messages.EquipBadgeMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
 import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass.MarkTutorialCompleteMessage;
@@ -57,16 +36,35 @@ import POGOProtos.Networking.Requests.Messages.SetAvatarMessageOuterClass.SetAva
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
 import POGOProtos.Networking.Responses.ClaimCodenameResponseOuterClass.ClaimCodenameResponse;
-import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import POGOProtos.Networking.Responses.EquipBadgeResponseOuterClass;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
-import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import POGOProtos.Networking.Responses.MarkTutorialCompleteResponseOuterClass.MarkTutorialCompleteResponse;
 import POGOProtos.Networking.Responses.SetAvatarResponseOuterClass.SetAvatarResponse;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Item;
+import com.pokegoapi.api.inventory.ItemBag;
+import com.pokegoapi.api.inventory.Stats;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
+import com.pokegoapi.exceptions.InvalidCurrencyException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.main.CommonRequest;
+import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.AsyncHelper;
+import com.pokegoapi.util.Log;
 import lombok.Setter;
+import rx.Observable;
 import rx.functions.Func1;
+
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Random;
 
 public class PlayerProfile {
 	private static final String TAG = PlayerProfile.class.getSimpleName();
@@ -204,22 +202,30 @@ public class PlayerProfile {
 		LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder()
 				.setLevel(level)
 				.build();
-		ServerRequest serverRequest = new ServerRequest(RequestType.LEVEL_UP_REWARDS, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-		LevelUpRewardsResponse response;
-		try {
-			response = LevelUpRewardsResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-		// Add the awarded items to our bag
-		ItemBag bag = api.getInventories().getItemBag();
-		for (ItemAward itemAward : response.getItemsAwardedList()) {
-			Item item = bag.getItem(itemAward.getItemId());
-			item.setCount(item.getCount() + itemAward.getItemCount());
-		}
-		// Build a new rewards object and return it
-		return new PlayerLevelUpRewards(response);
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.LEVEL_UP_REWARDS, msg, api);
+		return AsyncHelper.toBlocking(
+				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, PlayerLevelUpRewards>() {
+
+					@Override
+					public PlayerLevelUpRewards call(ByteString bytes) {
+						LevelUpRewardsResponse response;
+						try {
+							response = LevelUpRewardsResponse.parseFrom(bytes);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+						// Add the awarded items to our bag
+						ItemBag bag = api.getInventories().getItemBag();
+						for (ItemAward itemAward : response.getItemsAwardedList()) {
+							Item item = bag.getItem(itemAward.getItemId());
+							item.setCount(item.getCount() + itemAward.getItemCount());
+						}
+						// Build a new rewards object and return it
+						return new PlayerLevelUpRewards(response);
+					}
+				})
+		);
+
 	}
 
 	/**
@@ -237,38 +243,31 @@ public class PlayerProfile {
 		}
 	}
 
-	/**
-	 * Check and equip badges.
-	 *
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException When a buffer exception is thrown
-	 */
-	public void checkAndEquipBadges() throws LoginFailedException, RemoteServerException {
-		CheckAwardedBadgesMessage msg = CheckAwardedBadgesMessage.newBuilder().build();
-		ServerRequest serverRequest = new ServerRequest(RequestType.CHECK_AWARDED_BADGES, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-		CheckAwardedBadgesResponse response;
-		try {
-			response = CheckAwardedBadgesResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+
+	public Observable<Void> equipBadgeAsync(CheckAwardedBadgesResponse response) {
 		if (response.getSuccess()) {
 			for (int i = 0; i < response.getAwardedBadgesCount(); i++) {
-				EquipBadgeMessage msg1 = EquipBadgeMessage.newBuilder()
+				EquipBadgeMessageOuterClass.EquipBadgeMessage msg1 = EquipBadgeMessageOuterClass.EquipBadgeMessage.newBuilder()
 						.setBadgeType(response.getAwardedBadges(i))
 						.setBadgeTypeValue(response.getAwardedBadgeLevels(i)).build();
-				ServerRequest serverRequest1 = new ServerRequest(RequestType.EQUIP_BADGE, msg1);
-				api.getRequestHandler().sendServerRequests(serverRequest1);
-				EquipBadgeResponseOuterClass.EquipBadgeResponse response1;
-				try {
-					response1 = EquipBadgeResponseOuterClass.EquipBadgeResponse.parseFrom(serverRequest1.getData());
-					badge = response1.getEquipped();
-				} catch (InvalidProtocolBufferException e) {
-					throw new RemoteServerException(e);
-				}
+				AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.EQUIP_BADGE, msg1, api);
+				return
+						api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, Void>() {
+							@Override
+							public Void call(ByteString bytes) {
+								EquipBadgeResponseOuterClass.EquipBadgeResponse response1;
+								try {
+									response1 = EquipBadgeResponseOuterClass.EquipBadgeResponse.parseFrom(bytes);
+									badge = response1.getEquipped();
+								} catch (InvalidProtocolBufferException e) {
+									throw new AsyncRemoteServerException(e);
+								}
+								return null;
+							}
+						});
 			}
 		}
+		return null;
 	}
 
 	/**
@@ -514,7 +513,7 @@ public class PlayerProfile {
 		final SecureRandom r = new SecureRandom();
 		final int l = new Random().nextInt(15 - 10) + 10;
 		StringBuilder sb = new StringBuilder(l);
-		for (int i = 0;i < l;i++) {
+		for (int i = 0; i < l; i++) {
 			sb.append(a.charAt(r.nextInt(a.length())));
 		}
 		return sb.toString();
