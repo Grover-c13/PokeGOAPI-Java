@@ -424,7 +424,7 @@ public class PlayerProfile {
 
 						return response.getResult();
 					}
-				}, callback, api, CommonRequest.getDefaultCheckChallenge());
+				}, callback, api);
 	}
 
 	/**
