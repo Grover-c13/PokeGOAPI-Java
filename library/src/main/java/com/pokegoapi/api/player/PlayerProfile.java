@@ -466,11 +466,12 @@ public class PlayerProfile {
 
 						if (updatedCodename != null) {
 							markTutorial(TutorialStateOuterClass.TutorialState.NAME_SELECTION, null);
-							updateProfile(null);
 						}
 						return response.getStatus();
 					}
 				}, callback, api);
+
+		updateProfile(null);
 	}
 
 	/**
