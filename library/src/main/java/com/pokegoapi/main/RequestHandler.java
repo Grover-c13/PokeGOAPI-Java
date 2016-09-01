@@ -48,6 +48,7 @@ public class RequestHandler implements Runnable {
 	private String apiEndpoint;
 	private OkHttpClient client;
 	private Long requestId = new Random().nextLong();
+	private Random random;
 
 	private ExecutorService decoupler = Executors.newCachedThreadPool();
 
@@ -60,6 +61,7 @@ public class RequestHandler implements Runnable {
 	public RequestHandler(PokemonGo api, OkHttpClient client) {
 		this.api = api;
 		this.client = client;
+		this.random = new Random();
 		apiEndpoint = ApiSettings.API_ENDPOINT;
 		asyncHttpThread = new Thread(this, "Async HTTP Thread");
 		asyncHttpThread.setDaemon(true);
@@ -144,7 +146,6 @@ public class RequestHandler implements Runnable {
 				throw new RemoteServerException("Your account may be banned! please try from the official client.");
 			}
 
-
 			/**
 			 * map each reply to the numeric response,
 			 * ie first response = first request and send back to the requests to toBlocking.
@@ -182,7 +183,10 @@ public class RequestHandler implements Runnable {
 			Log.d(TAG, "Authenticated with static token");
 			builder.setAuthInfo(api.getAuthInfo());
 		}
-		builder.setMsSinceLastLocationfix(989);
+
+		int lastLocFix = random.nextInt(1800 - 149) + 149;
+
+		builder.setMsSinceLastLocationfix(lastLocFix);
 		builder.setLatitude(api.getLatitude());
 		builder.setLongitude(api.getLongitude());
 		builder.setAltitude(api.getAltitude());
