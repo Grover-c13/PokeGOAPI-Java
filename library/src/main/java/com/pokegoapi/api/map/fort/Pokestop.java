@@ -131,7 +131,7 @@ public class Pokestop {
 	 *
 	 * @return PokestopLootResult
 	 */
-	public void lootAsync() {
+	public void loot() {
 		FortSearchMessage searchMessage = FortSearchMessage.newBuilder()
 				.setFortId(getId())
 				.setFortLatitude(getLatitude())
@@ -164,7 +164,7 @@ public class Pokestop {
 	 * @param item the modifier to add to this pokestop
 	 * @return true if success
 	 */
-	public void addModifierAsync(ItemIdOuterClass.ItemId item) {
+	public void addModifier(ItemIdOuterClass.ItemId item) {
 		AddFortModifierMessage msg = AddFortModifierMessage.newBuilder()
 				.setModifierType(item)
 				.setFortId(getId())
@@ -192,7 +192,7 @@ public class Pokestop {
 	 *
 	 * @return FortDetails
 	 */
-	public void getDetailsAsync() {
+	public void getDetails() {
 		FortDetailsMessage reqMsg = FortDetailsMessage.newBuilder()
 				.setFortId(getId())
 				.setLatitude(getLatitude())

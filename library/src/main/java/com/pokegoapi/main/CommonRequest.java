@@ -143,7 +143,7 @@ public class CommonRequest {
 					api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(data));
 					break;
 				case CHECK_AWARDED_BADGES:
-					api.getPlayerProfile().equipBadgeAsync(CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse.parseFrom(data));
+					api.getPlayerProfile().equipBadge(CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse.parseFrom(data));
 				default:
 					break;
 			}

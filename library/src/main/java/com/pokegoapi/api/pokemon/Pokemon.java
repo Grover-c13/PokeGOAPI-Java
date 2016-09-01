@@ -49,7 +49,6 @@ import com.pokegoapi.util.PokeAFunc;
 import com.pokegoapi.util.PokeCallback;
 import lombok.Getter;
 import lombok.Setter;
-import rx.functions.Func1;
 
 /**
  * The type Pokemon.
@@ -340,9 +339,8 @@ public class Pokemon extends PokemonDetails {
 				.build();
 
 		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.USE_ITEM_REVIVE, reqMsg,
-				new PokeAFunc() {
-					@Override
-					public Object exec(GeneratedMessage response) {
+				new PokeAFunc<UseItemReviveResponse, UseItemReviveResponse.Result> () {
+					public UseItemReviveResponse.Result exec(UseItemReviveResponse response) {
 						if (response.getResult() == UseItemReviveResponse.Result.SUCCESS) {
 							setStamina(response.getStamina());
 						}
