@@ -108,54 +108,79 @@ public class PlayerProfile {
 						ArrayList<TutorialStateOuterClass.TutorialState> tutorialStates =
 								getTutorialState().getTutorialStates();
 						if (tutorialStates.isEmpty()) {
-							activateAccount(new PokeCallback<PlayerProfile>() {
-								@Override
-								public void onResponse(PlayerProfile result) {
-
-								}
-							});
+							activateAccount();
+							return null;
 						}
 
 						if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION)) {
-							setupAvatar(new PokeCallback<SetAvatarResponse.Status>() {
-								@Override
-								public void onResponse(SetAvatarResponse.Status result) {
-
-								}
-							});
+							setupAvatar();
+							return null;
 						}
 
 						if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.POKEMON_CAPTURE)) {
-							encounterTutorialComplete(new PokeCallback<EncounterTutorialCompleteResponse.Result>() {
-								@Override
-								public void onResponse(EncounterTutorialCompleteResponse.Result result) {
-
-								}
-							});
+							encounterTutorialComplete();
+							return null;
 						}
 
 						if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.NAME_SELECTION)) {
-							claimCodeName(new PokeCallback<ClaimCodenameResponse.Status>() {
-								@Override
-								public void onResponse(ClaimCodenameResponse.Status result) {
-
-								}
-							});
+							claimCodeName();
+							return null;
 						}
 
 						if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
-							firstTimeExperienceComplete(new PokeCallback<PlayerProfile>() {
-								@Override
-								public void onResponse(PlayerProfile result) {
-
-								}
-							});
+							firstTimeExperienceComplete();
 						}
+
 						return null;
 					}
 				}, null).addCommonRequest(new ServerRequest(RequestType.CHECK_CHALLENGE,
 				CheckChallenge.CheckChallengeMessage.getDefaultInstance()));
 		api.getRequestHandler().sendAsyncServerRequests(getPlayerServerRequest);
+	}
+
+	private void activateAccount() {
+		activateAccount(new PokeCallback<PlayerProfile>() {
+			@Override
+			public void onResponse(PlayerProfile result) {
+				setupAvatar();
+			}
+		});
+	}
+
+	private void setupAvatar() {
+		setupAvatar(new PokeCallback<SetAvatarResponse.Status>() {
+			@Override
+			public void onResponse(SetAvatarResponse.Status result) {
+				encounterTutorialComplete();
+			}
+		});
+	}
+
+	private void encounterTutorialComplete() {
+		encounterTutorialComplete(new PokeCallback<EncounterTutorialCompleteResponse.Result>() {
+			@Override
+			public void onResponse(EncounterTutorialCompleteResponse.Result result) {
+				claimCodeName();
+			}
+		});
+	}
+
+	private void claimCodeName() {
+		claimCodeName(new PokeCallback<ClaimCodenameResponse.Status>() {
+			@Override
+			public void onResponse(ClaimCodenameResponse.Status result) {
+				firstTimeExperienceComplete();
+			}
+		});
+	}
+
+	private void firstTimeExperienceComplete() {
+		firstTimeExperienceComplete(new PokeCallback<PlayerProfile>() {
+			@Override
+			public void onResponse(PlayerProfile result) {
+
+			}
+		});
 	}
 
 	/**
