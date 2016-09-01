@@ -21,7 +21,7 @@ import POGOProtos.Networking.Requests.Messages.RecycleInventoryItemMessageOuterC
 import POGOProtos.Networking.Requests.Messages.UseIncenseMessageOuterClass.UseIncenseMessage;
 import POGOProtos.Networking.Requests.Messages.UseItemXpBoostMessageOuterClass.UseItemXpBoostMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass;
+import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse;
 import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result;
 import POGOProtos.Networking.Responses.UseIncenseResponseOuterClass.UseIncenseResponse;
 import POGOProtos.Networking.Responses.UseItemXpBoostResponseOuterClass.UseItemXpBoostResponse;
@@ -62,7 +62,7 @@ public class ItemBag {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
-	public void removeItem(ItemId id, int quantity, PokeCallback<Result> callback) throws RemoteServerException, LoginFailedException {
+	public void removeItem(ItemId id, int quantity, PokeCallback<Result> callback) {
 		final Item item = getItem(id);
 		if (item.getCount() < quantity) {
 			throw new IllegalArgumentException("You cannont remove more quantity than you have");
@@ -71,10 +71,11 @@ public class ItemBag {
 		RecycleInventoryItemMessage msg = RecycleInventoryItemMessage.newBuilder().setItemId(id).setCount(quantity)
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.RECYCLE_INVENTORY_ITEM, msg, new PokeAFunc<RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse, Result>() {
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.RECYCLE_INVENTORY_ITEM, msg,
+				new PokeAFunc<RecycleInventoryItemResponse, Result>() {
 			@Override
-			public Result exec(RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse response) {
-				if (response.getResult() == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
+			public Result exec(RecycleInventoryItemResponse response) {
+				if (response.getResult() == RecycleInventoryItemResponse.Result.SUCCESS) {
 					item.setCount(response.getNewCount());
 				}
 				return response.getResult();

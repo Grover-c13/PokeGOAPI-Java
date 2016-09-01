@@ -24,6 +24,7 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
 import com.google.protobuf.GeneratedMessage;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.gym.Gym;
 import com.pokegoapi.google.common.geometry.MutableInteger;
 import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
@@ -33,6 +34,7 @@ import com.pokegoapi.util.PokeAFunc;
 import com.pokegoapi.util.PokeCallback;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -40,7 +42,6 @@ import java.util.stream.Stream;
 
 public class Map {
 	private final PokemonGo api;
-	private MapObjects cachedMapObjects;
 	private int cellWidth = 3;
 	private long lastMapUpdate;
 
@@ -62,10 +63,6 @@ public class Map {
 	 * @return MapObjects in the given cells
 	 */
 	private void getMapObjectsAsync(List<Long> cellIds, PokeCallback<MapObjects> callback) {
-		/*if (useCache()) {
-			return Observable.just(cachedMapObjects);
-		}*/
-
 		lastMapUpdate = api.currentTimeMillis();
 		GetMapObjectsMessage.Builder builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder()
 				.setLatitude(api.getLatitude())
@@ -81,7 +78,6 @@ public class Map {
 			@Override
 			public MapObjects exec(GetMapObjectsResponseOuterClass.GetMapObjectsResponse response) {
 				MapObjects result = new MapObjects(api);
-				cachedMapObjects = result;
 				for (MapCellOuterClass.MapCell mapCell : response.getMapCellsList()) {
 					result.addNearbyPokemons(mapCell.getNearbyPokemonsList());
 					result.addCatchablePokemons(mapCell.getCatchablePokemonsList());
@@ -89,23 +85,25 @@ public class Map {
 					result.addDecimatedSpawnPoints(mapCell.getDecimatedSpawnPointsList());
 					result.addSpawnPoints(mapCell.getSpawnPointsList());
 
-					java.util.Map<FortTypeOuterClass.FortType, List<FortDataOuterClass.FortData>> groupedForts = Stream.of(mapCell.getFortsList())
-							.collect(Collectors.groupingBy(new Function<FortDataOuterClass.FortData, FortTypeOuterClass.FortType>() {
-								@Override
-								public FortTypeOuterClass.FortType apply(FortDataOuterClass.FortData fortData) {
-									return fortData.getType();
-								}
-							}));
-					result.addGyms(groupedForts.get(FortTypeOuterClass.FortType.GYM));
-					result.addPokestops(groupedForts.get(FortTypeOuterClass.FortType.CHECKPOINT));
+					HashSet<FortDataOuterClass.FortData> gyms = new HashSet<>();
+					HashSet<FortDataOuterClass.FortData> pokestops = new HashSet<>();
+
+					for (FortDataOuterClass.FortData fortData : mapCell.getFortsList()) {
+						if (fortData.getType() == FortTypeOuterClass.FortType.CHECKPOINT) {
+							pokestops.add(fortData);
+						} else if (fortData.getType() == FortTypeOuterClass.FortType.GYM) {
+							gyms.add(fortData);
+						}
+					}
+
+					result.addGyms(gyms);
+					result.addPokestops(pokestops);
 				}
 
 				return result;
 			}
 		}, callback, api);
 		asyncServerRequest.addCommonRequest(CommonRequest.getCommonRequests(api));
-
-
 	}
 
 	/**
