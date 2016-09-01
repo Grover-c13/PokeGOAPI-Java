@@ -24,6 +24,7 @@ import com.pokegoapi.exceptions.RemoteServerException;
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
+import com.pokegoapi.util.PokeCallback;
 import lombok.Setter;
 
 /**
@@ -46,12 +47,12 @@ public class EggPokemon {
 	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 */
-	public void incubate(EggIncubator incubator)
+	public void incubate(EggIncubator incubator, PokeCallback<UseItemEggIncubatorResponse> callback)
 			throws LoginFailedException, RemoteServerException {
 		if (incubator.isInUse()) {
 			throw new IllegalArgumentException("Incubator already used");
 		}
-		incubator.hatchEgg(this);
+		incubator.hatchEgg(this, callback);
 	}
 
 	/**

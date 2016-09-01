@@ -143,8 +143,10 @@ public class CatchablePokemon implements MapPoint {
 	public void encounterPokemon(PokeCallback<EncounterResult> callback) {
 		if (encounterKind == EncounterKind.NORMAL) {
 			encounterNormalPokemon(callback);
+			return;
 		} else if (encounterKind == EncounterKind.DISK) {
 			encounterDiskPokemon(callback);
+			return;
 		}
 
 		throw new IllegalStateException("Catchable pokemon missing encounter type");

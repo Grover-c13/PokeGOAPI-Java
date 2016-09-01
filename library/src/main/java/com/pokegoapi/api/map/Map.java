@@ -102,7 +102,8 @@ public class Map {
 				return result;
 			}
 		}, callback, api);
-		asyncServerRequest.addCommonRequest(CommonRequest.getCommonRequests(api));
+		api.getRequestHandler().sendAsyncServerRequests(asyncServerRequest);
+
 	}
 
 	/**
