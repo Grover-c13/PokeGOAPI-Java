@@ -30,8 +30,18 @@ public class InternalServerRequest {
         RequestOuterClass.Request.Builder reqBuilder = RequestOuterClass.Request.newBuilder();
         reqBuilder.setRequestMessage(req.toByteString());
         reqBuilder.setRequestType(type);
-
         this.request = reqBuilder.build();
+        this.type = type;
+    }
+
+    /**
+     * Instantiates a new Server request.
+     *
+     * @param type    the type
+     * @param request the req
+     */
+    InternalServerRequest(RequestTypeOuterClass.RequestType type, RequestOuterClass.Request request) {
+        this.request = request;
         this.type = type;
     }
 
