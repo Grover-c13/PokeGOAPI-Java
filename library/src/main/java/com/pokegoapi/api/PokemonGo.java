@@ -19,6 +19,8 @@ import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+
+import com.google.protobuf.GeneratedMessage;
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.LocationFixes;
@@ -34,6 +36,8 @@ import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.util.ClientInterceptor;
+import com.pokegoapi.util.PokeAFunc;
+import com.pokegoapi.util.PokeCallback;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import lombok.Getter;
@@ -142,10 +146,10 @@ public class PokemonGo {
 	 * Login user with the provided provider
 	 *
 	 * @param credentialProvider the credential provider
-	 * @throws LoginFailedException  When login fails
-	 * @throws RemoteServerException When server fails
+	 * @param callback the callback that will return this instance or errors once login
+	 *                 process is fully completed
 	 */
-	public void login(CredentialProvider credentialProvider) throws LoginFailedException, RemoteServerException {
+	public void login(CredentialProvider credentialProvider, PokeCallback<PokemonGo> callback) {
 		if (credentialProvider == null) {
 			throw new NullPointerException("Credential Provider is null");
 		}
@@ -155,32 +159,29 @@ public class PokemonGo {
 		settings = new Settings(this);
 		inventories = new Inventories(this);
 
-		initialize();
-	}
-
-	private void initialize() throws RemoteServerException, LoginFailedException {
-		fireRequestBlock(new AsyncServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
-				CommonRequest.getDefaultDownloadRemoteConfigVersionRequest(), null, null));
-
-		fireRequestBlockTwo();
+		initialize(callback);
 	}
 
 	/**
-	 * Fire requests block.
+	 * Reproduce the login calls made by the official client and return a callback with login errors
+	 * or the current instance of PokemonGo once initialized
 	 *
-	 * @param request server request
-	 */
-	private void fireRequestBlock(AsyncServerRequest request) {
-		request.boundRequests(CommonRequest.getCommonRequests(this));
-		getRequestHandler().sendAsyncServerRequests(request);
-	}
-
-	/**
-	 * Second requests block. Public since it could be re-fired at any time
-	 */
-	public void fireRequestBlockTwo() {
-		fireRequestBlock(new AsyncServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
-				CommonRequest.getDefaultGetAssetDigestMessageRequest(), null, null));
+	 * @param callback the callback
+     */
+	private void initialize(PokeCallback<PokemonGo> callback) {
+		new AsyncServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
+				CommonRequest.getDefaultDownloadRemoteConfigVersionRequest(), new PokeAFunc() {
+			@Override
+			public Object exec(GeneratedMessage response) {
+				return null;
+			}
+		}, new PokeCallback() {
+			@Override
+			public void onResponse(Object result) {
+				new AsyncServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
+						CommonRequest.getDefaultGetAssetDigestMessageRequest(), null, callback, PokemonGo.this);
+			}
+		}, this);
 	}
 
 	/**

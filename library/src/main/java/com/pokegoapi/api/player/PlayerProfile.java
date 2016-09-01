@@ -76,10 +76,8 @@ public class PlayerProfile {
 
 	/**
 	 * @param api the api
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public PlayerProfile(PokemonGo api) throws LoginFailedException, RemoteServerException {
+	public PlayerProfile(PokemonGo api) {
 		this.api = api;
 		this.playerLocale = new PlayerLocale();
 
