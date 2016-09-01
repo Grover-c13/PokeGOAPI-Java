@@ -31,6 +31,7 @@ import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPla
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
 import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass.MarkTutorialCompleteMessage;
 import POGOProtos.Networking.Requests.Messages.SetAvatarMessageOuterClass.SetAvatarMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.ClaimCodenameResponseOuterClass.ClaimCodenameResponse;
 import POGOProtos.Networking.Responses.EncounterTutorialCompleteResponseOuterClass.EncounterTutorialCompleteResponse;
@@ -394,7 +395,8 @@ public class PlayerProfile {
 							markTutorial(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION, null);
 						}
 
-						api.fireRequestBlockTwo();
+						new AsyncServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
+								CommonRequest.getDefaultGetAssetDigestMessageRequest(), null, null, api);
 
 						return response.getStatus();
 					}
@@ -426,7 +428,7 @@ public class PlayerProfile {
 
 						return response.getResult();
 					}
-				}, callback, api, CommonRequest.getDefaultCheckChallenge())
+				}, callback, api, CommonRequest.getDefaultCheckChallenge());
 	}
 
 	/**

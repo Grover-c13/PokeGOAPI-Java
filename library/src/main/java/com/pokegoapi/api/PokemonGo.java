@@ -168,7 +168,7 @@ public class PokemonGo {
 	 *
 	 * @param callback the callback
      */
-	private void initialize(PokeCallback<PokemonGo> callback) {
+	private void initialize(final PokeCallback<PokemonGo> callback) {
 		new AsyncServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
 				CommonRequest.getDefaultDownloadRemoteConfigVersionRequest(), new PokeAFunc() {
 			@Override

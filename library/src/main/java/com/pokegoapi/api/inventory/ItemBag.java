@@ -69,7 +69,7 @@ public class ItemBag {
 		RecycleInventoryItemMessage msg = RecycleInventoryItemMessage.newBuilder().setItemId(id).setCount(quantity)
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.RECYCLE_INVENTORY_ITEM, msg,
+		new AsyncServerRequest(RequestType.RECYCLE_INVENTORY_ITEM, msg,
 				new PokeAFunc<RecycleInventoryItemResponse, Result>() {
 			@Override
 			public Result exec(RecycleInventoryItemResponse response) {
@@ -79,7 +79,6 @@ public class ItemBag {
 				return response.getResult();
 			}
 		}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
@@ -154,14 +153,13 @@ public class ItemBag {
 						.setIncenseTypeValue(type.getNumber())
 						.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.USE_INCENSE, useIncenseMessage,
+		new AsyncServerRequest(RequestType.USE_INCENSE, useIncenseMessage,
 				new PokeAFunc<UseIncenseResponse, UseIncenseResponse.Result>() {
 			@Override
 			public UseIncenseResponse.Result exec(UseIncenseResponse response) {
 				return response.getResult();
 			}
 		}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
@@ -184,7 +182,7 @@ public class ItemBag {
 				.setItemId(ItemId.ITEM_LUCKY_EGG)
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.USE_ITEM_XP_BOOST,
+		new AsyncServerRequest(RequestType.USE_ITEM_XP_BOOST,
 				xpMsg, new PokeAFunc<UseItemXpBoostResponse, UseItemXpBoostResponse>() {
 			@Override
 			public UseItemXpBoostResponse exec(UseItemXpBoostResponse response) {
@@ -192,7 +190,6 @@ public class ItemBag {
 				return response;
 			}
 		}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**

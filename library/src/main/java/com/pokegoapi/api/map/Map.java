@@ -25,6 +25,7 @@ import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
 import com.google.protobuf.GeneratedMessage;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.gym.Gym;
+import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.google.common.geometry.MutableInteger;
 import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
@@ -71,7 +72,7 @@ public class Map {
 			builder.addSinceTimestampMs(0);
 		}
 
-		final AsyncServerRequest asyncServerRequest = new AsyncServerRequest(
+		new AsyncServerRequest(
 				RequestType.GET_MAP_OBJECTS, builder.build(), new PokeAFunc<GetMapObjectsResponseOuterClass.GetMapObjectsResponse,MapObjects>() {
 			@Override
 			public MapObjects exec(GetMapObjectsResponseOuterClass.GetMapObjectsResponse response) {
@@ -101,8 +102,6 @@ public class Map {
 				return result;
 			}
 		}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(asyncServerRequest);
-
 	}
 
 	/**
@@ -111,7 +110,6 @@ public class Map {
 	public void getMapObjects(final PokeCallback<MapObjects> callback) {
 		getMapObjects(getDefaultCells(), callback);
 	}
-
 
 	/**
 	 * Get a list of all the Cell Ids.

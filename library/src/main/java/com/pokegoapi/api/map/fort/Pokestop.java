@@ -138,7 +138,7 @@ public class Pokestop {
 				.setPlayerLongitude(api.getLongitude())
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH,
+		new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH,
 				searchMessage, new PokeAFunc<FortSearchResponseOuterClass.FortSearchResponse, PokestopLootResult>() {
 			@Override
 			public PokestopLootResult exec(FortSearchResponseOuterClass.FortSearchResponse response) {
@@ -146,8 +146,6 @@ public class Pokestop {
 				return new PokestopLootResult(response);
 			}
 		}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
-
 	}
 
 	/**
@@ -164,16 +162,13 @@ public class Pokestop {
 				.setPlayerLongitude(api.getLongitude())
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.ADD_FORT_MODIFIER, msg, new PokeAFunc<AddFortModifierResponseOuterClass.AddFortModifierResponse, Boolean>() {
+		new AsyncServerRequest(RequestTypeOuterClass.RequestType.ADD_FORT_MODIFIER, msg, new PokeAFunc<AddFortModifierResponseOuterClass.AddFortModifierResponse, Boolean>() {
 			@Override
 			public Boolean exec(AddFortModifierResponseOuterClass.AddFortModifierResponse response) {
 				return Boolean.TRUE;
 			}
 		}, callback, api);
-
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
-
 
 	/**
 	 * Get more detailed information about a pokestop.
@@ -187,16 +182,14 @@ public class Pokestop {
 				.setLongitude(getLongitude())
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS, reqMsg,
+		new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS, reqMsg,
 				new PokeAFunc<FortDetailsResponseOuterClass.FortDetailsResponse, FortDetails>() {
 					@Override
 					public FortDetails exec(FortDetailsResponseOuterClass.FortDetailsResponse response) {
 						return new FortDetails(response);
 					}
 				}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
-
 
 	/**
 	 * Returns whether this pokestop has an active lure.
@@ -207,7 +200,6 @@ public class Pokestop {
 	public boolean hasLurePokemon() {
 		return fortData.hasLureInfo() && fortData.getLureInfo().getLureExpiresTimestampMs() > api.currentTimeMillis();
 	}
-
 
 	/**
 	 * Returns whether this pokestop has an active lure.

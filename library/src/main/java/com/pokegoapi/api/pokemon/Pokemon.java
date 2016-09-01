@@ -74,14 +74,13 @@ public class Pokemon extends PokemonDetails {
 	public void transferPokemon(PokeCallback<ReleasePokemonResponse.Result> callback) {
 		ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.RELEASE_POKEMON, reqMsg,
+		new AsyncServerRequest(RequestType.RELEASE_POKEMON, reqMsg,
 				new PokeAFunc<ReleasePokemonResponse, ReleasePokemonResponse.Result>() {
 					@Override
 					public ReleasePokemonResponse.Result exec(ReleasePokemonResponse response) {
 						return response.getResult();
 					}
 				}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
@@ -97,14 +96,13 @@ public class Pokemon extends PokemonDetails {
 				.setNickname(nickname)
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.NICKNAME_POKEMON, reqMsg,
+		new AsyncServerRequest(RequestType.NICKNAME_POKEMON, reqMsg,
 				new PokeAFunc<NicknamePokemonResponse, NicknamePokemonResponse.Result>() {
 					@Override
 					public NicknamePokemonResponse.Result exec(NicknamePokemonResponse response) {
 						return response.getResult();
 					}
 				}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
@@ -120,14 +118,13 @@ public class Pokemon extends PokemonDetails {
 				.setIsFavorite(markFavorite)
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.SET_FAVORITE_POKEMON, reqMsg,
+		new AsyncServerRequest(RequestType.SET_FAVORITE_POKEMON, reqMsg,
 				new PokeAFunc<SetFavoritePokemonResponse, SetFavoritePokemonResponse.Result>() {
 					@Override
 					public SetFavoritePokemonResponse.Result exec(SetFavoritePokemonResponse response) {
 						return response.getResult();
 					}
 				}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
@@ -172,7 +169,7 @@ public class Pokemon extends PokemonDetails {
 	 */
 	public void powerUp(PokeCallback<UpgradePokemonResponse.Result> callback) {
 		UpgradePokemonMessage reqMsg = UpgradePokemonMessage.newBuilder().setPokemonId(getId()).build();
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.UPGRADE_POKEMON, reqMsg,
+		new AsyncServerRequest(RequestType.UPGRADE_POKEMON, reqMsg,
 				new PokeAFunc<UpgradePokemonResponse, UpgradePokemonResponse.Result>() {
 					@Override
 					public UpgradePokemonResponse.Result exec(UpgradePokemonResponse response) {
@@ -181,7 +178,6 @@ public class Pokemon extends PokemonDetails {
 						return response.getResult();
 					}
 				}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
@@ -192,7 +188,7 @@ public class Pokemon extends PokemonDetails {
 	public void evolve(PokeCallback<EvolutionResult> callback) {
 		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.EVOLVE_POKEMON, reqMsg,
+		new AsyncServerRequest(RequestType.EVOLVE_POKEMON, reqMsg,
 				new PokeAFunc<EvolvePokemonResponse, EvolutionResult>() {
 					@Override
 					public EvolutionResult exec(EvolvePokemonResponse response) {
@@ -200,7 +196,6 @@ public class Pokemon extends PokemonDetails {
 						return result;
 					}
 				}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
@@ -276,7 +271,7 @@ public class Pokemon extends PokemonDetails {
 				.setPokemonId(getId())
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.USE_ITEM_POTION, reqMsg,
+		new AsyncServerRequest(RequestType.USE_ITEM_POTION, reqMsg,
 				new PokeAFunc<UseItemPotionResponse, UseItemPotionResponse.Result>() {
 					@Override
 					public UseItemPotionResponse.Result exec(UseItemPotionResponse response) {
@@ -286,7 +281,6 @@ public class Pokemon extends PokemonDetails {
 						return response.getResult();
 					}
 				}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
@@ -333,7 +327,7 @@ public class Pokemon extends PokemonDetails {
 				.setPokemonId(getId())
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.USE_ITEM_REVIVE, reqMsg,
+		new AsyncServerRequest(RequestType.USE_ITEM_REVIVE, reqMsg,
 				new PokeAFunc<UseItemReviveResponse, UseItemReviveResponse.Result>() {
 					public UseItemReviveResponse.Result exec(UseItemReviveResponse response) {
 						if (response.getResult() == UseItemReviveResponse.Result.SUCCESS) {
@@ -342,7 +336,6 @@ public class Pokemon extends PokemonDetails {
 						return response.getResult();
 					}
 				}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	public EvolutionForm getEvolutionForm() {
@@ -400,5 +393,4 @@ public class Pokemon extends PokemonDetails {
 
 		return false;
 	}
-
 }

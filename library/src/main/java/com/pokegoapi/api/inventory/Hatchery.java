@@ -60,7 +60,7 @@ public class Hatchery {
 	public void queryHatchedEggs(PokeCallback<List<HatchedEgg>> callback) {
 		GetHatchedEggsMessage msg = GetHatchedEggsMessage.newBuilder().build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.GET_HATCHED_EGGS, msg, new PokeAFunc<GetHatchedEggsResponse, List<HatchedEgg>>() {
+		new AsyncServerRequest(RequestType.GET_HATCHED_EGGS, msg, new PokeAFunc<GetHatchedEggsResponse, List<HatchedEgg>>() {
 			@Override
 			public List<HatchedEgg> exec(GetHatchedEggsResponse response) {
 				List<HatchedEgg> eggs = new ArrayList<HatchedEgg>();
@@ -73,6 +73,5 @@ public class Hatchery {
 				return eggs;
 			}
 		}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 }

@@ -62,14 +62,13 @@ public class EggIncubator {
 				.setPokemonId(egg.getId())
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR, reqMsg,
+		new AsyncServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR, reqMsg,
 				new PokeAFunc<UseItemEggIncubatorResponse, UseItemEggIncubatorResponse>() {
 					@Override
 					public UseItemEggIncubatorResponse exec(UseItemEggIncubatorResponse response) {
 						return response;
 					}
 				}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
