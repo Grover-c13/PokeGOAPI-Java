@@ -171,12 +171,7 @@ public class PlayerProfile {
 	}
 
 	private void firstTimeExperienceComplete() {
-		firstTimeExperienceComplete(new PokeCallback<PlayerProfile>() {
-			@Override
-			public void onResponse(PlayerProfile result) {
-
-			}
-		});
+		firstTimeExperienceComplete(null);
 	}
 
 	/**

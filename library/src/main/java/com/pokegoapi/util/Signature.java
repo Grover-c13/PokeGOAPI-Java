@@ -95,7 +95,7 @@ public class Signature {
 
 	private static int getLocationHash1(PokemonGo api, byte[] authTicket) {
 		XXHashFactory factory = XXHashFactory.safeInstance();
-		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x1B845238);
+		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x61656632);
 		xx32.update(authTicket, 0, authTicket.length);
 		byte[] bytes = new byte[8 * 3];
 
@@ -116,7 +116,7 @@ public class Signature {
 		System.arraycopy(getBytes(api.getLongitude()), 0, bytes, 8, 8);
 		System.arraycopy(getBytes(api.getAltitude()), 0, bytes, 16, 8);
 
-		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x1B845238);
+		StreamingXXHash32 xx32 = factory.newStreamingHash32(0x61656632);
 		xx32.update(bytes, 0, bytes.length);
 
 		return xx32.getValue();
@@ -124,7 +124,7 @@ public class Signature {
 
 	private static long getRequestHash(byte[] authTicket, byte[] request) {
 		XXHashFactory factory = XXHashFactory.safeInstance();
-		StreamingXXHash64 xx64 = factory.newStreamingHash64(0x1B845238);
+		StreamingXXHash64 xx64 = factory.newStreamingHash64(0x61656632);
 		xx64.update(authTicket, 0, authTicket.length);
 		xx64 = factory.newStreamingHash64(xx64.getValue());
 		xx64.update(request, 0, request.length);
