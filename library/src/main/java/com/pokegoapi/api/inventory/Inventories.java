@@ -72,11 +72,6 @@ public class Inventories {
 	 * @param response the get inventory response
 	 */
 	public void updateInventories(GetInventoryResponse response) {
-		List<EggPokemon> eggs = new LinkedList<>();
-		List<Pokemon> pokemons = new LinkedList<>();
-		List<Item> items = new LinkedList<>();
-		List<EggIncubator> incub = new LinkedList<>();
-
 
 		for (InventoryItemOuterClass.InventoryItem inventoryItem
 				: response.getInventoryDelta().getInventoryItemsList()) {
@@ -84,24 +79,23 @@ public class Inventories {
 
 			// hatchery
 			if (itemData.getPokemonData().getPokemonId() == PokemonId.MISSINGNO && itemData.getPokemonData().getIsEgg()) {
-				eggs.add(new EggPokemon(itemData.getPokemonData()));
+				hatchery.addEgg(new EggPokemon(itemData.getPokemonData()));
 			}
 
 			// pokebank
 			if (itemData.getPokemonData().getPokemonId() != PokemonId.MISSINGNO) {
-				pokemons.add(new Pokemon(api, inventoryItem.getInventoryItemData().getPokemonData()));
+				pokebank.addPokemon(new Pokemon(api, inventoryItem.getInventoryItemData().getPokemonData()));
 			}
 
 			// items
 			if (itemData.getItem().getItemId() != ItemId.UNRECOGNIZED && itemData.getItem().getItemId() != ItemId.ITEM_UNKNOWN) {
-				ItemData item = itemData.getItem();
-				items.add(new Item(item));
+				itemBag.addItem(new Item(itemData.getItem()));
 			}
 
 			// candyjar
 			if (itemData.getCandy().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED
 					&& itemData.getCandy().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_UNSET) {
-				candyjar.addCandy(
+				candyjar.setCandy(
 						itemData.getCandy().getFamilyId(),
 						itemData.getCandy().getCandy()
 				);
@@ -118,21 +112,13 @@ public class Inventories {
 
 			if (itemData.hasEggIncubators()) {
 				for (EggIncubatorOuterClass.EggIncubator incubator : itemData.getEggIncubators().getEggIncubatorList()) {
-					incub.add(new EggIncubator(api, incubator));
+					incubators.put(incubator.getId(),new EggIncubator(api, incubator));
 				}
 			}
 
 			lastInventoryUpdate = api.currentTimeMillis();
 		}
 
-		hatchery.setEggs(eggs);
-		pokebank.setPokemons(pokemons);
-		itemBag.setItems(items);
-		synchronized (incubators) {
-			incubators.clear();
-			for (EggIncubator incubator : incub) {
-				incubators.put(incubator.getId(), incubator);
-			}
-		}
+
 	}
 }

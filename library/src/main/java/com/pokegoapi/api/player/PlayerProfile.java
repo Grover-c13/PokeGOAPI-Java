@@ -32,10 +32,13 @@ import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.L
 import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass.MarkTutorialCompleteMessage;
 import POGOProtos.Networking.Requests.Messages.SetAvatarMessageOuterClass.SetAvatarMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.ClaimCodenameResponseOuterClass;
 import POGOProtos.Networking.Responses.ClaimCodenameResponseOuterClass.ClaimCodenameResponse;
+import POGOProtos.Networking.Responses.EncounterTutorialCompleteResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterTutorialCompleteResponseOuterClass.EncounterTutorialCompleteResponse;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
 
+import POGOProtos.Networking.Responses.SetAvatarResponseOuterClass;
 import com.google.protobuf.GeneratedMessage;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
@@ -105,23 +108,48 @@ public class PlayerProfile {
 						ArrayList<TutorialStateOuterClass.TutorialState> tutorialStates =
 								getTutorialState().getTutorialStates();
 						if (tutorialStates.isEmpty()) {
-							activateAccount();
+							activateAccount(new PokeCallback<PlayerProfile>() {
+								@Override
+								public void onResponse(PlayerProfile result) {
+
+								}
+							});
 						}
 
 						if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION)) {
-							setupAvatar();
+							setupAvatar(new PokeCallback<SetAvatarResponse.Status>() {
+								@Override
+								public void onResponse(SetAvatarResponse.Status result) {
+
+								}
+							});
 						}
 
 						if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.POKEMON_CAPTURE)) {
-							encounterTutorialComplete();
+							encounterTutorialComplete(new PokeCallback<EncounterTutorialCompleteResponse.Result>() {
+								@Override
+								public void onResponse(EncounterTutorialCompleteResponse.Result result) {
+
+								}
+							});
 						}
 
 						if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.NAME_SELECTION)) {
-							claimCodeName();
+							claimCodeName(new PokeCallback<ClaimCodenameResponse.Status>() {
+								@Override
+								public void onResponse(ClaimCodenameResponse.Status result) {
+
+								}
+							});
 						}
 
 						if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
-							firstTimeExperienceComplete();
+							firstTimeExperienceComplete(new PokeCallback<PlayerProfile>() {
+								@Override
+								public void onResponse(PlayerProfile result) {
+
+								}
+							});
 						}
 						return null;
 					}

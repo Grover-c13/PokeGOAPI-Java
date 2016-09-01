@@ -41,21 +41,7 @@ public class CandyJar {
 		this.candies.put(family, candies);
 	}
 
-	/**
-	 * Adds a candy to the candy jar.
-	 *
-	 * @param family Pokemon family id
-	 * @param amount Amount of candies to add
-	 */
-	public void addCandy(PokemonFamilyId family, int amount) {
-		synchronized (candies) {
-			if (candies.containsKey(family)) {
-				candies.put(family, candies.get(family) + amount);
-			} else {
-				candies.put(family, amount);
-			}
-		}
-	}
+
 
 	/**
 	 * Remove a candy from the candy jar.

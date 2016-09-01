@@ -15,15 +15,13 @@
 
 package com.pokegoapi.api.inventory;
 
+import POGOProtos.Inventory.Item.ItemIdOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.api.pokemon.HatchedEgg;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
@@ -39,7 +37,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Hatchery {
 	@Getter
-	private final Set<EggPokemon> eggs = Collections.newSetFromMap(new ConcurrentHashMap<EggPokemon, Boolean>());
+
+	private final ConcurrentHashMap<Long, EggPokemon> eggs = new ConcurrentHashMap<>();
 
 	@Getter
 	private PokemonGo api;
@@ -50,7 +49,7 @@ public class Hatchery {
 
 	public void addEgg(EggPokemon egg) {
 		egg.setApi(api);
-		eggs.add(egg);
+		eggs.put(egg.getId(), egg);
 	}
 
 	/**
@@ -63,7 +62,7 @@ public class Hatchery {
 	public void queryHatchedEggs(PokeCallback<List<HatchedEgg>> callback) throws RemoteServerException, LoginFailedException {
 		GetHatchedEggsMessage msg = GetHatchedEggsMessage.newBuilder().build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.GET_HATCHED_EGGS, msg, new PokeAFunc<GetHatchedEggsResponse,List<HatchedEgg>>() {
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.GET_HATCHED_EGGS, msg, new PokeAFunc<GetHatchedEggsResponse, List<HatchedEgg>>() {
 			@Override
 			public List<HatchedEgg> exec(GetHatchedEggsResponse response) {
 				List<HatchedEgg> eggs = new ArrayList<HatchedEgg>();
@@ -79,10 +78,4 @@ public class Hatchery {
 
 	}
 
-	public void setEggs(List<EggPokemon> eggs) {
-		synchronized (eggs) {
-			eggs.clear();
-			eggs.addAll(eggs);
-		}
-	}
 }

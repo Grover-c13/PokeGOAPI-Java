@@ -32,15 +32,10 @@ import POGOProtos.Networking.Responses.SetFavoritePokemonResponseOuterClass.SetF
 import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass.UpgradePokemonResponse;
 import POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass.UseItemPotionResponse;
 import POGOProtos.Networking.Responses.UseItemReviveResponseOuterClass.UseItemReviveResponse;
-
-import com.google.protobuf.ByteString;
-import com.google.protobuf.GeneratedMessage;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.map.pokemon.EvolutionResult;
 import com.pokegoapi.api.player.PlayerProfile;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -116,7 +111,7 @@ public class Pokemon extends PokemonDetails {
 	 * Function to mark the pokemon as favorite or not.
 	 *
 	 * @param markFavorite Mark Pokemon as Favorite?
-	 * @param callback an optional callback to handle results
+	 * @param callback     an optional callback to handle results
 	 */
 	public void setFavoritePokemon(boolean markFavorite, PokeCallback<SetFavoritePokemonResponse.Result> callback)
 			throws LoginFailedException, RemoteServerException {
@@ -264,7 +259,7 @@ public class Pokemon extends PokemonDetails {
 	 * use a potion on that pokemon. Will check if there is enough potions and if the pokemon need
 	 * to be healed.
 	 *
-	 * @param itemId {@link ItemId} of the potion to use.
+	 * @param itemId   {@link ItemId} of the potion to use.
 	 * @param callback an optional callback to handle results
 	 */
 	public void usePotion(ItemId itemId, PokeCallback<UseItemPotionResponse.Result> callback) {
@@ -322,7 +317,7 @@ public class Pokemon extends PokemonDetails {
 	 * Use a revive item on the pokemon. Will check if there is enough revive &amp; if the pokemon need
 	 * to be revived.
 	 *
-	 * @param itemId {@link ItemId} of the Revive to use.
+	 * @param itemId   {@link ItemId} of the Revive to use.
 	 * @param callback an optional callback to handle results
 	 */
 	public void useRevive(ItemId itemId, PokeCallback<UseItemReviveResponse.Result> callback) {
@@ -339,7 +334,7 @@ public class Pokemon extends PokemonDetails {
 				.build();
 
 		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.USE_ITEM_REVIVE, reqMsg,
-				new PokeAFunc<UseItemReviveResponse, UseItemReviveResponse.Result> () {
+				new PokeAFunc<UseItemReviveResponse, UseItemReviveResponse.Result>() {
 					public UseItemReviveResponse.Result exec(UseItemReviveResponse response) {
 						if (response.getResult() == UseItemReviveResponse.Result.SUCCESS) {
 							setStamina(response.getStamina());
@@ -390,4 +385,20 @@ public class Pokemon extends PokemonDetails {
 	public double getIvInPercentage() {
 		return ((Math.floor((this.getIvRatio() * 100) * 100)) / 100);
 	}
+
+	@Override
+	public int hashCode() {
+		return getProto().getPokemonId().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof EggPokemon) {
+			EggPokemon other = (EggPokemon) obj;
+			return (this.getId() == other.getId());
+		}
+
+		return false;
+	}
+
 }

@@ -207,7 +207,7 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws NoSuchItemException   the no such item exception
 	 */
-	public void catchPokemon(AsyncCatchOptions options)
+	public void catchPokemon(AsyncCatchOptions options, PokeCallback<CatchResult> callback)
 			throws LoginFailedException, RemoteServerException, NoSuchItemException {
 		if (options != null) {
 			if (options.getUseRazzBerry() != 0) {
@@ -224,7 +224,9 @@ public class CatchablePokemon implements MapPoint {
 						catchPokemon(asyncOptions.getNormalizedHitPosition(),
 								asyncOptions.getNormalizedReticleSize(),
 								asyncOptions.getSpinModifier(),
-								asyncPokeball);
+								asyncPokeball,
+								callback
+						);
 					}
 				});
 
@@ -235,7 +237,8 @@ public class CatchablePokemon implements MapPoint {
 		catchPokemon(options.getNormalizedHitPosition(),
 				options.getNormalizedReticleSize(),
 				options.getSpinModifier(),
-				options.getItemBall());
+				options.getItemBall(),
+				callback);
 	}
 
 	/**
@@ -251,7 +254,7 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws EncounterFailedException the encounter failed exception
 	 */
 	public void catchPokemon(EncounterResult encounter,
-							 AsyncCatchOptions options)
+							 AsyncCatchOptions options, PokeCallback<CatchResult> callback)
 			throws LoginFailedException, RemoteServerException,
 			NoSuchItemException, EncounterFailedException {
 
@@ -270,7 +273,7 @@ public class CatchablePokemon implements MapPoint {
 						catchPokemon(asyncOptions.getNormalizedHitPosition(),
 								asyncOptions.getNormalizedReticleSize(),
 								asyncOptions.getSpinModifier(),
-								asyncPokeball);
+								asyncPokeball, callback);
 					}
 				});
 
@@ -282,7 +285,8 @@ public class CatchablePokemon implements MapPoint {
 		catchPokemon(options.getNormalizedHitPosition(),
 				options.getNormalizedReticleSize(),
 				options.getSpinModifier(),
-				options.getItemBall(probability));
+				options.getItemBall(probability),
+				callback);
 	}
 
 
@@ -296,7 +300,7 @@ public class CatchablePokemon implements MapPoint {
 	 * @return CatchResult of resulted try to catch pokemon
 	 */
 	public void catchPokemon(
-			double normalizedHitPosition, double normalizedReticleSize, double spinModifier, Pokeball type) {
+			double normalizedHitPosition, double normalizedReticleSize, double spinModifier, Pokeball type, PokeCallback<CatchResult> callback) {
 		if (!isEncountered()) {
 			return;
 		}
@@ -319,7 +323,7 @@ public class CatchablePokemon implements MapPoint {
 
 				return new CatchResult(response);
 			}
-		}, null);
+		}, callback, api);
 		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
