@@ -170,7 +170,8 @@ public class CatchablePokemon implements MapPoint {
 				encountered = response.getStatus() == EncounterResponse.Status.ENCOUNTER_SUCCESS;
 				return new NormalEncounterResult(api, response);
 			}
-		}, callback);
+		}, callback, api);
+		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 
@@ -191,7 +192,8 @@ public class CatchablePokemon implements MapPoint {
 				encountered = response.getResult() == DiskEncounterResponseOuterClass.DiskEncounterResponse.Result.SUCCESS;
 				return new DiskEncounterResult(api, response);
 			}
-		}, callback);
+		}, callback, api);
+		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 
