@@ -46,6 +46,8 @@ public class AsyncServerRequest<T extends GeneratedMessage, K> {
 	 *
 	 * @param type the type
 	 * @param req  the req
+	 * @param func internal func to handle data
+	 * @param callback an optional callback to handle results
 	 */
 	public AsyncServerRequest(RequestType type, GeneratedMessage req, PokeAFunc<T, K> func, PokeCallback<K> callback) {
 		Request.Builder reqBuilder = Request.newBuilder();
@@ -57,18 +59,27 @@ public class AsyncServerRequest<T extends GeneratedMessage, K> {
 		this.func = func;
 	}
 
+	/**
+	 * Instantiates a new Server request.
+	 *
+	 * @param type the type
+	 * @param req  the req
+	 * @param func internal func to handle data
+	 * @param callback an optional callback to handle results
+	 * @param api the current instance of PokemonGo used to bound common requests
+	 */
 	public AsyncServerRequest(RequestType type, GeneratedMessage req, PokeAFunc<T, K> func, PokeCallback<K> callback, PokemonGo api) {
-		Request.Builder reqBuilder = Request.newBuilder();
-		reqBuilder.setRequestMessage(req.toByteString());
-		reqBuilder.setRequestType(type);
-		this.type = type;
-		this.request = reqBuilder.build();
-		this.callback = callback;
-		this.func = func;
+		this(type, req, func, callback);
 		addCommonRequest(CommonRequest.getCommonRequests(api));
 	}
 
-	public AsyncServerRequest addCommonRequest(ServerRequest... requests) {
+	/**
+	 * Bound requests to the current request
+	 *
+	 * @param requests the requests to bound
+	 * @return
+     */
+	public AsyncServerRequest boundRequests(ServerRequest... requests) {
 		Collections.addAll(commonRequests, requests);
 		return this;
 	}

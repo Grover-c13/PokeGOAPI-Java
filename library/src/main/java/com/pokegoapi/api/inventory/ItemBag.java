@@ -38,7 +38,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 /**
  * The type Bag.
  */
@@ -123,6 +122,7 @@ public class ItemBag {
 	 * use an item with itemID
 	 *
 	 * @param type type of item
+	 * @param callback an optional callback to handle results
 	 */
 	public void useItem(ItemId type, PokeCallback<UseIncenseResponse.Result> callback) {
 		if (type == ItemId.UNRECOGNIZED) {
@@ -206,5 +206,4 @@ public class ItemBag {
 				addItem(p);
 		}
 	}
-
 }
