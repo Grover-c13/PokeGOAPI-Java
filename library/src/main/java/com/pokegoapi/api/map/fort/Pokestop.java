@@ -23,7 +23,6 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.util.AsyncHelper;
 
 import java.util.List;
 
@@ -38,8 +37,7 @@ import POGOProtos.Networking.Responses.AddFortModifierResponseOuterClass;
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass;
 import lombok.Getter;
-import rx.Observable;
-import rx.functions.Func1;
+
 
 /**
  * Created by mjmfighter on 7/20/2016.
@@ -133,7 +131,7 @@ public class Pokestop {
 	 *
 	 * @return PokestopLootResult
 	 */
-	public Observable<PokestopLootResult> lootAsync() {
+	public void lootAsync() {
 		FortSearchMessage searchMessage = FortSearchMessage.newBuilder()
 				.setFortId(getId())
 				.setFortLatitude(getLatitude())
@@ -161,23 +159,12 @@ public class Pokestop {
 	}
 
 	/**
-	 * Loots a pokestop for pokeballs and other items.
-	 *
-	 * @return PokestopLootResult
-	 * @throws LoginFailedException  if login failed
-	 * @throws RemoteServerException if the server failed to respond
-	 */
-	public PokestopLootResult loot() throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(lootAsync());
-	}
-
-	/**
 	 * Adds a modifier to this pokestop. (i.e. add a lure module)
 	 *
 	 * @param item the modifier to add to this pokestop
 	 * @return true if success
 	 */
-	public Observable<Boolean> addModifierAsync(ItemIdOuterClass.ItemId item) {
+	public void addModifierAsync(ItemIdOuterClass.ItemId item) {
 		AddFortModifierMessage msg = AddFortModifierMessage.newBuilder()
 				.setModifierType(item)
 				.setFortId(getId())
@@ -199,23 +186,13 @@ public class Pokestop {
 		});
 	}
 
-	/**
-	 * Adds a modifier to this pokestop. (i.e. add a lure module)
-	 *
-	 * @param item the modifier to add to this pokestop
-	 * @throws LoginFailedException  if login failed
-	 * @throws RemoteServerException if the server failed to respond or the modifier could not be added to this pokestop
-	 */
-	public void addModifier(ItemIdOuterClass.ItemId item) throws LoginFailedException, RemoteServerException {
-		AsyncHelper.toBlocking(addModifierAsync(item));
-	}
 
 	/**
 	 * Get more detailed information about a pokestop.
 	 *
 	 * @return FortDetails
 	 */
-	public Observable<FortDetails> getDetailsAsync() {
+	public void getDetailsAsync() {
 		FortDetailsMessage reqMsg = FortDetailsMessage.newBuilder()
 				.setFortId(getId())
 				.setLatitude(getLatitude())
@@ -237,17 +214,6 @@ public class Pokestop {
 		});
 	}
 
-
-	/**
-	 * Get more detailed information about a pokestop.
-	 *
-	 * @return FortDetails
-	 * @throws LoginFailedException  if login failed
-	 * @throws RemoteServerException if the server failed to respond
-	 */
-	public FortDetails getDetails() throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(getDetailsAsync());
-	}
 
 	/**
 	 * Returns whether this pokestop has an active lure.

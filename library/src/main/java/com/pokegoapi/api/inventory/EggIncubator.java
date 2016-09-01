@@ -15,23 +15,18 @@
 
 package com.pokegoapi.api.inventory;
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.pokemon.EggPokemon;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.main.ServerRequest;
-
 import POGOProtos.Inventory.EggIncubatorOuterClass;
 import POGOProtos.Inventory.EggIncubatorTypeOuterClass.EggIncubatorType;
 import POGOProtos.Networking.Requests.Messages.UseItemEggIncubatorMessageOuterClass.UseItemEggIncubatorMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
-import com.pokegoapi.util.AsyncHelper;
-import rx.functions.Func1;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.pokemon.EggPokemon;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.util.PokeAFunc;
+import com.pokegoapi.util.PokeCallback;
 
 public class EggIncubator {
 	private final EggIncubatorOuterClass.EggIncubator proto;
@@ -65,7 +60,7 @@ public class EggIncubator {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
-	public UseItemEggIncubatorResponse.Result hatchEgg(EggPokemon egg)
+	public void hatchEgg(EggPokemon egg, PokeCallback<UseItemEggIncubatorResponse.Result> callback)
 			throws LoginFailedException, RemoteServerException {
 
 		UseItemEggIncubatorMessage reqMsg = UseItemEggIncubatorMessage.newBuilder()
@@ -73,26 +68,14 @@ public class EggIncubator {
 				.setPokemonId(egg.getId())
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR, reqMsg, api);
-		return AsyncHelper.toBlocking(
-				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, UseItemEggIncubatorResponse.Result>() {
-
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR, reqMsg,
+				new PokeAFunc<UseItemEggIncubatorResponse, UseItemEggIncubatorResponse.Result>() {
 					@Override
-					public UseItemEggIncubatorResponse.Result call(ByteString bytes) {
-						UseItemEggIncubatorResponse response;
-						try {
-							response = UseItemEggIncubatorResponse.parseFrom(bytes);
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
-						}
-
-
+					public UseItemEggIncubatorResponse.Result exec(UseItemEggIncubatorResponse response) {
 						return response.getResult();
 					}
-				})
-		);
-
-
+				}, callback, api);
+		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**

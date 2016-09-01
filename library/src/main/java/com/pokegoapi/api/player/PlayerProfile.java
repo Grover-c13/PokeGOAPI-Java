@@ -23,8 +23,6 @@ import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
 import POGOProtos.Enums.GenderOuterClass.Gender;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Enums.TutorialStateOuterClass;
-import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
-import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
 import POGOProtos.Networking.Requests.Messages.CheckChallenge;
 import POGOProtos.Networking.Requests.Messages.ClaimCodenameMessageOuterClass.ClaimCodenameMessage;
 import POGOProtos.Networking.Requests.Messages.EncounterTutorialCompleteMessageOuterClass.EncounterTutorialCompleteMessage;
@@ -35,30 +33,18 @@ import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterC
 import POGOProtos.Networking.Requests.Messages.SetAvatarMessageOuterClass.SetAvatarMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
-import POGOProtos.Networking.Responses.ClaimCodenameResponseOuterClass.ClaimCodenameResponse;
-import POGOProtos.Networking.Responses.EquipBadgeResponseOuterClass;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
-import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
-import POGOProtos.Networking.Responses.MarkTutorialCompleteResponseOuterClass.MarkTutorialCompleteResponse;
-import POGOProtos.Networking.Responses.SetAvatarResponseOuterClass.SetAvatarResponse;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.Item;
-import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Stats;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
+import com.pokegoapi.util.PokeAFunc;
 import lombok.Setter;
-import rx.Observable;
-import rx.functions.Func1;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -102,51 +88,36 @@ public class PlayerProfile {
 				.setPlayerLocale(playerLocale.getPlayerLocale())
 				.build();
 
-		AsyncServerRequest getPlayerServerRequest = new AsyncServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg)
-				.addCommonRequest(new ServerRequest(RequestType.CHECK_CHALLENGE,
-						CheckChallenge.CheckChallengeMessage.getDefaultInstance()));
+		AsyncServerRequest getPlayerServerRequest = new AsyncServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg, new PokeAFunc<GetPlayerResponse, Void>() {
+			@Override
+			public Void exec(GetPlayerResponse response) {
+				ArrayList<TutorialStateOuterClass.TutorialState> tutorialStates =
+						getTutorialState().getTutorialStates();
+				if (tutorialStates.isEmpty()) {
+					activateAccount();
+				}
 
-		api.getRequestHandler().sendAsyncServerRequests(getPlayerServerRequest)
-				.map(new Func1<ByteString, Void>() {
-					@Override
-					public Void call(ByteString byteString) {
-						try {
-							GetPlayerResponse getPlayerResponse = GetPlayerResponse.parseFrom(byteString);
-							updateProfile(getPlayerResponse);
+				if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION)) {
+					setupAvatar();
+				}
 
-							// From now one we will start to check our accounts is ready to fire requests.
-							// Actually, we can receive valid responses even with this first check,
-							// that mark the tutorial state into LEGAL_SCREEN.
-							// Following, we are going to check if the account binded to this session
-							// have an avatar, a nickname, and all the other things that are usually filled
-							// on the official client BEFORE sending any requests such as the getMapObject etc.
-							ArrayList<TutorialStateOuterClass.TutorialState> tutorialStates =
-									getTutorialState().getTutorialStates();
-							if (tutorialStates.isEmpty()) {
-								activateAccount();
-							}
+				if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.POKEMON_CAPTURE)) {
+					encounterTutorialComplete();
+				}
 
-							if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION)) {
-								setupAvatar();
-							}
+				if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.NAME_SELECTION)) {
+					claimCodeName();
+				}
 
-							if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.POKEMON_CAPTURE)) {
-								encounterTutorialComplete();
-							}
+				if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
+					firstTimeExperienceComplete();
+				}
+				return null;
+			}
+		}, null).addCommonRequest(new ServerRequest(RequestType.CHECK_CHALLENGE,
+				CheckChallenge.CheckChallengeMessage.getDefaultInstance()));
+		api.getRequestHandler().sendAsyncServerRequests(getPlayerServerRequest);
 
-							if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.NAME_SELECTION)) {
-								claimCodeName();
-							}
-
-							if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
-								firstTimeExperienceComplete();
-							}
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
-						}
-						return null;
-					}
-				});
 	}
 
 	/**
@@ -194,7 +165,7 @@ public class PlayerProfile {
 	 * @throws RemoteServerException when the server is down/having issues
 	 * @see PlayerLevelUpRewards
 	 */
-	public PlayerLevelUpRewards acceptLevelUpRewards(int level) throws RemoteServerException, LoginFailedException {
+	public void acceptLevelUpRewards(int level) throws RemoteServerException, LoginFailedException {
 		// Check if we even have achieved this level yet
 		if (level > stats.getLevel()) {
 			return new PlayerLevelUpRewards(PlayerLevelUpRewards.Status.NOT_UNLOCKED_YET);
@@ -244,7 +215,7 @@ public class PlayerProfile {
 	}
 
 
-	public Observable<Void> equipBadgeAsync(CheckAwardedBadgesResponse response) {
+	public void equipBadgeAsync(CheckAwardedBadgesResponse response) {
 		if (response.getSuccess()) {
 			for (int i = 0; i < response.getAwardedBadgesCount(); i++) {
 				EquipBadgeMessageOuterClass.EquipBadgeMessage msg1 = EquipBadgeMessageOuterClass.EquipBadgeMessage.newBuilder()

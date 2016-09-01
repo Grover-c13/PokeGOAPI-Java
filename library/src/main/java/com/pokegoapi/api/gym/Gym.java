@@ -41,8 +41,6 @@ import com.pokegoapi.util.MapPoint;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
-import rx.functions.Func1;
 
 public class Gym implements MapPoint {
 	private FortData proto;
@@ -212,9 +210,9 @@ public class Gym implements MapPoint {
 	 * @throws LoginFailedException  if the login failed
 	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public Observable<FortDeployPokemonResponse.Result> deployPokemonAsync(Pokemon pokemon)
+	public void deployPokemonAsync(Pokemon pokemon)
 			throws RemoteServerException, LoginFailedException {
-		FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
+		/*FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
 				.setFortId(getId())
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
@@ -237,8 +235,7 @@ public class Gym implements MapPoint {
 
 				}
 
-			});
-
+			});*/
 	}
 
 	protected PokemonGo getApi() {

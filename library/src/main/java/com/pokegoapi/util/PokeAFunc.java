@@ -1,30 +1,26 @@
 package com.pokegoapi.util;
 
-import rx.Subscriber;
+import com.google.protobuf.ByteString;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 
 /**
  * Created by rama on 31/08/16.
  */
-public abstract class PokeAFunc<T> {
+public abstract class PokeAFunc<T extends com.google.protobuf.GeneratedMessage, K> {
 
-	public abstract void onError(Throwable e);
 
-	public abstract void onResponse(T data);
+	public abstract K exec(T response);
 
-	public Subscriber<T> getSubscriber() {
-		return new Subscriber<T>() {
-			@Override
-			public void onCompleted() {}
+	public K exec(ByteString data) throws Throwable {
+		Class<T> klass = (Class<T>)
+				((ParameterizedType) getClass().getGenericSuperclass())
+						.getActualTypeArguments()[0];
 
-			@Override
-			public void onError(Throwable e) {
-				this.onError(e);
-			}
+		Method m = klass.getMethod("parseFrom", ByteString.class);
+		T response = (T) m.invoke(null, data);
 
-			@Override
-			public void onNext(T object) {
-				onResponse(object);
-			}
-		};
+		return exec(response);
 	}
 }

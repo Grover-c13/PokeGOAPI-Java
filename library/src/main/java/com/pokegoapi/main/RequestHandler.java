@@ -18,40 +18,31 @@ package com.pokegoapi.main;
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
-
 import com.google.protobuf.ByteString;
+import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.Signature;
-
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import rx.Observable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class RequestHandler implements Runnable {
 	private static final String TAG = RequestHandler.class.getSimpleName();
 	private final PokemonGo api;
 	private final Thread asyncHttpThread;
 	private final BlockingQueue<AsyncServerRequest> workQueue = new LinkedBlockingQueue<>();
-	private final Map<Long, ResultOrException> resultMap = new HashMap<>();
 	private String apiEndpoint;
 	private OkHttpClient client;
 	private Long requestId = new Random().nextLong();
@@ -77,61 +68,8 @@ public class RequestHandler implements Runnable {
 	 * @param asyncServerRequest Request to make
 	 * @return ByteString response to be processed in the future
 	 */
-	public Observable<ByteString> sendAsyncServerRequests(final AsyncServerRequest asyncServerRequest) {
+	public void sendAsyncServerRequests(final AsyncServerRequest asyncServerRequest) {
 		workQueue.offer(asyncServerRequest);
-		return Observable.from(new Future<ByteString>() {
-			@Override
-			public boolean cancel(boolean mayInterruptIfRunning) {
-				return false;
-			}
-
-			@Override
-			public boolean isCancelled() {
-				return false;
-			}
-
-			@Override
-			public boolean isDone() {
-				return resultMap.containsKey(asyncServerRequest.getId());
-			}
-
-			@Override
-			public ByteString get() throws InterruptedException, ExecutionException {
-				ResultOrException resultOrException = getResult(1, TimeUnit.MINUTES);
-				while (resultOrException == null) {
-					resultOrException = getResult(1, TimeUnit.MINUTES);
-				}
-				if (resultOrException.getException() != null) {
-					throw new ExecutionException(resultOrException.getException());
-				}
-				return resultOrException.getResult();
-			}
-
-			@Override
-			public ByteString get(long timeout, TimeUnit unit)
-					throws InterruptedException, ExecutionException, TimeoutException {
-				ResultOrException resultOrException = getResult(timeout, unit);
-				if (resultOrException == null) {
-					throw new TimeoutException("No result found");
-				}
-				if (resultOrException.getException() != null) {
-					throw new ExecutionException(resultOrException.getException());
-				}
-				return resultOrException.getResult();
-
-			}
-
-			private ResultOrException getResult(long timeout, TimeUnit timeUnit) throws InterruptedException {
-				long wait = api.currentTimeMillis() + timeUnit.toMillis(timeout);
-				while (!isDone()) {
-					Thread.sleep(10);
-					if (wait < api.currentTimeMillis()) {
-						return null;
-					}
-				}
-				return resultMap.remove(asyncServerRequest.getId());
-			}
-		});
 	}
 
 
@@ -252,7 +190,7 @@ public class RequestHandler implements Runnable {
 
 	@Override
 	public void run() {
-		AsyncServerRequest request = null;
+		AsyncServerRequest<GeneratedMessage,Object> request = null;
 		AuthTicket authTicket = null;
 		while (true) {
 			try {
@@ -264,7 +202,7 @@ public class RequestHandler implements Runnable {
 			if (request == null)
 				continue;
 
-			ArrayList<ServerRequest> serverRequests = new ArrayList();
+			ArrayList<ServerRequest> serverRequests = new ArrayList<>();
 
 			serverRequests.add(new ServerRequest(request.getType(), request.getRequest()));
 
@@ -278,9 +216,9 @@ public class RequestHandler implements Runnable {
 				authTicket = internalSendServerRequests(authTicket, arrayServerRequests);
 
 				try {
-					resultMap.put(request.getId(), ResultOrException.getResult(arrayServerRequests[0].getData()));
+					request.fire(arrayServerRequests[0].getData());
 				} catch (InvalidProtocolBufferException e) {
-					resultMap.put(request.getId(), ResultOrException.getError(e));
+					request.fire(e);
 				}
 
 				// Assuming all the bunded requests are commons
@@ -296,7 +234,7 @@ public class RequestHandler implements Runnable {
 				}
 				continue;
 			} catch (RemoteServerException | LoginFailedException e) {
-				resultMap.put(request.getId(), ResultOrException.getError(e));
+				request.fire(e);
 				continue;
 			} finally {
 				try {

@@ -15,7 +15,10 @@
 
 package com.pokegoapi.api;
 
-import com.google.protobuf.InvalidProtocolBufferException;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.LocationFixes;
@@ -30,25 +33,15 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.RequestHandler;
-import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.ClientInterceptor;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
-
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.UUID;
-
-import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-import POGOProtos.Networking.Envelopes.SignatureOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
+
+import java.util.Random;
+import java.util.UUID;
 
 
 public class PokemonGo {
@@ -167,7 +160,7 @@ public class PokemonGo {
 
 	private void initialize() throws RemoteServerException, LoginFailedException {
 		fireRequestBlock(new AsyncServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
-				CommonRequest.getDownloadRemoteConfigVersionMessageRequest()));
+				CommonRequest.getDownloadRemoteConfigVersionMessageRequest(), null, null));
 
 		fireRequestBlockTwo();
 	}
@@ -187,7 +180,7 @@ public class PokemonGo {
 	 */
 	public void fireRequestBlockTwo() {
 		fireRequestBlock(new AsyncServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
-				CommonRequest.getGetAssetDigestMessageRequest()));
+				CommonRequest.getGetAssetDigestMessageRequest(), null, null));
 	}
 
 	/**
@@ -287,7 +280,7 @@ public class PokemonGo {
 		}
 		return deviceInfo.getDeviceInfo();
 	}
-	
+
 	/**
 	 * Gets the sensor info
 	 *
@@ -301,7 +294,7 @@ public class PokemonGo {
 		}
 		return sensorInfo.getSensorInfo();
 	}
-	
+
 	/**
 	 * Gets the activity status
 	 *

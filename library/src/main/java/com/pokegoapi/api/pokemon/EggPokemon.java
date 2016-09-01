@@ -46,12 +46,12 @@ public class EggPokemon {
 	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 */
-	public UseItemEggIncubatorResponse.Result incubate(EggIncubator incubator)
+	public void incubate(EggIncubator incubator)
 			throws LoginFailedException, RemoteServerException {
 		if (incubator.isInUse()) {
 			throw new IllegalArgumentException("Incubator already used");
 		}
-		return incubator.hatchEgg(this);
+		incubator.hatchEgg(this);
 	}
 
 	/**

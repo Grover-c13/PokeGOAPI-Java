@@ -27,9 +27,9 @@ import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.util.AsyncHelper;
+import com.pokegoapi.util.PokeAFunc;
+import com.pokegoapi.util.PokeCallback;
 import lombok.Getter;
-import rx.functions.Func1;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,33 +60,22 @@ public class Hatchery {
 	 * @throws RemoteServerException e
 	 * @throws LoginFailedException  e
 	 */
-	public List<HatchedEgg> queryHatchedEggs() throws RemoteServerException, LoginFailedException {
+	public void queryHatchedEggs(PokeCallback<List<HatchedEgg>> callback) throws RemoteServerException, LoginFailedException {
 		GetHatchedEggsMessage msg = GetHatchedEggsMessage.newBuilder().build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.GET_HATCHED_EGGS, msg, api);
-		return AsyncHelper.toBlocking(
-				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, List<HatchedEgg>>() {
-
-					@Override
-					public List<HatchedEgg> call(ByteString bytes) {
-						GetHatchedEggsResponse response;
-						try {
-							response = GetHatchedEggsResponse.parseFrom(bytes);
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
-
-						}
-						List<HatchedEgg> eggs = new ArrayList<HatchedEgg>();
-						for (int i = 0; i < response.getPokemonIdCount(); i++) {
-							eggs.add(new HatchedEgg(response.getPokemonId(i),
-									response.getExperienceAwarded(i),
-									response.getCandyAwarded(i),
-									response.getStardustAwarded(i)));
-						}
-						return eggs;
-					}
-				})
-		);
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.GET_HATCHED_EGGS, msg, new PokeAFunc<GetHatchedEggsResponse,List<HatchedEgg>>() {
+			@Override
+			public List<HatchedEgg> exec(GetHatchedEggsResponse response) {
+				List<HatchedEgg> eggs = new ArrayList<HatchedEgg>();
+				for (int i = 0; i < response.getPokemonIdCount(); i++) {
+					eggs.add(new HatchedEgg(response.getPokemonId(i),
+							response.getExperienceAwarded(i),
+							response.getCandyAwarded(i),
+							response.getStardustAwarded(i)));
+				}
+				return eggs;
+			}
+		}, callback, api);
 
 	}
 

@@ -15,33 +15,28 @@
 
 package com.pokegoapi.api.map;
 
-import com.annimon.stream.Collectors;
-import com.annimon.stream.Stream;
-import com.annimon.stream.function.Function;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
+import POGOProtos.Map.Fort.FortDataOuterClass;
+import POGOProtos.Map.Fort.FortTypeOuterClass;
+import POGOProtos.Map.MapCellOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass;
+import com.google.protobuf.GeneratedMessage;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.map.pokemon.CatchablePokemon;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.google.common.geometry.MutableInteger;
 import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.CommonRequest;
+import com.pokegoapi.util.PokeAFunc;
 import com.pokegoapi.util.PokeCallback;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
-import POGOProtos.Map.Fort.FortTypeOuterClass.FortType;
-import POGOProtos.Map.MapCellOuterClass.MapCell;
-import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
-import rx.Observable;
-import rx.functions.Func1;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Map {
 	private final PokemonGo api;
@@ -66,10 +61,10 @@ public class Map {
 	 * @param cellIds List of cellId
 	 * @return MapObjects in the given cells
 	 */
-	private Observable<MapObjects> getMapObjectsAsync(List<Long> cellIds) {
-		if (useCache()) {
+	private void getMapObjectsAsync(List<Long> cellIds, PokeCallback<MapObjects> callback) {
+		/*if (useCache()) {
 			return Observable.just(cachedMapObjects);
-		}
+		}*/
 
 		lastMapUpdate = api.currentTimeMillis();
 		GetMapObjectsMessage.Builder builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder()
@@ -82,49 +77,42 @@ public class Map {
 		}
 
 		final AsyncServerRequest asyncServerRequest = new AsyncServerRequest(
-				RequestType.GET_MAP_OBJECTS, builder.build());
+				RequestType.GET_MAP_OBJECTS, builder.build(), new PokeAFunc<GetMapObjectsResponseOuterClass.GetMapObjectsResponse,MapObjects>() {
+			@Override
+			public MapObjects exec(GetMapObjectsResponseOuterClass.GetMapObjectsResponse response) {
+				MapObjects result = new MapObjects(api);
+				cachedMapObjects = result;
+				for (MapCellOuterClass.MapCell mapCell : response.getMapCellsList()) {
+					result.addNearbyPokemons(mapCell.getNearbyPokemonsList());
+					result.addCatchablePokemons(mapCell.getCatchablePokemonsList());
+					result.addWildPokemons(mapCell.getWildPokemonsList());
+					result.addDecimatedSpawnPoints(mapCell.getDecimatedSpawnPointsList());
+					result.addSpawnPoints(mapCell.getSpawnPointsList());
+
+					java.util.Map<FortTypeOuterClass.FortType, List<FortDataOuterClass.FortData>> groupedForts = Stream.of(mapCell.getFortsList())
+							.collect(Collectors.groupingBy(new Function<FortDataOuterClass.FortData, FortTypeOuterClass.FortType>() {
+								@Override
+								public FortTypeOuterClass.FortType apply(FortDataOuterClass.FortData fortData) {
+									return fortData.getType();
+								}
+							}));
+					result.addGyms(groupedForts.get(FortTypeOuterClass.FortType.GYM));
+					result.addPokestops(groupedForts.get(FortTypeOuterClass.FortType.CHECKPOINT));
+				}
+
+				return result;
+			}
+		}, callback, api);
 		asyncServerRequest.addCommonRequest(CommonRequest.getCommonRequests(api));
-		return api.getRequestHandler()
-				.sendAsyncServerRequests(asyncServerRequest).map(new Func1<ByteString, MapObjects>() {
-					@Override
-					public MapObjects call(ByteString byteString) {
-						GetMapObjectsResponse response;
-						try {
-							response = GetMapObjectsResponse.parseFrom(byteString);
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
-						}
 
-						MapObjects result = new MapObjects(api);
-						cachedMapObjects = result;
-						for (MapCell mapCell : response.getMapCellsList()) {
-							result.addNearbyPokemons(mapCell.getNearbyPokemonsList());
-							result.addCatchablePokemons(mapCell.getCatchablePokemonsList());
-							result.addWildPokemons(mapCell.getWildPokemonsList());
-							result.addDecimatedSpawnPoints(mapCell.getDecimatedSpawnPointsList());
-							result.addSpawnPoints(mapCell.getSpawnPointsList());
 
-							java.util.Map<FortType, List<FortData>> groupedForts = Stream.of(mapCell.getFortsList())
-									.collect(Collectors.groupingBy(new Function<FortData, FortType>() {
-										@Override
-										public FortType apply(FortData fortData) {
-											return fortData.getType();
-										}
-									}));
-							result.addGyms(groupedForts.get(FortType.GYM));
-							result.addPokestops(groupedForts.get(FortType.CHECKPOINT));
-						}
-
-						return result;
-					}
-				});
 	}
 
 	/**
 	 * Request a MapObjects around your current location.
 	 */
 	public void getMapObjects(final PokeCallback<MapObjects> callback) {
-		getMapObjectsAsync(getDefaultCells()).subscribe(callback.getSubscriber());
+		getMapObjectsAsync(getDefaultCells(), callback);
 	}
 
 	/**
@@ -134,7 +122,7 @@ public class Map {
 	 * @return MapObjects in the given cells
 	 */
 	public void getMapObjects(List<Long> cellIds, PokeCallback<MapObjects> callback) {
-		getMapObjectsAsync(cellIds).subscribe(callback.getSubscriber());
+		getMapObjectsAsync(cellIds, callback);
 	}
 
 	/**

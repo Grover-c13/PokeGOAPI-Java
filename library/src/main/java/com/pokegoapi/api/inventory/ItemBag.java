@@ -25,17 +25,13 @@ import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass;
 import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result;
 import POGOProtos.Networking.Responses.UseIncenseResponseOuterClass.UseIncenseResponse;
 import POGOProtos.Networking.Responses.UseItemXpBoostResponseOuterClass.UseItemXpBoostResponse;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.pokemon.Pokemon;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
-import rx.functions.Func1;
+import com.pokegoapi.util.PokeAFunc;
+import com.pokegoapi.util.PokeCallback;
 
 import java.util.Collection;
 import java.util.List;
@@ -66,7 +62,7 @@ public class ItemBag {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
-	public Result removeItem(ItemId id, int quantity) throws RemoteServerException, LoginFailedException {
+	public void removeItem(ItemId id, int quantity, PokeCallback<Result> callback) throws RemoteServerException, LoginFailedException {
 		final Item item = getItem(id);
 		if (item.getCount() < quantity) {
 			throw new IllegalArgumentException("You cannont remove more quantity than you have");
@@ -75,28 +71,17 @@ public class ItemBag {
 		RecycleInventoryItemMessage msg = RecycleInventoryItemMessage.newBuilder().setItemId(id).setCount(quantity)
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.RECYCLE_INVENTORY_ITEM, msg, api);
-		return AsyncHelper.toBlocking(
-				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, Result>() {
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.RECYCLE_INVENTORY_ITEM, msg, new PokeAFunc<RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse, Result>() {
+			@Override
+			public Result exec(RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse response) {
+				if (response.getResult() == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
+					item.setCount(response.getNewCount());
+				}
+				return response.getResult();
+			}
+		}, callback, api);
+		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 
-					@Override
-					public Result call(ByteString bytes) {
-						RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse response;
-						try {
-							response = RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse
-									.parseFrom(bytes);
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
-						}
-
-						if (response
-								.getResult() == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
-							item.setCount(response.getNewCount());
-						}
-						return response.getResult();
-					}
-				})
-		);
 	}
 
 	/**
@@ -142,7 +127,7 @@ public class ItemBag {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
-	public void useItem(ItemId type) throws RemoteServerException, LoginFailedException {
+	public void useItem(ItemId type, PokeCallback<UseIncenseResponse.Result> callback) throws RemoteServerException, LoginFailedException {
 		if (type == ItemId.UNRECOGNIZED) {
 			throw new IllegalArgumentException("You cannot use item for UNRECOGNIZED");
 		}
@@ -152,7 +137,7 @@ public class ItemBag {
 			case ITEM_INCENSE_SPICY:
 			case ITEM_INCENSE_COOL:
 			case ITEM_INCENSE_FLORAL:
-				useIncense(type);
+				useIncense(type, callback);
 				break;
 			default:
 				break;
@@ -166,30 +151,21 @@ public class ItemBag {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
-	public UseIncenseResponse.Result useIncense(ItemId type) throws RemoteServerException, LoginFailedException {
+	public void useIncense(ItemId type, PokeCallback<UseIncenseResponse.Result> callback) throws RemoteServerException, LoginFailedException {
 		UseIncenseMessage useIncenseMessage =
 				UseIncenseMessage.newBuilder()
 						.setIncenseType(type)
 						.setIncenseTypeValue(type.getNumber())
 						.build();
 
-
 		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.USE_INCENSE,
-				useIncenseMessage, api);
-		return AsyncHelper.toBlocking(
-				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, UseIncenseResponse.Result>() {
-
-					@Override
-					public UseIncenseResponse.Result call(ByteString bytes) {
-						try {
-							UseIncenseResponse response = UseIncenseResponse.parseFrom(bytes);
-							Log.i("Main", "Use incense result: " + response.getResult());
-							return response.getResult();
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
-						}
-					}
-				}));
+				useIncenseMessage, new PokeAFunc<UseIncenseResponse, UseIncenseResponse.Result>() {
+			@Override
+			public UseIncenseResponse.Result exec(UseIncenseResponse response) {
+				return response.getResult();
+			}
+		}, callback, api);
+		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 
@@ -199,8 +175,8 @@ public class ItemBag {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
-	public void useIncense() throws RemoteServerException, LoginFailedException {
-		useIncense(ItemId.ITEM_INCENSE_ORDINARY);
+	public void useIncense(PokeCallback<UseIncenseResponse.Result> callback) throws RemoteServerException, LoginFailedException {
+		useIncense(ItemId.ITEM_INCENSE_ORDINARY, callback);
 	}
 
 	/**
@@ -210,29 +186,21 @@ public class ItemBag {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
-	public UseItemXpBoostResponse useLuckyEgg() throws RemoteServerException, LoginFailedException {
+	public void useLuckyEgg(PokeCallback<UseItemXpBoostResponse> callback) throws RemoteServerException, LoginFailedException {
 		UseItemXpBoostMessage xpMsg = UseItemXpBoostMessage
 				.newBuilder()
 				.setItemId(ItemId.ITEM_LUCKY_EGG)
 				.build();
 
 		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.USE_ITEM_XP_BOOST,
-				xpMsg, api);
-		return AsyncHelper.toBlocking(
-				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, UseItemXpBoostResponse>() {
-
-					@Override
-					public UseItemXpBoostResponse call(ByteString bytes) {
-						try {
-							UseItemXpBoostResponse response = UseItemXpBoostResponse.parseFrom(bytes);
-							Log.i("Main", "Use incense result: " + response.getResult());
-							return response;
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
-						}
-					}
-				})
-		);
+				xpMsg, new PokeAFunc<UseItemXpBoostResponse, UseItemXpBoostResponse>() {
+			@Override
+			public UseItemXpBoostResponse exec(UseItemXpBoostResponse response) {
+				Log.i("Main", "Use incense result: " + response.getResult());
+				return response;
+			}
+		}, callback, api);
+		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	public void setItems(List<Item> items) {
