@@ -50,7 +50,8 @@ public class RequestHandler implements Runnable {
 	private OkHttpClient client;
 	private Long requestId = new Random().nextLong();
 
-	ExecutorService decoupler = Executors.newCachedThreadPool();
+	private ExecutorService decoupler = Executors.newCachedThreadPool();
+
 	/**
 	 * Instantiates a new Request handler.
 	 *
@@ -193,7 +194,7 @@ public class RequestHandler implements Runnable {
 
 	@Override
 	public void run() {
-		AsyncServerRequest<GeneratedMessage,Object> request = null;
+		AsyncServerRequest<GeneratedMessage, Object> request = null;
 		AuthTicket authTicket = null;
 		while (true) {
 			try {
@@ -213,8 +214,7 @@ public class RequestHandler implements Runnable {
 				serverRequests.add(extra);
 			}
 
-			ServerRequest[] arrayServerRequests = serverRequests.toArray(new ServerRequest[serverRequests.size()]);
-
+			final ServerRequest[] arrayServerRequests = serverRequests.toArray(new ServerRequest[serverRequests.size()]);
 
 			try {
 				authTicket = internalSendServerRequests(authTicket, arrayServerRequests);
