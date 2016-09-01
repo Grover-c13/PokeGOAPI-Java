@@ -65,14 +65,12 @@ public class Inventories {
 		hatchery = new Hatchery(api);
 	}
 
-
 	/**
 	 * Updates the inventories with the latest data.
 	 *
 	 * @param response the get inventory response
 	 */
 	public void updateInventories(GetInventoryResponse response) {
-
 		for (InventoryItemOuterClass.InventoryItem inventoryItem
 				: response.getInventoryDelta().getInventoryItemsList()) {
 			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
@@ -116,9 +114,7 @@ public class Inventories {
 				}
 			}
 
-			lastInventoryUpdate = api.currentTimeMillis();
+			lastInventoryUpdate = response.getInventoryDelta().getNewTimestampMs();
 		}
-
-
 	}
 }

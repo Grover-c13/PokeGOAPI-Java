@@ -86,9 +86,11 @@ public class CommonRequest {
 	 * @return GetInventoryMessage
 	 */
 	public static GetInventoryMessage getDefaultGetInventoryMessage(PokemonGo api) {
-		return GetInventoryMessage.newBuilder()
-				.setLastTimestampMs(api.getInventories().getLastInventoryUpdate())
-				.build();
+		GetInventoryMessage.Builder builder = GetInventoryMessage.newBuilder();
+		if (api.getInventories().getLastInventoryUpdate() != 0) {
+			builder.setLastTimestampMs(api.getInventories().getLastInventoryUpdate());
+		}
+		return builder.build();
 	}
 
 	/**
