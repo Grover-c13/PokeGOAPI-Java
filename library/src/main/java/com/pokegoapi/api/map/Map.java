@@ -107,6 +107,8 @@ public class Map {
 
 	/**
 	 * Request a MapObjects around your current location.
+	 * 
+	 * @param callback an optional callback to handle results
 	 */
 	public void getMapObjects(final PokeCallback<MapObjects> callback) {
 		getMapObjects(getDefaultCells(), callback);

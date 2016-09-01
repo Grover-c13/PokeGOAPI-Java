@@ -89,8 +89,7 @@ public class Pokemon extends PokemonDetails {
 	 * @param nickname the nickname
 	 * @param callback an optional callback to handle results
 	 */
-	public void renamePokemon(String nickname, PokeCallback<NicknamePokemonResponse.Result> callback)
-			throws LoginFailedException, RemoteServerException {
+	public void renamePokemon(String nickname, PokeCallback<NicknamePokemonResponse.Result> callback) {
 		NicknamePokemonMessage reqMsg = NicknamePokemonMessage.newBuilder()
 				.setPokemonId(getId())
 				.setNickname(nickname)
@@ -111,8 +110,7 @@ public class Pokemon extends PokemonDetails {
 	 * @param markFavorite Mark Pokemon as Favorite?
 	 * @param callback     an optional callback to handle results
 	 */
-	public void setFavoritePokemon(boolean markFavorite, PokeCallback<SetFavoritePokemonResponse.Result> callback)
-			throws LoginFailedException, RemoteServerException {
+	public void setFavoritePokemon(boolean markFavorite, PokeCallback<SetFavoritePokemonResponse.Result> callback) {
 		SetFavoritePokemonMessage reqMsg = SetFavoritePokemonMessage.newBuilder()
 				.setPokemonId(getId())
 				.setIsFavorite(markFavorite)

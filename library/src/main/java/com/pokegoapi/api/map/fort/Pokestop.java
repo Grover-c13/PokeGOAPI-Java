@@ -127,7 +127,7 @@ public class Pokestop {
 	/**
 	 * Loots a pokestop for pokeballs and other items.
 	 *
-	 * @return PokestopLootResult
+	 * @param callback an optional callback to handle results
 	 */
 	public void loot(PokeCallback<PokestopLootResult> callback) {
 		FortSearchMessage searchMessage = FortSearchMessage.newBuilder()
@@ -152,7 +152,7 @@ public class Pokestop {
 	 * Adds a modifier to this pokestop. (i.e. add a lure module)
 	 *
 	 * @param item the modifier to add to this pokestop
-	 * @return true if success
+	 * @param callback an optional callback to handle results
 	 */
 	public void addModifier(ItemIdOuterClass.ItemId item, PokeCallback<Boolean> callback) {
 		AddFortModifierMessage msg = AddFortModifierMessage.newBuilder()
@@ -173,7 +173,7 @@ public class Pokestop {
 	/**
 	 * Get more detailed information about a pokestop.
 	 *
-	 * @return FortDetails
+	 * @param callback an optional callback to handle results
 	 */
 	public void getDetails(PokeCallback<FortDetails> callback) {
 		FortDetailsMessage reqMsg = FortDetailsMessage.newBuilder()
@@ -196,20 +196,7 @@ public class Pokestop {
 	 *
 	 * @return lure status
 	 */
-	@Deprecated
-	public boolean hasLurePokemon() {
-		return fortData.hasLureInfo() && fortData.getLureInfo().getLureExpiresTimestampMs() > api.currentTimeMillis();
-	}
-
-	/**
-	 * Returns whether this pokestop has an active lure.
-	 *
-	 * @param updateFortDetails to make a new request and get updated lured status
-	 * @return lure status
-	 * @throws LoginFailedException  If login failed.
-	 * @throws RemoteServerException If server communications failed.
-	 */
-	public boolean hasLure() throws LoginFailedException, RemoteServerException {
+	public boolean hasLure() {
 		return fortData.getActiveFortModifierList().contains(ItemIdOuterClass.ItemId.ITEM_TROY_DISK);
 	}
 }

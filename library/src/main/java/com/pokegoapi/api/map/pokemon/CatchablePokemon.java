@@ -138,7 +138,7 @@ public class CatchablePokemon implements MapPoint {
 	/**
 	 * Encounter pokemon encounter result.
 	 *
-	 * @return the encounter result
+	 * @param callback an optional callback to handle results
 	 */
 	public void encounterPokemon(PokeCallback<EncounterResult> callback) {
 		if (encounterKind == EncounterKind.NORMAL) {
@@ -155,7 +155,7 @@ public class CatchablePokemon implements MapPoint {
 	/**
 	 * Encounter pokemon encounter result.
 	 *
-	 * @return the encounter result
+	 * @param callback an optional callback to handle results
 	 */
 	public void encounterNormalPokemon(PokeCallback<EncounterResult> callback) {
 		EncounterMessage reqMsg = EncounterMessage
@@ -176,7 +176,7 @@ public class CatchablePokemon implements MapPoint {
 	/**
 	 * Encounter pokemon
 	 *
-	 * @return the encounter result
+	 * @param callback an optional callback to handle results
 	 */
 	public void encounterDiskPokemon(PokeCallback<EncounterResult> callback) {
 		DiskEncounterMessage reqMsg = DiskEncounterMessage
@@ -198,13 +198,11 @@ public class CatchablePokemon implements MapPoint {
 	 * Tries to catch a pokemon (using defined {@link AsyncCatchOptions}).
 	 *
 	 * @param options the AsyncCatchOptions object
-	 * @return Observable CatchResult
-	 * @throws LoginFailedException  if failed to login
-	 * @throws RemoteServerException if the server failed to respond
+	 * @param callback an optional callback to handle results
 	 * @throws NoSuchItemException   the no such item exception
 	 */
 	public void catchPokemon(AsyncCatchOptions options, final PokeCallback<CatchResult> callback)
-			throws LoginFailedException, RemoteServerException, NoSuchItemException {
+			throws NoSuchItemException {
 		if (options != null) {
 			if (options.getUseRazzBerry() != 0) {
 				final AsyncCatchOptions asyncOptions = options;
@@ -244,17 +242,14 @@ public class CatchablePokemon implements MapPoint {
 	 *
 	 * @param encounter the encounter to compare
 	 * @param options   the CatchOptions object
-	 * @return the catch result
-	 * @throws LoginFailedException     the login failed exception
-	 * @throws RemoteServerException    the remote server exception
+	 * @param callback an optional callback to handle results
 	 * @throws NoSuchItemException      the no such item exception
 	 * @throws EncounterFailedException the encounter failed exception
 	 */
 	public void catchPokemon(EncounterResult encounter,
 							 AsyncCatchOptions options,
 							 final PokeCallback<CatchResult> callback)
-			throws LoginFailedException, RemoteServerException,
-			NoSuchItemException, EncounterFailedException {
+			throws NoSuchItemException, EncounterFailedException {
 
 		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
 		double probability = encounter.getCaptureProbability().getCaptureProbability(0);
@@ -295,7 +290,7 @@ public class CatchablePokemon implements MapPoint {
 	 * @param normalizedReticleSize the normalized hit reticle
 	 * @param spinModifier          the spin modifier
 	 * @param type                  Type of pokeball to throw
-	 * @return CatchResult of resulted try to catch pokemon
+	 * @param callback an optional callback to handle results
 	 */
 	public void catchPokemon(double normalizedHitPosition, double normalizedReticleSize,
 							 double spinModifier, Pokeball type, PokeCallback<CatchResult> callback) {
@@ -323,7 +318,7 @@ public class CatchablePokemon implements MapPoint {
 	 * Tries to use an item on a catchable pokemon (ie razzberry).
 	 *
 	 * @param item the item ID
-	 * @return CatchItemResult info about the new modifiers about the pokemon (can move, item capture multi) eg
+	 * @param callback an optional callback to handle results
 	 */
 	public void useItem(ItemId item, PokeCallback<CatchItemResult> callback) {
 		UseItemCaptureMessage reqMsg = UseItemCaptureMessage
