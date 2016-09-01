@@ -96,7 +96,7 @@ public class PlayerProfile {
 				.setPlayerLocale(playerLocale.getPlayerLocale())
 				.build();
 
-		AsyncServerRequest getPlayerServerRequest = new AsyncServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg,
+		new AsyncServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg,
 				new PokeAFunc<GetPlayerResponse, Void>() {
 					@Override
 					public Void exec(GetPlayerResponse response) {
@@ -130,8 +130,7 @@ public class PlayerProfile {
 
 						return null;
 					}
-				}, null).boundRequests(CommonRequest.getDefaultCheckChallenge());
-		api.getRequestHandler().sendAsyncServerRequests(getPlayerServerRequest);
+				}, null, api, CommonRequest.getDefaultCheckChallenge());
 	}
 
 	private void activateAccount() {
@@ -184,7 +183,7 @@ public class PlayerProfile {
 				.setPlayerLocale(playerLocale.getPlayerLocale())
 				.build();
 
-		AsyncServerRequest getPlayerServerRequest = new AsyncServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg,
+		new AsyncServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg,
 				new PokeAFunc<GetPlayerResponse, PlayerProfile>() {
 					@Override
 					public PlayerProfile exec(GetPlayerResponse response) {
@@ -192,7 +191,6 @@ public class PlayerProfile {
 						return PlayerProfile.this;
 					}
 				}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(getPlayerServerRequest);
 	}
 
 	/**
@@ -239,7 +237,7 @@ public class PlayerProfile {
 		LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder()
 				.setLevel(level)
 				.build();
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.LEVEL_UP_REWARDS, msg,
+		new AsyncServerRequest(RequestType.LEVEL_UP_REWARDS, msg,
 				new PokeAFunc<LevelUpRewardsResponse, PlayerLevelUpRewards>() {
 					@Override
 					public PlayerLevelUpRewards exec(LevelUpRewardsResponse response) {
@@ -254,7 +252,6 @@ public class PlayerProfile {
 						return new PlayerLevelUpRewards(response);
 					}
 				}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
@@ -389,7 +386,7 @@ public class PlayerProfile {
 				.setPlayerAvatar(playerAvatarBuilder.build())
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.SET_AVATAR, setAvatarMessage,
+		new AsyncServerRequest(RequestType.SET_AVATAR, setAvatarMessage,
 				new PokeAFunc<SetAvatarResponse, SetAvatarResponse.Status>() {
 					@Override
 					public SetAvatarResponse.Status exec(SetAvatarResponse response) {
@@ -404,7 +401,6 @@ public class PlayerProfile {
 						return response.getStatus();
 					}
 				}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
@@ -421,7 +417,7 @@ public class PlayerProfile {
 						.setPokemonId(pokemonId == 1 ? PokemonId.BULBASAUR :
 								pokemonId == 2 ? PokemonId.CHARMANDER : PokemonId.SQUIRTLE);
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(
+		new AsyncServerRequest(
 				RequestType.ENCOUNTER_TUTORIAL_COMPLETE, encounterTutorialCompleteBuilder.build(),
 				new PokeAFunc<EncounterTutorialCompleteResponse, EncounterTutorialCompleteResponse.Result>() {
 					@Override
@@ -432,9 +428,7 @@ public class PlayerProfile {
 
 						return response.getResult();
 					}
-				}, callback)
-				.boundRequests(CommonRequest.getDefaultCheckChallenge());
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
+				}, callback, api, CommonRequest.getDefaultCheckChallenge())
 	}
 
 	/**
@@ -447,7 +441,7 @@ public class PlayerProfile {
 				.setCodename(randomCodenameGenerator())
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(
+		new AsyncServerRequest(
 				RequestType.CLAIM_CODENAME, claimCodenameMessage,
 				new PokeAFunc<ClaimCodenameResponse, ClaimCodenameResponse.Status>() {
 					@Override
@@ -469,7 +463,6 @@ public class PlayerProfile {
 						return response.getStatus();
 					}
 				}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
@@ -493,7 +486,7 @@ public class PlayerProfile {
 				.setSendMarketingEmails(false)
 				.setSendPushNotifications(false).build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialMessage,
+		new AsyncServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialMessage,
 				new PokeAFunc<MarkTutorialCompleteResponse, PlayerProfile>() {
 					@Override
 					public PlayerProfile exec(MarkTutorialCompleteResponse response) {
@@ -501,7 +494,6 @@ public class PlayerProfile {
 						return PlayerProfile.this;
 					}
 				}, callback, api);
-		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	private static String randomCodenameGenerator() {

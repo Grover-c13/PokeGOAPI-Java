@@ -67,12 +67,13 @@ public class RequestHandler implements Runnable {
 	}
 
 	/**
-	 * Make an async server request. The answer will be provided in the future
+	 * This method is called internally from the AsyncServerRequest and is the unique method
+	 * to queue a request. Response is provided through proper callbacks built in the constructor
+	 * of each request
 	 *
 	 * @param asyncServerRequest Request to make
-	 * @return ByteString response to be processed in the future
 	 */
-	public void sendAsyncServerRequests(final AsyncServerRequest asyncServerRequest) {
+	protected void sendRequest(final AsyncServerRequest asyncServerRequest) {
 		workQueue.offer(asyncServerRequest);
 	}
 

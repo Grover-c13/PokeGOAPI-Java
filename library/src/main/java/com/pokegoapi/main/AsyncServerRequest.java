@@ -48,8 +48,12 @@ public class AsyncServerRequest<T extends GeneratedMessage, K> {
 	 * @param req  the req
 	 * @param func internal func to handle data
 	 * @param callback an optional callback to handle results
+	 * @param api the current instance of PokemonGo used to bound common requests
+	 * @param requests requests to bound in the same request envelope
 	 */
-	public AsyncServerRequest(RequestType type, GeneratedMessage req, PokeAFunc<T, K> func, PokeCallback<K> callback) {
+	public AsyncServerRequest(RequestType type, GeneratedMessage req, PokeAFunc<T, K> func,
+							  PokeCallback<K> callback, PokemonGo api,
+							  InternalServerRequest... requests) {
 		Request.Builder reqBuilder = Request.newBuilder();
 		reqBuilder.setRequestMessage(req.toByteString());
 		reqBuilder.setRequestType(type);
@@ -57,31 +61,14 @@ public class AsyncServerRequest<T extends GeneratedMessage, K> {
 		this.request = reqBuilder.build();
 		this.callback = callback;
 		this.func = func;
-	}
 
-	/**
-	 * Instantiates a new Server request.
-	 *
-	 * @param type the type
-	 * @param req  the req
-	 * @param func internal func to handle data
-	 * @param callback an optional callback to handle results
-	 * @param api the current instance of PokemonGo used to bound common requests
-	 */
-	public AsyncServerRequest(RequestType type, GeneratedMessage req, PokeAFunc<T, K> func, PokeCallback<K> callback, PokemonGo api) {
-		this(type, req, func, callback);
-		boundRequests(CommonRequest.getCommonRequests(api));
-	}
+		if (requests.length > 0) {
+			Collections.addAll(boundedRequests, requests);
+		} else {
+			Collections.addAll(boundedRequests, CommonRequest.getCommonRequests(api));
+		}
 
-	/**
-	 * Bound requests to the current request
-	 *
-	 * @param requests the requests to bound
-	 * @return this instance of AsyncServerRequest
-     */
-	public AsyncServerRequest boundRequests(InternalServerRequest... requests) {
-		Collections.addAll(boundedRequests, requests);
-		return this;
+		api.getRequestHandler().sendRequest(this);
 	}
 
 	public void fire(ByteString data) {
