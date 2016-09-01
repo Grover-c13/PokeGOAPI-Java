@@ -153,8 +153,8 @@ public class ItemBag {
 						.setIncenseTypeValue(type.getNumber())
 						.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.USE_INCENSE,
-				useIncenseMessage, new PokeAFunc<UseIncenseResponse, UseIncenseResponse.Result>() {
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.USE_INCENSE, useIncenseMessage,
+				new PokeAFunc<UseIncenseResponse, UseIncenseResponse.Result>() {
 			@Override
 			public UseIncenseResponse.Result exec(UseIncenseResponse response) {
 				return response.getResult();

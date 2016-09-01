@@ -72,7 +72,6 @@ public class RequestHandler implements Runnable {
 		workQueue.offer(asyncServerRequest);
 	}
 
-
 	/**
 	 * Sends multiple ServerRequests in a thread safe manner.
 	 *

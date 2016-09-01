@@ -25,20 +25,31 @@ import POGOProtos.Networking.Requests.Messages.UpgradePokemonMessageOuterClass.U
 import POGOProtos.Networking.Requests.Messages.UseItemPotionMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.UseItemReviveMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass.EvolvePokemonResponse;
 import POGOProtos.Networking.Responses.NicknamePokemonResponseOuterClass.NicknamePokemonResponse;
+import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
+import POGOProtos.Networking.Responses.SetFavoritePokemonResponseOuterClass.SetFavoritePokemonResponse;
+import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass.UpgradePokemonResponse;
 import POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass.UseItemPotionResponse;
 import POGOProtos.Networking.Responses.UseItemReviveResponseOuterClass.UseItemReviveResponse;
+
+import com.google.protobuf.ByteString;
+import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
+import com.pokegoapi.api.map.pokemon.EvolutionResult;
 import com.pokegoapi.api.player.PlayerProfile;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.util.PokeAFunc;
 import com.pokegoapi.util.PokeCallback;
 import lombok.Getter;
 import lombok.Setter;
-
+import rx.functions.Func1;
 
 /**
  * The type Pokemon.
@@ -64,104 +75,66 @@ public class Pokemon extends PokemonDetails {
 	/**
 	 * Transfers the pokemon.
 	 *
-	 * @return the result
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
+	 * @param callback an optional callback to handle results
 	 */
-	public void transferPokemon() throws LoginFailedException, RemoteServerException {
+	public void transferPokemon(PokeCallback<ReleasePokemonResponse.Result> callback) {
 		ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
-		final Pokemon me = this;
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.RELEASE_POKEMON, reqMsg, api);
-		return AsyncHelper.toBlocking(
-				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, Result>() {
-
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.RELEASE_POKEMON, reqMsg,
+				new PokeAFunc<ReleasePokemonResponse, ReleasePokemonResponse.Result>() {
 					@Override
-					public Result call(ByteString bytes) {
-						ReleasePokemonResponse response;
-						try {
-							response = ReleasePokemonResponse.parseFrom(bytes);
-						} catch (InvalidProtocolBufferException e) {
-							return ReleasePokemonResponse.Result.FAILED;
-						}
-
-						api.getInventories().getPokebank().removePokemon(me);
+					public ReleasePokemonResponse.Result exec(ReleasePokemonResponse response) {
+						api.getInventories().getPokebank().removePokemon(Pokemon.this);
 						return response.getResult();
 					}
-				})
-		);
-
+				}, callback, api);
+		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
 	 * Rename pokemon nickname pokemon response . result.
 	 *
 	 * @param nickname the nickname
-	 * @return the nickname pokemon response . result
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
+	 * @param callback an optional callback to handle results
 	 */
-	public void renamePokemon(String nickname)
+	public void renamePokemon(String nickname, PokeCallback<NicknamePokemonResponse.Result> callback)
 			throws LoginFailedException, RemoteServerException {
 		NicknamePokemonMessage reqMsg = NicknamePokemonMessage.newBuilder()
 				.setPokemonId(getId())
 				.setNickname(nickname)
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.NICKNAME_POKEMON, reqMsg, api);
-		return AsyncHelper.toBlocking(
-				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, NicknamePokemonResponse.Result>() {
-
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.NICKNAME_POKEMON, reqMsg,
+				new PokeAFunc<NicknamePokemonResponse, NicknamePokemonResponse.Result>() {
 					@Override
-					public NicknamePokemonResponse.Result call(ByteString bytes) {
-						NicknamePokemonResponse response;
-						try {
-							response = NicknamePokemonResponse.parseFrom(bytes);
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
-						}
-
-
+					public NicknamePokemonResponse.Result exec(NicknamePokemonResponse response) {
 						return response.getResult();
 					}
-				})
-		);
+				}, callback, api);
+		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
 	 * Function to mark the pokemon as favorite or not.
 	 *
 	 * @param markFavorite Mark Pokemon as Favorite?
-	 * @return the SetFavoritePokemonResponse.Result
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
+	 * @param callback an optional callback to handle results
 	 */
-	public void setFavoritePokemon(boolean markFavorite)
+	public void setFavoritePokemon(boolean markFavorite, PokeCallback<SetFavoritePokemonResponse.Result> callback)
 			throws LoginFailedException, RemoteServerException {
 		SetFavoritePokemonMessage reqMsg = SetFavoritePokemonMessage.newBuilder()
 				.setPokemonId(getId())
 				.setIsFavorite(markFavorite)
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.SET_FAVORITE_POKEMON, reqMsg, api);
-		return AsyncHelper.toBlocking(
-				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, SetFavoritePokemonResponse.Result>() {
-
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.SET_FAVORITE_POKEMON, reqMsg,
+				new PokeAFunc<SetFavoritePokemonResponse, SetFavoritePokemonResponse.Result>() {
 					@Override
-					public SetFavoritePokemonResponse.Result call(ByteString bytes) {
-						SetFavoritePokemonResponse response;
-						try {
-							response = SetFavoritePokemonResponse.parseFrom(bytes);
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
-						}
-
-
+					public SetFavoritePokemonResponse.Result exec(SetFavoritePokemonResponse response) {
 						return response.getResult();
 					}
-				})
-		);
-
+				}, callback, api);
+		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
@@ -202,59 +175,40 @@ public class Pokemon extends PokemonDetails {
 	 * Powers up a pokemon with candy and stardust.
 	 * After powering up this pokemon object will reflect the new changes.
 	 *
-	 * @return The result
+	 * @param callback an optional callback to handle results
 	 */
-	public void powerUp() {
+	public void powerUp(PokeCallback<UpgradePokemonResponse.Result> callback) {
 		UpgradePokemonMessage reqMsg = UpgradePokemonMessage.newBuilder().setPokemonId(getId()).build();
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.UPGRADE_POKEMON, reqMsg);
-
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
-				new Func1<ByteString, UpgradePokemonResponse.Result>() {
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.UPGRADE_POKEMON, reqMsg,
+				new PokeAFunc<UpgradePokemonResponse, UpgradePokemonResponse.Result>() {
 					@Override
-					public UpgradePokemonResponse.Result call(ByteString result) {
-						UpgradePokemonResponse response;
-						try {
-							response = UpgradePokemonResponse.parseFrom(result);
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
-						}
+					public UpgradePokemonResponse.Result exec(UpgradePokemonResponse response) {
 						//set new pokemon details
 						setProto(response.getUpgradedPokemon());
 						return response.getResult();
 					}
-				});
+				}, callback, api);
+		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
-	 * dus
 	 * Evolve evolution result.
 	 *
-	 * @return the evolution result
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
+	 * @param callback an optional callback to handle results
 	 */
-	public void evolve() throws LoginFailedException, RemoteServerException {
+	public void evolve(PokeCallback<EvolutionResult> callback) {
 		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
-		final Pokemon me = this;
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.EVOLVE_POKEMON, reqMsg, api);
-		return AsyncHelper.toBlocking(
-				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, EvolutionResult>() {
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.EVOLVE_POKEMON, reqMsg,
+				new PokeAFunc<EvolvePokemonResponse, EvolutionResult>() {
 					@Override
-					public EvolutionResult call(ByteString bytes) {
-						EvolvePokemonResponse response;
-						try {
-							response = EvolvePokemonResponse.parseFrom(bytes);
-						} catch (InvalidProtocolBufferException e) {
-							return null;
-						}
+					public EvolutionResult exec(EvolvePokemonResponse response) {
 						EvolutionResult result = new EvolutionResult(api, response);
-						api.getInventories().getPokebank().removePokemon(me);
+						api.getInventories().getPokebank().removePokemon(Pokemon.this);
 						return result;
 					}
-				})
-		);
-
+				}, callback, api);
+		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
@@ -278,38 +232,36 @@ public class Pokemon extends PokemonDetails {
 	/**
 	 * Heal a pokemon, using various fallbacks for potions
 	 *
-	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
-	 * @throws LoginFailedException  If login failed.
-	 * @throws RemoteServerException If server communication issues occurred.
+	 * @param callback an optional callback to handle results
 	 */
-	public void heal()
-			throws LoginFailedException, RemoteServerException {
+	public void heal(PokeCallback<UseItemPotionResponse.Result> callback) {
 
 		if (!isInjured()) {
-			return UseItemPotionResponse.Result.ERROR_CANNOT_USE;
+			callback.onResponse(UseItemPotionResponse.Result.ERROR_CANNOT_USE);
+			return;
 		}
 
 		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_POTION).getCount() > 0) {
-			usePotion(ItemId.ITEM_POTION);
+			usePotion(ItemId.ITEM_POTION, callback);
 			return;
 		}
 
 		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_SUPER_POTION).getCount() > 0) {
-			usePotion(ItemId.ITEM_SUPER_POTION);
+			usePotion(ItemId.ITEM_SUPER_POTION, callback);
 			return;
 		}
 
 		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_HYPER_POTION).getCount() > 0) {
-			usePotion(ItemId.ITEM_HYPER_POTION);
+			usePotion(ItemId.ITEM_HYPER_POTION, callback);
 			return;
 		}
 
 		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_MAX_POTION).getCount() > 0) {
-			usePotion(ItemId.ITEM_MAX_POTION);
+			usePotion(ItemId.ITEM_MAX_POTION, callback);
 			return;
 		}
 
-		return UseItemPotionResponse.Result.ERROR_CANNOT_USE;
+		callback.onResponse(UseItemPotionResponse.Result.ERROR_CANNOT_USE);
 	}
 
 	/**
@@ -317,17 +269,15 @@ public class Pokemon extends PokemonDetails {
 	 * to be healed.
 	 *
 	 * @param itemId {@link ItemId} of the potion to use.
-	 * @return Result, ERROR_CANNOT_USE if the requirements aren't met
-	 * @throws LoginFailedException  If login failed.
-	 * @throws RemoteServerException If server communications failed.
+	 * @param callback an optional callback to handle results
 	 */
-	public void usePotion(ItemId itemId)
-			throws LoginFailedException, RemoteServerException {
-
+	public void usePotion(ItemId itemId, PokeCallback<UseItemPotionResponse.Result> callback) {
 		Item potion = api.getInventories().getItemBag().getItem(itemId);
 		//some sanity check, to prevent wrong use of this call
-		if (!potion.isPotion() || potion.getCount() < 1 || !isInjured())
-			return UseItemPotionResponse.Result.ERROR_CANNOT_USE;
+		if (!potion.isPotion() || potion.getCount() < 1 || !isInjured()) {
+			callback.onResponse(UseItemPotionResponse.Result.ERROR_CANNOT_USE);
+			return;
+		}
 
 		UseItemPotionMessageOuterClass.UseItemPotionMessage reqMsg = UseItemPotionMessageOuterClass.UseItemPotionMessage
 				.newBuilder()
@@ -335,25 +285,17 @@ public class Pokemon extends PokemonDetails {
 				.setPokemonId(getId())
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.USE_ITEM_POTION, reqMsg, api);
-		return AsyncHelper.toBlocking(
-				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, UseItemPotionResponse.Result>() {
-
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.USE_ITEM_POTION, reqMsg,
+				new PokeAFunc<UseItemPotionResponse, UseItemPotionResponse.Result>() {
 					@Override
-					public UseItemPotionResponse.Result call(ByteString bytes) {
-						UseItemPotionResponse response;
-						try {
-							response = UseItemPotionResponse.parseFrom(bytes);
-							if (response.getResult() == UseItemPotionResponse.Result.SUCCESS) {
-								setStamina(response.getStamina());
-							}
-							return response.getResult();
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
+					public UseItemPotionResponse.Result exec(UseItemPotionResponse response) {
+						if (response.getResult() == UseItemPotionResponse.Result.SUCCESS) {
+							setStamina(response.getStamina());
 						}
+						return response.getResult();
 					}
-				})
-		);
+				}, callback, api);
+		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**

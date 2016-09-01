@@ -10,7 +10,6 @@ import java.lang.reflect.ParameterizedType;
  */
 public abstract class PokeAFunc<T extends com.google.protobuf.GeneratedMessage, K> {
 
-
 	public abstract K exec(T response);
 
 	public K exec(ByteString data) throws Throwable {
