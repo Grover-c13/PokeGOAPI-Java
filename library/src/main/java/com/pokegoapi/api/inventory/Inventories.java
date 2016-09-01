@@ -20,7 +20,6 @@ import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Inventory.EggIncubatorOuterClass;
 import POGOProtos.Inventory.InventoryItemDataOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
-import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import com.pokegoapi.api.PokemonGo;
@@ -28,8 +27,6 @@ import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.api.pokemon.Pokemon;
 import lombok.Getter;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -116,6 +113,9 @@ public class Inventories {
 			}
 		}
 
-		lastInventoryUpdate = response.getInventoryDelta().getNewTimestampMs();
+		if (response.hasInventoryDelta()
+				&& response.getInventoryDelta().getNewTimestampMs() > 0) {
+			lastInventoryUpdate = response.getInventoryDelta().getNewTimestampMs();
+		}
 	}
 }
