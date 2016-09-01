@@ -170,20 +170,10 @@ public class PokemonGo {
 	 */
 	private void initialize(final PokeCallback<PokemonGo> callback) {
 		new AsyncServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
-				CommonRequest.getDefaultDownloadRemoteConfigVersionRequest(),
-				new PokeAFunc() {
-					@Override
-					public Object exec(GeneratedMessage response) {
-						return null;
-					}
-				},
-				new PokeCallback() {
-					@Override
-					public void onResponse(Object result) {
-						new AsyncServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
-								CommonRequest.getDefaultGetAssetDigestMessageRequest(), null, callback, PokemonGo.this);
-					}
-				}, this);
+				CommonRequest.getDefaultDownloadRemoteConfigVersionRequest(), null, null, this);
+
+		new AsyncServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
+				CommonRequest.getDefaultGetAssetDigestMessageRequest(), null, callback, PokemonGo.this);
 	}
 
 	/**
