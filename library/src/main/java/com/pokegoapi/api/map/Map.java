@@ -52,7 +52,6 @@ public class Map {
 	 */
 	public Map(PokemonGo api) {
 		this.api = api;
-		cachedMapObjects = new MapObjects(api);
 		lastMapUpdate = 0;
 	}
 
@@ -113,15 +112,6 @@ public class Map {
 		getMapObjects(getDefaultCells(), callback);
 	}
 
-	/**
-	 * Returns the cells requested.
-	 *
-	 * @param cellIds List of cellId
-	 * @return MapObjects in the given cells
-	 */
-	public void getMapObjects(List<Long> cellIds, PokeCallback<MapObjects> callback) {
-		getMapObjects(cellIds, callback);
-	}
 
 	/**
 	 * Get a list of all the Cell Ids.
