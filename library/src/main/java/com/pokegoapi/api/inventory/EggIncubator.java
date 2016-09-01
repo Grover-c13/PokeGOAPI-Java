@@ -60,7 +60,7 @@ public class EggIncubator {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
-	public void hatchEgg(EggPokemon egg, PokeCallback<UseItemEggIncubatorResponse.Result> callback)
+	public void hatchEgg(EggPokemon egg, PokeCallback<UseItemEggIncubatorResponse> callback)
 			throws LoginFailedException, RemoteServerException {
 
 		UseItemEggIncubatorMessage reqMsg = UseItemEggIncubatorMessage.newBuilder()
@@ -69,10 +69,10 @@ public class EggIncubator {
 				.build();
 
 		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR, reqMsg,
-				new PokeAFunc<UseItemEggIncubatorResponse, UseItemEggIncubatorResponse.Result>() {
+				new PokeAFunc<UseItemEggIncubatorResponse, UseItemEggIncubatorResponse>() {
 					@Override
-					public UseItemEggIncubatorResponse.Result exec(UseItemEggIncubatorResponse response) {
-						return response.getResult();
+					public UseItemEggIncubatorResponse exec(UseItemEggIncubatorResponse response) {
+						return response;
 					}
 				}, callback, api);
 		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
