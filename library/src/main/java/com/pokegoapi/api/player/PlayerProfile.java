@@ -32,14 +32,10 @@ import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.L
 import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass.MarkTutorialCompleteMessage;
 import POGOProtos.Networking.Requests.Messages.SetAvatarMessageOuterClass.SetAvatarMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.ClaimCodenameResponseOuterClass;
 import POGOProtos.Networking.Responses.ClaimCodenameResponseOuterClass.ClaimCodenameResponse;
-import POGOProtos.Networking.Responses.EncounterTutorialCompleteResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterTutorialCompleteResponseOuterClass.EncounterTutorialCompleteResponse;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
 
-import POGOProtos.Networking.Responses.SetAvatarResponseOuterClass;
-import com.google.protobuf.GeneratedMessage;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.ItemBag;
@@ -49,7 +45,6 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.CommonRequest;
-import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.PokeAFunc;
 import com.pokegoapi.util.PokeCallback;
@@ -133,8 +128,7 @@ public class PlayerProfile {
 
 						return null;
 					}
-				}, null).addCommonRequest(new ServerRequest(RequestType.CHECK_CHALLENGE,
-				CheckChallenge.CheckChallengeMessage.getDefaultInstance()));
+				}, null).boundRequests(CommonRequest.getDefaultCheckChallenge());
 		api.getRequestHandler().sendAsyncServerRequests(getPlayerServerRequest);
 	}
 
@@ -442,8 +436,7 @@ public class PlayerProfile {
 						return response.getResult();
 					}
 				}, callback)
-				.addCommonRequest(new ServerRequest(RequestType.CHECK_CHALLENGE,
-						CheckChallenge.CheckChallengeMessage.getDefaultInstance()));
+				.boundRequests(CommonRequest.getDefaultCheckChallenge());
 		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 

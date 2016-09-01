@@ -36,7 +36,7 @@ public class AsyncServerRequest<T extends GeneratedMessage, K> {
 	@Getter
 	private final Request request;
 	@Getter
-	final ArrayList<ServerRequest> commonRequests = new ArrayList<>();
+	final ArrayList<InternalServerRequest> boundedRequests = new ArrayList<>();
 
 	private final PokeCallback<K> callback;
 	private final PokeAFunc<T, K> func;
@@ -70,17 +70,17 @@ public class AsyncServerRequest<T extends GeneratedMessage, K> {
 	 */
 	public AsyncServerRequest(RequestType type, GeneratedMessage req, PokeAFunc<T, K> func, PokeCallback<K> callback, PokemonGo api) {
 		this(type, req, func, callback);
-		addCommonRequest(CommonRequest.getCommonRequests(api));
+		boundRequests(CommonRequest.getCommonRequests(api));
 	}
 
 	/**
 	 * Bound requests to the current request
 	 *
 	 * @param requests the requests to bound
-	 * @return
+	 * @return this instance of AsyncServerRequest
      */
-	public AsyncServerRequest boundRequests(ServerRequest... requests) {
-		Collections.addAll(commonRequests, requests);
+	public AsyncServerRequest boundRequests(InternalServerRequest... requests) {
+		Collections.addAll(boundedRequests, requests);
 		return this;
 	}
 

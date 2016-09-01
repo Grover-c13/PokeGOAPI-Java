@@ -160,7 +160,7 @@ public class PokemonGo {
 
 	private void initialize() throws RemoteServerException, LoginFailedException {
 		fireRequestBlock(new AsyncServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
-				CommonRequest.getDownloadRemoteConfigVersionMessageRequest(), null, null));
+				CommonRequest.getDefaultDownloadRemoteConfigVersionRequest(), null, null));
 
 		fireRequestBlockTwo();
 	}
@@ -171,7 +171,7 @@ public class PokemonGo {
 	 * @param request server request
 	 */
 	private void fireRequestBlock(AsyncServerRequest request) {
-		request.addCommonRequest(CommonRequest.getCommonRequests(this));
+		request.boundRequests(CommonRequest.getCommonRequests(this));
 		getRequestHandler().sendAsyncServerRequests(request);
 	}
 
@@ -180,7 +180,7 @@ public class PokemonGo {
 	 */
 	public void fireRequestBlockTwo() {
 		fireRequestBlock(new AsyncServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
-				CommonRequest.getGetAssetDigestMessageRequest(), null, null));
+				CommonRequest.getDefaultGetAssetDigestMessageRequest(), null, null));
 	}
 
 	/**

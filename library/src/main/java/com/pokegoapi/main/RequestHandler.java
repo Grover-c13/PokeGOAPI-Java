@@ -39,7 +39,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class RequestHandler implements Runnable {
 	private static final String TAG = RequestHandler.class.getSimpleName();
@@ -84,7 +83,7 @@ public class RequestHandler implements Runnable {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
-	private AuthTicket internalSendServerRequests(AuthTicket authTicket, ServerRequest... serverRequests)
+	private AuthTicket internalSendServerRequests(AuthTicket authTicket, InternalServerRequest... serverRequests)
 			throws RemoteServerException, LoginFailedException {
 		AuthTicket newAuthTicket = authTicket;
 		if (serverRequests.length == 0) {
@@ -93,7 +92,7 @@ public class RequestHandler implements Runnable {
 		RequestEnvelope.Builder builder = RequestEnvelope.newBuilder();
 		resetBuilder(builder, authTicket);
 
-		for (ServerRequest serverRequest : serverRequests) {
+		for (InternalServerRequest serverRequest : serverRequests) {
 			builder.addRequests(serverRequest.getRequest());
 		}
 
@@ -151,7 +150,7 @@ public class RequestHandler implements Runnable {
 			 * */
 			int count = 0;
 			for (ByteString payload : responseEnvelop.getReturnsList()) {
-				ServerRequest serverReq = serverRequests[count];
+				InternalServerRequest serverReq = serverRequests[count];
 				/**
 				 * TODO: Probably all other payloads are garbage as well in this case,
 				 * so might as well throw an exception and leave this loop */
@@ -206,15 +205,15 @@ public class RequestHandler implements Runnable {
 				continue;
 			}
 
-			ArrayList<ServerRequest> serverRequests = new ArrayList<>();
+			ArrayList<InternalServerRequest> serverRequests = new ArrayList<>();
 
-			serverRequests.add(new ServerRequest(request.getType(), request.getRequest()));
+			serverRequests.add(new InternalServerRequest(request.getType(), request.getRequest()));
 
-			for (ServerRequest extra : request.getCommonRequests()) {
+			for (InternalServerRequest extra : request.getBoundedRequests()) {
 				serverRequests.add(extra);
 			}
 
-			final ServerRequest[] arrayServerRequests = serverRequests.toArray(new ServerRequest[serverRequests.size()]);
+			final InternalServerRequest[] arrayServerRequests = serverRequests.toArray(new InternalServerRequest[serverRequests.size()]);
 
 			try {
 				authTicket = internalSendServerRequests(authTicket, arrayServerRequests);

@@ -15,12 +15,10 @@
 
 package com.pokegoapi.api.gym;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +28,6 @@ import POGOProtos.Data.Battle.BattleActionTypeOuterClass;
 import POGOProtos.Data.Battle.BattlePokemonInfoOuterClass.BattlePokemonInfo;
 import POGOProtos.Data.Battle.BattleStateOuterClass.BattleState;
 import POGOProtos.Data.PokemonDataOuterClass;
-import POGOProtos.Networking.Requests.Messages.AttackGymMessageOuterClass.AttackGymMessage;
-import POGOProtos.Networking.Requests.Messages.StartGymBattleMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.StartGymBattleMessageOuterClass.StartGymBattleMessage.Builder;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.AttackGymResponseOuterClass.AttackGymResponse;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse.Result;

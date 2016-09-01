@@ -15,14 +15,11 @@
 
 package com.pokegoapi.main;
 
-import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.util.Constant;
-
-import java.util.ArrayList;
 
 import POGOProtos.Enums.PlatformOuterClass.Platform;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
@@ -47,7 +44,7 @@ public class CommonRequest {
 	 *
 	 * @return DownloadRemoteConfigVersionMessage
 	 */
-	public static DownloadRemoteConfigVersionMessage getDownloadRemoteConfigVersionMessageRequest() {
+	public static DownloadRemoteConfigVersionMessage getDefaultDownloadRemoteConfigVersionRequest() {
 		return DownloadRemoteConfigVersionMessage
 				.newBuilder()
 				.setPlatform(Platform.IOS)
@@ -60,7 +57,7 @@ public class CommonRequest {
 	 *
 	 * @return GetAssetDigestMessage
 	 */
-	public static GetAssetDigestMessage getGetAssetDigestMessageRequest() {
+	public static GetAssetDigestMessage getDefaultGetAssetDigestMessageRequest() {
 		return GetAssetDigestMessage.newBuilder()
 				.setPlatform(Platform.IOS)
 				.setAppVersion(Constant.APP_VERSION)
@@ -73,7 +70,7 @@ public class CommonRequest {
 	 * @param api The current instance of PokemonGO
 	 * @return DownloadSettingsMessage
 	 */
-	public static DownloadSettingsMessage getDownloadSettingsMessageRequest(PokemonGo api) {
+	public static DownloadSettingsMessage getDefaultDownloadSettingsMessageRequest(PokemonGo api) {
 		return DownloadSettingsMessage.newBuilder()
 				.setHash(api.getSettings().getHash())
 				.build();
@@ -94,17 +91,13 @@ public class CommonRequest {
 	}
 
 	/**
-	 * Append CheckChallenge request to the given ServerRequest
+	 * Build an internal server request for the checkchallenge message
 	 *
-	 * @param request The main request we want to fire
-	 * @return an array of ServerRequest
+	 * @return GetInventoryMessage
 	 */
-	public static ServerRequest[] appendCheckChallenge(ServerRequest request) {
-		return new ServerRequest[] {
-				request,
-				new ServerRequest(RequestType.CHECK_CHALLENGE,
-						CheckChallengeMessage.getDefaultInstance())
-		};
+	public static InternalServerRequest getDefaultCheckChallenge() {
+		return new InternalServerRequest(RequestType.CHECK_CHALLENGE,
+				CheckChallengeMessage.getDefaultInstance());
 	}
 
 	/**
@@ -113,18 +106,17 @@ public class CommonRequest {
 	 * @param api The current instance of PokemonGO
 	 * @return a List of AsyncServerRequests
 	 */
-	public static ServerRequest[] getCommonRequests(PokemonGo api) {
-		return new ServerRequest[] {
-				new ServerRequest(RequestType.CHECK_CHALLENGE,
-						CheckChallengeMessage.getDefaultInstance()),
-				new ServerRequest(RequestType.GET_HATCHED_EGGS,
+	public static InternalServerRequest[] getCommonRequests(PokemonGo api) {
+		return new InternalServerRequest[] {
+				getDefaultCheckChallenge(),
+				new InternalServerRequest(RequestType.GET_HATCHED_EGGS,
 						GetHatchedEggsMessage.getDefaultInstance()),
-				new ServerRequest(RequestType.GET_INVENTORY,
+				new InternalServerRequest(RequestType.GET_INVENTORY,
 						CommonRequest.getDefaultGetInventoryMessage(api)),
-				new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
+				new InternalServerRequest(RequestType.CHECK_AWARDED_BADGES,
 						CheckAwardedBadgesMessage.getDefaultInstance()),
-				new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
-						CommonRequest.getDownloadSettingsMessageRequest(api))
+				new InternalServerRequest(RequestType.DOWNLOAD_SETTINGS,
+						CommonRequest.getDefaultDownloadSettingsMessageRequest(api))
 		};
 	}
 

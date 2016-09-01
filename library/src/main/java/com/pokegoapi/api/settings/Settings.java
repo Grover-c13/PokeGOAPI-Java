@@ -1,14 +1,7 @@
 package com.pokegoapi.api.settings;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
 
-import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import lombok.Getter;
 
@@ -18,7 +11,6 @@ import lombok.Getter;
 public class Settings {
 
 	private final PokemonGo api;
-
 
 	@Getter
 	/**
@@ -44,7 +36,6 @@ public class Settings {
 	 */
 	private final FortSettings fortSettings;
 
-
 	@Getter
 	/**
 	 * Settings for various parameters during levelup
@@ -60,6 +51,7 @@ public class Settings {
 	 * @return GpsSettings instance.
 	 */
 	private final GpsSettings gpsSettings;
+
 	@Getter
 	/**
      * Settings for hash
@@ -83,8 +75,6 @@ public class Settings {
 		this.gpsSettings = new GpsSettings();
 		this.hash = new String();
 	}
-
-
 
 	/**
 	 * Updates settings latest data.
