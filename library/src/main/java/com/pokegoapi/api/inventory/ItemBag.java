@@ -58,9 +58,7 @@ public class ItemBag {
 	 *
 	 * @param id       the id
 	 * @param quantity the quantity
-	 * @return the result
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
+	 * @param callback an optional callback to handle results
 	 */
 	public void removeItem(ItemId id, int quantity, PokeCallback<Result> callback) {
 		final Item item = getItem(id);
@@ -82,7 +80,6 @@ public class ItemBag {
 			}
 		}, callback, api);
 		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
-
 	}
 
 	/**
@@ -125,10 +122,8 @@ public class ItemBag {
 	 * use an item with itemID
 	 *
 	 * @param type type of item
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
 	 */
-	public void useItem(ItemId type, PokeCallback<UseIncenseResponse.Result> callback) throws RemoteServerException, LoginFailedException {
+	public void useItem(ItemId type, PokeCallback<UseIncenseResponse.Result> callback) {
 		if (type == ItemId.UNRECOGNIZED) {
 			throw new IllegalArgumentException("You cannot use item for UNRECOGNIZED");
 		}
@@ -149,10 +144,9 @@ public class ItemBag {
 	 * use an incense
 	 *
 	 * @param type type of item
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
+	 * @param callback an optional callback to handle results
 	 */
-	public void useIncense(ItemId type, PokeCallback<UseIncenseResponse.Result> callback) throws RemoteServerException, LoginFailedException {
+	public void useIncense(ItemId type, PokeCallback<UseIncenseResponse.Result> callback) {
 		UseIncenseMessage useIncenseMessage =
 				UseIncenseMessage.newBuilder()
 						.setIncenseType(type)
@@ -169,25 +163,21 @@ public class ItemBag {
 		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
-
 	/**
 	 * use an item with itemID
 	 *
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
+	 * @param callback an optional callback to handle results
 	 */
-	public void useIncense(PokeCallback<UseIncenseResponse.Result> callback) throws RemoteServerException, LoginFailedException {
+	public void useIncense(PokeCallback<UseIncenseResponse.Result> callback) {
 		useIncense(ItemId.ITEM_INCENSE_ORDINARY, callback);
 	}
 
 	/**
 	 * use a lucky egg
 	 *
-	 * @return the xp boost response
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
+	 * @param callback an optional callback to handle results
 	 */
-	public void useLuckyEgg(PokeCallback<UseItemXpBoostResponse> callback) throws RemoteServerException, LoginFailedException {
+	public void useLuckyEgg(PokeCallback<UseItemXpBoostResponse> callback) {
 		UseItemXpBoostMessage xpMsg = UseItemXpBoostMessage
 				.newBuilder()
 				.setItemId(ItemId.ITEM_LUCKY_EGG)
@@ -204,6 +194,11 @@ public class ItemBag {
 		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
+	/**
+	 * Set the items
+	 *
+	 * @param items the list of items
+     */
 	public void setItems(List<Item> items) {
 		synchronized (this.items) {
 			this.items.clear();
