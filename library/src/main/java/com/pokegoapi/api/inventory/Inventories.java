@@ -114,8 +114,8 @@ public class Inventories {
 					incubators.put(incubator.getId(),new EggIncubator(api, incubator));
 				}
 			}
-
-			lastInventoryUpdate = response.getInventoryDelta().getNewTimestampMs();
 		}
+
+		lastInventoryUpdate = response.getInventoryDelta().getNewTimestampMs();
 	}
 }
