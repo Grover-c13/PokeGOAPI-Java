@@ -207,7 +207,7 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws NoSuchItemException   the no such item exception
 	 */
-	public void catchPokemon(AsyncCatchOptions options, PokeCallback<CatchResult> callback)
+	public void catchPokemon(AsyncCatchOptions options, final PokeCallback<CatchResult> callback)
 			throws LoginFailedException, RemoteServerException, NoSuchItemException {
 		if (options != null) {
 			if (options.getUseRazzBerry() != 0) {
@@ -234,6 +234,7 @@ public class CatchablePokemon implements MapPoint {
 		} else {
 			options = new AsyncCatchOptions(api);
 		}
+
 		catchPokemon(options.getNormalizedHitPosition(),
 				options.getNormalizedReticleSize(),
 				options.getSpinModifier(),
@@ -254,7 +255,8 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws EncounterFailedException the encounter failed exception
 	 */
 	public void catchPokemon(EncounterResult encounter,
-							 AsyncCatchOptions options, PokeCallback<CatchResult> callback)
+							 AsyncCatchOptions options,
+							 final PokeCallback<CatchResult> callback)
 			throws LoginFailedException, RemoteServerException,
 			NoSuchItemException, EncounterFailedException {
 
