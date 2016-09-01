@@ -43,12 +43,9 @@ public class EggPokemon {
 	 * Incubate this egg.
 	 *
 	 * @param incubator : the incubator
-	 * @return status of putting egg in incubator
-	 * @throws LoginFailedException  if failed to login
-	 * @throws RemoteServerException if the server failed to respond
+	 * @param callback an optional callback to handle results
 	 */
-	public void incubate(EggIncubator incubator, PokeCallback<UseItemEggIncubatorResponse> callback)
-			throws LoginFailedException, RemoteServerException {
+	public void incubate(EggIncubator incubator, PokeCallback<UseItemEggIncubatorResponse> callback) {
 		if (incubator.isInUse()) {
 			throw new IllegalArgumentException("Incubator already used");
 		}
@@ -71,8 +68,6 @@ public class EggPokemon {
 			return proto.getEggKmWalkedTarget()
 					- (incubator.getKmTarget() - api.getPlayerProfile().getStats().getKmWalked());
 	}
-
-	// DELEGATE METHODS BELOW //
 
 	/**
 	 * Build a EggPokemon wrapper from the proto.
@@ -124,5 +119,4 @@ public class EggPokemon {
 
 		return false;
 	}
-	// TODO: add wrapper objects for encubators and allow to be got.
 }

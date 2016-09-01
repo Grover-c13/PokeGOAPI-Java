@@ -94,7 +94,7 @@ public class Gym implements MapPoint {
 		return new Battle(api, team, this);
 	}
 
-	private GetGymDetailsResponse details() throws LoginFailedException, RemoteServerException {
+	private GetGymDetailsResponse details() {
 		/*if (details == null) {
 			GetGymDetailsMessage reqMsg = GetGymDetailsMessage
 					.newBuilder()
@@ -121,29 +121,29 @@ public class Gym implements MapPoint {
 		return null;
 	}
 
-	public String getName() throws LoginFailedException, RemoteServerException {
+	public String getName() {
 		return details().getName();
 	}
 
-	public ProtocolStringList getUrlsList() throws LoginFailedException, RemoteServerException {
+	public ProtocolStringList getUrlsList() {
 		return details().getUrlsList();
 	}
 
-	public GetGymDetailsResponse.Result getResult() throws LoginFailedException, RemoteServerException {
+	public GetGymDetailsResponse.Result getResult() {
 		return details().getResult();
 	}
 
-	public boolean inRange() throws LoginFailedException, RemoteServerException {
+	public boolean inRange() {
 		GetGymDetailsResponse.Result result = getResult();
 		return (result != GetGymDetailsResponse.Result.ERROR_NOT_IN_RANGE);
 	}
 
-	public String getDescription() throws LoginFailedException, RemoteServerException {
+	public String getDescription() {
 		return details().getDescription();
 	}
 
 
-	public List<GymMembership> getGymMembers() throws LoginFailedException, RemoteServerException {
+	public List<GymMembership> getGymMembers() {
 		return details().getGymState().getMembershipsList();
 	}
 
@@ -151,10 +151,8 @@ public class Gym implements MapPoint {
 	 * Get a list of pokemon defending this gym.
 	 *
 	 * @return List of pokemon
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public List<PokemonData> getDefendingPokemon() throws LoginFailedException, RemoteServerException {
+	public List<PokemonData> getDefendingPokemon() {
 		List<PokemonData> data = new ArrayList<PokemonData>();
 
 		for (GymMembership gymMember : getGymMembers()) {
@@ -169,8 +167,6 @@ public class Gym implements MapPoint {
 	 *
 	 * @param pokemon The pokemon to deploy
 	 * @return Result of attempt to deploy pokemon
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public FortDeployPokemonResponse.Result deployPokemon(Pokemon pokemon) {
 		/*FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
