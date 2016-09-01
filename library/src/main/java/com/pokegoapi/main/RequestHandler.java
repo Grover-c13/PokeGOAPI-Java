@@ -36,7 +36,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class RequestHandler implements Runnable {
 	private static final String TAG = RequestHandler.class.getSimpleName();
@@ -47,6 +50,7 @@ public class RequestHandler implements Runnable {
 	private OkHttpClient client;
 	private Long requestId = new Random().nextLong();
 
+	ExecutorService decoupler = Executors.newCachedThreadPool();
 	/**
 	 * Instantiates a new Request handler.
 	 *
@@ -211,26 +215,33 @@ public class RequestHandler implements Runnable {
 
 			ServerRequest[] arrayServerRequests = serverRequests.toArray(new ServerRequest[serverRequests.size()]);
 
+
 			try {
 				authTicket = internalSendServerRequests(authTicket, arrayServerRequests);
-
-				try {
-					request.fire(arrayServerRequests[0].getData());
-				} catch (InvalidProtocolBufferException e) {
-					request.fire(e);
-				}
-
-				// Assuming all the bunded requests are commons
-				if (arrayServerRequests.length > 1) {
-					for (int i = 1; i != arrayServerRequests.length; i++) {
+				final AsyncServerRequest<GeneratedMessage,Object> current = request;
+				decoupler.execute(new Runnable() {
+					@Override
+					public void run() {
 						try {
-							CommonRequest.parse(api, arrayServerRequests[i].getType(),
-									arrayServerRequests[i].getData());
+							current.fire(arrayServerRequests[0].getData());
 						} catch (InvalidProtocolBufferException e) {
-							//TODO: notify error even in case of common requests?
+							current.fire(e);
+						}
+
+						// Assuming all the bunded requests are commons
+						if (arrayServerRequests.length > 1) {
+							for (int i = 1; i != arrayServerRequests.length; i++) {
+								try {
+									CommonRequest.parse(api, arrayServerRequests[i].getType(),
+											arrayServerRequests[i].getData());
+								} catch (InvalidProtocolBufferException e) {
+									//TODO: notify error even in case of common requests?
+								}
+							}
 						}
 					}
-				}
+				});
+
 				continue;
 			} catch (RemoteServerException | LoginFailedException e) {
 				request.fire(e);
