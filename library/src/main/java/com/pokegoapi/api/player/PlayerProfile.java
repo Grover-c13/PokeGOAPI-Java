@@ -100,6 +100,8 @@ public class PlayerProfile {
 				new PokeAFunc<GetPlayerResponse, Void>() {
 					@Override
 					public Void exec(GetPlayerResponse response) {
+						parseData(response.getPlayerData());
+
 						ArrayList<TutorialStateOuterClass.TutorialState> tutorialStates =
 								getTutorialState().getTutorialStates();
 						if (tutorialStates.isEmpty()) {
