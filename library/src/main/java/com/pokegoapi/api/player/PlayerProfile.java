@@ -23,18 +23,23 @@ import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
 import POGOProtos.Enums.GenderOuterClass.Gender;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Enums.TutorialStateOuterClass;
+import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
 import POGOProtos.Networking.Requests.Messages.CheckChallenge;
 import POGOProtos.Networking.Requests.Messages.ClaimCodenameMessageOuterClass.ClaimCodenameMessage;
 import POGOProtos.Networking.Requests.Messages.EncounterTutorialCompleteMessageOuterClass.EncounterTutorialCompleteMessage;
-import POGOProtos.Networking.Requests.Messages.EquipBadgeMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
 import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass.MarkTutorialCompleteMessage;
 import POGOProtos.Networking.Requests.Messages.SetAvatarMessageOuterClass.SetAvatarMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
+import POGOProtos.Networking.Responses.ClaimCodenameResponseOuterClass.ClaimCodenameResponse;
+import POGOProtos.Networking.Responses.EncounterTutorialCompleteResponseOuterClass.EncounterTutorialCompleteResponse;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
+
+import com.google.protobuf.GeneratedMessage;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Item;
+import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Stats;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -44,6 +49,11 @@ import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.PokeAFunc;
+import com.pokegoapi.util.PokeCallback;
+
+import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
+import POGOProtos.Networking.Responses.MarkTutorialCompleteResponseOuterClass.MarkTutorialCompleteResponse;
+import POGOProtos.Networking.Responses.SetAvatarResponseOuterClass.SetAvatarResponse;
 import lombok.Setter;
 
 import java.security.SecureRandom;
@@ -76,57 +86,69 @@ public class PlayerProfile {
 		this.playerLocale = new PlayerLocale();
 
 		if (playerData == null) {
-			updateProfile();
+			initProfile();
 		}
 	}
 
 	/**
-	 * Updates the player profile with the latest data.
+	 * Init the player profile.
 	 */
-	public void updateProfile() {
+	private void initProfile() {
 		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
 				.setPlayerLocale(playerLocale.getPlayerLocale())
 				.build();
 
-		AsyncServerRequest getPlayerServerRequest = new AsyncServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg, new PokeAFunc<GetPlayerResponse, Void>() {
-			@Override
-			public Void exec(GetPlayerResponse response) {
-				ArrayList<TutorialStateOuterClass.TutorialState> tutorialStates =
-						getTutorialState().getTutorialStates();
-				if (tutorialStates.isEmpty()) {
-					activateAccount();
-				}
+		AsyncServerRequest getPlayerServerRequest = new AsyncServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg,
+				new PokeAFunc<GetPlayerResponse, Void>() {
+					@Override
+					public Void exec(GetPlayerResponse response) {
+						ArrayList<TutorialStateOuterClass.TutorialState> tutorialStates =
+								getTutorialState().getTutorialStates();
+						if (tutorialStates.isEmpty()) {
+							activateAccount();
+						}
 
-				if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION)) {
-					setupAvatar();
-				}
+						if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION)) {
+							setupAvatar();
+						}
 
-				if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.POKEMON_CAPTURE)) {
-					encounterTutorialComplete();
-				}
+						if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.POKEMON_CAPTURE)) {
+							encounterTutorialComplete();
+						}
 
-				if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.NAME_SELECTION)) {
-					claimCodeName();
-				}
+						if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.NAME_SELECTION)) {
+							claimCodeName();
+						}
 
-				if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
-					firstTimeExperienceComplete();
-				}
-				return null;
-			}
-		}, null).addCommonRequest(new ServerRequest(RequestType.CHECK_CHALLENGE,
+						if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
+							firstTimeExperienceComplete();
+						}
+						return null;
+					}
+				}, null).addCommonRequest(new ServerRequest(RequestType.CHECK_CHALLENGE,
 				CheckChallenge.CheckChallengeMessage.getDefaultInstance()));
 		api.getRequestHandler().sendAsyncServerRequests(getPlayerServerRequest);
-
 	}
 
 	/**
-	 * Update the profile with the given response
+	 * Update profile
 	 *
-	 * @param playerResponse the response
+	 * @param callback an optional callback to handle results
 	 */
-	public void updateProfile(GetPlayerResponse playerResponse) {
-		updateProfile(playerResponse.getPlayerData());
+	private void updateProfile(PokeCallback<PlayerProfile> callback) {
+		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
+				.setPlayerLocale(playerLocale.getPlayerLocale())
+				.build();
+
+		AsyncServerRequest getPlayerServerRequest = new AsyncServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg,
+				new PokeAFunc<GetPlayerResponse, PlayerProfile>() {
+					@Override
+					public PlayerProfile exec(GetPlayerResponse response) {
+						parseData(response.getPlayerData());
+						return PlayerProfile.this;
+					}
+				}, callback, api);
+		api.getRequestHandler().sendAsyncServerRequests(getPlayerServerRequest);
 	}
 
 	/**
@@ -134,7 +156,7 @@ public class PlayerProfile {
 	 *
 	 * @param playerData the data for update
 	 */
-	public void updateProfile(PlayerData playerData) {
+	private void parseData(PlayerData playerData) {
 		this.playerData = playerData;
 
 		avatar = new PlayerAvatar(playerData.getAvatar());
@@ -160,43 +182,35 @@ public class PlayerProfile {
 	 * The rewarded items are automatically inserted into the players item bag.
 	 *
 	 * @param level the trainer level that you want to accept the rewards for
-	 * @return a PlayerLevelUpRewards object containing information about the items rewarded and unlocked for this level
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
+	 * @param callback an optional callback to handle results
 	 * @see PlayerLevelUpRewards
 	 */
-	public void acceptLevelUpRewards(int level) throws RemoteServerException, LoginFailedException {
+	public void acceptLevelUpRewards(int level, PokeCallback<PlayerLevelUpRewards> callback) {
 		// Check if we even have achieved this level yet
 		if (level > stats.getLevel()) {
-			return new PlayerLevelUpRewards(PlayerLevelUpRewards.Status.NOT_UNLOCKED_YET);
+			callback.onResponse(new PlayerLevelUpRewards(PlayerLevelUpRewards.Status.NOT_UNLOCKED_YET));
+			return;
 		}
+
 		LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder()
 				.setLevel(level)
 				.build();
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.LEVEL_UP_REWARDS, msg, api);
-		return AsyncHelper.toBlocking(
-				api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, PlayerLevelUpRewards>() {
-
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.LEVEL_UP_REWARDS, msg,
+				new PokeAFunc<LevelUpRewardsResponse, PlayerLevelUpRewards>() {
 					@Override
-					public PlayerLevelUpRewards call(ByteString bytes) {
-						LevelUpRewardsResponse response;
-						try {
-							response = LevelUpRewardsResponse.parseFrom(bytes);
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
-						}
+					public PlayerLevelUpRewards exec(LevelUpRewardsResponse response) {
 						// Add the awarded items to our bag
 						ItemBag bag = api.getInventories().getItemBag();
 						for (ItemAward itemAward : response.getItemsAwardedList()) {
 							Item item = bag.getItem(itemAward.getItemId());
 							item.setCount(item.getCount() + itemAward.getItemCount());
 						}
+
 						// Build a new rewards object and return it
 						return new PlayerLevelUpRewards(response);
 					}
-				})
-		);
-
+				}, callback, api);
+		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
@@ -212,33 +226,6 @@ public class PlayerProfile {
 		} catch (Exception e) {
 			throw new InvalidCurrencyException();
 		}
-	}
-
-
-	public void equipBadgeAsync(CheckAwardedBadgesResponse response) {
-		if (response.getSuccess()) {
-			for (int i = 0; i < response.getAwardedBadgesCount(); i++) {
-				EquipBadgeMessageOuterClass.EquipBadgeMessage msg1 = EquipBadgeMessageOuterClass.EquipBadgeMessage.newBuilder()
-						.setBadgeType(response.getAwardedBadges(i))
-						.setBadgeTypeValue(response.getAwardedBadgeLevels(i)).build();
-				AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.EQUIP_BADGE, msg1, api);
-				return
-						api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, Void>() {
-							@Override
-							public Void call(ByteString bytes) {
-								EquipBadgeResponseOuterClass.EquipBadgeResponse response1;
-								try {
-									response1 = EquipBadgeResponseOuterClass.EquipBadgeResponse.parseFrom(bytes);
-									badge = response1.getEquipped();
-								} catch (InvalidProtocolBufferException e) {
-									throw new AsyncRemoteServerException(e);
-								}
-								return null;
-							}
-						});
-			}
-		}
-		return null;
 	}
 
 	/**
@@ -323,15 +310,19 @@ public class PlayerProfile {
 
 	/**
 	 * Set the account to legal screen in order to receive valid response
+	 *
+	 * @param callback an optional callback to handle results
 	 */
-	public void activateAccount() {
-		markTutorial(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN);
+	public void activateAccount(PokeCallback<PlayerProfile> callback) {
+		markTutorial(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN, callback);
 	}
 
 	/**
 	 * Setup an avatar for the current account
+
+	 * @param callback an optional callback to handle results
 	 */
-	public void setupAvatar() {
+	public void setupAvatar(PokeCallback<SetAvatarResponse.Status> callback) {
 		Random random = new Random();
 
 		final PlayerAvatarOuterClass.PlayerAvatar.Builder playerAvatarBuilder =
@@ -354,34 +345,30 @@ public class PlayerProfile {
 				.setPlayerAvatar(playerAvatarBuilder.build())
 				.build();
 
-		AsyncServerRequest request = new AsyncServerRequest(RequestType.SET_AVATAR, setAvatarMessage)
-				.addCommonRequest(CommonRequest.getCommonRequests(api));
-
-		api.getRequestHandler().sendAsyncServerRequests(request)
-				.map(new Func1<ByteString, Void>() {
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.SET_AVATAR, setAvatarMessage,
+				new PokeAFunc<SetAvatarResponse, SetAvatarResponse.Status>() {
 					@Override
-					public Void call(ByteString byteString) {
-						try {
-							SetAvatarResponse setAvatarResponse = SetAvatarResponse.parseFrom(byteString);
-							playerData = setAvatarResponse.getPlayerData();
+					public SetAvatarResponse.Status exec(SetAvatarResponse response) {
+						parseData(response.getPlayerData());
 
-							updateProfile(playerData);
-
-							markTutorial(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION);
-
-							api.fireRequestBlockTwo();
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
+						if (response.getStatus() == SetAvatarResponse.Status.SUCCESS) {
+							markTutorial(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION, null);
 						}
-						return null;
+
+						api.fireRequestBlockTwo();
+
+						return response.getStatus();
 					}
-				});
+				}, callback, api);
+		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
 	 * Encounter tutorial complete. In other words, catch the first Pokémon
+
+	 * @param callback an optional callback to handle results
 	 */
-	public void encounterTutorialComplete() {
+	public void encounterTutorialComplete(PokeCallback<EncounterTutorialCompleteResponse.Result> callback) {
 		Random random = new Random();
 		int pokemonId = random.nextInt(4);
 
@@ -390,93 +377,88 @@ public class PlayerProfile {
 						.setPokemonId(pokemonId == 1 ? PokemonId.BULBASAUR :
 								pokemonId == 2 ? PokemonId.CHARMANDER : PokemonId.SQUIRTLE);
 
-		AsyncServerRequest encounterTutorialRequest = new AsyncServerRequest(
-				RequestType.ENCOUNTER_TUTORIAL_COMPLETE, encounterTutorialCompleteBuilder.build())
+		AsyncServerRequest serverRequest = new AsyncServerRequest(
+				RequestType.ENCOUNTER_TUTORIAL_COMPLETE, encounterTutorialCompleteBuilder.build(),
+				new PokeAFunc<EncounterTutorialCompleteResponse, EncounterTutorialCompleteResponse.Result>() {
+					@Override
+					public EncounterTutorialCompleteResponse.Result exec(EncounterTutorialCompleteResponse response) {
+						if (response.getResult() == EncounterTutorialCompleteResponse.Result.SUCCESS) {
+							updateProfile(null);
+						}
+
+						return response.getResult();
+					}
+				}, callback)
 				.addCommonRequest(new ServerRequest(RequestType.CHECK_CHALLENGE,
 						CheckChallenge.CheckChallengeMessage.getDefaultInstance()));
-
-		api.getRequestHandler().sendAsyncServerRequests(encounterTutorialRequest)
-				.map(new Func1<ByteString, Void>() {
-					@Override
-					public Void call(ByteString byteString) {
-						return null;
-					}
-				});
-
-		updateProfileAsync();
+		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
 	 * Setup an user name for our account
+	 *
+	 * @param callback an optional callback to handle results
 	 */
-	public void claimCodeName() {
+	public void claimCodeName(final PokeCallback<ClaimCodenameResponse.Status> callback) {
 		ClaimCodenameMessage claimCodenameMessage = ClaimCodenameMessage.newBuilder()
 				.setCodename(randomCodenameGenerator())
 				.build();
 
-		AsyncServerRequest getPlayerRequest = new AsyncServerRequest(
-				RequestType.CLAIM_CODENAME, claimCodenameMessage)
-				.addCommonRequest(CommonRequest.getCommonRequests(api));
-
-		api.getRequestHandler().sendAsyncServerRequests(getPlayerRequest)
-				.map(new Func1<ByteString, Void>() {
+		AsyncServerRequest serverRequest = new AsyncServerRequest(
+				RequestType.CLAIM_CODENAME, claimCodenameMessage,
+				new PokeAFunc<ClaimCodenameResponse, ClaimCodenameResponse.Status>() {
 					@Override
-					public Void call(ByteString byteString) {
+					public ClaimCodenameResponse.Status exec(ClaimCodenameResponse response) {
 						String updatedCodename = null;
-
-						try {
-							ClaimCodenameResponse claimCodenameResponse = ClaimCodenameResponse.parseFrom(byteString);
-							if (claimCodenameResponse.getStatus() != ClaimCodenameResponse.Status.SUCCESS) {
-								if (claimCodenameResponse.getUpdatedPlayer().getRemainingCodenameClaims() > 0) {
-									claimCodeName();
-								}
-							} else {
-								updatedCodename = claimCodenameResponse.getCodename();
-								updateProfile(claimCodenameResponse.getUpdatedPlayer());
+						if (response.getStatus() != ClaimCodenameResponse.Status.SUCCESS) {
+							if (response.getUpdatedPlayer().getRemainingCodenameClaims() > 0) {
+								claimCodeName(callback);
 							}
-
-							if (updatedCodename != null) {
-								markTutorial(TutorialStateOuterClass.TutorialState.NAME_SELECTION);
-								updateProfileAsync();
-							}
-						} catch (InvalidProtocolBufferException e) {
-							e.printStackTrace();
+						} else {
+							updatedCodename = response.getCodename();
+							parseData(response.getUpdatedPlayer());
 						}
-						return null;
+
+						if (updatedCodename != null) {
+							markTutorial(TutorialStateOuterClass.TutorialState.NAME_SELECTION, null);
+							updateProfile(null);
+						}
+						return response.getStatus();
 					}
-				});
+				}, callback, api);
+		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	/**
 	 * The last step, mark the last tutorial state as completed
+	 *
+	 * @param callback an optional callback to handle results
 	 */
-	public void firstTimeExperienceComplete() {
-		markTutorial(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE);
+	public void firstTimeExperienceComplete(PokeCallback<PlayerProfile> callback) {
+		markTutorial(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE, callback);
 	}
 
-	private void markTutorial(TutorialStateOuterClass.TutorialState state) {
+	/**
+	 * Mark the tutorial state as complete
+	 *
+	 * @param state
+	 * @param callback an optional callback to handle results
+	 */
+	private void markTutorial(TutorialStateOuterClass.TutorialState state, PokeCallback<PlayerProfile> callback) {
 		final MarkTutorialCompleteMessage tutorialMessage = MarkTutorialCompleteMessage.newBuilder()
 				.addTutorialsCompleted(state)
 				.setSendMarketingEmails(false)
 				.setSendPushNotifications(false).build();
 
-		AsyncServerRequest request = new AsyncServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialMessage)
-				.addCommonRequest(CommonRequest.getCommonRequests(api));
-
-		api.getRequestHandler().sendAsyncServerRequests(request)
-				.map(new Func1<ByteString, Void>() {
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialMessage,
+				new PokeAFunc<MarkTutorialCompleteResponse, PlayerProfile>() {
 					@Override
-					public Void call(ByteString byteString) {
-						try {
-							playerData = MarkTutorialCompleteResponse.parseFrom(byteString).getPlayerData();
-
-							updateProfile(playerData);
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
-						}
-						return null;
+					public PlayerProfile exec(MarkTutorialCompleteResponse response) {
+						parseData(response.getPlayerData());
+						return PlayerProfile.this;
 					}
-				});
+				}, callback, api);
+		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
 
 	private static String randomCodenameGenerator() {
@@ -488,28 +470,5 @@ public class PlayerProfile {
 			sb.append(a.charAt(r.nextInt(a.length())));
 		}
 		return sb.toString();
-	}
-
-	private void updateProfileAsync() {
-		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
-				.setPlayerLocale(playerLocale.getPlayerLocale())
-				.build();
-
-		AsyncServerRequest getPlayerServerRequest = new AsyncServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg)
-				.addCommonRequest(CommonRequest.getCommonRequests(api));
-
-		api.getRequestHandler().sendAsyncServerRequests(getPlayerServerRequest)
-				.map(new Func1<ByteString, Void>() {
-					@Override
-					public Void call(ByteString byteString) {
-						try {
-							GetPlayerResponse getPlayerResponse = GetPlayerResponse.parseFrom(byteString);
-							updateProfile(getPlayerResponse);
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
-						}
-						return null;
-					}
-				});
 	}
 }

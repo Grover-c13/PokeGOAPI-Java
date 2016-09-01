@@ -81,17 +81,20 @@ public class AsyncServerRequest<T extends GeneratedMessage, K> {
 			try {
 				response = func.exec(data);
 			} catch (Throwable e) {
-				callback.onError(e);
+				if (callback != null) {
+					callback.onError(e);
+				}
 			}
 		}
 
-		if (callback != null)
+		if (callback != null) {
 			callback.onResponse(response);
+		}
 	}
 
 	public void fire(Throwable e) {
-		if (callback == null)
-			return;
-		callback.onError(e);
+		if (callback != null) {
+			callback.onError(e);
+		}
 	}
 }
