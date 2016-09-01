@@ -525,16 +525,13 @@ public class CatchablePokemon implements MapPoint {
 					throw new AsyncRemoteServerException(e);
 				}
 
-
 				// pokemon is caught of flees
 				if (response.getStatus() == CatchStatus.CATCH_FLEE
 						|| response.getStatus() == CatchStatus.CATCH_SUCCESS) {
-					api.getMap().removeCatchable(instance);
+					//TODO: api.getMap().removeCatchable(instance);
 				}
 
-				CatchResult res = new CatchResult(response);
-				return res;
-
+				return new CatchResult(response);
 			}
 		});
 	}
@@ -546,7 +543,6 @@ public class CatchablePokemon implements MapPoint {
 	 * @return CatchItemResult info about the new modifiers about the pokemon (can move, item capture multi) eg
 	 */
 	public Observable<CatchItemResult> useItemAsync(ItemId item) {
-
 		UseItemCaptureMessage reqMsg = UseItemCaptureMessage
 				.newBuilder()
 				.setEncounterId(this.getEncounterId())

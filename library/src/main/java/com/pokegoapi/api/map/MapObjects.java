@@ -180,8 +180,6 @@ public class MapObjects {
 		return complete;
 	}
 
-
-
 	public Set<CatchablePokemon> getAllCatchablePokemons() {
 		Set<CatchablePokemon> catchablePokemons = new HashSet<>();
 		for (MapPokemon mapPokemon : getCatchablePokemons()) {

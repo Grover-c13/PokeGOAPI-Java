@@ -1,12 +1,11 @@
 package com.pokegoapi.util;
 
-import com.pokegoapi.api.map.MapObjects;
 import rx.Subscriber;
 
 /**
  * Created by rama on 31/08/16.
  */
-public abstract class PokeCallback<T> {
+public abstract class PokeAFunc<T> {
 
 	public abstract void onError(Throwable e);
 
