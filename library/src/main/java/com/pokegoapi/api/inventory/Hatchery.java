@@ -55,11 +55,9 @@ public class Hatchery {
 	/**
 	 * Get if eggs has hatched.
 	 *
-	 * @return list of hatched eggs
-	 * @throws RemoteServerException e
-	 * @throws LoginFailedException  e
+	 * @param callback an optional callback to handle results
 	 */
-	public void queryHatchedEggs(PokeCallback<List<HatchedEgg>> callback) throws RemoteServerException, LoginFailedException {
+	public void queryHatchedEggs(PokeCallback<List<HatchedEgg>> callback) {
 		GetHatchedEggsMessage msg = GetHatchedEggsMessage.newBuilder().build();
 
 		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.GET_HATCHED_EGGS, msg, new PokeAFunc<GetHatchedEggsResponse, List<HatchedEgg>>() {
@@ -75,7 +73,6 @@ public class Hatchery {
 				return eggs;
 			}
 		}, callback, api);
-
+		api.getRequestHandler().sendAsyncServerRequests(serverRequest);
 	}
-
 }

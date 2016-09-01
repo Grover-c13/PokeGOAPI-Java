@@ -59,7 +59,6 @@ public class Map {
 	 * Returns the cells requested.
 	 *
 	 * @param cellIds List of cellId
-	 * @return MapObjects in the given cells
 	 */
 	private void getMapObjects(List<Long> cellIds, PokeCallback<MapObjects> callback) {
 		lastMapUpdate = api.currentTimeMillis();

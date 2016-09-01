@@ -22,8 +22,6 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.EggPokemon;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.util.PokeAFunc;
 import com.pokegoapi.util.PokeCallback;
@@ -56,13 +54,9 @@ public class EggIncubator {
 	 * Hatch an egg.
 	 *
 	 * @param egg the egg
-	 * @return status of putting egg in incubator
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
+	 * @param callback an optional callback to handle results
 	 */
-	public void hatchEgg(EggPokemon egg, PokeCallback<UseItemEggIncubatorResponse> callback)
-			throws LoginFailedException, RemoteServerException {
-
+	public void hatchEgg(EggPokemon egg, PokeCallback<UseItemEggIncubatorResponse> callback) {
 		UseItemEggIncubatorMessage reqMsg = UseItemEggIncubatorMessage.newBuilder()
 				.setItemId(proto.getId())
 				.setPokemonId(egg.getId())

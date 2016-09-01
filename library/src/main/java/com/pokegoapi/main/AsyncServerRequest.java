@@ -41,7 +41,6 @@ public class AsyncServerRequest<T extends GeneratedMessage, K> {
 	private final PokeCallback<K> callback;
 	private final PokeAFunc<T, K> func;
 
-
 	/**
 	 * Instantiates a new Server request.
 	 *

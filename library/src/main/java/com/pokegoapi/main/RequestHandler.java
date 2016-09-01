@@ -199,12 +199,12 @@ public class RequestHandler implements Runnable {
 		while (true) {
 			try {
 				request = workQueue.take();
-			} catch (Throwable e) {
-
+			} catch (Throwable ignored) {
 			}
 
-			if (request == null)
+			if (request == null) {
 				continue;
+			}
 
 			ArrayList<ServerRequest> serverRequests = new ArrayList<>();
 
@@ -249,8 +249,7 @@ public class RequestHandler implements Runnable {
 			} finally {
 				try {
 					Thread.sleep(350);
-				} catch (InterruptedException e) {
-
+				} catch (InterruptedException ignored) {
 				}
 			}
 		}
