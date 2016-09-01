@@ -164,13 +164,14 @@ public class CatchablePokemon implements MapPoint {
 				.setPlayerLongitude(api.getLongitude())
 				.setSpawnPointId(getSpawnPointId()).build();
 		new AsyncServerRequest(
-				RequestType.ENCOUNTER, reqMsg, new PokeAFunc<EncounterResponse, NormalEncounterResult>() {
-			@Override
-			public NormalEncounterResult exec(EncounterResponse response) {
-				encountered = response.getStatus() == EncounterResponse.Status.ENCOUNTER_SUCCESS;
-				return new NormalEncounterResult(api, response);
-			}
-		}, callback, api);
+				RequestType.ENCOUNTER, reqMsg,
+				new PokeAFunc<EncounterResponse, NormalEncounterResult>() {
+					@Override
+					public NormalEncounterResult exec(EncounterResponse response) {
+						encountered = response.getStatus() == EncounterResponse.Status.ENCOUNTER_SUCCESS;
+						return new NormalEncounterResult(api, response);
+					}
+				}, callback, api);
 	}
 
 	/**
@@ -184,13 +185,14 @@ public class CatchablePokemon implements MapPoint {
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
 				.setFortId(getSpawnPointId()).build();
-		new AsyncServerRequest(RequestType.DISK_ENCOUNTER, reqMsg, new PokeAFunc<DiskEncounterResponseOuterClass.DiskEncounterResponse, DiskEncounterResult>() {
-			@Override
-			public DiskEncounterResult exec(DiskEncounterResponseOuterClass.DiskEncounterResponse response) {
-				encountered = response.getResult() == DiskEncounterResponseOuterClass.DiskEncounterResponse.Result.SUCCESS;
-				return new DiskEncounterResult(api, response);
-			}
-		}, callback, api);
+		new AsyncServerRequest(RequestType.DISK_ENCOUNTER, reqMsg,
+				new PokeAFunc<DiskEncounterResponseOuterClass.DiskEncounterResponse, DiskEncounterResult>() {
+					@Override
+					public DiskEncounterResult exec(DiskEncounterResponseOuterClass.DiskEncounterResponse response) {
+						encountered = response.getResult() == DiskEncounterResponseOuterClass.DiskEncounterResponse.Result.SUCCESS;
+						return new DiskEncounterResult(api, response);
+					}
+				}, callback, api);
 	}
 
 	/**
@@ -246,9 +248,8 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws NoSuchItemException      the no such item exception
 	 * @throws EncounterFailedException the encounter failed exception
 	 */
-	public void catchPokemon(EncounterResult encounter,
-							 AsyncCatchOptions options,
-							 final PokeCallback<CatchResult> callback)
+	public void catchPokemon(EncounterResult encounter, AsyncCatchOptions options,
+								final PokeCallback<CatchResult> callback)
 			throws NoSuchItemException, EncounterFailedException {
 
 		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
@@ -293,7 +294,7 @@ public class CatchablePokemon implements MapPoint {
 	 * @param callback an optional callback to handle results
 	 */
 	public void catchPokemon(double normalizedHitPosition, double normalizedReticleSize,
-							 double spinModifier, Pokeball type, PokeCallback<CatchResult> callback) {
+								double spinModifier, Pokeball type, PokeCallback<CatchResult> callback) {
 		if (!isEncountered()) {
 			return;
 		}
@@ -306,12 +307,13 @@ public class CatchablePokemon implements MapPoint {
 				.setSpinModifier(spinModifier)
 				.setPokeball(type.getBallType()).build();
 		new AsyncServerRequest(
-				RequestType.CATCH_POKEMON, reqMsg, new PokeAFunc<CatchPokemonResponseOuterClass.CatchPokemonResponse, CatchResult>() {
-			@Override
-			public CatchResult exec(CatchPokemonResponseOuterClass.CatchPokemonResponse response) {
-				return new CatchResult(response);
-			}
-		}, callback, api);
+				RequestType.CATCH_POKEMON, reqMsg,
+				new PokeAFunc<CatchPokemonResponseOuterClass.CatchPokemonResponse, CatchResult>() {
+					@Override
+					public CatchResult exec(CatchPokemonResponseOuterClass.CatchPokemonResponse response) {
+						return new CatchResult(response);
+					}
+				}, callback, api);
 	}
 
 	/**

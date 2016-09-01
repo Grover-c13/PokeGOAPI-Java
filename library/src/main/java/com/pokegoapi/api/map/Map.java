@@ -74,40 +74,41 @@ public class Map {
 		}
 
 		new AsyncServerRequest(
-				RequestType.GET_MAP_OBJECTS, builder.build(), new PokeAFunc<GetMapObjectsResponseOuterClass.GetMapObjectsResponse,MapObjects>() {
-			@Override
-			public MapObjects exec(GetMapObjectsResponseOuterClass.GetMapObjectsResponse response) {
-				MapObjects result = new MapObjects(api);
-				for (MapCellOuterClass.MapCell mapCell : response.getMapCellsList()) {
-					result.addNearbyPokemons(mapCell.getNearbyPokemonsList());
-					result.addCatchablePokemons(mapCell.getCatchablePokemonsList());
-					result.addWildPokemons(mapCell.getWildPokemonsList());
-					result.addDecimatedSpawnPoints(mapCell.getDecimatedSpawnPointsList());
-					result.addSpawnPoints(mapCell.getSpawnPointsList());
+				RequestType.GET_MAP_OBJECTS, builder.build(),
+				new PokeAFunc<GetMapObjectsResponseOuterClass.GetMapObjectsResponse,MapObjects>() {
+					@Override
+					public MapObjects exec(GetMapObjectsResponseOuterClass.GetMapObjectsResponse response) {
+						MapObjects result = new MapObjects(api);
+						for (MapCellOuterClass.MapCell mapCell : response.getMapCellsList()) {
+							result.addNearbyPokemons(mapCell.getNearbyPokemonsList());
+							result.addCatchablePokemons(mapCell.getCatchablePokemonsList());
+							result.addWildPokemons(mapCell.getWildPokemonsList());
+							result.addDecimatedSpawnPoints(mapCell.getDecimatedSpawnPointsList());
+							result.addSpawnPoints(mapCell.getSpawnPointsList());
 
-					HashSet<FortDataOuterClass.FortData> gyms = new HashSet<>();
-					HashSet<FortDataOuterClass.FortData> pokestops = new HashSet<>();
+							HashSet<FortDataOuterClass.FortData> gyms = new HashSet<>();
+							HashSet<FortDataOuterClass.FortData> pokestops = new HashSet<>();
 
-					for (FortDataOuterClass.FortData fortData : mapCell.getFortsList()) {
-						if (fortData.getType() == FortTypeOuterClass.FortType.CHECKPOINT) {
-							pokestops.add(fortData);
-						} else if (fortData.getType() == FortTypeOuterClass.FortType.GYM) {
-							gyms.add(fortData);
+							for (FortDataOuterClass.FortData fortData : mapCell.getFortsList()) {
+								if (fortData.getType() == FortTypeOuterClass.FortType.CHECKPOINT) {
+									pokestops.add(fortData);
+								} else if (fortData.getType() == FortTypeOuterClass.FortType.GYM) {
+									gyms.add(fortData);
+								}
+							}
+
+							result.addGyms(gyms);
+							result.addPokestops(pokestops);
 						}
+
+						return result;
 					}
-
-					result.addGyms(gyms);
-					result.addPokestops(pokestops);
-				}
-
-				return result;
-			}
-		}, callback, api);
+				}, callback, api);
 	}
 
 	/**
 	 * Request a MapObjects around your current location.
-	 * 
+	 *
 	 * @param callback an optional callback to handle results
 	 */
 	public void getMapObjects(final PokeCallback<MapObjects> callback) {

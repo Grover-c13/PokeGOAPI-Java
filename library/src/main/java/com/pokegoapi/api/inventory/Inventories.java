@@ -86,7 +86,8 @@ public class Inventories {
 			}
 
 			// items
-			if (itemData.getItem().getItemId() != ItemId.UNRECOGNIZED && itemData.getItem().getItemId() != ItemId.ITEM_UNKNOWN) {
+			if (itemData.getItem().getItemId() != ItemId.UNRECOGNIZED
+					&& itemData.getItem().getItemId() != ItemId.ITEM_UNKNOWN) {
 				itemBag.addItem(new Item(itemData.getItem()));
 			}
 

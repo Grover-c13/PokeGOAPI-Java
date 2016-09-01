@@ -60,18 +60,19 @@ public class Hatchery {
 	public void queryHatchedEggs(PokeCallback<List<HatchedEgg>> callback) {
 		GetHatchedEggsMessage msg = GetHatchedEggsMessage.newBuilder().build();
 
-		new AsyncServerRequest(RequestType.GET_HATCHED_EGGS, msg, new PokeAFunc<GetHatchedEggsResponse, List<HatchedEgg>>() {
-			@Override
-			public List<HatchedEgg> exec(GetHatchedEggsResponse response) {
-				List<HatchedEgg> eggs = new ArrayList<HatchedEgg>();
-				for (int i = 0; i < response.getPokemonIdCount(); i++) {
-					eggs.add(new HatchedEgg(response.getPokemonId(i),
-							response.getExperienceAwarded(i),
-							response.getCandyAwarded(i),
-							response.getStardustAwarded(i)));
-				}
-				return eggs;
-			}
-		}, callback, api);
+		new AsyncServerRequest(RequestType.GET_HATCHED_EGGS, msg,
+				new PokeAFunc<GetHatchedEggsResponse, List<HatchedEgg>>() {
+					@Override
+					public List<HatchedEgg> exec(GetHatchedEggsResponse response) {
+						List<HatchedEgg> eggs = new ArrayList<HatchedEgg>();
+						for (int i = 0; i < response.getPokemonIdCount(); i++) {
+							eggs.add(new HatchedEgg(response.getPokemonId(i),
+									response.getExperienceAwarded(i),
+									response.getCandyAwarded(i),
+									response.getStardustAwarded(i)));
+						}
+						return eggs;
+					}
+				}, callback, api);
 	}
 }

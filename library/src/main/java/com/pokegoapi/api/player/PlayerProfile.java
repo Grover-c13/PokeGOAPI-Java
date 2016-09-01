@@ -132,46 +132,6 @@ public class PlayerProfile {
 				}, null, api, CommonRequest.getDefaultCheckChallenge());
 	}
 
-	private void activateAccount() {
-		activateAccount(new PokeCallback<PlayerProfile>() {
-			@Override
-			public void onResponse(PlayerProfile result) {
-				setupAvatar();
-			}
-		});
-	}
-
-	private void setupAvatar() {
-		setupAvatar(new PokeCallback<SetAvatarResponse.Status>() {
-			@Override
-			public void onResponse(SetAvatarResponse.Status result) {
-				encounterTutorialComplete();
-			}
-		});
-	}
-
-	private void encounterTutorialComplete() {
-		encounterTutorialComplete(new PokeCallback<EncounterTutorialCompleteResponse.Result>() {
-			@Override
-			public void onResponse(EncounterTutorialCompleteResponse.Result result) {
-				claimCodeName();
-			}
-		});
-	}
-
-	private void claimCodeName() {
-		claimCodeName(new PokeCallback<ClaimCodenameResponse.Status>() {
-			@Override
-			public void onResponse(ClaimCodenameResponse.Status result) {
-				firstTimeExperienceComplete();
-			}
-		});
-	}
-
-	private void firstTimeExperienceComplete() {
-		firstTimeExperienceComplete(null);
-	}
-
 	/**
 	 * Update profile
 	 *
@@ -349,6 +309,18 @@ public class PlayerProfile {
 	}
 
 	/**
+	 * Internal call for account activation
+	 */
+	private void activateAccount() {
+		activateAccount(new PokeCallback<PlayerProfile>() {
+			@Override
+			public void onResponse(PlayerProfile result) {
+				setupAvatar();
+			}
+		});
+	}
+
+	/**
 	 * Set the account to legal screen in order to receive valid response
 	 *
 	 * @param callback an optional callback to handle results
@@ -358,8 +330,20 @@ public class PlayerProfile {
 	}
 
 	/**
-	 * Setup an avatar for the current account
+	 * Internal call for avatar setup
+	 */
+	private void setupAvatar() {
+		setupAvatar(new PokeCallback<SetAvatarResponse.Status>() {
+			@Override
+			public void onResponse(SetAvatarResponse.Status result) {
+				encounterTutorialComplete();
+			}
+		});
+	}
 
+	/**
+	 * Setup an avatar for the current account
+	 *
 	 * @param callback an optional callback to handle results
 	 */
 	public void setupAvatar(PokeCallback<SetAvatarResponse.Status> callback) {
@@ -404,8 +388,20 @@ public class PlayerProfile {
 	}
 
 	/**
-	 * Encounter tutorial complete. In other words, catch the first Pokémon
+	 * Internal call to encounter tutorial complete
+	 */
+	private void encounterTutorialComplete() {
+		encounterTutorialComplete(new PokeCallback<EncounterTutorialCompleteResponse.Result>() {
+			@Override
+			public void onResponse(EncounterTutorialCompleteResponse.Result result) {
+				claimCodeName();
+			}
+		});
+	}
 
+	/**
+	 * Encounter tutorial complete. In other words, catch the first Pokémon
+	 *
 	 * @param callback an optional callback to handle results
 	 */
 	public void encounterTutorialComplete(PokeCallback<EncounterTutorialCompleteResponse.Result> callback) {
@@ -429,6 +425,18 @@ public class PlayerProfile {
 						return response.getResult();
 					}
 				}, callback, api, CommonRequest.getDefaultCheckChallenge());
+	}
+
+	/**
+	 * Internal call to claim a codename
+	 */
+	private void claimCodeName() {
+		claimCodeName(new PokeCallback<ClaimCodenameResponse.Status>() {
+			@Override
+			public void onResponse(ClaimCodenameResponse.Status result) {
+				firstTimeExperienceComplete();
+			}
+		});
 	}
 
 	/**
@@ -466,6 +474,13 @@ public class PlayerProfile {
 	}
 
 	/**
+	 * Internal call to mark the first time experience complete
+	 */
+	private void firstTimeExperienceComplete() {
+		firstTimeExperienceComplete(null);
+	}
+
+	/**
 	 * The last step, mark the last tutorial state as completed
 	 *
 	 * @param callback an optional callback to handle results
@@ -477,7 +492,7 @@ public class PlayerProfile {
 	/**
 	 * Mark the tutorial state as complete
 	 *
-	 * @param state
+	 * @param state the tutorial state
 	 * @param callback an optional callback to handle results
 	 */
 	private void markTutorial(TutorialStateOuterClass.TutorialState state, PokeCallback<PlayerProfile> callback) {

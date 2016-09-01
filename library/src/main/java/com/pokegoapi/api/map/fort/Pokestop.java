@@ -138,14 +138,14 @@ public class Pokestop {
 				.setPlayerLongitude(api.getLongitude())
 				.build();
 
-		new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH,
-				searchMessage, new PokeAFunc<FortSearchResponseOuterClass.FortSearchResponse, PokestopLootResult>() {
-			@Override
-			public PokestopLootResult exec(FortSearchResponseOuterClass.FortSearchResponse response) {
-				cooldownCompleteTimestampMs = response.getCooldownCompleteTimestampMs();
-				return new PokestopLootResult(response);
-			}
-		}, callback, api);
+		new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH, searchMessage,
+				new PokeAFunc<FortSearchResponseOuterClass.FortSearchResponse, PokestopLootResult>() {
+					@Override
+					public PokestopLootResult exec(FortSearchResponseOuterClass.FortSearchResponse response) {
+						cooldownCompleteTimestampMs = response.getCooldownCompleteTimestampMs();
+						return new PokestopLootResult(response);
+					}
+				}, callback, api);
 	}
 
 	/**
@@ -162,12 +162,13 @@ public class Pokestop {
 				.setPlayerLongitude(api.getLongitude())
 				.build();
 
-		new AsyncServerRequest(RequestTypeOuterClass.RequestType.ADD_FORT_MODIFIER, msg, new PokeAFunc<AddFortModifierResponseOuterClass.AddFortModifierResponse, Boolean>() {
-			@Override
-			public Boolean exec(AddFortModifierResponseOuterClass.AddFortModifierResponse response) {
-				return Boolean.TRUE;
-			}
-		}, callback, api);
+		new AsyncServerRequest(RequestTypeOuterClass.RequestType.ADD_FORT_MODIFIER, msg,
+				new PokeAFunc<AddFortModifierResponseOuterClass.AddFortModifierResponse, Boolean>() {
+					@Override
+					public Boolean exec(AddFortModifierResponseOuterClass.AddFortModifierResponse response) {
+						return Boolean.TRUE;
+					}
+				}, callback, api);
 	}
 
 	/**

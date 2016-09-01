@@ -180,6 +180,11 @@ public class MapObjects {
 		return complete;
 	}
 
+	/**
+	 * Get all the catchable pokemon on the current map
+	 *
+	 * @return a set of catchable pokemon
+     */
 	public Set<CatchablePokemon> getAllCatchablePokemons() {
 		Set<CatchablePokemon> catchablePokemons = new HashSet<>();
 		for (MapPokemon mapPokemon : getCatchablePokemons()) {

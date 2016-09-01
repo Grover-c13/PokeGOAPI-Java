@@ -70,7 +70,7 @@ public class Battle {
 	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public Result start() throws LoginFailedException, RemoteServerException {
-/*
+		/*
 		Builder builder = StartGymBattleMessageOuterClass.StartGymBattleMessage.newBuilder();
 
 		for (Pokemon team : teams) {
@@ -106,7 +106,6 @@ public class Battle {
 		return null;
 	}
 
-
 	/**
 	 * Attack a gym.
 	 *
@@ -132,7 +131,6 @@ public class Battle {
 
 		return doActions(actions);
 	}
-
 
 	/**
 	 * Creates a battle pokemon object to send with the request.
@@ -177,7 +175,8 @@ public class Battle {
 	 * @return AttackGymResponse
 	 */
 	private AttackGymResponse sendBlankAction() throws LoginFailedException, RemoteServerException {
-		/*AttackGymMessage message = AttackGymMessage
+		/*
+		AttackGymMessage message = AttackGymMessage
 				.newBuilder()
 				.setGymId(gym.getId())
 				.setPlayerLatitude(api.getLatitude())
@@ -205,8 +204,7 @@ public class Battle {
 	 * @return AttackGymResponse
 	 */
 	private AttackGymResponse doActions(List<BattleAction> actions) throws LoginFailedException, RemoteServerException {
-
-/*
+		/*
 		AttackGymMessage.Builder message = AttackGymMessage
 				.newBuilder()
 				.setGymId(gym.getId())
@@ -242,5 +240,4 @@ public class Battle {
 
 		return null;
 	}
-
 }

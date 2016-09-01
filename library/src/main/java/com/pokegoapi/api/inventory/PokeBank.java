@@ -30,11 +30,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PokeBank {
 	@Getter
-	private final ConcurrentHashMap<Long, Pokemon> pokemons = new ConcurrentHashMap<Long, Pokemon>();
+	private final ConcurrentHashMap<Long, Pokemon> pokemon = new ConcurrentHashMap<Long, Pokemon>();
 
 	public PokeBank() {
 	}
-
 
 	/**
 	 * Add a pokemon to the pokebank inventory.  Will not add duplicates (pokemon with same id).
@@ -42,7 +41,7 @@ public class PokeBank {
 	 * @param pokemon Pokemon to add to the inventory
 	 */
 	public void addPokemon(final Pokemon pokemon) {
-		pokemons.put(pokemon.getId(), pokemon);
+		this.pokemon.put(pokemon.getId(), pokemon);
 	}
 
 	/**
@@ -51,10 +50,9 @@ public class PokeBank {
 	 * @param id the id
 	 * @return the pokemon by pokemon id
 	 */
-
 	public List<Pokemon> getPokemonByPokemonId(final PokemonIdOuterClass.PokemonId id) {
 		List<Pokemon> ret = new ArrayList<>();
-		for (Pokemon p : pokemons.values()) {
+		for (Pokemon p : pokemon.values()) {
 			if (p.getPokemonId() == id)
 				ret.add(p);
 		}
@@ -67,7 +65,7 @@ public class PokeBank {
 	 * @param pokemon the pokemon
 	 */
 	public void removePokemon(final Pokemon pokemon) {
-		pokemons.remove(pokemon.getId());
+		this.pokemon.remove(pokemon.getId());
 	}
 
 	/**
@@ -77,13 +75,18 @@ public class PokeBank {
 	 * @return the pokemon
 	 */
 	public Pokemon getPokemonById(final Long id) {
-		return pokemons.get(id);
+		return pokemon.get(id);
 	}
 
-	public void setPokemons(List<Pokemon> pokemons) {
-		synchronized (this.pokemons) {
-			this.pokemons.clear();
-			for (Pokemon p : pokemons)
+	/**
+	 * Set pokemon
+	 *
+	 * @param pokemon the list of pokemon
+     */
+	public void setPokemons(List<Pokemon> pokemon) {
+		synchronized (this.pokemon) {
+			this.pokemon.clear();
+			for (Pokemon p : pokemon)
 				addPokemon(p);
 		}
 	}

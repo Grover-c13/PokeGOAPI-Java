@@ -52,8 +52,8 @@ public class AsyncServerRequest<T extends GeneratedMessage, K> {
 	 * @param requests requests to bound in the same request envelope
 	 */
 	public AsyncServerRequest(RequestType type, GeneratedMessage req, PokeAFunc<T, K> func,
-							  PokeCallback<K> callback, PokemonGo api,
-							  InternalServerRequest... requests) {
+								PokeCallback<K> callback, PokemonGo api,
+								InternalServerRequest... requests) {
 		Request.Builder reqBuilder = Request.newBuilder();
 		reqBuilder.setRequestMessage(req.toByteString());
 		reqBuilder.setRequestType(type);
@@ -71,6 +71,11 @@ public class AsyncServerRequest<T extends GeneratedMessage, K> {
 		api.getRequestHandler().sendRequest(this);
 	}
 
+	/**
+	 * Fire both, the internal callback and the outgoing callback
+	 *
+	 * @param data the data
+	 */
 	public void fire(ByteString data) {
 		K response = null;
 
@@ -89,9 +94,14 @@ public class AsyncServerRequest<T extends GeneratedMessage, K> {
 		}
 	}
 
-	public void fire(Throwable e) {
+	/**
+	 * Fire the error
+	 *
+	 * @param error the throwable exception
+	 */
+	public void fire(Throwable error) {
 		if (callback != null) {
-			callback.onError(e);
+			callback.onError(error);
 		}
 	}
 }

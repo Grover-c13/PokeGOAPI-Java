@@ -200,6 +200,7 @@ public class RequestHandler implements Runnable {
 			try {
 				request = workQueue.take();
 			} catch (Throwable ignored) {
+				// Ignore
 			}
 
 			if (request == null) {
@@ -214,7 +215,8 @@ public class RequestHandler implements Runnable {
 				serverRequests.add(extra);
 			}
 
-			final InternalServerRequest[] arrayServerRequests = serverRequests.toArray(new InternalServerRequest[serverRequests.size()]);
+			final InternalServerRequest[] arrayServerRequests =
+					serverRequests.toArray(new InternalServerRequest[serverRequests.size()]);
 
 			try {
 				authTicket = internalSendServerRequests(authTicket, arrayServerRequests);
@@ -250,6 +252,7 @@ public class RequestHandler implements Runnable {
 				try {
 					Thread.sleep(350);
 				} catch (InterruptedException ignored) {
+					// Ignore
 				}
 			}
 		}

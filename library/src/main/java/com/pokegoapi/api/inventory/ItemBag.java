@@ -71,14 +71,14 @@ public class ItemBag {
 
 		new AsyncServerRequest(RequestType.RECYCLE_INVENTORY_ITEM, msg,
 				new PokeAFunc<RecycleInventoryItemResponse, Result>() {
-			@Override
-			public Result exec(RecycleInventoryItemResponse response) {
-				if (response.getResult() == RecycleInventoryItemResponse.Result.SUCCESS) {
-					item.setCount(response.getNewCount());
-				}
-				return response.getResult();
-			}
-		}, callback, api);
+					@Override
+					public Result exec(RecycleInventoryItemResponse response) {
+						if (response.getResult() == RecycleInventoryItemResponse.Result.SUCCESS) {
+							item.setCount(response.getNewCount());
+						}
+						return response.getResult();
+					}
+				}, callback, api);
 	}
 
 	/**
@@ -155,11 +155,11 @@ public class ItemBag {
 
 		new AsyncServerRequest(RequestType.USE_INCENSE, useIncenseMessage,
 				new PokeAFunc<UseIncenseResponse, UseIncenseResponse.Result>() {
-			@Override
-			public UseIncenseResponse.Result exec(UseIncenseResponse response) {
-				return response.getResult();
-			}
-		}, callback, api);
+					@Override
+					public UseIncenseResponse.Result exec(UseIncenseResponse response) {
+						return response.getResult();
+					}
+				}, callback, api);
 	}
 
 	/**
@@ -182,21 +182,21 @@ public class ItemBag {
 				.setItemId(ItemId.ITEM_LUCKY_EGG)
 				.build();
 
-		new AsyncServerRequest(RequestType.USE_ITEM_XP_BOOST,
-				xpMsg, new PokeAFunc<UseItemXpBoostResponse, UseItemXpBoostResponse>() {
-			@Override
-			public UseItemXpBoostResponse exec(UseItemXpBoostResponse response) {
-				Log.i("Main", "Use incense result: " + response.getResult());
-				return response;
-			}
-		}, callback, api);
+		new AsyncServerRequest(RequestType.USE_ITEM_XP_BOOST, xpMsg,
+				new PokeAFunc<UseItemXpBoostResponse, UseItemXpBoostResponse>() {
+					@Override
+					public UseItemXpBoostResponse exec(UseItemXpBoostResponse response) {
+						Log.i("Main", "Use incense result: " + response.getResult());
+						return response;
+					}
+				}, callback, api);
 	}
 
 	/**
 	 * Set the items
 	 *
 	 * @param items the list of items
-     */
+	 */
 	public void setItems(List<Item> items) {
 		synchronized (this.items) {
 			for (Item p : items)

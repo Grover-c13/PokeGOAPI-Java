@@ -5,11 +5,9 @@ package com.pokegoapi.util;
  */
 public abstract class PokeCallback<T> {
 
-	public void onError(Throwable e) {
-		Log.e("PokeCallback", "exception", e);
+	public void onError(Throwable error) {
+		Log.e("PokeCallback", "exception", error);
 	}
 
 	public abstract void onResponse(T result);
-
-
 }
