@@ -171,7 +171,7 @@ public class AsyncCatchOptions {
 	 * @param numThrows
 	 * @return the AsyncCatchOptions object
 	 */
-	public AsyncCatchOptions usePokeball(int numThrows) {
+	public AsyncCatchOptions setNumThrows(int numThrows) {
 		this.numThrows = numThrows;
 		return this;
 	}

@@ -37,9 +37,7 @@ import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.NormalEncounterResult;
 import com.pokegoapi.api.settings.AsyncCatchOptions;
 import com.pokegoapi.exceptions.EncounterFailedException;
-import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
-import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.util.MapPoint;
 import com.pokegoapi.util.PokeAFunc;
@@ -199,9 +197,9 @@ public class CatchablePokemon implements MapPoint {
 	 * /**
 	 * Tries to catch a pokemon (using defined {@link AsyncCatchOptions}).
 	 *
-	 * @param options the AsyncCatchOptions object
+	 * @param options  the AsyncCatchOptions object
 	 * @param callback an optional callback to handle results
-	 * @throws NoSuchItemException   the no such item exception
+	 * @throws NoSuchItemException the no such item exception
 	 */
 	public void catchPokemon(AsyncCatchOptions options, final PokeCallback<CatchResult> callback)
 			throws NoSuchItemException {
@@ -221,6 +219,7 @@ public class CatchablePokemon implements MapPoint {
 								asyncOptions.getNormalizedReticleSize(),
 								asyncOptions.getSpinModifier(),
 								asyncPokeball,
+								asyncOptions.getNumThrows(),
 								callback
 						);
 					}
@@ -235,6 +234,7 @@ public class CatchablePokemon implements MapPoint {
 				options.getNormalizedReticleSize(),
 				options.getSpinModifier(),
 				options.getItemBall(),
+				options.getNumThrows(),
 				callback);
 	}
 
@@ -244,12 +244,12 @@ public class CatchablePokemon implements MapPoint {
 	 *
 	 * @param encounter the encounter to compare
 	 * @param options   the CatchOptions object
-	 * @param callback an optional callback to handle results
+	 * @param callback  an optional callback to handle results
 	 * @throws NoSuchItemException      the no such item exception
 	 * @throws EncounterFailedException the encounter failed exception
 	 */
 	public void catchPokemon(EncounterResult encounter, AsyncCatchOptions options,
-								final PokeCallback<CatchResult> callback)
+							 final PokeCallback<CatchResult> callback)
 			throws NoSuchItemException, EncounterFailedException {
 
 		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
@@ -267,7 +267,7 @@ public class CatchablePokemon implements MapPoint {
 						catchPokemon(asyncOptions.getNormalizedHitPosition(),
 								asyncOptions.getNormalizedReticleSize(),
 								asyncOptions.getSpinModifier(),
-								asyncPokeball, callback);
+								asyncPokeball, asyncOptions.getNumThrows(), callback);
 					}
 				});
 
@@ -281,6 +281,7 @@ public class CatchablePokemon implements MapPoint {
 				options.getNormalizedReticleSize(),
 				options.getSpinModifier(),
 				options.getItemBall(probability),
+				options.getNumThrows(),
 				callback);
 	}
 
@@ -291,13 +292,40 @@ public class CatchablePokemon implements MapPoint {
 	 * @param normalizedReticleSize the normalized hit reticle
 	 * @param spinModifier          the spin modifier
 	 * @param type                  Type of pokeball to throw
-	 * @param callback an optional callback to handle results
+	 * @param callback              an optional callback to handle results
 	 */
-	public void catchPokemon(double normalizedHitPosition, double normalizedReticleSize,
-								double spinModifier, Pokeball type, PokeCallback<CatchResult> callback) {
+	public void catchPokemon(final double normalizedHitPosition, final double normalizedReticleSize,
+							 final double spinModifier, final Pokeball type, final int numThrows, final PokeCallback<CatchResult> callback) {
 		if (!isEncountered()) {
 			return;
 		}
+
+		PokeCallback<CatchResult> customCallback = callback;
+		if (numThrows > 1) {
+			customCallback = new PokeCallback<CatchResult>() {
+				@Override
+				public void onError(Throwable e) {
+					callback.onError(e);
+				}
+
+				@Override
+				public void onResponse(CatchResult result) {
+					if (result.getStatus() == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.CATCH_FLEE
+							|| result.getStatus() == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.CATCH_SUCCESS
+							|| result.getStatus() == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.CATCH_ERROR
+							|| result.getStatus() == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.UNRECOGNIZED) {
+						//we can't retry
+						System.err.println("RIPROVO ");
+						callback.onResponse(result);
+						return;
+					}
+					//we can retry
+					catchPokemon(normalizedHitPosition, normalizedReticleSize,
+							spinModifier, type, numThrows - 1, callback);
+				}
+			};
+		}
+
 
 		CatchPokemonMessage reqMsg = CatchPokemonMessage.newBuilder()
 				.setEncounterId(getEncounterId()).setHitPokemon(true)
@@ -319,7 +347,7 @@ public class CatchablePokemon implements MapPoint {
 	/**
 	 * Tries to use an item on a catchable pokemon (ie razzberry).
 	 *
-	 * @param item the item ID
+	 * @param item     the item ID
 	 * @param callback an optional callback to handle results
 	 */
 	public void useItem(ItemId item, PokeCallback<CatchItemResult> callback) {
