@@ -42,7 +42,6 @@ public class CandyJar {
 	}
 
 
-
 	/**
 	 * Remove a candy from the candy jar.
 	 *
@@ -50,16 +49,9 @@ public class CandyJar {
 	 * @param amount Amount of candies to remove
 	 */
 	public void removeCandy(PokemonFamilyId family, int amount) {
-		synchronized (candies) {
-			if (candies.containsKey(family)) {
-				if (candies.get(family) - amount < 0) {
-					candies.put(family, 0);
-				} else {
-					candies.put(family, candies.get(family) - amount);
-				}
-			} else {
-				candies.put(family, 0);
-			}
+		Integer current = candies.putIfAbsent(family, amount);
+		if (current != null) {
+			current = Math.max(current - amount, 0);
 		}
 	}
 
@@ -70,6 +62,11 @@ public class CandyJar {
 	 * @return number of candies in jar
 	 */
 	public int getCandies(PokemonFamilyId family) {
-		return candies.getOrDefault(family, 0);
+		Integer val = candies.putIfAbsent(family, 0);
+
+		if (val == null)
+			val = 0;
+
+		return val;
 	}
 }

@@ -34,27 +34,24 @@ import com.pokegoapi.util.PokeCallback;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * The type Bag.
  */
 public class ItemBag {
 	private final PokemonGo api;
-	private final ConcurrentHashMap<ItemId, Item> items = new ConcurrentHashMap<>();
+	private final ConcurrentMap<ItemId, Item> items = new ConcurrentHashMap<>();
 
 	public ItemBag(PokemonGo api) {
 		this.api = api;
 	}
 
 	public void addItem(ItemData item) {
-		synchronized (items) {
-			Item current = items.get(item.getItemId());
-			if (current == null) {
-				items.put(item.getItemId(), new Item(item));
-			} else {
-				current.setCount(item.getCount());
-				current.setProto(item);
-			}
+		Item current = items.putIfAbsent(item.getItemId(), new Item(item));
+		if (current != null) {
+			current.setCount(item.getCount());
+			current.setProto(item);
 		}
 	}
 

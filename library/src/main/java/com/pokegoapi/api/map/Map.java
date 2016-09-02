@@ -37,9 +37,7 @@ import com.pokegoapi.util.PokeCallback;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Set;
 
 public class Map {
 	private final PokemonGo api;
@@ -86,8 +84,8 @@ public class Map {
 							result.addDecimatedSpawnPoints(mapCell.getDecimatedSpawnPointsList());
 							result.addSpawnPoints(mapCell.getSpawnPointsList());
 
-							HashSet<FortDataOuterClass.FortData> gyms = new HashSet<>();
-							HashSet<FortDataOuterClass.FortData> pokestops = new HashSet<>();
+							Set<FortDataOuterClass.FortData> gyms = new HashSet<>();
+							Set<FortDataOuterClass.FortData> pokestops = new HashSet<>();
 
 							for (FortDataOuterClass.FortData fortData : mapCell.getFortsList()) {
 								if (fortData.getType() == FortTypeOuterClass.FortType.CHECKPOINT) {

@@ -24,11 +24,12 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 
 public class PokeBank {
 	@Getter
-	private final ConcurrentHashMap<Long, Pokemon> pokemon = new ConcurrentHashMap<Long, Pokemon>();
+	private final ConcurrentMap<Long, Pokemon> pokemon = new ConcurrentHashMap<Long, Pokemon>();
 
 	public PokeBank() {
 	}
@@ -39,15 +40,11 @@ public class PokeBank {
 	 * @param pokemon Pokemon to add to the inventory
 	 */
 	public void addPokemon(PokemonGo api, PokemonDataOuterClass.PokemonData pokemonData) {
-		synchronized (pokemon) {
-			Pokemon current = pokemon.get(pokemonData.getId());
-			if (current == null) {
-				current = new Pokemon(api, pokemonData);
-				this.pokemon.put(current.getId(), current);
-			} else {
-				current.setProto(pokemonData);
-			}
+		Pokemon current = pokemon.putIfAbsent(pokemonData.getId(), new Pokemon(api, pokemonData));
+		if (current != null) {
+			current.setProto(pokemonData);
 		}
+
 	}
 
 	/**
@@ -59,8 +56,9 @@ public class PokeBank {
 	public List<Pokemon> getPokemonByPokemonId(final PokemonIdOuterClass.PokemonId id) {
 		List<Pokemon> ret = new ArrayList<>();
 		for (Pokemon p : pokemon.values()) {
-			if (p.getPokemonId() == id)
+			if (p.getPokemonId() == id) {
 				ret.add(p);
+			}
 		}
 		return ret;
 	}

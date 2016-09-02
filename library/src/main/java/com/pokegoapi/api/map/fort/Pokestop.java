@@ -197,6 +197,15 @@ public class Pokestop {
 	 *
 	 * @return lure status
 	 */
+	public boolean hasLurePokemon() {
+		return fortData.hasLureInfo() && fortData.getLureInfo().getLureExpiresTimestampMs() > api.currentTimeMillis();
+	}
+
+	/**
+	 * Returns whether this pokestop has an active lure.
+	 *
+	 * @return lure status
+	 */
 	public boolean hasLure() {
 		return fortData.getActiveFortModifierList().contains(ItemIdOuterClass.ItemId.ITEM_TROY_DISK);
 	}

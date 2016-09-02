@@ -30,11 +30,12 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class Hatchery {
 	@Getter
 
-	private final ConcurrentHashMap<Long, EggPokemon> eggs = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Long, EggPokemon> eggs = new ConcurrentHashMap<>();
 
 	@Getter
 	private PokemonGo api;
@@ -44,13 +45,9 @@ public class Hatchery {
 	}
 
 	public void addEgg(PokemonDataOuterClass.PokemonData egg) {
-		synchronized (eggs) {
-			EggPokemon current = eggs.get(egg.getId());
-			if (current == null) {
-				eggs.put(egg.getId(), new EggPokemon(api, egg));
-			} else {
-				current.setProto(egg);
-			}
+		EggPokemon current =  eggs.putIfAbsent(egg.getId(), new EggPokemon(api, egg));
+		if (current != null) {
+			current.setProto(egg);
 		}
 	}
 

@@ -23,7 +23,6 @@ import POGOProtos.Inventory.InventoryItemOuterClass;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.pokemon.EggPokemon;
 import lombok.Getter;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -107,14 +106,9 @@ public class Inventories {
 
 			if (itemData.hasEggIncubators()) {
 				for (EggIncubatorOuterClass.EggIncubator incubator : itemData.getEggIncubators().getEggIncubatorList()) {
-					synchronized (incubators) {
-						EggIncubator current = incubators.get(incubator.getId());
-						if (current == null) {
-							incubators.put(incubator.getId(), new EggIncubator(api, incubator));
-						} else {
-							current.setProto(incubator);
-						}
-					}
+					EggIncubator current = incubators.putIfAbsent(incubator.getId(), new EggIncubator(api, incubator));
+					if (current != null)
+						current.setProto(incubator);
 				}
 			}
 		}
