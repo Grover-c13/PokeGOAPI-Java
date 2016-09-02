@@ -25,9 +25,11 @@ import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.util.PokeAFunc;
 import com.pokegoapi.util.PokeCallback;
+import lombok.Setter;
 
 public class EggIncubator {
-	private final EggIncubatorOuterClass.EggIncubator proto;
+	@Setter
+	private EggIncubatorOuterClass.EggIncubator proto;
 	private final PokemonGo api;
 
 	/**
@@ -53,7 +55,7 @@ public class EggIncubator {
 	/**
 	 * Hatch an egg.
 	 *
-	 * @param egg the egg
+	 * @param egg      the egg
 	 * @param callback an optional callback to handle results
 	 */
 	public void hatchEgg(EggPokemon egg, PokeCallback<UseItemEggIncubatorResponse> callback) {

@@ -48,8 +48,9 @@ public class Hatchery {
 			EggPokemon current = eggs.get(egg.getId());
 			if (current == null) {
 				eggs.put(egg.getId(), new EggPokemon(api, egg));
+			} else {
+				current.setProto(egg);
 			}
-			current.setProto(egg);
 		}
 	}
 

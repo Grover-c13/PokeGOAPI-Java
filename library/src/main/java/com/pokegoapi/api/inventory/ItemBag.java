@@ -47,13 +47,14 @@ public class ItemBag {
 	}
 
 	public void addItem(ItemData item) {
-		synchronized (item) {
+		synchronized (items) {
 			Item current = items.get(item.getItemId());
 			if (current == null) {
 				items.put(item.getItemId(), new Item(item));
+			} else {
+				current.setCount(item.getCount());
+				current.setProto(item);
 			}
-			current.setCount(item.getCount());
-			current.setProto(item);
 		}
 	}
 

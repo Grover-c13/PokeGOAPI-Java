@@ -107,7 +107,14 @@ public class Inventories {
 
 			if (itemData.hasEggIncubators()) {
 				for (EggIncubatorOuterClass.EggIncubator incubator : itemData.getEggIncubators().getEggIncubatorList()) {
-					incubators.put(incubator.getId(), new EggIncubator(api, incubator));
+					synchronized (incubators) {
+						EggIncubator current = incubators.get(incubator.getId());
+						if (current == null) {
+							incubators.put(incubator.getId(), new EggIncubator(api, incubator));
+						} else {
+							current.setProto(incubator);
+						}
+					}
 				}
 			}
 		}
