@@ -332,7 +332,7 @@ public class Map {
 	 */
 	public Observable<MapObjects> getMapObjectsAsync(List<Long> cellIds) {
 
-		if (useCache() && cachedCatchable.size() > 0) {
+		if (useCache()) {
 			return Observable.just(cachedMapObjects);
 		}
 
