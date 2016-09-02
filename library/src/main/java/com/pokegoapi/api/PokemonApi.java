@@ -44,8 +44,8 @@ public class PokemonApi implements Networking.Callback {
 			   LocationFixes locationFixes, Locale locale) {
 		this.location = location;
 
-		networking = Networking.getInstance(server, executorService, client, location, deviceInfo, sensorInfo,
-				activityStatus, locationFixes, this, locale);
+		networking = new Networking(server, executorService, client, location, deviceInfo, sensorInfo,
+				activityStatus, locationFixes, locale, this);
 		BootstrapResult bootstrapResult = networking.bootstrap(credentialProvider.getAuthInfo());
 		playerProfile = new PlayerProfile(bootstrapResult.getPlayerResponse(), networking);
 		inventories = new Inventories(executorService, bootstrapResult.getInventoryResponse(),
