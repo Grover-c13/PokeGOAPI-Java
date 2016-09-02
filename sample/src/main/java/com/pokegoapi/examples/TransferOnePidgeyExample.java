@@ -23,6 +23,7 @@ import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
+import com.pokegoapi.util.PokeCallback;
 import okhttp3.OkHttpClient;
 
 import java.util.List;
@@ -34,25 +35,34 @@ public class TransferOnePidgeyExample {
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
 
-		PokemonGo go = new PokemonGo(http);
+		final PokemonGo go = new PokemonGo(http);
 		try {
 			// check readme for other example
 			go.login(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN,
-					ExampleLoginDetails.PASSWORD));
+					ExampleLoginDetails.PASSWORD), new PokeCallback<Void>() {
+				@Override
+				public void onResponse(Void result) {
+					List<Pokemon> pidgeys =
+							go.getInventories().getPokebank().getPokemonByPokemonId(PokemonIdOuterClass.PokemonId.PIDGEY);
 
-			List<Pokemon> pidgeys =
-					go.getInventories().getPokebank().getPokemonByPokemonId(PokemonIdOuterClass.PokemonId.PIDGEY);
+					if (pidgeys.size() > 0) {
+						Pokemon pest = pidgeys.get(0);
+						// print the pokemon data
+						pest.debug();
+						pest.transferPokemon(new PokeCallback<ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result>() {
+							@Override
+							public void onResponse(ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result result) {
+								Log.i("Main", "Transfered Pidgey result:" + result);
+							}
+						});
 
-			if (pidgeys.size() > 0) {
-				Pokemon pest = pidgeys.get(0);
-				// print the pokemon data
-				pest.debug();
-				ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result result = pest.transferPokemon();
+					} else {
+						Log.i("Main", "You have no pidgeys :O");
+					}
+				}
+			});
 
-				Log.i("Main", "Transfered Pidgey result:" + result);
-			} else {
-				Log.i("Main", "You have no pidgeys :O");
-			}
+
 		} catch (LoginFailedException | RemoteServerException e) {
 			// failed to login, invalid credentials, auth issue or server issue.
 			Log.e("Main", "Failed to login. Invalid credentials or server issue: ", e);
