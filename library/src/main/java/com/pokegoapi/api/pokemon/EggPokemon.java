@@ -67,7 +67,7 @@ public class EggPokemon {
 	/**
 	 * Build a EggPokemon wrapper from the proto.
 	 *
-	 * @param api
+	 * @param api : current api
 	 * @param proto : the prototype
 	 */
 	public EggPokemon(PokemonGo api, PokemonData proto) {
