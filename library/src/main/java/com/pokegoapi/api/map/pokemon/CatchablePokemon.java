@@ -45,6 +45,8 @@ import com.pokegoapi.util.PokeCallback;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 
 /**
  * The type Catchable pokemon.
@@ -305,6 +307,7 @@ public class CatchablePokemon implements MapPoint {
 			customCallback = new PokeCallback<CatchResult>() {
 				@Override
 				public void onError(Throwable e) {
+					//fire the original callback error
 					callback.onError(e);
 				}
 
@@ -314,12 +317,16 @@ public class CatchablePokemon implements MapPoint {
 							|| result.getStatus() == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.CATCH_SUCCESS
 							|| result.getStatus() == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.CATCH_ERROR
 							|| result.getStatus() == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.UNRECOGNIZED) {
-						//we can't retry
-						System.err.println("RIPROVO ");
+						//we can't retry, so we fire the original callback
 						callback.onResponse(result);
 						return;
 					}
-					//we can retry
+					//we can retry, but to prevent flagging it's necessary to sleep for a while between each retry
+					try {
+						Thread.sleep(ThreadLocalRandom.current().nextInt(1500, 1000));
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 					catchPokemon(normalizedHitPosition, normalizedReticleSize,
 							spinModifier, type, numThrows - 1, callback);
 				}
@@ -341,7 +348,7 @@ public class CatchablePokemon implements MapPoint {
 					public CatchResult exec(CatchPokemonResponseOuterClass.CatchPokemonResponse response) {
 						return new CatchResult(response);
 					}
-				}, callback, api);
+				}, customCallback, api);
 	}
 
 	/**
