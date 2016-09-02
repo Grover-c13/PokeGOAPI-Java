@@ -323,7 +323,7 @@ public class CatchablePokemon implements MapPoint {
 					}
 					//we can retry, but to prevent flagging it's necessary to sleep for a while between each retry
 					try {
-						Thread.sleep(ThreadLocalRandom.current().nextInt(1500, 1000));
+						Thread.sleep(ThreadLocalRandom.current().nextInt(1352, 1976));
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
