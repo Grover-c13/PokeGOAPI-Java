@@ -149,7 +149,7 @@ public class PokemonGo {
 	 * @param callback the callback that will return this instance or errors once login
 	 *                 process is fully completed
 	 */
-	public void login(CredentialProvider credentialProvider, PokeCallback<PokemonGo> callback) {
+	public void login(CredentialProvider credentialProvider, PokeCallback<Void> callback) {
 		if (credentialProvider == null) {
 			throw new NullPointerException("Credential Provider is null");
 		}
@@ -168,7 +168,7 @@ public class PokemonGo {
 	 *
 	 * @param callback the callback
 	 */
-	private void initialize(final PokeCallback<PokemonGo> callback) {
+	private void initialize(final PokeCallback<Void> callback) {
 		new AsyncServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
 				CommonRequest.getDefaultDownloadRemoteConfigVersionRequest(), null, null, this);
 
