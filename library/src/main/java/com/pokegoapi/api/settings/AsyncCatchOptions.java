@@ -57,7 +57,8 @@ public class AsyncCatchOptions {
 	private double normalizedReticleSize;
 	@Getter
 	private double spinModifier;
-
+	@Getter
+	private int numThrows;
 	/**
 	 * Instantiates a new CatchOptions object.
 	 *
@@ -75,6 +76,7 @@ public class AsyncCatchOptions {
 		this.normalizedHitPosition = 1.0;
 		this.normalizedReticleSize = 1.95 + Math.random() * 0.05;
 		this.spinModifier = 0.85 + Math.random() * 0.15;
+		this.numThrows = 1;
 	}
 
 	/**
@@ -160,6 +162,17 @@ public class AsyncCatchOptions {
 	 */
 	public AsyncCatchOptions useRazzberries(boolean useRazzBerries) {
 		this.useRazzBerry = useRazzBerries ? 1 : 0;
+		return this;
+	}
+
+	/**
+	 * Set the number of throws (retries)
+	 *
+	 * @param numThrows
+	 * @return the AsyncCatchOptions object
+	 */
+	public AsyncCatchOptions usePokeball(int numThrows) {
+		this.numThrows = numThrows;
 		return this;
 	}
 
