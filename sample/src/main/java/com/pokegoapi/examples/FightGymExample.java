@@ -51,53 +51,6 @@ public class FightGymExample {
 	 * Catches a pokemon at an area.
 	 */
 	public static void main(String[] args) {
-		OkHttpClient http = new OkHttpClient();
-		CredentialProvider auth = null;
-		PokemonGo go = new PokemonGo(http);
-		try {
-			auth = new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
-			go.login(auth);
-			// or google
-			//auth = new GoogleCredentialProvider(http, token); // currently uses oauth flow so no user or pass needed
-			// set location
-			go.setLocation(-32.011011, 115.932831, 0);
-
-			List<Pokemon> pokemons = go.getInventories().getPokebank().getPokemons();
-			Pokemon[] attackers = new Pokemon[6];
-
-			for (int i = 0; i < 6; i++) {
-				attackers[i] = pokemons.get(i);
-			}
-
-
-			for (Gym gym : go.getMap().getGyms()) {
-				if (gym.isAttackable()) {
-					Battle battle = gym.battle(attackers);
-					// start the battle
-					Result result = battle.start();
-
-					if (result == Result.SUCCESS) {
-						// started battle successfully
-
-						// loop while battle is not finished
-						while (!battle.isConcluded()) {
-							System.out.println("attack:" + battle.attack(5));
-							Thread.sleep(500);
-						}
-
-						System.out.println("Battle result:" + battle.getOutcome());
-
-					} else {
-						System.out.println("FAILED:" + result);
-					}
-				}
-
-			}
-
-		} catch (LoginFailedException | RemoteServerException | InterruptedException e) {
-			// failed to login, invalid credentials, auth issue or server issue.
-			Log.e("Main", "Failed to login or server issue: ", e);
-
-		}
+		//battle code it's not working, pr are welcome!
 	}
 }

@@ -203,12 +203,11 @@ public class CatchablePokemon implements MapPoint {
 	 * @param callback an optional callback to handle results
 	 * @throws NoSuchItemException the no such item exception
 	 */
-	public void catchPokemon(AsyncCatchOptions options, final PokeCallback<CatchResult> callback)
-			throws NoSuchItemException {
+	public void catchPokemon(AsyncCatchOptions options, final PokeCallback<CatchResult> callback) {
 		if (options != null) {
 			if (options.getUseRazzBerry() != 0) {
 				final AsyncCatchOptions asyncOptions = options;
-				final Pokeball asyncPokeball = asyncOptions.getItemBall();
+
 
 				useItem(ItemId.ITEM_RAZZ_BERRY, new PokeCallback<CatchItemResult>() {
 
@@ -217,13 +216,19 @@ public class CatchablePokemon implements MapPoint {
 						if (!result.getSuccess()) {
 							return;
 						}
-						catchPokemon(asyncOptions.getNormalizedHitPosition(),
-								asyncOptions.getNormalizedReticleSize(),
-								asyncOptions.getSpinModifier(),
-								asyncPokeball,
-								asyncOptions.getNumThrows(),
-								callback
-						);
+						try {
+							catchPokemon(asyncOptions.getNormalizedHitPosition(),
+									asyncOptions.getNormalizedReticleSize(),
+									asyncOptions.getSpinModifier(),
+									asyncOptions.getItemBall(),
+									asyncOptions.getNumThrows(),
+									callback
+							);
+						} catch (NoSuchItemException e) {
+							callback.onError(e);
+							return;
+						}
+
 					}
 				});
 
@@ -232,12 +237,17 @@ public class CatchablePokemon implements MapPoint {
 			options = new AsyncCatchOptions(api);
 		}
 
-		catchPokemon(options.getNormalizedHitPosition(),
-				options.getNormalizedReticleSize(),
-				options.getSpinModifier(),
-				options.getItemBall(),
-				options.getNumThrows(),
-				callback);
+		try {
+			catchPokemon(options.getNormalizedHitPosition(),
+					options.getNormalizedReticleSize(),
+					options.getSpinModifier(),
+					options.getItemBall(),
+					options.getNumThrows(),
+					callback);
+		} catch (NoSuchItemException e) {
+			callback.onError(e);
+			return;
+		}
 	}
 
 	/**

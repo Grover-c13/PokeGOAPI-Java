@@ -20,11 +20,12 @@ import com.pokegoapi.api.PokemonGo;
 import lombok.ToString;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @ToString
 public class CandyJar {
 	private final PokemonGo api;
-	private final ConcurrentHashMap<PokemonFamilyId, Integer> candies = new ConcurrentHashMap<>();
+	private final ConcurrentMap<PokemonFamilyId, Integer> candies = new ConcurrentHashMap<>();
 
 	public CandyJar(PokemonGo api) {
 		this.api = api;

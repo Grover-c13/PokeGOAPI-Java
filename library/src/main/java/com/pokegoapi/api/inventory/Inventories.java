@@ -26,6 +26,7 @@ import com.pokegoapi.api.PokemonGo;
 import lombok.Getter;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 
 public class Inventories {
@@ -40,7 +41,7 @@ public class Inventories {
 	@Getter
 	private Pokedex pokedex;
 	@Getter
-	private final ConcurrentHashMap<String, EggIncubator> incubators = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, EggIncubator> incubators = new ConcurrentHashMap<>();
 	@Getter
 	private Hatchery hatchery;
 	@Getter
