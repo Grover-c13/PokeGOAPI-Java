@@ -24,7 +24,6 @@ import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.EggPokemon;
-import com.pokegoapi.api.pokemon.Pokemon;
 import lombok.Getter;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -74,18 +73,18 @@ public class Inventories {
 
 			// hatchery
 			if (itemData.getPokemonData().getPokemonId() == PokemonId.MISSINGNO && itemData.getPokemonData().getIsEgg()) {
-				hatchery.addEgg(new EggPokemon(itemData.getPokemonData()));
+				hatchery.addEgg(itemData.getPokemonData());
 			}
 
 			// pokebank
 			if (itemData.getPokemonData().getPokemonId() != PokemonId.MISSINGNO) {
-				pokebank.addPokemon(new Pokemon(api, inventoryItem.getInventoryItemData().getPokemonData()));
+				pokebank.addPokemon(api, inventoryItem.getInventoryItemData().getPokemonData());
 			}
 
 			// items
 			if (itemData.getItem().getItemId() != ItemId.UNRECOGNIZED
 					&& itemData.getItem().getItemId() != ItemId.ITEM_UNKNOWN) {
-				itemBag.addItem(new Item(itemData.getItem()));
+				itemBag.addItem(itemData.getItem());
 			}
 
 			// candyjar
@@ -108,7 +107,7 @@ public class Inventories {
 
 			if (itemData.hasEggIncubators()) {
 				for (EggIncubatorOuterClass.EggIncubator incubator : itemData.getEggIncubators().getEggIncubatorList()) {
-					incubators.put(incubator.getId(),new EggIncubator(api, incubator));
+					incubators.put(incubator.getId(), new EggIncubator(api, incubator));
 				}
 			}
 		}

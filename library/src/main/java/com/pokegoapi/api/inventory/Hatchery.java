@@ -15,24 +15,20 @@
 
 package com.pokegoapi.api.inventory;
 
-import POGOProtos.Inventory.Item.ItemIdOuterClass;
+import POGOProtos.Data.PokemonDataOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.api.pokemon.HatchedEgg;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.util.PokeAFunc;
 import com.pokegoapi.util.PokeCallback;
 import lombok.Getter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Hatchery {
@@ -47,9 +43,14 @@ public class Hatchery {
 		this.api = api;
 	}
 
-	public void addEgg(EggPokemon egg) {
-		egg.setApi(api);
-		eggs.put(egg.getId(), egg);
+	public void addEgg(PokemonDataOuterClass.PokemonData egg) {
+		synchronized (eggs) {
+			EggPokemon current = eggs.get(egg.getId());
+			if (current == null) {
+				eggs.put(egg.getId(), new EggPokemon(api, egg));
+			}
+			current.setProto(egg);
+		}
 	}
 
 	/**

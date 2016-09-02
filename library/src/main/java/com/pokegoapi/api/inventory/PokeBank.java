@@ -15,16 +15,14 @@
 
 package com.pokegoapi.api.inventory;
 
+import POGOProtos.Data.PokemonDataOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass;
-import com.annimon.stream.Collectors;
-import com.annimon.stream.Stream;
-import com.annimon.stream.function.Predicate;
+import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -36,12 +34,20 @@ public class PokeBank {
 	}
 
 	/**
-	 * Add a pokemon to the pokebank inventory.  Will not add duplicates (pokemon with same id).
+	 * Add a pokemon to the pokebank inventory.  Will not add duplicates (pokemon with same id), but update them!!
 	 *
 	 * @param pokemon Pokemon to add to the inventory
 	 */
-	public void addPokemon(final Pokemon pokemon) {
-		this.pokemon.put(pokemon.getId(), pokemon);
+	public void addPokemon(PokemonGo api, PokemonDataOuterClass.PokemonData pokemonData) {
+		synchronized (pokemon) {
+			Pokemon current = pokemon.get(pokemonData.getId());
+			if (current == null) {
+				current = new Pokemon(api, pokemonData);
+				this.pokemon.put(current.getId(), current);
+			} else {
+				current.setProto(pokemonData);
+			}
+		}
 	}
 
 	/**
@@ -78,16 +84,5 @@ public class PokeBank {
 		return pokemon.get(id);
 	}
 
-	/**
-	 * Set pokemon
-	 *
-	 * @param pokemon the list of pokemon
-     */
-	public void setPokemons(List<Pokemon> pokemon) {
-		synchronized (this.pokemon) {
-			this.pokemon.clear();
-			for (Pokemon p : pokemon)
-				addPokemon(p);
-		}
-	}
+
 }

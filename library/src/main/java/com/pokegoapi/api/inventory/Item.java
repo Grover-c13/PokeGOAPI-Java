@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class Item {
+	@Setter
 	private ItemDataOuterClass.ItemData proto;
 	@Getter
 	@Setter

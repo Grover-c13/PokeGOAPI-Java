@@ -26,9 +26,6 @@ import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass.Re
 import POGOProtos.Networking.Responses.UseIncenseResponseOuterClass.UseIncenseResponse;
 import POGOProtos.Networking.Responses.UseItemXpBoostResponseOuterClass.UseItemXpBoostResponse;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.pokemon.EggPokemon;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.PokeAFunc;
@@ -49,8 +46,15 @@ public class ItemBag {
 		this.api = api;
 	}
 
-	public void addItem(Item item) {
-		items.put(item.getItemId(), item);
+	public void addItem(ItemData item) {
+		synchronized (item) {
+			Item current = items.get(item.getItemId());
+			if (current == null) {
+				items.put(item.getItemId(), new Item(item));
+			}
+			current.setCount(item.getCount());
+			current.setProto(item);
+		}
 	}
 
 	/**
@@ -192,15 +196,4 @@ public class ItemBag {
 				}, callback, api);
 	}
 
-	/**
-	 * Set the items
-	 *
-	 * @param items the list of items
-	 */
-	public void setItems(List<Item> items) {
-		synchronized (this.items) {
-			for (Item p : items)
-				addItem(p);
-		}
-	}
 }
