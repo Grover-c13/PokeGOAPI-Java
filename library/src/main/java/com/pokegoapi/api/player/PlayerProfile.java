@@ -137,7 +137,7 @@ public class PlayerProfile {
 	 *
 	 * @param callback an optional callback to handle results
 	 */
-	private void updateProfile(PokeCallback<PlayerProfile> callback) {
+	public void updateProfile(PokeCallback<PlayerProfile> callback) {
 		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
 				.setPlayerLocale(playerLocale.getPlayerLocale())
 				.build();
