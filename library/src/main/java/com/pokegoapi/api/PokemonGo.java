@@ -146,10 +146,12 @@ public class PokemonGo {
 	 * Login user with the provided provider
 	 *
 	 * @param credentialProvider the credential provider
-	 * @param callback the callback that will return this instance or errors once login
-	 *                 process is fully completed
+	 * @param callback           the callback that will return this instance or errors once login
+	 *                           process is fully completed
+	 *
+	 * @return callback passed as argument
 	 */
-	public void login(CredentialProvider credentialProvider, PokeCallback<Void> callback) {
+	public PokeCallback<Void> login(CredentialProvider credentialProvider, PokeCallback<Void> callback) {
 		if (credentialProvider == null) {
 			throw new NullPointerException("Credential Provider is null");
 		}
@@ -159,7 +161,7 @@ public class PokemonGo {
 		settings = new Settings(this);
 		inventories = new Inventories(this);
 
-		initialize(callback);
+		return initialize(callback);
 	}
 
 	/**
@@ -167,13 +169,16 @@ public class PokemonGo {
 	 * or the current instance of PokemonGo once initialized
 	 *
 	 * @param callback the callback
+	 *
+	 * @return callback passed as argument
 	 */
-	private void initialize(final PokeCallback<Void> callback) {
+	private PokeCallback<Void> initialize(final PokeCallback<Void> callback) {
 		new AsyncServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
 				CommonRequest.getDefaultDownloadRemoteConfigVersionRequest(), null, null, this);
 
 		new AsyncServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
 				CommonRequest.getDefaultGetAssetDigestMessageRequest(), null, callback, PokemonGo.this);
+		return callback;
 	}
 
 	/**

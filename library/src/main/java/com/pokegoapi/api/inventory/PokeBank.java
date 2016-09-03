@@ -37,7 +37,7 @@ public class PokeBank {
 	/**
 	 * Add a pokemon to the pokebank inventory.  Will not add duplicates (pokemon with same id), but update them!!
 	 *
-	 * @paran api current api
+	 * @param api current api
 	 * @param pokemonData proto of the new pokemon
 	 */
 	public void addPokemon(PokemonGo api, PokemonDataOuterClass.PokemonData pokemonData) {

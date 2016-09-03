@@ -31,7 +31,6 @@ import POGOProtos.Networking.Responses.DiskEncounterResponseOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.map.pokemon.encounter.DiskEncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.NormalEncounterResult;
@@ -39,9 +38,11 @@ import com.pokegoapi.api.settings.AsyncCatchOptions;
 import com.pokegoapi.exceptions.EncounterFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.util.Log;
 import com.pokegoapi.util.MapPoint;
 import com.pokegoapi.util.PokeAFunc;
 import com.pokegoapi.util.PokeCallback;
+
 import lombok.Getter;
 import lombok.ToString;
 
@@ -115,6 +116,7 @@ public class CatchablePokemon implements MapPoint {
 	 *
 	 * @param api   the api
 	 * @param proto the proto
+	 *
 	 */
 	public CatchablePokemon(PokemonGo api, FortData proto) {
 		if (!proto.hasLureInfo()) {
@@ -127,8 +129,7 @@ public class CatchablePokemon implements MapPoint {
 		this.encounterId = proto.getLureInfo().getEncounterId();
 		this.pokemonId = proto.getLureInfo().getActivePokemonId();
 		this.pokemonIdValue = proto.getLureInfo().getActivePokemonIdValue();
-		this.expirationTimestampMs = proto.getLureInfo()
-				.getLureExpiresTimestampMs();
+		this.expirationTimestampMs = proto.getLureInfo().getLureExpiresTimestampMs();
 		this.latitude = proto.getLatitude();
 		this.longitude = proto.getLongitude();
 		this.encounterKind = EncounterKind.DISK;
@@ -139,32 +140,23 @@ public class CatchablePokemon implements MapPoint {
 	 * Encounter pokemon encounter result.
 	 *
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void encounterPokemon(PokeCallback<EncounterResult> callback) {
+	public PokeCallback<EncounterResult> encounterPokemon(PokeCallback<EncounterResult> callback) {
 		if (encounterKind == EncounterKind.NORMAL) {
-			encounterNormalPokemon(callback);
-			return;
+			return encounterNormalPokemon(callback);
 		} else if (encounterKind == EncounterKind.DISK) {
-			encounterDiskPokemon(callback);
-			return;
+			return encounterDiskPokemon(callback);
 		}
 
 		throw new IllegalStateException("Catchable pokemon missing encounter type");
 	}
 
-	/**
-	 * Encounter pokemon encounter result.
-	 *
-	 * @param callback an optional callback to handle results
-	 */
-	public void encounterNormalPokemon(PokeCallback<EncounterResult> callback) {
-		EncounterMessage reqMsg = EncounterMessage
-				.newBuilder().setEncounterId(getEncounterId())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
-				.setSpawnPointId(getSpawnPointId()).build();
-		new AsyncServerRequest(
-				RequestType.ENCOUNTER, reqMsg,
+	private PokeCallback<EncounterResult> encounterNormalPokemon(PokeCallback<EncounterResult> callback) {
+		EncounterMessage reqMsg = EncounterMessage.newBuilder().setEncounterId(getEncounterId()).setPlayerLatitude(
+				api.getLatitude()).setPlayerLongitude(api.getLongitude()).setSpawnPointId(getSpawnPointId()).build();
+		new AsyncServerRequest(RequestType.ENCOUNTER, reqMsg,
 				new PokeAFunc<EncounterResponse, NormalEncounterResult>() {
 					@Override
 					public NormalEncounterResult exec(EncounterResponse response) {
@@ -172,19 +164,13 @@ public class CatchablePokemon implements MapPoint {
 						return new NormalEncounterResult(api, response);
 					}
 				}, callback, api);
+		return callback;
 	}
 
-	/**
-	 * Encounter pokemon
-	 *
-	 * @param callback an optional callback to handle results
-	 */
-	public void encounterDiskPokemon(PokeCallback<EncounterResult> callback) {
-		DiskEncounterMessage reqMsg = DiskEncounterMessage
-				.newBuilder().setEncounterId(getEncounterId())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
-				.setFortId(getSpawnPointId()).build();
+	private PokeCallback<EncounterResult> encounterDiskPokemon(PokeCallback<EncounterResult> callback) {
+		DiskEncounterMessage reqMsg = DiskEncounterMessage.newBuilder().setEncounterId(
+				getEncounterId()).setPlayerLatitude(api.getLatitude()).setPlayerLongitude(api.getLongitude()).setFortId(
+				getSpawnPointId()).build();
 		new AsyncServerRequest(RequestType.DISK_ENCOUNTER, reqMsg,
 				new PokeAFunc<DiskEncounterResponseOuterClass.DiskEncounterResponse, DiskEncounterResult>() {
 					@Override
@@ -193,6 +179,18 @@ public class CatchablePokemon implements MapPoint {
 						return new DiskEncounterResult(api, response);
 					}
 				}, callback, api);
+		return callback;
+	}
+
+	/**
+	 * Catch a pokemon with standard options
+	 *
+	 * @param callback an optional callback to handle result
+	 *
+	 * @return callback passed as argument
+	 */
+	public PokeCallback<CatchResult> catchPokemon(final PokeCallback<CatchResult> callback) {
+		return catchPokemon(new AsyncCatchOptions(api), callback);
 	}
 
 	/**
@@ -201,53 +199,13 @@ public class CatchablePokemon implements MapPoint {
 	 *
 	 * @param options  the AsyncCatchOptions object
 	 * @param callback an optional callback to handle results
-	 * @throws NoSuchItemException the no such item exception
+	 *
+	 * @return callback passed as argument
 	 */
-	public void catchPokemon(AsyncCatchOptions options, final PokeCallback<CatchResult> callback) {
-		if (options != null) {
-			if (options.getUseRazzBerry() != 0) {
-				final AsyncCatchOptions asyncOptions = options;
+	public PokeCallback<CatchResult> catchPokemon(AsyncCatchOptions options, final PokeCallback<CatchResult> callback) {
+		if (options == null) options = new AsyncCatchOptions(api);
 
-
-				useItem(ItemId.ITEM_RAZZ_BERRY, new PokeCallback<CatchItemResult>() {
-
-					@Override
-					public void onResponse(CatchItemResult result) {
-						if (!result.getSuccess()) {
-							return;
-						}
-						try {
-							catchPokemon(asyncOptions.getNormalizedHitPosition(),
-									asyncOptions.getNormalizedReticleSize(),
-									asyncOptions.getSpinModifier(),
-									asyncOptions.getItemBall(),
-									asyncOptions.getNumThrows(),
-									callback
-							);
-						} catch (NoSuchItemException e) {
-							callback.onError(e);
-							return;
-						}
-
-					}
-				});
-
-			}
-		} else {
-			options = new AsyncCatchOptions(api);
-		}
-
-		try {
-			catchPokemon(options.getNormalizedHitPosition(),
-					options.getNormalizedReticleSize(),
-					options.getSpinModifier(),
-					options.getItemBall(),
-					options.getNumThrows(),
-					callback);
-		} catch (NoSuchItemException e) {
-			callback.onError(e);
-			return;
-		}
+		return catchPokemon(options, 1, callback);
 	}
 
 	/**
@@ -257,68 +215,72 @@ public class CatchablePokemon implements MapPoint {
 	 * @param encounter the encounter to compare
 	 * @param options   the CatchOptions object
 	 * @param callback  an optional callback to handle results
-	 * @throws NoSuchItemException      the no such item exception
-	 * @throws EncounterFailedException the encounter failed exception
+	 *
+	 * @return callback passed as argument
 	 */
-	public void catchPokemon(EncounterResult encounter, AsyncCatchOptions options,
-							 final PokeCallback<CatchResult> callback)
-			throws NoSuchItemException, EncounterFailedException {
+	public PokeCallback<CatchResult> catchPokemon(EncounterResult encounter, AsyncCatchOptions options,
+			final PokeCallback<CatchResult> callback) {
 
-		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
-		double probability = encounter.getCaptureProbability().getCaptureProbability(0);
+		if (!encounter.wasSuccessful()) {
+			callback.fire(new EncounterFailedException());
+			return callback;
+		}
 
-		if (options != null) {
-			if (options.getUseRazzBerry() != 0) {
-				final AsyncCatchOptions asyncOptions = options;
-				final Pokeball asyncPokeball = asyncOptions.getItemBall(probability);
-				useItem(ItemId.ITEM_RAZZ_BERRY, new PokeCallback<CatchItemResult>() {
-
-					public void onResponse(CatchItemResult data) {
-						if (!data.getSuccess())
-							return;
-						catchPokemon(asyncOptions.getNormalizedHitPosition(),
-								asyncOptions.getNormalizedReticleSize(),
-								asyncOptions.getSpinModifier(),
-								asyncPokeball, asyncOptions.getNumThrows(), callback);
-					}
-				});
-
-				return;
-			}
-		} else {
+		if (options == null) {
 			options = new AsyncCatchOptions(api);
 		}
 
-		catchPokemon(options.getNormalizedHitPosition(),
-				options.getNormalizedReticleSize(),
-				options.getSpinModifier(),
-				options.getItemBall(probability),
-				options.getNumThrows(),
-				callback);
+		options.checkProbability(encounter.getCaptureProbability().getCaptureProbability(0));
+		return catchPokemon(options, callback);
 	}
 
-	/**
-	 * Tries to catch a pokemon.
-	 *
-	 * @param normalizedHitPosition the normalized hit position
-	 * @param normalizedReticleSize the normalized hit reticle
-	 * @param spinModifier          the spin modifier
-	 * @param type                  Type of pokeball to throw
-	 * @param callback              an optional callback to handle results
-	 */
-	public void catchPokemon(final double normalizedHitPosition, final double normalizedReticleSize,
-							 final double spinModifier, final Pokeball type, final int numThrows, final PokeCallback<CatchResult> callback) {
+	private PokeCallback<CatchResult> catchPokemon(final AsyncCatchOptions options, final int trialNum,
+			final PokeCallback<CatchResult> callback) {
 		if (!isEncountered()) {
-			return;
+			callback.fire(new EncounterFailedException());
+			return callback;
 		}
+		//we have to do a retry
+		if (options.getRazzBerries() >= trialNum && api.getInventories().getItemBag().getItem(
+				ItemId.ITEM_RAZZ_BERRY).getCount() > 0) useBerry(options, trialNum, callback);
+		else catchPokemonPostBerry(options, trialNum, callback);
+		//our last try
+		return callback;
+	}
 
-		PokeCallback<CatchResult> customCallback = callback;
-		if (numThrows > 1) {
-			customCallback = new PokeCallback<CatchResult>() {
+	private PokeCallback<CatchResult> useBerry(final AsyncCatchOptions options, final int trialNum,
+			final PokeCallback<CatchResult> callback) {
+		Log.d("useBerry", "trialNum:" + trialNum + " max:" + options.getRazzBerries());
+		useItem(ItemId.ITEM_RAZZ_BERRY, new PokeCallback<CatchItemResult>() {
+			@Override
+			public void onResponse(CatchItemResult result) {
+				if (!result.getSuccess()) {
+					return;
+				}
+				catchPokemonPostBerry(options, trialNum, callback);
+			}
+		});
+		return callback;
+	}
+
+
+	private PokeCallback<CatchResult> catchPokemonPostBerry(final AsyncCatchOptions options, final int trialNum,
+			final PokeCallback<CatchResult> callback) {
+		if (!isEncountered()) {
+			callback.fire(new EncounterFailedException());
+			return callback;
+		}
+		Log.d("catchPokemonPostBerry", "trialNum:" + trialNum + " max:" + options.getNumThrows());
+
+		PokeCallback<CatchResult> wrappedCallback = callback;
+
+		if (options.getNumThrows() > trialNum) {
+
+			wrappedCallback = new PokeCallback<CatchResult>() {
 				@Override
-				public void onError(Throwable e) {
+				public void onError(Throwable throwable) {
 					//fire the original callback error
-					callback.onError(e);
+					callback.fire(throwable);
 				}
 
 				@Override
@@ -328,7 +290,7 @@ public class CatchablePokemon implements MapPoint {
 							|| result.getStatus() == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.CATCH_ERROR
 							|| result.getStatus() == CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus.UNRECOGNIZED) {
 						//we can't retry, so we fire the original callback
-						callback.onResponse(result);
+						callback.fire(result);
 						return;
 					}
 					//we can retry, but to prevent flagging it's necessary to sleep for a while between each retry
@@ -337,43 +299,46 @@ public class CatchablePokemon implements MapPoint {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					catchPokemon(normalizedHitPosition, normalizedReticleSize,
-							spinModifier, type, numThrows - 1, callback);
+					catchPokemon(options, trialNum + 1, callback);
 				}
 			};
 		}
 
+		try {
+			CatchPokemonMessage reqMsg = CatchPokemonMessage.newBuilder()
+					.setEncounterId(getEncounterId())
+					.setHitPokemon(true).setNormalizedHitPosition(options.getNormalizedHitPosition())
+					.setNormalizedReticleSize(options.getNormalizedReticleSize())
+					.setSpawnPointId(getSpawnPointId())
+					.setSpinModifier(options.getSpinModifier())
+					.setPokeball(options.getItemBall().getBallType())
+					.build();
 
-		CatchPokemonMessage reqMsg = CatchPokemonMessage.newBuilder()
-				.setEncounterId(getEncounterId()).setHitPokemon(true)
-				.setNormalizedHitPosition(normalizedHitPosition)
-				.setNormalizedReticleSize(normalizedReticleSize)
-				.setSpawnPointId(getSpawnPointId())
-				.setSpinModifier(spinModifier)
-				.setPokeball(type.getBallType()).build();
-		new AsyncServerRequest(
-				RequestType.CATCH_POKEMON, reqMsg,
-				new PokeAFunc<CatchPokemonResponseOuterClass.CatchPokemonResponse, CatchResult>() {
-					@Override
-					public CatchResult exec(CatchPokemonResponseOuterClass.CatchPokemonResponse response) {
-						return new CatchResult(response);
-					}
-				}, customCallback, api);
+			new AsyncServerRequest(RequestType.CATCH_POKEMON, reqMsg,
+					new PokeAFunc<CatchPokemonResponseOuterClass.CatchPokemonResponse, CatchResult>() {
+						@Override
+						public CatchResult exec(CatchPokemonResponseOuterClass.CatchPokemonResponse response) {
+							return new CatchResult(response);
+						}
+					}, wrappedCallback, api);
+		} catch (NoSuchItemException e) {
+			callback.fire(e);
+		}
+
+		return callback;
 	}
+
 
 	/**
 	 * Tries to use an item on a catchable pokemon (ie razzberry).
 	 *
 	 * @param item     the item ID
 	 * @param callback an optional callback to handle results
+	 * @return callback passed as argument
 	 */
-	public void useItem(ItemId item, PokeCallback<CatchItemResult> callback) {
-		UseItemCaptureMessage reqMsg = UseItemCaptureMessage
-				.newBuilder()
-				.setEncounterId(this.getEncounterId())
-				.setSpawnPointId(this.getSpawnPointId())
-				.setItemId(item)
-				.build();
+	public PokeCallback<CatchItemResult> useItem(ItemId item, PokeCallback<CatchItemResult> callback) {
+		UseItemCaptureMessage reqMsg = UseItemCaptureMessage.newBuilder().setEncounterId(
+				this.getEncounterId()).setSpawnPointId(this.getSpawnPointId()).setItemId(item).build();
 
 		new AsyncServerRequest(RequestType.USE_ITEM_CAPTURE, reqMsg,
 				new PokeAFunc<UseItemCaptureResponseOuterClass.UseItemCaptureResponse, CatchItemResult>() {
@@ -382,6 +347,7 @@ public class CatchablePokemon implements MapPoint {
 						return new CatchItemResult(response);
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	@Override
@@ -389,8 +355,7 @@ public class CatchablePokemon implements MapPoint {
 		if (obj == this) {
 			return true;
 		} else if (obj instanceof CatchablePokemon) {
-			return this.getEncounterId() == ((CatchablePokemon) obj)
-					.getEncounterId();
+			return this.getEncounterId() == ((CatchablePokemon) obj).getEncounterId();
 		}
 		return false;
 	}

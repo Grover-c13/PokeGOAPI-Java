@@ -123,7 +123,8 @@ public class PlayerProfile {
 							return null;
 						}
 
-						if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
+						if (!tutorialStates.contains(
+								TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
 							firstTimeExperienceComplete();
 						}
 
@@ -136,8 +137,10 @@ public class PlayerProfile {
 	 * Update profile
 	 *
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void updateProfile(PokeCallback<PlayerProfile> callback) {
+	public PokeCallback<PlayerProfile> updateProfile(PokeCallback<PlayerProfile> callback) {
 		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
 				.setPlayerLocale(playerLocale.getPlayerLocale())
 				.build();
@@ -150,6 +153,7 @@ public class PlayerProfile {
 						return PlayerProfile.this;
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	/**
@@ -182,15 +186,18 @@ public class PlayerProfile {
 	 * server until a player actively accepts them.
 	 * The rewarded items are automatically inserted into the players item bag.
 	 *
-	 * @param level the trainer level that you want to accept the rewards for
+	 * @param level    the trainer level that you want to accept the rewards for
 	 * @param callback an optional callback to handle results
 	 * @see PlayerLevelUpRewards
+	 *
+	 * @return callback passed as argument
 	 */
-	public void acceptLevelUpRewards(int level, PokeCallback<PlayerLevelUpRewards> callback) {
+	public PokeCallback<PlayerLevelUpRewards> acceptLevelUpRewards(int level,
+			PokeCallback<PlayerLevelUpRewards> callback) {
 		// Check if we even have achieved this level yet
 		if (level > stats.getLevel()) {
-			callback.onResponse(new PlayerLevelUpRewards(PlayerLevelUpRewards.Status.NOT_UNLOCKED_YET));
-			return;
+			callback.fire(new PlayerLevelUpRewards(PlayerLevelUpRewards.Status.NOT_UNLOCKED_YET));
+			return callback;
 		}
 
 		LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder()
@@ -211,6 +218,7 @@ public class PlayerProfile {
 						return new PlayerLevelUpRewards(response);
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	/**
@@ -324,9 +332,11 @@ public class PlayerProfile {
 	 * Set the account to legal screen in order to receive valid response
 	 *
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void activateAccount(PokeCallback<PlayerProfile> callback) {
-		markTutorial(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN, callback);
+	public PokeCallback<PlayerProfile> activateAccount(PokeCallback<PlayerProfile> callback) {
+		return markTutorial(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN, callback);
 	}
 
 	/**
@@ -345,8 +355,10 @@ public class PlayerProfile {
 	 * Setup an avatar for the current account
 	 *
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void setupAvatar(PokeCallback<SetAvatarResponse.Status> callback) {
+	public PokeCallback<SetAvatarResponse.Status> setupAvatar(PokeCallback<SetAvatarResponse.Status> callback) {
 		Random random = new Random();
 
 		final PlayerAvatarOuterClass.PlayerAvatar.Builder playerAvatarBuilder =
@@ -385,6 +397,7 @@ public class PlayerProfile {
 						return response.getStatus();
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	/**
@@ -403,8 +416,11 @@ public class PlayerProfile {
 	 * Encounter tutorial complete. In other words, catch the first Pokémon
 	 *
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void encounterTutorialComplete(PokeCallback<EncounterTutorialCompleteResponse.Result> callback) {
+	public PokeCallback<EncounterTutorialCompleteResponse.Result> encounterTutorialComplete(
+			PokeCallback<EncounterTutorialCompleteResponse.Result> callback) {
 		Random random = new Random();
 		int pokemonId = random.nextInt(4);
 
@@ -425,6 +441,7 @@ public class PlayerProfile {
 						return response.getResult();
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	/**
@@ -443,8 +460,11 @@ public class PlayerProfile {
 	 * Setup an user name for our account
 	 *
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void claimCodeName(final PokeCallback<ClaimCodenameResponse.Status> callback) {
+	public PokeCallback<ClaimCodenameResponse.Status> claimCodeName(
+			final PokeCallback<ClaimCodenameResponse.Status> callback) {
 		ClaimCodenameMessage claimCodenameMessage = ClaimCodenameMessage.newBuilder()
 				.setCodename(randomCodenameGenerator())
 				.build();
@@ -472,6 +492,7 @@ public class PlayerProfile {
 				}, callback, api);
 
 		updateProfile(null);
+		return callback;
 	}
 
 	/**
@@ -485,18 +506,22 @@ public class PlayerProfile {
 	 * The last step, mark the last tutorial state as completed
 	 *
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void firstTimeExperienceComplete(PokeCallback<PlayerProfile> callback) {
+	public PokeCallback<PlayerProfile> firstTimeExperienceComplete(PokeCallback<PlayerProfile> callback) {
 		markTutorial(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE, callback);
+		return callback;
 	}
 
 	/**
 	 * Mark the tutorial state as complete
 	 *
-	 * @param state the tutorial state
+	 * @param state    the tutorial state
 	 * @param callback an optional callback to handle results
 	 */
-	private void markTutorial(TutorialStateOuterClass.TutorialState state, PokeCallback<PlayerProfile> callback) {
+	private PokeCallback<PlayerProfile> markTutorial(TutorialStateOuterClass.TutorialState state,
+			PokeCallback<PlayerProfile> callback) {
 		final MarkTutorialCompleteMessage tutorialMessage = MarkTutorialCompleteMessage.newBuilder()
 				.addTutorialsCompleted(state)
 				.setSendMarketingEmails(false)
@@ -510,6 +535,7 @@ public class PlayerProfile {
 						return PlayerProfile.this;
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	private static String randomCodenameGenerator() {

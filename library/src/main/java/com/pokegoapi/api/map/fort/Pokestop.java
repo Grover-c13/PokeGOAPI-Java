@@ -128,8 +128,10 @@ public class Pokestop {
 	 * Loots a pokestop for pokeballs and other items.
 	 *
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void loot(PokeCallback<PokestopLootResult> callback) {
+	public PokeCallback<PokestopLootResult>  loot(PokeCallback<PokestopLootResult> callback) {
 		FortSearchMessage searchMessage = FortSearchMessage.newBuilder()
 				.setFortId(getId())
 				.setFortLatitude(getLatitude())
@@ -146,6 +148,7 @@ public class Pokestop {
 						return new PokestopLootResult(response);
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	/**
@@ -153,8 +156,10 @@ public class Pokestop {
 	 *
 	 * @param item the modifier to add to this pokestop
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void addModifier(ItemIdOuterClass.ItemId item, PokeCallback<Boolean> callback) {
+	public PokeCallback<Boolean> addModifier(ItemIdOuterClass.ItemId item, PokeCallback<Boolean> callback) {
 		AddFortModifierMessage msg = AddFortModifierMessage.newBuilder()
 				.setModifierType(item)
 				.setFortId(getId())
@@ -169,14 +174,17 @@ public class Pokestop {
 						return Boolean.TRUE;
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	/**
 	 * Get more detailed information about a pokestop.
 	 *
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void getDetails(PokeCallback<FortDetails> callback) {
+	public PokeCallback<FortDetails> getDetails(PokeCallback<FortDetails> callback) {
 		FortDetailsMessage reqMsg = FortDetailsMessage.newBuilder()
 				.setFortId(getId())
 				.setLatitude(getLatitude())
@@ -190,6 +198,7 @@ public class Pokestop {
 						return new FortDetails(response);
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	/**

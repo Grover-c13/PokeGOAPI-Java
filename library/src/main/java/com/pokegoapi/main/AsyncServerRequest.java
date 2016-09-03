@@ -44,16 +44,16 @@ public class AsyncServerRequest<T extends GeneratedMessage, K> {
 	/**
 	 * Instantiates a new Server request.
 	 *
-	 * @param type the type
-	 * @param req  the req
-	 * @param func internal func to handle data
+	 * @param type     the type
+	 * @param req      the req
+	 * @param func     internal func to handle data
 	 * @param callback an optional callback to handle results
-	 * @param api the current instance of PokemonGo used to bound common requests
+	 * @param api      the current instance of PokemonGo used to bound common requests
 	 * @param requests requests to bound in the same request envelope
 	 */
 	public AsyncServerRequest(RequestType type, GeneratedMessage req, PokeAFunc<T, K> func,
-								PokeCallback<K> callback, PokemonGo api,
-								InternalServerRequest... requests) {
+			PokeCallback<K> callback, PokemonGo api,
+			InternalServerRequest... requests) {
 		Request.Builder reqBuilder = Request.newBuilder();
 		reqBuilder.setRequestMessage(req.toByteString());
 		reqBuilder.setRequestType(type);
@@ -84,13 +84,13 @@ public class AsyncServerRequest<T extends GeneratedMessage, K> {
 				response = func.exec(data);
 			} catch (Throwable e) {
 				if (callback != null) {
-					callback.onError(e);
+					callback.fire(e);
 				}
 			}
 		}
 
 		if (callback != null) {
-			callback.onResponse(response);
+			callback.fire(response);
 		}
 	}
 
@@ -101,7 +101,7 @@ public class AsyncServerRequest<T extends GeneratedMessage, K> {
 	 */
 	public void fire(Throwable error) {
 		if (callback != null) {
-			callback.onError(error);
+			callback.fire(error);
 		}
 	}
 }

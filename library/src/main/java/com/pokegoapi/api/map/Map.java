@@ -57,10 +57,10 @@ public class Map {
 	/**
 	 * Returns the cells requested.
 	 *
-	 * @param cellIds List of cellId
+	 * @param cellIds  List of cellId
 	 * @param callback an optional callback to handle results
 	 */
-	private void getMapObjects(List<Long> cellIds, PokeCallback<MapObjects> callback) {
+	private PokeCallback<MapObjects> getMapObjects(List<Long> cellIds, PokeCallback<MapObjects> callback) {
 		lastMapUpdate = api.currentTimeMillis();
 		GetMapObjectsMessage.Builder builder = GetMapObjectsMessageOuterClass.GetMapObjectsMessage.newBuilder()
 				.setLatitude(api.getLatitude())
@@ -73,7 +73,7 @@ public class Map {
 
 		new AsyncServerRequest(
 				RequestType.GET_MAP_OBJECTS, builder.build(),
-				new PokeAFunc<GetMapObjectsResponseOuterClass.GetMapObjectsResponse,MapObjects>() {
+				new PokeAFunc<GetMapObjectsResponseOuterClass.GetMapObjectsResponse, MapObjects>() {
 					@Override
 					public MapObjects exec(GetMapObjectsResponseOuterClass.GetMapObjectsResponse response) {
 						MapObjects result = new MapObjects(api);
@@ -102,15 +102,18 @@ public class Map {
 						return result;
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	/**
 	 * Request a MapObjects around your current location.
 	 *
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void getMapObjects(final PokeCallback<MapObjects> callback) {
-		getMapObjects(getDefaultCells(), callback);
+	public PokeCallback<MapObjects> getMapObjects(final PokeCallback<MapObjects> callback) {
+		return getMapObjects(getDefaultCells(), callback);
 	}
 
 	/**

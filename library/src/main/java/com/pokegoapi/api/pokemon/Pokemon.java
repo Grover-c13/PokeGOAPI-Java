@@ -70,8 +70,11 @@ public class Pokemon extends PokemonDetails {
 	 * Transfers the pokemon.
 	 *
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void transferPokemon(PokeCallback<ReleasePokemonResponse.Result> callback) {
+	public PokeCallback<ReleasePokemonResponse.Result> transferPokemon(
+			PokeCallback<ReleasePokemonResponse.Result> callback) {
 		ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
 		new AsyncServerRequest(RequestType.RELEASE_POKEMON, reqMsg,
@@ -81,6 +84,7 @@ public class Pokemon extends PokemonDetails {
 						return response.getResult();
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	/**
@@ -88,8 +92,11 @@ public class Pokemon extends PokemonDetails {
 	 *
 	 * @param nickname the nickname
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void renamePokemon(String nickname, PokeCallback<NicknamePokemonResponse.Result> callback) {
+	public PokeCallback<NicknamePokemonResponse.Result> renamePokemon(String nickname,
+			PokeCallback<NicknamePokemonResponse.Result> callback) {
 		NicknamePokemonMessage reqMsg = NicknamePokemonMessage.newBuilder()
 				.setPokemonId(getId())
 				.setNickname(nickname)
@@ -102,6 +109,7 @@ public class Pokemon extends PokemonDetails {
 						return response.getResult();
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	/**
@@ -109,8 +117,11 @@ public class Pokemon extends PokemonDetails {
 	 *
 	 * @param markFavorite Mark Pokemon as Favorite?
 	 * @param callback     an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void setFavoritePokemon(boolean markFavorite, PokeCallback<SetFavoritePokemonResponse.Result> callback) {
+	public PokeCallback<SetFavoritePokemonResponse.Result> setFavoritePokemon(boolean markFavorite,
+			PokeCallback<SetFavoritePokemonResponse.Result> callback) {
 		SetFavoritePokemonMessage reqMsg = SetFavoritePokemonMessage.newBuilder()
 				.setPokemonId(getId())
 				.setIsFavorite(markFavorite)
@@ -123,6 +134,7 @@ public class Pokemon extends PokemonDetails {
 						return response.getResult();
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	/**
@@ -164,8 +176,10 @@ public class Pokemon extends PokemonDetails {
 	 * After powering up this pokemon object will reflect the new changes.
 	 *
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void powerUp(PokeCallback<UpgradePokemonResponse.Result> callback) {
+	public PokeCallback<UpgradePokemonResponse.Result> powerUp(PokeCallback<UpgradePokemonResponse.Result> callback) {
 		UpgradePokemonMessage reqMsg = UpgradePokemonMessage.newBuilder().setPokemonId(getId()).build();
 		new AsyncServerRequest(RequestType.UPGRADE_POKEMON, reqMsg,
 				new PokeAFunc<UpgradePokemonResponse, UpgradePokemonResponse.Result>() {
@@ -176,14 +190,17 @@ public class Pokemon extends PokemonDetails {
 						return response.getResult();
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	/**
 	 * Evolve evolution result.
 	 *
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void evolve(PokeCallback<EvolutionResult> callback) {
+	public PokeCallback<EvolutionResult> evolve(PokeCallback<EvolutionResult> callback) {
 		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
 		new AsyncServerRequest(RequestType.EVOLVE_POKEMON, reqMsg,
@@ -194,6 +211,7 @@ public class Pokemon extends PokemonDetails {
 						return result;
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	/**
@@ -218,34 +236,33 @@ public class Pokemon extends PokemonDetails {
 	 * Heal a pokemon, using various fallbacks for potions
 	 *
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void heal(PokeCallback<UseItemPotionResponse.Result> callback) {
+	public PokeCallback<UseItemPotionResponse.Result> heal(PokeCallback<UseItemPotionResponse.Result> callback) {
 		if (!isInjured()) {
-			callback.onResponse(UseItemPotionResponse.Result.ERROR_CANNOT_USE);
-			return;
+			callback.fire(UseItemPotionResponse.Result.ERROR_CANNOT_USE);
+			return callback;
 		}
 
 		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_POTION).getCount() > 0) {
-			usePotion(ItemId.ITEM_POTION, callback);
-			return;
+			return usePotion(ItemId.ITEM_POTION, callback);
 		}
 
 		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_SUPER_POTION).getCount() > 0) {
-			usePotion(ItemId.ITEM_SUPER_POTION, callback);
-			return;
+			return usePotion(ItemId.ITEM_SUPER_POTION, callback);
 		}
 
 		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_HYPER_POTION).getCount() > 0) {
-			usePotion(ItemId.ITEM_HYPER_POTION, callback);
-			return;
+			return usePotion(ItemId.ITEM_HYPER_POTION, callback);
 		}
 
 		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_MAX_POTION).getCount() > 0) {
-			usePotion(ItemId.ITEM_MAX_POTION, callback);
-			return;
+			return usePotion(ItemId.ITEM_MAX_POTION, callback);
 		}
 
-		callback.onResponse(UseItemPotionResponse.Result.ERROR_CANNOT_USE);
+		callback.fire(UseItemPotionResponse.Result.ERROR_CANNOT_USE);
+		return callback;
 	}
 
 	/**
@@ -254,13 +271,16 @@ public class Pokemon extends PokemonDetails {
 	 *
 	 * @param itemId   {@link ItemId} of the potion to use.
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void usePotion(ItemId itemId, PokeCallback<UseItemPotionResponse.Result> callback) {
+	public PokeCallback<UseItemPotionResponse.Result> usePotion(ItemId itemId,
+			PokeCallback<UseItemPotionResponse.Result> callback) {
 		Item potion = api.getInventories().getItemBag().getItem(itemId);
 		//some sanity check, to prevent wrong use of this call
 		if (!potion.isPotion() || potion.getCount() < 1 || !isInjured()) {
-			callback.onResponse(UseItemPotionResponse.Result.ERROR_CANNOT_USE);
-			return;
+			callback.fire(UseItemPotionResponse.Result.ERROR_CANNOT_USE);
+			return callback;
 		}
 
 		UseItemPotionMessageOuterClass.UseItemPotionMessage reqMsg = UseItemPotionMessageOuterClass.UseItemPotionMessage
@@ -279,30 +299,32 @@ public class Pokemon extends PokemonDetails {
 						return response.getResult();
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	/**
 	 * Revive a pokemon, using various fallbacks for revive items
 	 *
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void revive(PokeCallback<UseItemReviveResponse.Result> callback) {
+	public PokeCallback<UseItemReviveResponse.Result> revive(PokeCallback<UseItemReviveResponse.Result> callback) {
 		if (!isFainted()) {
-			callback.onResponse(UseItemReviveResponse.Result.ERROR_CANNOT_USE);
-			return;
+			callback.fire(UseItemReviveResponse.Result.ERROR_CANNOT_USE);
+			return callback;
 		}
 
 		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_REVIVE).getCount() > 0) {
-			useRevive(ItemId.ITEM_REVIVE, callback);
-			return;
+			return useRevive(ItemId.ITEM_REVIVE, callback);
 		}
 
 		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_MAX_REVIVE).getCount() > 0) {
-			useRevive(ItemId.ITEM_MAX_REVIVE, callback);
-			return;
+			return useRevive(ItemId.ITEM_MAX_REVIVE, callback);
 		}
 
-		callback.onResponse(UseItemReviveResponse.Result.ERROR_CANNOT_USE);
+		callback.fire(UseItemReviveResponse.Result.ERROR_CANNOT_USE);
+		return callback;
 	}
 
 	/**
@@ -311,12 +333,15 @@ public class Pokemon extends PokemonDetails {
 	 *
 	 * @param itemId   {@link ItemId} of the Revive to use.
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void useRevive(ItemId itemId, PokeCallback<UseItemReviveResponse.Result> callback) {
+	public PokeCallback<UseItemReviveResponse.Result> useRevive(ItemId itemId,
+			PokeCallback<UseItemReviveResponse.Result> callback) {
 		Item item = api.getInventories().getItemBag().getItem(itemId);
 		if (!item.isRevive() || item.getCount() < 1 || !isFainted()) {
-			callback.onResponse(UseItemReviveResponse.Result.ERROR_CANNOT_USE);
-			return;
+			callback.fire(UseItemReviveResponse.Result.ERROR_CANNOT_USE);
+			return callback;
 		}
 
 		UseItemReviveMessageOuterClass.UseItemReviveMessage reqMsg = UseItemReviveMessageOuterClass.UseItemReviveMessage
@@ -334,6 +359,7 @@ public class Pokemon extends PokemonDetails {
 						return response.getResult();
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	public EvolutionForm getEvolutionForm() {

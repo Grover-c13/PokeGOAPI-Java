@@ -39,12 +39,15 @@ public class EggPokemon {
 	 *
 	 * @param incubator : the incubator
 	 * @param callback  an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void incubate(EggIncubator incubator, PokeCallback<UseItemEggIncubatorResponse> callback) {
+	public PokeCallback<UseItemEggIncubatorResponse> incubate(EggIncubator incubator,
+			PokeCallback<UseItemEggIncubatorResponse> callback) {
 		if (incubator.isInUse()) {
 			throw new IllegalArgumentException("Incubator already used");
 		}
-		incubator.hatchEgg(this, callback);
+		return incubator.hatchEgg(this, callback);
 	}
 
 	/**
@@ -67,7 +70,7 @@ public class EggPokemon {
 	/**
 	 * Build a EggPokemon wrapper from the proto.
 	 *
-	 * @param api : current api
+	 * @param api   : current api
 	 * @param proto : the prototype
 	 */
 	public EggPokemon(PokemonGo api, PokemonData proto) {

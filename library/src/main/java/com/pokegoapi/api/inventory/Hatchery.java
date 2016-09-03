@@ -44,8 +44,13 @@ public class Hatchery {
 		this.api = api;
 	}
 
+	/**
+	 * Add an egg to inventory, if absent, update it if it's already there.
+	 *
+	 * @param egg data of the eggs
+	 */
 	public void addEgg(PokemonDataOuterClass.PokemonData egg) {
-		EggPokemon current =  eggs.putIfAbsent(egg.getId(), new EggPokemon(api, egg));
+		EggPokemon current = eggs.putIfAbsent(egg.getId(), new EggPokemon(api, egg));
 		if (current != null) {
 			current.setProto(egg);
 		}
@@ -55,8 +60,10 @@ public class Hatchery {
 	 * Get if eggs has hatched.
 	 *
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void queryHatchedEggs(PokeCallback<List<HatchedEgg>> callback) {
+	public PokeCallback<List<HatchedEgg>> queryHatchedEggs(PokeCallback<List<HatchedEgg>> callback) {
 		GetHatchedEggsMessage msg = GetHatchedEggsMessage.newBuilder().build();
 
 		new AsyncServerRequest(RequestType.GET_HATCHED_EGGS, msg,
@@ -73,5 +80,6 @@ public class Hatchery {
 						return eggs;
 					}
 				}, callback, api);
+		return callback;
 	}
 }

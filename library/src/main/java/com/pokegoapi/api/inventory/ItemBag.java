@@ -47,6 +47,11 @@ public class ItemBag {
 		this.api = api;
 	}
 
+	/**
+	 * Add an item to inventory, if absent, update it if it's already there.
+	 *
+	 * @param item object that have to be added
+	 */
 	public void addItem(ItemData item) {
 		Item current = items.putIfAbsent(item.getItemId(), new Item(item));
 		if (current != null) {
@@ -61,8 +66,10 @@ public class ItemBag {
 	 * @param id       the id
 	 * @param quantity the quantity
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void removeItem(ItemId id, int quantity, PokeCallback<Result> callback) {
+	public PokeCallback<Result> removeItem(ItemId id, int quantity, PokeCallback<Result> callback) {
 		final Item item = getItem(id);
 		if (item.getCount() < quantity) {
 			throw new IllegalArgumentException("You cannont remove more quantity than you have");
@@ -81,6 +88,7 @@ public class ItemBag {
 						return response.getResult();
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	/**
@@ -122,12 +130,16 @@ public class ItemBag {
 	/**
 	 * use an item with itemID
 	 *
-	 * @param type type of item
+	 * @param type     type of item
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void useItem(ItemId type, PokeCallback<UseIncenseResponse.Result> callback) {
+	public PokeCallback<UseIncenseResponse.Result> useItem(ItemId type,
+			PokeCallback<UseIncenseResponse.Result> callback) {
 		if (type == ItemId.UNRECOGNIZED) {
-			throw new IllegalArgumentException("You cannot use item for UNRECOGNIZED");
+			callback.fire(new IllegalArgumentException("You cannot use item for UNRECOGNIZED"));
+			return callback;
 		}
 
 		switch (type) {
@@ -140,15 +152,19 @@ public class ItemBag {
 			default:
 				break;
 		}
+		return callback;
 	}
 
 	/**
 	 * use an incense
 	 *
-	 * @param type type of item
+	 * @param type     type of item
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void useIncense(ItemId type, PokeCallback<UseIncenseResponse.Result> callback) {
+	public PokeCallback<UseIncenseResponse.Result> useIncense(ItemId type,
+			PokeCallback<UseIncenseResponse.Result> callback) {
 		UseIncenseMessage useIncenseMessage =
 				UseIncenseMessage.newBuilder()
 						.setIncenseType(type)
@@ -162,23 +178,29 @@ public class ItemBag {
 						return response.getResult();
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	/**
 	 * use an item with itemID
 	 *
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void useIncense(PokeCallback<UseIncenseResponse.Result> callback) {
+	public PokeCallback<UseIncenseResponse.Result> useIncense(PokeCallback<UseIncenseResponse.Result> callback) {
 		useIncense(ItemId.ITEM_INCENSE_ORDINARY, callback);
+		return callback;
 	}
 
 	/**
 	 * use a lucky egg
 	 *
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void useLuckyEgg(PokeCallback<UseItemXpBoostResponse> callback) {
+	public PokeCallback<UseItemXpBoostResponse> useLuckyEgg(PokeCallback<UseItemXpBoostResponse> callback) {
 		UseItemXpBoostMessage xpMsg = UseItemXpBoostMessage
 				.newBuilder()
 				.setItemId(ItemId.ITEM_LUCKY_EGG)
@@ -192,6 +214,7 @@ public class ItemBag {
 						return response;
 					}
 				}, callback, api);
+		return callback;
 	}
 
 }

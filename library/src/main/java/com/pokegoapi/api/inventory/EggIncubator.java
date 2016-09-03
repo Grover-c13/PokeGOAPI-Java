@@ -57,8 +57,11 @@ public class EggIncubator {
 	 *
 	 * @param egg      the egg
 	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void hatchEgg(EggPokemon egg, PokeCallback<UseItemEggIncubatorResponse> callback) {
+	public PokeCallback<UseItemEggIncubatorResponse> hatchEgg(EggPokemon egg,
+			PokeCallback<UseItemEggIncubatorResponse> callback) {
 		UseItemEggIncubatorMessage reqMsg = UseItemEggIncubatorMessage.newBuilder()
 				.setItemId(proto.getId())
 				.setPokemonId(egg.getId())
@@ -71,6 +74,7 @@ public class EggIncubator {
 						return response;
 					}
 				}, callback, api);
+		return callback;
 	}
 
 	/**

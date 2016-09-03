@@ -93,7 +93,7 @@ public class CatchPokemonAtAreaExample {
 							if (encResult.wasSuccessful()) {
 								System.out.println("Encounted:" + cp.getPokemonId());
 								AsyncCatchOptions options = new AsyncCatchOptions(go);
-								options.useRazzberries(true);
+								options.setRazzBerries(3);
 
 								cp.catchPokemon(options, new PokeCallback<CatchResult>() {
 									@Override
