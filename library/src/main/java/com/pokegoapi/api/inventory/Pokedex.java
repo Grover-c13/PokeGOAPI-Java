@@ -28,9 +28,6 @@ public class Pokedex {
 	public Pokedex() {
 	}
 
-	public void reset() {
-		pokedexMap.clear();
-	}
 
 	/**
 	 * Add/Update a PokdexEntry.

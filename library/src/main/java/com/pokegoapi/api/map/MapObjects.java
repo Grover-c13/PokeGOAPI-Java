@@ -15,18 +15,22 @@
 
 package com.pokegoapi.api.map;
 
+import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.fort.Pokestop;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass.NearbyPokemon;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Map.SpawnPointOuterClass.SpawnPoint;
+import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -176,53 +180,26 @@ public class MapObjects {
 		return complete;
 	}
 
-
 	/**
-	 * updates the object.
+	 * Get all the catchable pokemon on the current map
 	 *
-	 * @param other Update this {@link MapObjects} data with the provided data.
-	 */
-	@Deprecated
-	public void update(MapObjects other) {
-
-		nearbyPokemons.clear();
-		addNearbyPokemons(other.getNearbyPokemons());
-
-		catchablePokemons.clear();
-		addCatchablePokemons(other.getCatchablePokemons());
-
-		wildPokemons.clear();
-		addWildPokemons(other.getWildPokemons());
-
-		decimatedSpawnPoints.clear();
-		addDecimatedSpawnPoints(other.getDecimatedSpawnPoints());
-
-		spawnPoints.clear();
-		addSpawnPoints(other.getSpawnPoints());
-
-
-		/* for (FortData otherGym: other.getGyms()) {
-			Iterator<FortData> iterator = gyms.iterator();
-			while (iterator.hasNext()) {
-				FortData gym = iterator.next();
-				if (otherGym.getId().equals(gym.getId())) {
-					gyms.remove(gym);
-					break;
-				}
-			}
-			gyms.add(otherGym);
+	 * @return a set of catchable pokemon
+     */
+	public Set<CatchablePokemon> getAllCatchablePokemons() {
+		Set<CatchablePokemon> catchablePokemons = new HashSet<>();
+		for (MapPokemon mapPokemon : getCatchablePokemons()) {
+			catchablePokemons.add(new CatchablePokemon(api, mapPokemon));
 		}
 
-		/*for (Pokestop otherPokestop: other.getPokestops()) {
-			Iterator<Pokestop> iterator = pokestops.iterator();
-			while (iterator.hasNext()) {
-				Pokestop pokestop = iterator.next();
-				if (otherPokestop.getId().equals(pokestop.getId())) {
-					pokestops.remove(pokestop);
-					break;
-				}
+		for (WildPokemonOuterClass.WildPokemon wildPokemon : getWildPokemons()) {
+			catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
+		}
+
+		for (Pokestop pokestop : getPokestops()) {
+			if (pokestop.inRangeForLuredPokemon() && pokestop.getFortData().hasLureInfo()) {
+				catchablePokemons.add(new CatchablePokemon(api, pokestop.getFortData()));
 			}
-			pokestops.add(otherPokestop);
-		}*/
+		}
+		return catchablePokemons;
 	}
 }

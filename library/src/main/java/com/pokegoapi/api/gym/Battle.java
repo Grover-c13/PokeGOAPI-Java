@@ -15,12 +15,10 @@
 
 package com.pokegoapi.api.gym;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +28,6 @@ import POGOProtos.Data.Battle.BattleActionTypeOuterClass;
 import POGOProtos.Data.Battle.BattlePokemonInfoOuterClass.BattlePokemonInfo;
 import POGOProtos.Data.Battle.BattleStateOuterClass.BattleState;
 import POGOProtos.Data.PokemonDataOuterClass;
-import POGOProtos.Networking.Requests.Messages.AttackGymMessageOuterClass.AttackGymMessage;
-import POGOProtos.Networking.Requests.Messages.StartGymBattleMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.StartGymBattleMessageOuterClass.StartGymBattleMessage.Builder;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.AttackGymResponseOuterClass.AttackGymResponse;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse.Result;
@@ -76,7 +70,7 @@ public class Battle {
 	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public Result start() throws LoginFailedException, RemoteServerException {
-
+		/*
 		Builder builder = StartGymBattleMessageOuterClass.StartGymBattleMessage.newBuilder();
 
 		for (Pokemon team : teams) {
@@ -108,9 +102,9 @@ public class Battle {
 			gymIndex.add(action.getTargetIndex());
 		}
 
-		return battleResponse.getResult();
+		return battleResponse.getResult();*/
+		return null;
 	}
-
 
 	/**
 	 * Attack a gym.
@@ -137,7 +131,6 @@ public class Battle {
 
 		return doActions(actions);
 	}
-
 
 	/**
 	 * Creates a battle pokemon object to send with the request.
@@ -182,6 +175,7 @@ public class Battle {
 	 * @return AttackGymResponse
 	 */
 	private AttackGymResponse sendBlankAction() throws LoginFailedException, RemoteServerException {
+		/*
 		AttackGymMessage message = AttackGymMessage
 				.newBuilder()
 				.setGymId(gym.getId())
@@ -198,7 +192,8 @@ public class Battle {
 			return AttackGymResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException();
-		}
+		}*/
+		return null;
 	}
 
 
@@ -209,8 +204,7 @@ public class Battle {
 	 * @return AttackGymResponse
 	 */
 	private AttackGymResponse doActions(List<BattleAction> actions) throws LoginFailedException, RemoteServerException {
-
-
+		/*
 		AttackGymMessage.Builder message = AttackGymMessage
 				.newBuilder()
 				.setGymId(gym.getId())
@@ -242,8 +236,8 @@ public class Battle {
 			return response;
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException();
-		}
+		}*/
 
+		return null;
 	}
-
 }

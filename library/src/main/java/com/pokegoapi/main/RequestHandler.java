@@ -18,48 +18,39 @@ package com.pokegoapi.main;
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
-
 import com.google.protobuf.ByteString;
+import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.AsyncPokemonGoException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.Signature;
-
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import rx.Observable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class RequestHandler implements Runnable {
 	private static final String TAG = RequestHandler.class.getSimpleName();
 	private final PokemonGo api;
 	private final Thread asyncHttpThread;
 	private final BlockingQueue<AsyncServerRequest> workQueue = new LinkedBlockingQueue<>();
-	private final Map<Long, ResultOrException> resultMap = new HashMap<>();
 	private String apiEndpoint;
 	private OkHttpClient client;
 	private Long requestId = new Random().nextLong();
+	private Random random;
+
+	private ExecutorService decoupler = Executors.newCachedThreadPool();
 
 	/**
 	 * Instantiates a new Request handler.
@@ -70,6 +61,7 @@ public class RequestHandler implements Runnable {
 	public RequestHandler(PokemonGo api, OkHttpClient client) {
 		this.api = api;
 		this.client = client;
+		this.random = new Random();
 		apiEndpoint = ApiSettings.API_ENDPOINT;
 		asyncHttpThread = new Thread(this, "Async HTTP Thread");
 		asyncHttpThread.setDaemon(true);
@@ -77,66 +69,14 @@ public class RequestHandler implements Runnable {
 	}
 
 	/**
-	 * Make an async server request. The answer will be provided in the future
+	 * This method is called internally from the AsyncServerRequest and is the unique method
+	 * to queue a request. Response is provided through proper callbacks built in the constructor
+	 * of each request
 	 *
 	 * @param asyncServerRequest Request to make
-	 * @return ByteString response to be processed in the future
 	 */
-	public Observable<ByteString> sendAsyncServerRequests(final AsyncServerRequest asyncServerRequest) {
+	protected void sendRequest(final AsyncServerRequest asyncServerRequest) {
 		workQueue.offer(asyncServerRequest);
-		return Observable.from(new Future<ByteString>() {
-			@Override
-			public boolean cancel(boolean mayInterruptIfRunning) {
-				return false;
-			}
-
-			@Override
-			public boolean isCancelled() {
-				return false;
-			}
-
-			@Override
-			public boolean isDone() {
-				return resultMap.containsKey(asyncServerRequest.getId());
-			}
-
-			@Override
-			public ByteString get() throws InterruptedException, ExecutionException {
-				ResultOrException resultOrException = getResult(1, TimeUnit.MINUTES);
-				while (resultOrException == null) {
-					resultOrException = getResult(1, TimeUnit.MINUTES);
-				}
-				if (resultOrException.getException() != null) {
-					throw new ExecutionException(resultOrException.getException());
-				}
-				return resultOrException.getResult();
-			}
-
-			@Override
-			public ByteString get(long timeout, TimeUnit unit)
-					throws InterruptedException, ExecutionException, TimeoutException {
-				ResultOrException resultOrException = getResult(timeout, unit);
-				if (resultOrException == null) {
-					throw new TimeoutException("No result found");
-				}
-				if (resultOrException.getException() != null) {
-					throw new ExecutionException(resultOrException.getException());
-				}
-				return resultOrException.getResult();
-
-			}
-
-			private ResultOrException getResult(long timeout, TimeUnit timeUnit) throws InterruptedException {
-				long wait = api.currentTimeMillis() + timeUnit.toMillis(timeout);
-				while (!isDone()) {
-					Thread.sleep(10);
-					if (wait < api.currentTimeMillis()) {
-						return null;
-					}
-				}
-				return resultMap.remove(asyncServerRequest.getId());
-			}
-		});
 	}
 
 	/**
@@ -146,25 +86,7 @@ public class RequestHandler implements Runnable {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
-	public void sendServerRequests(ServerRequest... serverRequests) throws RemoteServerException, LoginFailedException {
-		List<Observable<ByteString>> observables = new ArrayList<>(serverRequests.length);
-		for (ServerRequest request : serverRequests) {
-			AsyncServerRequest asyncServerRequest = new AsyncServerRequest(request.getType(), request.getRequest());
-			observables.add(sendAsyncServerRequests(asyncServerRequest));
-		}
-		for (int i = 0; i != serverRequests.length; i++) {
-			serverRequests[i].handleData(AsyncHelper.toBlocking(observables.get(i)));
-		}
-	}
-
-	/**
-	 * Sends multiple ServerRequests in a thread safe manner.
-	 *
-	 * @param serverRequests list of ServerRequests to be sent
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
-	 */
-	private AuthTicket internalSendServerRequests(AuthTicket authTicket, ServerRequest... serverRequests)
+	private AuthTicket internalSendServerRequests(AuthTicket authTicket, InternalServerRequest... serverRequests)
 			throws RemoteServerException, LoginFailedException {
 		AuthTicket newAuthTicket = authTicket;
 		if (serverRequests.length == 0) {
@@ -173,7 +95,7 @@ public class RequestHandler implements Runnable {
 		RequestEnvelope.Builder builder = RequestEnvelope.newBuilder();
 		resetBuilder(builder, authTicket);
 
-		for (ServerRequest serverRequest : serverRequests) {
+		for (InternalServerRequest serverRequest : serverRequests) {
 			builder.addRequests(serverRequest.getRequest());
 		}
 
@@ -224,14 +146,13 @@ public class RequestHandler implements Runnable {
 				throw new RemoteServerException("Your account may be banned! please try from the official client.");
 			}
 
-
 			/**
 			 * map each reply to the numeric response,
 			 * ie first response = first request and send back to the requests to toBlocking.
 			 * */
 			int count = 0;
 			for (ByteString payload : responseEnvelop.getReturnsList()) {
-				ServerRequest serverReq = serverRequests[count];
+				InternalServerRequest serverReq = serverRequests[count];
 				/**
 				 * TODO: Probably all other payloads are garbage as well in this case,
 				 * so might as well throw an exception and leave this loop */
@@ -262,7 +183,10 @@ public class RequestHandler implements Runnable {
 			Log.d(TAG, "Authenticated with static token");
 			builder.setAuthInfo(api.getAuthInfo());
 		}
-		builder.setMsSinceLastLocationfix(989);
+
+		int lastLocFix = random.nextInt(1800 - 149) + 149;
+
+		builder.setMsSinceLastLocationfix(lastLocFix);
 		builder.setLatitude(api.getLatitude());
 		builder.setLongitude(api.getLongitude());
 		builder.setAltitude(api.getAltitude());
@@ -274,68 +198,67 @@ public class RequestHandler implements Runnable {
 
 	@Override
 	public void run() {
-		List<AsyncServerRequest> requests = new LinkedList<>();
+		AsyncServerRequest<GeneratedMessage, Object> request = null;
 		AuthTicket authTicket = null;
 		while (true) {
 			try {
-				Thread.sleep(350);
-			} catch (InterruptedException e) {
-				throw new AsyncPokemonGoException("System shutdown", e);
+				request = workQueue.take();
+			} catch (Throwable ignored) {
+				// Ignore
 			}
-			if (workQueue.isEmpty()) {
+
+			if (request == null) {
 				continue;
 			}
 
-			workQueue.drainTo(requests);
+			ArrayList<InternalServerRequest> serverRequests = new ArrayList<>();
 
-			ArrayList<ServerRequest> serverRequests = new ArrayList();
-			boolean addCommon = false;
-			for (AsyncServerRequest request : requests) {
-				serverRequests.add(new ServerRequest(request.getType(), request.getRequest()));
-				if (request.isRequireCommonRequest())
-					addCommon = true;
+			serverRequests.add(new InternalServerRequest(request.getType(), request.getRequest()));
+
+			for (InternalServerRequest extra : request.getBoundedRequests()) {
+				serverRequests.add(extra);
 			}
 
-			ServerRequest[] commonRequests = new ServerRequest[0];
-
-			if (addCommon) {
-				commonRequests = CommonRequest.getCommonRequests(api);
-				Collections.addAll(serverRequests, commonRequests);
-			}
-
-			ServerRequest[] arrayServerRequests = serverRequests.toArray(new ServerRequest[serverRequests.size()]);
+			final InternalServerRequest[] arrayServerRequests =
+					serverRequests.toArray(new InternalServerRequest[serverRequests.size()]);
 
 			try {
 				authTicket = internalSendServerRequests(authTicket, arrayServerRequests);
+				final AsyncServerRequest<GeneratedMessage,Object> current = request;
+				decoupler.execute(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							current.fire(arrayServerRequests[0].getData());
+						} catch (InvalidProtocolBufferException e) {
+							current.fire(e);
+						}
 
-				for (int i = 0; i != requests.size(); i++) {
-					try {
-						resultMap.put(requests.get(i).getId(), ResultOrException.getResult(arrayServerRequests[i].getData()));
-					} catch (InvalidProtocolBufferException e) {
-						resultMap.put(requests.get(i).getId(), ResultOrException.getError(e));
+						// Assuming all the bunded requests are commons
+						if (arrayServerRequests.length > 1) {
+							for (int i = 1; i != arrayServerRequests.length; i++) {
+								try {
+									CommonRequest.parse(api, arrayServerRequests[i].getType(),
+											arrayServerRequests[i].getData());
+								} catch (InvalidProtocolBufferException e) {
+									//TODO: notify error even in case of common requests?
+								}
+							}
+						}
 					}
-				}
-
-				for (int i = 0; i != commonRequests.length; i++) {
-					try {
-						CommonRequest.parse(api, arrayServerRequests[requests.size() + i].getType(),
-								arrayServerRequests[requests.size() + i].getData());
-					} catch (InvalidProtocolBufferException e) {
-						//TODO: notify error even in case of common requests?
-					}
-				}
+				});
 
 				continue;
 			} catch (RemoteServerException | LoginFailedException e) {
-				for (AsyncServerRequest request : requests) {
-					resultMap.put(request.getId(), ResultOrException.getError(e));
-				}
+				request.fire(e);
 				continue;
 			} finally {
-				requests.clear();
+				try {
+					Thread.sleep(350);
+				} catch (InterruptedException ignored) {
+					// Ignore
+				}
 			}
 		}
 	}
-
-
 }

@@ -15,7 +15,12 @@
 
 package com.pokegoapi.api;
 
-import com.google.protobuf.InvalidProtocolBufferException;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+
+import com.google.protobuf.GeneratedMessage;
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.LocationFixes;
@@ -27,27 +32,20 @@ import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.RequestHandler;
-import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.ClientInterceptor;
+import com.pokegoapi.util.PokeAFunc;
+import com.pokegoapi.util.PokeCallback;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
-
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.UUID;
-
-import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-import POGOProtos.Networking.Envelopes.SignatureOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
+
+import java.util.Random;
+import java.util.UUID;
 
 
 public class PokemonGo {
@@ -148,10 +146,12 @@ public class PokemonGo {
 	 * Login user with the provided provider
 	 *
 	 * @param credentialProvider the credential provider
-	 * @throws LoginFailedException  When login fails
-	 * @throws RemoteServerException When server fails
+	 * @param callback           the callback that will return this instance or errors once login
+	 *                           process is fully completed
+	 *
+	 * @return callback passed as argument
 	 */
-	public void login(CredentialProvider credentialProvider) throws LoginFailedException, RemoteServerException {
+	public PokeCallback<Void> login(CredentialProvider credentialProvider, PokeCallback<Void> callback) {
 		if (credentialProvider == null) {
 			throw new NullPointerException("Credential Provider is null");
 		}
@@ -161,71 +161,24 @@ public class PokemonGo {
 		settings = new Settings(this);
 		inventories = new Inventories(this);
 
-		initialize();
-	}
-
-	private void initialize() throws RemoteServerException, LoginFailedException {
-		fireRequestBlock(new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
-				CommonRequest.getDownloadRemoteConfigVersionMessageRequest()));
-
-		fireRequestBlockTwo();
-
-		// From now one we will start to check our accounts is ready to fire requests.
-		// Actually, we can receive valid responses even with this first check,
-		// that mark the tutorial state into LEGAL_SCREEN.
-		// Following, we are going to check if the account binded to this session
-		// have an avatar, a nickname, and all the other things that are usually filled
-		// on the official client BEFORE sending any requests such as the getMapObject etc.
-		ArrayList<TutorialState> tutorialStates = playerProfile.getTutorialState().getTutorialStates();
-		if (tutorialStates.isEmpty()) {
-			playerProfile.activateAccount();
-		}
-
-		if (!tutorialStates.contains(TutorialState.AVATAR_SELECTION)) {
-			playerProfile.setupAvatar();
-		}
-
-		if (!tutorialStates.contains(TutorialState.POKEMON_CAPTURE)) {
-			playerProfile.encounterTutorialComplete();
-		}
-
-		if (!tutorialStates.contains(TutorialState.NAME_SELECTION)) {
-			playerProfile.claimCodeName();
-		}
-
-		if (!tutorialStates.contains(TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
-			playerProfile.firstTimeExperienceComplete();
-		}
+		return initialize(callback);
 	}
 
 	/**
-	 * Fire requests block.
+	 * Reproduce the login calls made by the official client and return a callback with login errors
+	 * or the current instance of PokemonGo once initialized
 	 *
-	 * @param request server request
-	 * @throws LoginFailedException  When login fails
-	 * @throws RemoteServerException When server fails
-	 */
-	private void fireRequestBlock(ServerRequest request) throws RemoteServerException, LoginFailedException {
-		ServerRequest[] requests = CommonRequest.fillRequest(request, this);
-
-		getRequestHandler().sendServerRequests(requests);
-		try {
-			inventories.updateInventories(GetInventoryResponse.parseFrom(requests[3].getData()));
-			settings.updateSettings(DownloadSettingsResponse.parseFrom(requests[5].getData()));
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException();
-		}
-	}
-
-	/**
-	 * Second requests block. Public since it could be re-fired at any time
+	 * @param callback the callback
 	 *
-	 * @throws LoginFailedException  When login fails
-	 * @throws RemoteServerException When server fails
+	 * @return callback passed as argument
 	 */
-	public void fireRequestBlockTwo() throws RemoteServerException, LoginFailedException {
-		fireRequestBlock(new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
-				CommonRequest.getGetAssetDigestMessageRequest()));
+	private PokeCallback<Void> initialize(final PokeCallback<Void> callback) {
+		new AsyncServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
+				CommonRequest.getDefaultDownloadRemoteConfigVersionRequest(), null, null, this);
+
+		new AsyncServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
+				CommonRequest.getDefaultGetAssetDigestMessageRequest(), null, callback, PokemonGo.this);
+		return callback;
 	}
 
 	/**
@@ -266,9 +219,6 @@ public class PokemonGo {
 	 * @param altitude  the altitude
 	 */
 	public void setLocation(double latitude, double longitude, double altitude) {
-		if (latitude != this.latitude || longitude != this.longitude) {
-			getMap().clearCache();
-		}
 		setLatitude(latitude);
 		setLongitude(longitude);
 		setAltitude(altitude);
@@ -328,7 +278,7 @@ public class PokemonGo {
 		}
 		return deviceInfo.getDeviceInfo();
 	}
-	
+
 	/**
 	 * Gets the sensor info
 	 *
@@ -342,7 +292,7 @@ public class PokemonGo {
 		}
 		return sensorInfo.getSensorInfo();
 	}
-	
+
 	/**
 	 * Gets the activity status
 	 *

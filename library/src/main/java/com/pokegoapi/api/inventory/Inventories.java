@@ -15,29 +15,18 @@
 
 package com.pokegoapi.api.inventory;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.pokemon.EggPokemon;
-import com.pokegoapi.api.pokemon.Pokemon;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Inventory.EggIncubatorOuterClass;
 import POGOProtos.Inventory.InventoryItemDataOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
-import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
-import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
+import com.pokegoapi.api.PokemonGo;
 import lombok.Getter;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 
 public class Inventories {
@@ -52,7 +41,7 @@ public class Inventories {
 	@Getter
 	private Pokedex pokedex;
 	@Getter
-	private final List<EggIncubator> incubators = new ArrayList<>();
+	private final ConcurrentMap<String, EggIncubator> incubators = new ConcurrentHashMap<>();
 	@Getter
 	private Hatchery hatchery;
 	@Getter
@@ -73,49 +62,6 @@ public class Inventories {
 	}
 
 	/**
-	 * Updates the inventories with latest data.
-	 *
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	public void updateInventories() throws LoginFailedException, RemoteServerException {
-		updateInventories(false);
-	}
-
-	/**
-	 * Updates the inventories with the latest data.
-	 *
-	 * @param forceUpdate For a full update if true
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	public void updateInventories(boolean forceUpdate) throws LoginFailedException, RemoteServerException {
-		if (forceUpdate) {
-			lastInventoryUpdate = 0;
-			itemBag.reset();
-			pokebank.reset();
-			candyjar.reset();
-			pokedex.reset();
-			incubators.clear();
-			hatchery.reset();
-		}
-		GetInventoryMessage invReqMsg = GetInventoryMessage.newBuilder()
-				.setLastTimestampMs(lastInventoryUpdate)
-				.build();
-		ServerRequest inventoryRequest = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY, invReqMsg);
-		api.getRequestHandler().sendServerRequests(inventoryRequest);
-
-		GetInventoryResponse response;
-		try {
-			response = GetInventoryResponse.parseFrom(inventoryRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-
-		updateInventories(response);
-	}
-
-	/**
 	 * Updates the inventories with the latest data.
 	 *
 	 * @param response the get inventory response
@@ -127,19 +73,18 @@ public class Inventories {
 
 			// hatchery
 			if (itemData.getPokemonData().getPokemonId() == PokemonId.MISSINGNO && itemData.getPokemonData().getIsEgg()) {
-				hatchery.addEgg(new EggPokemon(itemData.getPokemonData()));
+				hatchery.addEgg(itemData.getPokemonData());
 			}
 
 			// pokebank
 			if (itemData.getPokemonData().getPokemonId() != PokemonId.MISSINGNO) {
-				pokebank.addPokemon(new Pokemon(api, inventoryItem.getInventoryItemData().getPokemonData()));
+				pokebank.addPokemon(api, inventoryItem.getInventoryItemData().getPokemonData());
 			}
 
 			// items
 			if (itemData.getItem().getItemId() != ItemId.UNRECOGNIZED
 					&& itemData.getItem().getItemId() != ItemId.ITEM_UNKNOWN) {
-				ItemData item = itemData.getItem();
-				itemBag.addItem(new Item(item));
+				itemBag.addItem(itemData.getItem());
 			}
 
 			// candyjar
@@ -162,11 +107,16 @@ public class Inventories {
 
 			if (itemData.hasEggIncubators()) {
 				for (EggIncubatorOuterClass.EggIncubator incubator : itemData.getEggIncubators().getEggIncubatorList()) {
-					incubators.add(new EggIncubator(api, incubator));
+					EggIncubator current = incubators.putIfAbsent(incubator.getId(), new EggIncubator(api, incubator));
+					if (current != null)
+						current.setProto(incubator);
 				}
 			}
+		}
 
-			lastInventoryUpdate = api.currentTimeMillis();
+		if (response.hasInventoryDelta()
+				&& response.getInventoryDelta().getNewTimestampMs() > 0) {
+			lastInventoryUpdate = response.getInventoryDelta().getNewTimestampMs();
 		}
 	}
 }

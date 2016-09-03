@@ -15,21 +15,21 @@
 
 package com.pokegoapi.api.inventory;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.pokemon.EggPokemon;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
-
 import POGOProtos.Inventory.EggIncubatorOuterClass;
 import POGOProtos.Inventory.EggIncubatorTypeOuterClass.EggIncubatorType;
 import POGOProtos.Networking.Requests.Messages.UseItemEggIncubatorMessageOuterClass.UseItemEggIncubatorMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.pokemon.EggPokemon;
+import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.util.PokeAFunc;
+import com.pokegoapi.util.PokeCallback;
+import lombok.Setter;
 
 public class EggIncubator {
-	private final EggIncubatorOuterClass.EggIncubator proto;
+	@Setter
+	private EggIncubatorOuterClass.EggIncubator proto;
 	private final PokemonGo api;
 
 	/**
@@ -55,32 +55,26 @@ public class EggIncubator {
 	/**
 	 * Hatch an egg.
 	 *
-	 * @param egg the egg
-	 * @return status of putting egg in incubator
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
+	 * @param egg      the egg
+	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public UseItemEggIncubatorResponse.Result hatchEgg(EggPokemon egg)
-			throws LoginFailedException, RemoteServerException {
-
+	public PokeCallback<UseItemEggIncubatorResponse> hatchEgg(EggPokemon egg,
+			PokeCallback<UseItemEggIncubatorResponse> callback) {
 		UseItemEggIncubatorMessage reqMsg = UseItemEggIncubatorMessage.newBuilder()
 				.setItemId(proto.getId())
 				.setPokemonId(egg.getId())
 				.build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-
-		UseItemEggIncubatorResponse response;
-		try {
-			response = UseItemEggIncubatorResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-
-		api.getInventories().updateInventories(true);
-
-		return response.getResult();
+		new AsyncServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR, reqMsg,
+				new PokeAFunc<UseItemEggIncubatorResponse, UseItemEggIncubatorResponse>() {
+					@Override
+					public UseItemEggIncubatorResponse exec(UseItemEggIncubatorResponse response) {
+						return response;
+					}
+				}, callback, api);
+		return callback;
 	}
 
 	/**

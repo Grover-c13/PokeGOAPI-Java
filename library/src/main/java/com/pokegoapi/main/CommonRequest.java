@@ -21,8 +21,6 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.util.Constant;
 
-import java.util.ArrayList;
-
 import POGOProtos.Enums.PlatformOuterClass.Platform;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
 import POGOProtos.Networking.Requests.Messages.CheckChallenge.CheckChallengeMessage;
@@ -46,7 +44,7 @@ public class CommonRequest {
 	 *
 	 * @return DownloadRemoteConfigVersionMessage
 	 */
-	public static DownloadRemoteConfigVersionMessage getDownloadRemoteConfigVersionMessageRequest() {
+	public static DownloadRemoteConfigVersionMessage getDefaultDownloadRemoteConfigVersionRequest() {
 		return DownloadRemoteConfigVersionMessage
 				.newBuilder()
 				.setPlatform(Platform.IOS)
@@ -59,7 +57,7 @@ public class CommonRequest {
 	 *
 	 * @return GetAssetDigestMessage
 	 */
-	public static GetAssetDigestMessage getGetAssetDigestMessageRequest() {
+	public static GetAssetDigestMessage getDefaultGetAssetDigestMessageRequest() {
 		return GetAssetDigestMessage.newBuilder()
 				.setPlatform(Platform.IOS)
 				.setAppVersion(Constant.APP_VERSION)
@@ -72,7 +70,7 @@ public class CommonRequest {
 	 * @param api The current instance of PokemonGO
 	 * @return DownloadSettingsMessage
 	 */
-	public static DownloadSettingsMessage getDownloadSettingsMessageRequest(PokemonGo api) {
+	public static DownloadSettingsMessage getDefaultDownloadSettingsMessageRequest(PokemonGo api) {
 		return DownloadSettingsMessage.newBuilder()
 				.setHash(api.getSettings().getHash())
 				.build();
@@ -85,48 +83,21 @@ public class CommonRequest {
 	 * @return GetInventoryMessage
 	 */
 	public static GetInventoryMessage getDefaultGetInventoryMessage(PokemonGo api) {
-		return GetInventoryMessage.newBuilder()
-				.setLastTimestampMs(api.getInventories().getLastInventoryUpdate())
-				.build();
+		GetInventoryMessage.Builder builder = GetInventoryMessage.newBuilder();
+		if (api.getInventories().getLastInventoryUpdate() != 0) {
+			builder.setLastTimestampMs(api.getInventories().getLastInventoryUpdate());
+		}
+		return builder.build();
 	}
 
 	/**
-	 * Append CheckChallenge request to the given ServerRequest
+	 * Build an internal server request for the checkchallenge message
 	 *
-	 * @param request The main request we want to fire
-	 * @return an array of ServerRequest
+	 * @return GetInventoryMessage
 	 */
-	public static ServerRequest[] appendCheckChallenge(ServerRequest request) {
-		return new ServerRequest[] {
-				request,
-				new ServerRequest(RequestType.CHECK_CHALLENGE,
-						CheckChallengeMessage.getDefaultInstance())
-		};
-	}
-
-	/**
-	 * Most of the requests from the official client are fired together with the following
-	 * requests. We will append our request on top of the array and we will send it
-	 * together with the others.
-	 *
-	 * @param request The main request we want to fire
-	 * @param api The current instance of PokemonGO
-	 * @return an array of ServerRequest
-	 */
-	public static ServerRequest[] fillRequest(ServerRequest request, PokemonGo api) {
-		return new ServerRequest[] {
-				request,
-				new ServerRequest(RequestType.CHECK_CHALLENGE,
-						CheckChallengeMessage.getDefaultInstance()),
-				new ServerRequest(RequestType.GET_HATCHED_EGGS,
-						GetHatchedEggsMessage.getDefaultInstance()),
-				new ServerRequest(RequestType.GET_INVENTORY,
-						CommonRequest.getDefaultGetInventoryMessage(api)),
-				new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
-						CheckAwardedBadgesMessage.getDefaultInstance()),
-				new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
-						CommonRequest.getDownloadSettingsMessageRequest(api))
-		};
+	public static InternalServerRequest getDefaultCheckChallenge() {
+		return new InternalServerRequest(RequestType.CHECK_CHALLENGE,
+				CheckChallengeMessage.getDefaultInstance());
 	}
 
 	/**
@@ -135,18 +106,17 @@ public class CommonRequest {
 	 * @param api The current instance of PokemonGO
 	 * @return a List of AsyncServerRequests
 	 */
-	public static ServerRequest[] getCommonRequests(PokemonGo api) {
-		return new ServerRequest[] {
-				new ServerRequest(RequestType.CHECK_CHALLENGE,
-						CheckChallengeMessage.getDefaultInstance()),
-				new ServerRequest(RequestType.GET_HATCHED_EGGS,
+	public static InternalServerRequest[] getCommonRequests(PokemonGo api) {
+		return new InternalServerRequest[] {
+				getDefaultCheckChallenge(),
+				new InternalServerRequest(RequestType.GET_HATCHED_EGGS,
 						GetHatchedEggsMessage.getDefaultInstance()),
-				new ServerRequest(RequestType.GET_INVENTORY,
+				new InternalServerRequest(RequestType.GET_INVENTORY,
 						CommonRequest.getDefaultGetInventoryMessage(api)),
-				new ServerRequest(RequestType.CHECK_AWARDED_BADGES,
+				new InternalServerRequest(RequestType.CHECK_AWARDED_BADGES,
 						CheckAwardedBadgesMessage.getDefaultInstance()),
-				new ServerRequest(RequestType.DOWNLOAD_SETTINGS,
-						CommonRequest.getDownloadSettingsMessageRequest(api))
+				new InternalServerRequest(RequestType.DOWNLOAD_SETTINGS,
+						CommonRequest.getDefaultDownloadSettingsMessageRequest(api))
 		};
 	}
 
@@ -166,6 +136,8 @@ public class CommonRequest {
 				case DOWNLOAD_SETTINGS:
 					api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(data));
 					break;
+				case CHECK_AWARDED_BADGES:
+				//	api.getPlayerProfile().equipBadge(CheckAwardedBadgesResponse.parseFrom(data));
 				default:
 					break;
 			}

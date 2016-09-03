@@ -20,29 +20,18 @@ import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.TeamColorOuterClass;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
-import POGOProtos.Networking.Requests.Messages.GetGymDetailsMessageOuterClass.GetGymDetailsMessage;
-import POGOProtos.Networking.Requests.Messages.FortDeployPokemonMessageOuterClass.FortDeployPokemonMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetGymDetailsResponseOuterClass.GetGymDetailsResponse;
 import POGOProtos.Networking.Responses.FortDeployPokemonResponseOuterClass.FortDeployPokemonResponse;
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.ProtocolStringList;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
-import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.util.MapPoint;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import rx.Observable;
-import rx.functions.Func1;
 
 public class Gym implements MapPoint {
 	private FortData proto;
@@ -105,8 +94,8 @@ public class Gym implements MapPoint {
 		return new Battle(api, team, this);
 	}
 
-	private GetGymDetailsResponse details() throws LoginFailedException, RemoteServerException {
-		if (details == null) {
+	private GetGymDetailsResponse details() {
+		/*if (details == null) {
 			GetGymDetailsMessage reqMsg = GetGymDetailsMessage
 					.newBuilder()
 					.setGymId(this.getId())
@@ -128,32 +117,33 @@ public class Gym implements MapPoint {
 
 		}
 
-		return details;
+		return details;*/
+		return null;
 	}
 
-	public String getName() throws LoginFailedException, RemoteServerException {
+	public String getName() {
 		return details().getName();
 	}
 
-	public ProtocolStringList getUrlsList() throws LoginFailedException, RemoteServerException {
+	public ProtocolStringList getUrlsList() {
 		return details().getUrlsList();
 	}
 
-	public GetGymDetailsResponse.Result getResult() throws LoginFailedException, RemoteServerException {
+	public GetGymDetailsResponse.Result getResult() {
 		return details().getResult();
 	}
 
-	public boolean inRange() throws LoginFailedException, RemoteServerException {
+	public boolean inRange() {
 		GetGymDetailsResponse.Result result = getResult();
 		return (result != GetGymDetailsResponse.Result.ERROR_NOT_IN_RANGE);
 	}
 
-	public String getDescription() throws LoginFailedException, RemoteServerException {
+	public String getDescription() {
 		return details().getDescription();
 	}
 
 
-	public List<GymMembership> getGymMembers() throws LoginFailedException, RemoteServerException {
+	public List<GymMembership> getGymMembers() {
 		return details().getGymState().getMembershipsList();
 	}
 
@@ -161,10 +151,8 @@ public class Gym implements MapPoint {
 	 * Get a list of pokemon defending this gym.
 	 *
 	 * @return List of pokemon
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public List<PokemonData> getDefendingPokemon() throws LoginFailedException, RemoteServerException {
+	public List<PokemonData> getDefendingPokemon() {
 		List<PokemonData> data = new ArrayList<PokemonData>();
 
 		for (GymMembership gymMember : getGymMembers()) {
@@ -179,12 +167,9 @@ public class Gym implements MapPoint {
 	 *
 	 * @param pokemon The pokemon to deploy
 	 * @return Result of attempt to deploy pokemon
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public FortDeployPokemonResponse.Result deployPokemon(Pokemon pokemon)
-			throws LoginFailedException, RemoteServerException {
-		FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
+	public FortDeployPokemonResponse.Result deployPokemon(Pokemon pokemon) {
+		/*FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
 				.setFortId(getId())
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
@@ -198,44 +183,8 @@ public class Gym implements MapPoint {
 			return FortDeployPokemonResponse.parseFrom(serverRequest.getData()).getResult();
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException();
-		}
-
-	}
-
-	/**
-	 * Deploy pokemon
-	 *
-	 * @param pokemon The pokemon to deploy
-	 * @return Result of attempt to deploy pokemon
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
-	 */
-	public Observable<FortDeployPokemonResponse.Result> deployPokemonAsync(Pokemon pokemon)
-			throws RemoteServerException, LoginFailedException {
-		FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
-				.setFortId(getId())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
-				.setPokemonId(pokemon.getId())
-				.build();
-
-		AsyncServerRequest asyncServerRequest = new AsyncServerRequest(RequestType.FORT_DEPLOY_POKEMON, reqMsg);
-		return api.getRequestHandler()
-			.sendAsyncServerRequests(asyncServerRequest)
-			.map(new Func1<ByteString, FortDeployPokemonResponse.Result>() {
-
-				@Override
-				public FortDeployPokemonResponse.Result call(ByteString response) {
-
-					try {
-						return FortDeployPokemonResponse.parseFrom(response).getResult();
-					} catch (InvalidProtocolBufferException e) {
-						throw new AsyncRemoteServerException(e);
-					}
-
-				}
-
-			});
+		}*/
+		return null;
 
 	}
 

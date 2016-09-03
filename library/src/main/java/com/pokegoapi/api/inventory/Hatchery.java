@@ -15,27 +15,28 @@
 
 package com.pokegoapi.api.inventory;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.pokemon.EggPokemon;
-import com.pokegoapi.api.pokemon.HatchedEgg;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import POGOProtos.Data.PokemonDataOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.pokemon.EggPokemon;
+import com.pokegoapi.api.pokemon.HatchedEgg;
+import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.util.PokeAFunc;
+import com.pokegoapi.util.PokeCallback;
 import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class Hatchery {
 	@Getter
-	private final Set<EggPokemon> eggs = new HashSet<EggPokemon>();
+
+	private final ConcurrentMap<Long, EggPokemon> eggs = new ConcurrentHashMap<>();
+
 	@Getter
 	private PokemonGo api;
 
@@ -43,42 +44,42 @@ public class Hatchery {
 		this.api = api;
 	}
 
-	public void reset() {
-		eggs.clear();
-	}
-
-	public void addEgg(EggPokemon egg) {
-		egg.setApi(api);
-		eggs.add(egg);
+	/**
+	 * Add an egg to inventory, if absent, update it if it's already there.
+	 *
+	 * @param egg data of the eggs
+	 */
+	public void addEgg(PokemonDataOuterClass.PokemonData egg) {
+		EggPokemon current = eggs.putIfAbsent(egg.getId(), new EggPokemon(api, egg));
+		if (current != null) {
+			current.setProto(egg);
+		}
 	}
 
 	/**
 	 * Get if eggs has hatched.
 	 *
-	 * @return list of hatched eggs
-	 * @throws RemoteServerException e
-	 * @throws LoginFailedException  e
+	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public List<HatchedEgg> queryHatchedEggs() throws RemoteServerException, LoginFailedException {
+	public PokeCallback<List<HatchedEgg>> queryHatchedEggs(PokeCallback<List<HatchedEgg>> callback) {
 		GetHatchedEggsMessage msg = GetHatchedEggsMessage.newBuilder().build();
-		ServerRequest serverRequest = new ServerRequest(RequestType.GET_HATCHED_EGGS, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
 
-		GetHatchedEggsResponse response;
-		try {
-			response = GetHatchedEggsResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-		api.getInventories().updateInventories();
-		List<HatchedEgg> eggs = new ArrayList<HatchedEgg>();
-		for (int i = 0; i < response.getPokemonIdCount(); i++) {
-			eggs.add(new HatchedEgg(response.getPokemonId(i),
-					response.getExperienceAwarded(i),
-					response.getCandyAwarded(i),
-					response.getStardustAwarded(i)));
-		}
-		return eggs;
+		new AsyncServerRequest(RequestType.GET_HATCHED_EGGS, msg,
+				new PokeAFunc<GetHatchedEggsResponse, List<HatchedEgg>>() {
+					@Override
+					public List<HatchedEgg> exec(GetHatchedEggsResponse response) {
+						List<HatchedEgg> eggs = new ArrayList<HatchedEgg>();
+						for (int i = 0; i < response.getPokemonIdCount(); i++) {
+							eggs.add(new HatchedEgg(response.getPokemonId(i),
+									response.getExperienceAwarded(i),
+									response.getCandyAwarded(i),
+									response.getStardustAwarded(i)));
+						}
+						return eggs;
+					}
+				}, callback, api);
+		return callback;
 	}
-
 }

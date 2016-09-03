@@ -15,25 +15,22 @@
 
 package com.pokegoapi.api.inventory;
 
-import com.pokegoapi.api.PokemonGo;
-
-import java.util.HashMap;
-
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
+import com.pokegoapi.api.PokemonGo;
 import lombok.ToString;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @ToString
 public class CandyJar {
 	private final PokemonGo api;
-	private final HashMap<PokemonFamilyId, Integer> candies = new HashMap<>();
+	private final ConcurrentMap<PokemonFamilyId, Integer> candies = new ConcurrentHashMap<>();
 
 	public CandyJar(PokemonGo api) {
 		this.api = api;
 	}
 
-	public void reset() {
-		candies.clear();
-	}
 
 	/**
 	 * Sets the number of candies in the jar.
@@ -45,19 +42,6 @@ public class CandyJar {
 		this.candies.put(family, candies);
 	}
 
-	/**
-	 * Adds a candy to the candy jar.
-	 *
-	 * @param family Pokemon family id
-	 * @param amount Amount of candies to add
-	 */
-	public void addCandy(PokemonFamilyId family, int amount) {
-		if (candies.containsKey(family)) {
-			candies.put(family, candies.get(family) + amount);
-		} else {
-			candies.put(family, amount);
-		}
-	}
 
 	/**
 	 * Remove a candy from the candy jar.
@@ -66,14 +50,9 @@ public class CandyJar {
 	 * @param amount Amount of candies to remove
 	 */
 	public void removeCandy(PokemonFamilyId family, int amount) {
-		if (candies.containsKey(family)) {
-			if (candies.get(family) - amount < 0) {
-				candies.put(family, 0);
-			} else {
-				candies.put(family, candies.get(family) - amount);
-			}
-		} else {
-			candies.put(family, 0);
+		Integer current = candies.putIfAbsent(family, amount);
+		if (current != null) {
+			current = Math.max(current - amount, 0);
 		}
 	}
 
@@ -84,10 +63,11 @@ public class CandyJar {
 	 * @return number of candies in jar
 	 */
 	public int getCandies(PokemonFamilyId family) {
-		if (candies.containsKey(family)) {
-			return this.candies.get(family);
-		} else {
-			return 0;
-		}
+		Integer val = candies.putIfAbsent(family, 0);
+
+		if (val == null)
+			val = 0;
+
+		return val;
 	}
 }

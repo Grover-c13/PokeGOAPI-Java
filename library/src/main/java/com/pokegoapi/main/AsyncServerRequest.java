@@ -15,60 +15,93 @@
 
 package com.pokegoapi.main;
 
-import com.google.protobuf.GeneratedMessage;
-
 import POGOProtos.Networking.Requests.RequestOuterClass.Request;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.GeneratedMessage;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.util.PokeAFunc;
+import com.pokegoapi.util.PokeCallback;
 import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * The type Server request.
  */
-public class AsyncServerRequest {
-	@Getter
-	private final long id = System.nanoTime();
+public class AsyncServerRequest<T extends GeneratedMessage, K> {
 	@Getter
 	private final RequestType type;
 	@Getter
 	private final Request request;
 	@Getter
-	private final boolean requireCommonRequest;
+	final ArrayList<InternalServerRequest> boundedRequests = new ArrayList<>();
+
+	private final PokeCallback<K> callback;
+	private final PokeAFunc<T, K> func;
 
 	/**
 	 * Instantiates a new Server request.
 	 *
-	 * @param type the type
-	 * @param req  the req
-	 * @param requireCommonRequest indicate if this request require common requests
+	 * @param type     the type
+	 * @param req      the req
+	 * @param func     internal func to handle data
+	 * @param callback an optional callback to handle results
+	 * @param api      the current instance of PokemonGo used to bound common requests
+	 * @param requests requests to bound in the same request envelope
 	 */
-	public AsyncServerRequest(RequestType type, GeneratedMessage req, boolean requireCommonRequest) {
+	public AsyncServerRequest(RequestType type, GeneratedMessage req, PokeAFunc<T, K> func,
+			PokeCallback<K> callback, PokemonGo api,
+			InternalServerRequest... requests) {
 		Request.Builder reqBuilder = Request.newBuilder();
 		reqBuilder.setRequestMessage(req.toByteString());
 		reqBuilder.setRequestType(type);
 		this.type = type;
 		this.request = reqBuilder.build();
-		this.requireCommonRequest = requireCommonRequest;
+		this.callback = callback;
+		this.func = func;
+
+		if (requests.length > 0) {
+			Collections.addAll(boundedRequests, requests);
+		} else {
+			Collections.addAll(boundedRequests, CommonRequest.getCommonRequests(api));
+		}
+
+		api.getRequestHandler().sendRequest(this);
 	}
 
 	/**
-	 * Instantiates a new Server request.
+	 * Fire both, the internal callback and the outgoing callback
 	 *
-	 * @param type the type
-	 * @param req  the req
+	 * @param data the data
 	 */
-	public AsyncServerRequest(RequestType type, GeneratedMessage req) {
-		this(type, req, false);
+	public void fire(ByteString data) {
+		K response = null;
+
+		if (func != null) {
+			try {
+				response = func.exec(data);
+			} catch (Throwable e) {
+				if (callback != null) {
+					callback.fire(e);
+				}
+			}
+		}
+
+		if (callback != null) {
+			callback.fire(response);
+		}
 	}
 
 	/**
-	 * Instantiates a new Server request.
+	 * Fire the error
 	 *
-	 * @param type the type
-	 * @param req  the req
+	 * @param error the throwable exception
 	 */
-	AsyncServerRequest(RequestType type, Request req) {
-		this.type = type;
-		this.request = req;
-		this.requireCommonRequest = false;
+	public void fire(Throwable error) {
+		if (callback != null) {
+			callback.fire(error);
+		}
 	}
 }

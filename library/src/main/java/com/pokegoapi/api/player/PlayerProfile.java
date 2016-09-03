@@ -15,23 +15,6 @@
 
 package com.pokegoapi.api.player;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.Item;
-import com.pokegoapi.api.inventory.ItemBag;
-import com.pokegoapi.api.inventory.Stats;
-import com.pokegoapi.exceptions.InvalidCurrencyException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.CommonRequest;
-import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.Log;
-
-import java.security.SecureRandom;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Random;
-
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.Player.EquippedBadgeOuterClass.EquippedBadge;
 import POGOProtos.Data.Player.PlayerAvatarOuterClass;
@@ -41,25 +24,42 @@ import POGOProtos.Enums.GenderOuterClass.Gender;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Enums.TutorialStateOuterClass;
 import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
-import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
+import POGOProtos.Networking.Requests.Messages.CheckChallenge;
 import POGOProtos.Networking.Requests.Messages.ClaimCodenameMessageOuterClass.ClaimCodenameMessage;
 import POGOProtos.Networking.Requests.Messages.EncounterTutorialCompleteMessageOuterClass.EncounterTutorialCompleteMessage;
-import POGOProtos.Networking.Requests.Messages.EquipBadgeMessageOuterClass.EquipBadgeMessage;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
 import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass.MarkTutorialCompleteMessage;
 import POGOProtos.Networking.Requests.Messages.SetAvatarMessageOuterClass.SetAvatarMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
 import POGOProtos.Networking.Responses.ClaimCodenameResponseOuterClass.ClaimCodenameResponse;
-import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
-import POGOProtos.Networking.Responses.EquipBadgeResponseOuterClass;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
+import POGOProtos.Networking.Responses.EncounterTutorialCompleteResponseOuterClass.EncounterTutorialCompleteResponse;
 import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
+
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Item;
+import com.pokegoapi.api.inventory.ItemBag;
+import com.pokegoapi.api.inventory.Stats;
+import com.pokegoapi.exceptions.InvalidCurrencyException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.main.CommonRequest;
+import com.pokegoapi.util.Log;
+import com.pokegoapi.util.PokeAFunc;
+import com.pokegoapi.util.PokeCallback;
+
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import POGOProtos.Networking.Responses.MarkTutorialCompleteResponseOuterClass.MarkTutorialCompleteResponse;
 import POGOProtos.Networking.Responses.SetAvatarResponseOuterClass.SetAvatarResponse;
 import lombok.Setter;
+
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Random;
 
 public class PlayerProfile {
 	private static final String TAG = PlayerProfile.class.getSimpleName();
@@ -77,47 +77,83 @@ public class PlayerProfile {
 
 	/**
 	 * @param api the api
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public PlayerProfile(PokemonGo api) throws LoginFailedException, RemoteServerException {
+	public PlayerProfile(PokemonGo api) {
 		this.api = api;
 		this.playerLocale = new PlayerLocale();
 
 		if (playerData == null) {
-			updateProfile();
+			initProfile();
 		}
 	}
 
 	/**
-	 * Updates the player profile with the latest data.
-	 *
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
+	 * Init the player profile.
 	 */
-	public void updateProfile() throws RemoteServerException, LoginFailedException {
+	private void initProfile() {
 		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
 				.setPlayerLocale(playerLocale.getPlayerLocale())
 				.build();
 
-		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
-		api.getRequestHandler().sendServerRequests(
-				CommonRequest.appendCheckChallenge(getPlayerServerRequest));
+		new AsyncServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg,
+				new PokeAFunc<GetPlayerResponse, Void>() {
+					@Override
+					public Void exec(GetPlayerResponse response) {
+						parseData(response.getPlayerData());
 
-		try {
-			updateProfile(GetPlayerResponse.parseFrom(getPlayerServerRequest.getData()));
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+						ArrayList<TutorialStateOuterClass.TutorialState> tutorialStates =
+								getTutorialState().getTutorialStates();
+						if (tutorialStates.isEmpty()) {
+							activateAccount();
+							return null;
+						}
+
+						if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION)) {
+							setupAvatar();
+							return null;
+						}
+
+						if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.POKEMON_CAPTURE)) {
+							encounterTutorialComplete();
+							return null;
+						}
+
+						if (!tutorialStates.contains(TutorialStateOuterClass.TutorialState.NAME_SELECTION)) {
+							claimCodeName();
+							return null;
+						}
+
+						if (!tutorialStates.contains(
+								TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
+							firstTimeExperienceComplete();
+						}
+
+						return null;
+					}
+				}, null, api, CommonRequest.getDefaultCheckChallenge());
 	}
 
 	/**
-	 * Update the profile with the given response
+	 * Update profile
 	 *
-	 * @param playerResponse the response
+	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void updateProfile(GetPlayerResponse playerResponse) {
-		updateProfile(playerResponse.getPlayerData());
+	public PokeCallback<PlayerProfile> updateProfile(PokeCallback<PlayerProfile> callback) {
+		GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
+				.setPlayerLocale(playerLocale.getPlayerLocale())
+				.build();
+
+		new AsyncServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg,
+				new PokeAFunc<GetPlayerResponse, PlayerProfile>() {
+					@Override
+					public PlayerProfile exec(GetPlayerResponse response) {
+						parseData(response.getPlayerData());
+						return PlayerProfile.this;
+					}
+				}, callback, api);
+		return callback;
 	}
 
 	/**
@@ -125,7 +161,7 @@ public class PlayerProfile {
 	 *
 	 * @param playerData the data for update
 	 */
-	public void updateProfile(PlayerData playerData) {
+	private void parseData(PlayerData playerData) {
 		this.playerData = playerData;
 
 		avatar = new PlayerAvatar(playerData.getAvatar());
@@ -150,36 +186,39 @@ public class PlayerProfile {
 	 * server until a player actively accepts them.
 	 * The rewarded items are automatically inserted into the players item bag.
 	 *
-	 * @param level the trainer level that you want to accept the rewards for
-	 * @return a PlayerLevelUpRewards object containing information about the items rewarded and unlocked for this level
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
+	 * @param level    the trainer level that you want to accept the rewards for
+	 * @param callback an optional callback to handle results
 	 * @see PlayerLevelUpRewards
+	 *
+	 * @return callback passed as argument
 	 */
-	public PlayerLevelUpRewards acceptLevelUpRewards(int level) throws RemoteServerException, LoginFailedException {
+	public PokeCallback<PlayerLevelUpRewards> acceptLevelUpRewards(int level,
+			PokeCallback<PlayerLevelUpRewards> callback) {
 		// Check if we even have achieved this level yet
 		if (level > stats.getLevel()) {
-			return new PlayerLevelUpRewards(PlayerLevelUpRewards.Status.NOT_UNLOCKED_YET);
+			callback.fire(new PlayerLevelUpRewards(PlayerLevelUpRewards.Status.NOT_UNLOCKED_YET));
+			return callback;
 		}
+
 		LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder()
 				.setLevel(level)
 				.build();
-		ServerRequest serverRequest = new ServerRequest(RequestType.LEVEL_UP_REWARDS, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-		LevelUpRewardsResponse response;
-		try {
-			response = LevelUpRewardsResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-		// Add the awarded items to our bag
-		ItemBag bag = api.getInventories().getItemBag();
-		for (ItemAward itemAward : response.getItemsAwardedList()) {
-			Item item = bag.getItem(itemAward.getItemId());
-			item.setCount(item.getCount() + itemAward.getItemCount());
-		}
-		// Build a new rewards object and return it
-		return new PlayerLevelUpRewards(response);
+		new AsyncServerRequest(RequestType.LEVEL_UP_REWARDS, msg,
+				new PokeAFunc<LevelUpRewardsResponse, PlayerLevelUpRewards>() {
+					@Override
+					public PlayerLevelUpRewards exec(LevelUpRewardsResponse response) {
+						// Add the awarded items to our bag
+						ItemBag bag = api.getInventories().getItemBag();
+						for (ItemAward itemAward : response.getItemsAwardedList()) {
+							Item item = bag.getItem(itemAward.getItemId());
+							item.setCount(item.getCount() + itemAward.getItemCount());
+						}
+
+						// Build a new rewards object and return it
+						return new PlayerLevelUpRewards(response);
+					}
+				}, callback, api);
+		return callback;
 	}
 
 	/**
@@ -194,40 +233,6 @@ public class PlayerProfile {
 			currencies.put(Currency.valueOf(name), amount);
 		} catch (Exception e) {
 			throw new InvalidCurrencyException();
-		}
-	}
-
-	/**
-	 * Check and equip badges.
-	 *
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException When a buffer exception is thrown
-	 */
-	public void checkAndEquipBadges() throws LoginFailedException, RemoteServerException {
-		CheckAwardedBadgesMessage msg = CheckAwardedBadgesMessage.newBuilder().build();
-		ServerRequest serverRequest = new ServerRequest(RequestType.CHECK_AWARDED_BADGES, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-		CheckAwardedBadgesResponse response;
-		try {
-			response = CheckAwardedBadgesResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-		if (response.getSuccess()) {
-			for (int i = 0; i < response.getAwardedBadgesCount(); i++) {
-				EquipBadgeMessage msg1 = EquipBadgeMessage.newBuilder()
-						.setBadgeType(response.getAwardedBadges(i))
-						.setBadgeTypeValue(response.getAwardedBadgeLevels(i)).build();
-				ServerRequest serverRequest1 = new ServerRequest(RequestType.EQUIP_BADGE, msg1);
-				api.getRequestHandler().sendServerRequests(serverRequest1);
-				EquipBadgeResponseOuterClass.EquipBadgeResponse response1;
-				try {
-					response1 = EquipBadgeResponseOuterClass.EquipBadgeResponse.parseFrom(serverRequest1.getData());
-					badge = response1.getEquipped();
-				} catch (InvalidProtocolBufferException e) {
-					throw new RemoteServerException(e);
-				}
-			}
 		}
 	}
 
@@ -312,22 +317,48 @@ public class PlayerProfile {
 	}
 
 	/**
+	 * Internal call for account activation
+	 */
+	private void activateAccount() {
+		activateAccount(new PokeCallback<PlayerProfile>() {
+			@Override
+			public void onResponse(PlayerProfile result) {
+				setupAvatar();
+			}
+		});
+	}
+
+	/**
 	 * Set the account to legal screen in order to receive valid response
 	 *
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
+	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void activateAccount() throws LoginFailedException, RemoteServerException {
-		markTutorial(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN);
+	public PokeCallback<PlayerProfile> activateAccount(PokeCallback<PlayerProfile> callback) {
+		return markTutorial(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN, callback);
+	}
+
+	/**
+	 * Internal call for avatar setup
+	 */
+	private void setupAvatar() {
+		setupAvatar(new PokeCallback<SetAvatarResponse.Status>() {
+			@Override
+			public void onResponse(SetAvatarResponse.Status result) {
+				encounterTutorialComplete();
+			}
+		});
 	}
 
 	/**
 	 * Setup an avatar for the current account
 	 *
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
+	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void setupAvatar() throws LoginFailedException, RemoteServerException {
+	public PokeCallback<SetAvatarResponse.Status> setupAvatar(PokeCallback<SetAvatarResponse.Status> callback) {
 		Random random = new Random();
 
 		final PlayerAvatarOuterClass.PlayerAvatar.Builder playerAvatarBuilder =
@@ -350,164 +381,161 @@ public class PlayerProfile {
 				.setPlayerAvatar(playerAvatarBuilder.build())
 				.build();
 
-		ServerRequest[] requests = CommonRequest.fillRequest(
-				new ServerRequest(RequestType.SET_AVATAR, setAvatarMessage), api);
+		new AsyncServerRequest(RequestType.SET_AVATAR, setAvatarMessage,
+				new PokeAFunc<SetAvatarResponse, SetAvatarResponse.Status>() {
+					@Override
+					public SetAvatarResponse.Status exec(SetAvatarResponse response) {
+						parseData(response.getPlayerData());
 
-		api.getRequestHandler().sendServerRequests(requests);
+						if (response.getStatus() == SetAvatarResponse.Status.SUCCESS) {
+							markTutorial(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION, null);
+						}
 
-		try {
-			SetAvatarResponse setAvatarResponse = SetAvatarResponse.parseFrom(requests[0].getData());
-			playerData = setAvatarResponse.getPlayerData();
+						new AsyncServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
+								CommonRequest.getDefaultGetAssetDigestMessageRequest(), null, null, api);
 
-			updateProfile(playerData);
+						return response.getStatus();
+					}
+				}, callback, api);
+		return callback;
+	}
 
-			api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
-			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-
-		markTutorial(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION);
-
-		api.fireRequestBlockTwo();
+	/**
+	 * Internal call to encounter tutorial complete
+	 */
+	private void encounterTutorialComplete() {
+		encounterTutorialComplete(new PokeCallback<EncounterTutorialCompleteResponse.Result>() {
+			@Override
+			public void onResponse(EncounterTutorialCompleteResponse.Result result) {
+				claimCodeName();
+			}
+		});
 	}
 
 	/**
 	 * Encounter tutorial complete. In other words, catch the first Pokémon
 	 *
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
+	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void encounterTutorialComplete() throws LoginFailedException, RemoteServerException {
+	public PokeCallback<EncounterTutorialCompleteResponse.Result> encounterTutorialComplete(
+			PokeCallback<EncounterTutorialCompleteResponse.Result> callback) {
 		Random random = new Random();
 		int pokemonId = random.nextInt(4);
 
 		final EncounterTutorialCompleteMessage.Builder encounterTutorialCompleteBuilder =
 				EncounterTutorialCompleteMessage.newBuilder()
-				.setPokemonId(pokemonId == 1 ? PokemonId.BULBASAUR :
-					pokemonId == 2 ? PokemonId.CHARMANDER : PokemonId.SQUIRTLE);
+						.setPokemonId(pokemonId == 1 ? PokemonId.BULBASAUR :
+								pokemonId == 2 ? PokemonId.CHARMANDER : PokemonId.SQUIRTLE);
 
-		ServerRequest[] requests = CommonRequest.fillRequest(
-				new ServerRequest(RequestType.ENCOUNTER_TUTORIAL_COMPLETE,
-				encounterTutorialCompleteBuilder.build()), api);
+		new AsyncServerRequest(
+				RequestType.ENCOUNTER_TUTORIAL_COMPLETE, encounterTutorialCompleteBuilder.build(),
+				new PokeAFunc<EncounterTutorialCompleteResponse, EncounterTutorialCompleteResponse.Result>() {
+					@Override
+					public EncounterTutorialCompleteResponse.Result exec(EncounterTutorialCompleteResponse response) {
+						if (response.getResult() == EncounterTutorialCompleteResponse.Result.SUCCESS) {
+							updateProfile(null);
+						}
 
-		api.getRequestHandler().sendServerRequests(requests);
+						return response.getResult();
+					}
+				}, callback, api);
+		return callback;
+	}
 
-		try {
-			api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
-			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-
-		final GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
-				.setPlayerLocale(playerLocale.getPlayerLocale())
-				.build();
-		requests = CommonRequest.fillRequest(
-				new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg), api);
-
-		api.getRequestHandler().sendServerRequests(requests);
-
-		try {
-			updateProfile(GetPlayerResponse.parseFrom(requests[0].getData()));
-
-			api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
-			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+	/**
+	 * Internal call to claim a codename
+	 */
+	private void claimCodeName() {
+		claimCodeName(new PokeCallback<ClaimCodenameResponse.Status>() {
+			@Override
+			public void onResponse(ClaimCodenameResponse.Status result) {
+				firstTimeExperienceComplete();
+			}
+		});
 	}
 
 	/**
 	 * Setup an user name for our account
 	 *
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
+	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void claimCodeName() throws LoginFailedException, RemoteServerException {
+	public PokeCallback<ClaimCodenameResponse.Status> claimCodeName(
+			final PokeCallback<ClaimCodenameResponse.Status> callback) {
 		ClaimCodenameMessage claimCodenameMessage = ClaimCodenameMessage.newBuilder()
 				.setCodename(randomCodenameGenerator())
 				.build();
 
-		ServerRequest[] requests = CommonRequest.fillRequest(
-				new ServerRequest(RequestType.CLAIM_CODENAME,
-						claimCodenameMessage), api);
+		new AsyncServerRequest(
+				RequestType.CLAIM_CODENAME, claimCodenameMessage,
+				new PokeAFunc<ClaimCodenameResponse, ClaimCodenameResponse.Status>() {
+					@Override
+					public ClaimCodenameResponse.Status exec(ClaimCodenameResponse response) {
+						String updatedCodename = null;
+						if (response.getStatus() != ClaimCodenameResponse.Status.SUCCESS) {
+							if (response.getUpdatedPlayer().getRemainingCodenameClaims() > 0) {
+								claimCodeName(callback);
+							}
+						} else {
+							updatedCodename = response.getCodename();
+							parseData(response.getUpdatedPlayer());
+						}
 
-		api.getRequestHandler().sendServerRequests(requests);
+						if (updatedCodename != null) {
+							markTutorial(TutorialStateOuterClass.TutorialState.NAME_SELECTION, null);
+						}
+						return response.getStatus();
+					}
+				}, callback, api);
 
-		String updatedCodename = null;
-		try {
-			api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
-			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
+		updateProfile(null);
+		return callback;
+	}
 
-			ClaimCodenameResponse claimCodenameResponse = ClaimCodenameResponse.parseFrom(requests[0].getData());
-			if (claimCodenameResponse.getStatus() != ClaimCodenameResponse.Status.SUCCESS) {
-				if (claimCodenameResponse.getUpdatedPlayer().getRemainingCodenameClaims() > 0) {
-					claimCodeName();
-				}
-			} else {
-				updatedCodename = claimCodenameResponse.getCodename();
-				updateProfile(claimCodenameResponse.getUpdatedPlayer());
-			}
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-
-		if (updatedCodename != null) {
-			markTutorial(TutorialStateOuterClass.TutorialState.NAME_SELECTION);
-
-			final GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
-					.setPlayerLocale(playerLocale.getPlayerLocale())
-					.build();
-			requests = CommonRequest.fillRequest(
-					new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg), api);
-
-			api.getRequestHandler().sendServerRequests(requests);
-
-			try {
-				updateProfile(GetPlayerResponse.parseFrom(requests[0].getData()));
-
-				api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
-				api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
-			} catch (InvalidProtocolBufferException e) {
-				throw new RemoteServerException(e);
-			}
-		}
+	/**
+	 * Internal call to mark the first time experience complete
+	 */
+	private void firstTimeExperienceComplete() {
+		firstTimeExperienceComplete(null);
 	}
 
 	/**
 	 * The last step, mark the last tutorial state as completed
 	 *
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
+	 * @param callback an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public void firstTimeExperienceComplete()
-			throws LoginFailedException, RemoteServerException {
-		markTutorial(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE);
+	public PokeCallback<PlayerProfile> firstTimeExperienceComplete(PokeCallback<PlayerProfile> callback) {
+		markTutorial(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE, callback);
+		return callback;
 	}
 
-	private void markTutorial(TutorialStateOuterClass.TutorialState state)
-				throws LoginFailedException, RemoteServerException {
+	/**
+	 * Mark the tutorial state as complete
+	 *
+	 * @param state    the tutorial state
+	 * @param callback an optional callback to handle results
+	 */
+	private PokeCallback<PlayerProfile> markTutorial(TutorialStateOuterClass.TutorialState state,
+			PokeCallback<PlayerProfile> callback) {
 		final MarkTutorialCompleteMessage tutorialMessage = MarkTutorialCompleteMessage.newBuilder()
 				.addTutorialsCompleted(state)
 				.setSendMarketingEmails(false)
 				.setSendPushNotifications(false).build();
 
-		ServerRequest[] requests = CommonRequest.fillRequest(
-				new ServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialMessage), api);
-
-		api.getRequestHandler().sendServerRequests(requests);
-
-		try {
-			playerData = MarkTutorialCompleteResponse.parseFrom(requests[0].getData()).getPlayerData();
-
-			updateProfile(playerData);
-
-			api.getInventories().updateInventories(GetInventoryResponse.parseFrom(requests[2].getData()));
-			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
+		new AsyncServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialMessage,
+				new PokeAFunc<MarkTutorialCompleteResponse, PlayerProfile>() {
+					@Override
+					public PlayerProfile exec(MarkTutorialCompleteResponse response) {
+						parseData(response.getPlayerData());
+						return PlayerProfile.this;
+					}
+				}, callback, api);
+		return callback;
 	}
 
 	private static String randomCodenameGenerator() {
@@ -515,7 +543,7 @@ public class PlayerProfile {
 		final SecureRandom r = new SecureRandom();
 		final int l = new Random().nextInt(15 - 10) + 10;
 		StringBuilder sb = new StringBuilder(l);
-		for (int i = 0;i < l;i++) {
+		for (int i = 0; i < l; i++) {
 			sb.append(a.charAt(r.nextInt(a.length())));
 		}
 		return sb.toString();

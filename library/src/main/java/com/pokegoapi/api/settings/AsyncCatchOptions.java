@@ -46,7 +46,7 @@ public class AsyncCatchOptions {
 	private boolean useBestPokeball;
 	private boolean skipMasterBall;
 	@Getter
-	private int useRazzBerry;
+	private int razzBerries;
 	private Pokeball pokeBall;
 	private boolean strictBallType;
 	private boolean smartSelect;
@@ -57,6 +57,8 @@ public class AsyncCatchOptions {
 	private double normalizedReticleSize;
 	@Getter
 	private double spinModifier;
+	@Getter
+	private int numThrows;
 
 	/**
 	 * Instantiates a new CatchOptions object.
@@ -65,7 +67,7 @@ public class AsyncCatchOptions {
 	 */
 	public AsyncCatchOptions(PokemonGo api) {
 		this.api = api;
-		this.useRazzBerry = 0;
+		this.razzBerries = 0;
 		this.useBestPokeball = false;
 		this.skipMasterBall = false;
 		this.pokeBall = POKEBALL;
@@ -75,6 +77,7 @@ public class AsyncCatchOptions {
 		this.normalizedHitPosition = 1.0;
 		this.normalizedReticleSize = 1.95 + Math.random() * 0.05;
 		this.spinModifier = 0.85 + Math.random() * 0.15;
+		this.numThrows = 1;
 	}
 
 	/**
@@ -137,29 +140,37 @@ public class AsyncCatchOptions {
 	}
 
 	/**
-	 * Gets item ball to catch a pokemon
+	 * Set if the bestBall have to be used with particular probability
 	 *
 	 * @param encounterProbability the capture probability to compare
-	 * @return the item ball
-	 * @throws NoSuchItemException the no such item exception
 	 */
-	public Pokeball getItemBall(double encounterProbability) throws NoSuchItemException {
+	public void checkProbability(double encounterProbability) {
 		if (encounterProbability >= probability) {
 			useBestPokeball = false;
 		} else {
 			useBestPokeball = true;
 		}
-		return getItemBall();
 	}
 
 	/**
 	 * Enable or disable the use of razzberries
 	 *
-	 * @param useRazzBerries true or false
+	 * @param berries the numbers of berries that should be used on this catch attemp
 	 * @return the AsyncCatchOptions object
 	 */
-	public AsyncCatchOptions useRazzberries(boolean useRazzBerries) {
-		this.useRazzBerry = useRazzBerries ? 1 : 0;
+	public AsyncCatchOptions setRazzBerries(int berries) {
+		this.razzBerries = berries;
+		return this;
+	}
+
+	/**
+	 * Set the number of throws (retries)
+	 *
+	 * @param numThrows number of retry that should be done during this catch
+	 * @return the AsyncCatchOptions object
+	 */
+	public AsyncCatchOptions setNumThrows(int numThrows) {
+		this.numThrows = numThrows;
 		return this;
 	}
 

@@ -31,11 +31,13 @@
 package com.pokegoapi.examples;
 
 
+import POGOProtos.Networking.Responses.UseIncenseResponseOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.auth.GoogleAutoCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
+import com.pokegoapi.util.PokeCallback;
 import com.pokegoapi.util.SystemTimeImpl;
 import okhttp3.OkHttpClient;
 
@@ -47,17 +49,27 @@ public class UseIncenseExample {
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
 
-		PokemonGo go = new PokemonGo(http, new SystemTimeImpl());
+		final PokemonGo go = new PokemonGo(http, new SystemTimeImpl());
 
 		try {
 			GoogleAutoCredentialProvider authProvider =
 					new GoogleAutoCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
 			//new PtcLogin(http).login(ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
 
-			go.login(authProvider);
+			go.login(authProvider, new PokeCallback<Void>() {
+				@Override
+				public void onResponse(Void result) {
+					go.setLocation(45.817521, 16.028199, 0);
+					go.getInventories().getItemBag().useIncense(new PokeCallback<UseIncenseResponseOuterClass.UseIncenseResponse.Result>() {
+						@Override
+						public void onResponse(UseIncenseResponseOuterClass.UseIncenseResponse.Result result) {
+							System.out.println("usedIncense result: " + result);
+						}
+					});
 
-			go.setLocation(45.817521, 16.028199, 0);
-			go.getInventories().getItemBag().useIncense();
+				}
+			});
+
 
 		} catch (LoginFailedException | RemoteServerException e) {
 			// failed to login, invalid credentials, auth issue or server issue.

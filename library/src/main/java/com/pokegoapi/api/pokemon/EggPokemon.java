@@ -15,15 +15,11 @@
 
 package com.pokegoapi.api.pokemon;
 
-import com.annimon.stream.Stream;
-import com.annimon.stream.function.Predicate;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.EggIncubator;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.EggIncubator;
+import com.pokegoapi.util.PokeCallback;
 import lombok.Setter;
 
 /**
@@ -32,8 +28,8 @@ import lombok.Setter;
 public class EggPokemon {
 
 	private static final String TAG = EggPokemon.class.getSimpleName();
+	final PokemonGo api;
 	@Setter
-	PokemonGo api;
 	private PokemonData proto;
 
 	// API METHODS //
@@ -42,16 +38,16 @@ public class EggPokemon {
 	 * Incubate this egg.
 	 *
 	 * @param incubator : the incubator
-	 * @return status of putting egg in incubator
-	 * @throws LoginFailedException  if failed to login
-	 * @throws RemoteServerException if the server failed to respond
+	 * @param callback  an optional callback to handle results
+	 *
+	 * @return callback passed as argument
 	 */
-	public UseItemEggIncubatorResponse.Result incubate(EggIncubator incubator)
-			throws LoginFailedException, RemoteServerException {
+	public PokeCallback<UseItemEggIncubatorResponse> incubate(EggIncubator incubator,
+			PokeCallback<UseItemEggIncubatorResponse> callback) {
 		if (incubator.isInUse()) {
 			throw new IllegalArgumentException("Incubator already used");
 		}
-		return incubator.hatchEgg(this);
+		return incubator.hatchEgg(this, callback);
 	}
 
 	/**
@@ -62,13 +58,7 @@ public class EggPokemon {
 	public double getEggKmWalked() {
 		if (!isIncubate())
 			return 0;
-		EggIncubator incubator = Stream.of(api.getInventories().getIncubators())
-				.filter(new Predicate<EggIncubator>() {
-					@Override
-					public boolean test(EggIncubator incub) {
-						return incub.getId().equals(proto.getEggIncubatorId());
-					}
-				}).findFirst().orElse(null);
+		EggIncubator incubator = api.getInventories().getIncubators().get(proto.getEggIncubatorId());
 		// incubator should not be null but why not eh
 		if (incubator == null)
 			return 0;
@@ -77,14 +67,14 @@ public class EggPokemon {
 					- (incubator.getKmTarget() - api.getPlayerProfile().getStats().getKmWalked());
 	}
 
-	// DELEGATE METHODS BELOW //
-
 	/**
 	 * Build a EggPokemon wrapper from the proto.
 	 *
+	 * @param api   : current api
 	 * @param proto : the prototype
 	 */
-	public EggPokemon(PokemonData proto) {
+	public EggPokemon(PokemonGo api, PokemonData proto) {
+		this.api = api;
 		if (!proto.getIsEgg()) {
 			throw new IllegalArgumentException("You cant build a EggPokemon without a valid PokemonData.");
 		}
@@ -129,5 +119,4 @@ public class EggPokemon {
 
 		return false;
 	}
-	// TODO: add wrapper objects for encubators and allow to be got.
 }

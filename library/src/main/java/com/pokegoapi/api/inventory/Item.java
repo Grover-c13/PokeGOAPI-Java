@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class Item {
+	@Setter
 	private ItemDataOuterClass.ItemData proto;
 	@Getter
 	@Setter
@@ -61,5 +62,20 @@ public class Item {
 		return getItemId() == ItemId.ITEM_REVIVE
 				|| getItemId() == ItemId.ITEM_MAX_REVIVE
 				;
+	}
+
+
+	@Override
+	public int hashCode() {
+		return proto.getItemId().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Item) {
+			Item other = (Item) obj;
+			return (this.getItemId().getNumber() == other.getItemId().getNumber());
+		}
+		return false;
 	}
 }
