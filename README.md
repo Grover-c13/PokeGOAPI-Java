@@ -1,11 +1,14 @@
+# pokejava pokego
+Pokemon GO Java API, forked from https://github.com/Grover-c13/PokeGOAPI-Java.
 
-# PokeGOAPI-Java
-Pokemon GO Java API
+This fork went in a different direction and since the changes where not likely to be merged back, this repo was set up.
 
-[![Build Status](https://travis-ci.org/Grover-c13/PokeGOAPI-Java.svg?branch=master)](https://travis-ci.org/Grover-c13/PokeGOAPI-Java)
-[![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
+The focus of this build is Java SE/EE, above Android. If this build works on Android, great! If not, please go to the original PokeGOAPI-JAva.
 
-Javadocs : [CLICK ME](https://jitpack.io/com/github/Grover-c13/PokeGOAPI-Java/a2828da60d/javadoc/) 
+[![Build Status](https://travis-ci.org/pokejava/pokego.svg?branch=master)](https://travis-ci.org/pokejava/pokego)
+[![](https://jitpack.io/v/Gpokejava/pokego.svg)](https://jitpack.io/#pokejava/pokego)
+
+Javadocs : [CLICK ME](https://jitpack.io/com/github/pokejava/pokego/a2828da60d/javadoc/)
 
 See this guide for adding functionality:
    https://docs.google.com/document/d/1BE8O6Z19sQ54T5T7QauXgA11GbL6D9vx9AAMCM5KlRA
