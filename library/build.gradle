@@ -126,23 +126,14 @@ artifacts {
     archives javadocJar
 }
 
-Properties properties = new Properties()
-try {
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-} catch (Exception ignore) {
-}
-
 bintray {
-    user = properties.getProperty('user')
-    key =  properties.getProperty('apiKey')
     configurations = ['archives']
     pkg {
         repo = 'maven'
-        name = 'PokeGOAPI'
-        userOrg = user
+        name = 'pokego=api'
+        userOrg = 'pokejava'
         licenses = ['GPL-3.0']
-        vcsUrl = 'https://github.com/Grover-c13/PokeGOAPI-Java.git'
-        publish = true
+        vcsUrl = 'https://github.com/pokejava/pokego.git'
     }
 }
 
