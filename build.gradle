@@ -1,8 +1,8 @@
 allprojects {
     apply plugin: 'java'
-    group = 'com.pokegoapi'
-    version = '0.6.0-SNAPSHOT'
-    archivesBaseName = 'PokeGOAPI'
+    group = 'com.github.pokejava'
+    version = '0.1.0-SNAPSHOT'
+    archivesBaseName = 'pokego'
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
     description = """Pokemon Go Java API"""

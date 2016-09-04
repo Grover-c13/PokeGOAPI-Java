@@ -129,16 +129,12 @@ class RequestScheduler {
 	}
 
 	@Data
-	static class RequestWrap {
+	private static class RequestWrap {
 		private final RequestEnvelope requestEnvelope;
 		private final Subscriber<? super ResponseEnvelope> subscriber;
 	}
 
 	AuthTicket getAuthTicket() {
 		return requestExecutor.authTicket;
-	}
-
-	String getUrlEndpoint() {
-		return requestExecutor.currentServer.toExternalForm();
 	}
 }
