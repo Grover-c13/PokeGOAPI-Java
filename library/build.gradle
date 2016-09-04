@@ -128,8 +128,8 @@ artifacts {
 
 bintray {
     configurations = ['archives']
-    user = bintrayUser
-    key = bintrayApiKey
+    user = project.hasProperty("bintrayUser") ? project.property("bintrayUser") : null;
+    key = project.hasProperty("bintrayApiKey") ? project.property("bintrayApiKey") : null;
     pkg {
         repo = 'maven'
         name = 'pokego=api'
