@@ -1,10 +1,7 @@
-Properties properties = new Properties()
-properties.load(new File(".version").newReader())
-
 allprojects {
     apply plugin: 'java'
     group = 'com.github.pokejava'
-    version = properties.get("version")
+    version =  new File(".version").newReader().readLine()
     archivesBaseName = 'pokego'
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
