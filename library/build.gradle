@@ -56,7 +56,7 @@ protobuf {
 def checkstyleOutputDir = "${project.projectDir}/build/reports/checkstyle/"
 
 checkstyle {
-    toolVersion = '7.0'
+    toolVersion = '6.19'
     configFile = file("${project.projectDir}/config/checkstyle.xml")
     configProperties = [ "suppressionFile" : file("${project.projectDir}/config/suppressions.xml")]
     reportsDir = file(checkstyleOutputDir)
