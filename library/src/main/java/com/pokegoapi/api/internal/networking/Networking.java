@@ -71,9 +71,8 @@ public final class Networking {
 	private final Locale locale;
 	private Long lastInventoryCheck = null;
 	private AuthInfo authInfo;
-	// private final RequestHandler oldRequestHandler;
 
-	private Networking(URL initialServer, ExecutorService executorService, OkHttpClient client, final Location location, final DeviceInfo deviceInfo,
+	public Networking(URL initialServer, ExecutorService executorService, OkHttpClient client, final Location location, final DeviceInfo deviceInfo,
 					   final SensorInfo sensorInfo, final ActivityStatus activityStatus, final LocationFixes locationFixes, final Locale locale, Callback callback) {
 		this.executorService = executorService;
 		this.location = location;
@@ -81,20 +80,6 @@ public final class Networking {
 		this.signature = new Signature(location, deviceInfo, sensorInfo, activityStatus, locationFixes);
 		this.locale = locale;
 		this.requestScheduler = new RequestScheduler(executorService, client, initialServer);
-	}
-
-	public static Networking getInstance(URL initialServer, ExecutorService executorService, OkHttpClient client, Location location, DeviceInfo deviceInfo,
-										 SensorInfo sensorInfo, ActivityStatus activityStatus, LocationFixes locationFixes, Callback callback, Locale locale) {
-		String serverString = initialServer.toExternalForm();
-		if (!INSTANCES.containsKey(serverString)) {
-			synchronized (INSTANCES) {
-				if (!INSTANCES.containsKey(serverString)) {
-					INSTANCES.put(serverString, new Networking(initialServer, executorService, client, location, deviceInfo,
-							sensorInfo, activityStatus, locationFixes, locale, callback));
-				}
-			}
-		}
-		return INSTANCES.get(serverString);
 	}
 
 	private static void sleep(long ms) {
@@ -296,8 +281,9 @@ public final class Networking {
 			@Override
 			public Observable<T> call(ResponseEnvelope responseEnvelope) {
 				try {
-					T responseMessage = getParser(responseType).parseFrom(responseEnvelope.getReturns(0));
+					T responseMessage;
 					if (responseEnvelope.getReturnsCount() > 1) {
+						responseMessage = getParser(responseType).parseFrom(responseEnvelope.getReturns(0));
 						final GetHatchedEggsResponse getHatchedEggsResponse = GetHatchedEggsResponse.parseFrom(responseEnvelope.getReturns(2));
 						final GetInventoryResponse getInventoryResponse = GetInventoryResponse.parseFrom(responseEnvelope.getReturns(3));
 						final CheckAwardedBadgesResponse checkAwardedBadgesResponse = CheckAwardedBadgesResponse.parseFrom(responseEnvelope.getReturns(4));
@@ -308,6 +294,9 @@ public final class Networking {
 								callback.update(getHatchedEggsResponse, getInventoryResponse, checkAwardedBadgesResponse, downloadSettingsResponse);
 							}
 						});
+					}
+					else {
+						return Observable.empty();
 					}
 					return Observable.just(responseMessage);
 				} catch (IllegalAccessException | InvalidProtocolBufferException | NoSuchMethodException | InvocationTargetException e) {
