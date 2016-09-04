@@ -131,8 +131,8 @@ bintray {
     user = project.hasProperty("bintrayUser") ? project.property("bintrayUser") : null;
     key = project.hasProperty("bintrayApiKey") ? project.property("bintrayApiKey") : null;
     pkg {
-        repo = 'pokejava'
-        name = 'pokego-api'
+        repo = 'pokego'
+        name = 'pokego'
         userOrg = 'pokejava'
         licenses = ['GPL-3.0']
         vcsUrl = 'https://github.com/pokejava/pokego.git'
