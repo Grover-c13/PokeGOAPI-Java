@@ -16,6 +16,8 @@
 package com.pokegoapi.util;
 
 
+import POGOProtos.Inventory.Item.ItemIdOuterClass;
+
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -26,6 +28,7 @@ import java.util.ResourceBundle;
 public class PokeDictionary {
 	private static final String POKE_NAMES_BUNDLE = "pokemon_names";
 	private static final String POKE_DESCRIPTIONS_BUNDLE = "pokemon_descriptions";
+	private static final String ITEM_NAMES_BUNDLE = "item_names";
 
 	/**
 	 * An array of all supported locales.
@@ -51,7 +54,7 @@ public class PokeDictionary {
 
 	/**
 	 * Returns the Pokédex Name for a Pokedex ID including known translations.
-	 * Fallback to English if names do not exist for the given {@link Locale}.
+	 * Fallback to the default locale if names do not exist for the given {@link Locale}.
 	 *
 	 * @param pokedexId Pokemon index number
 	 * @param locale    target name locale
@@ -65,7 +68,7 @@ public class PokeDictionary {
 
 	/**
 	 * Returns the Pokédex Description for a Pokédex ID including known translations.
-	 * Fallback to English if names do not exist for the given {@link Locale}.
+	 * Fallback to the default locale if names do not exist for the given {@link Locale}.
 	 *
 	 * @param pokedexId Pokemon index number
 	 * @param locale    target name locale
@@ -78,8 +81,22 @@ public class PokeDictionary {
 	}
 
 	/**
+	 * Returns the item name for a given ItemId including known translations.
+	 * Fallback to the default locale if names do not exist for the given {@link Locale}.
+	 *
+	 * @param itemId Item id
+	 * @param locale    target name locale
+	 * @return the item name in locale
+	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
+	 */
+	public static String getDisplayItemName(ItemIdOuterClass.ItemId itemId, Locale locale)
+			throws MissingResourceException {
+		return getPokeBundle(ITEM_NAMES_BUNDLE, locale).getString(String.valueOf(itemId.getNumber()));
+	}
+
+	/**
 	 * Returns translated Pokemon name from ENGLISH locale.
-	 * Fallback to English if names do not exist for the given {@link Locale}.
+	 * Fallback to the default locale if names do not exist for the given {@link Locale}.
 	 *
 	 * @param engName   pokemon ENGLISH name
 	 * @param newLocale the locale you want translate to
