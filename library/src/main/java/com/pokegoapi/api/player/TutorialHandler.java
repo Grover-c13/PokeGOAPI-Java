@@ -73,7 +73,7 @@ public abstract class TutorialHandler {
 	/**
 	 * Which pokemon should be chosen as the players starter pokemon.
 	 * By default, this will return a random {@link PokemonIdOuterClass.PokemonId},
-	 * chosen between Bulbasaur, Charmander and Squirtle.
+	 * chosen between Bulbasaur, Charmander, Squirtle and Pikachu.
 	 * You can override this and for example ask the user.
 	 *
 	 * @return A valid starter pokemon.
@@ -84,7 +84,9 @@ public abstract class TutorialHandler {
 		int pokemonId = random.nextInt(4);
 
 		return pokemonId == 1 ? PokemonIdOuterClass.PokemonId.BULBASAUR :
-				pokemonId == 2 ? PokemonIdOuterClass.PokemonId.CHARMANDER : PokemonIdOuterClass.PokemonId.SQUIRTLE;
+				pokemonId == 2 ? PokemonIdOuterClass.PokemonId.CHARMANDER :
+						pokemonId == 3 ? PokemonIdOuterClass.PokemonId.SQUIRTLE
+								: PokemonIdOuterClass.PokemonId.PIKACHU;
 	}
 
 	/**
@@ -113,8 +115,8 @@ public abstract class TutorialHandler {
 	/**
 	 * Will be called if the given nickname is invalid.
 	 *
-	 * @see PlayerProfile#isNicknameValid(String)
 	 * @param nickname The invalid nickname.
+	 * @see PlayerProfile#isNicknameValid(String)
 	 */
 	public void onNicknameInvalid(String nickname) {
 	}
