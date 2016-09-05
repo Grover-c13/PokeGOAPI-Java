@@ -46,7 +46,7 @@ public class EggIncubator {
 	/**
 	 * Returns the remaining uses.
 	 *
-	 * @return uses remaining
+	 * @return uses remaining, always 0 for infinite egg incubator
 	 */
 	public int getUsesRemaining() {
 		return proto.getUsesRemaining();
