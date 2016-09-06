@@ -34,6 +34,7 @@ import com.pokegoapi.api.internal.Location;
 import com.pokegoapi.api.internal.networking.Networking;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.inventory.Pokeball;
+import com.pokegoapi.api.map.MapPoint;
 import com.pokegoapi.api.map.pokemon.encounter.DiskEncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.NormalEncounterResult;
@@ -41,7 +42,6 @@ import com.pokegoapi.exceptions.EncounterFailedException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.api.map.MapPoint;
 import lombok.Getter;
 import lombok.ToString;
 import rx.Observable;
@@ -53,8 +53,6 @@ import rx.functions.Func1;
  */
 @ToString
 public class CatchablePokemon implements MapPoint {
-
-	private static final String TAG = CatchablePokemon.class.getSimpleName();
 	private final Networking networking;
 	private final Location location;
 	private final Inventories inventories;
@@ -76,9 +74,12 @@ public class CatchablePokemon implements MapPoint {
 	private Boolean encountered = null;
 
 	/**
-	 * Instantiates a new Catchable pokemon.
+	 * Instantiates a new Catchable pokemon. Constructor is only for internal use
 	 *
-	 * @param proto the proto
+	 * @param networking  Networking, for all actions on pokemon
+	 * @param location    Current location of the user
+	 * @param inventories Inventories are needed to use an item
+	 * @param proto       the proto
 	 */
 	public CatchablePokemon(Networking networking, Location location, Inventories inventories, MapPokemon proto) {
 		this.networking = networking;
@@ -96,9 +97,12 @@ public class CatchablePokemon implements MapPoint {
 
 
 	/**
-	 * Instantiates a new Catchable pokemon.
+	 * Instantiates a new Catchable pokemon. Constructor is only for internal use
 	 *
-	 * @param proto the proto
+	 * @param networking  Networking, for all actions on pokemon
+	 * @param location    Current location of the user
+	 * @param inventories Inventories are needed to use an item
+	 * @param proto       the proto
 	 */
 	public CatchablePokemon(Networking networking, Location location, Inventories inventories, WildPokemon proto) {
 		this.networking = networking;
@@ -117,10 +121,10 @@ public class CatchablePokemon implements MapPoint {
 	/**
 	 * Instantiates a new Catchable pokemon.
 	 *
-	 * @param networking Networking, for all actions on pokemon
-	 * @param location Current location of the user
+	 * @param networking  Networking, for all actions on pokemon
+	 * @param location    Current location of the user
 	 * @param inventories Inventories are needed to use an item
-	 * @param proto the proto
+	 * @param proto       the proto
 	 */
 	public CatchablePokemon(Networking networking, Location location, Inventories inventories, FortData proto) {
 		if (!proto.hasLureInfo()) {
@@ -238,15 +242,11 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	/**
-	 * Tries to catch a pokemon (will attempt to use a pokeball if the capture probability greater than 50%, if you have
-	 * none will use greatball etc).
+	 * Tries to catch a pokemon with the provided catch options
 	 *
 	 * @param encounter the encounter to compare
 	 * @param options   the CatchOptions object
 	 * @return the catch result
-	 * @throws LoginFailedException     the login failed exception
-	 * @throws RemoteServerException    the remote server exception
-	 * @throws NoSuchItemException      the no such item exception
 	 * @throws EncounterFailedException the encounter failed exception
 	 */
 	public Observable<CatchResult> catchPokemon(EncounterResult encounter,
@@ -293,10 +293,12 @@ public class CatchablePokemon implements MapPoint {
 	 * @param normalizedReticleSize the normalized hit reticle
 	 * @param spinModifier          the spin modifier
 	 * @param type                  Type of pokeball to throw
+	 * @param hitPokemon            If false, the server will be notified the Pokeball missed the pokemon
 	 * @return CatchResult of resulted try to catch pokemon
 	 */
 	public Observable<CatchResult> catchPokemon(
-			double normalizedHitPosition, double normalizedReticleSize, double spinModifier, Pokeball type, boolean hitPokemon) {
+			double normalizedHitPosition, double normalizedReticleSize, double spinModifier, Pokeball type,
+			boolean hitPokemon) {
 		if (!isEncountered()) {
 			return Observable.just(new CatchResult());
 		}
@@ -331,12 +333,13 @@ public class CatchablePokemon implements MapPoint {
 	 */
 	public Observable<CatchItemResult> useItemAsync(ItemId item) {
 		return networking.queueRequest(RequestType.USE_ITEM_CAPTURE,
-		UseItemCaptureMessage
-				.newBuilder()
-				.setEncounterId(this.getEncounterId())
-				.setSpawnPointId(this.getSpawnPointId())
-				.setItemId(item)
-				.build(), UseItemCaptureResponse.class).map(new Func1<UseItemCaptureResponse, CatchItemResult>() {
+				UseItemCaptureMessage
+						.newBuilder()
+						.setEncounterId(this.getEncounterId())
+						.setSpawnPointId(this.getSpawnPointId())
+						.setItemId(item)
+						.build(), UseItemCaptureResponse.class).map(new Func1<UseItemCaptureResponse,
+				CatchItemResult>() {
 			@Override
 			public CatchItemResult call(UseItemCaptureResponse response) {
 				return new CatchItemResult(response);
@@ -382,12 +385,12 @@ public class CatchablePokemon implements MapPoint {
 		return encounterKind == EncounterKind.DISK;
 	}
 
+	public CatchOptions newCatchOptions() {
+		return new CatchOptions(inventories);
+	}
+
 	private enum EncounterKind {
 		NORMAL,
 		DISK;
-	}
-
-	public CatchOptions newCatchOptions() {
-		return new CatchOptions(inventories);
 	}
 }
