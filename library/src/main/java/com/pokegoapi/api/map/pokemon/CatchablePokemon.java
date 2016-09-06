@@ -252,13 +252,7 @@ public class CatchablePokemon implements MapPoint {
 	 */
 	public CatchResult catchPokemon(CatchOptions options) throws LoginFailedException,
 			RemoteServerException, NoSuchItemException {
-		if (options != null) {
-			if (options.getRazzberries() == 1) {
-				useItem(ItemId.ITEM_RAZZ_BERRY);
-				options.useRazzberries(false);
-				options.maxRazzberries(-1);
-			}
-		} else {
+		if (options == null) {
 			options = new CatchOptions(api);
 		}
 
@@ -289,13 +283,7 @@ public class CatchablePokemon implements MapPoint {
 		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
 		double probability = encounter.getCaptureProbability().getCaptureProbability(0);
 
-		if (options != null) {
-			if (options.getRazzberries() == 1) {
-				useItem(ItemId.ITEM_RAZZ_BERRY);
-				options.useRazzberries(false);
-				options.maxRazzberries(-1);
-			}
-		} else {
+		if (options == null) {
 			options = new CatchOptions(api);
 		}
 

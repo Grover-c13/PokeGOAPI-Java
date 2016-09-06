@@ -70,7 +70,7 @@ public class CatchOptions {
 	public CatchOptions(PokemonGo api) {
 		this.api = api;
 		this.useRazzBerries = false;
-		this.maxRazzBerries = 0;
+		this.maxRazzBerries = 1;
 		this.useBestPokeball = false;
 		this.skipMasterBall = false;
 		this.pokeBall = POKEBALL;
@@ -167,7 +167,7 @@ public class CatchOptions {
 	 * @return the number to use
 	 */
 	public int getRazzberries() {
-		return useRazzBerries && maxRazzBerries == 0 ? 1 : maxRazzBerries;
+		return !useRazzBerries ? 0 : maxRazzBerries;
 	}
 	
 	/**
@@ -182,7 +182,9 @@ public class CatchOptions {
 	}
 	
 	/**
-	 * Set a maximum number of razzberries
+	 * Set a maximum number of razzberries.
+	 * Default: 1
+	 * If set to -1, the maximum number is only limited by the amount of razzberries available.
 	 *
 	 * @param maxRazzBerries maximum allowed
 	 * @return               the CatchOptions object
