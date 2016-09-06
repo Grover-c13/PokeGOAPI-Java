@@ -20,20 +20,35 @@ import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import java.util.Random;
 
 /**
- * Created by fabianterhorst on 08.08.16.
+ * Sensor info of the device
  */
-
 public class SensorInfo {
 	private final SensorInfoProvider sensorInfoProvider;
 
+	/**
+	 * Constructor with provider
+	 *
+	 * @param sensorInfoProvider Sensor info provider
+	 */
 	public SensorInfo(SensorInfoProvider sensorInfoProvider) {
 		this.sensorInfoProvider = sensorInfoProvider;
 	}
 
+	/**
+	 * Default sensor info, for internal use
+	 *
+	 * @param random Random object
+	 * @return Sensor info
+	 */
 	public static SensorInfo getDefault(final Random random) {
 		return new SensorInfo(new DefaultSensorInfoProvider(random));
 	}
 
+	/**
+	 * Get sensor info, for internal use
+	 *
+	 * @return Sensor info builder
+	 */
 	public SignatureOuterClass.Signature.SensorInfo getSensorInfo() {
 		SensorInfoProvider.Info info = sensorInfoProvider.getInfo();
 		return SignatureOuterClass.Signature.SensorInfo.newBuilder()

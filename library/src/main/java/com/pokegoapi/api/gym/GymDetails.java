@@ -13,14 +13,20 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import java.util.List;
 
 /**
- * Created by paul on 22-8-2016.
+ * Details of a gym
  */
 public class GymDetails {
 	private final GetGymDetailsResponse getGymDetailsResponse;
 
+	/**
+	 * For internal use
+	 *
+	 * @param getGymDetailsResponse Response
+	 */
 	GymDetails(GetGymDetailsResponse getGymDetailsResponse) {
 		this.getGymDetailsResponse = getGymDetailsResponse;
 	}
+
 	public String getName() throws LoginFailedException, RemoteServerException {
 		return getGymDetailsResponse.getName();
 	}
@@ -54,7 +60,7 @@ public class GymDetails {
 	 * @throws LoginFailedException  if the login failed
 	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
-	public List<PokemonData> getDefendingPokemon()  {
+	public List<PokemonData> getDefendingPokemon() {
 		return Stream.of(getGymMembers()).map(new Function<GymMembershipOuterClass.GymMembership, PokemonData>() {
 			@Override
 			public PokemonData apply(GymMembershipOuterClass.GymMembership gymMembership) {

@@ -47,8 +47,6 @@ public class TransferOnePidgeyExample {
 
 		if (pidgeys.size() > 0) {
 			Pokemon pest = pidgeys.get(0);
-			// print the pokemon data
-			pest.debug();
 			ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result result = pest.transferPokemon()
 					.toBlocking().first();
 			Log.i("Main", "Transfered Pidgey result:" + result);

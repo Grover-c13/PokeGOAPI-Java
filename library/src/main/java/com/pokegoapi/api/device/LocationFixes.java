@@ -13,34 +13,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Created by fabianterhorst on 23.08.16.
+ * Location fixes class
  */
 @RequiredArgsConstructor
-public class LocationFixes  {
+public class LocationFixes {
 	private final LocationFixProvider locationFixProvider;
-
-	public Collection<SignatureOuterClass.Signature.LocationFix> getLocationFixes(final Location location,
-																				  final boolean getMapObjectRequest) {
-		return Stream.of(locationFixProvider.getLocationFixes(location.getLatitude(), location.getLongitude(),
-				location.getAccuracy(), getMapObjectRequest)).map(new Function<LocationFixProvider.LocationFix, SignatureOuterClass.Signature.LocationFix>() {
-			@Override
-			public SignatureOuterClass.Signature.LocationFix apply(LocationFixProvider.LocationFix locationFix) {
-				SignatureOuterClass.Signature.LocationFix.Builder locationFixBuilder =
-						SignatureOuterClass.Signature.LocationFix.newBuilder();
-
-				return locationFixBuilder.setProvider("fused")
-						.setAltitude(locationFix.getAltitude())
-						.setHorizontalAccuracy(locationFix.getHorizontalAccuracy())
-						.setVerticalAccuracy(locationFix.getVerticalAccuracy())
-						.setLatitude(locationFix.getLatitude())
-						.setLongitude(locationFix.getLongitude())
-						.setLocationType(locationFix.getLocationType())
-						.setTimestampSnapshot(locationFix.getTimestampSnapshot())
-						.setProviderStatus(3)
-						.build();
-			}
-		}).collect(Collectors.<SignatureOuterClass.Signature.LocationFix>toList());
-	}
 
 	/**
 	 * Gets the default device info for the given api
@@ -52,6 +29,39 @@ public class LocationFixes  {
 		return new LocationFixes(new DefaultLocationFixProvider(random));
 	}
 
+	/**
+	 * For internal use
+	 *
+	 * @param location            Location containing the current position
+	 * @param getMapObjectRequest Is this a map objects request
+	 * @return Collection of LocationFix's
+	 */
+	public Collection<SignatureOuterClass.Signature.LocationFix> getLocationFixes(final Location location,
+			final boolean getMapObjectRequest) {
+		return Stream.of(locationFixProvider
+				.getLocationFixes(location.getLatitude(), location.getLongitude(), location.getAccuracy(),
+						getMapObjectRequest))
+				.map(new Function<LocationFixProvider.LocationFix, SignatureOuterClass.Signature.LocationFix>() {
+					@Override
+					public SignatureOuterClass.Signature.LocationFix apply(
+							LocationFixProvider.LocationFix locationFix) {
+						SignatureOuterClass.Signature.LocationFix.Builder locationFixBuilder =
+								SignatureOuterClass.Signature.LocationFix.newBuilder();
+
+						return locationFixBuilder.setProvider("fused")
+								.setAltitude(locationFix.getAltitude())
+								.setHorizontalAccuracy(locationFix.getHorizontalAccuracy())
+								.setVerticalAccuracy(locationFix.getVerticalAccuracy())
+								.setLatitude(locationFix.getLatitude())
+								.setLongitude(locationFix.getLongitude())
+								.setLocationType(locationFix.getLocationType())
+								.setTimestampSnapshot(locationFix.getTimestampSnapshot())
+								.setProviderStatus(3)
+								.build();
+					}
+				}).collect(Collectors.<SignatureOuterClass.Signature.LocationFix>toList());
+	}
+
 	@RequiredArgsConstructor
 	private static class DefaultLocationFixProvider implements LocationFixProvider {
 		private final long startTime = System.currentTimeMillis();
@@ -59,9 +69,24 @@ public class LocationFixes  {
 		private long previousTimestamp;
 		private List<LocationFix> previousLocationFixes;
 
+		private static boolean contains(int[] array, int value) {
+			for (final int i : array) {
+				if (i == value) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private static float offsetOnLatLong(double lat, double ran) {
+			double round = 6378137;
+			double dl = ran / (round * Math.cos(Math.PI * lat / 180));
+			return (float) (lat + dl * 180 / Math.PI);
+		}
+
 		@Override
 		public Collection<LocationFix> getLocationFixes(final double lat, final double lng,
-														final double alt, boolean getMapObjectRequest) {
+				final double alt, boolean getMapObjectRequest) {
 			long currentTime = System.currentTimeMillis();
 			int pn = random.nextInt(100);
 			int providerCount;
@@ -97,13 +122,13 @@ public class LocationFixes  {
 				}
 			}
 
-//			locationFixes.setTimestampCreate(api.currentTimeMillis());
+			// locationFixes.setTimestampCreate(api.currentTimeMillis());
 
 			for (int i = 0; i < providerCount; i++) {
 				float latitude = offsetOnLatLong(lat, random.nextInt(100) + 10);
 				float longitude = offsetOnLatLong(lng, random.nextInt(100) + 10);
 				float altitude = 65;
-				float verticalAccuracy = (float) (15 + (23 - 15) * random.nextDouble());
+				final float verticalAccuracy = (float) (15 + (23 - 15) * random.nextDouble());
 
 				// Fake errors
 				if (!getMapObjectRequest) {
@@ -118,10 +143,10 @@ public class LocationFixes  {
 
 				LocationFix locationFix = new LocationFix();
 				locationFix.setTimestampSnapshot(
-								contains(negativeSnapshotProviders, i)
-										? random.nextInt(1000) - 3000
-										: currentTime - startTime
-										+ (150 * (i + 1) + random.nextInt(250 * (i + 1) - (150 * (i + 1)))));
+						contains(negativeSnapshotProviders, i)
+								? random.nextInt(1000) - 3000
+								: currentTime - startTime
+								+ (150 * (i + 1) + random.nextInt(250 * (i + 1) - (150 * (i + 1)))));
 				locationFix.setLatitude(latitude);
 				locationFix.setLongitude(longitude);
 				locationFix.setHorizontalAccuracy(-1);
@@ -132,21 +157,6 @@ public class LocationFixes  {
 				locationFixes.add(locationFix);
 			}
 			return locationFixes;
-		}
-
-		private static boolean contains(int[] array, int value) {
-			for (final int i : array) {
-				if (i == value) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		private static float offsetOnLatLong(double lat, double ran) {
-			double round = 6378137;
-			double dl = ran / (round * Math.cos(Math.PI * lat / 180));
-			return (float) (lat + dl * 180 / Math.PI);
 		}
 	}
 

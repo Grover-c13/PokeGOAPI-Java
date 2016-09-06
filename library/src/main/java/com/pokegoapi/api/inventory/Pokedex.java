@@ -24,15 +24,29 @@ import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
 import java.util.EnumMap;
 import java.util.Map;
 
+/**
+ * Pokemon pokedex containing information about pokemons, which have been seen and caught.
+ */
 public class Pokedex {
 	private Map<PokemonId, PokedexEntry> pokedexMap = new EnumMap<>(PokemonId.class);
 
+	/**
+	 * Constructor for internal use
+	 *
+	 * @param getInventoryResponse Initial inventory response
+	 */
 	public Pokedex(GetInventoryResponseOuterClass.GetInventoryResponse getInventoryResponse) {
 		update(getInventoryResponse);
 	}
 
+	/**
+	 * Update call
+	 *
+	 * @param getInventoryResponse Update the class with information from the response
+	 */
 	public final void update(GetInventoryResponseOuterClass.GetInventoryResponse getInventoryResponse) {
-		for (InventoryItemOuterClass.InventoryItem inventoryItem : getInventoryResponse.getInventoryDelta().getInventoryItemsList()) {
+		for (InventoryItemOuterClass.InventoryItem inventoryItem : getInventoryResponse.getInventoryDelta()
+				.getInventoryItemsList()) {
 			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
 			if (itemData.hasPokedexEntry()) {
 				pokedexMap.put(itemData.getPokedexEntry().getPokemonId(), itemData.getPokedexEntry());

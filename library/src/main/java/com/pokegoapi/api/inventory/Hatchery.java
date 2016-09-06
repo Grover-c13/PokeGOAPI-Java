@@ -31,6 +31,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
+/**
+ * Hatchery, for hatching eggs
+ */
 public class Hatchery {
 	private final Map<Long, EggPokemon> eggMap = new ConcurrentHashMap<>();
 	private final Inventories inventories;
@@ -39,7 +42,7 @@ public class Hatchery {
 	private Callback callback;
 
 	Hatchery(GetInventoryResponse getInventoryResponse, GetHatchedEggsResponse getHatchedEggsResponse,
-			 Inventories inventories, ExecutorService executorService) {
+			Inventories inventories, ExecutorService executorService) {
 		this.executorService = executorService;
 		this.inventories = inventories;
 		update(getInventoryResponse);
@@ -48,9 +51,11 @@ public class Hatchery {
 
 	final void update(GetInventoryResponse getInventoryResponse) {
 		List<Long> currentItems = new LinkedList<>();
-		for (InventoryItemOuterClass.InventoryItem inventoryItem : getInventoryResponse.getInventoryDelta().getInventoryItemsList()) {
+		for (InventoryItemOuterClass.InventoryItem inventoryItem : getInventoryResponse.getInventoryDelta()
+				.getInventoryItemsList()) {
 			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
-			if (itemData.getPokemonData().getPokemonId() == PokemonIdOuterClass.PokemonId.MISSINGNO && itemData.getPokemonData().getIsEgg()) {
+			if (itemData.getPokemonData().getPokemonId() == PokemonIdOuterClass.PokemonId.MISSINGNO
+					&& itemData.getPokemonData().getIsEgg()) {
 				eggMap.put(itemData.getPokemonData().getId(), new EggPokemon(itemData.getPokemonData(), inventories));
 				currentItems.add(itemData.getPokemonData().getId());
 			}
@@ -80,7 +85,13 @@ public class Hatchery {
 		return eggMap.values();
 	}
 
+	/**
+	 * Callback for when an egg is hatched
+	 */
 	public interface Callback {
+		/**
+		 * @param hatchedEgg Newly hatched egg
+		 */
 		void hatchedEgg(HatchedEgg hatchedEgg);
 	}
 

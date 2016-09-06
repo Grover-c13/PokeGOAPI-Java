@@ -79,7 +79,8 @@ class MapUtil {
 	static <K extends MapPoint> Map<Double, K> sortItems(List<K> items, Location location) {
 		Map<Double, K> result = new TreeMap<>();
 		for (K point : items) {
-			result.put(distFrom(location.getLatitude(), location.getLongitude(), point.getLatitude(), point.getLongitude()), point);
+			result.put(distFrom(location.getLatitude(), location.getLongitude(), point.getLatitude(),
+					point.getLongitude()), point);
 		}
 		return result;
 	}

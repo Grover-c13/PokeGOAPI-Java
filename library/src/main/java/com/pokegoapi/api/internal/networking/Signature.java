@@ -20,7 +20,7 @@ import net.jpountz.xxhash.XXHashFactory;
 
 import java.util.Random;
 
-public class Signature {
+class Signature {
 	private final byte[] sessionHash;
 	private final long startTime = System.currentTimeMillis();
 	private final Location location;
@@ -29,7 +29,8 @@ public class Signature {
 	private final ActivityStatus activityStatus;
 	private final LocationFixes locationFixes;
 
-	public Signature(Location location, DeviceInfo deviceInfo, SensorInfo sensorInfo, ActivityStatus activityStatus, LocationFixes locationFixes) {
+	Signature(Location location, DeviceInfo deviceInfo, SensorInfo sensorInfo, ActivityStatus activityStatus,
+			LocationFixes locationFixes) {
 		this.sessionHash = new byte[32];
 		new Random().nextBytes(sessionHash);
 		this.location = location;
@@ -37,6 +38,29 @@ public class Signature {
 		this.sensorInfo = sensorInfo;
 		this.activityStatus = activityStatus;
 		this.locationFixes = locationFixes;
+	}
+
+	private static byte[] getBytes(float input) {
+		long rawDouble = Double.doubleToRawLongBits((double) input);
+		return new byte[]{
+				(byte) (rawDouble >>> 56),
+				(byte) (rawDouble >>> 48),
+				(byte) (rawDouble >>> 40),
+				(byte) (rawDouble >>> 32),
+				(byte) (rawDouble >>> 24),
+				(byte) (rawDouble >>> 16),
+				(byte) (rawDouble >>> 8),
+				(byte) rawDouble
+		};
+	}
+
+	private static long getRequestHash(byte[] authTicket, byte[] request) {
+		XXHashFactory factory = XXHashFactory.safeInstance();
+		StreamingXXHash64 xx64 = factory.newStreamingHash64(0x61656632);
+		xx64.update(authTicket, 0, authTicket.length);
+		xx64 = factory.newStreamingHash64(xx64.getValue());
+		xx64.update(request, 0, request.length);
+		return xx64.getValue();
 	}
 
 	/**
@@ -62,12 +86,13 @@ public class Signature {
 			xx64.update(unknown, 0, unknown.length);
 			long unknown25 = xx64.getValue();
 		*/
-		boolean getMapRequest = Stream.of(builder.getRequestsList()).filter(new Predicate<RequestOuterClass.Request>() {
-			@Override
-			public boolean test(RequestOuterClass.Request value) {
-				return value.getRequestType() == RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS;
-			}
-		}).count() >= 1;
+		boolean getMapRequest = Stream.of(builder.getRequestsList())
+				.filter(new Predicate<RequestOuterClass.Request>() {
+					@Override
+					public boolean test(RequestOuterClass.Request value) {
+						return value.getRequestType() == RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS;
+					}
+				}).count() >= 1;
 
 		SignatureOuterClass.Signature.Builder sigBuilder = SignatureOuterClass.Signature.newBuilder()
 				.setLocationHash1(getLocationHash1(authTicketBA))
@@ -80,7 +105,8 @@ public class Signature {
 				.addAllLocationFix(locationFixes.getLocationFixes(location, getMapRequest))
 				.setUnknown25(7363665268261373700L);
 
-/*		SignatureOuterClass.Signature.SensorInfo sensorInfo = this.sensorInfo.getSensorInfo();
+		/*
+		SignatureOuterClass.Signature.SensorInfo sensorInfo = this.sensorInfo.getSensorInfo();
 		if (sensorInfo != null) {
 			sigBuilder.setSensorInfo(sensorInfo);
 		}*/
@@ -100,23 +126,10 @@ public class Signature {
 				.PlatformRequest.newBuilder()
 				.setType(PlatformRequestTypeOuterClass.PlatformRequestType.SEND_ENCRYPTED_SIGNATURE)
 				// TODO: Check this code
-				.setRequestMessage(SendEncryptedSignatureRequestOuterClass.SendEncryptedSignatureRequest.newBuilder().setEncryptedSignature(ByteString.copyFrom(encrypted)).build().toByteString())
-			.build();
+				.setRequestMessage(SendEncryptedSignatureRequestOuterClass.SendEncryptedSignatureRequest.newBuilder()
+						.setEncryptedSignature(ByteString.copyFrom(encrypted)).build().toByteString())
+				.build();
 		builder.addPlatformRequests(platformRequest);
-	}
-
-	private static byte[] getBytes(float input) {
-		long rawDouble = Double.doubleToRawLongBits((double)input);
-		return new byte[]{
-				(byte) (rawDouble >>> 56),
-				(byte) (rawDouble >>> 48),
-				(byte) (rawDouble >>> 40),
-				(byte) (rawDouble >>> 32),
-				(byte) (rawDouble >>> 24),
-				(byte) (rawDouble >>> 16),
-				(byte) (rawDouble >>> 8),
-				(byte) rawDouble
-		};
 	}
 
 	private int getLocationHash1(byte[] authTicket) {
@@ -146,14 +159,5 @@ public class Signature {
 		xx32.update(bytes, 0, bytes.length);
 
 		return xx32.getValue();
-	}
-
-	private static long getRequestHash(byte[] authTicket, byte[] request) {
-		XXHashFactory factory = XXHashFactory.safeInstance();
-		StreamingXXHash64 xx64 = factory.newStreamingHash64(0x61656632);
-		xx64.update(authTicket, 0, authTicket.length);
-		xx64 = factory.newStreamingHash64(xx64.getValue());
-		xx64.update(request, 0, request.length);
-		return xx64.getValue();
 	}
 }

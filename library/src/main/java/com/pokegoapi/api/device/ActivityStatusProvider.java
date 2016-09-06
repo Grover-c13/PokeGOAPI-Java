@@ -18,19 +18,25 @@ package com.pokegoapi.api.device;
 import lombok.Data;
 
 /**
- * Created by fabianterhorst on 22.08.16.
+ * Provider for activity status
  */
-
 public interface ActivityStatusProvider {
 
+	/**
+	 * Status
+	 */
 	@Data
 	class Status {
 		public enum Activity {
 			AUTOMOTIVE, CYCLING, RUNNING, STATIONARY, WALKING;
 		}
+
 		private final Activity activity;
 		private final boolean tilting;
-
 	}
+
+	/**
+	 * @return Status
+	 */
 	Status getActivity();
 }

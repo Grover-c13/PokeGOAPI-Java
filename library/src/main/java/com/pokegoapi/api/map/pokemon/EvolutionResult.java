@@ -31,13 +31,13 @@ public class EvolutionResult {
 	/**
 	 * The evolution result.
 	 *
-	 * @param networking Networking
-	 * @param inventories Inventories are needed for the pokemon actions
+	 * @param networking    Networking
+	 * @param inventories   Inventories are needed for the pokemon actions
 	 * @param playerProfile Player profile is needed for calulations of max cp and such
-	 * @param proto      Pokemon proto
+	 * @param proto         Pokemon proto
 	 */
 	public EvolutionResult(Networking networking, Inventories inventories, PlayerProfile playerProfile,
-						   EvolvePokemonResponseOuterClass.EvolvePokemonResponse proto) {
+						EvolvePokemonResponseOuterClass.EvolvePokemonResponse proto) {
 		this.proto = proto;
 		this.pokemon = new Pokemon(networking, inventories, playerProfile, proto.getEvolvedPokemonData());
 	}

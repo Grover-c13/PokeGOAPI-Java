@@ -1,3 +1,18 @@
+/*
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
@@ -9,7 +24,6 @@ import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.util.Log;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +33,9 @@ import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.JOLTEON;
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.VAPOREON;
 import static java.util.Arrays.asList;
 
+/**
+ * All pokemon details
+ */
 public class PokemonDetails {
 	private static final String TAG = Pokemon.class.getSimpleName();
 	@Getter
@@ -28,7 +45,12 @@ public class PokemonDetails {
 	private final PokemonMeta meta;
 	private final Inventories inventories;
 
-	public PokemonDetails(PokemonData proto, Inventories inventories) {
+	/**
+	 * Constructor for details
+	 * @param proto Pokemon data
+	 * @param inventories Inventories
+	 */
+	protected PokemonDetails(PokemonData proto, Inventories inventories) {
 		this.proto = proto;
 		this.meta = PokemonMetaRegistry.getMeta(this.getPokemonId());
 		this.inventories = inventories;
@@ -168,21 +190,12 @@ public class PokemonDetails {
 		return proto.getFavorite() > 0;
 	}
 
-	@Deprecated
-	public boolean getFavorite() {
-		return proto.getFavorite() > 0;
-	}
-
 	public String getNickname() {
 		return proto.getNickname();
 	}
 
 	public boolean getFromFort() {
 		return proto.getFromFort() > 0;
-	}
-
-	public void debug() {
-		Log.d(TAG, proto.toString());
 	}
 
 	public int getBaseStam() {
@@ -225,12 +238,11 @@ public class PokemonDetails {
 	/**
 	 * Calculate the maximum CP for this individual pokemon and this player's level
 	 *
+	 * @param playerLevel Player level to use in calculations
 	 * @return The maximum CP for this pokemon
 	 * @throws NoSuchItemException   If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
-	 * @throws LoginFailedException  If login failed
-	 * @throws RemoteServerException If the server is causing issues
 	 */
-	public int getMaxCpForPlayer(int playerLevel) throws NoSuchItemException, LoginFailedException, RemoteServerException {
+	public int getMaxCpForPlayer(int playerLevel) throws NoSuchItemException {
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
 		if (pokemonMeta == null) {
 			throw new NoSuchItemException("Cannot find meta data for " + proto.getPokemonId().name());
@@ -255,27 +267,25 @@ public class PokemonDetails {
 	 * Calculated the max cp of this pokemon, if you upgrade it fully and the player is at level 40
 	 *
 	 * @return Max cp of this pokemon
-	 * @throws LoginFailedException  If login failed
-	 * @throws RemoteServerException If the server is causing issues
 	 */
-	public int getCpFullEvolveAndPowerup() throws LoginFailedException, RemoteServerException {
+	public int getCpFullEvolveAndPowerup()  {
 		return getMaxCpFullEvolveAndPowerup(40);
 	}
 
 	/**
 	 * Calculated the max cp of this pokemon, if you upgrade it fully with your current player level
 	 *
+	 * @param playerLevel Player level to use in calculations
 	 * @return Max cp of this pokemon
-	 * @throws LoginFailedException  If login failed
-	 * @throws RemoteServerException If the server is causing issues
 	 */
-	public int getMaxCpFullEvolveAndPowerupForPlayer(int playerLevel) throws LoginFailedException, RemoteServerException {
+	public int getMaxCpFullEvolveAndPowerupForPlayer(int playerLevel) {
 		return getMaxCpFullEvolveAndPowerup(playerLevel);
 	}
 
 	/**
 	 * Calculated the max cp of this pokemon, if you upgrade it fully with your current player level
 	 *
+	 * @param playerLevel Player level to use in calculations
 	 * @return Max cp of this pokemon
 	 */
 	private int getMaxCpFullEvolveAndPowerup(int playerLevel) {

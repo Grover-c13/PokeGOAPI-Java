@@ -39,6 +39,10 @@ import rx.functions.Func1;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Battle instance
+ * TODO: Update this class with upstream version
+ */
 public class Battle {
 	private final Networking networking;
 	private final Location location;
@@ -57,10 +61,13 @@ public class Battle {
 	/**
 	 * New battle to track the state of a battle.
 	 *
-	 * @param team The Pokemon to use for attacking in the battle.
-	 * @param gym  The Gym to fight at.
+	 * @param networking Networking, for all actions on pokemon
+	 * @param location   Current location of the user
+	 * @param gym        The Gym to fight at.
+	 * @param gymDetails The Gym to fight at, detailed information
+	 * @param team       The Pokemon to use for attacking in the battle.
 	 */
-	public Battle(Networking networking, Location location, Pokemon[] team, Gym gym, GymDetails gymDetails) {
+	public Battle(Networking networking, Location location, Gym gym, GymDetails gymDetails, Pokemon... team) {
 		this.networking = networking;
 		this.location = location;
 		this.team = team;
@@ -70,8 +77,8 @@ public class Battle {
 		this.bteam = new ArrayList<>();
 		this.gymIndex = new ArrayList<>();
 
-		for (int i = 0; i < team.length; i++) {
-			bteam.add(this.createBattlePokemon(team[i]));
+		for (Pokemon pokemon : team) {
+			bteam.add(this.createBattlePokemon(pokemon));
 		}
 	}
 
@@ -80,12 +87,11 @@ public class Battle {
 	 *
 	 * @return Result of the attempt to start
 	 */
-	public Observable<Result> start() throws LoginFailedException, RemoteServerException {
-
+	public Observable<Result> start() {
 		Builder builder = StartGymBattleMessageOuterClass.StartGymBattleMessage.newBuilder();
 
-		for (int i = 0; i < team.length; i++) {
-			builder.addAttackingPokemonIds(team[i].getId());
+		for (Pokemon pokemon : team) {
+			builder.addAttackingPokemonIds(pokemon.getId());
 		}
 
 		List<PokemonDataOuterClass.PokemonData> defenders = gymDetails.getDefendingPokemon();
@@ -135,17 +141,16 @@ public class Battle {
 	/**
 	 * Creates a battle pokemon object to send with the request.
 	 *
+	 * @param pokemon Pokemon to battle with
 	 * @return BattlePokemonInfo
-	 * @Param Pokemon
 	 */
 	private BattlePokemonInfo createBattlePokemon(Pokemon pokemon) {
-		BattlePokemonInfo info = BattlePokemonInfo
+		return BattlePokemonInfo
 				.newBuilder()
 				.setCurrentEnergy(0)
 				.setCurrentHealth(100)
 				.setPokemonData(pokemon.getDefaultInstanceForType())
 				.build();
-		return info;
 	}
 
 	/**
@@ -170,7 +175,8 @@ public class Battle {
 	 * @param actions list of actions to send in this request
 	 * @return AttackGymResponse
 	 */
-	private Observable<AttackGymResponse> doActions(List<BattleAction> actions) throws LoginFailedException, RemoteServerException {
+	private Observable<AttackGymResponse> doActions(List<BattleAction> actions)
+			throws LoginFailedException, RemoteServerException {
 		AttackGymMessage.Builder message = AttackGymMessage
 				.newBuilder()
 				.setGymId(gym.getId())
@@ -181,19 +187,20 @@ public class Battle {
 		for (BattleAction action : actions) {
 			message.addAttackActions(action);
 		}
-		return networking.queueRequest(RequestType.ATTACK_GYM, message.build(), AttackGymResponse.class).map(new Func1<AttackGymResponse, AttackGymResponse>() {
-			@Override
-			public AttackGymResponse call(AttackGymResponse response) {
-				if (response.getBattleLog().getState() == BattleState.DEFEATED
-						|| response.getBattleLog().getState() == BattleState.VICTORY
-						|| response.getBattleLog().getState() == BattleState.TIMED_OUT) {
-					concluded = true;
-				}
+		return networking.queueRequest(RequestType.ATTACK_GYM, message.build(), AttackGymResponse.class)
+				.map(new Func1<AttackGymResponse, AttackGymResponse>() {
+					@Override
+					public AttackGymResponse call(AttackGymResponse response) {
+						if (response.getBattleLog().getState() == BattleState.DEFEATED
+								|| response.getBattleLog().getState() == BattleState.VICTORY
+								|| response.getBattleLog().getState() == BattleState.TIMED_OUT) {
+							concluded = true;
+						}
 
-				outcome = response.getBattleLog().getState();
-				return response;
-			}
-		});
+						outcome = response.getBattleLog().getState();
+						return response;
+					}
+				});
 	}
 
 }

@@ -24,23 +24,34 @@ import lombok.Data;
 import java.util.EnumMap;
 import java.util.Map;
 
+/**
+ * Player profile class
+ */
 @Data
 public class PlayerProfile {
 	private static final String TAG = PlayerProfile.class.getSimpleName();
-	private PlayerData playerData;
 	private final PlayerAvatar avatar = new PlayerAvatar();
 	private final DailyBonus dailyBonus;
 	private final ContactSettings contactSettings = new ContactSettings();
 	private final Map<Currency, Integer> currencies = new EnumMap<>(Currency.class);
 	private final TutorialState tutorialState = new TutorialState();
+	private PlayerData playerData;
 
 	/**
+	 * Constructor for internal use
+	 *
+	 * @param getPlayerResponse Inital player response
+	 * @param networking        Networking for doing requests
 	 */
 	public PlayerProfile(GetPlayerResponse getPlayerResponse, Networking networking) {
 		dailyBonus = new DailyBonus(networking);
 		update(getPlayerResponse);
 	}
 
+	/**
+	 * Updates the player related objects, for internal use
+	 * @param getPlayerResponse Response to use in update
+	 */
 	public final void update(GetPlayerResponse getPlayerResponse) {
 		playerData = getPlayerResponse.getPlayerData();
 		avatar.update(playerData.getAvatar());
@@ -65,6 +76,9 @@ public class PlayerProfile {
 		return currencies.get(currency);
 	}
 
+	/**
+	 * Currency types
+	 */
 	public enum Currency {
 		STARDUST, POKECOIN;
 	}

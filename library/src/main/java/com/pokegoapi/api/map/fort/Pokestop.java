@@ -30,8 +30,8 @@ import com.pokegoapi.api.internal.networking.Networking;
 import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import repack.com.google.common.geometry.S2LatLng;
 import lombok.Getter;
+import repack.com.google.common.geometry.S2LatLng;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -49,10 +49,11 @@ public class Pokestop {
 
 	/**
 	 * Instantiate new pokestop
+	 *
 	 * @param networking Networking needed for all operations on this pokestop
-	 * @param location Current location of the user
-	 * @param settings Settings from the remote server, needed for checking if stop is in reach
-	 * @param fortData Response from server
+	 * @param location   Current location of the user
+	 * @param settings   Settings from the remote server, needed for checking if stop is in reach
+	 * @param fortData   Response from server
 	 */
 	public Pokestop(Networking networking, Location location, Settings settings, FortData fortData) {
 		this.networking = networking;
@@ -138,13 +139,14 @@ public class Pokestop {
 				.setFortLongitude(getLongitude())
 				.setPlayerLatitude(location.getLatitude())
 				.setPlayerLongitude(location.getLongitude())
-				.build(), FortSearchResponse.class).map(new Func1<FortSearchResponse, PokestopLootResult>() {
-			@Override
-			public PokestopLootResult call(FortSearchResponse response) {
-				cooldownCompleteTimestampMs = response.getCooldownCompleteTimestampMs();
-				return new PokestopLootResult(response);
-			}
-		});
+				.build(), FortSearchResponse.class)
+				.map(new Func1<FortSearchResponse, PokestopLootResult>() {
+					@Override
+					public PokestopLootResult call(FortSearchResponse response) {
+						cooldownCompleteTimestampMs = response.getCooldownCompleteTimestampMs();
+						return new PokestopLootResult(response);
+					}
+				});
 	}
 
 	/**
@@ -159,12 +161,13 @@ public class Pokestop {
 				.setFortId(getId())
 				.setPlayerLatitude(location.getLatitude())
 				.setPlayerLongitude(location.getLongitude())
-				.build(), AddFortModifierResponse.class).map(new Func1<AddFortModifierResponse, Boolean>() {
-			@Override
-			public Boolean call(AddFortModifierResponse addFortModifierResponse) {
-				return addFortModifierResponse.getResult() == AddFortModifierResponse.Result.SUCCESS;
-			}
-		});
+				.build(), AddFortModifierResponse.class)
+				.map(new Func1<AddFortModifierResponse, Boolean>() {
+					@Override
+					public Boolean call(AddFortModifierResponse addFortModifierResponse) {
+						return addFortModifierResponse.getResult() == AddFortModifierResponse.Result.SUCCESS;
+					}
+				});
 	}
 
 	/**
@@ -177,12 +180,13 @@ public class Pokestop {
 				.setFortId(getId())
 				.setLatitude(getLatitude())
 				.setLongitude(getLongitude())
-				.build(), FortDetailsResponse.class).map(new Func1<FortDetailsResponse, FortDetails>() {
-			@Override
-			public FortDetails call(FortDetailsResponse response) {
-				return new FortDetails(response);
-			}
-		});
+				.build(), FortDetailsResponse.class)
+				.map(new Func1<FortDetailsResponse, FortDetails>() {
+					@Override
+					public FortDetails call(FortDetailsResponse response) {
+						return new FortDetails(response);
+					}
+				});
 	}
 
 	/**

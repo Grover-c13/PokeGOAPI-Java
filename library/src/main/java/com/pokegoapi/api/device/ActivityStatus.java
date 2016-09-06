@@ -23,12 +23,16 @@ import lombok.Data;
 import java.util.Random;
 
 /**
- * Created by fabianterhorst on 22.08.16.
+ * Activity status
  */
-
 public class ActivityStatus {
 	private final ActivityStatusProvider activityStatusProvider;
 
+	/**
+	 * Construct an activity status from a provider
+	 *
+	 * @param activityStatusProvider Activity status provider, default available
+	 */
 	public ActivityStatus(ActivityStatusProvider activityStatusProvider) {
 		this.activityStatusProvider = activityStatusProvider;
 	}
@@ -43,6 +47,11 @@ public class ActivityStatus {
 		return new ActivityStatus(new DefaultActivityStatusProvider(random));
 	}
 
+	/**
+	 * Method for internal use
+	 *
+	 * @return Activity status proto
+	 */
 	public SignatureOuterClass.Signature.ActivityStatus getActivityStatus() {
 		Builder builder = SignatureOuterClass.Signature.ActivityStatus.newBuilder();
 		builder.setTilting(activityStatusProvider.getActivity().isTilting());
@@ -57,6 +66,7 @@ public class ActivityStatus {
 	@Data
 	private static class DefaultActivityStatusProvider implements ActivityStatusProvider {
 		private final Random random;
+
 		@Override
 		public Status getActivity() {
 			boolean tilting = random.nextInt() % 2 == 0;

@@ -21,6 +21,6 @@
 
 <suppressions>
     <suppress checks="." files="repack[\\/].*"/>
-    <suppress checks="." files="com[\\/]pokegoapi[\\/]util[\\/]Crypto\.java"/>
+    <suppress checks="." files=".*[\\/]Crypto\.java"/>
     <suppress checks="." files="[\\/]build[\\/]"/>
 </suppressions>

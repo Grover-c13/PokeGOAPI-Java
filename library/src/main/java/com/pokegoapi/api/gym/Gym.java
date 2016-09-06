@@ -20,7 +20,6 @@ import POGOProtos.Enums.TeamColorOuterClass;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Networking.Requests.Messages.FortDeployPokemonMessageOuterClass.FortDeployPokemonMessage;
 import POGOProtos.Networking.Requests.Messages.GetGymDetailsMessageOuterClass.GetGymDetailsMessage;
-import POGOProtos.Networking.Requests.Messages.FortDeployPokemonMessageOuterClass.FortDeployPokemonMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.FortDeployPokemonResponseOuterClass.FortDeployPokemonResponse;
 import POGOProtos.Networking.Responses.GetGymDetailsResponseOuterClass.GetGymDetailsResponse;
@@ -31,9 +30,9 @@ import com.pokegoapi.api.pokemon.Pokemon;
 import rx.Observable;
 import rx.functions.Func1;
 
-import rx.Observable;
-import rx.functions.Func1;
-
+/**
+ * Gym type
+ */
 public class Gym implements MapPoint {
 	private final Networking networking;
 	private final Location location;
@@ -43,7 +42,9 @@ public class Gym implements MapPoint {
 	/**
 	 * Gym object.
 	 *
-	 * @param proto The FortData to populate the Gym with.
+	 * @param networking Networking, for all actions on pokemon
+	 * @param location   Current location of the user
+	 * @param proto      The FortData to populate the Gym with.
 	 */
 	public Gym(Networking networking, Location location, FortData proto) {
 		this.networking = networking;
@@ -87,49 +88,68 @@ public class Gym implements MapPoint {
 		return proto.getIsInBattle();
 	}
 
+	/**
+	 * Deploys a pokemon into the Gym
+	 *
+	 * @param pokemon Pokemon to deploy
+	 * @return Observable with the result of the deployment
+	 */
 	public Observable<FortDeployPokemonResponse.Result> deploy(Pokemon pokemon) {
 		return networking.queueRequest(RequestType.FORT_DEPLOY_POKEMON,
-		FortDeployPokemonMessage.newBuilder()
-				.setFortId(getId())
-				.setPlayerLatitude(location.getLatitude())
-				.setPlayerLongitude(location.getLongitude())
-				.setPokemonId(pokemon.getId()).build(),
-				FortDeployPokemonResponse.class).map(new Func1<FortDeployPokemonResponse, FortDeployPokemonResponse.Result>() {
-			@Override
-			public FortDeployPokemonResponse.Result call(FortDeployPokemonResponse fortDeployPokemonResponse) {
-				return fortDeployPokemonResponse.getResult();
-			}
-		});
+				FortDeployPokemonMessage.newBuilder()
+						.setFortId(getId())
+						.setPlayerLatitude(location.getLatitude())
+						.setPlayerLongitude(location.getLongitude())
+						.setPokemonId(pokemon.getId()).build(),
+				FortDeployPokemonResponse.class)
+				.map(new Func1<FortDeployPokemonResponse, FortDeployPokemonResponse.Result>() {
+					@Override
+					public FortDeployPokemonResponse.Result call(FortDeployPokemonResponse fortDeployPokemonResponse) {
+						return fortDeployPokemonResponse.getResult();
+					}
+				});
 	}
 
-	public Observable<Battle> battle(final Pokemon[] team) {
+	/**
+	 * Start a battle
+	 *
+	 * @param team Team of pokemon to deploy
+	 * @return An observable with the battle
+	 */
+	public Observable<Battle> battle(final Pokemon... team) {
 		final Gym gym = this;
-		return getGymDetails().map(new Func1<GymDetails, Battle>() {
-			@Override
-			public Battle call(GymDetails gymDetails) {
-				return new Battle(networking, location, team, gym, gymDetails);
-			}
-		});
+		return getGymDetails()
+				.map(new Func1<GymDetails, Battle>() {
+					@Override
+					public Battle call(GymDetails gymDetails) {
+						return new Battle(networking, location, gym, gymDetails, team);
+					}
+				});
 	}
 
-
+	/**
+	 * Get details of the gym. This is a network request so an observable is returned
+	 *
+	 * @return Observable gym details
+	 */
 	public Observable<GymDetails> getGymDetails() {
 		if (gymDetails != null) {
 			return Observable.just(gymDetails);
 		}
 		return networking.queueRequest(RequestType.GET_GYM_DETAILS, GetGymDetailsMessage
-					.newBuilder()
-					.setGymId(this.getId())
-					.setGymLatitude(this.getLatitude())
-					.setGymLongitude(this.getLongitude())
-					.setPlayerLatitude(location.getLatitude())
-					.setPlayerLongitude(location.getLongitude())
-					.build(), GetGymDetailsResponse.class).map(new Func1<GetGymDetailsResponse, GymDetails>() {
-			@Override
-			public GymDetails call(GetGymDetailsResponse getGymDetailsResponse) {
-				gymDetails = new GymDetails(getGymDetailsResponse);
-				return gymDetails;
-			}
-		});
+				.newBuilder()
+				.setGymId(this.getId())
+				.setGymLatitude(this.getLatitude())
+				.setGymLongitude(this.getLongitude())
+				.setPlayerLatitude(location.getLatitude())
+				.setPlayerLongitude(location.getLongitude())
+				.build(), GetGymDetailsResponse.class)
+				.map(new Func1<GetGymDetailsResponse, GymDetails>() {
+					@Override
+					public GymDetails call(GetGymDetailsResponse getGymDetailsResponse) {
+						gymDetails = new GymDetails(getGymDetailsResponse);
+						return gymDetails;
+					}
+				});
 	}
 }

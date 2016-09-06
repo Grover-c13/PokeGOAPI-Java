@@ -27,6 +27,9 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import rx.Observable;
 import rx.functions.Func1;
 
+/**
+ * Egg incubator, for hatching eggs
+ */
 public class EggIncubator {
 	private final Networking networking;
 	private final Inventories inventories;
@@ -62,17 +65,18 @@ public class EggIncubator {
 	 */
 	public Observable<UseItemEggIncubatorResponse.Result> hatchEgg(EggPokemon egg) {
 		return networking.queueRequest(RequestType.USE_ITEM_EGG_INCUBATOR,
-				UseItemEggIncubatorMessage.
-						newBuilder()
+				UseItemEggIncubatorMessage
+						.newBuilder()
 						.setItemId(proto.getId())
 						.setPokemonId(egg.getId())
 						.build(),
-				UseItemEggIncubatorResponse.class).map(new Func1<UseItemEggIncubatorResponse, UseItemEggIncubatorResponse.Result>() {
-			@Override
-			public UseItemEggIncubatorResponse.Result call(UseItemEggIncubatorResponse response) {
-				return response.getResult();
-			}
-		});
+				UseItemEggIncubatorResponse.class)
+				.map(new Func1<UseItemEggIncubatorResponse, UseItemEggIncubatorResponse.Result>() {
+					@Override
+					public UseItemEggIncubatorResponse.Result call(UseItemEggIncubatorResponse response) {
+						return response.getResult();
+					}
+				});
 	}
 
 	/**
@@ -100,16 +104,6 @@ public class EggIncubator {
 	 */
 	public double getKmTarget() {
 		return proto.getTargetKmWalked();
-	}
-
-	/**
-	 * Get the distance walked before the current egg was incubated.
-	 *
-	 * @return distance to walked before incubating egg
-	 * @deprecated Wrong method name, use {@link #getKmStart()}
-	 */
-	public double getKmWalked() {
-		return getKmStart();
 	}
 
 	/**

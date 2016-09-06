@@ -21,8 +21,6 @@ import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
 import com.pokegoapi.api.inventory.EggIncubator;
 import com.pokegoapi.api.inventory.Inventories;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
 import rx.Observable;
 
 /**
@@ -34,6 +32,12 @@ public class EggPokemon {
 	private final PokemonData proto;
 	private final Inventories inventories;
 
+	/**
+	 * Constructor, for internal use
+	 *
+	 * @param proto       Egg pokemon data
+	 * @param inventories Inventory of player
+	 */
 	public EggPokemon(PokemonData proto, Inventories inventories) {
 		this.proto = proto;
 		this.inventories = inventories;
@@ -44,8 +48,6 @@ public class EggPokemon {
 	 *
 	 * @param incubator : the incubator
 	 * @return status of putting egg in incubator
-	 * @throws LoginFailedException  if failed to login
-	 * @throws RemoteServerException if the server failed to respond
 	 */
 	public Observable<UseItemEggIncubatorResponse.Result> incubate(EggIncubator incubator) {
 		if (incubator.isInUse()) {
@@ -58,10 +60,8 @@ public class EggPokemon {
 	 * Get the current distance that has been done with this egg
 	 *
 	 * @return get distance already walked
-	 * @throws LoginFailedException  if failed to login
-	 * @throws RemoteServerException if the server failed to respond
 	 */
-	public double getEggKmWalked() throws LoginFailedException, RemoteServerException {
+	public double getEggKmWalked() {
 		if (!isIncubate())
 			return 0;
 
@@ -75,8 +75,7 @@ public class EggPokemon {
 		// incubator should not be null but why not eh
 		if (incubator == null) {
 			return 0;
-		}
-		else
+		} else
 			return proto.getEggKmWalkedTarget()
 					- (incubator.getKmTarget() - inventories.getStats().getKmWalked());
 	}

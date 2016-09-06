@@ -16,7 +16,6 @@
 package com.pokegoapi.api.map;
 
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
-import POGOProtos.Map.Fort.FortTypeOuterClass;
 import POGOProtos.Map.Fort.FortTypeOuterClass.FortType;
 import POGOProtos.Map.MapCellOuterClass;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass;
@@ -76,8 +75,8 @@ class MapObjects {
 	private final GetKey<Point> spawnPointGetKey = new GetKey<Point>() {
 		@Override
 		public String getKey(Point obj) {
-			long latitidue = (long)obj.getLatitude() * 100000L;
-			long longitude = (long)obj.getLatitude() * 10000000000L;
+			long latitidue = (long) obj.getLatitude() * 100000L;
+			long longitude = (long) obj.getLatitude() * 10000000000L;
 			return Long.toString(latitidue + longitude);
 		}
 	};
@@ -97,13 +96,36 @@ class MapObjects {
 	/**
 	 * Instantiates a new Map objects.
 	 *
+	 * @param networking            For doing network requests
+	 * @param location              Holds the current position
+	 * @param inventories           Inventories of the player
+	 * @param settings              Settings
+	 * @param getMapObjectsResponse Initial response object to fill the map objects
 	 */
-	MapObjects(Networking networking, Location location, Inventories inventories, Settings settings, GetMapObjectsResponse getMapObjectsResponse) {
+	MapObjects(Networking networking, Location location, Inventories inventories, Settings settings,
+			GetMapObjectsResponse getMapObjectsResponse) {
 		this.networking = networking;
 		this.location = location;
 		this.inventories = inventories;
 		this.settings = settings;
 		update(getMapObjectsResponse);
+	}
+
+	private static <T> void add(List<T> newList, Map<String, T> map, GetKey<T> getKey, MapOnSubscribe<T> subscribe) {
+		List<String> existingKeys = new ArrayList<>(newList.size());
+		List<T> newItems = new ArrayList<>(newList.size());
+		for (T obj : newList) {
+			String key = getKey.getKey(obj);
+			map.put(key, obj);
+			if (!existingKeys.contains(key)) {
+				newItems.add(obj);
+			}
+			existingKeys.add(key);
+		}
+		map.keySet().retainAll(existingKeys);
+		for (T newObj : newItems) {
+			subscribe.onNext(newObj);
+		}
 	}
 
 	final void update(GetMapObjectsResponse response) {
@@ -150,7 +172,8 @@ class MapObjects {
 			}
 			for (Pokestop pokestop : pokestops) {
 				if (pokestop.inRangeForLuredPokemon() && pokestop.getFortData().hasLureInfo()) {
-					catchablePokemons.add(new CatchablePokemon(networking, location, inventories, pokestop.getFortData()));
+					catchablePokemons
+							.add(new CatchablePokemon(networking, location, inventories, pokestop.getFortData()));
 				}
 			}
 		}
@@ -160,23 +183,6 @@ class MapObjects {
 		add(spawnPoints, spawnPointMap, spawnPointGetKey, spawnPointMapOnSubscribe);
 		add(gyms, gymMap, fortDataGetKey, gymMapOnSubscribe);
 		add(pokestops, pokestopMap, pokestopGetKey, pokestopOnSubscribe);
-	}
-
-	private static <T> void add(List<T> newList, Map<String, T> map, GetKey<T> getKey, MapOnSubscribe<T> subscribe) {
-		List<String> existingKeys = new ArrayList<>(newList.size());
-		List<T> newItems = new ArrayList<>(newList.size());
-		for (T obj : newList) {
-			String key = getKey.getKey(obj);
-			map.put(key, obj);
-			if (!existingKeys.contains(key)) {
-				newItems.add(obj);
-			}
-			existingKeys.add(key);
-		}
-		map.keySet().retainAll(existingKeys);
-		for (T newObj : newItems) {
-			subscribe.onNext(newObj);
-		}
 	}
 
 	Collection<CatchablePokemon> getCatchablePokemons() {
@@ -203,10 +209,6 @@ class MapObjects {
 		return pokestopMap.values();
 	}
 
-	private interface GetKey<T> {
-		String getKey(T obj);
-	}
-
 	MapOnSubscribe<NearbyPokemon> getNearbyPokemonMapOnSubscribe() {
 		return nearbyPokemonMapOnSubscribe;
 	}
@@ -229,5 +231,9 @@ class MapObjects {
 
 	MapOnSubscribe<Pokestop> getPokestopOnSubscribe() {
 		return pokestopOnSubscribe;
+	}
+
+	private interface GetKey<T> {
+		String getKey(T obj);
 	}
 }

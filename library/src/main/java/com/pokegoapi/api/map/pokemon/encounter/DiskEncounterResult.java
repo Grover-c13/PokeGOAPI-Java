@@ -27,7 +27,7 @@ import lombok.Getter;
 public class DiskEncounterResult extends PokemonDetails implements EncounterResult {
 	@Getter
 	private DiskEncounterResponse response;
-	//
+
 	public DiskEncounterResult(DiskEncounterResponse response, Inventories inventories) {
 		super(response.getPokemonData(), inventories);
 		this.response = response;

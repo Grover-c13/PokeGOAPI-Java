@@ -21,6 +21,9 @@ import POGOProtos.Inventory.InventoryItemOuterClass;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass;
 import lombok.Getter;
 
+/**
+ * Player statistics
+ */
 public class Stats {
 	@Getter
 	private PlayerStats proto;
@@ -40,6 +43,7 @@ public class Stats {
 			}
 		}
 	}
+
 	public int getLevel() {
 		return proto.getLevel();
 	}

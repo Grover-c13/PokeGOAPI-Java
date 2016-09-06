@@ -27,32 +27,48 @@ import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.api.pokemon.Pokemon;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
+/**
+ * Pokebank contains all pokemon
+ */
 public class PokeBank {
 	private final Networking networking;
 	private final Inventories inventories;
 	private final PlayerProfile playerProfile;
 	private final Map<Long, Pokemon> pokemons = new ConcurrentHashMap<>();
 
-	public PokeBank(GetInventoryResponse getInventoryResponse, Inventories inventories, Networking networking, PlayerProfile playerProfile) {
+	/**
+	 * Constructor for internal use
+	 *
+	 * @param getInventoryResponse Inventory response, for inital loading
+	 * @param inventories          Inventories is used to pass to pokemon objects, so they can be caught with pokeballs
+	 * @param networking           Networking is used to pass to pokemon objects, so they can be caught
+	 * @param playerProfile        Player profile is used for the pokemon objects to do CP calculations
+	 */
+	public PokeBank(GetInventoryResponse getInventoryResponse, Inventories inventories, Networking networking,
+					PlayerProfile playerProfile) {
 		this.networking = networking;
 		this.inventories = inventories;
 		this.playerProfile = playerProfile;
 		update(getInventoryResponse);
 	}
 
+	/**
+	 * Update object
+	 *
+	 * @param getInventoryResponse for finding pokemons in the inventory
+	 */
 	final void update(GetInventoryResponse getInventoryResponse) {
 		List<Long> currentItems = new LinkedList<>();
 		for (InventoryItem inventoryItem : getInventoryResponse.getInventoryDelta().getInventoryItemsList()) {
 			InventoryItemData itemData = inventoryItem.getInventoryItemData();
 			if (itemData.getPokemonData().getPokemonId() != PokemonIdOuterClass.PokemonId.MISSINGNO) {
-				Pokemon pokemon = new Pokemon(networking, inventories, playerProfile, inventoryItem.getInventoryItemData().getPokemonData());
+				Pokemon pokemon = new Pokemon(networking, inventories, playerProfile,
+						inventoryItem.getInventoryItemData().getPokemonData());
 				pokemons.put(pokemon.getId(), pokemon);
 				currentItems.add(pokemon.getId());
 			}

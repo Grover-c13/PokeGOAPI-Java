@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * Created by paul on 21-8-2016.
+ * Location object representing the position of the user, together with the accuracy
  */
 @Data
 @AllArgsConstructor
@@ -13,9 +13,14 @@ public class Location {
 	private float longitude;
 	private float accuracy;
 
-
-	public Location(double latitiude, double longitude, double accuracy) {
-		this.latitude = (float)latitiude;
+	/**
+	 * Constructor, for internal use
+	 * @param latitude Latitude
+	 * @param longitude Longitude
+	 * @param accuracy Accuracy
+	 */
+	public Location(double latitude, double longitude, double accuracy) {
+		this.latitude = (float)latitude;
 		this.longitude = (float)longitude;
 		this.accuracy = (float) accuracy;
 	}

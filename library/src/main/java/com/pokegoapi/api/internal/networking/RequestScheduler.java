@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  */
 class RequestScheduler {
 	private static final int REQUESTS_PER_SECOND = 3;
-	private static final int MINIMUM_WAIT_TIME = Math.round(1/(float)REQUESTS_PER_SECOND);
+	private static final int MINIMUM_WAIT_TIME = Math.round(1 / (float) REQUESTS_PER_SECOND);
 	private final RequestExecutor requestExecutor;
 	private final BlockingQueue<RequestWrap> requestQueue = new LinkedBlockingQueue<>();
 
@@ -37,23 +37,28 @@ class RequestScheduler {
 	}
 
 	Observable<ResponseEnvelope> queueRequest(final RequestEnvelope requestEnvelope) {
-		return Observable.create(new Observable.OnSubscribe<ResponseEnvelope>() {
-			@Override
-			public void call(Subscriber<? super ResponseEnvelope> subscriber) {
-				requestQueue.add(new RequestWrap(requestEnvelope, subscriber));
-			}
-		});
+		return Observable
+				.create(new Observable.OnSubscribe<ResponseEnvelope>() {
+					@Override
+					public void call(Subscriber<? super ResponseEnvelope> subscriber) {
+						requestQueue.add(new RequestWrap(requestEnvelope, subscriber));
+					}
+				});
 	}
 
 	void setCurrentServer(URL currentServer) {
 		this.requestExecutor.currentServer = currentServer;
 	}
 
+	AuthTicket getAuthTicket() {
+		return requestExecutor.authTicket;
+	}
+
 	@Slf4j
 	private static class RequestExecutor implements Runnable {
-		private long lastRequest = 0;
 		private final BlockingQueue<RequestWrap> requestQueue;
 		private final OkHttpClient client;
+		private long lastRequest = 0;
 		private URL currentServer;
 		private AuthTicket authTicket;
 
@@ -97,7 +102,8 @@ class RequestScheduler {
 							.build();
 					try (Response response = client.newCall(httpRequest).execute()) {
 						if (response.code() != 200) {
-							request.getSubscriber().onError(new RemoteServerException("Got a unexpected http code : " + response.code()));
+							request.getSubscriber().onError(
+									new RemoteServerException("Got a unexpected http code : " + response.code()));
 							continue;
 						}
 
@@ -106,10 +112,12 @@ class RequestScheduler {
 							responseEnvelop = ResponseEnvelope.parseFrom(content);
 						} catch (IOException e) {
 							// retrieved garbage from the server
-							request.getSubscriber().onError(new RemoteServerException("Received malformed response : " + e));
+							request.getSubscriber()
+									.onError(new RemoteServerException("Received malformed response : " + e));
 							continue;
 						}
-						if (responseEnvelop.getAuthTicket().getExpireTimestampMs() > 0L && responseEnvelop.getAuthTicket().getStart() != ByteString.EMPTY) {
+						if (responseEnvelop.getAuthTicket().getExpireTimestampMs() > 0L
+								&& responseEnvelop.getAuthTicket().getStart() != ByteString.EMPTY) {
 							authTicket = responseEnvelop.getAuthTicket();
 						}
 						request.getSubscriber().onNext(responseEnvelop);
@@ -117,8 +125,7 @@ class RequestScheduler {
 					} catch (IOException e) {
 						request.getSubscriber().onError(new RemoteServerException(e));
 					}
-				}
-				catch (RuntimeException e) {
+				} catch (RuntimeException e) {
 					log.error("Dramatic crash!", e);
 					if (request != null) {
 						request.getSubscriber().onError(new RemoteServerException(e));
@@ -132,9 +139,5 @@ class RequestScheduler {
 	private static class RequestWrap {
 		private final RequestEnvelope requestEnvelope;
 		private final Subscriber<? super ResponseEnvelope> subscriber;
-	}
-
-	AuthTicket getAuthTicket() {
-		return requestExecutor.authTicket;
 	}
 }

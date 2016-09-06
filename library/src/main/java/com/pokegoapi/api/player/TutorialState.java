@@ -22,7 +22,8 @@ import java.util.List;
 import java.util.Set;
 
 public class TutorialState {
-	private final Set<TutorialStateOuterClass.TutorialState> tutorialStateList = EnumSet.noneOf(TutorialStateOuterClass.TutorialState.class);
+	private final Set<TutorialStateOuterClass.TutorialState> tutorialStateList =
+			EnumSet.noneOf(TutorialStateOuterClass.TutorialState.class);
 
 	TutorialState() {
 

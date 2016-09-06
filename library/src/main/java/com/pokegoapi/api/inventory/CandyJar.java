@@ -27,6 +27,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Virtual candy jar containing pokemon candy
+ */
 @ToString
 public class CandyJar {
 	private final Map<PokemonFamilyId, Integer> candies = new EnumMap<>(PokemonFamilyId.class);
@@ -37,7 +40,8 @@ public class CandyJar {
 
 	final void update(GetInventoryResponse getInventoryResponse) {
 		List<PokemonFamilyId> currentItems = new LinkedList<>();
-		for (InventoryItemOuterClass.InventoryItem inventoryItem : getInventoryResponse.getInventoryDelta().getInventoryItemsList()) {
+		for (InventoryItemOuterClass.InventoryItem inventoryItem : getInventoryResponse.getInventoryDelta()
+				.getInventoryItemsList()) {
 			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
 			if (itemData.getCandy().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED
 					&& itemData.getCandy().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_UNSET) {

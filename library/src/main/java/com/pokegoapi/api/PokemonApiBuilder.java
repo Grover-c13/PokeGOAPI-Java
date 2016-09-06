@@ -1,3 +1,18 @@
+/*
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.pokegoapi.api;
 
 import com.pokegoapi.api.device.ActivityStatus;
@@ -20,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created by paul on 21-8-2016.
+ * Builder class for setting up API
  */
 public class PokemonApiBuilder {
 	private ExecutorService executorService;
@@ -101,6 +116,9 @@ public class PokemonApiBuilder {
 		return this;
 	}
 
+	/**
+	 * @return Builds the pokemon api
+	 */
 	public PokemonApi build() {
 		if (latitude == null) {
 			throw new IllegalArgumentException("Latitude must be set");
@@ -118,7 +136,8 @@ public class PokemonApiBuilder {
 			executorService = Executors.newCachedThreadPool(new PokemonApiThreadFactory());
 		}
 		if (client == null) {
-			client = new OkHttpClient.Builder().readTimeout(5, TimeUnit.SECONDS).writeTimeout(5, TimeUnit.SECONDS).build();
+			client = new OkHttpClient.Builder().readTimeout(5, TimeUnit.SECONDS).writeTimeout(5, TimeUnit.SECONDS)
+					.build();
 		}
 		if (locale == null) {
 			locale = Locale.getDefault();
@@ -129,8 +148,7 @@ public class PokemonApiBuilder {
 		if (server == null) {
 			try {
 				server = URI.create("https://pgorelease.nianticlabs.com/plfe/rpc").toURL();
-			}
-			catch (MalformedURLException e) {
+			} catch (MalformedURLException e) {
 				throw new RuntimeException("The predefined url is not valid", e);
 			}
 		}
@@ -146,7 +164,8 @@ public class PokemonApiBuilder {
 		if (locationFixes == null) {
 			locationFixes = LocationFixes.getDefault(random);
 		}
-		return new PokemonApi(executorService, credentialProvider, client, server, new Location(latitude, longitude, altitude),
+		return new PokemonApi(executorService, credentialProvider, client, server,
+				new Location(latitude, longitude, altitude),
 				deviceInfo, sensorInfo, activityStatus, locationFixes, locale);
 	}
 
@@ -154,12 +173,14 @@ public class PokemonApiBuilder {
 		private static final AtomicInteger poolNumber = new AtomicInteger(1);
 		private final String baseName;
 		private final AtomicInteger counter = new AtomicInteger(1);
+
 		PokemonApiThreadFactory() {
 			baseName = "pokemonapi-" + poolNumber.addAndGet(1) + "-thread-";
 		}
+
 		@Override
-		public Thread newThread(Runnable r) {
-			Thread thread = new Thread(r,baseName.concat(Integer.toString(counter.getAndAdd(1))));
+		public Thread newThread(Runnable runnable) {
+			Thread thread = new Thread(runnable, baseName.concat(Integer.toString(counter.getAndAdd(1))));
 			thread.setDaemon(true);
 			return thread;
 		}

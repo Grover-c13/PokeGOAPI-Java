@@ -24,7 +24,7 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 
 /**
- * Created by paul on 20-8-2016.
+ * Pokemon API
  */
 public class PokemonApi implements Networking.Callback {
 	private final Location location;
@@ -40,8 +40,8 @@ public class PokemonApi implements Networking.Callback {
 	private final Settings settings;
 
 	PokemonApi(ExecutorService executorService, CredentialProvider credentialProvider, OkHttpClient client, URL server,
-			   Location location, DeviceInfo deviceInfo, SensorInfo sensorInfo, ActivityStatus activityStatus,
-			   LocationFixes locationFixes, Locale locale) {
+			Location location, DeviceInfo deviceInfo, SensorInfo sensorInfo, ActivityStatus activityStatus,
+			LocationFixes locationFixes, Locale locale) {
 		this.location = location;
 
 		networking = new Networking(server, executorService, client, location, deviceInfo, sensorInfo,
@@ -55,20 +55,26 @@ public class PokemonApi implements Networking.Callback {
 				location, inventories, bootstrapResult.getGetMapObjectsResponse());
 	}
 
+	/**
+	 * @return Pokemon api builder
+	 */
 	public static PokemonApiBuilder newBuilder() {
 		return new PokemonApiBuilder();
 	}
 
 	@Override
 	public void update(GetHatchedEggsResponse getHatchedEggsResponse,
-					   GetInventoryResponse getInventoryResponse,
-					   CheckAwardedBadgesResponse checkAwardedBadgesResponse,
-					   DownloadSettingsResponse downloadSettingsResponse) {
+			GetInventoryResponse getInventoryResponse,
+			CheckAwardedBadgesResponse checkAwardedBadgesResponse,
+			DownloadSettingsResponse downloadSettingsResponse) {
 		inventories.update(getHatchedEggsResponse);
 		inventories.update(getInventoryResponse);
 		settings.update(downloadSettingsResponse);
 	}
 
+	public double getLatitude() {
+		return location.getLatitude();
+	}
 
 	/**
 	 * Validates and sets a given latitude value
@@ -81,6 +87,10 @@ public class PokemonApi implements Networking.Callback {
 			throw new IllegalArgumentException("latittude can not exceed +/- 90");
 		}
 		location.setLatitude(value);
+	}
+
+	public double getLongitude() {
+		return location.getLongitude();
 	}
 
 	/**
@@ -96,25 +106,24 @@ public class PokemonApi implements Networking.Callback {
 		location.setLongitude(value);
 	}
 
-	private void setAltitude(double value) {
-		location.setAccuracy(value);
-	}
-
-	public double getLatitude() {
-		return location.getLatitude();
-	}
-
-	public double getLongitude() {
-		return location.getLongitude();
-	}
-
 	public double getAltitude() {
 		return location.getAccuracy();
 	}
 
-	public void setLocation(double latitude, double longitude, double altitude) {
+	private void setAccuracy(double value) {
+		location.setAccuracy(value);
+	}
+
+	/**
+	 * Set location and accuracy
+	 *
+	 * @param latitude  Latitude
+	 * @param longitude Longitude
+	 * @param accuracy  Accuracy of the location
+	 */
+	public void setLocation(double latitude, double longitude, double accuracy) {
 		setLatitude(latitude);
 		setLongitude(longitude);
-		setAltitude(altitude);
+		setAccuracy(accuracy);
 	}
 }

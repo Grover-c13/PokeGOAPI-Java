@@ -45,6 +45,10 @@ public class DailyBonus {
 		return proto.getNextDefenderBonusCollectTimestampMs();
 	}
 
+	/**
+	 * Collect daily bonus.
+	 * @return Observable with the result.
+	 */
 	public Observable<CollectDailyBonusResponse.Result> collect() {
 		if (getNextDefenderBonusCollectTimestampMs() > System.currentTimeMillis()) {
 			return Observable.just(CollectDailyBonusResponse.Result.TOO_SOON);

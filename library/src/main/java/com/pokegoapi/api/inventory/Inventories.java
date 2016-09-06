@@ -31,6 +31,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
+/**
+ * Inventories, holding all items of a player
+ */
 public class Inventories {
 	private final Networking networking;
 	@Getter
@@ -50,10 +53,15 @@ public class Inventories {
 	/**
 	 * Creates Inventories and initializes content.
 	 *
+	 * @param executorService        Executor service to run async requests on
+	 * @param getInventoryResponse   First inventory response
+	 * @param getHatchedEggsResponse First hatched eggs response
+	 * @param networking             Networking, for all actions on pokemon
+	 * @param playerProfile          Player profile for updating, player info is in inventories
 	 */
 	public Inventories(ExecutorService executorService, GetInventoryResponse getInventoryResponse,
-					   GetHatchedEggsResponse getHatchedEggsResponse, Networking networking,
-					   PlayerProfile playerProfile) {
+			GetHatchedEggsResponse getHatchedEggsResponse, Networking networking,
+			PlayerProfile playerProfile) {
 		this.networking = networking;
 		itemBag = new ItemBag(getInventoryResponse, networking);
 		pokebank = new PokeBank(getInventoryResponse, this, networking, playerProfile);
@@ -64,6 +72,11 @@ public class Inventories {
 		updateInventories(getInventoryResponse);
 	}
 
+	/**
+	 * Update inventories
+	 *
+	 * @param getInventoryResponse Get inventory response
+	 */
 	public final void update(GetInventoryResponse getInventoryResponse) {
 		itemBag.update(getInventoryResponse);
 		pokebank.update(getInventoryResponse);
@@ -73,6 +86,11 @@ public class Inventories {
 		stats.update(getInventoryResponse);
 	}
 
+	/**
+	 * Update hatched eggs
+	 *
+	 * @param response Hatched eggs response
+	 */
 	public final void update(GetHatchedEggsResponse response) {
 		hatchery.update(response);
 	}
@@ -84,7 +102,8 @@ public class Inventories {
 
 			if (itemData.hasEggIncubators()) {
 				List<String> currentIncubators = new ArrayList<>(itemData.getEggIncubators().getEggIncubatorCount());
-				for (EggIncubatorOuterClass.EggIncubator incubator : itemData.getEggIncubators().getEggIncubatorList()) {
+				for (EggIncubatorOuterClass.EggIncubator incubator : itemData.getEggIncubators()
+						.getEggIncubatorList()) {
 					currentIncubators.add(incubator.getId());
 					incubators.put(incubator.getId(), new EggIncubator(networking, this, incubator));
 				}
