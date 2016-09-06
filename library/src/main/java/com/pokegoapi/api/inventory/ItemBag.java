@@ -29,8 +29,6 @@ import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass.Re
 import POGOProtos.Networking.Responses.UseIncenseResponseOuterClass.UseIncenseResponse;
 import POGOProtos.Networking.Responses.UseItemXpBoostResponseOuterClass.UseItemXpBoostResponse;
 import com.pokegoapi.api.internal.networking.Networking;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -48,6 +46,12 @@ public class ItemBag {
 	private final Networking networking;
 	private final Map<ItemId, Item> items = new ConcurrentHashMap<>();
 
+	/**
+	 * Constructor for internal use
+	 *
+	 * @param getInventoryResponse Initial inventory response
+	 * @param networking           Networking for requests
+	 */
 	public ItemBag(GetInventoryResponse getInventoryResponse, Networking networking) {
 		this.networking = networking;
 		update(getInventoryResponse);
@@ -141,13 +145,14 @@ public class ItemBag {
 	 * use an incense
 	 *
 	 * @param type type of item
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
+	 * @return Respionse observable
 	 */
 	public Observable<UseIncenseResponse> useIncense(ItemId type) {
 		final Item item = items.get(type);
 		if (item.getCount() == 0) {
-			return Observable.just(UseIncenseResponse.newBuilder().setResult(UseIncenseResponse.Result.NONE_IN_INVENTORY).build());
+			return Observable
+					.just(UseIncenseResponse.newBuilder().setResult(UseIncenseResponse.Result.NONE_IN_INVENTORY)
+							.build());
 		}
 		return networking
 				.queueRequest(RequestType.USE_INCENSE,
@@ -170,8 +175,7 @@ public class ItemBag {
 	/**
 	 * use an item with itemID
 	 *
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
+	 * @return Incense response
 	 */
 	public Observable<UseIncenseResponse> useIncense() {
 		return useIncense(ItemId.ITEM_INCENSE_ORDINARY);
@@ -181,10 +185,8 @@ public class ItemBag {
 	 * use a lucky egg
 	 *
 	 * @return the xp boost response
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
 	 */
-	public Observable<UseItemXpBoostResponse> useLuckyEgg() throws RemoteServerException, LoginFailedException {
+	public Observable<UseItemXpBoostResponse> useLuckyEgg() {
 		return networking.queueRequest(RequestType.USE_ITEM_XP_BOOST,
 				UseItemXpBoostMessage
 						.newBuilder()
