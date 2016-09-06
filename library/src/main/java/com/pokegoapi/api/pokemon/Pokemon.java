@@ -167,9 +167,10 @@ public class Pokemon extends PokemonDetails {
 	 */
 	public boolean canPowerUp(boolean considerMaxCPLimitForPlayerLevel)
 			throws LoginFailedException, RemoteServerException, NoSuchItemException {
-		// TODO: Get player level
 		return considerMaxCPLimitForPlayerLevel
-				? this.canPowerUp() && (this.getCp() < this.getMaxCpForPlayer(0))
+				? this.canPowerUp() && (this.getCp() < this.getMaxCpForPlayer(
+				inventories.getStats().getLevel()
+		))
 				: canPowerUp();
 	}
 
@@ -377,8 +378,7 @@ public class Pokemon extends PokemonDetails {
 	 * @return Actual cp in percentage
 	 */
 	public int getCPInPercentageActualPlayerLevel() {
-		// TODO: Get player level
-		return ((getCp() * 100) / getMaxCpForPlayer(0));
+		return ((getCp() * 100) / getMaxCpForPlayer(inventories.getStats().getLevel()));
 	}
 
 	/**
