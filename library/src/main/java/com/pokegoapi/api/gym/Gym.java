@@ -20,7 +20,6 @@ import POGOProtos.Enums.TeamColorOuterClass;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Networking.Requests.Messages.FortDeployPokemonMessageOuterClass.FortDeployPokemonMessage;
 import POGOProtos.Networking.Requests.Messages.GetGymDetailsMessageOuterClass.GetGymDetailsMessage;
-import POGOProtos.Networking.Requests.Messages.FortDeployPokemonMessageOuterClass.FortDeployPokemonMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.FortDeployPokemonResponseOuterClass.FortDeployPokemonResponse;
 import POGOProtos.Networking.Responses.GetGymDetailsResponseOuterClass.GetGymDetailsResponse;
@@ -31,9 +30,9 @@ import com.pokegoapi.api.pokemon.Pokemon;
 import rx.Observable;
 import rx.functions.Func1;
 
-import rx.Observable;
-import rx.functions.Func1;
-
+/**
+ * Gym type
+ */
 public class Gym implements MapPoint {
 	private final Networking networking;
 	private final Location location;
@@ -43,6 +42,8 @@ public class Gym implements MapPoint {
 	/**
 	 * Gym object.
 	 *
+	 * @param networking  Networking, for all actions on pokemon
+	 * @param location    Current location of the user
 	 * @param proto The FortData to populate the Gym with.
 	 */
 	public Gym(Networking networking, Location location, FortData proto) {
@@ -87,6 +88,11 @@ public class Gym implements MapPoint {
 		return proto.getIsInBattle();
 	}
 
+	/**
+	 * Deploys a pokemon into the Gym
+	 * @param pokemon Pokemon to deploy
+	 * @return Observable with the result of the deployment
+	 */
 	public Observable<FortDeployPokemonResponse.Result> deploy(Pokemon pokemon) {
 		return networking.queueRequest(RequestType.FORT_DEPLOY_POKEMON,
 		FortDeployPokemonMessage.newBuilder()
@@ -102,7 +108,12 @@ public class Gym implements MapPoint {
 		});
 	}
 
-	public Observable<Battle> battle(final Pokemon[] team) {
+	/**
+	 * Start a battle
+	 * @param team Team of pokemon to deploy
+	 * @return An observable with the battle
+	 */
+	public Observable<Battle> battle(final Pokemon ... team) {
 		final Gym gym = this;
 		return getGymDetails().map(new Func1<GymDetails, Battle>() {
 			@Override
