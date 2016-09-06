@@ -12,9 +12,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pokegoapi.google.common.geometry;
-
-import com.pokegoapi.google.common.geometry.S2.Metric;
+package repack.com.google.common.geometry;
 
 /**
  * This class specifies the details of how the cube faces are projected onto the
@@ -85,20 +83,20 @@ public final strictfp class S2Projections {
   // The minimum area of any cell at level k is at least MIN_AREA.GetValue(k),
   // and the maximum is at most MAX_AREA.GetValue(k). The average area of all
   // cells at level k is exactly AVG_AREA.GetValue(k).
-  public static final Metric MIN_AREA = new Metric(2,
+  public static final S2.Metric MIN_AREA = new S2.Metric(2,
     S2_PROJECTION == Projections.S2_LINEAR_PROJECTION ? 1 / (3 * Math.sqrt(3)) : // 0.192
       S2_PROJECTION == Projections.S2_TAN_PROJECTION ? (S2.M_PI * S2.M_PI)
         / (16 * S2.M_SQRT2) : // 0.436
         S2_PROJECTION == Projections.S2_QUADRATIC_PROJECTION
           ? 2 * S2.M_SQRT2 / 9 : // 0.314
           0);
-  public static final Metric MAX_AREA = new Metric(2,
+  public static final S2.Metric MAX_AREA = new S2.Metric(2,
     S2_PROJECTION == Projections.S2_LINEAR_PROJECTION ? 1 : // 1.000
       S2_PROJECTION == Projections.S2_TAN_PROJECTION ? S2.M_PI * S2.M_PI / 16 : // 0.617
         S2_PROJECTION == Projections.S2_QUADRATIC_PROJECTION
           ? 0.65894981424079037 : // 0.659
           0);
-  public static final Metric AVG_AREA = new Metric(2, S2.M_PI / 6); // 0.524)
+  public static final S2.Metric AVG_AREA = new S2.Metric(2, S2.M_PI / 6); // 0.524)
 
 
   // Each cell is bounded by four planes passing through its four edges and
@@ -108,18 +106,18 @@ public final strictfp class S2Projections {
   // example, the maximum angle between opposite bounding planes for a cell at
   // level k is MAX_ANGLE_SPAN.GetValue(k), and the average angle span for all
   // cells at level k is approximately AVG_ANGLE_SPAN.GetValue(k).
-  public static final Metric MIN_ANGLE_SPAN = new Metric(1,
+  public static final S2.Metric MIN_ANGLE_SPAN = new S2.Metric(1,
     S2_PROJECTION == Projections.S2_LINEAR_PROJECTION ? 0.5 : // 0.500
       S2_PROJECTION == Projections.S2_TAN_PROJECTION ? S2.M_PI / 4 : // 0.785
         S2_PROJECTION == Projections.S2_QUADRATIC_PROJECTION ? 2. / 3 : // 0.667
           0);
-  public static final Metric MAX_ANGLE_SPAN = new Metric(1,
+  public static final S2.Metric MAX_ANGLE_SPAN = new S2.Metric(1,
     S2_PROJECTION == Projections.S2_LINEAR_PROJECTION ? 1 : // 1.000
       S2_PROJECTION == Projections.S2_TAN_PROJECTION ? S2.M_PI / 4 : // 0.785
         S2_PROJECTION == Projections.S2_QUADRATIC_PROJECTION
           ? 0.85244858959960922 : // 0.852
           0);
-  public static final Metric AVG_ANGLE_SPAN = new Metric(1, S2.M_PI / 4); // 0.785
+  public static final S2.Metric AVG_ANGLE_SPAN = new S2.Metric(1, S2.M_PI / 4); // 0.785
 
 
   // The width of geometric figure is defined as the distance between two
@@ -140,14 +138,14 @@ public final strictfp class S2Projections {
   // The width is useful for bounding the minimum or maximum distance from a
   // point on one edge of a cell to the closest point on the opposite edge.
   // For example, this is useful when "growing" regions by a fixed distance.
-  public static final Metric MIN_WIDTH = new Metric(1,
+  public static final S2.Metric MIN_WIDTH = new S2.Metric(1,
     (S2Projections.S2_PROJECTION == Projections.S2_LINEAR_PROJECTION ? 1 / Math.sqrt(6) : // 0.408
       S2_PROJECTION == Projections.S2_TAN_PROJECTION ? S2.M_PI / (4 * S2.M_SQRT2) : // 0.555
         S2_PROJECTION == Projections.S2_QUADRATIC_PROJECTION ? S2.M_SQRT2 / 3 : // 0.471
         0));
 
-  public static final Metric MAX_WIDTH = new Metric(1, MAX_ANGLE_SPAN.deriv());
-  public static final Metric AVG_WIDTH = new Metric(1,
+  public static final S2.Metric MAX_WIDTH = new S2.Metric(1, MAX_ANGLE_SPAN.deriv());
+  public static final S2.Metric AVG_WIDTH = new S2.Metric(1,
     S2_PROJECTION == Projections.S2_LINEAR_PROJECTION ? 0.70572967292222848 : // 0.706
       S2_PROJECTION == Projections.S2_TAN_PROJECTION ? 0.71865931946258044 : // 0.719
         S2_PROJECTION == Projections.S2_QUADRATIC_PROJECTION
@@ -163,13 +161,13 @@ public final strictfp class S2Projections {
   // its edge neighbors. In particular, it can be used to bound the distance
   // between adjacent cell centers along the space-filling Hilbert curve for
   // cells at any given level.
-  public static final Metric MIN_EDGE = new Metric(1,
+  public static final S2.Metric MIN_EDGE = new S2.Metric(1,
     S2_PROJECTION == Projections.S2_LINEAR_PROJECTION ? S2.M_SQRT2 / 3 : // 0.471
       S2_PROJECTION == Projections.S2_TAN_PROJECTION ? S2.M_PI / (4 * S2.M_SQRT2) : // 0.555
         S2_PROJECTION == Projections.S2_QUADRATIC_PROJECTION ? S2.M_SQRT2 / 3 : // 0.471
           0);
-  public static final Metric MAX_EDGE = new Metric(1, MAX_ANGLE_SPAN.deriv());
-  public static final Metric AVG_EDGE = new Metric(1,
+  public static final S2.Metric MAX_EDGE = new S2.Metric(1, MAX_ANGLE_SPAN.deriv());
+  public static final S2.Metric AVG_EDGE = new S2.Metric(1,
     S2_PROJECTION == Projections.S2_LINEAR_PROJECTION ? 0.72001709647780182 : // 0.720
       S2_PROJECTION == Projections.S2_TAN_PROJECTION ? 0.73083351627336963 : // 0.731
         S2_PROJECTION == Projections.S2_QUADRATIC_PROJECTION
@@ -185,19 +183,19 @@ public final strictfp class S2Projections {
   // and also the maximum geometric width (see the discussion above). So for
   // example, the distance from an arbitrary point to the closest cell center
   // at a given level is at most half the maximum diagonal length.
-  public static final Metric MIN_DIAG = new Metric(1,
+  public static final S2.Metric MIN_DIAG = new S2.Metric(1,
     S2_PROJECTION == Projections.S2_LINEAR_PROJECTION ? S2.M_SQRT2 / 3 : // 0.471
       S2_PROJECTION == Projections.S2_TAN_PROJECTION ? S2.M_PI / (3 * S2.M_SQRT2) : // 0.740
         S2_PROJECTION == Projections.S2_QUADRATIC_PROJECTION
           ? 4 * S2.M_SQRT2 / 9 : // 0.629
           0);
-  public static final Metric MAX_DIAG = new Metric(1,
+  public static final S2.Metric MAX_DIAG = new S2.Metric(1,
     S2_PROJECTION == Projections.S2_LINEAR_PROJECTION ? S2.M_SQRT2 : // 1.414
       S2_PROJECTION == Projections.S2_TAN_PROJECTION ? S2.M_PI / Math.sqrt(6) : // 1.283
         S2_PROJECTION == Projections.S2_QUADRATIC_PROJECTION
           ? 1.2193272972170106 : // 1.219
           0);
-  public static final Metric AVG_DIAG = new Metric(1,
+  public static final S2.Metric AVG_DIAG = new S2.Metric(1,
     S2_PROJECTION == Projections.S2_LINEAR_PROJECTION ? 1.0159089332094063 : // 1.016
       S2_PROJECTION == Projections.S2_TAN_PROJECTION ? 1.0318115985978178 : // 1.032
         S2_PROJECTION == Projections.S2_QUADRATIC_PROJECTION

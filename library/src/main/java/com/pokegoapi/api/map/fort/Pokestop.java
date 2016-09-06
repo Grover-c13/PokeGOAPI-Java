@@ -30,7 +30,7 @@ import com.pokegoapi.api.internal.networking.Networking;
 import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.google.common.geometry.S2LatLng;
+import repack.com.google.common.geometry.S2LatLng;
 import lombok.Getter;
 import rx.Observable;
 import rx.functions.Func1;

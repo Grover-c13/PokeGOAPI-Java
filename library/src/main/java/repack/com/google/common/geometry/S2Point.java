@@ -12,7 +12,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pokegoapi.google.common.geometry;
+package repack.com.google.common.geometry;
 
 /**
  * An S2Point represents a point on the unit sphere as a 3D vector. Usually

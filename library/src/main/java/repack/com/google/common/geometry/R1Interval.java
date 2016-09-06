@@ -12,7 +12,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pokegoapi.google.common.geometry;
+package repack.com.google.common.geometry;
 
 /**
  * An R1Interval represents a closed, bounded interval on the real line. It is

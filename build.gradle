@@ -17,7 +17,8 @@ allprojects {
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
     description = """Pokemon Go Java API"""
-    def checkstyleOutputDir = "${project.projectDir}/build/reports/checkstyle/"
+    def checkstyleOutputDir = "${project.projectDir}/build/re" +
+            "ports/checkstyle/"
 
     repositories {
         mavenCentral()
@@ -56,6 +57,10 @@ allprojects {
         }
     }
 
+    javadoc {
+        exclude "repack**/"
+    }
+
     task sourcesJar(type: Jar, dependsOn: classes) {
         classifier = 'sources'
         from sourceSets.main.allJava
@@ -72,7 +77,6 @@ allprojects {
         archives sourcesJar
         archives javadocJar
     }
-
 
     // Run this task to bundle all needed dependency
     task bundle(type: Jar) {

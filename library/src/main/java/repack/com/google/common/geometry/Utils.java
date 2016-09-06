@@ -13,7 +13,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.google.common.geometry;
+package repack.com.google.common.geometry;
 
 import java.util.Arrays;
 

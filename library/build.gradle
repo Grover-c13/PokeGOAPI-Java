@@ -29,10 +29,6 @@ processResources {
     exclude('signature/Signature.proto')
 }
 
-javadoc {
-    exclude "**/google/common/geometry/**"
-}
-
 protobuf {
     // Configure the protoc executable
     protoc {
