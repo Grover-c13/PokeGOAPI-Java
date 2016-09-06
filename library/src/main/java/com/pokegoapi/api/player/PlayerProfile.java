@@ -15,6 +15,8 @@
 
 package com.pokegoapi.api.player;
 
+import POGOProtos.Data.Player.PlayerAvatarOuterClass;
+import POGOProtos.Enums.PokemonIdOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
@@ -23,7 +25,6 @@ import com.pokegoapi.api.inventory.Stats;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.TutorialCanceledException;
 import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
@@ -320,15 +321,14 @@ public class PlayerProfile {
 	/**
 	 * Setup an avatar for the current account
 	 *
-	 * @param tutorialHandler the tutorial handler
+	 * @param playerAvatar the player avatar
 	 * @throws LoginFailedException  when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
-	 * @throws TutorialCanceledException When canceled by the user.
 	 */
-	public void setupAvatar(TutorialHandler tutorialHandler)
-			throws LoginFailedException, RemoteServerException, TutorialCanceledException {
+	public void setupAvatar(PlayerAvatarOuterClass.PlayerAvatar playerAvatar)
+			throws LoginFailedException, RemoteServerException {
 		final SetAvatarMessage setAvatarMessage = SetAvatarMessage.newBuilder()
-				.setPlayerAvatar(tutorialHandler.createAvatar().build())
+				.setPlayerAvatar(playerAvatar)
 				.build();
 
 		ServerRequest[] requests = CommonRequest.fillRequest(
@@ -356,20 +356,19 @@ public class PlayerProfile {
 	/**
 	 * Encounter tutorial complete. In other words, catch the first Pokémon
 	 *
-	 * @param tutorialHandler the tutorial handler
+	 * @param pokemonId the starter pokemon id
 	 * @throws LoginFailedException  when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
-	 * @throws TutorialCanceledException When canceled by the user.
 	 */
-	public void encounterTutorialComplete(TutorialHandler tutorialHandler)
-			throws LoginFailedException, RemoteServerException, TutorialCanceledException {
+	public void encounterTutorialComplete(PokemonIdOuterClass.PokemonId pokemonId)
+			throws LoginFailedException, RemoteServerException {
 		final EncounterTutorialCompleteMessage.Builder encounterTutorialCompleteBuilder =
 				EncounterTutorialCompleteMessage.newBuilder()
-				.setPokemonId(tutorialHandler.chooseStarterPokemon());
+						.setPokemonId(pokemonId);
 
 		ServerRequest[] requests = CommonRequest.fillRequest(
 				new ServerRequest(RequestType.ENCOUNTER_TUTORIAL_COMPLETE,
-				encounterTutorialCompleteBuilder.build()), api);
+						encounterTutorialCompleteBuilder.build()), api);
 
 		api.getRequestHandler().sendServerRequests(requests);
 
@@ -399,27 +398,25 @@ public class PlayerProfile {
 	}
 
 	/**
-	 * Setup an user name for our account
+	 * Setup a nickname for our account
 	 *
-	 * @param tutorialHandler the tutorial handler
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
-	 * @throws TutorialCanceledException when canceled by the user
+	 * @param codename the nickname
+	 * @return True if nickname was claimed, else False
+	 * @throws LoginFailedException                   when the auth is invalid
+	 * @throws RemoteServerException                  when the server is down/having issues
+	 * @throws Tutorial.NicknameNotAvailableException when the nickname is not available
+	 * @throws Tutorial.NicknameInvalidException      when the nickname is invalid
 	 */
-	public void claimCodeName(TutorialHandler tutorialHandler)
-			throws LoginFailedException, RemoteServerException, TutorialCanceledException {
+	public boolean claimCodeName(final String codename)
+			throws LoginFailedException, RemoteServerException,
+			Tutorial.NicknameInvalidException, Tutorial.NicknameNotAvailableException {
 
-		String nickname = null;
-		do {
-			if (nickname != null) {
-				tutorialHandler.onNicknameInvalid(nickname);
-			}
-			nickname = tutorialHandler.chooseNickname();
+		if (!isNicknameValid(codename)) {
+			throw new Tutorial.NicknameInvalidException();
 		}
-		while (!isNicknameValid(nickname));
 
 		ClaimCodenameMessage claimCodenameMessage = ClaimCodenameMessage.newBuilder()
-				.setCodename(nickname)
+				.setCodename(codename)
 				.build();
 
 		ServerRequest[] requests = CommonRequest.fillRequest(
@@ -434,15 +431,18 @@ public class PlayerProfile {
 			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
 
 			ClaimCodenameResponse claimCodenameResponse = ClaimCodenameResponse.parseFrom(requests[0].getData());
-			if (claimCodenameResponse.getStatus() != ClaimCodenameResponse.Status.SUCCESS) {
-				if (claimCodenameResponse.getUpdatedPlayer().getRemainingCodenameClaims() > 0) {
-					tutorialHandler.onNicknameAlreadyInUse(nickname);
-					claimCodeName(tutorialHandler);
-				}
-			} else {
-				updatedCodename = claimCodenameResponse.getCodename();
-				updateProfile(claimCodenameResponse.getUpdatedPlayer());
+
+			ClaimCodenameResponse.Status status = claimCodenameResponse.getStatus();
+			if (status == ClaimCodenameResponse.Status.CODENAME_NOT_VALID) {
+				throw new Tutorial.NicknameInvalidException();
 			}
+			if (status != ClaimCodenameResponse.Status.SUCCESS) {
+				throw new Tutorial.NicknameNotAvailableException();
+			}
+
+			updatedCodename = claimCodenameResponse.getCodename();
+			updateProfile(claimCodenameResponse.getUpdatedPlayer());
+
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
@@ -467,6 +467,7 @@ public class PlayerProfile {
 				throw new RemoteServerException(e);
 			}
 		}
+		return true;
 	}
 
 	/**
@@ -481,7 +482,7 @@ public class PlayerProfile {
 	}
 
 	private void markTutorial(TutorialStateOuterClass.TutorialState state)
-				throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, RemoteServerException {
 		final MarkTutorialCompleteMessage tutorialMessage = MarkTutorialCompleteMessage.newBuilder()
 				.addTutorialsCompleted(state)
 				.setSendMarketingEmails(false)
@@ -508,7 +509,7 @@ public class PlayerProfile {
 	 * Verifies if the given nickname is a valid Pokemon Go nickname or not.
 	 * A valid nickname must have between 3 and 15 characters and must not contain any symbols.
 	 *
-	 * @param nickname Nickname to verify
+	 * @param nickname NicknameDialog to verify
 	 * @return True if nickname valid, else False.
 	 */
 	private static boolean isNicknameValid(String nickname) {

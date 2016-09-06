@@ -23,12 +23,11 @@ import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
-import com.pokegoapi.api.player.TutorialHandler;
+import com.pokegoapi.api.player.Tutorial;
 import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.TutorialCanceledException;
 import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
@@ -91,6 +90,9 @@ public class PokemonGo {
 	@Getter
 	@Setter
 	public LocationFixes locationFixes;
+	@Setter
+	private Tutorial.TutorialProvider tutorialProvider;
+
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -147,28 +149,13 @@ public class PokemonGo {
 	}
 
 	/**
-	 * Login user with the provided provider and if the tutorial has not been finished before, also finish the tutorial
-	 * with a random avatar, random username and random starter pokemon.
+	 * Login user with the provided provider and finish the tutorial if not done yet.
 	 *
 	 * @param credentialProvider the credential provider
 	 * @throws LoginFailedException  When login fails
 	 * @throws RemoteServerException When server fails
 	 */
 	public void login(CredentialProvider credentialProvider)
-			throws LoginFailedException, RemoteServerException {
-		login(credentialProvider, new TutorialHandler() {});
-	}
-
-	/**
-	 * Login user with the provided provider and if the tutorial has not been finished before, also finish the tutorial
-	 * using the given tutorial handler.
-	 *
-	 * @param credentialProvider the credential provider
-	 * @param tutorialHandler the tutorial handler
-	 * @throws LoginFailedException  When login fails
-	 * @throws RemoteServerException When server fails
-	 */
-	public void login(CredentialProvider credentialProvider, TutorialHandler tutorialHandler)
 			throws LoginFailedException, RemoteServerException {
 		if (credentialProvider == null) {
 			throw new NullPointerException("Credential Provider is null");
@@ -179,10 +166,10 @@ public class PokemonGo {
 		settings = new Settings(this);
 		inventories = new Inventories(this);
 
-		initialize(tutorialHandler);
+		initialize();
 	}
 
-	private void initialize(TutorialHandler tutorialHandler) throws RemoteServerException, LoginFailedException {
+	private void initialize() throws RemoteServerException, LoginFailedException {
 		fireRequestBlock(new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
 				CommonRequest.getDownloadRemoteConfigVersionMessageRequest()));
 
@@ -195,34 +182,66 @@ public class PokemonGo {
 		// have an avatar, a nickname, and all the other things that are usually filled
 		// on the official client BEFORE sending any requests such as the getMapObject etc.
 		ArrayList<TutorialState> tutorialStates = playerProfile.getTutorialState().getTutorialStates();
-		try {
-			if (tutorialStates.isEmpty()) {
-				if (tutorialHandler.acceptTOS()) {
+
+		boolean isAcceptTOSMissing = !tutorialStates.contains(TutorialState.LEGAL_SCREEN);
+		boolean isAvatarMissing = !tutorialStates.contains(TutorialState.AVATAR_SELECTION);
+		boolean isStarterPokemonMissing = !tutorialStates.contains(TutorialState.POKEMON_CAPTURE);
+		boolean isNicknameMissing = !tutorialStates.contains(TutorialState.NAME_SELECTION);
+
+		if (isAcceptTOSMissing | isAvatarMissing | isStarterPokemonMissing | isNicknameMissing) {
+			try {
+				final Tutorial tutorial = getTutorialProvider()
+						.setMissing(isAcceptTOSMissing, isAvatarMissing, isStarterPokemonMissing, isNicknameMissing)
+						.getTutorial();
+
+				if (isAcceptTOSMissing && tutorial.isAcceptTOS()) {
 					playerProfile.activateAccount();
-				} else {
-					throw new TutorialCanceledException();
+				} else if (isAcceptTOSMissing) {
+					throw new Tutorial.CanceledException();
 				}
-			}
 
-			if (!tutorialStates.contains(TutorialState.AVATAR_SELECTION)) {
-				playerProfile.setupAvatar(tutorialHandler);
-			}
+				if (isAvatarMissing) {
+					playerProfile.setupAvatar(tutorial.getPlayerAvatar());
+				}
 
-			if (!tutorialStates.contains(TutorialState.POKEMON_CAPTURE)) {
-				playerProfile.encounterTutorialComplete(tutorialHandler);
-			}
+				if (isStarterPokemonMissing) {
+					playerProfile.encounterTutorialComplete(tutorial.getStarterPokemon());
+				}
 
-			if (!tutorialStates.contains(TutorialState.NAME_SELECTION)) {
-				playerProfile.claimCodeName(tutorialHandler);
+				if (isNicknameMissing) {
+					String nickname = null;
+					boolean nicknameClaimed = false;
+					Exception lastException = null;
+
+					while (!nicknameClaimed) {
+						try {
+							if (lastException == null) {
+								nickname = tutorial.getNicknameDialog().getNickname();
+							} else if (lastException instanceof Tutorial.NicknameInvalidException) {
+								nickname = tutorial.getNicknameDialog().fallbackNicknameInvalid(nickname,
+										(Tutorial.NicknameInvalidException) lastException);
+							} else {
+								nickname = tutorial.getNicknameDialog().fallbackNicknameAlreadyInUse(nickname,
+										(Tutorial.NicknameNotAvailableException) lastException);
+							}
+
+							nicknameClaimed = playerProfile.claimCodeName(nickname);
+						} catch (Tutorial.NicknameInvalidException | Tutorial.NicknameNotAvailableException e) {
+							lastException = e;
+						}
+					}
+				}
+
+			} catch (Tutorial.CanceledException e) {
+				throw new LoginFailedException("The tutorial was canceled. It is not safe to continue.", e);
 			}
-		} catch (TutorialCanceledException e) {
-			throw new LoginFailedException("The tutorial was canceled. It is not safe to continue.", e);
 		}
 
 		if (!tutorialStates.contains(TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
 			playerProfile.firstTimeExperienceComplete();
 		}
 	}
+
 
 	/**
 	 * Fire requests block.
@@ -380,5 +399,22 @@ public class PokemonGo {
 			return ActivityStatus.getDefault(this, random);
 		}
 		return activityStatus.getActivityStatus();
+	}
+
+	/**
+	 * Gets the tutorial handler
+	 *
+	 * @return the tutorial handler
+	 */
+	private Tutorial.TutorialProvider getTutorialProvider() {
+		if (tutorialProvider == null) {
+			tutorialProvider = new Tutorial.TutorialProvider() {
+				@Override
+				public Tutorial getTutorial() {
+					return new Tutorial.TutorialBuilder().build();
+				}
+			};
+		}
+		return tutorialProvider;
 	}
 }
