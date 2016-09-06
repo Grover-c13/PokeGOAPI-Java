@@ -118,7 +118,7 @@ public class Gym implements MapPoint {
 		return getGymDetails().map(new Func1<GymDetails, Battle>() {
 			@Override
 			public Battle call(GymDetails gymDetails) {
-				return new Battle(networking, location, team, gym, gymDetails);
+				return new Battle(networking, location, gym, gymDetails, team);
 			}
 		});
 	}
