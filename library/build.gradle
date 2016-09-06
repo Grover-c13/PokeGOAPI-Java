@@ -4,15 +4,12 @@ buildscript {
     }
     dependencies {
         classpath 'com.google.protobuf:protobuf-gradle-plugin:0.7.7'
-        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1"
     }
 }
 
 apply plugin: 'idea'
 apply plugin: 'maven'
 apply plugin: 'com.google.protobuf'
-apply plugin: 'checkstyle'
-apply plugin: 'com.jfrog.bintray'
 
 archivesBaseName = archivesBaseName + '-api'
 
@@ -36,15 +33,6 @@ javadoc {
     exclude "**/google/common/geometry/**"
 }
 
-// Run this task to bundle all needed dependency
-task bundle(type: Jar) {
-    baseName = archivesBaseName + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
-
-jar.finalizedBy(bundle)
-
 protobuf {
     // Configure the protoc executable
     protoc {
@@ -53,43 +41,7 @@ protobuf {
     }
 }
 
-def checkstyleOutputDir = "${project.projectDir}/build/reports/checkstyle/"
-
-checkstyle {
-    toolVersion = '6.19'
-    configFile = file("${project.projectDir}/config/checkstyle.xml")
-    configProperties = [ "suppressionFile" : file("${project.projectDir}/config/suppressions.xml")]
-    reportsDir = file(checkstyleOutputDir)
-
-    ignoreFailures = false
-
-    checkstyleMain {
-        source = sourceSets.main.allSource
-    }
-
-    configurations {
-        checkstyle
-    }
-
-
-    dependencies {
-        checkstyle "com.puppycrawl.tools:checkstyle:${toolVersion}"
-    }
-}
-
-//Abort if any checkstyle warnings
-checkstyleMain.doLast {
-    def outputFile = file(checkstyleOutputDir + "main.xml")
-    if (outputFile.exists() && outputFile.text.contains("<error ")) {
-        logger.warn("!!!!-----------------------------------!!!!")
-        logger.warn("There were checkstyle warnings! For more info check $outputFile")
-        logger.warn("PLEASE CORRECT BEFORE SUBMITTING A PULLREQUEST")
-        logger.warn("!!!!-----------------------------------!!!!")
-    }
-}
-
 dependencies {
-    compile 'svarzee.gps:gpsoauth:0.3'
     compile 'com.squareup.okio:okio:1.9.0'
     compile 'com.squareup.moshi:moshi:1.2.0'
     compile 'com.annimon:stream:1.1.1'
@@ -108,34 +60,3 @@ idea {
         sourceDirs += file("${protobuf.generatedFilesBaseDir}/main/java");
     }
 }
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allJava
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    javadoc.failOnError(false);
-    javadoc.source = sourceSets.main.allJava
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-}
-
-bintray {
-    configurations = ['archives']
-    user = project.hasProperty("bintrayUser") ? project.property("bintrayUser") : null;
-    key = project.hasProperty("bintrayApiKey") ? project.property("bintrayApiKey") : null;
-    pkg {
-        repo = 'pokego'
-        name = 'pokego'
-        userOrg = 'pokejava'
-        licenses = ['GPL-3.0']
-        vcsUrl = 'https://github.com/pokejava/pokego.git'
-    }
-}
-

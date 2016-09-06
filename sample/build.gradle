@@ -4,8 +4,11 @@ mainClassName = "com.pokegoapi.examples.CatchPokemonAtAreaExample"
 
 archivesBaseName = archivesBaseName + '-sample'
 
+repositories {
+	jcenter()
+}
 dependencies {
-    compile project(':library')
+	compile project(':library'), project(':google-auto-auth')
 }
 
 task runSample << {
@@ -24,5 +27,5 @@ task runSample << {
 	} else if (sample == "7") {
 		mainClassName = "com.pokegoapi.examples.TranslatePokenameExample"
 	}
-    run.execute()
+	run.execute()
 }

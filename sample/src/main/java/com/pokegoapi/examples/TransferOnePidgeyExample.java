@@ -33,8 +33,8 @@ public class TransferOnePidgeyExample {
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
 
-		PokemonApi pokemonApi = PokemonApi.newBuilder().credentialProvider(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN,
-				ExampleLoginDetails.PASSWORD))
+		PokemonApi pokemonApi = PokemonApi.newBuilder().credentialProvider(new PtcCredentialProvider(http,
+				ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD))
 				.withHttpClient(http)
 				.latitude(45.817521)
 				.longitude(16.028199)
@@ -49,7 +49,8 @@ public class TransferOnePidgeyExample {
 			Pokemon pest = pidgeys.get(0);
 			// print the pokemon data
 			pest.debug();
-			ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result result = pest.transferPokemon().toBlocking().first();
+			ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result result = pest.transferPokemon()
+					.toBlocking().first();
 			Log.i("Main", "Transfered Pidgey result:" + result);
 		} else {
 			Log.i("Main", "You have no pidgeys :O");

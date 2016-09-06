@@ -60,8 +60,8 @@ public class CatchPokemonAtAreaExample {
 			//new PokemonGo(GoogleCredentialProvider(http,listner));
 			//Subsequently
 			//new PokemonGo(GoogleCredentialProvider(http,refreshtoken));
-			PokemonApi pokemonApi = PokemonApi.newBuilder().credentialProvider(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN,
-					ExampleLoginDetails.PASSWORD))
+			PokemonApi pokemonApi = PokemonApi.newBuilder().credentialProvider(new PtcCredentialProvider(http,
+					ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD))
 					.withHttpClient(http)
 					.latitude(-32.058087)
 					.longitude(115.744325)

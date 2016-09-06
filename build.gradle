@@ -1,12 +1,99 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1"
+    }
+}
 allprojects {
     apply plugin: 'java'
+    apply plugin: 'checkstyle'
+    apply plugin: 'com.jfrog.bintray'
+
     group = 'com.github.pokejava'
     version =  new File(".version").newReader().readLine()
     archivesBaseName = 'pokego'
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
     description = """Pokemon Go Java API"""
+    def checkstyleOutputDir = "${project.projectDir}/build/reports/checkstyle/"
+
     repositories {
-        jcenter()
+        mavenCentral()
     }
+
+    checkstyle {
+        toolVersion = '6.19'
+        configFile = file("${rootProject.projectDir}/config/checkstyle.xml")
+        configProperties = [ "suppressionFile" : file("${rootProject.projectDir}/config/suppressions.xml")]
+        reportsDir = file(checkstyleOutputDir)
+
+        ignoreFailures = false
+
+        checkstyleMain {
+            source = sourceSets.main.allSource
+        }
+
+        configurations {
+            checkstyle
+        }
+
+
+        dependencies {
+            checkstyle "com.puppycrawl.tools:checkstyle:${toolVersion}"
+        }
+    }
+
+    //Abort if any checkstyle warnings
+    checkstyleMain.doLast {
+        def outputFile = file(checkstyleOutputDir + "main.xml")
+        if (outputFile.exists() && outputFile.text.contains("<error ")) {
+            logger.warn("!!!!-----------------------------------!!!!")
+            logger.warn("There were checkstyle warnings! For more info check $outputFile")
+            logger.warn("PLEASE CORRECT BEFORE SUBMITTING A PULLREQUEST")
+            logger.warn("!!!!-----------------------------------!!!!")
+        }
+    }
+
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allJava
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        javadoc.failOnError(false);
+        javadoc.source = sourceSets.main.allJava
+        from javadoc.destinationDir
+    }
+
+    artifacts {
+        archives sourcesJar
+        archives javadocJar
+    }
+
+
+    // Run this task to bundle all needed dependency
+    task bundle(type: Jar) {
+        baseName = archivesBaseName + '-all'
+        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+        with jar
+    }
+
+    jar.finalizedBy(bundle)
+
+    bintray {
+        configurations = ['archives']
+        user = project.hasProperty("bintrayUser") ? project.property("bintrayUser") : null;
+        key = project.hasProperty("bintrayApiKey") ? project.property("bintrayApiKey") : null;
+        pkg {
+            repo = 'pokego'
+            name = 'pokego'
+            userOrg = 'pokejava'
+            licenses = ['GPL-3.0']
+            vcsUrl = 'https://github.com/pokejava/pokego.git'
+        }
+    }
+
 }

@@ -1,0 +1,15 @@
+apply plugin: 'idea'
+apply plugin: 'maven'
+
+archivesBaseName = archivesBaseName + '-google-auto-auth'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'svarzee.gps:gpsoauth:0.3'
+    compile project(":library")
+    testCompile 'junit:junit:4.10'
+    testCompile 'ch.qos.logback:logback-classic:1.1.7'
+}
