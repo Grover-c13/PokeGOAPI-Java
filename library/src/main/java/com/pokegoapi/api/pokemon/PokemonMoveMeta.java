@@ -19,6 +19,9 @@ import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Pokemon moves
+ */
 public class PokemonMoveMeta {
 
 	@Getter

@@ -20,6 +20,9 @@ import lombok.Getter;
 
 import java.util.EnumMap;
 
+/**
+ * Move registry
+ */
 public class PokemonMoveMetaRegistry {
 
 	@Getter

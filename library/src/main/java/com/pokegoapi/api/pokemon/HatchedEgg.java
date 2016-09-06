@@ -15,15 +15,15 @@
 
 package com.pokegoapi.api.pokemon;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
+/**
+ * Hatched egg
+ */
 @Data
-@AllArgsConstructor
 public class HatchedEgg {
-
-	private Long id;
-	private int experience;
-	private int candy;
-	private int stardust;
+	private final Long id;
+	private final int experience;
+	private final int candy;
+	private final int stardust;
 }
