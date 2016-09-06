@@ -190,24 +190,18 @@ public class TutorialCompletionExample {
 			return enterNickname();
 		}
 
-		// This will be called if your user set a nickname that was already in use
+		// This will be called if your user set a nickname that was invalid or already in use
 		// Return another nickname they want
 		@Override
-		public String fallbackNicknameAlreadyInUse(String nickname, Tutorial.NicknameNotAvailableException cause)
-				throws Tutorial.CanceledException {
-			System.out.println(String.format("%s is already in use.\r\n" +
-					"Please choose a different nickname (or enter nothing to cancel the tutorial):", nickname));
-			return enterNickname();
-		}
-
-		// This will be called if your user set a nickname that is invalid
-		// Return another nickname they want
-		@Override
-		public String fallbackNicknameInvalid(String nickname, Tutorial.NicknameInvalidException cause)
-				throws Tutorial.CanceledException {
-			System.out.println(String.format("%s is invalid. " +
-					"A valid nickname contains between 3 and 15 characters and no symbols.\r\n" +
-					"Please choose a valid nickname (or enter nothing to cancel the tutorial):", nickname));
+		public String getFallback(String nickname, Tutorial.NicknameException cause) throws Tutorial.CanceledException {
+			if (cause instanceof Tutorial.NicknameInvalidException) {
+				System.out.println(String.format("%s is invalid. " +
+						"A valid nickname contains between 3 and 15 characters and no symbols.\r\n" +
+						"Please choose a valid nickname (or enter nothing to cancel the tutorial):", nickname));
+			} else {
+				System.out.println(String.format("%s is already in use.\r\n" +
+						"Please choose a different nickname (or enter nothing to cancel the tutorial):", nickname));
+			}
 			return enterNickname();
 		}
 	};

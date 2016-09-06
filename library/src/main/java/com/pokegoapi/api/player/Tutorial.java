@@ -79,14 +79,7 @@ public class Tutorial {
 			}
 
 			@Override
-			public String fallbackNicknameAlreadyInUse(String alreadyUsedNickname,
-													NicknameNotAvailableException lastException) {
-				return getNickname();
-			}
-
-			@Override
-			public String fallbackNicknameInvalid(String invalidNickname,
-												NicknameInvalidException lastException) {
+			public String getFallback(String alreadyUsedNickname, NicknameException lastException) {
 				return getNickname();
 			}
 		};
@@ -187,26 +180,15 @@ public class Tutorial {
 		String getNickname() throws CanceledException;
 
 		/**
-		 * Gets a different nickname in case that the previous nickname was already in use
+		 * Gets a different nickname in case that the previous nickname was invalid or already in use
 		 *
-		 * @param alreadyUsedNickname the nickname, that was already in use
-		 * @param cause the causing exception
+		 * @param nickname the nickname, that was invalid or already in use
+		 * @param cause    the causing exception. Can be either instanceof Tutorial.NicknameInvalidException
+		 *                 or instanceof Tutorial.NicknameNotAvailableException
 		 * @return a nickname
 		 * @throws CanceledException if the nickname dialog gets canceled
 		 */
-		String fallbackNicknameAlreadyInUse(String alreadyUsedNickname, NicknameNotAvailableException cause)
-				throws CanceledException;
-
-		/**
-		 * Gets a different nickname in case that the previous nickname was invalid
-		 *
-		 * @param invalidNickname the nickname, that was invalid
-		 * @param cause the causing exception
-		 * @return a nickname
-		 * @throws CanceledException if the nickname dialog gets canceled
-		 */
-		String fallbackNicknameInvalid(String invalidNickname, NicknameInvalidException cause)
-				throws CanceledException;
+		String getFallback(String nickname, NicknameException cause) throws CanceledException;
 	}
 
 	/**
@@ -380,40 +362,30 @@ public class Tutorial {
 		}
 	}
 
-	public static class NicknameInvalidException extends Exception {
-		public NicknameInvalidException() {
+	public static class NicknameException extends Exception {
+		public NicknameException() {
 			super();
 		}
 
-		public NicknameInvalidException(String message) {
+		public NicknameException(String message) {
 			super(message);
 		}
 
-		public NicknameInvalidException(String message, Throwable cause) {
+		public NicknameException(String message, Throwable cause) {
 			super(message, cause);
 		}
 
-		public NicknameInvalidException(Throwable cause) {
+		public NicknameException(Throwable cause) {
 			super(cause);
 		}
 	}
 
-	public static class NicknameNotAvailableException extends Exception {
-		public NicknameNotAvailableException() {
-			super();
-		}
+	public static class NicknameInvalidException extends NicknameException {
 
-		public NicknameNotAvailableException(String message) {
-			super(message);
-		}
+	}
 
-		public NicknameNotAvailableException(String message, Throwable cause) {
-			super(message, cause);
-		}
+	public static class NicknameNotAvailableException extends NicknameException {
 
-		public NicknameNotAvailableException(Throwable cause) {
-			super(cause);
-		}
 	}
 }
 

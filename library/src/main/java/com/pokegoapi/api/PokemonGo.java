@@ -211,22 +211,18 @@ public class PokemonGo {
 				if (isNicknameMissing) {
 					String nickname = null;
 					boolean nicknameClaimed = false;
-					Exception lastException = null;
+					Tutorial.NicknameException lastException = null;
 
 					while (!nicknameClaimed) {
 						try {
 							if (lastException == null) {
 								nickname = tutorial.getNicknameDialog().getNickname();
-							} else if (lastException instanceof Tutorial.NicknameInvalidException) {
-								nickname = tutorial.getNicknameDialog().fallbackNicknameInvalid(nickname,
-										(Tutorial.NicknameInvalidException) lastException);
 							} else {
-								nickname = tutorial.getNicknameDialog().fallbackNicknameAlreadyInUse(nickname,
-										(Tutorial.NicknameNotAvailableException) lastException);
+								nickname = tutorial.getNicknameDialog().getFallback(nickname, lastException);
 							}
 
 							nicknameClaimed = playerProfile.claimCodeName(nickname);
-						} catch (Tutorial.NicknameInvalidException | Tutorial.NicknameNotAvailableException e) {
+						} catch (Tutorial.NicknameException e) {
 							lastException = e;
 						}
 					}

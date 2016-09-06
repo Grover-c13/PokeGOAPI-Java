@@ -402,14 +402,13 @@ public class PlayerProfile {
 	 *
 	 * @param codename the nickname
 	 * @return True if nickname was claimed, else False
-	 * @throws LoginFailedException                   when the auth is invalid
-	 * @throws RemoteServerException                  when the server is down/having issues
-	 * @throws Tutorial.NicknameNotAvailableException when the nickname is not available
-	 * @throws Tutorial.NicknameInvalidException      when the nickname is invalid
+	 * @throws LoginFailedException       when the auth is invalid
+	 * @throws RemoteServerException      when the server is down/having issues
+	 * @throws Tutorial.NicknameException when something is wrong with the nickname
 	 */
 	public boolean claimCodeName(final String codename)
 			throws LoginFailedException, RemoteServerException,
-			Tutorial.NicknameInvalidException, Tutorial.NicknameNotAvailableException {
+			Tutorial.NicknameException {
 
 		if (!isNicknameValid(codename)) {
 			throw new Tutorial.NicknameInvalidException();
