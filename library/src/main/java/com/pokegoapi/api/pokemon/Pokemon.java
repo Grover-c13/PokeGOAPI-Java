@@ -46,26 +46,28 @@ import lombok.Setter;
 import rx.Observable;
 import rx.functions.Func1;
 
-import static POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass.UseItemPotionResponse.Result.ERROR_CANNOT_USE;
+import static POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass.UseItemPotionResponse.Result
+		.ERROR_CANNOT_USE;
 import static com.pokegoapi.api.player.PlayerProfile.Currency.STARDUST;
 
 /**
  * The type Pokemon.
  */
 public class Pokemon extends PokemonDetails {
-
-	private static final String TAG = Pokemon.class.getSimpleName();
-	@Getter
-	@Setter
-	private int stamina;
 	private final Networking networking;
 	private final Inventories inventories;
 	private final PlayerProfile playerProfile;
+	@Getter
+	@Setter
+	private int stamina;
 
 	/**
 	 * Creates a Pokemon object with helper functions around the proto.
 	 *
-	 * @param proto the proto from the server
+	 * @param networking    Networking, for all actions on pokemon
+	 * @param inventories   Inventories are needed to use an item
+	 * @param playerProfile Player profile to find the amount of stardust
+	 * @param proto         the proto from the server
 	 */
 	public Pokemon(Networking networking, Inventories inventories, PlayerProfile playerProfile, PokemonData proto) {
 		super(proto, inventories);
@@ -95,6 +97,7 @@ public class Pokemon extends PokemonDetails {
 					}
 				});
 	}
+
 	/**
 	 * Rename pokemon nickname pokemon response . result.
 	 *
@@ -105,14 +108,15 @@ public class Pokemon extends PokemonDetails {
 		return networking.queueRequest(RequestType.NICKNAME_POKEMON,
 				NicknamePokemonMessage
 						.newBuilder()
-					.setPokemonId(getId())
-					.setNickname(nickname)
-					.build(), NicknamePokemonResponse.class).map(new Func1<NicknamePokemonResponse, NicknamePokemonResponse.Result>() {
-			@Override
-			public NicknamePokemonResponse.Result call(NicknamePokemonResponse nicknamePokemonResponse) {
-				return nicknamePokemonResponse.getResult();
-			}
-		});
+						.setPokemonId(getId())
+						.setNickname(nickname)
+						.build(), NicknamePokemonResponse.class)
+				.map(new Func1<NicknamePokemonResponse, NicknamePokemonResponse.Result>() {
+					@Override
+					public NicknamePokemonResponse.Result call(NicknamePokemonResponse nicknamePokemonResponse) {
+						return nicknamePokemonResponse.getResult();
+					}
+				});
 	}
 
 	/**
@@ -126,14 +130,16 @@ public class Pokemon extends PokemonDetails {
 	public Observable<SetFavoritePokemonResponse.Result> setFavoritePokemon(boolean markFavorite) {
 		return networking.queueRequest(RequestType.SET_FAVORITE_POKEMON,
 				SetFavoritePokemonMessage.newBuilder()
-				.setPokemonId(getId())
-				.setIsFavorite(markFavorite)
-				.build(), SetFavoritePokemonResponse.class).map(new Func1<SetFavoritePokemonResponse, SetFavoritePokemonResponse.Result>() {
-			@Override
-			public SetFavoritePokemonResponse.Result call(SetFavoritePokemonResponse setFavoritePokemonResponse) {
-				return setFavoritePokemonResponse.getResult();
-			}
-		});
+						.setPokemonId(getId())
+						.setIsFavorite(markFavorite)
+						.build(), SetFavoritePokemonResponse.class)
+				.map(new Func1<SetFavoritePokemonResponse, SetFavoritePokemonResponse.Result>() {
+					@Override
+					public SetFavoritePokemonResponse.Result call(
+							SetFavoritePokemonResponse setFavoritePokemonResponse) {
+						return setFavoritePokemonResponse.getResult();
+					}
+				});
 	}
 
 	/**
@@ -207,10 +213,10 @@ public class Pokemon extends PokemonDetails {
 	 */
 	public Observable<EvolutionResult> evolve() {
 		return networking.queueRequest(RequestType.EVOLVE_POKEMON,
-		EvolvePokemonMessage
-				.newBuilder()
-				.setPokemonId(getId())
-				.build(),
+				EvolvePokemonMessage
+						.newBuilder()
+						.setPokemonId(getId())
+						.build(),
 				EvolvePokemonResponse.class)
 				.map(new Func1<EvolvePokemonResponse, EvolutionResult>() {
 					@Override
@@ -287,15 +293,16 @@ public class Pokemon extends PokemonDetails {
 				.newBuilder()
 				.setItemId(itemId)
 				.setPokemonId(getId())
-				.build(), UseItemPotionResponse.class).map(new Func1<UseItemPotionResponse, UseItemPotionResponse.Result>() {
-			@Override
-			public UseItemPotionResponse.Result call(UseItemPotionResponse response) {
-				if (response.getResult() == UseItemPotionResponse.Result.SUCCESS) {
-					setStamina(response.getStamina());
-				}
-				return response.getResult();
-			}
-		});
+				.build(), UseItemPotionResponse.class)
+				.map(new Func1<UseItemPotionResponse, UseItemPotionResponse.Result>() {
+					@Override
+					public UseItemPotionResponse.Result call(UseItemPotionResponse response) {
+						if (response.getResult() == UseItemPotionResponse.Result.SUCCESS) {
+							setStamina(response.getStamina());
+						}
+						return response.getResult();
+					}
+				});
 	}
 
 	/**
@@ -340,15 +347,16 @@ public class Pokemon extends PokemonDetails {
 				.newBuilder()
 				.setItemId(itemId)
 				.setPokemonId(getId())
-				.build(), UseItemReviveResponse.class).map(new Func1<UseItemReviveResponse, UseItemReviveResponse.Result>() {
-			@Override
-			public UseItemReviveResponse.Result call(UseItemReviveResponse response) {
-				if (response.getResult() == UseItemReviveResponse.Result.SUCCESS) {
-					setStamina(response.getStamina());
-				}
-				return response.getResult();
-			}
-		});
+				.build(), UseItemReviveResponse.class)
+				.map(new Func1<UseItemReviveResponse, UseItemReviveResponse.Result>() {
+					@Override
+					public UseItemReviveResponse.Result call(UseItemReviveResponse response) {
+						if (response.getResult() == UseItemReviveResponse.Result.SUCCESS) {
+							setStamina(response.getStamina());
+						}
+						return response.getResult();
+					}
+				});
 	}
 
 	public EvolutionForm getEvolutionForm() {
@@ -368,7 +376,7 @@ public class Pokemon extends PokemonDetails {
 	 *
 	 * @return Actual cp in percentage
 	 */
-	public int getCPInPercentageActualPlayerLevel()  {
+	public int getCPInPercentageActualPlayerLevel() {
 		// TODO: Get player level
 		return ((getCp() * 100) / getMaxCpForPlayer(0));
 	}
