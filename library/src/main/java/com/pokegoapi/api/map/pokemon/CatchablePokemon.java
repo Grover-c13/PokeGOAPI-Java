@@ -435,6 +435,8 @@ public class CatchablePokemon implements MapPoint {
 									int amount, int razberriesLimit)
 			throws LoginFailedException, RemoteServerException {
 
+		api.getInventories().updateInventories();
+		
 		Item razberriesInventory = api.getInventories().getItemBag().getItem(ItemId.ITEM_RAZZ_BERRY);
 		int razberries = 0;
 		int numThrows = 0;
