@@ -433,12 +433,15 @@ public class CatchablePokemon implements MapPoint {
 									double normalizedReticleSize, double spinModifier, Pokeball type,
 									int amount, int razberriesLimit)
 			throws LoginFailedException, RemoteServerException {
+
+		int razberriesInventory = api.getInventories().getItemBag().getItem(ItemId.ITEM_RAZZ_BERRY).getCount();
 		int razberries = 0;
 		int numThrows = 0;
+
 		CatchResult result;
 		do {
 
-			if (razberries < razberriesLimit || razberriesLimit == -1) {
+			if (razberriesInventory - razberries > 0 && (razberries < razberriesLimit || razberriesLimit == -1)) {
 				useItem(ItemId.ITEM_RAZZ_BERRY);
 				razberries++;
 			}
