@@ -82,7 +82,7 @@ public class TutorialCompletionExample {
 
 			// First we need a tutorial builder.
 			// We can either set specific values or let them be generated randomly, which happens by default.
-			Tutorial.TutorialBuilder tutorialBuilder = new Tutorial.TutorialBuilder();
+			Tutorial.TutorialBuilder tutorialBuilder = Tutorial.newBuilder();
 
 			// If the TOS have not been accepted before, ask the user if they want to accept them.
 			// Note that if you don't set the TOS, they will be accepted automatically.

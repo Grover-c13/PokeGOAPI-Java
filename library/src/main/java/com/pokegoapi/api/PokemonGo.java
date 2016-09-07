@@ -407,7 +407,7 @@ public class PokemonGo {
 			tutorialProvider = new Tutorial.TutorialProvider() {
 				@Override
 				public Tutorial getTutorial() {
-					return new Tutorial.TutorialBuilder().build();
+					return Tutorial.newBuilder().build();
 				}
 			};
 		}

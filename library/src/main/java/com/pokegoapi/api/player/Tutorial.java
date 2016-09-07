@@ -167,6 +167,10 @@ public class Tutorial {
 		return nicknameDialog;
 	}
 
+	static public TutorialBuilder newBuilder() {
+		return new TutorialBuilder();
+	}
+
 	/**
 	 * Interface for nickname dialog
 	 */
@@ -204,7 +208,7 @@ public class Tutorial {
 		/**
 		 * Creates an instance of {@link TutorialBuilder}.
 		 */
-		public TutorialBuilder() {
+		TutorialBuilder() {
 		}
 
 		/**
