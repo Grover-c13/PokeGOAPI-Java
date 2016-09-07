@@ -438,8 +438,16 @@ public class CatchablePokemon implements MapPoint {
 		Item razberriesInventory = api.getInventories().getItemBag().getItem(ItemId.ITEM_RAZZ_BERRY);
 		int razberries = 0;
 		int numThrows = 0;
-		Log.d("catchPokemon", String.format("attempt to catch pokemon using max %d razzberries. %d in inventory",
-				razberriesLimit, razberriesInventory.getCount()));
+		Log.d("catchPokemon",
+				String.format("attempt to catch pokemon%s.",
+						razberriesLimit > 0
+								? String.format(" using max %d razzberrys. %d in inventory",
+								razberriesLimit, razberriesInventory.getCount())
+								: razberriesLimit == -1
+								? String.format(" using all %d razzberrys in inventory",
+								razberriesInventory.getCount())
+								: " using no razzberries"
+				));
 
 		CatchResult result;
 		do {
