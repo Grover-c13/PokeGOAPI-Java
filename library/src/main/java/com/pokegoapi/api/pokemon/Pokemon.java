@@ -46,8 +46,7 @@ import lombok.Setter;
 import rx.Observable;
 import rx.functions.Func1;
 
-import static POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass.UseItemPotionResponse.Result
-		.ERROR_CANNOT_USE;
+import static POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass.UseItemPotionResponse.Result.ERROR_CANNOT_USE;
 import static com.pokegoapi.api.player.PlayerProfile.Currency.STARDUST;
 
 /**
@@ -151,8 +150,8 @@ public class Pokemon extends PokemonDetails {
 	 */
 	public boolean canPowerUp() throws LoginFailedException, RemoteServerException {
 
-		return getCandy() >= getCandyCostsForPowerup() &&
-				playerProfile.getCurrency(STARDUST) >= getStardustCostsForPowerup();
+		return getCandy() >= getCandyCostsForPowerup()
+				&& playerProfile.getCurrency(STARDUST) >= getStardustCostsForPowerup();
 	}
 
 	/**
