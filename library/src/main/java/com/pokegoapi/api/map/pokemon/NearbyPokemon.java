@@ -17,12 +17,16 @@ package com.pokegoapi.api.map.pokemon;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
+import lombok.Getter;
 
 public class NearbyPokemon {
-	private NearbyPokemonOuterClass.NearbyPokemon proto;
+	private final NearbyPokemonOuterClass.NearbyPokemon proto;
+	@Getter
+	private final long cellId;
 
-	public NearbyPokemon(NearbyPokemonOuterClass.NearbyPokemon proto) {
+	public NearbyPokemon(NearbyPokemonOuterClass.NearbyPokemon proto, long cellId) {
 		this.proto = proto;
+		this.cellId = cellId;
 	}
 
 	public PokemonIdOuterClass.PokemonId getPokemonId() {

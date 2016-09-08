@@ -138,7 +138,7 @@ class MapObjects {
 
 		for (MapCellOuterClass.MapCell mapCell : response.getMapCellsList()) {
 			for (NearbyPokemonOuterClass.NearbyPokemon nearbyPokemon : mapCell.getNearbyPokemonsList()) {
-				nearbyPokemons.add(new NearbyPokemon(nearbyPokemon));
+				nearbyPokemons.add(new NearbyPokemon(nearbyPokemon, mapCell.getS2CellId()));
 			}
 			for (MapPokemonOuterClass.MapPokemon mapPokemon : mapCell.getCatchablePokemonsList()) {
 				catchablePokemons.add(new CatchablePokemon(networking, location, inventories, mapPokemon));
