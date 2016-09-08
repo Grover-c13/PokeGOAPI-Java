@@ -47,7 +47,7 @@ public class CatchOptions {
 	private final PokemonGo api;
 	private boolean useBestPokeball;
 	private boolean skipMasterBall;
-	private boolean useRazzBerries;
+	private boolean useRazzBerry;
 	private int maxRazzBerries;
 	private Pokeball pokeBall;
 	private boolean strictBallType;
@@ -69,7 +69,7 @@ public class CatchOptions {
 	 */
 	public CatchOptions(PokemonGo api) {
 		this.api = api;
-		this.useRazzBerries = false;
+		this.useRazzBerry = false;
 		this.maxRazzBerries = 0;
 		this.useBestPokeball = false;
 		this.skipMasterBall = false;
@@ -162,22 +162,13 @@ public class CatchOptions {
 	}
 	
 	/**
-	 * Gets razzberries to catch a pokemon
+	 * Allows using a single razzberry to attempt capture
 	 *
-	 * @return the number to use
-	 */
-	public int getRazzberries() {
-		return useRazzBerries && maxRazzBerries == 0 ? 1 : maxRazzBerries;
-	}
-	
-	/**
-	 * Enable or disable the use of razzberries
-	 *
-	 * @param useRazzBerries true or false
+	 * @param useRazzBerry true or false
 	 * @return               the CatchOptions object
 	 */
-	public CatchOptions useRazzberries(boolean useRazzBerries) {
-		this.useRazzBerries = useRazzBerries;
+	public CatchOptions useRazzberry(boolean useRazzBerry) {
+		this.useRazzBerry = useRazzBerry;
 		return this;
 	}
 	
@@ -190,6 +181,15 @@ public class CatchOptions {
 	public CatchOptions maxRazzberries(int maxRazzBerries) {
 		this.maxRazzBerries = maxRazzBerries;
 		return this;
+	}
+	
+	/**
+	 * Gets razzberries to catch a pokemon
+	 *
+	 * @return the number to use
+	 */
+	public int getRazzberries() {
+		return useRazzBerry && maxRazzBerries == 0 ? 1 : maxRazzBerries;
 	}
 	
 	/**
