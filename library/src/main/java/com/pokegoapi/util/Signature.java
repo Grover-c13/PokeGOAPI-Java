@@ -1,11 +1,5 @@
 package com.pokegoapi.util;
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
-import POGOProtos.Networking.Envelopes.SignatureOuterClass;
-import POGOProtos.Networking.Envelopes.Unknown6OuterClass;
-import POGOProtos.Networking.Envelopes.Unknown6OuterClass.Unknown6.Unknown2;
-import POGOProtos.Networking.Requests.RequestOuterClass;
-
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.device.ActivityStatus;
@@ -17,6 +11,11 @@ import net.jpountz.xxhash.StreamingXXHash64;
 import net.jpountz.xxhash.XXHashFactory;
 
 import java.util.Random;
+
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
+import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import POGOProtos.Networking.Platform.PlatformRequestTypeOuterClass;
+import POGOProtos.Networking.Requests.RequestOuterClass;
 
 public class Signature {
 
@@ -73,10 +72,12 @@ public class Signature {
 		byte[] iv = new byte[32];
 		new Random().nextBytes(iv);
 		byte[] encrypted = Crypto.encrypt(uk2, iv).toByteBuffer().array();
-		Unknown6OuterClass.Unknown6 uk6 = Unknown6OuterClass.Unknown6.newBuilder()
-				.setRequestType(6)
-				.setUnknown2(Unknown2.newBuilder().setEncryptedSignature(ByteString.copyFrom(encrypted))).build();
-		builder.addUnknown6(uk6);
+		RequestEnvelopeOuterClass.RequestEnvelope.PlatformRequest platformRequest = RequestEnvelopeOuterClass
+				.RequestEnvelope.PlatformRequest.newBuilder()
+				.setType(PlatformRequestTypeOuterClass.PlatformRequestType.SEND_ENCRYPTED_SIGNATURE)
+				.setRequestMessage(ByteString.copyFrom(encrypted))
+				.build();
+		builder.addPlatformRequests(platformRequest);
 	}
 
 	private static byte[] getBytes(double input) {

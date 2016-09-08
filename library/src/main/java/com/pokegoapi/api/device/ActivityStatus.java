@@ -15,7 +15,6 @@
 
 package com.pokegoapi.api.device;
 
-import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 
 import java.util.Random;
@@ -48,47 +47,12 @@ public class ActivityStatus {
 			activityStatus = new ActivityStatus();
 			api.setActivityStatus(activityStatus);
 		}
-		activityStatus.setStationary(true);
+		SignatureOuterClass.Signature.ActivityStatus.Builder builder = activityStatus.getBuilder();
+		builder.setStationary(true);
 		if (tilting) {
-			activityStatus.setTilting(true);
+			builder.setTilting(true);
 		}
-		return activityStatus.getActivityStatus();
-	}
-
-	public void setAutomotive(boolean automotive) {
-		activityStatusBuilder.setAutomotive(automotive);
-	}
-
-	public void setCycling(boolean cycling) {
-		activityStatusBuilder.setCycling(cycling);
-	}
-
-	public void setTilting(boolean tilting) {
-		activityStatusBuilder.setTilting(tilting);
-	}
-
-	public void setRunning(boolean running) {
-		activityStatusBuilder.setRunning(running);
-	}
-
-	public void setStationary(boolean stationary) {
-		activityStatusBuilder.setStationary(stationary);
-	}
-
-	public void setWalking(boolean walking) {
-		activityStatusBuilder.setWalking(walking);
-	}
-
-	public void setStartTimeMs(long startTimeMs) {
-		activityStatusBuilder.setStartTimeMs(startTimeMs);
-	}
-
-	public void setStatus(ByteString status) {
-		activityStatusBuilder.setStatus(status);
-	}
-
-	public void setUnknownStatus(boolean unknownStatus) {
-		activityStatusBuilder.setUnknownStatus(unknownStatus);
+		return builder.build();
 	}
 
 	/**
@@ -98,9 +62,5 @@ public class ActivityStatus {
 	 */
 	public SignatureOuterClass.Signature.ActivityStatus.Builder getBuilder() {
 		return activityStatusBuilder;
-	}
-
-	public SignatureOuterClass.Signature.ActivityStatus getActivityStatus() {
-		return activityStatusBuilder.build();
 	}
 }

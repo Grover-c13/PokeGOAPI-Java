@@ -473,7 +473,7 @@ public class Map {
 	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	@Deprecated
-	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude, double altitude)
+	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude, float altitude)
 			throws LoginFailedException, RemoteServerException {
 		api.setLatitude(latitude);
 		api.setLongitude(longitude);

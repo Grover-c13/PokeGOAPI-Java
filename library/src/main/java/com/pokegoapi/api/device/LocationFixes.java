@@ -78,7 +78,7 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 		for (int i = 0; i < providerCount; i++) {
 			float latitude = offsetOnLatLong(api.getLatitude(), random.nextInt(100) + 10);
 			float longitude = offsetOnLatLong(api.getLongitude(), random.nextInt(100) + 10);
-			float altitude = (float) api.getAltitude();
+			float altitude = api.getAltitude();
 			float verticalAccuracy = (float) (15 + (23 - 15) * random.nextDouble());
 
 			// Fake errors
@@ -107,7 +107,11 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 					.setAltitude(altitude)
 					.setVerticalAccuracy(verticalAccuracy)
 					.setProviderStatus(3)
-					.setLocationType(1);
+					.setLocationType(1)
+					.setAltitude(api.getAltitude())
+					.setSpeed(api.getSpeed())
+					.setCourse(random.nextInt(360))
+					.setFloor(/*Todo : The floor of the building this person is on*/0);
 			locationFixes.add(locationFixBuilder.build());
 		}
 		return locationFixes;

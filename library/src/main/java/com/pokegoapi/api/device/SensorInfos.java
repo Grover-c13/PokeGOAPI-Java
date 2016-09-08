@@ -28,63 +28,81 @@ public interface SensorInfos {
 
 	/**
 	 *
+	 * @return linear acceleration x
+	 */
+	double getLinearAccelerationX();
+
+	/**
+	 *
+	 * @return linear acceleration y
+	 */
+	double getLinearAccelerationY();
+
+	/**
+	 *
+	 * @return linear acceleration z
+	 */
+	double getLinearAccelerationZ();
+
+	/**
+	 *
 	 * @return accelerometer axes, always 3
 	 */
 	long getAccelerometerAxes();
 
 	/**
 	 *
-	 * @return accel normalized x
+	 * @return magnetic field x
 	 */
-	double getAccelNormalizedX();
+	double getMagneticFieldX();
 
 	/**
 	 *
-	 * @return accel normalized y
+	 * @return magnetic field y
 	 */
-	double getAccelNormalizedY();
+	double getMagneticFieldY();
 
 	/**
 	 *
-	 * @return accel normalized z
+	 * @return magnetic field z
 	 */
-	double getAccelNormalizedZ();
+	double getMagneticFieldZ();
 
 	/**
 	 *
-	 * @return accel raw x
+	 * @return rotation vector x
 	 */
-	double getAccelRawX();
+	double getRotationVectorX();
 
 	/**
 	 *
-	 * @return accel raw y
+	 * @return rotation vector y
 	 */
-	double getAccelRawY();
+	double getRotationVectorY();
 
 	/**
 	 *
-	 * @return accel raw z
+	 * @return rotation vector z
 	 */
-	double getAccelRawZ();
+	double getRotationVectorZ();
 
 	/**
 	 *
-	 * @return angel normalized x
+	 * @return gravity x
 	 */
-	double getAngleNormalizedX();
+	double getGravityX();
 
 	/**
 	 *
-	 * @return angel normalized y
+	 * @return gravity y
 	 */
-	double getAngleNormalizedY();
+	double getGravityY();
 
 	/**
 	 *
-	 * @return angel normalized z
+	 * @return gravity z
 	 */
-	double getAngleNormalizedZ();
+	double getGravityZ();
 
 	/**
 	 *

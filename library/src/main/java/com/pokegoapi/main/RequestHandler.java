@@ -15,10 +15,6 @@
 
 package com.pokegoapi.main;
 
-import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
-import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
-
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -28,11 +24,6 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.Signature;
-
-import okhttp3.OkHttpClient;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import rx.Observable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -50,6 +41,14 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
+import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import rx.Observable;
 
 public class RequestHandler implements Runnable {
 	private static final String TAG = RequestHandler.class.getSimpleName();
@@ -214,13 +213,13 @@ public class RequestHandler implements Runnable {
 				newAuthTicket = responseEnvelop.getAuthTicket();
 			}
 
-			if (responseEnvelop.getStatusCode() == 102) {
+			if (responseEnvelop.getStatusCode() == ResponseEnvelope.StatusCode.INVALID_AUTH_TOKEN) {
 				throw new LoginFailedException(String.format("Invalid Auth status code recieved, token not refreshed? %s %s",
 						responseEnvelop.getApiUrl(), responseEnvelop.getError()));
-			} else if (responseEnvelop.getStatusCode() == 53) {
+			} else if (responseEnvelop.getStatusCode() == ResponseEnvelope.StatusCode.REDIRECT) {
 				// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
 				return internalSendServerRequests(newAuthTicket, serverRequests);
-			} else if (responseEnvelop.getStatusCode() == 3) {
+			} else if (responseEnvelop.getStatusCode() == ResponseEnvelope.StatusCode.BAD_REQUEST) {
 				throw new RemoteServerException("Your account may be banned! please try from the official client.");
 			}
 
@@ -265,7 +264,7 @@ public class RequestHandler implements Runnable {
 		builder.setMsSinceLastLocationfix(989);
 		builder.setLatitude(api.getLatitude());
 		builder.setLongitude(api.getLongitude());
-		builder.setAltitude(api.getAltitude());
+		builder.setAccuracy(api.getAccuracy());
 	}
 
 	private Long getRequestId() {

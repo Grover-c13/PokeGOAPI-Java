@@ -48,28 +48,30 @@ public class SensorInfo {
 		this();
 		sensorInfoBuilder
 				.setTimestampSnapshot(sensorInfos.getTimestampSnapshot())
-				.setAccelerometerAxes(sensorInfos.getAccelerometerAxes())
-				.setAccelNormalizedX(sensorInfos.getAccelNormalizedX())
-				.setAccelNormalizedY(sensorInfos.getAccelNormalizedY())
-				.setAccelNormalizedZ(sensorInfos.getAccelNormalizedZ())
-				.setAccelRawX(sensorInfos.getAccelRawX())
-				.setAccelRawY(sensorInfos.getAccelRawY())
-				.setAccelRawZ(sensorInfos.getAccelRawZ())
-				.setAngleNormalizedX(sensorInfos.getAngleNormalizedX())
-				.setAngleNormalizedY(sensorInfos.getAngleNormalizedY())
-				.setAngleNormalizedZ(sensorInfos.getAngleNormalizedZ())
+				.setLinearAccelerationX(sensorInfos.getLinearAccelerationX())
+				.setLinearAccelerationY(sensorInfos.getLinearAccelerationY())
+				.setLinearAccelerationZ(sensorInfos.getLinearAccelerationZ())
+				.setMagneticFieldX(sensorInfos.getMagneticFieldX())
+				.setMagneticFieldY(sensorInfos.getMagneticFieldY())
+				.setMagneticFieldZ(sensorInfos.getMagneticFieldZ())
+				.setRotationVectorX(sensorInfos.getRotationVectorX())
+				.setRotationVectorY(sensorInfos.getRotationVectorY())
+				.setRotationVectorZ(sensorInfos.getRotationVectorZ())
 				.setGyroscopeRawX(sensorInfos.getGyroscopeRawX())
 				.setGyroscopeRawY(sensorInfos.getGyroscopeRawY())
 				.setGyroscopeRawZ(sensorInfos.getGyroscopeRawZ())
-				.build();
+				.setGravityX(sensorInfos.getGravityX())
+				.setGravityY(sensorInfos.getGravityY())
+				.setGravityZ(sensorInfos.getGravityZ())
+				.setAccelerometerAxes(sensorInfos.getAccelerometerAxes());
 	}
 
 	/**
 	 * Gets the default sensor info for the given api
 	 *
-	 * @param api the api
+	 * @param api         the api
 	 * @param currentTime the current time
-	 * @param random random object
+	 * @param random      random object
 	 * @return the default sensor info for the given api
 	 */
 	public static SignatureOuterClass.Signature.SensorInfo getDefault(PokemonGo api, long currentTime, Random random) {
@@ -77,180 +79,51 @@ public class SensorInfo {
 		if (api.getSensorInfo() == null) {
 			sensorInfo = new SensorInfo();
 			sensorInfo.getBuilder().setTimestampSnapshot(currentTime - api.getStartTime() + random.nextInt(500))
-					.setAccelRawX(0.1 + (0.7 - 0.1) * random.nextDouble())
-					.setAccelRawY(0.1 + (0.8 - 0.1) * random.nextDouble())
-					.setAccelRawZ(0.1 + (0.8 - 0.1) * random.nextDouble())
+					.setRotationVectorX(0.1 + (0.7 - 0.1) * random.nextDouble())
+					.setRotationVectorY(0.1 + (0.8 - 0.1) * random.nextDouble())
+					.setRotationVectorZ(0.1 + (0.8 - 0.1) * random.nextDouble())
 					.setGyroscopeRawX(-1.0 + random.nextDouble() * 2.0)
 					.setGyroscopeRawY(-1.0 + random.nextDouble() * 2.0)
 					.setGyroscopeRawZ(-1.0 + random.nextDouble() * 2.0)
-					.setAccelNormalizedX(-1.0 + random.nextDouble() * 2.0)
-					.setAccelNormalizedY(6.0 + (9.0 - 6.0) * random.nextDouble())
-					.setAccelNormalizedZ(-1.0 + (8.0 - (-1.0)) * random.nextDouble())
+					.setMagneticFieldX(-1.0 + random.nextDouble() * 2.0)
+					.setMagneticFieldY(6.0 + (9.0 - 6.0) * random.nextDouble())
+					.setMagneticFieldZ(-1.0 + (8.0 - (-1.0)) * random.nextDouble())
 					.setAccelerometerAxes(3);
 			api.setSensorInfo(sensorInfo);
 		} else {
 			sensorInfo = api.getSensorInfo();
 			sensorInfo.getBuilder().setTimestampSnapshot(currentTime - api.getStartTime() + random.nextInt(500))
-					.setMagnetometerX(-0.7 + random.nextDouble() * 1.4)
-					.setMagnetometerY(-0.7 + random.nextDouble() * 1.4)
-					.setMagnetometerZ(-0.7 + random.nextDouble() * 1.4)
-					.setAngleNormalizedX(-55.0 + random.nextDouble() * 110.0)
-					.setAngleNormalizedY(-55.0 + random.nextDouble() * 110.0)
-					.setAngleNormalizedZ(-55.0 + random.nextDouble() * 110.0)
-					.setAccelRawX(0.1 + (0.7 - 0.1) * random.nextDouble())
-					.setAccelRawY(0.1 + (0.8 - 0.1) * random.nextDouble())
-					.setAccelRawZ(0.1 + (0.8 - 0.1) * random.nextDouble())
+					.setLinearAccelerationX(-0.7 + random.nextDouble() * 1.4)
+					.setLinearAccelerationY(-0.7 + random.nextDouble() * 1.4)
+					.setLinearAccelerationZ(-0.7 + random.nextDouble() * 1.4)
+					.setMagneticFieldX(-55.0 + random.nextDouble() * 110.0)
+					.setMagneticFieldY(-55.0 + random.nextDouble() * 110.0)
+					.setMagneticFieldZ(-55.0 + random.nextDouble() * 110.0)
+					.setRotationVectorX(0.1 + (0.7 - 0.1) * random.nextDouble())
+					.setRotationVectorY(0.1 + (0.8 - 0.1) * random.nextDouble())
+					.setRotationVectorZ(0.1 + (0.8 - 0.1) * random.nextDouble())
 					.setGyroscopeRawX(-1.0 + random.nextDouble() * 2.0)
 					.setGyroscopeRawY(-1.0 + random.nextDouble() * 2.0)
 					.setGyroscopeRawZ(-1.0 + random.nextDouble() * 2.0)
-					.setAccelNormalizedX(-1.0 + random.nextDouble() * 2.0)
-					.setAccelNormalizedY(6.0 + (9.0 - 6.0) * random.nextDouble())
-					.setAccelNormalizedZ(-1.0 + (8.0 - (-1.0)) * random.nextDouble())
+					.setGravityX(-1.0 + random.nextDouble() * 2.0)
+					.setGravityY(6.0 + (9.0 - 6.0) * random.nextDouble())
+					.setGravityZ(-1.0 + (8.0 - (-1.0)) * random.nextDouble())
 					.setAccelerometerAxes(3);
 		}
 		if (currentTime - sensorInfo.getTimestampCreate() > (random.nextInt(10 * 1000) + 5 * 1000)) {
 			sensorInfo.setTimestampCreate(currentTime);
-			return sensorInfo.getSensorInfo();
+			return sensorInfo.getBuilder().build();
 		}
 		return null;
 	}
 
 	/**
-	 * Sets timestamp snapshot since start
+	 * Gets the scene info builder
 	 *
-	 * @param timestampSnapshot timestamp in ms since app start
+	 * @return the scene info builder
 	 */
-	public void setTimestampSnapshot(long timestampSnapshot) {
-		sensorInfoBuilder.setTimestampSnapshot(timestampSnapshot);
-	}
-
-	/**
-	 * Sets accelerometer axes
-	 *
-	 * @param accelerometerAxes accelerometer axes (always 3)
-	 */
-	public void setAccelerometerAxes(long accelerometerAxes) {
-		sensorInfoBuilder.setAccelerometerAxes(accelerometerAxes);
-	}
-
-	/**
-	 * Sets accel normalized x
-	 *
-	 * @param accelNormalizedX accel normalized x
-	 */
-	public void setAccelNormalizedX(double accelNormalizedX) {
-		sensorInfoBuilder.setAccelNormalizedX(accelNormalizedX);
-	}
-
-	/**
-	 * Sets accel normalized y
-	 *
-	 * @param accelNormalizedY accel normalized y
-	 */
-	public void setAccelNormalizedY(double accelNormalizedY) {
-		sensorInfoBuilder.setAngleNormalizedY(accelNormalizedY);
-	}
-
-	/**
-	 * Sets accel normalized z
-	 *
-	 * @param accelNormalizedZ accel normalized z
-	 */
-	public void setAccelNormalizedZ(double accelNormalizedZ) {
-		sensorInfoBuilder.setAccelNormalizedZ(accelNormalizedZ);
-	}
-
-	/**
-	 * Sets accel raw x
-	 *
-	 * @param accelRawX accel raw x
-	 */
-	public void setAccelRawX(double accelRawX) {
-		sensorInfoBuilder.setAccelRawX(accelRawX);
-	}
-
-	/**
-	 * Sets accel raw y
-	 *
-	 * @param accelRawY accel raw y
-	 */
-	public void setAccelRawY(double accelRawY) {
-		sensorInfoBuilder.setAccelRawY(accelRawY);
-	}
-
-	/**
-	 * Sets accel raw z
-	 *
-	 * @param accelRawZ accel raw z
-	 */
-	public void setAccelRawZ(double accelRawZ) {
-		sensorInfoBuilder.setAccelRawZ(accelRawZ);
-	}
-
-	/**
-	 * Sets angel normalized x
-	 *
-	 * @param angleNormalizedX angel normalized x
-	 */
-	public void setAngleNormalizedX(double angleNormalizedX) {
-		sensorInfoBuilder.setAngleNormalizedX(angleNormalizedX);
-	}
-
-	/**
-	 * Sets angel normalized y
-	 *
-	 * @param angleNormalizedY angel normalized y
-	 */
-	public void setAngleNormalizedY(double angleNormalizedY) {
-		sensorInfoBuilder.setAngleNormalizedY(angleNormalizedY);
-	}
-
-	/**
-	 * Sets angel normalized z
-	 *
-	 * @param angleNormalizedZ angel normalized z
-	 */
-	public void setAngleNormalizedZ(double angleNormalizedZ) {
-		sensorInfoBuilder.setAngleNormalizedZ(angleNormalizedZ);
-	}
-
-	/**
-	 * Sets gyroscope raw x
-	 *
-	 * @param gyroscopeRawX gyroscope raw x
-	 */
-	public void setGyroscopeRawX(double gyroscopeRawX) {
-		sensorInfoBuilder.setGyroscopeRawX(gyroscopeRawX);
-	}
-
-	/**
-	 * Sets gyroscope raw y
-	 *
-	 * @param gyroscopeRawY gyroscope raw y
-	 */
-	public void setGyroscopeRawY(double gyroscopeRawY) {
-		sensorInfoBuilder.setGyroscopeRawY(gyroscopeRawY);
-	}
-
-	/**
-	 * Sets gyroscope raw z
-	 *
-	 * @param gyroscopeRawZ gyroscope raw z
-	 */
-	public void setGyroscopeRawZ(double gyroscopeRawZ) {
-		sensorInfoBuilder.setGyroscopeRawZ(gyroscopeRawZ);
-	}
-
 	public SignatureOuterClass.Signature.SensorInfo.Builder getBuilder() {
 		return sensorInfoBuilder;
 	}
 
-	/**
-	 * Gets SensorInfo.
-	 *
-	 * @return SensorInfo
-	 */
-	public SignatureOuterClass.Signature.SensorInfo getSensorInfo() {
-		return sensorInfoBuilder.build();
-	}
 }
