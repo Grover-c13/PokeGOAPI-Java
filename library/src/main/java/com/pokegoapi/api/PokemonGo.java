@@ -15,6 +15,13 @@
 
 package com.pokegoapi.api;
 
+import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
@@ -34,21 +41,13 @@ import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.ClientInterceptor;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
+import lombok.Getter;
+import lombok.Setter;
+import okhttp3.OkHttpClient;
 
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
-
-import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-import POGOProtos.Networking.Envelopes.SignatureOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
-import lombok.Getter;
-import lombok.Setter;
-import okhttp3.OkHttpClient;
 
 
 public class PokemonGo {
@@ -91,7 +90,7 @@ public class PokemonGo {
 	@Setter
 	public LocationFixes locationFixes;
 	@Setter
-	private Tutorial.TutorialProvider tutorialProvider;
+	private Tutorial tutorial;
 
 
 	/**
@@ -165,6 +164,9 @@ public class PokemonGo {
 		playerProfile = new PlayerProfile(this);
 		settings = new Settings(this);
 		inventories = new Inventories(this);
+		if (tutorial == null) {
+			tutorial = Tutorial.newBuilder().build();
+		}
 
 		initialize();
 	}
@@ -190,10 +192,6 @@ public class PokemonGo {
 
 		if (isAcceptTOSMissing | isAvatarMissing | isStarterPokemonMissing | isNicknameMissing) {
 			try {
-				final Tutorial tutorial = getTutorialProvider()
-						.setMissing(isAcceptTOSMissing, isAvatarMissing, isStarterPokemonMissing, isNicknameMissing)
-						.getTutorial();
-
 				if (isAcceptTOSMissing && tutorial.isAcceptTOS()) {
 					playerProfile.activateAccount();
 				} else if (isAcceptTOSMissing) {
@@ -216,9 +214,9 @@ public class PokemonGo {
 					while (!nicknameClaimed) {
 						try {
 							if (lastException == null) {
-								nickname = tutorial.getNicknameDialog().getNickname();
+								nickname = tutorial.getNickname();
 							} else {
-								nickname = tutorial.getNicknameDialog().getFallback(nickname, lastException);
+								nickname = tutorial.getNicknameFallback(nickname, lastException);
 							}
 
 							nicknameClaimed = playerProfile.claimCodeName(nickname);
@@ -395,22 +393,5 @@ public class PokemonGo {
 			return ActivityStatus.getDefault(this, random);
 		}
 		return activityStatus.getActivityStatus();
-	}
-
-	/**
-	 * Gets the tutorial handler
-	 *
-	 * @return the tutorial handler
-	 */
-	private Tutorial.TutorialProvider getTutorialProvider() {
-		if (tutorialProvider == null) {
-			tutorialProvider = new Tutorial.TutorialProvider() {
-				@Override
-				public Tutorial getTutorial() {
-					return Tutorial.newBuilder().build();
-				}
-			};
-		}
-		return tutorialProvider;
 	}
 }

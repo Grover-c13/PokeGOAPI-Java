@@ -33,30 +33,78 @@ package com.pokegoapi.api.player;
 import POGOProtos.Data.Player.PlayerAvatarOuterClass;
 import POGOProtos.Enums.GenderOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass;
+import POGOProtos.Networking.Responses.ClaimCodenameResponseOuterClass.ClaimCodenameResponse.Status;
 
 import java.security.SecureRandom;
 import java.util.Random;
 
 public class Tutorial {
-	private final boolean acceptTOS;
-	private final PlayerAvatarOuterClass.PlayerAvatar playerAvatar;
-	private final PokemonIdOuterClass.PokemonId starterPokemon;
-	private final NicknameDialog nicknameDialog;
+	private final AcceptTosInterface acceptTOS;
+	private final PlayerAvatarInterface playerAvatar;
+	private final StarterPokemonInterface starterPokemon;
+	private final NicknameInterface nickname;
+	private final NicknameFallbackInterface nicknameFallback;
 
 	/**
 	 * Creates a {@link Tutorial}. Null values will be replaced by default values.
 	 *
-	 * @param acceptTOS      accept TOS?
-	 * @param playerAvatar   the player avatar
-	 * @param starterPokemon the starter pokemon
-	 * @param nicknameDialog the nickname dialog
+	 * @param acceptTOS        the accept TOS implementation
+	 * @param playerAvatar     the player avatar implementation
+	 * @param starterPokemon   the starter pokemon implementation
+	 * @param nickname         the nickname implementation
+	 * @param nicknameFallback the fallback nickname implementation
 	 */
-	public Tutorial(Boolean acceptTOS, PlayerAvatarOuterClass.PlayerAvatar playerAvatar,
-					PokemonIdOuterClass.PokemonId starterPokemon, NicknameDialog nicknameDialog) {
-		this.acceptTOS = acceptTOS != null ? acceptTOS : true;
-		this.playerAvatar = playerAvatar != null ? playerAvatar : getRandomPlayerAvatar().build();
-		this.starterPokemon = starterPokemon != null ? starterPokemon : getRandomStarterPokemon();
-		this.nicknameDialog = nicknameDialog != null ? nicknameDialog : getRandomNickname();
+	private Tutorial(AcceptTosInterface acceptTOS, PlayerAvatarInterface playerAvatar,
+					 StarterPokemonInterface starterPokemon, final NicknameInterface nickname, NicknameFallbackInterface nicknameFallback) {
+		this.acceptTOS = acceptTOS != null
+				? acceptTOS
+				:
+				new AcceptTosInterface() {
+					@Override
+					public boolean acceptTOS() throws CanceledException {
+						return true;
+					}
+				};
+
+		this.playerAvatar = playerAvatar != null
+				? playerAvatar
+				:
+				new PlayerAvatarInterface() {
+					@Override
+					public PlayerAvatarOuterClass.PlayerAvatar setPlayerAvatar() throws CanceledException {
+						return getRandomPlayerAvatar().build();
+					}
+				};
+
+		this.starterPokemon = starterPokemon != null
+				? starterPokemon
+				:
+				new StarterPokemonInterface() {
+					@Override
+					public PokemonIdOuterClass.PokemonId setStarterPokemon() throws CanceledException {
+						return getRandomStarterPokemon();
+					}
+				};
+
+		this.nickname = nickname != null
+				? nickname
+				:
+				new NicknameInterface() {
+					@Override
+					public String setNickname() throws CanceledException {
+						return getRandomNickname();
+					}
+				};
+
+		this.nicknameFallback = nicknameFallback != null
+				? nicknameFallback
+				:
+				new NicknameFallbackInterface() {
+					@Override
+					public String setNicknameFallback(String nicknameStr, NicknameException cause) throws CanceledException {
+						return Tutorial.this.nickname.setNickname();
+					}
+				};
 	}
 
 	/**
@@ -64,27 +112,15 @@ public class Tutorial {
 	 *
 	 * @return a random nickname dialog
 	 */
-	public static NicknameDialog getRandomNickname() {
-		NicknameDialog randomNicknameDialog = new NicknameDialog() {
-			@Override
-			public String getNickname() {
-				final String a = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-				final SecureRandom r = new SecureRandom();
-				final int l = new Random().nextInt(15 - 10) + 10;
-				StringBuilder sb = new StringBuilder(l);
-				for (int i = 0; i < l; i++) {
-					sb.append(a.charAt(r.nextInt(a.length())));
-				}
-				return sb.toString();
-			}
-
-			@Override
-			public String getFallback(String alreadyUsedNickname, NicknameException lastException) {
-				return getNickname();
-			}
-		};
-
-		return randomNicknameDialog;
+	public static String getRandomNickname() {
+		final String a = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+		final SecureRandom r = new SecureRandom();
+		final int l = new Random().nextInt(15 - 10) + 10;
+		StringBuilder sb = new StringBuilder(l);
+		for (int i = 0; i < l; i++) {
+			sb.append(a.charAt(r.nextInt(a.length())));
+		}
+		return sb.toString();
 	}
 
 	/**
@@ -117,16 +153,16 @@ public class Tutorial {
 			playerAvatarBuilder.setGender(GenderOuterClass.Gender.FEMALE);
 		}
 
-		playerAvatarBuilder.setSkin(random.nextInt(PlayerAvatar.getAvailableSkins()))
-				.setHair(random.nextInt(PlayerAvatar.getAvailableHair()))
-				.setEyes(random.nextInt(PlayerAvatar.getAvailableEyes()))
-				.setHat(random.nextInt(PlayerAvatar.getAvailableHats()))
-				.setShirt(random.nextInt(PlayerAvatar.getAvailableShirts(
+		playerAvatarBuilder.setSkin(random.nextInt(com.pokegoapi.api.player.PlayerAvatar.getAvailableSkins()))
+				.setHair(random.nextInt(com.pokegoapi.api.player.PlayerAvatar.getAvailableHair()))
+				.setEyes(random.nextInt(com.pokegoapi.api.player.PlayerAvatar.getAvailableEyes()))
+				.setHat(random.nextInt(com.pokegoapi.api.player.PlayerAvatar.getAvailableHats()))
+				.setShirt(random.nextInt(com.pokegoapi.api.player.PlayerAvatar.getAvailableShirts(
 						female ? GenderOuterClass.Gender.FEMALE : GenderOuterClass.Gender.MALE)))
-				.setPants(random.nextInt(PlayerAvatar.getAvailablePants(
+				.setPants(random.nextInt(com.pokegoapi.api.player.PlayerAvatar.getAvailablePants(
 						female ? GenderOuterClass.Gender.FEMALE : GenderOuterClass.Gender.MALE)))
-				.setShoes(random.nextInt(PlayerAvatar.getAvailableShoes()))
-				.setBackpack(random.nextInt(PlayerAvatar.getAvailableShoes()));
+				.setShoes(random.nextInt(com.pokegoapi.api.player.PlayerAvatar.getAvailableShoes()))
+				.setBackpack(random.nextInt(com.pokegoapi.api.player.PlayerAvatar.getAvailableShoes()));
 
 		return playerAvatarBuilder;
 	}
@@ -136,8 +172,8 @@ public class Tutorial {
 	 *
 	 * @return True if accepting, else False
 	 */
-	public boolean isAcceptTOS() {
-		return acceptTOS;
+	public boolean isAcceptTOS() throws CanceledException {
+		return acceptTOS.acceptTOS();
 	}
 
 	/**
@@ -145,8 +181,8 @@ public class Tutorial {
 	 *
 	 * @return the player avatar
 	 */
-	public PlayerAvatarOuterClass.PlayerAvatar getPlayerAvatar() {
-		return playerAvatar;
+	public PlayerAvatarOuterClass.PlayerAvatar getPlayerAvatar() throws CanceledException {
+		return playerAvatar.setPlayerAvatar();
 	}
 
 	/**
@@ -154,45 +190,55 @@ public class Tutorial {
 	 *
 	 * @return the starter pokemon
 	 */
-	public PokemonIdOuterClass.PokemonId getStarterPokemon() {
-		return starterPokemon;
+	public PokemonIdOuterClass.PokemonId getStarterPokemon() throws CanceledException {
+		return starterPokemon.setStarterPokemon();
 	}
 
 	/**
-	 * Gets the nickname dialog
+	 * Gets the nickname
 	 *
-	 * @return the nickname dialog
+	 * @return the nickname
 	 */
-	public NicknameDialog getNicknameDialog() {
-		return nicknameDialog;
+	public String getNickname() throws CanceledException {
+		return nickname.setNickname();
 	}
 
+	/**
+	 * Gets the fallback nickname
+	 *
+	 * @return the fallback nickname
+	 */
+	public String getNicknameFallback(String nickname, NicknameException cause) throws CanceledException {
+		return nicknameFallback.setNicknameFallback(nickname, cause);
+	}
+
+	/**
+	 * Gets a new tutorial builder
+	 *
+	 * @return the tutorial builder
+	 */
 	static public TutorialBuilder newBuilder() {
 		return new TutorialBuilder();
 	}
 
-	/**
-	 * Interface for nickname dialog
-	 */
-	public interface NicknameDialog {
-		/**
-		 * Gets the chosen nickname
-		 *
-		 * @return a nickname
-		 * @throws CanceledException if the nickname dialog gets canceled
-		 */
-		String getNickname() throws CanceledException;
+	public interface AcceptTosInterface {
+		boolean acceptTOS() throws CanceledException;
+	}
 
-		/**
-		 * Gets a different nickname in case that the previous nickname was invalid or already in use
-		 *
-		 * @param nickname the nickname, that was invalid or already in use
-		 * @param cause    the causing exception. Can be either instanceof Tutorial.NicknameInvalidException
-		 *                 or instanceof Tutorial.NicknameNotAvailableException
-		 * @return a nickname
-		 * @throws CanceledException if the nickname dialog gets canceled
-		 */
-		String getFallback(String nickname, NicknameException cause) throws CanceledException;
+	public interface PlayerAvatarInterface {
+		PlayerAvatarOuterClass.PlayerAvatar setPlayerAvatar() throws CanceledException;
+	}
+
+	public interface NicknameInterface {
+		String setNickname() throws CanceledException;
+	}
+
+	public interface NicknameFallbackInterface {
+		String setNicknameFallback(String nickname, NicknameException cause) throws CanceledException;
+	}
+
+	public interface StarterPokemonInterface {
+		PokemonIdOuterClass.PokemonId setStarterPokemon() throws CanceledException;
 	}
 
 	/**
@@ -200,10 +246,11 @@ public class Tutorial {
 	 * Call {@link #build()} to build.
 	 */
 	public static class TutorialBuilder {
-		private Boolean acceptTOS;
-		private PlayerAvatarOuterClass.PlayerAvatar playerAvatar;
-		private PokemonIdOuterClass.PokemonId starterPokemon;
-		private NicknameDialog nicknameDialog;
+		private AcceptTosInterface acceptTOS;
+		private PlayerAvatarInterface playerAvatar;
+		private StarterPokemonInterface starterPokemon;
+		private NicknameInterface nickname;
+		private NicknameFallbackInterface nicknameFallback;
 
 		/**
 		 * Creates an instance of {@link TutorialBuilder}.
@@ -212,50 +259,57 @@ public class Tutorial {
 		}
 
 		/**
-		 * Sets whether or not the user accepts the TOS of Niantic.
-		 * Default: True.
+		 * Sets an implementation of {@link AcceptTosInterface}
 		 *
-		 * @param acceptTOS True if accepting, else False.
+		 * @param acceptTOS the implementation
 		 * @return the tutorial builder
 		 */
-		public TutorialBuilder setAcceptTOS(boolean acceptTOS) {
+		public TutorialBuilder setAcceptTOS(AcceptTosInterface acceptTOS) {
 			this.acceptTOS = acceptTOS;
 			return this;
 		}
 
 		/**
-		 * Sets the player avatar.
-		 * Default: a random avatar.
+		 * Sets an implementation of {@link PlayerAvatarInterface}
 		 *
-		 * @param playerAvatar the player avatar
+		 * @param playerAvatar the implementation
 		 * @return the tutorial builder
 		 */
-		public TutorialBuilder setPlayerAvatar(PlayerAvatarOuterClass.PlayerAvatar playerAvatar) {
+		public TutorialBuilder setPlayerAvatar(PlayerAvatarInterface playerAvatar) {
 			this.playerAvatar = playerAvatar;
 			return this;
 		}
 
 		/**
-		 * Sets the starter pokemon.
-		 * Default: a random starter pokemon.
+		 * Sets an implementation of {@link StarterPokemonInterface}
 		 *
-		 * @param starterPokemon the starter pokemon, must be either Pikachu, Squirtle, Charmander or Bulbasaur.
+		 * @param starterPokemon the implementation
 		 * @return the tutorial builder
 		 */
-		public TutorialBuilder setStarterPokemon(PokemonIdOuterClass.PokemonId starterPokemon) {
+		public TutorialBuilder setStarterPokemon(StarterPokemonInterface starterPokemon) {
 			this.starterPokemon = starterPokemon;
 			return this;
 		}
 
 		/**
-		 * Sets the player's nicknameDialog.
-		 * Default: a random nicknameDialog (e.g. kKU8G46FfawQ36).
+		 * Sets an implementation of {@link NicknameInterface}
 		 *
-		 * @param nicknameDialog the nicknameDialog
+		 * @param nickname the implementation
 		 * @return the tutorial builder
 		 */
-		public TutorialBuilder setNicknameDialog(NicknameDialog nicknameDialog) {
-			this.nicknameDialog = nicknameDialog;
+		public TutorialBuilder setNickname(NicknameInterface nickname) {
+			this.nickname = nickname;
+			return this;
+		}
+
+		/**
+		 * Sets an implementation of {@link NicknameFallbackInterface}
+		 *
+		 * @param nicknameFallback the implementation
+		 * @return the tutorial builder
+		 */
+		public TutorialBuilder setNicknameFallback(NicknameFallbackInterface nicknameFallback) {
+			this.nicknameFallback = nicknameFallback;
 			return this;
 		}
 
@@ -266,86 +320,9 @@ public class Tutorial {
 		 * @return the tutorial
 		 */
 		public Tutorial build() {
-			return new Tutorial(acceptTOS, playerAvatar, starterPokemon, nicknameDialog);
-		}
-	}
-
-	/**
-	 * Provides a tutorial
-	 */
-	public abstract static class TutorialProvider {
-		private boolean isAcceptTOSMissing;
-		private boolean isAvatarMissing;
-		private boolean isStarterPokemonMissing;
-		private boolean isNicknameMissing;
-
-		/**
-		 * Creates a tutorial provider
-		 */
-		public TutorialProvider() {
+			return new Tutorial(acceptTOS, playerAvatar, starterPokemon, nickname, nicknameFallback);
 		}
 
-		/**
-		 * Gets whether or not the TOS have been accepted before
-		 *
-		 * @return True if TOS have not been accepted before, else False
-		 */
-		public boolean isAcceptTOSMissing() {
-			return isAcceptTOSMissing;
-		}
-
-		/**
-		 * Gets whether or not the player avatar has been set before
-		 *
-		 * @return True if player avatar is missing, else False
-		 */
-		public boolean isAvatarMissing() {
-			return isAvatarMissing;
-		}
-
-		/**
-		 * Gets whether or not the starter pokemon has been set before
-		 *
-		 * @return True if starter pokemon is missing, else False
-		 */
-		public boolean isStarterPokemonMissing() {
-			return isStarterPokemonMissing;
-		}
-
-		/**
-		 * Gets whether or not the nickname has been set before
-		 *
-		 * @return True if nickname is missing, else False
-		 */
-		public boolean isNicknameMissing() {
-			return isNicknameMissing;
-		}
-
-		/**
-		 * Gets a tutorial that handles the missing options
-		 *
-		 * @return a tutorial
-		 * @throws CanceledException if the tutorial gets canceled
-		 */
-		public abstract Tutorial getTutorial() throws CanceledException;
-
-		/**
-		 * Sets missing options
-		 *
-		 * @param isAcceptTOSMissing      True if TOS have not been accepted before, else False
-		 * @param isAvatarMissing         True if player avatar is missing, else False
-		 * @param isStarterPokemonMissing True if starter pokemon is missing, else False
-		 * @param isNicknameMissing       True if nickname is missing, else False
-		 * @return the tutorial provider
-		 */
-		public TutorialProvider setMissing(boolean isAcceptTOSMissing, boolean isAvatarMissing,
-										boolean isStarterPokemonMissing, boolean isNicknameMissing) {
-			this.isAcceptTOSMissing = isAcceptTOSMissing;
-			this.isAvatarMissing = isAvatarMissing;
-			this.isStarterPokemonMissing = isStarterPokemonMissing;
-			this.isNicknameMissing = isNicknameMissing;
-			return this;
-		}
 	}
 
 	public static class CanceledException extends Exception {
@@ -367,29 +344,23 @@ public class Tutorial {
 	}
 
 	public static class NicknameException extends Exception {
-		public NicknameException() {
-			super();
+		private final Status status;
+
+		public NicknameException(Status status) {
+			this.status = status;
 		}
 
-		public NicknameException(String message) {
-			super(message);
+		public Status getStatus() {
+			return status;
 		}
 
-		public NicknameException(String message, Throwable cause) {
-			super(message, cause);
+		public boolean isNicknameInvalid() {
+			return status == Status.CODENAME_NOT_VALID;
 		}
 
-		public NicknameException(Throwable cause) {
-			super(cause);
+		public boolean isNicknameNotAvailable() {
+			return status == Status.CODENAME_NOT_AVAILABLE;
 		}
-	}
-
-	public static class NicknameInvalidException extends NicknameException {
-
-	}
-
-	public static class NicknameNotAvailableException extends NicknameException {
-
 	}
 }
 

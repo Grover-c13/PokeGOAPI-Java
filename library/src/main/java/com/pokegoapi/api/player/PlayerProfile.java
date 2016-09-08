@@ -410,8 +410,8 @@ public class PlayerProfile {
 			throws LoginFailedException, RemoteServerException,
 			Tutorial.NicknameException {
 
-		if (!isNicknameValid(codename)) {
-			throw new Tutorial.NicknameInvalidException();
+		if (!isCodenameValid(codename)) {
+			throw new Tutorial.NicknameException(ClaimCodenameResponse.Status.CODENAME_NOT_VALID);
 		}
 
 		ClaimCodenameMessage claimCodenameMessage = ClaimCodenameMessage.newBuilder()
@@ -432,11 +432,8 @@ public class PlayerProfile {
 			ClaimCodenameResponse claimCodenameResponse = ClaimCodenameResponse.parseFrom(requests[0].getData());
 
 			ClaimCodenameResponse.Status status = claimCodenameResponse.getStatus();
-			if (status == ClaimCodenameResponse.Status.CODENAME_NOT_VALID) {
-				throw new Tutorial.NicknameInvalidException();
-			}
 			if (status != ClaimCodenameResponse.Status.SUCCESS) {
-				throw new Tutorial.NicknameNotAvailableException();
+				throw new Tutorial.NicknameException(status);
 			}
 
 			updatedCodename = claimCodenameResponse.getCodename();
@@ -511,7 +508,7 @@ public class PlayerProfile {
 	 * @param nickname NicknameDialog to verify
 	 * @return True if nickname valid, else False.
 	 */
-	private static boolean isNicknameValid(String nickname) {
+	private static boolean isCodenameValid(String nickname) {
 		return nickname != null
 				&& (3 <= nickname.length()) && (nickname.length() <= 15)
 				&& nickname.matches("^[0-9a-zA-Z]+$");
