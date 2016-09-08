@@ -116,7 +116,6 @@ class Signature {
 			sigBuilder.addRequestHash(getRequestHash(authTicketBA, request));
 		}
 
-		// TODO: Call encrypt function on this
 		byte[] uk2 = sigBuilder.build().toByteArray();
 		byte[] iv = new byte[32];
 		new Random().nextBytes(iv);
@@ -125,7 +124,6 @@ class Signature {
 				.RequestEnvelope
 				.PlatformRequest.newBuilder()
 				.setType(PlatformRequestTypeOuterClass.PlatformRequestType.SEND_ENCRYPTED_SIGNATURE)
-				// TODO: Check this code
 				.setRequestMessage(SendEncryptedSignatureRequestOuterClass.SendEncryptedSignatureRequest.newBuilder()
 						.setEncryptedSignature(ByteString.copyFrom(encrypted)).build().toByteString())
 				.build();

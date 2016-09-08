@@ -359,7 +359,8 @@ public final class Networking {
 							}
 						});
 					} else {
-						return Observable.empty();
+						return Observable.error(new RemoteServerException("Invalid response for request " +
+								requestType + " received: " + responseEnvelope.getStatusCode().name()));
 					}
 					return Observable.just(responseMessage);
 				} catch (IllegalAccessException | InvalidProtocolBufferException | NoSuchMethodException

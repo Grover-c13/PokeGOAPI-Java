@@ -71,7 +71,7 @@ public class CatchablePokemon implements MapPoint {
 	@Getter
 	private final double longitude;
 	private final EncounterKind encounterKind;
-	private Boolean encountered = null;
+	private boolean encountered = false;
 
 	/**
 	 * Instantiates a new Catchable pokemon. Constructor is only for internal use
@@ -166,7 +166,8 @@ public class CatchablePokemon implements MapPoint {
 	 */
 	private Observable<EncounterResult> encounterNormalPokemon() {
 		return networking.queueRequest(RequestType.ENCOUNTER, EncounterMessage
-				.newBuilder().setEncounterId(getEncounterId())
+				.newBuilder()
+				.setEncounterId(getEncounterId())
 				.setPlayerLatitude(location.getLatitude())
 				.setPlayerLongitude(location.getLongitude())
 				.setSpawnPointId(getSpawnPointId()).build(), EncounterResponse.class)
@@ -210,34 +211,34 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws NoSuchItemException   the no such item exception
 	 */
 	public Observable<CatchResult> catchPokemon(CatchOptions options) {
-		if (options != null) {
-			if (options.getUseRazzBerry() != 0) {
-				final CatchOptions catchOptions = options;
-				final Pokeball pokeball = catchOptions.getItemBall();
-				return useItemAsync(ItemId.ITEM_RAZZ_BERRY)
-						.flatMap(
-								new Func1<CatchItemResult, Observable<CatchResult>>() {
-									@Override
-									public Observable<CatchResult> call(CatchItemResult result) {
-										if (!result.getSuccess()) {
-											return Observable.just(new CatchResult());
-										}
-										return catchPokemon(catchOptions.getNormalizedHitPosition(),
-												catchOptions.getNormalizedReticleSize(),
-												catchOptions.getSpinModifier(),
-												pokeball,
-												catchOptions.isHitPokemon());
-									}
-								});
-			}
-		} else {
-			options = new CatchOptions(inventories);
+		if (!encountered) {
+			throw new IllegalArgumentException("Pokemon not yet encountered");
 		}
-		return catchPokemon(options.getNormalizedHitPosition(),
-				options.getNormalizedReticleSize(),
-				options.getSpinModifier(),
-				options.getItemBall(),
-				options.isHitPokemon());
+		final CatchOptions internalOptions;
+		if (options == null) {
+			internalOptions = new CatchOptions(inventories);
+		}
+		else {
+			internalOptions = options;
+		}
+		final Observable<CatchResult> catchResultObservable = catchPokemon(internalOptions.getNormalizedHitPosition(),
+				internalOptions.getNormalizedReticleSize(),
+				internalOptions.getSpinModifier(),
+				internalOptions.getItemBall(),
+				internalOptions.isHitPokemon());
+		if (internalOptions.getUseRazzBerry() != 0 && inventories.getItemBag().getItem(ItemId.ITEM_RAZZ_BERRY).getCount()
+				> 0) {
+			return useItemAsync(ItemId.ITEM_RAZZ_BERRY).flatMap(new Func1<CatchItemResult, Observable<CatchResult>>() {
+				@Override
+				public Observable<CatchResult> call(CatchItemResult result) {
+					if (!result.getSuccess()) {
+						return Observable.just(new CatchResult());
+					}
+					return catchResultObservable;
+				}
+			});
+		}
+		return catchResultObservable;
 	}
 
 	/**
@@ -371,9 +372,6 @@ public class CatchablePokemon implements MapPoint {
 	 * @return Checks if encounter has happened
 	 */
 	public boolean isEncountered() {
-		if (encountered == null) {
-			return false;
-		}
 		return encountered;
 	}
 
