@@ -145,7 +145,7 @@ public class TutorialCompletionExample {
 				})
 
 				/*	If the chosen nickname was invalid or already in use, ask the user to choose a different one
-					By default, the fallback will just call what is set by setNickname */
+					By default, the fallback will be generated randomly (e.g. kKU8G46FfawQ36). */
 				.setNicknameFallback(new Tutorial.NicknameFallbackInterface() {
 					@Override
 					public String setNicknameFallback(String nickname, Tutorial.NicknameException cause)

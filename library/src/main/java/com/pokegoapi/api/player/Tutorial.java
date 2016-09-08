@@ -106,7 +106,7 @@ public class Tutorial {
 				new NicknameFallbackInterface() {
 					@Override
 					public String setNicknameFallback(String nicknameStr, NicknameException cause) throws CanceledException {
-						return Tutorial.this.nickname.setNickname();
+						return getRandomNickname();
 					}
 				};
 	}
