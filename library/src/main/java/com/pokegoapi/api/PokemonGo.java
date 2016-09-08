@@ -366,7 +366,7 @@ public class PokemonGo {
 	 * @throws IllegalStateException if location has not been set
 	 */
 	public Map getMap() {
-		if (this.latitude == Double.NaN) {
+		if (this.latitude == Double.NaN || this.longitude == Double.NaN) {
 			throw new IllegalStateException("Attempt to get map without setting location first");
 		}
 		return map;
