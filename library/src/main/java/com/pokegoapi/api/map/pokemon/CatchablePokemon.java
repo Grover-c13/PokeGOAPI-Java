@@ -19,6 +19,7 @@ package com.pokegoapi.api.map.pokemon;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.map.pokemon.encounter.DiskEncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
@@ -252,13 +253,7 @@ public class CatchablePokemon implements MapPoint {
 	 */
 	public CatchResult catchPokemon(CatchOptions options) throws LoginFailedException,
 			RemoteServerException, NoSuchItemException {
-		if (options != null) {
-			if (options.getRazzberries() == 1) {
-				useItem(ItemId.ITEM_RAZZ_BERRY);
-				options.useRazzberries(false);
-				options.maxRazzberries(-1);
-			}
-		} else {
+		if (options == null) {
 			options = new CatchOptions(api);
 		}
 
@@ -289,13 +284,7 @@ public class CatchablePokemon implements MapPoint {
 		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
 		double probability = encounter.getCaptureProbability().getCaptureProbability(0);
 
-		if (options != null) {
-			if (options.getRazzberries() == 1) {
-				useItem(ItemId.ITEM_RAZZ_BERRY);
-				options.useRazzberries(false);
-				options.maxRazzberries(-1);
-			}
-		} else {
+		if (options == null) {
 			options = new CatchOptions(api);
 		}
 
@@ -445,14 +434,37 @@ public class CatchablePokemon implements MapPoint {
 									double normalizedReticleSize, double spinModifier, Pokeball type,
 									int amount, int razberriesLimit)
 			throws LoginFailedException, RemoteServerException {
+
+		api.getInventories().updateInventories();
+		
+		Item razberriesInventory = api.getInventories().getItemBag().getItem(ItemId.ITEM_RAZZ_BERRY);
 		int razberries = 0;
 		int numThrows = 0;
+		Log.d("catchPokemon",
+				String.format("attempt to catch pokemon%s.",
+						razberriesLimit > 0
+								? String.format(" using max %d razzberrys. %d in inventory",
+								razberriesLimit, razberriesInventory.getCount())
+								: razberriesLimit == -1
+								? String.format(" using all %d razzberrys in inventory",
+								razberriesInventory.getCount())
+								: " using no razzberries"
+				));
+
 		CatchResult result;
 		do {
 
-			if (razberries < razberriesLimit || razberriesLimit == -1) {
-				useItem(ItemId.ITEM_RAZZ_BERRY);
-				razberries++;
+			if (razberriesInventory.getCount() > 0 && (razberries < razberriesLimit || razberriesLimit == -1)) {
+				if (useItem(ItemId.ITEM_RAZZ_BERRY).getSuccess()) {
+					razberriesInventory.setCount(razberriesInventory.getCount() - 1);
+					razberries++;
+
+					Log.d("catchPokemon",
+							String.format("razzberries used: %d / left: %d",
+									razberries,
+									razberriesInventory.getCount())
+					);
+				}
 			}
 			result = AsyncHelper.toBlocking(catchPokemonAsync(normalizedHitPosition,
 					normalizedReticleSize, spinModifier, type));
