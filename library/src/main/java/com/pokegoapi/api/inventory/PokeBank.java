@@ -73,7 +73,9 @@ public class PokeBank {
 				currentItems.add(pokemon.getId());
 			}
 		}
-		pokemons.keySet().retainAll(currentItems);
+		if (!currentItems.isEmpty()) {
+			pokemons.keySet().retainAll(currentItems);
+		}
 	}
 
 	/**

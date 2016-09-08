@@ -33,10 +33,8 @@ import rx.Observable;
 import rx.functions.Func1;
 
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 
 /**
@@ -44,7 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ItemBag {
 	private final Networking networking;
-	private final Map<ItemId, Item> items = new ConcurrentHashMap<>();
+	private final ConcurrentMap<ItemId, Item> items = new ConcurrentHashMap<>();
 
 	/**
 	 * Constructor for internal use
@@ -58,7 +56,6 @@ public class ItemBag {
 	}
 
 	final void update(GetInventoryResponse getInventoryResponse) {
-		List<ItemId> currentItems = new LinkedList<>();
 		for (InventoryItem inventoryItem
 				: getInventoryResponse.getInventoryDelta().getInventoryItemsList()) {
 			InventoryItemData itemData = inventoryItem.getInventoryItemData();
@@ -67,18 +64,12 @@ public class ItemBag {
 					&& itemData.getItem().getItemId() != ItemId.ITEM_UNKNOWN) {
 				ItemData item = itemData.getItem();
 				items.put(item.getItemId(), new Item(item));
-				currentItems.add(item.getItemId());
 			}
 		}
-		// Fill all non-received item its with 0
 		for (ItemId itemId : ItemId.values()) {
-			if (currentItems.contains(itemId)) {
-				continue;
+			if (itemId != ItemId.UNRECOGNIZED && itemId != ItemId.ITEM_UNKNOWN) {
+				items.putIfAbsent(itemId, new Item(ItemData.newBuilder().setCount(0).setItemId(itemId).build()));
 			}
-			if (itemId == ItemId.UNRECOGNIZED) {
-				continue;
-			}
-			items.put(itemId, new Item(ItemData.newBuilder().setCount(0).setItemId(itemId).build()));
 		}
 	}
 

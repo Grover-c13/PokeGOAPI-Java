@@ -49,6 +49,9 @@ public class CandyJar {
 				currentItems.add(itemData.getCandy().getFamilyId());
 			}
 		}
+		if (currentItems.isEmpty()) {
+			return;
+		}
 		for (PokemonFamilyId pokemonFamilyId : PokemonFamilyId.values()) {
 			if (currentItems.contains(pokemonFamilyId)) {
 				continue;

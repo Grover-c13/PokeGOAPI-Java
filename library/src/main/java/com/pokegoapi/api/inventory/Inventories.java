@@ -81,7 +81,7 @@ public class Inventories {
 		itemBag.update(getInventoryResponse);
 		pokebank.update(getInventoryResponse);
 		candyjar.update(getInventoryResponse);
-		pokebank.update(getInventoryResponse);
+		pokedex.update(getInventoryResponse);
 		hatchery.update(getInventoryResponse);
 		stats.update(getInventoryResponse);
 	}

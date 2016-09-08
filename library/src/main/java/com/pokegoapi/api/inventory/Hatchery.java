@@ -60,7 +60,9 @@ public class Hatchery {
 				currentItems.add(itemData.getPokemonData().getId());
 			}
 		}
-		eggMap.keySet().retainAll(currentItems);
+		if (!currentItems.isEmpty()) {
+			eggMap.keySet().retainAll(currentItems);
+		}
 	}
 
 	final void update(GetHatchedEggsResponse response) {
