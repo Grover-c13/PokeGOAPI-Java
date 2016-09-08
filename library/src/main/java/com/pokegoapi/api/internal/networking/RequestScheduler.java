@@ -121,7 +121,9 @@ class RequestScheduler {
 							authTicket = responseEnvelop.getAuthTicket();
 						}
 						request.getSubscriber().onNext(responseEnvelop);
-						request.getSubscriber().onCompleted();
+						if (!request.getSubscriber().isUnsubscribed()) {
+							request.getSubscriber().onCompleted();
+						}
 					} catch (IOException e) {
 						request.getSubscriber().onError(new RemoteServerException(e));
 					}
