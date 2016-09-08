@@ -76,7 +76,7 @@ public class CatchPokemonAtAreaExample {
 				if (encResult.wasSuccessful()) {
 					System.out.println("Encounted:" + cp.getPokemonId());
 					CatchOptions options = new CatchOptions(go);
-					options.useRazzberries(true);
+					options.useRazzberry(true);
 					CatchResult result = cp.catchPokemon(options);
 					System.out.println("Attempt to catch:" + cp.getPokemonId() + " " + result.getStatus());
 				}
