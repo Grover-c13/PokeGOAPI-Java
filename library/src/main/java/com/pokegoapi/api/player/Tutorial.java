@@ -54,8 +54,12 @@ public class Tutorial {
 	 * @param nickname         the nickname implementation
 	 * @param nicknameFallback the fallback nickname implementation
 	 */
-	private Tutorial(AcceptTosInterface acceptTOS, PlayerAvatarInterface playerAvatar,
-					 StarterPokemonInterface starterPokemon, final NicknameInterface nickname, NicknameFallbackInterface nicknameFallback) {
+	private Tutorial(
+			AcceptTosInterface acceptTOS,
+			PlayerAvatarInterface playerAvatar,
+			StarterPokemonInterface starterPokemon,
+			NicknameInterface nickname,
+			NicknameFallbackInterface nicknameFallback) {
 		this.acceptTOS = acceptTOS != null
 				? acceptTOS
 				:
@@ -171,6 +175,7 @@ public class Tutorial {
 	 * Gets whether or not the user accepts the TOS of Niantic.
 	 *
 	 * @return True if accepting, else False
+	 * @throws CanceledException when canceled
 	 */
 	public boolean isAcceptTOS() throws CanceledException {
 		return acceptTOS.acceptTOS();
@@ -180,6 +185,7 @@ public class Tutorial {
 	 * Gets the player avatar
 	 *
 	 * @return the player avatar
+	 * @throws CanceledException when canceled
 	 */
 	public PlayerAvatarOuterClass.PlayerAvatar getPlayerAvatar() throws CanceledException {
 		return playerAvatar.setPlayerAvatar();
@@ -189,6 +195,7 @@ public class Tutorial {
 	 * Gets the starter pokemon
 	 *
 	 * @return the starter pokemon
+	 * @throws CanceledException when canceled
 	 */
 	public PokemonIdOuterClass.PokemonId getStarterPokemon() throws CanceledException {
 		return starterPokemon.setStarterPokemon();
@@ -198,6 +205,7 @@ public class Tutorial {
 	 * Gets the nickname
 	 *
 	 * @return the nickname
+	 * @throws CanceledException when canceled
 	 */
 	public String getNickname() throws CanceledException {
 		return nickname.setNickname();
@@ -206,7 +214,10 @@ public class Tutorial {
 	/**
 	 * Gets the fallback nickname
 	 *
+	 * @param nickname the nickname that caused the exception
+	 * @param cause    the exception caused by the nickname
 	 * @return the fallback nickname
+	 * @throws CanceledException when canceled
 	 */
 	public String getNicknameFallback(String nickname, NicknameException cause) throws CanceledException {
 		return nicknameFallback.setNicknameFallback(nickname, cause);
@@ -217,7 +228,7 @@ public class Tutorial {
 	 *
 	 * @return the tutorial builder
 	 */
-	static public TutorialBuilder newBuilder() {
+	public static TutorialBuilder newBuilder() {
 		return new TutorialBuilder();
 	}
 
