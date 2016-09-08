@@ -332,7 +332,11 @@ public class Map {
 	 */
 	public Observable<MapObjects> getMapObjectsAsync(List<Long> cellIds) {
 
-		if (useCache()) {
+		if (useCache() && (cachedMapObjects.getNearbyPokemons().size() > 0
+							|| cachedMapObjects.getCatchablePokemons().size() > 0
+							|| cachedMapObjects.getWildPokemons().size() > 0
+							|| cachedMapObjects.getDecimatedSpawnPoints().size() > 0
+							|| cachedMapObjects.getSpawnPoints().size() > 0)) {
 			return Observable.just(cachedMapObjects);
 		}
 
