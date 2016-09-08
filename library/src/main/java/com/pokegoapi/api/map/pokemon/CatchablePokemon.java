@@ -19,6 +19,7 @@ package com.pokegoapi.api.map.pokemon;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.map.pokemon.encounter.DiskEncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
@@ -433,14 +434,25 @@ public class CatchablePokemon implements MapPoint {
 									double normalizedReticleSize, double spinModifier, Pokeball type,
 									int amount, int razberriesLimit)
 			throws LoginFailedException, RemoteServerException {
+
+		Item razzberriesInventory = api.getInventories().getItemBag().getItem(ItemId.ITEM_RAZZ_BERRY);
+		int razzberriesCountInventory = razzberriesInventory.getCount();
 		int razberries = 0;
 		int numThrows = 0;
 		CatchResult result;
-		do {
 
-			if (razberries < razberriesLimit || razberriesLimit == -1) {
-				useItem(ItemId.ITEM_RAZZ_BERRY);
+		if (razzberriesCountInventory < razberriesLimit) {
+			razberriesLimit = razzberriesCountInventory;
+		}
+
+		do {
+			if ((razberries < razberriesLimit || razberriesLimit == -1)
+					&& useItem(ItemId.ITEM_RAZZ_BERRY).getSuccess()) {
+
 				razberries++;
+				razzberriesCountInventory--;
+
+				razzberriesInventory.setCount(razzberriesCountInventory);
 			}
 			result = AsyncHelper.toBlocking(catchPokemonAsync(normalizedHitPosition,
 					normalizedReticleSize, spinModifier, type));
