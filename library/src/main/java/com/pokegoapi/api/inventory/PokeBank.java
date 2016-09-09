@@ -15,34 +15,28 @@
 
 package com.pokegoapi.api.inventory;
 
-import POGOProtos.Enums.PokemonIdOuterClass;
-
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
-import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
-
-import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import POGOProtos.Enums.PokemonIdOuterClass;
+import lombok.Getter;
+
 
 public class PokeBank {
 	@Getter
-	List<Pokemon> pokemons = Collections.synchronizedList(new ArrayList<Pokemon>());
-	@Getter
-	PokemonGo instance;
+	private final List<Pokemon> pokemons = Collections.synchronizedList(new ArrayList<Pokemon>());
 
-	public PokeBank(PokemonGo pgo) {
-		reset(pgo);
+	public PokeBank() {
 	}
 
-	public void reset(PokemonGo pgo) {
-		this.instance = pgo;
-		pokemons = new ArrayList<>();
+	public void reset() {
+		pokemons.clear();
 	}
 
 	/**
@@ -83,12 +77,13 @@ public class PokeBank {
 	 * @param pokemon the pokemon
 	 */
 	public void removePokemon(final Pokemon pokemon) {
-		pokemons = Stream.of(pokemons).filter(new Predicate<Pokemon>() {
+		pokemons.clear();
+		pokemons.addAll(Stream.of(pokemons).filter(new Predicate<Pokemon>() {
 			@Override
 			public boolean test(Pokemon pokemn) {
 				return pokemn.getId() != pokemon.getId();
 			}
-		}).collect(Collectors.<Pokemon>toList());
+		}).collect(Collectors.<Pokemon>toList()));
 	}
 
 	/**

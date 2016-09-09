@@ -16,7 +16,7 @@
 package com.pokegoapi.api.player;
 
 import POGOProtos.Data.Player.PlayerAvatarOuterClass;
-import POGOProtos.Enums.GenderOuterClass;
+import POGOProtos.Enums.GenderOuterClass.Gender;
 import lombok.Data;
 
 @Data
@@ -55,7 +55,7 @@ public class PlayerAvatar {
 		return avatar.getGenderValue();
 	}
 
-	public GenderOuterClass.Gender getGender() {
+	public Gender getGender() {
 		return avatar.getGender();
 	}
 
@@ -65,5 +65,37 @@ public class PlayerAvatar {
 
 	public int getBackpack() {
 		return avatar.getBackpack();
+	}
+
+	public static int getAvailableSkins() {
+		return 4;
+	}
+
+	public static int getAvailableHair() {
+		return 6;
+	}
+
+	public static int getAvailableEyes() {
+		return 5;
+	}
+
+	public static int getAvailableHats() {
+		return 5;
+	}
+
+	public static int getAvailableShirts(Gender gender) {
+		return gender.getNumber() == Gender.MALE_VALUE ? 4 : 9;
+	}
+
+	public static int getAvailablePants(Gender gender) {
+		return gender.getNumber() == Gender.MALE_VALUE ? 3 : 6;
+	}
+
+	public static int getAvailableShoes() {
+		return 7;
+	}
+
+	public static int getAvailableBags(Gender gender) {
+		return gender.getNumber() == Gender.MALE_VALUE ? 6 : 3;
 	}
 }

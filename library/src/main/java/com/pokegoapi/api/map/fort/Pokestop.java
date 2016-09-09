@@ -52,7 +52,6 @@ public class Pokestop {
 	@Getter
 	private long cooldownCompleteTimestampMs;
 
-
 	/**
 	 * Instantiates a new Pokestop.
 	 *
@@ -261,20 +260,41 @@ public class Pokestop {
 	}
 
 	/**
+	 * Returns whether this pokestop has an active lure when detected on map.
+	 *
+	 * @return lure status
+	 */
+	public boolean hasLure() {
+		try {
+			return hasLure(false);
+		} catch (LoginFailedException | RemoteServerException e) {
+			// No need
+		}
+
+		return false;
+	}
+
+	/**
 	 * Returns whether this pokestop has an active lure.
 	 *
+	 * @param updateFortDetails to make a new request and get updated lured status
 	 * @return lure status
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communications failed.
 	 */
-	public boolean hasLure() throws LoginFailedException, RemoteServerException {
-		List<FortModifierOuterClass.FortModifier> modifiers = getDetails().getModifier();
-		for (FortModifierOuterClass.FortModifier mod : modifiers) {
-			if (mod.getItemId() == ItemIdOuterClass.ItemId.ITEM_TROY_DISK) {
-				return true;
+	public boolean hasLure(boolean updateFortDetails) throws LoginFailedException, RemoteServerException {
+		if (updateFortDetails) {
+			List<FortModifierOuterClass.FortModifier> modifiers = getDetails().getModifier();
+			for (FortModifierOuterClass.FortModifier modifier : modifiers) {
+				if (modifier.getItemId() == ItemIdOuterClass.ItemId.ITEM_TROY_DISK) {
+					return true;
+				}
 			}
+
+			return false;
 		}
 
-		return false;
+		return fortData.getActiveFortModifierList()
+				.contains(ItemIdOuterClass.ItemId.ITEM_TROY_DISK);
 	}
 }

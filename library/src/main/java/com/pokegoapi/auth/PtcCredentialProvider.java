@@ -15,14 +15,18 @@
 
 package com.pokegoapi.auth;
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import com.squareup.moshi.Moshi;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
@@ -31,12 +35,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 
 public class PtcCredentialProvider extends CredentialProvider {
@@ -142,7 +140,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 				.get()
 				.build();
 
-		Response getResponse = null;
+		Response getResponse;
 		try {
 			getResponse = client.newCall(get).execute();
 		} catch (IOException e) {
@@ -151,7 +149,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 
 		Moshi moshi = new Moshi.Builder().build();
 
-		PtcAuthJson ptcAuth = null;
+		PtcAuthJson ptcAuth;
 		try {
 			String response = getResponse.body().string();
 			ptcAuth = moshi.adapter(PtcAuthJson.class).fromJson(response);
@@ -175,7 +173,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 				.build();
 
 		// Need a new client for this to not follow redirects
-		Response response = null;
+		Response response;
 		try {
 			response = client.newBuilder()
 					.followRedirects(false)
@@ -187,7 +185,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 			throw new RemoteServerException("Network failure", e);
 		}
 
-		String body = null;
+		String body;
 		try {
 			body = response.body().string();
 		} catch (IOException e) {
@@ -195,7 +193,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 		}
 
 		if (body.length() > 0) {
-			PtcError ptcError = null;
+			PtcError ptcError;
 			try {
 				ptcError = moshi.adapter(PtcError.class).fromJson(body);
 			} catch (IOException e) {
@@ -208,7 +206,14 @@ public class PtcCredentialProvider extends CredentialProvider {
 
 		String ticket = null;
 		for (String location : response.headers("location")) {
-			ticket = location.split("ticket=")[1];
+			String[] ticketArray = location.split("ticket=");
+			if (ticketArray.length > 1) {
+				ticket = ticketArray[1];
+			}
+		}
+
+		if (ticket == null) {
+			throw new LoginFailedException("Failed to fetch token, body:" + body);
 		}
 
 		url = HttpUrl.parse(LOGIN_OAUTH).newBuilder()

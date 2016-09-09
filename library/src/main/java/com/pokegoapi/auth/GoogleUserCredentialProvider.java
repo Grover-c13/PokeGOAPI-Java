@@ -104,8 +104,6 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 			throws LoginFailedException, RemoteServerException {
 		this.time = time;
 		this.client = client;
-
-		authbuilder = AuthInfo.newBuilder();
 	}
 
 	/**
@@ -119,8 +117,6 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 			throws LoginFailedException, RemoteServerException {
 		this.time = new SystemTimeImpl();
 		this.client = client;
-
-		authbuilder = AuthInfo.newBuilder();
 	}
 
 
@@ -219,6 +215,8 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 				+ (googleAuth.getExpiresIn() * 1000 - REFRESH_TOKEN_BUFFER_TIME);
 		tokenId = googleAuth.getIdToken();
 		refreshToken = googleAuth.getRefreshToken();
+		
+		authbuilder = AuthInfo.newBuilder();
 	}
 
 	@Override
