@@ -26,17 +26,14 @@ import java.util.Collection;
  */
 public interface LocationFixProvider {
 	/**
-	 * Get location fixes
-	 * TODO: Change this to one location and call this on every update (set location on API)
+	 * Get location fixes for all providers. A device usually has 2
 	 *
 	 * @param latitude            Latitude
 	 * @param longitude           Longittude
 	 * @param accuracy            Accuracy
-	 * @param getMapObjectRequest Is this a get map request?
 	 * @return Collection of location fixes
 	 */
-	Collection<LocationFix> getLocationFixes(double latitude, double longitude, double accuracy,
-			boolean getMapObjectRequest);
+	Collection<LocationFix> getLocationFixes(double latitude, double longitude, double accuracy);
 
 	/**
 	 * Location fix object

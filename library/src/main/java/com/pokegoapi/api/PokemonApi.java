@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutorService;
  */
 public class PokemonApi implements Networking.Callback {
 	private final Location location;
+	private final LocationFixes locationFixes;
 	@Getter
 	private final Networking networking;
 	@Getter
@@ -43,6 +44,7 @@ public class PokemonApi implements Networking.Callback {
 			Location location, DeviceInfo deviceInfo, SensorInfo sensorInfo, ActivityStatus activityStatus,
 			LocationFixes locationFixes, Locale locale) {
 		this.location = location;
+		this.locationFixes = locationFixes;
 
 		networking = new Networking(server, executorService, client, location, deviceInfo, sensorInfo,
 				activityStatus, locationFixes, locale, this);
@@ -121,9 +123,10 @@ public class PokemonApi implements Networking.Callback {
 	 * @param longitude Longitude
 	 * @param accuracy  Accuracy of the location
 	 */
-	public void setLocation(double latitude, double longitude, double accuracy) {
+	public void setLocation(final double latitude, final double longitude, final double accuracy) {
 		setLatitude(latitude);
 		setLongitude(longitude);
 		setAccuracy(accuracy);
+		locationFixes.locationUpdated(latitude, longitude, accuracy);
 	}
 }

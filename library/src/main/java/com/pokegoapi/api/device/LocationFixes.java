@@ -7,10 +7,12 @@ import com.annimon.stream.function.Function;
 import com.pokegoapi.api.internal.Location;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Location fixes class
@@ -18,6 +20,7 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class LocationFixes {
 	private final LocationFixProvider locationFixProvider;
+	private final List<LocationFixProvider.LocationFix> fixList = new CopyOnWriteArrayList<>();
 
 	/**
 	 * Gets the default device info for the given api
@@ -38,9 +41,9 @@ public class LocationFixes {
 	 */
 	public Collection<SignatureOuterClass.Signature.LocationFix> getLocationFixes(final Location location,
 			final boolean getMapObjectRequest) {
-		return Stream.of(locationFixProvider
-				.getLocationFixes(location.getLatitude(), location.getLongitude(), location.getAccuracy(),
-						getMapObjectRequest))
+		List<LocationFixProvider.LocationFix> fixes = new ArrayList<>(fixList);
+		fixList.clear();
+		return Stream.of(fixes)
 				.map(new Function<LocationFixProvider.LocationFix, SignatureOuterClass.Signature.LocationFix>() {
 					@Override
 					public SignatureOuterClass.Signature.LocationFix apply(
@@ -60,6 +63,16 @@ public class LocationFixes {
 								.build();
 					}
 				}).collect(Collectors.<SignatureOuterClass.Signature.LocationFix>toList());
+	}
+
+	/**
+	 * Trigger location update
+	 * @param lat Latitude
+	 * @param lng longitude
+	 * @param accuracy Accuracy
+	 */
+	public void locationUpdated(double lat, double lng, double accuracy) {
+		fixList.addAll(locationFixProvider.getLocationFixes(lat, lng, accuracy));
 	}
 
 	@RequiredArgsConstructor
@@ -85,8 +98,7 @@ public class LocationFixes {
 		}
 
 		@Override
-		public Collection<LocationFix> getLocationFixes(final double lat, final double lng,
-				final double alt, boolean getMapObjectRequest) {
+		public Collection<LocationFix> getLocationFixes(final double lat, final double lng, final double accuracy) {
 			long currentTime = System.currentTimeMillis();
 			int pn = random.nextInt(100);
 			int providerCount;
@@ -112,11 +124,9 @@ public class LocationFixes {
 				locationFixes = previousLocationFixes;
 				locationFixes.clear();
 
-				if (!getMapObjectRequest && (currentTime - previousTimestamp < (random.nextInt(10 * 1000) + 5000))) {
+				if ((currentTime - previousTimestamp < (random.nextInt(10 * 1000) + 5000))) {
 					previousTimestamp = currentTime;
 					return locationFixes;
-				} else if (getMapObjectRequest) {
-					providerCount = chance >= 90 ? 2 : 1;
 				} else {
 					providerCount = pn < 60 ? 1 : pn < 90 ? 2 : 3;
 				}
@@ -128,10 +138,10 @@ public class LocationFixes {
 				float latitude = offsetOnLatLong(lat, random.nextInt(100) + 10);
 				float longitude = offsetOnLatLong(lng, random.nextInt(100) + 10);
 				float altitude = 65;
-				final float verticalAccuracy = (float) (15 + (23 - 15) * random.nextDouble());
+				final float verticalAccuracy = (float) (accuracy + (8 * random.nextDouble()));
 
 				// Fake errors
-				if (!getMapObjectRequest) {
+				if (random.nextInt(100) < 20) {
 					if (random.nextInt(100) > 90) {
 						latitude = 360;
 						longitude = -360;
