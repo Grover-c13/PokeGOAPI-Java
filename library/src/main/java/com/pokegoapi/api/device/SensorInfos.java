@@ -21,85 +21,71 @@ package com.pokegoapi.api.device;
 
 public interface SensorInfos {
 	/**
-	 *
 	 * @return timestamp snapshot in ms since start
 	 */
 	long getTimestampSnapshot();
 
 	/**
-	 *
 	 * @return accelerometer axes, always 3
 	 */
 	long getAccelerometerAxes();
 
 	/**
-	 *
 	 * @return accel normalized x
 	 */
 	double getAccelNormalizedX();
 
 	/**
-	 *
 	 * @return accel normalized y
 	 */
 	double getAccelNormalizedY();
 
 	/**
-	 *
 	 * @return accel normalized z
 	 */
 	double getAccelNormalizedZ();
 
 	/**
-	 *
 	 * @return accel raw x
 	 */
 	double getAccelRawX();
 
 	/**
-	 *
 	 * @return accel raw y
 	 */
 	double getAccelRawY();
 
 	/**
-	 *
 	 * @return accel raw z
 	 */
 	double getAccelRawZ();
 
 	/**
-	 *
 	 * @return angel normalized x
 	 */
 	double getAngleNormalizedX();
 
 	/**
-	 *
 	 * @return angel normalized y
 	 */
 	double getAngleNormalizedY();
 
 	/**
-	 *
 	 * @return angel normalized z
 	 */
 	double getAngleNormalizedZ();
 
 	/**
-	 *
 	 * @return gyroscope raw x
 	 */
 	double getGyroscopeRawX();
 
 	/**
-	 *
 	 * @return gyroscope raw y
 	 */
 	double getGyroscopeRawY();
 
 	/**
-	 *
 	 * @return gyroscope raw z
 	 */
 	double getGyroscopeRawZ();

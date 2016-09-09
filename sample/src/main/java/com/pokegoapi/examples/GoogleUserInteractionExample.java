@@ -17,8 +17,7 @@ package com.pokegoapi.examples;
 
 
 import com.pokegoapi.auth.GoogleUserCredentialProvider;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import okhttp3.OkHttpClient;
 
 import java.util.Scanner;
@@ -39,15 +38,15 @@ public class GoogleUserInteractionExample {
 			System.out.println("Please go to " + provider.LOGIN_URL);
 			System.out.println("Enter authorisation code:");
 			
-			// Ask the user to enter it in the standart input
+			// Ask the user to enter it in the standard input
 			Scanner sc = new Scanner(System.in);
 			String access = sc.nextLine();
 			
 			// we should be able to login with this token
 			provider.login(access);
-			System.out.println("Refresh token:" + provider.getRefreshToken());
+			System.out.println("Refresh token:" + provider.refreshToken);
 			
-		} catch (LoginFailedException | RemoteServerException e) {
+		} catch (RequestFailedException e) {
 			e.printStackTrace();
 		}
 

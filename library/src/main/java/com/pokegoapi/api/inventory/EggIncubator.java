@@ -18,14 +18,14 @@ package com.pokegoapi.api.inventory;
 import POGOProtos.Inventory.EggIncubatorOuterClass;
 import POGOProtos.Inventory.EggIncubatorTypeOuterClass.EggIncubatorType;
 import POGOProtos.Networking.Requests.Messages.UseItemEggIncubatorMessageOuterClass.UseItemEggIncubatorMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
-
+import POGOProtos.Settings.Master.Item.EggIncubatorAttributesOuterClass.EggIncubatorAttributes;
+import POGOProtos.Settings.Master.ItemSettingsOuterClass.ItemSettings;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.EggPokemon;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.main.ServerRequest;
 
 public class EggIncubator {
@@ -35,7 +35,7 @@ public class EggIncubator {
 	/**
 	 * Create new EggIncubator with given proto.
 	 *
-	 * @param api   the api
+	 * @param api the api
 	 * @param proto the proto
 	 */
 	public EggIncubator(PokemonGo api, EggIncubatorOuterClass.EggIncubator proto) {
@@ -44,9 +44,20 @@ public class EggIncubator {
 	}
 
 	/**
+	 * @return the attributes of this incubator, null if there are none
+	 */
+	public EggIncubatorAttributes getAttributes() {
+		ItemSettings settings = api.itemTemplates.getItemSettings(proto.getItemId());
+		if (settings != null) {
+			return settings.getEggIncubator();
+		}
+		return null;
+	}
+
+	/**
 	 * Returns the remaining uses.
 	 *
-	 * @return uses remaining
+	 * @return uses remaining, always 0 for infinite egg incubator
 	 */
 	public int getUsesRemaining() {
 		return proto.getUsesRemaining();
@@ -57,28 +68,26 @@ public class EggIncubator {
 	 *
 	 * @param egg the egg
 	 * @return status of putting egg in incubator
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public UseItemEggIncubatorResponse.Result hatchEgg(EggPokemon egg)
-			throws LoginFailedException, RemoteServerException {
+	public UseItemEggIncubatorResponse.Result hatchEgg(EggPokemon egg) throws RequestFailedException {
 
 		UseItemEggIncubatorMessage reqMsg = UseItemEggIncubatorMessage.newBuilder()
 				.setItemId(proto.getId())
 				.setPokemonId(egg.getId())
 				.build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_EGG_INCUBATOR, reqMsg);
+		api.requestHandler.sendServerRequests(serverRequest, true);
 
 		UseItemEggIncubatorResponse response;
 		try {
 			response = UseItemEggIncubatorResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 
-		api.getInventories().updateInventories(true);
+		api.inventories.updateInventories();
 
 		return response.getResult();
 	}
@@ -142,32 +151,31 @@ public class EggIncubator {
 	 * Get the distance walked with the current incubated egg.
 	 *
 	 * @return distance walked with the current incubated egg (km)
-	 * @throws LoginFailedException  if there is an error with the token during retrieval of player stats
-	 * @throws RemoteServerException if the server responds badly during retrieval of player stats
 	 */
-	public double getKmCurrentlyWalked() throws LoginFailedException, RemoteServerException {
-		return api.getPlayerProfile().getStats().getKmWalked() - getKmStart();
+	public double getKmCurrentlyWalked() {
+		return api.playerProfile.getStats().getKmWalked() - getKmStart();
 	}
 
 	/**
 	 * Get the distance left to walk before this incubated egg will hatch.
 	 *
 	 * @return distance to walk before hatch (km)
-	 * @throws LoginFailedException  if there is an error with the token during retrieval of player stats
-	 * @throws RemoteServerException if the server responds badly during retrieval of player stats
 	 */
-	public double getKmLeftToWalk() throws LoginFailedException, RemoteServerException {
-		return getKmTarget() - api.getPlayerProfile().getStats().getKmWalked();
+	public double getKmLeftToWalk() {
+		return getKmTarget() - api.playerProfile.getStats().getKmWalked();
 	}
 
 	/**
 	 * Is the incubator currently being used
 	 *
 	 * @return currently used or not
-	 * @throws LoginFailedException  if there is an error with the token during retrieval of player stats
-	 * @throws RemoteServerException if the server responds badly during retrieval of player stats
 	 */
-	public boolean isInUse() throws LoginFailedException, RemoteServerException {
-		return getKmTarget() > api.getPlayerProfile().getStats().getKmWalked();
+	public boolean isInUse() {
+		return getKmTarget() > api.playerProfile.getStats().getKmWalked();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof EggIncubator && ((EggIncubator) obj).getId().equals(getId());
 	}
 }

@@ -16,12 +16,10 @@
 package com.pokegoapi.auth;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.request.InvalidCredentialsException;
+import com.pokegoapi.exceptions.request.LoginFailedException;
 import com.pokegoapi.util.Log;
 import com.squareup.moshi.Moshi;
-
 import lombok.Getter;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -32,6 +30,10 @@ import okhttp3.Response;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+/**
+ * @deprecated use {@link GoogleAutoCredentialProvider}
+ */
+@Deprecated
 public class GoogleCredentialProvider extends CredentialProvider {
 
 	public static final String SECRET = "NCjF1TLi2CcY6t5mt0ZveuL7";
@@ -57,13 +59,13 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	/**
 	 * Used for logging in when one has a persisted refreshToken.
 	 *
-	 * @param client       OkHttp client
+	 * @param client OkHttp client
 	 * @param refreshToken Refresh Token Persisted by user
-	 * @throws LoginFailedException  When login fails
-	 * @throws RemoteServerException if the server failed to respond
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
 	public GoogleCredentialProvider(OkHttpClient client, String refreshToken)
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, InvalidCredentialsException {
 		this.client = client;
 		this.refreshToken = refreshToken;
 		onGoogleLoginOAuthCompleteListener = null;
@@ -74,13 +76,14 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	/**
 	 * Used for logging in when you dont have a persisted refresh token.
 	 *
-	 * @param client                             OkHttp client
+	 * @param client OkHttp client
 	 * @param onGoogleLoginOAuthCompleteListener Callback to know verification url and also persist refresh token
-	 * @throws LoginFailedException When login fails
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
 	public GoogleCredentialProvider(OkHttpClient client,
-									OnGoogleLoginOAuthCompleteListener onGoogleLoginOAuthCompleteListener)
-			throws LoginFailedException {
+			OnGoogleLoginOAuthCompleteListener onGoogleLoginOAuthCompleteListener)
+			throws LoginFailedException, InvalidCredentialsException {
 		this.client = client;
 		if (onGoogleLoginOAuthCompleteListener != null) {
 			this.onGoogleLoginOAuthCompleteListener = onGoogleLoginOAuthCompleteListener;
@@ -95,10 +98,11 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	 * Given the refresh token fetches a new access token and returns AuthInfo.
 	 *
 	 * @param refreshToken Refresh token persisted by the user after initial login
-	 * @throws LoginFailedException  If we fail to get tokenId
-	 * @throws RemoteServerException if the server failed to respond
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
-	public void refreshToken(String refreshToken) throws LoginFailedException, RemoteServerException {
+	public void refreshToken(String refreshToken)
+			throws LoginFailedException, InvalidCredentialsException {
 		HttpUrl url = HttpUrl.parse(OAUTH_TOKEN_ENDPOINT).newBuilder()
 				.addQueryParameter("client_id", CLIENT_ID)
 				.addQueryParameter("client_secret", SECRET)
@@ -116,33 +120,33 @@ public class GoogleCredentialProvider extends CredentialProvider {
 		try {
 			response = client.newCall(request).execute();
 		} catch (IOException e) {
-			throw new RemoteServerException("Network Request failed to fetch refreshed tokenId", e);
+			throw new LoginFailedException("Network Request failed to fetch refreshed tokenId", e);
 		}
 		Moshi moshi = new Moshi.Builder().build();
 		GoogleAuthTokenJson googleAuthTokenJson = null;
 		try {
 			googleAuthTokenJson = moshi.adapter(GoogleAuthTokenJson.class).fromJson(response.body().string());
-			Log.d(TAG, "" + googleAuthTokenJson.getExpiresIn());
+			Log.d(TAG, "" + googleAuthTokenJson.expiresIn);
 		} catch (IOException e) {
-			throw new RemoteServerException("Failed to unmarshal the Json response to fetch refreshed tokenId", e);
+			throw new LoginFailedException("Failed to unmarshal the Json response to fetch refreshed tokenId", e);
 		}
-		if (googleAuthTokenJson.getError() != null) {
-			throw new LoginFailedException(googleAuthTokenJson.getError());
+		if (googleAuthTokenJson.error != null) {
+			throw new InvalidCredentialsException(googleAuthTokenJson.error);
 		} else {
-			Log.d(TAG, "Refreshed Token " + googleAuthTokenJson.getIdToken());
+			Log.d(TAG, "Refreshed Token " + googleAuthTokenJson.idToken);
 			expiresTimestamp = System.currentTimeMillis()
-					+ (googleAuthTokenJson.getExpiresIn() * 1000 - REFRESH_TOKEN_BUFFER_TIME);
-			tokenId = googleAuthTokenJson.getIdToken();
+					+ (googleAuthTokenJson.expiresIn * 1000 - REFRESH_TOKEN_BUFFER_TIME);
+			tokenId = googleAuthTokenJson.idToken;
 		}
 	}
 
 	/**
 	 * Starts a login flow for google using googles device oauth endpoint.
 	 *
-	 * @throws LoginFailedException If we fail to get tokenId
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
-	public void login() throws LoginFailedException {
-
+	public void login() throws LoginFailedException, InvalidCredentialsException {
 		HttpUrl url = HttpUrl.parse(OAUTH_ENDPOINT).newBuilder()
 				.addQueryParameter("client_id", CLIENT_ID)
 				.addQueryParameter("scope", "openid email https://www.googleapis.com/auth/userinfo.email")
@@ -167,19 +171,19 @@ public class GoogleCredentialProvider extends CredentialProvider {
 		GoogleAuthJson googleAuth = null;
 		try {
 			googleAuth = moshi.adapter(GoogleAuthJson.class).fromJson(response.body().string());
-			Log.d(TAG, "" + googleAuth.getExpiresIn());
+			Log.d(TAG, "" + googleAuth.expiresIn);
 		} catch (IOException e) {
 			throw new LoginFailedException("Failed to unmarshell the Json response to fetch tokenId", e);
 		}
 		Log.d(TAG, "Get user to go to:"
-				+ googleAuth.getVerificationUrl()
-				+ " and enter code:" + googleAuth.getUserCode());
+				+ googleAuth.verificationUrl
+				+ " and enter code:" + googleAuth.userCode);
 		onGoogleLoginOAuthCompleteListener.onInitialOAuthComplete(googleAuth);
 
 		GoogleAuthTokenJson googleAuthTokenJson;
 		try {
 			while ((googleAuthTokenJson = poll(googleAuth)) == null) {
-				Thread.sleep(googleAuth.getInterval() * 1000);
+				Thread.sleep(googleAuth.interval * 1000);
 			}
 		} catch (InterruptedException e) {
 			throw new LoginFailedException("Sleeping was interrupted", e);
@@ -189,12 +193,12 @@ public class GoogleCredentialProvider extends CredentialProvider {
 			throw new LoginFailedException(e);
 		}
 
-		Log.d(TAG, "Got token: " + googleAuthTokenJson.getIdToken());
+		Log.d(TAG, "Got token: " + googleAuthTokenJson.idToken);
 		onGoogleLoginOAuthCompleteListener.onTokenIdReceived(googleAuthTokenJson);
 		expiresTimestamp = System.currentTimeMillis()
-				+ (googleAuthTokenJson.getExpiresIn() * 1000 - REFRESH_TOKEN_BUFFER_TIME);
-		tokenId = googleAuthTokenJson.getIdToken();
-		refreshToken = googleAuthTokenJson.getRefreshToken();
+				+ (googleAuthTokenJson.expiresIn * 1000 - REFRESH_TOKEN_BUFFER_TIME);
+		tokenId = googleAuthTokenJson.idToken;
+		refreshToken = googleAuthTokenJson.refreshToken;
 	}
 
 	/**
@@ -202,15 +206,16 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	 *
 	 * @param json google auth json
 	 * @return google auth token json
-	 * @throws URISyntaxException   syntax exception
-	 * @throws IOException          io exception
+	 * @throws URISyntaxException syntax exception
+	 * @throws IOException io exception
 	 * @throws LoginFailedException If we fail to get tokenId
 	 */
-	private GoogleAuthTokenJson poll(GoogleAuthJson json) throws URISyntaxException, IOException, LoginFailedException {
+	private GoogleAuthTokenJson poll(GoogleAuthJson json) throws URISyntaxException, IOException,
+			LoginFailedException {
 		HttpUrl url = HttpUrl.parse(OAUTH_TOKEN_ENDPOINT).newBuilder()
 				.addQueryParameter("client_id", CLIENT_ID)
 				.addQueryParameter("client_secret", SECRET)
-				.addQueryParameter("code", json.getDeviceCode())
+				.addQueryParameter("code", json.deviceCode)
 				.addQueryParameter("grant_type", "http://oauth.net/grant_type/device/1.0")
 				.addQueryParameter("scope", "openid email https://www.googleapis.com/auth/userinfo.email")
 				.build();
@@ -227,7 +232,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 		Moshi moshi = new Moshi.Builder().build();
 		GoogleAuthTokenJson token = moshi.adapter(GoogleAuthTokenJson.class).fromJson(response.body().string());
 
-		if (token.getError() == null) {
+		if (token.error == null) {
 			return token;
 		} else {
 			return null;
@@ -235,8 +240,8 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	}
 
 	@Override
-	public String getTokenId() throws LoginFailedException, RemoteServerException {
-		if (isTokenIdExpired()) {
+	public String getTokenId(boolean refresh) throws LoginFailedException, InvalidCredentialsException {
+		if (refresh || isTokenIdInvalid()) {
 			refreshToken(refreshToken);
 		}
 		return tokenId;
@@ -245,23 +250,30 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	/**
 	 * Refreshes tokenId if it has expired
 	 *
+	 * @param refresh if this AuthInfo should be refreshed
 	 * @return AuthInfo object
-	 * @throws LoginFailedException  When login fails
-	 * @throws RemoteServerException if the server failed to respond
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
 	@Override
-	public AuthInfo getAuthInfo() throws LoginFailedException, RemoteServerException {
-		if (isTokenIdExpired()) {
+	public AuthInfo getAuthInfo(boolean refresh) throws LoginFailedException, InvalidCredentialsException {
+		if (refresh || isTokenIdInvalid()) {
 			refreshToken(refreshToken);
 		}
 		authbuilder.setProvider("google");
-		authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(tokenId).setUnknown2(59).build());
+		authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(tokenId).setUnknown2(0).build());
 		return authbuilder.build();
 	}
 
 	@Override
-	public boolean isTokenIdExpired() {
-		return System.currentTimeMillis() > expiresTimestamp;
+	public boolean isTokenIdInvalid() {
+		return tokenId == null || System.currentTimeMillis() > expiresTimestamp;
+	}
+
+	@Override
+	public void reset() {
+		tokenId = null;
+		refreshToken = null;
 	}
 
 	/**

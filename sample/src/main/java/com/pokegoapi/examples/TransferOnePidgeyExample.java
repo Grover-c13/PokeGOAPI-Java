@@ -20,9 +20,9 @@ import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.auth.PtcCredentialProvider;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.util.Log;
+import com.pokegoapi.util.hash.HashProvider;
 import okhttp3.OkHttpClient;
 
 import java.util.List;
@@ -34,14 +34,14 @@ public class TransferOnePidgeyExample {
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
 
-		PokemonGo go = new PokemonGo(http);
+		PokemonGo api = new PokemonGo(http);
 		try {
-			// check readme for other example
-			go.login(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN,
-					ExampleLoginDetails.PASSWORD));
+			HashProvider hasher = ExampleConstants.getHashProvider();
+			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD), hasher);
+			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 
 			List<Pokemon> pidgeys =
-					go.getInventories().getPokebank().getPokemonByPokemonId(PokemonIdOuterClass.PokemonId.PIDGEY);
+					api.inventories.pokebank.getPokemonByPokemonId(PokemonIdOuterClass.PokemonId.PIDGEY);
 
 			if (pidgeys.size() > 0) {
 				Pokemon pest = pidgeys.get(0);
@@ -53,9 +53,9 @@ public class TransferOnePidgeyExample {
 			} else {
 				Log.i("Main", "You have no pidgeys :O");
 			}
-		} catch (LoginFailedException | RemoteServerException e) {
+		} catch (RequestFailedException e) {
 			// failed to login, invalid credentials, auth issue or server issue.
-			Log.e("Main", "Failed to login. Invalid credentials or server issue: ", e);
+			Log.e("Main", "Failed to login. Invalid credentials, captcha or server issue: ", e);
 		}
 	}
 }

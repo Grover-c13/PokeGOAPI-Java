@@ -22,8 +22,8 @@ public class PtcAuthJson {
 
 	@Getter
 	@Setter
-	private String lt;
+	public String lt;
 	@Getter
 	@Setter
-	private String execution;
+	public String execution;
 }

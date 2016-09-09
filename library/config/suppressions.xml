@@ -21,6 +21,5 @@
 
 <suppressions>
     <suppress checks="." files="com[\\/]pokegoapi[\\/]google[\\/]common[\\/]geometry[\\/]"/>
-    <suppress checks="." files="com[\\/]pokegoapi[\\/]util[\\/]Crypto\.java"/>
     <suppress checks="." files="[\\/]build[\\/]"/>
 </suppressions>

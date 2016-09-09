@@ -4,23 +4,18 @@ Pokemon GO Java API
 
 [![Build Status](https://travis-ci.org/Grover-c13/PokeGOAPI-Java.svg?branch=master)](https://travis-ci.org/Grover-c13/PokeGOAPI-Java)
 [![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
+[![Code Quality: Java](https://img.shields.io/lgtm/grade/java/g/Grover-c13/PokeGOAPI-Java.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Grover-c13/PokeGOAPI-Java/context:java)
+[![Total Alerts](https://img.shields.io/lgtm/alerts/g/Grover-c13/PokeGOAPI-Java.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Grover-c13/PokeGOAPI-Java/alerts)
 
 Javadocs : [CLICK ME](https://jitpack.io/com/github/Grover-c13/PokeGOAPI-Java/a2828da60d/javadoc/) 
-
-See this guide for adding functionality:
-   https://docs.google.com/document/d/1BE8O6Z19sQ54T5T7QauXgA11GbL6D9vx9AAMCM5KlRA
-
-See this spreadsheet for RPC endpoints and progress :
-   https://docs.google.com/spreadsheets/d/1Xv0Gw5PzIRaVou2xrl6r7qySrcmOKjQWLBjJA73YnJM
-
 ___
 :exclamation: :exclamation: :exclamation:
 
 This API may have issues when the PokemonGO servers are under high load or down, in this case please wait for the official to get back up. You can check the official servers status on [IsPokemonGoDownOrNot.com](http://ispokemongodownornot.com) or [MMOServerStatus.com](http://www.mmoserverstatus.com/pokemon_go).
 
-This API doesnt fake the official client perfectly, niantic may know that you arent using the official app, we encourage you to use a alternate account to play with this API.
+This API doesnt fake the official client perfectly, niantic may know that you aren't using the official app, we encourage you to use an alternate account to play with this API.
 
-If you are using this lib to catch pokemon and loot pokestop, take care that you arent teleporting, the servers may issue a softban against your client (its temporary, between 10 and 30 minutes in general).
+If you are using this lib to catch pokemon and loot pokestop, take care that you aren't teleporting, the servers may issue a softban against your client (its temporary, between 10 and 30 minutes in general).
 
 :exclamation: :exclamation: :exclamation:
 ___
@@ -47,9 +42,9 @@ Import JAR with gradle
   - Complete `Build from source` below
   - Open the project gradle.build file
   - Locate ``dependencies {`` 
-  - Add ``compile files('PATH_TO/PokeGOAPI-Java/library/build/libs/PokeGOAPI-library-all-0.X.X.jar')``
+  - Add ``compile fileTree(include: ['PokeGOAPI-library-all-*.jar'], dir: 'PATH_TO/PokeGOAPI-Java/library/build/libs')``
     - (PATH_TO is the exact path from root to the API folder, i.e. C:/MyGitProjects)
-    - (0.X.X refers to the version number provided in the JAR filename, ie. 0.3.0)
+    - (Make sure to perform a clean build to avoid multiple versions being included)
 
 OR
 
@@ -87,35 +82,40 @@ OkHttpClient httpClient = new OkHttpClient();
 * Afer this, the user must signin on google and get the token that will be show to him.
 * This token will need to be put as argument to login.
 */
-GoogleUserCredentialProvider provider = new GoogleUserCredentialProvider(http);
+GoogleUserCredentialProvider provider = new GoogleUserCredentialProvider(httpClient);
 
 // in this url, you will get a code for the google account that is logged
 System.out.println("Please go to " + GoogleUserCredentialProvider.LOGIN_URL);
-System.out.println("Enter authorisation code:");
+System.out.println("Enter authorization code:");
 			
-// Ask the user to enter it in the standart input
+// Ask the user to enter it in the standard input
 Scanner sc = new Scanner(System.in);
 String access = sc.nextLine();
 			
 // we should be able to login with this token
 provider.login(access);
-PokemonGo go = new PokemonGo(provider, httpClient);
+PokemonGo go = new PokemonGo(httpClient);
+go.login(provider);
 
 /**
 * After this, if you do not want to re-authorize the google account every time, 
 * you will need to store the refresh_token that you can get the first time with provider.getRefreshToken()
 * ! The API does not store the refresh token for you !
 * log in using the refresh token like this :
+* - Needs hasher - example below
 */
-PokemonGo go = new PokemonGo(new GoogleUserCredentialProvider(httpClient, refreshToken), httpClient);
+PokemonGo go = new PokemonGo(httpClient);
+go.login(new GoogleUserCredentialProvider(httpClient, refreshToken), hasher);
 
 /**
 * PTC is much simpler, but less secure.
 * You will need the username and password for each user log in
 * This account does not currently support a refresh_token. 
 * Example log in :
+* - Needs hasher - example below
 */
-PokemonGo go = new PokemonGo(new PtcCredentialProvider(httpClient,username,password),httpClient);
+PokemonGo go = new PokemonGo(httpClient);
+go.login(new PtcCredentialProvider(httpClient, username, password), hasher);
 
 // After this you can access the api from the PokemonGo instance :
 go.getPlayerProfile(); // to get the user profile
@@ -140,6 +140,15 @@ try {
 	// its possible that the parsing fail when servers are in high load for example.
 	throw new RemoteServerException(e);
 }
+
+public static HashProvider getHashProvider(){
+    String POKEHASH_KEY = "****************";
+    if(POKEHASH_KEY != null && POKEHASH_KEY.length() > 0){
+        return new PokeHashProvider(PokeHashKey.from(POKEHASH_KEY), true);
+    }
+    throw new IllegalStateException("Cannot start example without hash key");
+}
+
 ```
 
 ## (Async)CatchOptions
@@ -178,9 +187,7 @@ options.noMasterBall(true);
 cp.catchPokemon(options);
 ```
 
-Each option has a default and can override any with a similar functionality based on the most relevant option (for example, usePokeBall can be set as a minimum by using it with useBestBall, a maximum by using it alone, or exclusive by using with noFallback).
-
-Please see the javadocs for each item for further explanation. Replaced methods include examples of their CatchOptions or AsyncCatchOptions equivalent to simplify conversion.
+Each option has a default and the most relevant option will override others with similar functionality (for example, usePokeBall will set the minimum of useBestBall, a maximum by using it alone, or the specific value with noFallback). See the javadocs for more info.
 
 ##Android Dev FAQ
 

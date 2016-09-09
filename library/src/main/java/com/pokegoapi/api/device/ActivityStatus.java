@@ -43,10 +43,10 @@ public class ActivityStatus {
 	 */
 	public static SignatureOuterClass.Signature.ActivityStatus getDefault(PokemonGo api, Random random) {
 		boolean tilting = random.nextInt() % 2 == 0;
-		ActivityStatus activityStatus = api.getActivityStatus();
+		ActivityStatus activityStatus = api.activityStatus;
 		if (activityStatus == null) {
 			activityStatus = new ActivityStatus();
-			api.setActivityStatus(activityStatus);
+			api.activityStatus = activityStatus;
 		}
 		activityStatus.setStationary(true);
 		if (tilting) {

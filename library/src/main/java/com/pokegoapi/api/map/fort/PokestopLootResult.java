@@ -15,6 +15,7 @@
 
 package com.pokegoapi.api.map.fort;
 
+import POGOProtos.Data.PokemonDataOuterClass;
 import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse.Result;
@@ -46,6 +47,14 @@ public class PokestopLootResult {
 
 	public int getExperience() {
 		return response.getExperienceAwarded();
+	}
+
+	public boolean hasEgg() {
+		return response.hasPokemonDataEgg();
+	}
+
+	public PokemonDataOuterClass.PokemonData getEgg() {
+		return response.getPokemonDataEgg();
 	}
 
 	public FortSearchResponseOuterClass.FortSearchResponse toPrimitive() {

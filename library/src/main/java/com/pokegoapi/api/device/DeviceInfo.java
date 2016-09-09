@@ -15,77 +15,32 @@
 
 package com.pokegoapi.api.device;
 
+import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import com.pokegoapi.api.PokemonGo;
 
 import java.util.Random;
-import java.util.UUID;
-
-import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 
 /**
  * Created by fabianterhorst on 08.08.16.
  */
 
 public class DeviceInfo {
+	private static final String[][] DEVICES = new String[][]{
+			{"iPhone8,1", "iPhone", "N71AP"},
+			{"iPhone8,2", "iPhone", "N66AP"},
+			{"iPhone8,4", "iPhone", "N69AP"},
 
-	@Deprecated
-	public static final DeviceInfo DEFAULT = new DeviceInfo() {
-		{
-			String uuid = UUID.randomUUID().toString();
-			setDeviceId(uuid);
-			Random random = new Random(uuid.hashCode());
-			String[][] devices =
-					{
-							{"iPad3,1", "iPad", "J1AP"},
-							{"iPad3,2", "iPad", "J2AP"},
-							{"iPad3,3", "iPad", "J2AAP"},
-							{"iPad3,4", "iPad", "P101AP"},
-							{"iPad3,5", "iPad", "P102AP"},
-							{"iPad3,6", "iPad", "P103AP"},
+			{"iPhone9,1", "iPhone", "D10AP"},
+			{"iPhone9,2", "iPhone", "D11AP"},
+			{"iPhone9,3", "iPhone", "D101AP"},
+			{"iPhone9,4", "iPhone", "D111AP"}
+	};
 
-							{"iPad4,1", "iPad", "J71AP"},
-							{"iPad4,2", "iPad", "J72AP"},
-							{"iPad4,3", "iPad", "J73AP"},
-							{"iPad4,4", "iPad", "J85AP"},
-							{"iPad4,5", "iPad", "J86AP"},
-							{"iPad4,6", "iPad", "J87AP"},
-							{"iPad4,7", "iPad", "J85mAP"},
-							{"iPad4,8", "iPad", "J86mAP"},
-							{"iPad4,9", "iPad", "J87mAP"},
+	private static final String[] IPHONE_OS_VERSIONS = { "11.0", "11.1", "11.2", "11.2.5", "11.3.0"
+	};
 
-							{"iPad5,1", "iPad", "J96AP"},
-							{"iPad5,2", "iPad", "J97AP"},
-							{"iPad5,3", "iPad", "J81AP"},
-							{"iPad5,4", "iPad", "J82AP"},
-
-							{"iPad6,7", "iPad", "J98aAP"},
-							{"iPad6,8", "iPad", "J99aAP"},
-
-							{"iPhone5,1", "iPhone", "N41AP"},
-							{"iPhone5,2", "iPhone", "N42AP"},
-							{"iPhone5,3", "iPhone", "N48AP"},
-							{"iPhone5,4", "iPhone", "N49AP"},
-
-							{"iPhone6,1", "iPhone", "N51AP"},
-							{"iPhone6,2", "iPhone", "N53AP"},
-
-							{"iPhone7,1", "iPhone", "N56AP"},
-							{"iPhone7,2", "iPhone", "N61AP"},
-
-							{"iPhone8,1", "iPhone", "N71AP"}
-
-					};
-			String[] osVersions = {"8.1.1", "8.1.2", "8.1.3", "8.2", "8.3", "8.4", "8.4.1",
-					"9.0", "9.0.1", "9.0.2", "9.1", "9.2", "9.2.1", "9.3", "9.3.1", "9.3.2", "9.3.3", "9.3.4"};
-			setFirmwareType(osVersions[random.nextInt(osVersions.length)]);
-			String[] device = devices[random.nextInt(devices.length)];
-			setDeviceModelBoot(device[0]);
-			setDeviceModel(device[1]);
-			setHardwareModel(device[2]);
-			setFirmwareBrand("iPhone OS");
-			setDeviceBrand("Apple");
-			setHardwareManufacturer("Apple");
-		}
+	private static final String[] IOS_VERSIONS = {
+			"11.0", "11.1", "11.2", "11.2.5", "11.3.0"
 	};
 
 	private SignatureOuterClass.Signature.DeviceInfo.Builder deviceInfoBuilder;
@@ -137,59 +92,21 @@ public class DeviceInfo {
 	 */
 	public static DeviceInfo getDefault(PokemonGo api) {
 		DeviceInfo deviceInfo = new DeviceInfo();
-		Random random = new Random(api.getSeed());
+		Random random = new Random(api.seed);
 		byte[] bytes = new byte[16];
 		random.nextBytes(bytes);
+		String[] device = DEVICES[random.nextInt(DEVICES.length)];
 		deviceInfo.setDeviceId(bytesToHex(bytes));
-		String[][] devices =
-				{
-						{"iPad3,1", "iPad", "J1AP"},
-						{"iPad3,2", "iPad", "J2AP"},
-						{"iPad3,3", "iPad", "J2AAP"},
-						{"iPad3,4", "iPad", "P101AP"},
-						{"iPad3,5", "iPad", "P102AP"},
-						{"iPad3,6", "iPad", "P103AP"},
-
-						{"iPad4,1", "iPad", "J71AP"},
-						{"iPad4,2", "iPad", "J72AP"},
-						{"iPad4,3", "iPad", "J73AP"},
-						{"iPad4,4", "iPad", "J85AP"},
-						{"iPad4,5", "iPad", "J86AP"},
-						{"iPad4,6", "iPad", "J87AP"},
-						{"iPad4,7", "iPad", "J85mAP"},
-						{"iPad4,8", "iPad", "J86mAP"},
-						{"iPad4,9", "iPad", "J87mAP"},
-
-						{"iPad5,1", "iPad", "J96AP"},
-						{"iPad5,2", "iPad", "J97AP"},
-						{"iPad5,3", "iPad", "J81AP"},
-						{"iPad5,4", "iPad", "J82AP"},
-
-						{"iPad6,7", "iPad", "J98aAP"},
-						{"iPad6,8", "iPad", "J99aAP"},
-
-						{"iPhone5,1", "iPhone", "N41AP"},
-						{"iPhone5,2", "iPhone", "N42AP"},
-						{"iPhone5,3", "iPhone", "N48AP"},
-						{"iPhone5,4", "iPhone", "N49AP"},
-
-						{"iPhone6,1", "iPhone", "N51AP"},
-						{"iPhone6,2", "iPhone", "N53AP"},
-
-						{"iPhone7,1", "iPhone", "N56AP"},
-						{"iPhone7,2", "iPhone", "N61AP"},
-
-						{"iPhone8,1", "iPhone", "N71AP"}
-
-				};
-		String[] osVersions = {"8.1.1", "8.1.2", "8.1.3", "8.2", "8.3", "8.4", "8.4.1",
-				"9.0", "9.0.1", "9.0.2", "9.1", "9.2", "9.2.1", "9.3", "9.3.1", "9.3.2", "9.3.3", "9.3.4"};
-		deviceInfo.setFirmwareType(osVersions[random.nextInt(osVersions.length)]);
-		String[] device = devices[random.nextInt(devices.length)];
+		if (random.nextInt(IPHONE_OS_VERSIONS.length + IOS_VERSIONS.length) >= IPHONE_OS_VERSIONS.length) {
+			deviceInfo.setFirmwareType(IOS_VERSIONS[random.nextInt(IOS_VERSIONS.length)]);
+			deviceInfo.setFirmwareBrand("iOS");
+		} else {
+			deviceInfo.setFirmwareType(IPHONE_OS_VERSIONS[random.nextInt(IPHONE_OS_VERSIONS.length)]);
+			deviceInfo.setFirmwareBrand("iPhone OS");
+		}
 		deviceInfo.setDeviceModelBoot(device[0]);
 		deviceInfo.setDeviceModel(device[1]);
 		deviceInfo.setHardwareModel(device[2]);
-		deviceInfo.setFirmwareBrand("iPhone OS");
 		deviceInfo.setDeviceBrand("Apple");
 		deviceInfo.setHardwareManufacturer("Apple");
 		return deviceInfo;
@@ -197,7 +114,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets AndroidBoardName
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setAndroidBoardName(Build.BOARD);}
 	 * </pre>
@@ -210,7 +126,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets AndroidBootloader
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setAndroidBootloader(Build.BOOTLOADER);}
 	 * </pre>
@@ -223,7 +138,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets DeviceBrand
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setDeviceBrand(Build.BRAND);}
 	 * </pre>
@@ -236,7 +150,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets DeviceId
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setDeviceId(UUID.randomUUID().toString());}
 	 * </pre>
@@ -249,7 +162,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets DeviceModel
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setDeviceModel(Build.MODEL);}
 	 * </pre>
@@ -262,7 +174,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets DeviceModelBoot
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setDeviceModelBoot("qcom");}
 	 * </pre>
@@ -275,7 +186,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets DeviceModelIdentifier
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setDeviceModelIdentifier(Build.PRODUCT);}
 	 * </pre>
@@ -288,7 +198,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets FirmwareBrand
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setFirmwareBrand(Build.PRODUCT);}
 	 * </pre>
@@ -301,13 +210,12 @@ public class DeviceInfo {
 
 	/**
 	 * Sets FirmwareFingerprint
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setFirmwareFingerprint(Build.FINGERPRINT);}
 	 * </pre>
 	 *
 	 * @param firmwareFingerprint FirmwareFingerprint,
-	 *                            for example: "google/angler/angler:7.0/NPD90G/3051502:user/release-keys"
+	 *     for example: "google/angler/angler:7.0/NPD90G/3051502:user/release-keys"
 	 */
 	public void setFirmwareFingerprint(String firmwareFingerprint) {
 		deviceInfoBuilder.setFirmwareFingerprint(firmwareFingerprint);
@@ -315,7 +223,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets FirmwareTags
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setFirmwareTags(Build.TAGS);}
 	 * </pre>
@@ -328,7 +235,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets FirmwareType
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setFirmwareType(Build.TYPE);}
 	 * </pre>
@@ -341,7 +247,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets HardwareManufacturer
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setHardwareManufacturer(Build.MANUFACTURER);}
 	 * </pre>
@@ -354,7 +259,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets HardwareModel
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setHardwareModel(Build.HARDWARE);}
 	 * </pre>

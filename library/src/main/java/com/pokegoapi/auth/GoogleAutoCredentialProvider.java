@@ -1,12 +1,10 @@
 package com.pokegoapi.auth;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.request.InvalidCredentialsException;
+import com.pokegoapi.exceptions.request.LoginFailedException;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
-
 import lombok.Getter;
 import okhttp3.OkHttpClient;
 import svarzee.gps.gpsoauth.AuthToken;
@@ -37,13 +35,13 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	 * Constructs credential provider using username and password
 	 *
 	 * @param httpClient OkHttp client
-	 * @param username   google username
-	 * @param password   google password
-	 * @throws LoginFailedException  - login failed possibly due to invalid credentials
-	 * @throws RemoteServerException - some server/network failure
+	 * @param username google username
+	 * @param password google password
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
 	public GoogleAutoCredentialProvider(OkHttpClient httpClient, String username, String password)
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, InvalidCredentialsException {
 		this.gpsoauth = new Gpsoauth(httpClient);
 		this.username = username;
 		this.tokenInfo = login(username, password);
@@ -52,14 +50,14 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 
 	/**
 	 * @param httpClient the client that will make http call
-	 * @param username   google username
-	 * @param password   google pwd
-	 * @param time       time instance used to refresh token
-	 * @throws LoginFailedException  login failed possibly due to invalid credentials
-	 * @throws RemoteServerException some server/network failure
+	 * @param username google username
+	 * @param password google pwd
+	 * @param time time instance used to refresh token
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
 	public GoogleAutoCredentialProvider(OkHttpClient httpClient, String username, String password, Time time)
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, InvalidCredentialsException {
 		this.gpsoauth = new Gpsoauth(httpClient);
 		this.username = username;
 		this.tokenInfo = login(username, password);
@@ -67,68 +65,71 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	}
 
 	private TokenInfo login(String username, String password)
-			throws RemoteServerException, LoginFailedException {
+			throws LoginFailedException, InvalidCredentialsException {
 		try {
 			String masterToken = gpsoauth.performMasterLoginForToken(username, password, GOOGLE_LOGIN_ANDROID_ID);
 			AuthToken authToken = gpsoauth.performOAuthForToken(username, masterToken, GOOGLE_LOGIN_ANDROID_ID,
 					GOOGLE_LOGIN_SERVICE, GOOGLE_LOGIN_APP, GOOGLE_LOGIN_CLIENT_SIG);
 			return new TokenInfo(authToken, masterToken);
-		} catch (IOException e) {
-			throw new RemoteServerException(e);
-		} catch (Gpsoauth.TokenRequestFailed e) {
+		} catch (IOException | Gpsoauth.TokenRequestFailed e) {
 			throw new LoginFailedException(e);
 		}
 	}
 
 	/**
-	 * @param username     user name
+	 * @param username user name
 	 * @param refreshToken refresh token
 	 * @return the token info
-	 * @throws RemoteServerException login failed possibly due to invalid credentials
-	 * @throws LoginFailedException  some server/network failure
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
-	private TokenInfo refreshToken(String username, String refreshToken)
-			throws RemoteServerException, LoginFailedException {
+	private TokenInfo refreshToken(String username, String refreshToken) throws LoginFailedException,
+			InvalidCredentialsException {
 		try {
 			AuthToken authToken = gpsoauth.performOAuthForToken(username, refreshToken, GOOGLE_LOGIN_ANDROID_ID,
 					GOOGLE_LOGIN_SERVICE, GOOGLE_LOGIN_APP, GOOGLE_LOGIN_CLIENT_SIG);
 			return new TokenInfo(authToken, refreshToken);
-		} catch (IOException e) {
-			throw new RemoteServerException(e);
-		} catch (Gpsoauth.TokenRequestFailed e) {
+		} catch (IOException | Gpsoauth.TokenRequestFailed e) {
 			throw new LoginFailedException(e);
 		}
 	}
 
 	/**
+	 * @param refresh if this AuthInfo should be refreshed
 	 * @return token id
-	 * @throws RemoteServerException login failed possibly due to invalid credentials
-	 * @throws LoginFailedException  some server/network failure
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
 	@Override
-	public String getTokenId() throws RemoteServerException, LoginFailedException {
-		if (isTokenIdExpired()) {
+	public String getTokenId(boolean refresh) throws LoginFailedException, InvalidCredentialsException {
+		if (refresh || isTokenIdInvalid()) {
 			this.tokenInfo = refreshToken(username, tokenInfo.refreshToken);
 		}
 		return tokenInfo.authToken.getToken();
 	}
 
 	/**
+	 * @param refresh if this AuthInfo should be refreshed
 	 * @return auth info
-	 * @throws RemoteServerException login failed possibly due to invalid credentials
-	 * @throws LoginFailedException  some server/network failure
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
 	@Override
-	public AuthInfo getAuthInfo() throws RemoteServerException, LoginFailedException {
+	public AuthInfo getAuthInfo(boolean refresh) throws LoginFailedException, InvalidCredentialsException {
 		AuthInfo.Builder builder = AuthInfo.newBuilder();
 		builder.setProvider("google");
-		builder.setToken(AuthInfo.JWT.newBuilder().setContents(getTokenId()).setUnknown2(59).build());
+		builder.setToken(AuthInfo.JWT.newBuilder().setContents(getTokenId(refresh)).setUnknown2(0).build());
 		return builder.build();
 	}
 
 	@Override
-	public boolean isTokenIdExpired() {
-		return tokenInfo.authToken.getExpiry() > time.currentTimeMillis() / 1000 - 60;
+	public boolean isTokenIdInvalid() {
+		return tokenInfo == null || tokenInfo.authToken.getExpiry() < time.currentTimeMillis() / 1000;
+	}
+
+	@Override
+	public void reset() {
+		tokenInfo = null;
 	}
 
 	private static class TokenInfo {

@@ -16,6 +16,8 @@
 package com.pokegoapi.util;
 
 
+import POGOProtos.Inventory.Item.ItemIdOuterClass;
+
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -26,6 +28,7 @@ import java.util.ResourceBundle;
 public class PokeDictionary {
 	private static final String POKE_NAMES_BUNDLE = "pokemon_names";
 	private static final String POKE_DESCRIPTIONS_BUNDLE = "pokemon_descriptions";
+	private static final String ITEM_NAMES_BUNDLE = "item_names";
 
 	/**
 	 * An array of all supported locales.
@@ -46,20 +49,15 @@ public class PokeDictionary {
 
 	private static ResourceBundle getPokeBundle(String bundleBaseName, Locale locale)
 			throws MissingResourceException {
-		return ResourceBundle.getBundle(bundleBaseName, locale, new ResourceBundle.Control() {
-			@Override
-			public Locale getFallbackLocale(String baseName, Locale locale) {
-				return Locale.ENGLISH;
-			}
-		});
+		return ResourceBundle.getBundle(bundleBaseName, locale);
 	}
 
 	/**
 	 * Returns the Pokédex Name for a Pokedex ID including known translations.
-	 * Fallback to English if names do not exist for the given {@link Locale}.
+	 * Fallback to the default locale if names do not exist for the given {@link Locale}.
 	 *
 	 * @param pokedexId Pokemon index number
-	 * @param locale    target name locale
+	 * @param locale target name locale
 	 * @return the Pokemon name in locale
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
@@ -70,10 +68,10 @@ public class PokeDictionary {
 
 	/**
 	 * Returns the Pokédex Description for a Pokédex ID including known translations.
-	 * Fallback to English if names do not exist for the given {@link Locale}.
+	 * Fallback to the default locale if names do not exist for the given {@link Locale}.
 	 *
 	 * @param pokedexId Pokemon index number
-	 * @param locale    target name locale
+	 * @param locale target name locale
 	 * @return the Pokemon description in locale
 	 * @throws MissingResourceException if can not find a matched Pokemon description for the given pokedex
 	 */
@@ -83,10 +81,24 @@ public class PokeDictionary {
 	}
 
 	/**
-	 * Returns translated Pokemon name from ENGLISH locale.
-	 * Fallback to English if names do not exist for the given {@link Locale}.
+	 * Returns the item name for a given ItemId including known translations.
+	 * Fallback to the default locale if names do not exist for the given {@link Locale}.
 	 *
-	 * @param engName   pokemon ENGLISH name
+	 * @param itemId Item id
+	 * @param locale target name locale
+	 * @return the item name in locale
+	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
+	 */
+	public static String getDisplayItemName(ItemIdOuterClass.ItemId itemId, Locale locale)
+			throws MissingResourceException {
+		return getPokeBundle(ITEM_NAMES_BUNDLE, locale).getString(String.valueOf(itemId.getNumber()));
+	}
+
+	/**
+	 * Returns translated Pokemon name from ENGLISH locale.
+	 * Fallback to the default locale if names do not exist for the given {@link Locale}.
+	 *
+	 * @param engName pokemon ENGLISH name
 	 * @param newLocale the locale you want translate to
 	 * @return translated pokemon name
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
@@ -100,7 +112,7 @@ public class PokeDictionary {
 	 * Returns the Pokemon index from the Pokemon name list.
 	 *
 	 * @param pokeName pokemon name in locale
-	 * @param locale   the locale on this name
+	 * @param locale the locale on this name
 	 * @return pokedex Pokedex Id if a Pokemon with the given pokedex id exists, else -1.
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */

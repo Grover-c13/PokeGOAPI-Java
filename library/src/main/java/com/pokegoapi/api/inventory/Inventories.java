@@ -15,139 +15,170 @@
 
 package com.pokegoapi.api.inventory;
 
-import POGOProtos.Enums.PokemonFamilyIdOuterClass;
+import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
+import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
+import POGOProtos.Inventory.AppliedItemOuterClass.AppliedItem;
+import POGOProtos.Inventory.AppliedItemsOuterClass.AppliedItems;
+import POGOProtos.Inventory.CandyOuterClass.Candy;
 import POGOProtos.Inventory.EggIncubatorOuterClass;
-import POGOProtos.Inventory.InventoryItemDataOuterClass;
-import POGOProtos.Inventory.InventoryItemOuterClass;
+import POGOProtos.Inventory.EggIncubatorsOuterClass.EggIncubators;
+import POGOProtos.Inventory.InventoryItemDataOuterClass.InventoryItemData;
+import POGOProtos.Inventory.InventoryItemOuterClass.InventoryItem;
 import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
-import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
-
+import POGOProtos.Networking.Requests.Messages.GetHoloInventoryMessageOuterClass.GetHoloInventoryMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.GetHoloInventoryResponseOuterClass.GetHoloInventoryResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.api.pokemon.Pokemon;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.main.ServerRequest;
-
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 public class Inventories {
 
 	private final PokemonGo api;
 	@Getter
-	private ItemBag itemBag;
+	public ItemBag itemBag;
 	@Getter
-	private PokeBank pokebank;
+	public PokeBank pokebank;
 	@Getter
-	private CandyJar candyjar;
+	public CandyJar candyjar;
 	@Getter
 	private Pokedex pokedex;
 	@Getter
-	private List<EggIncubator> incubators;
+	public final List<EggIncubator> incubators = Collections.synchronizedList(new ArrayList<EggIncubator>());
 	@Getter
-	private Hatchery hatchery;
+	public Hatchery hatchery;
+	@Getter
+	public long lastInventoryUpdate = 0;
 
-	private long lastInventoryUpdate = 0;
+	private Map<ItemId, AppliedItem> appliedItems = new HashMap<>();
+
+	@Getter
+	private final Object lock = new Object();
 
 	/**
 	 * Creates Inventories and initializes content.
 	 *
 	 * @param api PokemonGo api
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
 	 */
-	public Inventories(PokemonGo api) throws LoginFailedException, RemoteServerException {
+	public Inventories(PokemonGo api) {
 		this.api = api;
 		itemBag = new ItemBag(api);
 		pokebank = new PokeBank(api);
 		candyjar = new CandyJar(api);
-		pokedex = new Pokedex(api);
-		incubators = new ArrayList<>();
+		pokedex = new Pokedex();
 		hatchery = new Hatchery(api);
-		updateInventories();
 	}
 
 	/**
 	 * Updates the inventories with latest data.
 	 *
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
+	 * @return the response to the update message
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public void updateInventories() throws LoginFailedException, RemoteServerException {
-		updateInventories(false);
+	public GetHoloInventoryResponse updateInventories() throws RequestFailedException {
+		return updateInventories(false);
 	}
 
 	/**
 	 * Updates the inventories with the latest data.
 	 *
 	 * @param forceUpdate For a full update if true
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
+	 * @return the response to the update message
+	 * @throws RequestFailedException if an exception occurred while sending requests
+	 * @deprecated Inventory is updated as a common request
 	 */
-	public void updateInventories(boolean forceUpdate) throws LoginFailedException, RemoteServerException {
+	@Deprecated
+	public GetHoloInventoryResponse updateInventories(boolean forceUpdate)
+			throws RequestFailedException {
 		if (forceUpdate) {
 			lastInventoryUpdate = 0;
-			itemBag.reset(api);
-			pokebank.reset(api);
-			candyjar.reset(api);
-			pokedex.reset(api);
-			incubators = new ArrayList<>();
-			hatchery.reset(api);
+			itemBag.reset();
+			pokebank.reset();
+			candyjar.reset();
+			pokedex.reset();
+			synchronized (this.lock) {
+				incubators.clear();
+			}
+			hatchery.reset();
 		}
-		GetInventoryMessage invReqMsg = GetInventoryMessage.newBuilder()
+		GetHoloInventoryMessage invReqMsg = GetHoloInventoryMessage.newBuilder()
 				.setLastTimestampMs(lastInventoryUpdate)
 				.build();
-		ServerRequest inventoryRequest = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY, invReqMsg);
-		api.getRequestHandler().sendServerRequests(inventoryRequest);
+		ServerRequest inventoryRequest = new ServerRequest(RequestType.GET_HOLOHOLO_INVENTORY, invReqMsg);
+		api.requestHandler.sendServerRequests(inventoryRequest, false);
 
-		GetInventoryResponse response = null;
+		GetHoloInventoryResponse response;
 		try {
-			response = GetInventoryResponse.parseFrom(inventoryRequest.getData());
+			response = GetHoloInventoryResponse.parseFrom(inventoryRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 
-		for (InventoryItemOuterClass.InventoryItem inventoryItem
-				: response.getInventoryDelta().getInventoryItemsList()) {
-			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
+		return response;
+	}
 
-			// hatchery
-			if (itemData.getPokemonData().getPokemonId() == PokemonId.MISSINGNO && itemData.getPokemonData().getIsEgg()) {
-				hatchery.addEgg(new EggPokemon(itemData.getPokemonData()));
+	/**
+	 * Updates the inventories with the latest data.
+	 *
+	 * @param response the get inventory response
+	 * @throws RequestFailedException if a request fails while sending a request
+	 */
+	public void updateInventories(GetHoloInventoryResponse response) throws RequestFailedException {
+		lastInventoryUpdate = api.currentTimeMillis();
+
+		for (InventoryItem inventoryItem : response.getInventoryDelta().getInventoryItemsList()) {
+			
+			// Remove released Pokemon from bag.
+			if (inventoryItem.getDeletedItem().getPokemonId() != 0) {
+				pokebank.removePokemon(inventoryItem.getDeletedItem().getPokemonId());
+			}
+			
+			InventoryItemData itemData = inventoryItem.getInventoryItemData();
+
+			if (itemData.hasPokemonData()) {
+				PokemonData pokemonData = itemData.getPokemonData();
+				if (pokemonData.getPokemonId() == PokemonId.MISSINGNO && pokemonData.getIsEgg()) {
+					hatchery.addEgg(new EggPokemon(pokemonData));
+				}
+
+				if (pokemonData.getPokemonId() != PokemonId.MISSINGNO) {
+					pokebank.addPokemon(new Pokemon(api, pokemonData));
+				}
 			}
 
-			// pokebank
-			if (itemData.getPokemonData().getPokemonId() != PokemonId.MISSINGNO) {
-				pokebank.addPokemon(new Pokemon(api, inventoryItem.getInventoryItemData().getPokemonData()));
-			}
-
-			// items
-			if (itemData.getItem().getItemId() != ItemId.UNRECOGNIZED
-					&& itemData.getItem().getItemId() != ItemId.ITEM_UNKNOWN) {
+			if (itemData.hasItem()) {
 				ItemData item = itemData.getItem();
-				itemBag.addItem(new Item(item));
+				if (item.getCount() > 0) {
+					itemBag.addItem(new Item(api, item, itemBag));
+				}
 			}
 
-			// candyjar
-			if (itemData.getCandy().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED
-					&& itemData.getCandy().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_UNSET) {
-				candyjar.setCandy(
-						itemData.getCandy().getFamilyId(),
-						itemData.getCandy().getCandy()
-				);
+			if (itemData.hasCandy()) {
+				Candy candy = itemData.getCandy();
+				if (candy.getFamilyId() != PokemonFamilyId.UNRECOGNIZED
+						&& candy.getFamilyId() != PokemonFamilyId.FAMILY_UNSET) {
+					candyjar.setCandy(candy.getFamilyId(), candy.getCandy());
+				}
 			}
+
 			// player stats
 			if (itemData.hasPlayerStats()) {
-				api.getPlayerProfile().setStats(new Stats(itemData.getPlayerStats()));
+				api.playerProfile.setStats(new Stats(itemData.getPlayerStats()));
 			}
 
 			// pokedex
@@ -156,12 +187,40 @@ public class Inventories {
 			}
 
 			if (itemData.hasEggIncubators()) {
-				for (EggIncubatorOuterClass.EggIncubator incubator : itemData.getEggIncubators().getEggIncubatorList()) {
-					incubators.add(new EggIncubator(api, incubator));
+				EggIncubators eggIncubators = itemData.getEggIncubators();
+				for (EggIncubatorOuterClass.EggIncubator incubator : eggIncubators.getEggIncubatorList()) {
+					EggIncubator eggIncubator = new EggIncubator(api, incubator);
+					synchronized (this.lock) {
+						incubators.remove(eggIncubator);
+						incubators.add(eggIncubator);
+					}
 				}
 			}
 
-			lastInventoryUpdate = api.currentTimeMillis();
+			if (itemData.hasAppliedItems()) {
+				AppliedItems appliedItems = itemData.getAppliedItems();
+				for (AppliedItem appliedItem : appliedItems.getItemList()) {
+					this.appliedItems.put(appliedItem.getItemId(), appliedItem);
+				}
+			}
+
+			Set<ItemId> stale = new HashSet<>();
+			for (Map.Entry<ItemId, AppliedItem> entry : appliedItems.entrySet()) {
+				ItemId itemId = entry.getKey();
+				AppliedItem applied = entry.getValue();
+				if (api.currentTimeMillis() >= applied.getExpireMs()) {
+					stale.add(itemId);
+				} else {
+					Item item = itemBag.getItem(itemId);
+					item.setApplied(applied);
+					itemBag.addItem(item);
+				}
+			}
+
+			for (ItemId item : stale) {
+				appliedItems.remove(item);
+				itemBag.getItem(item).removeApplied();
+			}
 		}
 	}
 }

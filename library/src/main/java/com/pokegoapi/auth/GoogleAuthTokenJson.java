@@ -23,25 +23,25 @@ import lombok.Setter;
 public class GoogleAuthTokenJson {
 	@Getter
 	@Setter
-	private String error;
+	public String error;
 	@Getter
 	@Setter
 	@Json(name = "access_token")
-	private String accessToken;
+	public String accessToken;
 	@Getter
 	@Setter
 	@Json(name = "token_type")
-	private String tokenType;
+	public String tokenType;
 	@Getter
 	@Setter
 	@Json(name = "expires_in")
-	private int expiresIn;
+	public int expiresIn;
 	@Getter
 	@Setter
 	@Json(name = "refresh_token")
-	private String refreshToken;
+	public String refreshToken;
 	@Getter
 	@Setter
 	@Json(name = "id_token")
-	private String idToken;
+	public String idToken;
 }

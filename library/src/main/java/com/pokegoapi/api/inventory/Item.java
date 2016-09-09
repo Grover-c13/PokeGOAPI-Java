@@ -15,20 +15,49 @@
 
 package com.pokegoapi.api.inventory;
 
+import POGOProtos.Enums.ItemCategoryOuterClass.ItemCategory;
+import POGOProtos.Inventory.AppliedItemOuterClass.AppliedItem;
 import POGOProtos.Inventory.Item.ItemDataOuterClass;
+import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
+import POGOProtos.Settings.Master.ItemSettingsOuterClass.ItemSettings;
+import com.pokegoapi.api.PokemonGo;
 import lombok.Getter;
-import lombok.Setter;
 
 public class Item {
-	private ItemDataOuterClass.ItemData proto;
-	@Getter
-	@Setter
-	private int count;
+	private ItemData proto;
 
-	public Item(ItemDataOuterClass.ItemData proto) {
+	private PokemonGo api;
+
+	@Getter
+	private final ItemSettings settings;
+
+	@Getter
+	public int count;
+
+	@Getter
+	private ItemBag itemBag;
+
+	private boolean applied;
+
+	@Getter
+	private long appliedTime;
+	@Getter
+	private long appliedExpiration;
+
+	/**
+	 * Constructs a new item.
+	 *
+	 * @param api the current api
+	 * @param proto the protocol to construct this item from
+	 * @param itemBag the item bag containing this item
+	 */
+	public Item(PokemonGo api, ItemDataOuterClass.ItemData proto, ItemBag itemBag) {
+		this.api = api;
 		this.proto = proto;
 		this.count = proto.getCount();
+		this.itemBag = itemBag;
+		this.settings = api.itemTemplates.getItemSettings(getItemId());
 	}
 
 	public ItemId getItemId() {
@@ -40,26 +69,86 @@ public class Item {
 	}
 
 	/**
-	 * Check if the item it's a potion
+	 * Check if the item is a potion
 	 *
-	 * @return true if the item it's a potion
+	 * @return true if the item is a potion
 	 */
 	public boolean isPotion() {
-		return getItemId() == ItemId.ITEM_POTION
-				|| getItemId() == ItemId.ITEM_SUPER_POTION
-				|| getItemId() == ItemId.ITEM_HYPER_POTION
-				|| getItemId() == ItemId.ITEM_MAX_POTION
-				;
+		return settings.hasPotion();
 	}
 
 	/**
-	 * Check if the item it's a revive
+	 * Check if the item is a revive
 	 *
-	 * @return true if the item it's a revive
+	 * @return true if the item is a revive
 	 */
 	public boolean isRevive() {
-		return getItemId() == ItemId.ITEM_REVIVE
-				|| getItemId() == ItemId.ITEM_MAX_REVIVE
-				;
+		return settings.hasRevive();
+	}
+
+	/**
+	 * Check if the item is a lucky egg
+	 *
+	 * @return true if the item is a lucky egg
+	 */
+	public boolean isLuckyEgg() {
+		return settings.hasXpBoost();
+	}
+
+	/**
+	 * Check if the item is incense
+	 *
+	 * @return true if the item is incense
+	 */
+	public boolean isIncense() {
+		return settings.hasIncense();
+	}
+
+	/**
+	 * Sets the item count. If the count reaches 0, this item is removed from the containing item bag.
+	 *
+	 * @param count the new item count
+	 */
+	public void setCount(int count) {
+		this.count = count;
+		if (count <= 0) {
+			itemBag.removeItem(getItemId());
+		} else {
+			itemBag.addItem(this);
+		}
+	}
+
+	/**
+	 * @return the category this item is in
+	 */
+	public ItemCategory getCategory() {
+		return settings.getCategory();
+	}
+
+	/**
+	 * Sets this item to applied with the given AppliedItem proto
+	 *
+	 * @param item the proto to import from
+	 */
+	public void setApplied(AppliedItem item) {
+		this.applied = true;
+		this.appliedTime = item.getAppliedMs();
+		this.appliedExpiration = item.getExpireMs();
+	}
+
+	/**
+	 * Checks if this item is applied
+	 *
+	 * @return if this item is applied / active
+	 */
+	public boolean isApplied() {
+		return api.currentTimeMillis() <= appliedExpiration && applied;
+	}
+
+	/**
+	 * Sets this item as not applied
+	 */
+	public void removeApplied() {
+		applied = false;
 	}
 }

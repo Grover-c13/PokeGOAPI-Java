@@ -17,14 +17,11 @@ package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
-
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.EggIncubator;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import lombok.Setter;
 
 /**
@@ -34,7 +31,7 @@ public class EggPokemon {
 
 	private static final String TAG = EggPokemon.class.getSimpleName();
 	@Setter
-	PokemonGo api;
+	public PokemonGo api;
 	private PokemonData proto;
 
 	// API METHODS //
@@ -44,11 +41,9 @@ public class EggPokemon {
 	 *
 	 * @param incubator : the incubator
 	 * @return status of putting egg in incubator
-	 * @throws LoginFailedException  if failed to login
-	 * @throws RemoteServerException if the server failed to respond
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public UseItemEggIncubatorResponse.Result incubate(EggIncubator incubator)
-			throws LoginFailedException, RemoteServerException {
+	public UseItemEggIncubatorResponse.Result incubate(EggIncubator incubator) throws RequestFailedException {
 		if (incubator.isInUse()) {
 			throw new IllegalArgumentException("Incubator already used");
 		}
@@ -59,13 +54,11 @@ public class EggPokemon {
 	 * Get the current distance that has been done with this egg
 	 *
 	 * @return get distance already walked
-	 * @throws LoginFailedException  if failed to login
-	 * @throws RemoteServerException if the server failed to respond
 	 */
-	public double getEggKmWalked() throws LoginFailedException, RemoteServerException {
+	public double getEggKmWalked() {
 		if (!isIncubate())
 			return 0;
-		EggIncubator incubator = Stream.of(api.getInventories().getIncubators())
+		EggIncubator incubator = Stream.of(api.inventories.incubators)
 				.filter(new Predicate<EggIncubator>() {
 					@Override
 					public boolean test(EggIncubator incub) {
@@ -77,7 +70,7 @@ public class EggPokemon {
 			return 0;
 		else
 			return proto.getEggKmWalkedTarget()
-					- (incubator.getKmTarget() - api.getPlayerProfile().getStats().getKmWalked());
+					- (incubator.getKmTarget() - api.playerProfile.getStats().getKmWalked());
 	}
 
 	// DELEGATE METHODS BELOW //
