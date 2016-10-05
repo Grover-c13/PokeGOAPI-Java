@@ -367,6 +367,7 @@ public class Map {
 
 						MapObjects result = new MapObjects(api);
 						cachedMapObjects = result;
+						cachedCatchable = null;
 						for (MapCell mapCell : response.getMapCellsList()) {
 							result.addNearbyPokemons(mapCell.getNearbyPokemonsList());
 							result.addCatchablePokemons(mapCell.getCatchablePokemonsList());
