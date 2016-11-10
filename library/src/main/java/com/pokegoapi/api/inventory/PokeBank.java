@@ -15,17 +15,16 @@
 
 package com.pokegoapi.api.inventory;
 
+import POGOProtos.Enums.PokemonIdOuterClass;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
 import com.pokegoapi.api.pokemon.Pokemon;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import POGOProtos.Enums.PokemonIdOuterClass;
-import lombok.Getter;
 
 
 public class PokeBank {
@@ -74,11 +73,14 @@ public class PokeBank {
 	/**
 	 * Remove pokemon.
 	 *
-	 * @param pokemon the pokemon
+	 * @param pokemon the pokemon to remove.
 	 */
 	public void removePokemon(final Pokemon pokemon) {
+		List<Pokemon> previous = new ArrayList<>();
+		previous.addAll(pokemons);
+
 		pokemons.clear();
-		pokemons.addAll(Stream.of(pokemons).filter(new Predicate<Pokemon>() {
+		pokemons.addAll(Stream.of(previous).filter(new Predicate<Pokemon>() {
 			@Override
 			public boolean test(Pokemon pokemn) {
 				return pokemn.getId() != pokemon.getId();

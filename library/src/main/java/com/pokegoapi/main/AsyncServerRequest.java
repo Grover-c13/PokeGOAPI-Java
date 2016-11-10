@@ -15,18 +15,21 @@
 
 package com.pokegoapi.main;
 
-import com.google.protobuf.GeneratedMessage;
-
 import POGOProtos.Networking.Requests.RequestOuterClass.Request;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import com.google.protobuf.GeneratedMessage;
 import lombok.Getter;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * The type Server request.
  */
 public class AsyncServerRequest {
+	private static final AtomicLong CURRENT_ID = new AtomicLong(System.currentTimeMillis());
+
 	@Getter
-	private final long id = System.nanoTime();
+	private final long id = CURRENT_ID.getAndIncrement();
 	@Getter
 	private final RequestType type;
 	@Getter
