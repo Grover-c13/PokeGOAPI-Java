@@ -214,13 +214,13 @@ public class RequestHandler implements Runnable {
 				newAuthTicket = responseEnvelop.getAuthTicket();
 			}
 
-			if (responseEnvelop.getStatusCode() == 102) {
+			if (responseEnvelop.getStatusCode() == ResponseEnvelope.StatusCode.INVALID_AUTH_TOKEN) {
 				throw new LoginFailedException(String.format("Invalid Auth status code recieved, token not refreshed? %s %s",
 						responseEnvelop.getApiUrl(), responseEnvelop.getError()));
-			} else if (responseEnvelop.getStatusCode() == 53) {
+			} else if (responseEnvelop.getStatusCode() == ResponseEnvelope.StatusCode.REDIRECT) {
 				// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
 				return internalSendServerRequests(newAuthTicket, serverRequests);
-			} else if (responseEnvelop.getStatusCode() == 3) {
+			} else if (responseEnvelop.getStatusCode() == ResponseEnvelope.StatusCode.BAD_REQUEST) {
 				throw new RemoteServerException("Your account may be banned! please try from the official client.");
 			}
 
@@ -265,7 +265,6 @@ public class RequestHandler implements Runnable {
 		builder.setMsSinceLastLocationfix(989);
 		builder.setLatitude(api.getLatitude());
 		builder.setLongitude(api.getLongitude());
-		builder.setAltitude(api.getAltitude());
 	}
 
 	private Long getRequestId() {
