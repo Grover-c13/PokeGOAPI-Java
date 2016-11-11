@@ -18,7 +18,6 @@ package com.pokegoapi.main;
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
-
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -28,7 +27,6 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.Signature;
-
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -39,12 +37,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -56,7 +54,7 @@ public class RequestHandler implements Runnable {
 	private final PokemonGo api;
 	private final Thread asyncHttpThread;
 	private final BlockingQueue<AsyncServerRequest> workQueue = new LinkedBlockingQueue<>();
-	private final Map<Long, ResultOrException> resultMap = new HashMap<>();
+	private final Map<Long, ResultOrException> resultMap = new ConcurrentHashMap<>();
 	private String apiEndpoint;
 	private OkHttpClient client;
 	private Long requestId = new Random().nextLong();
@@ -277,7 +275,7 @@ public class RequestHandler implements Runnable {
 		AuthTicket authTicket = null;
 		while (true) {
 			try {
-				Thread.sleep(350);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				throw new AsyncPokemonGoException("System shutdown", e);
 			}
