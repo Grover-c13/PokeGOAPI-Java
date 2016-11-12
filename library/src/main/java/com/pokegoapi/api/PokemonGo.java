@@ -15,6 +15,13 @@
 
 package com.pokegoapi.api;
 
+import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
@@ -33,21 +40,13 @@ import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.ClientInterceptor;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
+import lombok.Getter;
+import lombok.Setter;
+import okhttp3.OkHttpClient;
 
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
-
-import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-import POGOProtos.Networking.Envelopes.SignatureOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
-import lombok.Getter;
-import lombok.Setter;
-import okhttp3.OkHttpClient;
 
 
 public class PokemonGo {
@@ -71,6 +70,9 @@ public class PokemonGo {
 	@Getter
 	@Setter
 	private double altitude;
+	@Getter
+	@Setter
+	private double horizontalAccuracy = 5;
 	private CredentialProvider credentialProvider;
 	@Getter
 	private Settings settings;
@@ -94,8 +96,8 @@ public class PokemonGo {
 	 * Instantiates a new Pokemon go.
 	 *
 	 * @param client the http client
-	 * @param time   a time implementation
-	 * @param seed   the seed to generate same device
+	 * @param time a time implementation
+	 * @param seed the seed to generate same device
 	 */
 	public PokemonGo(OkHttpClient client, Time time, long seed) {
 		this.time = time;
@@ -117,7 +119,7 @@ public class PokemonGo {
 	 * Deprecated: specify a time implementation
 	 *
 	 * @param client the http client
-	 * @param seed   the seed to generate same device
+	 * @param seed the seed to generate same device
 	 */
 	public PokemonGo(OkHttpClient client, long seed) {
 		this(client, new SystemTimeImpl(), seed);
@@ -128,7 +130,7 @@ public class PokemonGo {
 	 * Deprecated: specify a time implementation
 	 *
 	 * @param client the http client
-	 * @param time   a time implementation
+	 * @param time a time implementation
 	 */
 	public PokemonGo(OkHttpClient client, Time time) {
 		this(client, time, hash(UUID.randomUUID().toString()));
@@ -148,7 +150,7 @@ public class PokemonGo {
 	 * Login user with the provided provider
 	 *
 	 * @param credentialProvider the credential provider
-	 * @throws LoginFailedException  When login fails
+	 * @throws LoginFailedException When login fails
 	 * @throws RemoteServerException When server fails
 	 */
 	public void login(CredentialProvider credentialProvider) throws LoginFailedException, RemoteServerException {
@@ -202,7 +204,7 @@ public class PokemonGo {
 	 * Fire requests block.
 	 *
 	 * @param request server request
-	 * @throws LoginFailedException  When login fails
+	 * @throws LoginFailedException When login fails
 	 * @throws RemoteServerException When server fails
 	 */
 	private void fireRequestBlock(ServerRequest request) throws RemoteServerException, LoginFailedException {
@@ -220,7 +222,7 @@ public class PokemonGo {
 	/**
 	 * Second requests block. Public since it could be re-fired at any time
 	 *
-	 * @throws LoginFailedException  When login fails
+	 * @throws LoginFailedException When login fails
 	 * @throws RemoteServerException When server fails
 	 */
 	public void fireRequestBlockTwo() throws RemoteServerException, LoginFailedException {
@@ -250,7 +252,7 @@ public class PokemonGo {
 	 * Fetches valid AuthInfo
 	 *
 	 * @return AuthInfo object
-	 * @throws LoginFailedException  when login fails
+	 * @throws LoginFailedException when login fails
 	 * @throws RemoteServerException When server fails
 	 */
 	public AuthInfo getAuthInfo()
@@ -261,17 +263,30 @@ public class PokemonGo {
 	/**
 	 * Sets location.
 	 *
-	 * @param latitude  the latitude
+	 * @param latitude the latitude
 	 * @param longitude the longitude
-	 * @param altitude  the altitude
+	 * @param altitude the altitude
 	 */
 	public void setLocation(double latitude, double longitude, double altitude) {
+		setLocation(latitude, longitude, altitude, horizontalAccuracy);
+	}
+
+	/**
+	 * Sets location with horizontal accuracy.
+	 *
+	 * @param latitude the latitude
+	 * @param longitude the longitude
+	 * @param altitude the altitude
+	 * @param horizontalAccuracy the horizontal accuracy
+	 */
+	public void setLocation(double latitude, double longitude, double altitude, double horizontalAccuracy) {
 		if (latitude != this.latitude || longitude != this.longitude) {
 			getMap().clearCache();
 		}
 		setLatitude(latitude);
 		setLongitude(longitude);
 		setAltitude(altitude);
+		setHorizontalAccuracy(horizontalAccuracy);
 	}
 
 	public long currentTimeMillis() {
@@ -328,12 +343,12 @@ public class PokemonGo {
 		}
 		return deviceInfo.getDeviceInfo();
 	}
-	
+
 	/**
 	 * Gets the sensor info
 	 *
 	 * @param currentTime the current time
-	 * @param random      the random object
+	 * @param random the random object
 	 * @return the sensor info
 	 */
 	public SignatureOuterClass.Signature.SensorInfo getSensorSignature(long currentTime, Random random) {
@@ -342,7 +357,7 @@ public class PokemonGo {
 		}
 		return sensorInfo.getSensorInfo();
 	}
-	
+
 	/**
 	 * Gets the activity status
 	 *

@@ -263,6 +263,7 @@ public class RequestHandler implements Runnable {
 		builder.setMsSinceLastLocationfix(989);
 		builder.setLatitude(api.getLatitude());
 		builder.setLongitude(api.getLongitude());
+		builder.setAccuracy(api.getHorizontalAccuracy());
 	}
 
 	private Long getRequestId() {
