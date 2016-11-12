@@ -15,16 +15,6 @@
 
 package com.pokegoapi.api.inventory;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.Log;
-
-import java.util.Collection;
-import java.util.HashMap;
-
 import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.RecycleInventoryItemMessageOuterClass.RecycleInventoryItemMessage;
@@ -35,6 +25,15 @@ import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass;
 import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result;
 import POGOProtos.Networking.Responses.UseIncenseResponseOuterClass.UseIncenseResponse;
 import POGOProtos.Networking.Responses.UseItemXpBoostResponseOuterClass.UseItemXpBoostResponse;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.Log;
+
+import java.util.Collection;
+import java.util.HashMap;
 
 
 /**
@@ -57,7 +56,7 @@ public class ItemBag {
 	}
 
 	/**
-	 * Remove item result.
+	 * Discards the given item.
 	 *
 	 * @param id       the id
 	 * @param quantity the quantity
@@ -68,7 +67,7 @@ public class ItemBag {
 	public Result removeItem(ItemId id, int quantity) throws RemoteServerException, LoginFailedException {
 		Item item = getItem(id);
 		if (item.getCount() < quantity) {
-			throw new IllegalArgumentException("You cannont remove more quantity than you have");
+			throw new IllegalArgumentException("You cannot remove more quantity than you have");
 		}
 
 		RecycleInventoryItemMessage msg = RecycleInventoryItemMessage.newBuilder().setItemId(id).setCount(quantity)
@@ -88,8 +87,21 @@ public class ItemBag {
 		if (response
 				.getResult() == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
 			item.setCount(response.getNewCount());
+			if (item.getCount() <= 0) {
+				removeItem(item.getItemId());
+			}
 		}
 		return response.getResult();
+	}
+
+	/**
+	 * Removes the given item ID from the bag item map.
+	 *
+	 * @param id the item to remove
+	 * @return The item removed, if any
+	 */
+	public Item removeItem(ItemId id) {
+		return items.remove(id);
 	}
 
 	/**
@@ -105,7 +117,7 @@ public class ItemBag {
 
 		// prevent returning null
 		if (!items.containsKey(type)) {
-			return new Item(ItemData.newBuilder().setCount(0).setItemId(type).build());
+			return new Item(ItemData.newBuilder().setCount(0).setItemId(type).build(), this);
 		}
 
 		return items.get(type);
@@ -214,5 +226,4 @@ public class ItemBag {
 			throw new RemoteServerException(e);
 		}
 	}
-
 }
