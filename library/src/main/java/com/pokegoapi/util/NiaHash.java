@@ -3,20 +3,20 @@ package com.pokegoapi.util;
 import java.nio.ByteBuffer;
 
 public class NiaHash {
-	private static final int HASH_SEED = 0x61247FBF;
+	private static final int HASH_SEED = 0x46E945F8;
 	private static final long[] MAGIC_TABLE = new long[]{
-			0x95C05F4D1512959EL, 0xE4F3C46EEF0DCF07L,
-			0x6238DC228F980AD2L, 0x53F3E3BC49607092L,
-			0x4E7BE7069078D625L, 0x1016D709D1AD25FCL,
-			0x044E89B8AC76E045L, 0xE0B684DDA364BFA1L,
-			0x90C533B835E89E5FL, 0x3DAF462A74FA874FL,
-			0xFEA54965DD3EF5A0L, 0x287A5D7CCB31B970L,
-			0xAE681046800752F8L, 0x121C2D6EAF66EC6EL,
-			0xEE8F8CA7E090FB20L, 0xCE1AE25F48FE0A52L
+			0x2DD7CAAEFCF073EBL, 0xA9209937349CFE9CL,
+			0xB84BFC934B0E60EFL, 0xFF709C157B26E477L,
+			0x3936FD8735455112L, 0xCA141BF22338D331L,
+			0xDD40E749CB64FD02L, 0x5E268F564B0DEB26L,
+			0x658239596BDEA9ECL, 0x31CEDF33AC38C624L,
+			0x12F56816481B0CFDL, 0x94E9DE155F40F095L,
+			0x5089C907844C6325L, 0xDF887E97D73C50E3L,
+			0xAE8870787CE3C11DL, 0xA6767D18C58D2117L,
 	};
-	private static final UInt128 ROUND_MAGIC = new UInt128(0x14C983660183C0AEL, 0x78F32468CD48D6DEL);
-	private static final long FINAL_MAGIC_0 = 0xBDB31B10864F3F87L;
-	private static final long FINAL_MAGIC_1 = 0x5B7E9E828A9B8ABDL;
+	private static final UInt128 ROUND_MAGIC = new UInt128(0x081570AFDD535EC3L, 0xE3F0D44988BCDFABL);
+	private static final long FINAL_MAGIC_0 = 0xCE7C4801D683E824L;
+	private static final long FINAL_MAGIC_1 = 0x6823775B1DAAD522L;
 
 	public static int hash32(byte[] buffer) {
 		return hash32Salt(buffer, toBytes(HASH_SEED));
@@ -180,14 +180,14 @@ public class NiaHash {
 
 		/* Return as uint128_t */
 		// no carry during addition as bit63 = 0
-		return new UInt128((r1 << 32) | (r0 & 0xffffffffL), ((r3 << 33 >>> 1) | (r2 & 0xffffffffL)) + (r1 >>> 32));
+		return new UInt128((r1 << 32) | (r0 & 0xFFFFFFFFL), ((r3 << 33 >>> 1) | (r2 & 0xFFFFFFFFL)) + (r1 >>> 32));
 	}
 
 	private static long readInt64(byte[] bytes, int offset) { // 01, 02, 03, 04, 05, 06, 07, 08 -> 0x0807060504030201
 		// endian-safe read 64-bit integer
 		long value = 0;
 		for (int i = 7; i >= 0; i--) {
-			value = (value << 8) | (bytes[offset + i] & 0xff);
+			value = (value << 8) | (bytes[offset + i] & 0xFF);
 		}
 		return value;
 	}
