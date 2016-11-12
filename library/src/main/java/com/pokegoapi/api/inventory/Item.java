@@ -18,17 +18,25 @@ package com.pokegoapi.api.inventory;
 import POGOProtos.Inventory.Item.ItemDataOuterClass;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import lombok.Getter;
-import lombok.Setter;
 
 public class Item {
 	private ItemDataOuterClass.ItemData proto;
 	@Getter
-	@Setter
 	private int count;
 
-	public Item(ItemDataOuterClass.ItemData proto) {
+	@Getter
+	private ItemBag itemBag;
+
+	/**
+	 * Constructs a new item.
+	 *
+	 * @param proto the protocol to construct this item from
+	 * @param itemBag the item bag containing this item
+	 */
+	public Item(ItemDataOuterClass.ItemData proto, ItemBag itemBag) {
 		this.proto = proto;
 		this.count = proto.getCount();
+		this.itemBag = itemBag;
 	}
 
 	public ItemId getItemId() {
@@ -61,5 +69,19 @@ public class Item {
 		return getItemId() == ItemId.ITEM_REVIVE
 				|| getItemId() == ItemId.ITEM_MAX_REVIVE
 				;
+	}
+
+	/**
+	 * Sets the item count. If the count reaches 0, this item is removed from the containing item bag.
+	 *
+	 * @param count the new item count
+	 */
+	public void setCount(int count) {
+		this.count = count;
+		if (count <= 0) {
+			itemBag.removeItem(getItemId());
+		} else {
+			itemBag.addItem(this);
+		}
 	}
 }
