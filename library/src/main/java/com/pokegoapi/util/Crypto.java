@@ -23,23 +23,23 @@ import java.util.Arrays;
 
 public class Crypto {
 	private static class Rand {
-		public Long state;
+		public long state;
 	}
 
 	private static byte[] makeIv(Rand rand) {
 		byte[] iv = new byte[256];
 		for (int i = 0; i < 256; i++) {
 			rand.state = (0x41C64E6D * rand.state) + 0x3039;
-			Long shiftedRand = rand.state >> 16;
-			iv[i] = shiftedRand.byteValue();
+			long shiftedRand = rand.state >> 16;
+			iv[i] = Long.valueOf(shiftedRand).byteValue();
 		}
 		return iv;
 	}
 
 	private static byte makeIntegrityByte(Rand rand) {
 		rand.state = (0x41C64E6D * rand.state) + 0x3039;
-		Long shiftedRand = rand.state >> 16;
-		byte lastbyte = shiftedRand.byteValue();
+		long shiftedRand = rand.state >> 16;
+		byte lastbyte = Long.valueOf(shiftedRand).byteValue();
 
 		byte v74 = (byte) ((lastbyte ^ 0x0C) & lastbyte);
 		byte v75 = (byte) (((~v74 & 0x67) | (v74 & 0x98)) ^ 0x6F | (v74 & 8));
@@ -53,7 +53,7 @@ public class Crypto {
 	 * @param msSinceStart
 	 * @return shuffled bytes
 	 */
-	public static CipherText encrypt(byte[] input, Long msSinceStart) {
+	public static CipherText encrypt(byte[] input, long msSinceStart) {
 		Rand rand = new Rand();
 
 		byte[] arr3;
@@ -3509,7 +3509,7 @@ public class Crypto {
 		int totalsize;
 		int inputLen;
 
-		byte[] intToBytes(Long x) {
+		byte[] intToBytes(long x) {
 			ByteBuffer buffer = ByteBuffer.allocate(4);
 			buffer.putInt(new BigInteger(String.valueOf(x)).intValue());
 			return buffer.array();
@@ -3521,7 +3521,7 @@ public class Crypto {
 		 * @param input the contents
 		 * @param ms
 		 */
-		public CipherText(byte[] input, Long ms, Rand rand) {
+		public CipherText(byte[] input, long ms, Rand rand) {
 			this.inputLen = input.length;
 			this.rand = rand;
 			prefix = new byte[32];
