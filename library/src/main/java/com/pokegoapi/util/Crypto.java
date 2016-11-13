@@ -26,8 +26,6 @@ public class Crypto {
 		public Long state;
 	}
 
-	private static Rand rand = new Rand();
-
 	private static byte[] makeIv(Rand rand) {
 		byte[] iv = new byte[256];
 		for (int i = 0; i < 256; i++) {
@@ -56,13 +54,15 @@ public class Crypto {
 	 * @return shuffled bytes
 	 */
 	public static CipherText encrypt(byte[] input, Long msSinceStart) {
+		Rand rand = new Rand();
+
 		byte[] arr3;
 		CipherText output;
 
 		rand.state = msSinceStart;
 
 		byte[] iv = makeIv(rand);
-		output = new CipherText(input, msSinceStart);
+		output = new CipherText(input, msSinceStart, rand);
 
 		for (int i = 0; i < output.content.size(); ++i) {
 			byte[] current = output.content.get(i);
@@ -3502,6 +3502,7 @@ public class Crypto {
 
 
 	public static class CipherText {
+		Rand rand;
 		byte[] prefix;
 		public ArrayList<byte[]> content;
 
@@ -3520,8 +3521,9 @@ public class Crypto {
 		 * @param input the contents
 		 * @param ms
 		 */
-		public CipherText(byte[] input, Long ms) {
+		public CipherText(byte[] input, Long ms, Rand rand) {
 			this.inputLen = input.length;
+			this.rand = rand;
 			prefix = new byte[32];
 			content = new ArrayList<>();
 			int roundedsize = input.length + (256 - (input.length % 256));

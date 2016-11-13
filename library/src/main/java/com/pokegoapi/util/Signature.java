@@ -103,7 +103,7 @@ public class Signature {
 		byte[] bytes = new byte[24];
 		System.arraycopy(getBytes(api.getLatitude()), 0, bytes, 0, 8);
 		System.arraycopy(getBytes(api.getLongitude()), 0, bytes, 8, 8);
-		System.arraycopy(getBytes(api.getHorizontalAccuracy()), 0, bytes, 16, 8);
+		System.arraycopy(getBytes(api.getAccuracy()), 0, bytes, 16, 8);
 		int seed = NiaHash.hash32(authTicket);
 		return NiaHash.hash32Salt(bytes, NiaHash.toBytes(seed));
 	}
@@ -112,7 +112,7 @@ public class Signature {
 		byte[] bytes = new byte[24];
 		System.arraycopy(getBytes(api.getLatitude()), 0, bytes, 0, 8);
 		System.arraycopy(getBytes(api.getLongitude()), 0, bytes, 8, 8);
-		System.arraycopy(getBytes(api.getHorizontalAccuracy()), 0, bytes, 16, 8);
+		System.arraycopy(getBytes(api.getAccuracy()), 0, bytes, 16, 8);
 
 		return NiaHash.hash32(bytes);
 	}

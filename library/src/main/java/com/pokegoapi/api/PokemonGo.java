@@ -72,7 +72,7 @@ public class PokemonGo {
 	private double altitude;
 	@Getter
 	@Setter
-	private double horizontalAccuracy = 5;
+	private double accuracy = 1;
 	private CredentialProvider credentialProvider;
 	@Getter
 	private Settings settings;
@@ -268,25 +268,25 @@ public class PokemonGo {
 	 * @param altitude the altitude
 	 */
 	public void setLocation(double latitude, double longitude, double altitude) {
-		setLocation(latitude, longitude, altitude, horizontalAccuracy);
+		setLocation(latitude, longitude, altitude, accuracy);
 	}
 
 	/**
-	 * Sets location with horizontal accuracy.
+	 * Sets location with accuracy.
 	 *
 	 * @param latitude the latitude
 	 * @param longitude the longitude
 	 * @param altitude the altitude
-	 * @param horizontalAccuracy the horizontal accuracy
+	 * @param accuracy the accuracy of this location
 	 */
-	public void setLocation(double latitude, double longitude, double altitude, double horizontalAccuracy) {
+	public void setLocation(double latitude, double longitude, double altitude, double accuracy) {
 		if (latitude != this.latitude || longitude != this.longitude) {
 			getMap().clearCache();
 		}
 		setLatitude(latitude);
 		setLongitude(longitude);
 		setAltitude(altitude);
-		setHorizontalAccuracy(horizontalAccuracy);
+		setAccuracy(accuracy);
 	}
 
 	public long currentTimeMillis() {

@@ -102,7 +102,7 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 									+ (150 * (i + 1) + random.nextInt(250 * (i + 1) - (150 * (i + 1)))))
 					.setLatitude(latitude)
 					.setLongitude(longitude)
-					.setHorizontalAccuracy((float) api.getHorizontalAccuracy())
+					.setHorizontalAccuracy(-1)
 					.setAltitude(altitude)
 					.setVerticalAccuracy(verticalAccuracy)
 					.setProviderStatus(3)
