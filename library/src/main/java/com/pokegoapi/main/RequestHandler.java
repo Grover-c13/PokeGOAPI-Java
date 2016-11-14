@@ -48,6 +48,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class RequestHandler implements Runnable {
 	private static final String TAG = RequestHandler.class.getSimpleName();
@@ -57,7 +58,8 @@ public class RequestHandler implements Runnable {
 	private final Map<Long, ResultOrException> resultMap = new ConcurrentHashMap<>();
 	private String apiEndpoint;
 	private OkHttpClient client;
-	private Long requestId = new Random().nextLong();
+	private AtomicLong requestId = new AtomicLong(System.currentTimeMillis());
+	private Random random;
 
 	/**
 	 * Instantiates a new Request handler.
@@ -72,6 +74,7 @@ public class RequestHandler implements Runnable {
 		asyncHttpThread = new Thread(this, "Async HTTP Thread");
 		asyncHttpThread.setDaemon(true);
 		asyncHttpThread.start();
+		random = new Random();
 	}
 
 	/**
@@ -260,13 +263,14 @@ public class RequestHandler implements Runnable {
 			Log.d(TAG, "Authenticated with static token");
 			builder.setAuthInfo(api.getAuthInfo());
 		}
-		builder.setMsSinceLastLocationfix(989);
+		builder.setMsSinceLastLocationfix(random.nextInt(1651) + 149);
 		builder.setLatitude(api.getLatitude());
 		builder.setLongitude(api.getLongitude());
+		builder.setAccuracy(api.getAccuracy());
 	}
 
 	private Long getRequestId() {
-		return ++requestId;
+		return requestId.getAndIncrement();
 	}
 
 	@Override

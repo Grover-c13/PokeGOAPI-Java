@@ -1,15 +1,14 @@
 package com.pokegoapi.api.device;
 
-import com.pokegoapi.api.PokemonGo;
-
-import java.util.ArrayList;
-import java.util.Random;
-
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import com.pokegoapi.api.PokemonGo;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by fabianterhorst on 23.08.16.
@@ -27,8 +26,8 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 	/**
 	 * Gets the default device info for the given api
 	 *
-	 * @param api         the api
-	 * @param builder     the request builder
+	 * @param api the api
+	 * @param builder the request builder
 	 * @param currentTime the current time
 	 * @param random random object
 	 * @return the default device info for the given api
