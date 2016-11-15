@@ -15,14 +15,6 @@
 
 package com.pokegoapi.main;
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
-import com.pokegoapi.util.Constant;
-
-import java.util.ArrayList;
-
 import POGOProtos.Enums.PlatformOuterClass.Platform;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
 import POGOProtos.Networking.Requests.Messages.CheckChallenge.CheckChallengeMessage;
@@ -32,8 +24,15 @@ import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.G
 import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.CheckChallengeResponseOuterClass.CheckChallengeResponse;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
+import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
+import com.pokegoapi.util.Constant;
 
 /**
  * Created by iGio90 on 27/08/16.
@@ -165,6 +164,13 @@ public class CommonRequest {
 					break;
 				case DOWNLOAD_SETTINGS:
 					api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(data));
+					break;
+				case GET_HATCHED_EGGS:
+					api.getInventories().getHatchery().updateHatchedEggs(GetHatchedEggsResponse.parseFrom(data));
+					break;
+				case CHECK_CHALLENGE:
+					CheckChallengeResponse response = CheckChallengeResponse.parseFrom(data);
+					api.updateChallenge(response.getChallengeUrl(), response.getShowChallenge());
 					break;
 				default:
 					break;
