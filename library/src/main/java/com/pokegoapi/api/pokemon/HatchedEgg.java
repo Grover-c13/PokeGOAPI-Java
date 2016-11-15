@@ -26,4 +26,14 @@ public class HatchedEgg {
 	private int experience;
 	private int candy;
 	private int stardust;
+
+	@Override
+	public int hashCode() {
+		return id.intValue();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof HatchedEgg && ((HatchedEgg) obj).id.equals(id);
+	}
 }

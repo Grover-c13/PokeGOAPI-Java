@@ -92,6 +92,11 @@ public class PokemonGo {
 	@Setter
 	public LocationFixes locationFixes;
 
+	@Getter
+	private boolean hasChallenge;
+	@Getter
+	private String challengeURL;
+
 	/**
 	 * Instantiates a new Pokemon go.
 	 *
@@ -369,5 +374,15 @@ public class PokemonGo {
 			return ActivityStatus.getDefault(this, random);
 		}
 		return activityStatus.getActivityStatus();
+	}
+
+	/**
+	 * Updates the current challenge
+	 * @param url the challenge url, if any
+	 * @param hasChallenge whether the challenge solve is required
+	 */
+	public void updateChallenge(String url, boolean hasChallenge) {
+		this.hasChallenge = hasChallenge;
+		this.challengeURL = url;
 	}
 }
