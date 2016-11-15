@@ -15,6 +15,9 @@
 
 package com.pokegoapi.api.inventory;
 
+import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.EggPokemon;
@@ -22,20 +25,18 @@ import com.pokegoapi.api.pokemon.HatchedEgg;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
-import lombok.Getter;
-
 public class Hatchery {
 	@Getter
 	private final Set<EggPokemon> eggs = new HashSet<EggPokemon>();
+	@Getter
+	private final Set<HatchedEgg> hatchedEggs = new HashSet<HatchedEgg>();
 	@Getter
 	private PokemonGo api;
 
@@ -45,6 +46,7 @@ public class Hatchery {
 
 	public void reset() {
 		eggs.clear();
+		hatchedEggs.clear();
 	}
 
 	public void addEgg(EggPokemon egg) {
@@ -53,12 +55,48 @@ public class Hatchery {
 	}
 
 	/**
+	 * Adds the given hatched egg to the hatchedEggs set.
+	 * @param egg the egg to add
+	 */
+	public void addHatchedEgg(HatchedEgg egg) {
+		hatchedEggs.add(egg);
+	}
+
+	/**
+	 * Removes the given egg from the hatchedEggs set.
+	 * @param egg the egg to remove
+	 */
+	public void removeHatchedEgg(HatchedEgg egg) {
+		hatchedEggs.remove(egg);
+	}
+
+	/**
+	 * Adds the hatched eggs obtained from the given GetHatchedEggs response
+	 * @param response the GetHatchedEggs response
+	 * @return the hatched eggs contained in the response
+	 */
+	public List<HatchedEgg> updateHatchedEggs(GetHatchedEggsResponse response) {
+		List<HatchedEgg> eggs = new ArrayList<HatchedEgg>();
+		for (int i = 0; i < response.getPokemonIdCount(); i++) {
+			HatchedEgg egg = new HatchedEgg(response.getPokemonId(i),
+					response.getExperienceAwarded(i),
+					response.getCandyAwarded(i),
+					response.getStardustAwarded(i));
+			eggs.add(egg);
+			hatchedEggs.add(egg);
+		}
+		return eggs;
+	}
+
+	/**
 	 * Get if eggs has hatched.
 	 *
 	 * @return list of hatched eggs
 	 * @throws RemoteServerException e
 	 * @throws LoginFailedException  e
+	 * @deprecated Use getHatchedEggs()
 	 */
+	@Deprecated
 	public List<HatchedEgg> queryHatchedEggs() throws RemoteServerException, LoginFailedException {
 		GetHatchedEggsMessage msg = GetHatchedEggsMessage.newBuilder().build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.GET_HATCHED_EGGS, msg);
@@ -71,14 +109,7 @@ public class Hatchery {
 			throw new RemoteServerException(e);
 		}
 		api.getInventories().updateInventories();
-		List<HatchedEgg> eggs = new ArrayList<HatchedEgg>();
-		for (int i = 0; i < response.getPokemonIdCount(); i++) {
-			eggs.add(new HatchedEgg(response.getPokemonId(i),
-					response.getExperienceAwarded(i),
-					response.getCandyAwarded(i),
-					response.getStardustAwarded(i)));
-		}
-		return eggs;
+		return updateHatchedEggs(response);
 	}
 
 }
