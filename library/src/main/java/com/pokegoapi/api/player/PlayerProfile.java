@@ -15,6 +15,8 @@
 
 package com.pokegoapi.api.player;
 
+import POGOProtos.Data.Player.PlayerAvatarOuterClass;
+import POGOProtos.Enums.PokemonIdOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
@@ -27,18 +29,13 @@ import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 
-import java.security.SecureRandom;
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.Random;
 
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.Player.EquippedBadgeOuterClass.EquippedBadge;
-import POGOProtos.Data.Player.PlayerAvatarOuterClass;
 import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
-import POGOProtos.Enums.GenderOuterClass.Gender;
-import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Enums.TutorialStateOuterClass;
 import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
@@ -324,30 +321,14 @@ public class PlayerProfile {
 	/**
 	 * Setup an avatar for the current account
 	 *
+	 * @param playerAvatar the player avatar
 	 * @throws LoginFailedException  when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public void setupAvatar() throws LoginFailedException, RemoteServerException {
-		Random random = new Random();
-
-		final PlayerAvatarOuterClass.PlayerAvatar.Builder playerAvatarBuilder =
-				PlayerAvatarOuterClass.PlayerAvatar.newBuilder();
-		final boolean female = random.nextInt(100) % 2 == 0;
-		if (female) {
-			playerAvatarBuilder.setGender(Gender.FEMALE);
-		}
-
-		playerAvatarBuilder.setSkin(random.nextInt(PlayerAvatar.getAvailableSkins()))
-				.setHair(random.nextInt(PlayerAvatar.getAvailableHair()))
-				.setEyes(random.nextInt(PlayerAvatar.getAvailableEyes()))
-				.setHat(random.nextInt(PlayerAvatar.getAvailableHats()))
-				.setShirt(random.nextInt(PlayerAvatar.getAvailableShirts(female ? Gender.FEMALE : Gender.MALE)))
-				.setPants(random.nextInt(PlayerAvatar.getAvailablePants(female ? Gender.FEMALE : Gender.MALE)))
-				.setShoes(random.nextInt(PlayerAvatar.getAvailableShoes()))
-				.setBackpack(random.nextInt(PlayerAvatar.getAvailableShoes()));
-
+	public void setupAvatar(PlayerAvatarOuterClass.PlayerAvatar playerAvatar)
+			throws LoginFailedException, RemoteServerException {
 		final SetAvatarMessage setAvatarMessage = SetAvatarMessage.newBuilder()
-				.setPlayerAvatar(playerAvatarBuilder.build())
+				.setPlayerAvatar(playerAvatar)
 				.build();
 
 		ServerRequest[] requests = CommonRequest.fillRequest(
@@ -375,21 +356,19 @@ public class PlayerProfile {
 	/**
 	 * Encounter tutorial complete. In other words, catch the first Pokémon
 	 *
+	 * @param pokemonId the starter pokemon id
 	 * @throws LoginFailedException  when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
-	public void encounterTutorialComplete() throws LoginFailedException, RemoteServerException {
-		Random random = new Random();
-		int pokemonId = random.nextInt(4);
-
+	public void encounterTutorialComplete(PokemonIdOuterClass.PokemonId pokemonId)
+			throws LoginFailedException, RemoteServerException {
 		final EncounterTutorialCompleteMessage.Builder encounterTutorialCompleteBuilder =
 				EncounterTutorialCompleteMessage.newBuilder()
-				.setPokemonId(pokemonId == 1 ? PokemonId.BULBASAUR :
-					pokemonId == 2 ? PokemonId.CHARMANDER : PokemonId.SQUIRTLE);
+						.setPokemonId(pokemonId);
 
 		ServerRequest[] requests = CommonRequest.fillRequest(
 				new ServerRequest(RequestType.ENCOUNTER_TUTORIAL_COMPLETE,
-				encounterTutorialCompleteBuilder.build()), api);
+						encounterTutorialCompleteBuilder.build()), api);
 
 		api.getRequestHandler().sendServerRequests(requests);
 
@@ -419,14 +398,24 @@ public class PlayerProfile {
 	}
 
 	/**
-	 * Setup an user name for our account
+	 * Setup a nickname for our account
 	 *
-	 * @throws LoginFailedException  when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
+	 * @param codename the nickname
+	 * @return True if nickname was claimed, else False
+	 * @throws LoginFailedException       when the auth is invalid
+	 * @throws RemoteServerException      when the server is down/having issues
+	 * @throws Tutorial.NicknameException when something is wrong with the nickname
 	 */
-	public void claimCodeName() throws LoginFailedException, RemoteServerException {
+	public boolean claimCodeName(final String codename)
+			throws LoginFailedException, RemoteServerException,
+			Tutorial.NicknameException {
+
+		if (!isCodenameValid(codename)) {
+			throw new Tutorial.NicknameException(ClaimCodenameResponse.Status.CODENAME_NOT_VALID);
+		}
+
 		ClaimCodenameMessage claimCodenameMessage = ClaimCodenameMessage.newBuilder()
-				.setCodename(randomCodenameGenerator())
+				.setCodename(codename)
 				.build();
 
 		ServerRequest[] requests = CommonRequest.fillRequest(
@@ -441,14 +430,15 @@ public class PlayerProfile {
 			api.getSettings().updateSettings(DownloadSettingsResponse.parseFrom(requests[4].getData()));
 
 			ClaimCodenameResponse claimCodenameResponse = ClaimCodenameResponse.parseFrom(requests[0].getData());
-			if (claimCodenameResponse.getStatus() != ClaimCodenameResponse.Status.SUCCESS) {
-				if (claimCodenameResponse.getUpdatedPlayer().getRemainingCodenameClaims() > 0) {
-					claimCodeName();
-				}
-			} else {
-				updatedCodename = claimCodenameResponse.getCodename();
-				updateProfile(claimCodenameResponse.getUpdatedPlayer());
+
+			ClaimCodenameResponse.Status status = claimCodenameResponse.getStatus();
+			if (status != ClaimCodenameResponse.Status.SUCCESS) {
+				throw new Tutorial.NicknameException(status);
 			}
+
+			updatedCodename = claimCodenameResponse.getCodename();
+			updateProfile(claimCodenameResponse.getUpdatedPlayer());
+
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
@@ -473,6 +463,7 @@ public class PlayerProfile {
 				throw new RemoteServerException(e);
 			}
 		}
+		return true;
 	}
 
 	/**
@@ -487,7 +478,7 @@ public class PlayerProfile {
 	}
 
 	private void markTutorial(TutorialStateOuterClass.TutorialState state)
-				throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, RemoteServerException {
 		final MarkTutorialCompleteMessage tutorialMessage = MarkTutorialCompleteMessage.newBuilder()
 				.addTutorialsCompleted(state)
 				.setSendMarketingEmails(false)
@@ -510,14 +501,16 @@ public class PlayerProfile {
 		}
 	}
 
-	private static String randomCodenameGenerator() {
-		final String a = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-		final SecureRandom r = new SecureRandom();
-		final int l = new Random().nextInt(15 - 10) + 10;
-		StringBuilder sb = new StringBuilder(l);
-		for (int i = 0;i < l;i++) {
-			sb.append(a.charAt(r.nextInt(a.length())));
-		}
-		return sb.toString();
+	/**
+	 * Verifies if the given nickname is a valid Pokemon Go nickname or not.
+	 * A valid nickname must have between 3 and 15 characters and must not contain any symbols.
+	 *
+	 * @param nickname NicknameDialog to verify
+	 * @return True if nickname valid, else False.
+	 */
+	private static boolean isCodenameValid(String nickname) {
+		return nickname != null
+				&& (3 <= nickname.length()) && (nickname.length() <= 15)
+				&& nickname.matches("^[0-9a-zA-Z]+$");
 	}
 }

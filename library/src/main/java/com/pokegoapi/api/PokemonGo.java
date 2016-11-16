@@ -30,6 +30,7 @@ import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
+import com.pokegoapi.api.player.Tutorial;
 import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -91,6 +92,9 @@ public class PokemonGo {
 	@Getter
 	@Setter
 	public LocationFixes locationFixes;
+	@Setter
+	private Tutorial tutorial;
+
 
 	@Getter
 	private boolean hasChallenge;
@@ -152,13 +156,14 @@ public class PokemonGo {
 	}
 
 	/**
-	 * Login user with the provided provider
+	 * Login user with the provided provider and finish the tutorial if not done yet.
 	 *
 	 * @param credentialProvider the credential provider
 	 * @throws LoginFailedException When login fails
 	 * @throws RemoteServerException When server fails
 	 */
-	public void login(CredentialProvider credentialProvider) throws LoginFailedException, RemoteServerException {
+	public void login(CredentialProvider credentialProvider)
+			throws LoginFailedException, RemoteServerException {
 		if (credentialProvider == null) {
 			throw new NullPointerException("Credential Provider is null");
 		}
@@ -167,6 +172,9 @@ public class PokemonGo {
 		playerProfile = new PlayerProfile(this);
 		settings = new Settings(this);
 		inventories = new Inventories(this);
+		if (tutorial == null) {
+			tutorial = Tutorial.newBuilder().build();
+		}
 
 		initialize();
 	}
@@ -184,26 +192,58 @@ public class PokemonGo {
 		// have an avatar, a nickname, and all the other things that are usually filled
 		// on the official client BEFORE sending any requests such as the getMapObject etc.
 		ArrayList<TutorialState> tutorialStates = playerProfile.getTutorialState().getTutorialStates();
-		if (tutorialStates.isEmpty()) {
-			playerProfile.activateAccount();
-		}
 
-		if (!tutorialStates.contains(TutorialState.AVATAR_SELECTION)) {
-			playerProfile.setupAvatar();
-		}
+		boolean isAcceptTOSMissing = !tutorialStates.contains(TutorialState.LEGAL_SCREEN);
+		boolean isAvatarMissing = !tutorialStates.contains(TutorialState.AVATAR_SELECTION);
+		boolean isStarterPokemonMissing = !tutorialStates.contains(TutorialState.POKEMON_CAPTURE);
+		boolean isNicknameMissing = !tutorialStates.contains(TutorialState.NAME_SELECTION);
 
-		if (!tutorialStates.contains(TutorialState.POKEMON_CAPTURE)) {
-			playerProfile.encounterTutorialComplete();
-		}
+		if (isAcceptTOSMissing | isAvatarMissing | isStarterPokemonMissing | isNicknameMissing) {
+			try {
+				if (isAcceptTOSMissing && tutorial.isAcceptTOS()) {
+					playerProfile.activateAccount();
+				} else if (isAcceptTOSMissing) {
+					throw new Tutorial.CanceledException();
+				}
 
-		if (!tutorialStates.contains(TutorialState.NAME_SELECTION)) {
-			playerProfile.claimCodeName();
+				if (isAvatarMissing) {
+					playerProfile.setupAvatar(tutorial.getPlayerAvatar());
+				}
+
+				if (isStarterPokemonMissing) {
+					playerProfile.encounterTutorialComplete(tutorial.getStarterPokemon());
+				}
+
+				if (isNicknameMissing) {
+					String nickname = null;
+					boolean nicknameClaimed = false;
+					Tutorial.NicknameException lastException = null;
+
+					while (!nicknameClaimed) {
+						try {
+							if (lastException == null) {
+								nickname = tutorial.getNickname();
+							} else {
+								nickname = tutorial.getNicknameFallback(nickname, lastException);
+							}
+
+							nicknameClaimed = playerProfile.claimCodeName(nickname);
+						} catch (Tutorial.NicknameException e) {
+							lastException = e;
+						}
+					}
+				}
+
+			} catch (Tutorial.CanceledException e) {
+				throw new LoginFailedException("The tutorial was canceled. It is not safe to continue.", e);
+			}
 		}
 
 		if (!tutorialStates.contains(TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
 			playerProfile.firstTimeExperienceComplete();
 		}
 	}
+
 
 	/**
 	 * Fire requests block.

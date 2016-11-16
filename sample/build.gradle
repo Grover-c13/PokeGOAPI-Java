@@ -23,6 +23,8 @@ task runSample << {
 		mainClassName = "com.pokegoapi.examples.UseIncenseExample"
 	} else if (sample == "7") {
 		mainClassName = "com.pokegoapi.examples.TranslatePokenameExample"
+	} else if (sample == "8") {
+		mainClassName = "com.pokegoapi.examples.TutorialCompletionExample"
 	}
     run.execute()
 }
