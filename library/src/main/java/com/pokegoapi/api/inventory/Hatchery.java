@@ -20,6 +20,7 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.listener.PokemonListener;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.api.pokemon.HatchedEgg;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -60,6 +61,14 @@ public class Hatchery {
 	 */
 	public void addHatchedEgg(HatchedEgg egg) {
 		hatchedEggs.add(egg);
+		boolean remove = false;
+		List<PokemonListener> listeners = api.getListeners(PokemonListener.class);
+		for (PokemonListener listener : listeners) {
+			remove |= listener.onEggHatch(api, egg);
+		}
+		if (remove) {
+			removeHatchedEgg(egg);
+		}
 	}
 
 	/**
@@ -83,7 +92,7 @@ public class Hatchery {
 					response.getCandyAwarded(i),
 					response.getStardustAwarded(i));
 			eggs.add(egg);
-			hatchedEggs.add(egg);
+			addHatchedEgg(egg);
 		}
 		return eggs;
 	}

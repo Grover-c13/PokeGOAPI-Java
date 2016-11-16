@@ -15,30 +15,11 @@
 
 package com.pokegoapi.api.player;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.Item;
-import com.pokegoapi.api.inventory.ItemBag;
-import com.pokegoapi.api.inventory.Stats;
-import com.pokegoapi.exceptions.InvalidCurrencyException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.CommonRequest;
-import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.Log;
-
-import java.security.SecureRandom;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Random;
-
 import POGOProtos.Data.Player.CurrencyOuterClass;
 import POGOProtos.Data.Player.EquippedBadgeOuterClass.EquippedBadge;
-import POGOProtos.Data.Player.PlayerAvatarOuterClass;
 import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
 import POGOProtos.Enums.GenderOuterClass.Gender;
-import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Enums.TutorialStateOuterClass;
 import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
@@ -59,7 +40,26 @@ import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResp
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import POGOProtos.Networking.Responses.MarkTutorialCompleteResponseOuterClass.MarkTutorialCompleteResponse;
 import POGOProtos.Networking.Responses.SetAvatarResponseOuterClass.SetAvatarResponse;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Item;
+import com.pokegoapi.api.inventory.ItemBag;
+import com.pokegoapi.api.inventory.Stats;
+import com.pokegoapi.api.listener.TutorialListener;
+import com.pokegoapi.api.pokemon.StarterPokemon;
+import com.pokegoapi.exceptions.InvalidCurrencyException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.CommonRequest;
+import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.Log;
 import lombok.Setter;
+
+import java.security.SecureRandom;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class PlayerProfile {
 	private static final String TAG = PlayerProfile.class.getSimpleName();
@@ -328,26 +328,30 @@ public class PlayerProfile {
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
 	public void setupAvatar() throws LoginFailedException, RemoteServerException {
-		Random random = new Random();
+		SecureRandom random = new SecureRandom();
 
-		final PlayerAvatarOuterClass.PlayerAvatar.Builder playerAvatarBuilder =
-				PlayerAvatarOuterClass.PlayerAvatar.newBuilder();
-		final boolean female = random.nextInt(100) % 2 == 0;
-		if (female) {
-			playerAvatarBuilder.setGender(Gender.FEMALE);
+		Gender gender = random.nextInt(100) % 2 == 0 ? Gender.FEMALE : Gender.MALE;
+		PlayerAvatar avatar = new PlayerAvatar(gender,
+				random.nextInt(PlayerAvatar.getAvailableSkins()),
+				random.nextInt(PlayerAvatar.getAvailableHair()),
+				random.nextInt(PlayerAvatar.getAvailableShirts(gender)),
+				random.nextInt(PlayerAvatar.getAvailablePants(gender)),
+				random.nextInt(PlayerAvatar.getAvailableHats()),
+				random.nextInt(PlayerAvatar.getAvailableShoes()),
+				random.nextInt(PlayerAvatar.getAvailableEyes()),
+				random.nextInt(PlayerAvatar.getAvailableBags(gender)));
+
+		List<TutorialListener> listeners = api.getListeners(TutorialListener.class);
+		for (TutorialListener listener : listeners) {
+			PlayerAvatar listenerAvatar = listener.selectAvatar(api);
+			if (listenerAvatar != null) {
+				avatar = listenerAvatar;
+				break;
+			}
 		}
 
-		playerAvatarBuilder.setSkin(random.nextInt(PlayerAvatar.getAvailableSkins()))
-				.setHair(random.nextInt(PlayerAvatar.getAvailableHair()))
-				.setEyes(random.nextInt(PlayerAvatar.getAvailableEyes()))
-				.setHat(random.nextInt(PlayerAvatar.getAvailableHats()))
-				.setShirt(random.nextInt(PlayerAvatar.getAvailableShirts(female ? Gender.FEMALE : Gender.MALE)))
-				.setPants(random.nextInt(PlayerAvatar.getAvailablePants(female ? Gender.FEMALE : Gender.MALE)))
-				.setShoes(random.nextInt(PlayerAvatar.getAvailableShoes()))
-				.setBackpack(random.nextInt(PlayerAvatar.getAvailableShoes()));
-
 		final SetAvatarMessage setAvatarMessage = SetAvatarMessage.newBuilder()
-				.setPlayerAvatar(playerAvatarBuilder.build())
+				.setPlayerAvatar(avatar.getAvatar())
 				.build();
 
 		ServerRequest[] requests = CommonRequest.fillRequest(
@@ -379,13 +383,20 @@ public class PlayerProfile {
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
 	public void encounterTutorialComplete() throws LoginFailedException, RemoteServerException {
-		Random random = new Random();
-		int pokemonId = random.nextInt(4);
+		StarterPokemon starter = StarterPokemon.random();
+
+		List<TutorialListener> listeners = api.getListeners(TutorialListener.class);
+		for (TutorialListener listener : listeners) {
+			StarterPokemon pokemon = listener.selectStarter(api);
+			if (pokemon != null) {
+				starter = pokemon;
+				break;
+			}
+		}
 
 		final EncounterTutorialCompleteMessage.Builder encounterTutorialCompleteBuilder =
 				EncounterTutorialCompleteMessage.newBuilder()
-				.setPokemonId(pokemonId == 1 ? PokemonId.BULBASAUR :
-					pokemonId == 2 ? PokemonId.CHARMANDER : PokemonId.SQUIRTLE);
+				.setPokemonId(starter.getPokemon());
 
 		ServerRequest[] requests = CommonRequest.fillRequest(
 				new ServerRequest(RequestType.ENCOUNTER_TUTORIAL_COMPLETE,
@@ -425,8 +436,30 @@ public class PlayerProfile {
 	 * @throws RemoteServerException when the server is down/having issues
 	 */
 	public void claimCodeName() throws LoginFailedException, RemoteServerException {
+		claimCodeName(null);
+	}
+
+	/**
+	 * Setup an user name for our account
+	 *
+	 * @param lastFailure the last name used that was already taken; null for first try.
+	 * @throws LoginFailedException  when the auth is invalid
+	 * @throws RemoteServerException when the server is down/having issues
+	 */
+	public void claimCodeName(String lastFailure) throws LoginFailedException, RemoteServerException {
+		String name = randomCodenameGenerator();
+
+		List<TutorialListener> listeners = api.getListeners(TutorialListener.class);
+		for (TutorialListener listener : listeners) {
+			String listenerName = listener.claimName(api, lastFailure);
+			if (listenerName != null) {
+				name = listenerName;
+				break;
+			}
+		}
+
 		ClaimCodenameMessage claimCodenameMessage = ClaimCodenameMessage.newBuilder()
-				.setCodename(randomCodenameGenerator())
+				.setCodename(name)
 				.build();
 
 		ServerRequest[] requests = CommonRequest.fillRequest(
@@ -443,7 +476,7 @@ public class PlayerProfile {
 			ClaimCodenameResponse claimCodenameResponse = ClaimCodenameResponse.parseFrom(requests[0].getData());
 			if (claimCodenameResponse.getStatus() != ClaimCodenameResponse.Status.SUCCESS) {
 				if (claimCodenameResponse.getUpdatedPlayer().getRemainingCodenameClaims() > 0) {
-					claimCodeName();
+					claimCodeName(name);
 				}
 			} else {
 				updatedCodename = claimCodenameResponse.getCodename();

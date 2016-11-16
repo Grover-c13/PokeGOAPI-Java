@@ -16,29 +16,7 @@
 package com.pokegoapi.api.map.pokemon;
 
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.Item;
-import com.pokegoapi.api.inventory.Pokeball;
-import com.pokegoapi.api.map.pokemon.encounter.DiskEncounterResult;
-import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
-import com.pokegoapi.api.map.pokemon.encounter.NormalEncounterResult;
-import com.pokegoapi.api.settings.AsyncCatchOptions;
-import com.pokegoapi.api.settings.CatchOptions;
-import com.pokegoapi.exceptions.AsyncLoginFailedException;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
-import com.pokegoapi.exceptions.EncounterFailedException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.NoSuchItemException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.util.AsyncHelper;
-import com.pokegoapi.util.Log;
-import com.pokegoapi.util.MapPoint;
-
-import java.util.List;
-
+import POGOProtos.Enums.EncounterTypeOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
@@ -54,10 +32,33 @@ import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokem
 import POGOProtos.Networking.Responses.DiskEncounterResponseOuterClass.DiskEncounterResponse;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass.UseItemCaptureResponse;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Item;
+import com.pokegoapi.api.inventory.Pokeball;
+import com.pokegoapi.api.listener.PokemonListener;
+import com.pokegoapi.api.map.pokemon.encounter.DiskEncounterResult;
+import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
+import com.pokegoapi.api.map.pokemon.encounter.NormalEncounterResult;
+import com.pokegoapi.api.settings.AsyncCatchOptions;
+import com.pokegoapi.api.settings.CatchOptions;
+import com.pokegoapi.exceptions.AsyncLoginFailedException;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
+import com.pokegoapi.exceptions.EncounterFailedException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.NoSuchItemException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.util.AsyncHelper;
+import com.pokegoapi.util.Log;
+import com.pokegoapi.util.MapPoint;
 import lombok.Getter;
 import lombok.ToString;
 import rx.Observable;
 import rx.functions.Func1;
+
+import java.util.List;
 
 
 /**
@@ -197,6 +198,12 @@ public class CatchablePokemon implements MapPoint {
 							throw new AsyncRemoteServerException(e);
 						}
 						encountered = response.getStatus() == EncounterResponse.Status.ENCOUNTER_SUCCESS;
+						if (encountered) {
+							List<PokemonListener> listeners = api.getListeners(PokemonListener.class);
+							for (PokemonListener listener : listeners) {
+								listener.onEncounter(api, getEncounterId(), CatchablePokemon.this, EncounterTypeOuterClass.EncounterType.SPAWN_POINT);
+							}
+						}
 						return new NormalEncounterResult(api, response);
 					}
 				});
@@ -237,6 +244,12 @@ public class CatchablePokemon implements MapPoint {
 							throw new AsyncRemoteServerException(e);
 						}
 						encountered = response.getResult() == DiskEncounterResponse.Result.SUCCESS;
+						if (encountered) {
+							List<PokemonListener> listeners = api.getListeners(PokemonListener.class);
+							for (PokemonListener listener : listeners) {
+								listener.onEncounter(api, getEncounterId(), CatchablePokemon.this, EncounterTypeOuterClass.EncounterType.DISK);
+							}
+						}
 						return new DiskEncounterResult(api, response);
 					}
 				});
@@ -479,6 +492,17 @@ public class CatchablePokemon implements MapPoint {
 					|| result.getStatus() == CatchStatus.UNRECOGNIZED) {
 				Log.wtf(TAG, "Got an error or unrecognized catch attempt");
 				Log.wtf(TAG, "Proto:" + result);
+				break;
+			}
+
+			boolean abort = false;
+
+			List<PokemonListener> listeners = api.getListeners(PokemonListener.class);
+			for (PokemonListener listener : listeners) {
+				abort |= listener.onCatchEscape(api, this, type, numThrows);
+			}
+
+			if (abort) {
 				break;
 			}
 
