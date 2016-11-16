@@ -14,7 +14,7 @@ public interface PokemonListener extends Listener {
 	 * Called when an egg is hatched.
 	 * @param api the current api
 	 * @param hatchedEgg the hatched egg
-	 * @return whether this egg should be removed from the hatched egg list for later access via Hatchery#getHatchedEggs
+	 * @return true if this egg should be removed, if not required for later access via Hatchery#getHatchedEggs
 	 */
 	boolean onEggHatch(PokemonGo api, HatchedEgg hatchedEgg);
 
