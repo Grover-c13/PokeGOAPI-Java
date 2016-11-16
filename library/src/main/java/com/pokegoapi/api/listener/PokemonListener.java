@@ -1,6 +1,6 @@
 package com.pokegoapi.api.listener;
 
-import POGOProtos.Enums.EncounterTypeOuterClass;
+import POGOProtos.Enums.EncounterTypeOuterClass.EncounterType;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
@@ -25,7 +25,7 @@ public interface PokemonListener extends Listener {
 	 * @param pokemon the pokemon encountered
 	 * @param encounterType the type of encounter made
 	 */
-	void onEncounter(PokemonGo api, long encounterId, CatchablePokemon pokemon, EncounterTypeOuterClass.EncounterType encounterType);
+	void onEncounter(PokemonGo api, long encounterId, CatchablePokemon pokemon, EncounterType encounterType);
 
 	/**
 	 * Called after a miss or pokeball escape when capturing a pokemon.

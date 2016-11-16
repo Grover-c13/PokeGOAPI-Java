@@ -5,7 +5,7 @@ import com.pokegoapi.api.player.PlayerAvatar;
 import com.pokegoapi.api.pokemon.StarterPokemon;
 
 /**
- * Listener for all tutorial & account setup events.
+ * Listener for all tutorial and account setup events.
  */
 public interface TutorialListener extends Listener {
 	/**

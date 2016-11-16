@@ -16,7 +16,7 @@
 package com.pokegoapi.api.map.pokemon;
 
 
-import POGOProtos.Enums.EncounterTypeOuterClass;
+import POGOProtos.Enums.EncounterTypeOuterClass.EncounterType;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
@@ -201,7 +201,7 @@ public class CatchablePokemon implements MapPoint {
 						if (encountered) {
 							List<PokemonListener> listeners = api.getListeners(PokemonListener.class);
 							for (PokemonListener listener : listeners) {
-								listener.onEncounter(api, getEncounterId(), CatchablePokemon.this, EncounterTypeOuterClass.EncounterType.SPAWN_POINT);
+								listener.onEncounter(api, getEncounterId(), CatchablePokemon.this, EncounterType.SPAWN_POINT);
 							}
 						}
 						return new NormalEncounterResult(api, response);
@@ -247,7 +247,7 @@ public class CatchablePokemon implements MapPoint {
 						if (encountered) {
 							List<PokemonListener> listeners = api.getListeners(PokemonListener.class);
 							for (PokemonListener listener : listeners) {
-								listener.onEncounter(api, getEncounterId(), CatchablePokemon.this, EncounterTypeOuterClass.EncounterType.DISK);
+								listener.onEncounter(api, getEncounterId(), CatchablePokemon.this, EncounterType.DISK);
 							}
 						}
 						return new DiskEncounterResult(api, response);
