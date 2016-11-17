@@ -15,18 +15,6 @@
 
 package com.pokegoapi.api.map.fort;
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.google.common.geometry.S2LatLng;
-import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.util.AsyncHelper;
-
-import java.util.List;
-
 import POGOProtos.Inventory.Item.ItemIdOuterClass;
 import POGOProtos.Map.Fort.FortDataOuterClass;
 import POGOProtos.Map.Fort.FortModifierOuterClass;
@@ -37,9 +25,21 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.AddFortModifierResponseOuterClass;
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.listener.PokestopListener;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.google.common.geometry.S2LatLng;
+import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.util.AsyncHelper;
 import lombok.Getter;
 import rx.Observable;
 import rx.functions.Func1;
+
+import java.util.List;
 
 /**
  * Created by mjmfighter on 7/20/2016.
@@ -155,7 +155,12 @@ public class Pokestop {
 							throw new AsyncRemoteServerException(e);
 						}
 						cooldownCompleteTimestampMs = response.getCooldownCompleteTimestampMs();
-						return new PokestopLootResult(response);
+						PokestopLootResult lootResult = new PokestopLootResult(response);
+							List<PokestopListener> listeners = api.getListeners(PokestopListener.class);
+						for (PokestopListener listener : listeners) {
+							listener.onLoot(lootResult);
+						}
+						return lootResult;
 					}
 				});
 	}

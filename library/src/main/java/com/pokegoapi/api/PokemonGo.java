@@ -28,6 +28,8 @@ import com.pokegoapi.api.device.DeviceInfo;
 import com.pokegoapi.api.device.LocationFixes;
 import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.inventory.Inventories;
+import com.pokegoapi.api.listener.Listener;
+import com.pokegoapi.api.listener.LoginListener;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.api.settings.Settings;
@@ -45,6 +47,7 @@ import lombok.Setter;
 import okhttp3.OkHttpClient;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -96,6 +99,9 @@ public class PokemonGo {
 	private boolean hasChallenge;
 	@Getter
 	private String challengeURL;
+
+	@Getter
+	private List<Listener> listeners = new ArrayList<>();
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -176,6 +182,12 @@ public class PokemonGo {
 				CommonRequest.getDownloadRemoteConfigVersionMessageRequest()));
 
 		fireRequestBlockTwo();
+
+		List<LoginListener> loginListeners = getListeners(LoginListener.class);
+
+		for (LoginListener listener : loginListeners) {
+			listener.onLogin(this);
+		}
 
 		// From now one we will start to check our accounts is ready to fire requests.
 		// Actually, we can receive valid responses even with this first check,
@@ -384,5 +396,43 @@ public class PokemonGo {
 	public void updateChallenge(String url, boolean hasChallenge) {
 		this.hasChallenge = hasChallenge;
 		this.challengeURL = url;
+		if (hasChallenge) {
+			List<LoginListener> listeners = getListeners(LoginListener.class);
+			for (LoginListener listener : listeners) {
+				listener.onChallenge(this, url);
+			}
+		}
+	}
+
+	/**
+	 * Registers the given listener to this api.
+	 * @param listener the listener to register
+	 */
+	public void addListener(Listener listener) {
+		listeners.add(listener);
+	}
+
+	/**
+	 * Removes the given listener from this api.
+	 *
+	 * @param listener the listener to remove
+	 */
+	public void removeListener(Listener listener) {
+		listeners.remove(listener);
+	}
+
+	/**
+	 * Returns all listeners for the given type.
+	 * @param listenerType the type of listeners to return
+	 * @return all listeners for the given type
+	 */
+	public <T extends Listener> List<T> getListeners(Class<T> listenerType) {
+		List<T> listeners = new ArrayList<>();
+		for (Listener listener : this.listeners) {
+			if (listenerType.isAssignableFrom(listener.getClass())) {
+				listeners.add((T) listener);
+			}
+		}
+		return listeners;
 	}
 }
