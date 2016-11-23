@@ -340,11 +340,11 @@ public class PokemonDetails {
 
 		if (getPokemonFamily() == PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_EEVEE) {
 			if (getPokemonId() == PokemonIdOuterClass.PokemonId.EEVEE) {
-				final PokemonIdOuterClass.PokemonId[] eeveelutions = asList(
-						PokemonIdOuterClass.PokemonId.VAPOREON,
-						PokemonIdOuterClass.PokemonId.FLAREON,
-						PokemonIdOuterClass.PokemonId.JOLTEON
-				);
+				final PokemonIdOuterClass.PokemonId[] eeveelutions = new PokemonIdOuterClass.PokemonId[]{
+                        PokemonIdOuterClass.PokemonId.VAPOREON,
+                        PokemonIdOuterClass.PokemonId.FLAREON,
+                        PokemonIdOuterClass.PokemonId.JOLTEON
+                };
 				int highestCp = 0;
 
 				for (PokemonIdOuterClass.PokemonId pokemonId : eeveelutions) {
