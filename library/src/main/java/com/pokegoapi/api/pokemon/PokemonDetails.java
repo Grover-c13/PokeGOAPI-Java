@@ -12,6 +12,9 @@ import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collections;
+import java.util.Comparator;
+
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.EEVEE;
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.FLAREON;
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.JOLTEON;
@@ -333,13 +336,39 @@ public class PokemonDetails {
 	 * @return New CP after evolve
 	 */
 	public int getCpAfterFullEvolve() {
-		if (asList(VAPOREON, JOLTEON, FLAREON).contains(getPokemonId())) {
-			return getCp();
-		}
 		PokemonIdOuterClass.PokemonId highestUpgradedFamily = PokemonMetaRegistry.getHighestForFamily(getPokemonFamily());
+
+		if (getPokemonFamily() == PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_EEVEE) {
+			if (getPokemonId() == PokemonIdOuterClass.PokemonId.EEVEE) {
+				final PokemonMeta vap = PokemonMetaRegistry.getMeta(PokemonIdOuterClass.PokemonId.VAPOREON);
+				final PokemonMeta fla = PokemonMetaRegistry.getMeta(PokemonIdOuterClass.PokemonId.FLAREON);
+				final PokemonMeta jol = PokemonMetaRegistry.getMeta(PokemonIdOuterClass.PokemonId.JOLTEON);
+				if (vap != null && fla != null && jol != null) {
+					final Comparator<PokemonMeta> cMeta = (m1, m2) -> {
+						final int comb1 = PokemonCpUtils.getMaxCp(
+								m1.getBaseAttack(),
+								m1.getBaseDefense(),
+								m1.getBaseStamina());
+						final int comb2 = PokemonCpUtils.getMaxCp(
+								m2.getBaseAttack(),
+								m2.getBaseDefense(),
+								m2.getBaseStamina());
+						return comb1 - comb2;
+					};
+					highestUpgradedFamily = PokemonIdOuterClass.PokemonId.forNumber(
+							Collections.max(asList(vap, fla, jol), cMeta).getNumber());
+				}
+			} else {
+				// This is one of the eeveelutions, so PokemonMetaRegistry.getHightestForFamily() returns Eevee.
+				// We correct that here
+				highestUpgradedFamily = getPokemonId();
+			}
+		}
+
 		if (getPokemonId() == highestUpgradedFamily) {
 			return getCp();
 		}
+
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
 		int attack = getProto().getIndividualAttack() + pokemonMeta.getBaseAttack();
 		int defense = getProto().getIndividualDefense() + pokemonMeta.getBaseDefense();
