@@ -5763,7 +5763,7 @@ public class PokemonMetaRegistry {
 		metap.setParentId(PokemonId.UNRECOGNIZED);
 		metap.setCylGroundM(0);
 		metap.setQuickMoves(new PokemonMove[]{
-				PokemonMove.POUND_FAST
+				PokemonMove.TRANSFORM_FAST
 		});
 		metap.setCinematicMoves(new PokemonMove[]{
 				PokemonMove.STRUGGLE
