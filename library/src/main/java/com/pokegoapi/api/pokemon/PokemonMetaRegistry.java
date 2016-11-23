@@ -743,7 +743,7 @@ public class PokemonMetaRegistry {
 		metap.setCinematicMoves(new PokemonMove[]{
 				PokemonMove.AERIAL_ACE,
 				PokemonMove.SLUDGE_BOMB,
-				PokemonMove.X-SCISSOR
+				PokemonMove.X_SCISSOR
 		});
 		metap.setNumber(15);
 		meta.put(PokemonId.BEEDRILL, metap);
@@ -2077,7 +2077,7 @@ public class PokemonMetaRegistry {
 		metap.setCinematicMoves(new PokemonMove[]{
 				PokemonMove.CROSS_POISON,
 				PokemonMove.SEED_BOMB,
-				PokemonMove.X-SCISSOR
+				PokemonMove.X_SCISSOR
 		});
 		metap.setNumber(46);
 		meta.put(PokemonId.PARAS, metap);
@@ -2120,7 +2120,7 @@ public class PokemonMetaRegistry {
 		metap.setCinematicMoves(new PokemonMove[]{
 				PokemonMove.CROSS_POISON,
 				PokemonMove.SOLAR_BEAM,
-				PokemonMove.X-SCISSOR
+				PokemonMove.X_SCISSOR
 		});
 		metap.setNumber(47);
 		meta.put(PokemonId.PARASECT, metap);
@@ -4363,7 +4363,7 @@ public class PokemonMetaRegistry {
 		metap.setCinematicMoves(new PokemonMove[]{
 				PokemonMove.VICE_GRIP,
 				PokemonMove.WATER_PULSE,
-				PokemonMove.X-SCISSOR
+				PokemonMove.X_SCISSOR
 		});
 		metap.setNumber(99);
 		meta.put(PokemonId.KINGLER, metap);
@@ -5399,7 +5399,7 @@ public class PokemonMetaRegistry {
 		metap.setCinematicMoves(new PokemonMove[]{
 				PokemonMove.BUG_BUZZ,
 				PokemonMove.NIGHT_SLASH,
-				PokemonMove.X-SCISSOR
+				PokemonMove.X_SCISSOR
 		});
 		metap.setNumber(123);
 		meta.put(PokemonId.SCYTHER, metap);
@@ -5571,7 +5571,7 @@ public class PokemonMetaRegistry {
 		metap.setCinematicMoves(new PokemonMove[]{
 				PokemonMove.SUBMISSION,
 				PokemonMove.VICE_GRIP,
-				PokemonMove.X-SCISSOR
+				PokemonMove.X_SCISSOR
 		});
 		metap.setNumber(127);
 		meta.put(PokemonId.PINSIR, metap);
