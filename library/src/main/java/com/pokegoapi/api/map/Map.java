@@ -15,6 +15,26 @@
 
 package com.pokegoapi.api.map;
 
+import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
+import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
+import POGOProtos.Map.Fort.FortTypeOuterClass.FortType;
+import POGOProtos.Map.MapCellOuterClass.MapCell;
+import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
+import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
+import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
+import POGOProtos.Map.SpawnPointOuterClass;
+import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.CatchPokemonMessage;
+import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
+import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass.FortSearchMessage;
+import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
+import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
+import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
+import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
+import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
@@ -36,6 +56,8 @@ import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.MapUtil;
+import rx.Observable;
+import rx.functions.Func1;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,29 +65,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
-import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
-import POGOProtos.Map.Fort.FortTypeOuterClass.FortType;
-import POGOProtos.Map.MapCellOuterClass.MapCell;
-import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
-import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
-import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
-import POGOProtos.Map.SpawnPointOuterClass;
-import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.CatchPokemonMessage;
-import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
-import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass.FortSearchMessage;
-import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
-import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
-import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
-import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
-import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
-import rx.Observable;
-import rx.functions.Func1;
 
 public class Map {
 	private final PokemonGo api;
@@ -332,11 +331,11 @@ public class Map {
 	 */
 	public Observable<MapObjects> getMapObjectsAsync(List<Long> cellIds) {
 
-		if (useCache() && (cachedMapObjects.getNearbyPokemons().size() > 0
+		if ((useCache() && (cachedMapObjects.getNearbyPokemons().size() > 0
 							|| cachedMapObjects.getCatchablePokemons().size() > 0
 							|| cachedMapObjects.getWildPokemons().size() > 0
 							|| cachedMapObjects.getDecimatedSpawnPoints().size() > 0
-							|| cachedMapObjects.getSpawnPoints().size() > 0)) {
+							|| cachedMapObjects.getSpawnPoints().size() > 0)) || api.hasChallenge()) {
 			return Observable.just(cachedMapObjects);
 		}
 

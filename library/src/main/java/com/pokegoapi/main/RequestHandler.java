@@ -283,13 +283,13 @@ public class RequestHandler implements Runnable {
 			} catch (InterruptedException e) {
 				throw new AsyncPokemonGoException("System shutdown", e);
 			}
-			if (workQueue.isEmpty()) {
+			if (workQueue.isEmpty() || api.hasChallenge()) {
 				continue;
 			}
 
 			workQueue.drainTo(requests);
 
-			ArrayList<ServerRequest> serverRequests = new ArrayList();
+			ArrayList<ServerRequest> serverRequests = new ArrayList<>();
 			boolean addCommon = false;
 			for (AsyncServerRequest request : requests) {
 				serverRequests.add(new ServerRequest(request.getType(), request.getRequest()));

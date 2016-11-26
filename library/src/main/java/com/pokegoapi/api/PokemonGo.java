@@ -18,10 +18,13 @@ package com.pokegoapi.api;
 import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import POGOProtos.Networking.Requests.Messages.VerifyChallenge.VerifyChallengeMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
+import POGOProtos.Networking.Responses.VerifyChallengeResponseOuterClass.VerifyChallengeResponse;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
@@ -36,9 +39,11 @@ import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.CommonRequest;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.ClientInterceptor;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
@@ -95,7 +100,7 @@ public class PokemonGo {
 	@Setter
 	public LocationFixes locationFixes;
 
-	@Getter
+	@Setter
 	private boolean hasChallenge;
 	@Getter
 	private String challengeURL;
@@ -434,5 +439,34 @@ public class PokemonGo {
 			}
 		}
 		return listeners;
+	}
+
+	/**
+	 * @return if there is an active challenge required. Challenge accessible via getChallengeURL.
+	 */
+	public boolean hasChallenge() {
+		return this.hasChallenge;
+	}
+
+	/**
+	 * Verifies the current challenge with the given token.
+	 * @param token the challenge response token
+	 * @return if the token was valid or not
+	 * @throws LoginFailedException when login fails
+	 * @throws RemoteServerException when server fails
+	 * @throws InvalidProtocolBufferException when the client receives an invalid message from the server
+	 */
+	public boolean verifyChallenge(String token)
+			throws RemoteServerException, LoginFailedException, InvalidProtocolBufferException {
+		hasChallenge = false;
+		VerifyChallengeMessage message = VerifyChallengeMessage.newBuilder().setToken(token).build();
+		AsyncServerRequest request = new AsyncServerRequest(RequestType.VERIFY_CHALLENGE, message);
+		ByteString responseData = AsyncHelper.toBlocking(getRequestHandler().sendAsyncServerRequests(request));
+		VerifyChallengeResponse response = VerifyChallengeResponse.parseFrom(responseData);
+		hasChallenge = !response.getSuccess();
+		if (!hasChallenge) {
+			challengeURL = null;
+		}
+		return response.getSuccess();
 	}
 }
