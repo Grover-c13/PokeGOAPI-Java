@@ -1,19 +1,15 @@
 package com.pokegoapi.api.pokemon;
 
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.NoSuchItemException;
-import com.pokegoapi.util.Log;
-
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.exceptions.NoSuchItemException;
+import com.pokegoapi.util.Log;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Collections;
-import java.util.Comparator;
 
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.EEVEE;
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.FLAREON;
@@ -341,10 +337,10 @@ public class PokemonDetails {
 		if (getPokemonFamily() == PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_EEVEE) {
 			if (getPokemonId() == PokemonIdOuterClass.PokemonId.EEVEE) {
 				final PokemonIdOuterClass.PokemonId[] eeveelutions = new PokemonIdOuterClass.PokemonId[]{
-                        PokemonIdOuterClass.PokemonId.VAPOREON,
-                        PokemonIdOuterClass.PokemonId.FLAREON,
-                        PokemonIdOuterClass.PokemonId.JOLTEON
-                };
+					PokemonIdOuterClass.PokemonId.VAPOREON,
+					PokemonIdOuterClass.PokemonId.FLAREON,
+					PokemonIdOuterClass.PokemonId.JOLTEON
+				};
 				int highestCp = 0;
 
 				for (PokemonIdOuterClass.PokemonId pokemonId : eeveelutions) {
