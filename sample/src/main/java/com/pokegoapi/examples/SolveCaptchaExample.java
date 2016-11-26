@@ -56,6 +56,11 @@ import java.net.URLStreamHandlerFactory;
 import java.util.regex.Pattern;
 
 public class SolveCaptchaExample {
+	public static final String USER_AGENT =
+			"Mozilla/5.0 (Windows NT 10.0; WOW64)" +
+			" AppleWebKit/537.36 (KHTML, like Gecko) " +
+			"Chrome/54.0.2840.99 Safari/537.36";
+
 	/**
 	 * Opens a window for captcha solving if needed
 	 *
@@ -78,7 +83,8 @@ public class SolveCaptchaExample {
 							return new URLConnection(url) {
 								@Override
 								public void connect() throws IOException {
-									System.out.println("Received token: " + url.toString().split(Pattern.quote(":"))[1]);
+									System.out.println("Received token: " + url.toString()
+											.split(Pattern.quote(":"))[1]);
 								}
 							};
 						}
@@ -113,7 +119,7 @@ public class SolveCaptchaExample {
 		WebView view = new WebView();
 		WebEngine engine = view.getEngine();
 		//Set UserAgent so captcha shows in the WebView
-		engine.setUserAgent("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
+		engine.setUserAgent(USER_AGENT);
 		engine.load(challengeURL);
 		final JFrame frame = new JFrame("Solve Captcha");
 		engine.locationProperty().addListener(new ChangeListener<String>() {
@@ -132,7 +138,8 @@ public class SolveCaptchaExample {
 							api.updateChallenge(null, false);
 							CheckChallengeMessage message = CheckChallengeMessage.newBuilder().build();
 							AsyncServerRequest request = new AsyncServerRequest(RequestType.CHECK_CHALLENGE, message);
-							ByteString responseData = AsyncHelper.toBlocking(api.getRequestHandler().sendAsyncServerRequests(request));
+							ByteString responseData =
+									AsyncHelper.toBlocking(api.getRequestHandler().sendAsyncServerRequests(request));
 							CheckChallengeResponse response = CheckChallengeResponse.parseFrom(responseData);
 							String newChallenge = response.getChallengeUrl();
 							if (newChallenge != null && newChallenge.length() > 0) {
