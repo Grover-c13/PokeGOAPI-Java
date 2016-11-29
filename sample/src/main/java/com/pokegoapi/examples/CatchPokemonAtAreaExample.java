@@ -67,9 +67,9 @@ public class CatchPokemonAtAreaExample {
 					= new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
 			api.login(provider, new PokemonCallback() {
 				@Override
-				public void onCompleted(Exception e) {
-					if (e != null) {
-						Log.e("Main", "Failed to login or server issue: ", e);
+				public void onCompleted(Exception exception) {
+					if (exception != null) {
+						Log.e("Main", "Failed to login or server issue: ", exception);
 					}
 					onLogin(api);
 				}
@@ -85,7 +85,7 @@ public class CatchPokemonAtAreaExample {
 
 		api.getMap().getCatchablePokemon(new AsyncReturn<List<CatchablePokemon>>() {
 			@Override
-			public void onReceive(final List<CatchablePokemon> catchablePokemon, Exception e) {
+			public void onReceive(final List<CatchablePokemon> catchablePokemon, Exception exception) {
 				//Queue task to run on task thread so it doesn't block the request thread
 				api.queueTask(new Runnable() {
 					@Override

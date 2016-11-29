@@ -250,8 +250,8 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	private void captureRecursive(final CatchOptions options, final AsyncReturn<CatchResult> result,
-								  final int maxPokeballs, final int maxRazzberries,
-								  final int pokeballsUsed, final int razzberriesUsed) {
+									final int maxPokeballs, final int maxRazzberries,
+									final int pokeballsUsed, final int razzberriesUsed) {
 		if (maxPokeballs >= 0 && pokeballsUsed >= maxPokeballs) {
 			result.onReceive(new CatchResult(), new RuntimeException("Reached Pokeball limit"));
 			return;
@@ -261,8 +261,8 @@ public class CatchablePokemon implements MapPoint {
 		}
 		this.attemptCapture(options, new AsyncReturn<CatchResult>() {
 			@Override
-			public void onReceive(CatchResult catchResult, Exception e) {
-				if (Utils.callbackException(e, result, new CatchResult())) {
+			public void onReceive(CatchResult catchResult, Exception exception) {
+				if (Utils.callbackException(exception, result, new CatchResult())) {
 					return;
 				}
 				if (catchResult.isFailed()) {
@@ -312,8 +312,8 @@ public class CatchablePokemon implements MapPoint {
 					if (options.isUseRazzberry()) {
 						useItem(ItemId.ITEM_RAZZ_BERRY, new AsyncReturn<CatchItemResult>() {
 							@Override
-							public void onReceive(CatchItemResult itemResult, Exception e) {
-								if (Utils.callbackException(e, result, new CatchResult())) {
+							public void onReceive(CatchItemResult itemResult, Exception exception) {
+								if (Utils.callbackException(exception, result, new CatchResult())) {
 									return;
 								}
 								if (itemResult.getSuccess()) {
@@ -372,7 +372,7 @@ public class CatchablePokemon implements MapPoint {
 	 * Tries to use an item on a catchable pokemon (ie razzberry).
 	 *
 	 * @param item the item ID
-	 * @param result callback to return CatchItemResult info about the new modifiers about the pokemon (can move, item capture multi) eg
+	 * @param result callback to return CatchItemResult
 	 */
 	public void useItem(ItemId item, final AsyncReturn<CatchItemResult> result) {
 		final UseItemCaptureMessage message = UseItemCaptureMessage

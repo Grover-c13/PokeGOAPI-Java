@@ -16,5 +16,5 @@
 package com.pokegoapi.main;
 
 public interface AsyncReturn<T> {
-	void onReceive(T object, Exception e);
+	void onReceive(T object, Exception exception);
 }

@@ -90,8 +90,8 @@ public class Map {
 		List<Long> defaultCells = getDefaultCells();
 		getMapObjects(defaultCells, new AsyncReturn<MapObjects>() {
 			@Override
-			public void onReceive(MapObjects objects, Exception e) {
-				if (Utils.callbackException(e, catchablePokemon, new ArrayList<CatchablePokemon>())) {
+			public void onReceive(MapObjects objects, Exception exception) {
+				if (Utils.callbackException(exception, catchablePokemon, new ArrayList<CatchablePokemon>())) {
 					return;
 				}
 				Set<CatchablePokemon> catchablePokemons = new HashSet<>();
@@ -136,8 +136,8 @@ public class Map {
 	public void getSortedCatchablePokemon(final AsyncReturn<java.util.Map<Double, CatchablePokemon>> catchablePokemon) {
 		getCatchablePokemon(new AsyncReturn<List<CatchablePokemon>>() {
 			@Override
-			public void onReceive(List<CatchablePokemon> pokemon, Exception e) {
-				if (Utils.callbackException(e, catchablePokemon, new TreeMap<Double, CatchablePokemon>())) {
+			public void onReceive(List<CatchablePokemon> pokemon, Exception exception) {
+				if (Utils.callbackException(exception, catchablePokemon, new TreeMap<Double, CatchablePokemon>())) {
 					return;
 				}
 				MapUtil<CatchablePokemon> util = new MapUtil<>();
@@ -153,8 +153,8 @@ public class Map {
 	public void getNearbyPokemon(final AsyncReturn<List<NearbyPokemon>> nearby) {
 		getMapObjects(getDefaultCells(), new AsyncReturn<MapObjects>() {
 			@Override
-			public void onReceive(MapObjects objects, Exception e) {
-				if (Utils.callbackException(e, nearby, new ArrayList<NearbyPokemon>())) {
+			public void onReceive(MapObjects objects, Exception exception) {
+				if (Utils.callbackException(exception, nearby, new ArrayList<NearbyPokemon>())) {
 					return;
 				}
 				List<NearbyPokemon> pokemons = new ArrayList<>();
@@ -174,8 +174,8 @@ public class Map {
 	public void getSpawnPoints(final AsyncReturn<List<Point>> spawnPoints) {
 		getMapObjects(new AsyncReturn<MapObjects>() {
 			@Override
-			public void onReceive(MapObjects objects, Exception e) {
-				if (Utils.callbackException(e, spawnPoints, new ArrayList<Point>())) {
+			public void onReceive(MapObjects objects, Exception exception) {
+				if (Utils.callbackException(exception, spawnPoints, new ArrayList<Point>())) {
 					return;
 				}
 				List<Point> points = new ArrayList<>();
@@ -195,8 +195,8 @@ public class Map {
 	public void getGyms(final AsyncReturn<List<Gym>> gymCallback) {
 		getMapObjects(new AsyncReturn<MapObjects>() {
 			@Override
-			public void onReceive(MapObjects objects, Exception e) {
-				if (Utils.callbackException(e, gymCallback, new ArrayList<Gym>())) {
+			public void onReceive(MapObjects objects, Exception exception) {
+				if (Utils.callbackException(exception, gymCallback, new ArrayList<Gym>())) {
 					return;
 				}
 				List<Gym> gyms = new ArrayList<>();
@@ -216,8 +216,8 @@ public class Map {
 	public void getSortedGyms(final AsyncReturn<java.util.Map<Double, Gym>> gyms) {
 		getGyms(new AsyncReturn<List<Gym>>() {
 			@Override
-			public void onReceive(List<Gym> gymList, Exception e) {
-				if (Utils.callbackException(e, gyms, new TreeMap<Double, Gym>())) {
+			public void onReceive(List<Gym> gymList, Exception exception) {
+				if (Utils.callbackException(exception, gyms, new TreeMap<Double, Gym>())) {
 					return;
 				}
 				MapUtil<Gym> util = new MapUtil<>();
@@ -234,8 +234,8 @@ public class Map {
 	public void getDecimatedSpawnPoints(final AsyncReturn<List<Point>> pointsCallback) {
 		getMapObjects(getDefaultCells(), new AsyncReturn<MapObjects>() {
 			@Override
-			public void onReceive(MapObjects objects, Exception e) {
-				if (Utils.callbackException(e, pointsCallback, new ArrayList<Point>())) {
+			public void onReceive(MapObjects objects, Exception exception) {
+				if (Utils.callbackException(exception, pointsCallback, new ArrayList<Point>())) {
 					return;
 				}
 				List<Point> points = new ArrayList<>();
@@ -255,8 +255,8 @@ public class Map {
 	public void getSortedDecimatedSpawnPoints(final AsyncReturn<java.util.Map<Double, Point>> pointsCallback) {
 		getDecimatedSpawnPoints(new AsyncReturn<List<Point>>() {
 			@Override
-			public void onReceive(List<Point> points, Exception e) {
-				if (Utils.callbackException(e, pointsCallback, new TreeMap<Double, Point>())) {
+			public void onReceive(List<Point> points, Exception exception) {
+				if (Utils.callbackException(exception, pointsCallback, new TreeMap<Double, Point>())) {
 					return;
 				}
 				MapUtil<Point> util = new MapUtil<>();

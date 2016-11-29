@@ -253,8 +253,8 @@ public class Pokestop {
 		if (updateFortDetails) {
 			getDetails(new AsyncReturn<FortDetails>() {
 				@Override
-				public void onReceive(FortDetails details, Exception e) {
-					if (Utils.callbackException(e, result, cached)) {
+				public void onReceive(FortDetails details, Exception exception) {
+					if (Utils.callbackException(exception, result, cached)) {
 						return;
 					}
 					List<FortModifierOuterClass.FortModifier> modifiers = details.getModifier();

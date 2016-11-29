@@ -5,8 +5,8 @@ public class BlockingCallback implements PokemonCallback {
 	private Exception exception;
 
 	@Override
-	public void onCompleted(Exception e) {
-		this.exception = e;
+	public void onCompleted(Exception exception) {
+		this.exception = exception;
 		synchronized (this.lock) {
 			this.lock.notify();
 		}
@@ -42,9 +42,9 @@ public class BlockingCallback implements PokemonCallback {
 		}
 
 		@Override
-		public void onCompleted(Exception e) {
-			this.callback.onCompleted(e);
-			super.onCompleted(e);
+		public void onCompleted(Exception exception) {
+			this.callback.onCompleted(exception);
+			super.onCompleted(exception);
 		}
 	}
 }

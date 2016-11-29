@@ -130,6 +130,11 @@ public class PlayerAvatar {
 		return gender.getNumber() == Gender.MALE_VALUE ? 6 : 3;
 	}
 
+	/**
+	 * Generates a random avatar for the given gender
+	 * @param gender the gender to generate a random avatar for
+	 * @return the randomly generated avatar
+	 */
 	public static PlayerAvatar random(Gender gender) {
 		SecureRandom random = new SecureRandom();
 		return new PlayerAvatar(gender,

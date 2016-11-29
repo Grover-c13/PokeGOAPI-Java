@@ -93,11 +93,15 @@ public class Gym implements MapPoint {
 		return proto.getIsInBattle();
 	}
 
+	/**
+	 * Returns whether or not this gym is attackable or not.
+	 * @param attackable async callback to return the result
+	 */
 	public void isAttackable(final AsyncReturn<Boolean> attackable) {
 		getGymMembers(new AsyncReturn<List<GymMembership>>() {
 			@Override
-			public void onReceive(List<GymMembership> members, Exception e) {
-				if (Utils.callbackException(e, attackable, false)) {
+			public void onReceive(List<GymMembership> members, Exception exception) {
+				if (Utils.callbackException(exception, attackable, false)) {
 					return;
 				}
 				attackable.onReceive(members.size() > 0, null);
@@ -109,6 +113,10 @@ public class Gym implements MapPoint {
 		return new Battle(api, team, this);
 	}
 
+	/**
+	 * Gets the details of this gym.
+	 * @param result async callback to return the result from this method
+	 */
 	public void getDetails(final AsyncReturn<GetGymDetailsResponse> result) {
 		if (details == null) {
 			final GetGymDetailsMessage message = GetGymDetailsMessage
@@ -141,11 +149,16 @@ public class Gym implements MapPoint {
 		}
 	}
 
+	/**
+	 * Gets the name of this gym.
+	 *
+	 * @param name async callback to return the result of this method
+	 */
 	public void getName(final AsyncReturn<String> name) {
 		getDetails(new AsyncReturn<GetGymDetailsResponse>() {
 			@Override
-			public void onReceive(GetGymDetailsResponse details, Exception e) {
-				if (Utils.callbackException(e, name, null)) {
+			public void onReceive(GetGymDetailsResponse details, Exception exception) {
+				if (Utils.callbackException(exception, name, null)) {
 					return;
 				}
 				if (details != null) {
@@ -157,11 +170,15 @@ public class Gym implements MapPoint {
 		});
 	}
 
+	/**
+	 * Gets the URLs for this gym
+	 * @param urls async callback to return the result of this method
+	 */
 	public void getURLsList(final AsyncReturn<ProtocolStringList> urls) {
 		getDetails(new AsyncReturn<GetGymDetailsResponse>() {
 			@Override
-			public void onReceive(GetGymDetailsResponse details, Exception e) {
-				if (Utils.callbackException(e, urls, null)) {
+			public void onReceive(GetGymDetailsResponse details, Exception exception) {
+				if (Utils.callbackException(exception, urls, null)) {
 					return;
 				}
 				if (details != null) {
@@ -173,11 +190,15 @@ public class Gym implements MapPoint {
 		});
 	}
 
+	/**
+	 * Gets the details response result.
+	 * @param result async callback to return the result of this method
+	 */
 	public void getResult(final AsyncReturn<GetGymDetailsResponse.Result> result) {
 		getDetails(new AsyncReturn<GetGymDetailsResponse>() {
 			@Override
-			public void onReceive(GetGymDetailsResponse details, Exception e) {
-				if (Utils.callbackException(e, result, null)) {
+			public void onReceive(GetGymDetailsResponse details, Exception exception) {
+				if (Utils.callbackException(exception, result, null)) {
 					return;
 				}
 				if (details != null) {
@@ -189,11 +210,15 @@ public class Gym implements MapPoint {
 		});
 	}
 
+	/**
+	 * Returns if this gym is in range or not.
+	 * @param inRange async callback to return the result of this method
+	 */
 	public void inRange(final AsyncReturn<Boolean> inRange) {
 		getResult(new AsyncReturn<GetGymDetailsResponse.Result>() {
 			@Override
-			public void onReceive(GetGymDetailsResponse.Result result, Exception e) {
-				if (Utils.callbackException(e, inRange, false)) {
+			public void onReceive(GetGymDetailsResponse.Result result, Exception exception) {
+				if (Utils.callbackException(exception, inRange, false)) {
 					return;
 				}
 				if (result != null) {
@@ -205,11 +230,15 @@ public class Gym implements MapPoint {
 		});
 	}
 
+	/**
+	 * Gets the description of this gym
+	 * @param description async callback to return the result of this method
+	 */
 	public void getDescription(final AsyncReturn<String> description) {
 		getDetails(new AsyncReturn<GetGymDetailsResponse>() {
 			@Override
-			public void onReceive(GetGymDetailsResponse details, Exception e) {
-				if (Utils.callbackException(e, description, null)) {
+			public void onReceive(GetGymDetailsResponse details, Exception exception) {
+				if (Utils.callbackException(exception, description, null)) {
 					return;
 				}
 				if (details != null) {
@@ -221,11 +250,15 @@ public class Gym implements MapPoint {
 		});
 	}
 
+	/**
+	 * Gets the members of this gym
+	 * @param members async callback to return the result of this method
+	 */
 	public void getGymMembers(final AsyncReturn<List<GymMembership>> members) {
 		getDetails(new AsyncReturn<GetGymDetailsResponse>() {
 			@Override
-			public void onReceive(GetGymDetailsResponse details, Exception e) {
-				if (Utils.callbackException(e, members, null)) {
+			public void onReceive(GetGymDetailsResponse details, Exception exception) {
+				if (Utils.callbackException(exception, members, null)) {
 					return;
 				}
 				if (details != null) {
@@ -245,8 +278,8 @@ public class Gym implements MapPoint {
 	public void getDefendingPokemon(final AsyncReturn<List<PokemonData>> result) {
 		getGymMembers(new AsyncReturn<List<GymMembership>>() {
 			@Override
-			public void onReceive(List<GymMembership> members, Exception e) {
-				if (Utils.callbackException(e, result, null)) {
+			public void onReceive(List<GymMembership> members, Exception exception) {
+				if (Utils.callbackException(exception, result, null)) {
 					return;
 				}
 				if (members != null) {

@@ -58,9 +58,9 @@ public class FightGymExample {
 			credentials = new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
 			api.login(credentials, new PokemonCallback() {
 				@Override
-				public void onCompleted(Exception e) {
-					if (e != null) {
-						Log.e("Main", "Failed to login or server issue: ", e);
+				public void onCompleted(Exception exception) {
+					if (exception != null) {
+						Log.e("Main", "Failed to login or server issue: ", exception);
 					}
 					onLogin(api);
 				}
@@ -85,9 +85,9 @@ public class FightGymExample {
 
 			api.getMap().getGyms(new AsyncReturn<List<Gym>>() {
 				@Override
-				public void onReceive(final List<Gym> gyms, Exception e) {
-					if (e != null) {
-						Log.e("Main", "Failed to load gyms in area: ", e);
+				public void onReceive(final List<Gym> gyms, Exception exception) {
+					if (exception != null) {
+						Log.e("Main", "Failed to load gyms in area: ", exception);
 					} else {
 						api.queueTask(new Runnable() {
 							@Override

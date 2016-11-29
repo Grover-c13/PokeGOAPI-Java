@@ -61,9 +61,9 @@ public class ItemBag {
 	/**
 	 * Discards the given item.
 	 *
-	 * @param id       the id
+	 * @param id the id
 	 * @param quantity the quantity
-	 * @param result   result callback
+	 * @param result result callback
 	 */
 	public void removeItem(ItemId id, int quantity, final AsyncReturn<Result> result) {
 		final Item item = getItem(id);
@@ -84,7 +84,8 @@ public class ItemBag {
 					return;
 				}
 				try {
-					RecycleInventoryItemResponse messageResponse = RecycleInventoryItemResponse.parseFrom(response.getResponseData());
+					RecycleInventoryItemResponse messageResponse
+							= RecycleInventoryItemResponse.parseFrom(response.getResponseData());
 					if (messageResponse.getResult() == Result.SUCCESS) {
 						item.setCount(messageResponse.getNewCount());
 						if (item.getCount() <= 0) {
@@ -227,7 +228,8 @@ public class ItemBag {
 					return;
 				}
 				try {
-					UseItemXpBoostResponse messageResponse = UseItemXpBoostResponse.parseFrom(response.getResponseData());
+					UseItemXpBoostResponse messageResponse
+							= UseItemXpBoostResponse.parseFrom(response.getResponseData());
 					Log.i("Main", "Use incense result: " + messageResponse.getResult());
 					callback.onReceive(messageResponse, null);
 				} catch (InvalidProtocolBufferException e) {

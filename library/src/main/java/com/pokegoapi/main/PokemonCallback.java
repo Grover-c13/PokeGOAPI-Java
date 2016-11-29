@@ -18,13 +18,13 @@ package com.pokegoapi.main;
 public interface PokemonCallback {
 	PokemonCallback NULL_CALLBACK = new PokemonCallback() {
 		@Override
-		public void onCompleted(Exception e) {
+		public void onCompleted(Exception exception) {
 		}
 	};
 
 	/**
 	 * Called when a task completes.
-	 * @param e exception thrown while doing this task, null if no exception was thrown.
+	 * @param exception exception thrown while doing this task, null if no exception was thrown.
 	 */
-	void onCompleted(Exception e);
+	void onCompleted(Exception exception);
 }

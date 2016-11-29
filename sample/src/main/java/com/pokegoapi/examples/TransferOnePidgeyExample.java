@@ -51,7 +51,7 @@ public class TransferOnePidgeyExample {
 				pest.debug();
 				pest.transferPokemon(new AsyncReturn<ReleasePokemonResponse.Result>() {
 					@Override
-					public void onReceive(ReleasePokemonResponse.Result result, Exception e) {
+					public void onReceive(ReleasePokemonResponse.Result result, Exception exception) {
 						Log.i("Main", "Transferred Pidgey result:" + result);
 					}
 				});

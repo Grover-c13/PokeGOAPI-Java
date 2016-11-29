@@ -175,8 +175,8 @@ public class RequestHandler implements Runnable {
 				final RequestCallback callback = pokemonRequest.getCallback();
 				if (callback != null) {
 					final PokemonResponse pokemonResponse =
-							responseData != null ?
-									PokemonResponse.getResult(responseData) :
+							responseData != null
+									? PokemonResponse.getResult(responseData) :
 									PokemonResponse.getError(new InvalidProtocolBufferException("Null response"));
 					callback.handleResponse(pokemonResponse);
 				}
@@ -249,6 +249,7 @@ public class RequestHandler implements Runnable {
 				authTicket = internalSendRequests(authTicket, requestArray);
 				continue;
 			} catch (RemoteServerException | LoginFailedException e) {
+				//no need to do anything here
 			} finally {
 				pokemonRequests.clear();
 			}

@@ -88,18 +88,18 @@ public class Battle {
 
 		gym.getDetails(new AsyncReturn<GetGymDetailsResponseOuterClass.GetGymDetailsResponse>() {
 			@Override
-			public void onReceive(GetGymDetailsResponseOuterClass.GetGymDetailsResponse details, Exception e) {
+			public void onReceive(GetGymDetailsResponseOuterClass.GetGymDetailsResponse details, Exception exception) {
 				gym.getGymMembers(new AsyncReturn<List<GymMembershipOuterClass.GymMembership>>() {
 					@Override
-					public void onReceive(List<GymMembershipOuterClass.GymMembership> members, Exception e) {
-						if (Utils.callbackException(e, result, Result.UNRECOGNIZED)) {
+					public void onReceive(List<GymMembershipOuterClass.GymMembership> members, Exception exception) {
+						if (Utils.callbackException(exception, result, Result.UNRECOGNIZED)) {
 							return;
 						}
 						memberships = members;
 						gym.getDefendingPokemon(new AsyncReturn<List<PokemonData>>() {
 							@Override
-							public void onReceive(List<PokemonData> defenders, Exception e) {
-								if (Utils.callbackException(e, result, Result.UNRECOGNIZED)) {
+							public void onReceive(List<PokemonData> defenders, Exception exception) {
+								if (Utils.callbackException(exception, result, Result.UNRECOGNIZED)) {
 									return;
 								}
 								builder.setGymId(gym.getId());
@@ -118,8 +118,8 @@ public class Battle {
 											battleResponse = StartGymBattleResponse.parseFrom(response.getResponseData());
 											sendBlankAction(new AsyncReturn<AttackGymResponse>() {
 												@Override
-												public void onReceive(AttackGymResponse attackResponse, Exception e) {
-													if (Utils.callbackException(e, result, Result.UNRECOGNIZED)) {
+												public void onReceive(AttackGymResponse attackResponse, Exception exception) {
+													if (Utils.callbackException(exception, result, Result.UNRECOGNIZED)) {
 														result.onReceive(Result.UNRECOGNIZED, null);
 														return;
 													}

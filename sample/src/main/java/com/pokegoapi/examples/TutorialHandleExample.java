@@ -95,9 +95,9 @@ public class TutorialHandleExample {
 			});
 			api.login(provider, new PokemonCallback() {
 				@Override
-				public void onCompleted(Exception e) {
-					if (e != null) {
-						Log.e("Main", "Failed to login or server issue: ", e);
+				public void onCompleted(Exception exception) {
+					if (exception != null) {
+						Log.e("Main", "Failed to login or server issue: ", exception);
 					} else {
 						System.out.println("Logged in successfully!");
 					}

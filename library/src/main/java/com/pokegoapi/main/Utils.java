@@ -55,15 +55,15 @@ public class Utils {
 
 	/**
 	 * Checks if the given error is not null, and returns to the AsyncReturn with the given error value.
-	 * @param e the exception
+	 * @param exception the exception
 	 * @param asyncReturn the callback to return on
 	 * @param error the default error return value
 	 * @param <T> the return type
 	 * @return true if the exception was not null
 	 */
-	public static <T> boolean callbackException(Exception e, AsyncReturn<T> asyncReturn, T error) {
-		if (e != null) {
-			asyncReturn.onReceive(error, e);
+	public static <T> boolean callbackException(Exception exception, AsyncReturn<T> asyncReturn, T error) {
+		if (exception != null) {
+			asyncReturn.onReceive(error, exception);
 			return true;
 		}
 		return false;

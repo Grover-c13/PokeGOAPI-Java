@@ -21,9 +21,9 @@ public class SyncedReturn<T> implements AsyncReturn<T> {
 	private Exception exception;
 
 	@Override
-	public void onReceive(T object, Exception e) {
+	public void onReceive(T object, Exception exception) {
 		this.result = object;
-		this.exception = e;
+		this.exception = exception;
 		synchronized (this.lock) {
 			this.lock.notify();
 		}

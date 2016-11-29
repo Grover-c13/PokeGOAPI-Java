@@ -112,7 +112,7 @@ public class SolveCaptchaExample {
 						*/
 						api.checkChallenge(new AsyncReturn<String>() {
 							@Override
-							public void onReceive(String url, Exception e) {
+							public void onReceive(String url, Exception exception) {
 								System.out.println("New challenge URL received!");
 							}
 						});

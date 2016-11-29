@@ -60,10 +60,10 @@ public class UseIncenseExample {
 			go.setLocation(-32.058087, 115.744325, 0);
 			go.getInventories().getItemBag().useIncense(new PokemonCallback() {
 				@Override
-				public void onCompleted(Exception e) {
+				public void onCompleted(Exception exception) {
 					System.out.println("Incense was used!");
-					if (e != null) {
-						Log.e("Main", "Error while placing incense", e);
+					if (exception != null) {
+						Log.e("Main", "Error while placing incense", exception);
 					}
 				}
 			});

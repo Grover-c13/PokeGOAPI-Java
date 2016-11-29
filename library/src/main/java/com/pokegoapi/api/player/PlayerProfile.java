@@ -375,11 +375,11 @@ public class PlayerProfile {
 							updateProfile(playerData);
 							markTutorial(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION, new PokemonCallback() {
 								@Override
-								public void onCompleted(Exception e) {
-									if (e == null) {
+								public void onCompleted(Exception exception) {
+									if (exception == null) {
 										api.fireAssetRequestBlock(callback);
 									} else {
-										callback.onCompleted(e);
+										callback.onCompleted(exception);
 									}
 								}
 							});
@@ -507,8 +507,8 @@ public class PlayerProfile {
 	private void completeNameSelection(final PokemonCallback callback) {
 		markTutorial(TutorialStateOuterClass.TutorialState.NAME_SELECTION, new PokemonCallback() {
 			@Override
-			public void onCompleted(Exception e) {
-				if (e == null) {
+			public void onCompleted(Exception exception) {
+				if (exception == null) {
 					final GetPlayerMessage getPlayerMessage = GetPlayerMessage.newBuilder()
 							.setPlayerLocale(playerLocale.getPlayerLocale()).build();
 					PokemonRequest getPlayerRequest = new PokemonRequest(RequestType.GET_PLAYER, getPlayerMessage)
@@ -523,7 +523,7 @@ public class PlayerProfile {
 					PokemonRequest[] requests = CommonRequests.fillRequest(getPlayerRequest, api);
 					api.getRequestHandler().sendRequests(requests);
 				} else {
-					callback.onCompleted(e);
+					callback.onCompleted(exception);
 				}
 			}
 		});

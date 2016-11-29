@@ -27,11 +27,16 @@ import com.pokegoapi.api.settings.Settings;
 import java.util.List;
 
 public class LoginFlow {
+	/**
+	 * Begins login flow
+	 * @param api the api to begin the login flow on
+	 * @param callback for when this task completes
+	 */
 	public static void beginLogin(final PokemonGo api, final PokemonCallback callback) {
 		api.setPlayerProfile(new PlayerProfile(api, new PokemonCallback() {
 			@Override
-			public void onCompleted(Exception e) {
-				if (callbackIfException(e, callback)) {
+			public void onCompleted(Exception exception) {
+				if (callbackIfException(exception, callback)) {
 					return;
 				}
 
@@ -47,8 +52,8 @@ public class LoginFlow {
 		PokemonRequest request = new PokemonRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION, message);
 		api.fireRequestBlock(request, new PokemonCallback() {
 			@Override
-			public void onCompleted(Exception e) {
-				if (callbackIfException(e, callback)) {
+			public void onCompleted(Exception exception) {
+				if (callbackIfException(exception, callback)) {
 					return;
 				}
 
@@ -60,8 +65,8 @@ public class LoginFlow {
 	private static void downloadAssetDigest(final PokemonGo api, final PokemonCallback callback) {
 		api.fireAssetRequestBlock(new PokemonCallback() {
 			@Override
-			public void onCompleted(Exception e) {
-				if (callbackIfException(e, callback)) {
+			public void onCompleted(Exception exception) {
+				if (callbackIfException(exception, callback)) {
 					return;
 				}
 
@@ -92,8 +97,8 @@ public class LoginFlow {
 		if (states.isEmpty()) {
 			profile.activateAccount(new PokemonCallback() {
 				@Override
-				public void onCompleted(Exception e) {
-					if (callbackIfException(e, callback)) {
+				public void onCompleted(Exception exception) {
+					if (callbackIfException(exception, callback)) {
 						return;
 					}
 
@@ -110,8 +115,8 @@ public class LoginFlow {
 		if (!states.contains(TutorialState.AVATAR_SELECTION)) {
 			profile.setupAvatar(new PokemonCallback() {
 				@Override
-				public void onCompleted(Exception e) {
-					if (callbackIfException(e, callback)) {
+				public void onCompleted(Exception exception) {
+					if (callbackIfException(exception, callback)) {
 						return;
 					}
 
@@ -126,8 +131,8 @@ public class LoginFlow {
 		if (!states.contains(TutorialState.POKEMON_CAPTURE)) {
 			profile.setupAvatar(new PokemonCallback() {
 				@Override
-				public void onCompleted(Exception e) {
-					if (callbackIfException(e, callback)) {
+				public void onCompleted(Exception exception) {
+					if (callbackIfException(exception, callback)) {
 						return;
 					}
 
@@ -138,12 +143,12 @@ public class LoginFlow {
 	}
 
 	private static void claimName(final PlayerProfile profile, final List<TutorialState> states,
-								  final PokemonCallback callback) {
+									final PokemonCallback callback) {
 		if (!states.contains(TutorialState.NAME_SELECTION)) {
 			profile.claimCodeName(new PokemonCallback() {
 				@Override
-				public void onCompleted(Exception e) {
-					if (callbackIfException(e, callback)) {
+				public void onCompleted(Exception exception) {
+					if (callbackIfException(exception, callback)) {
 						return;
 					}
 
@@ -154,12 +159,12 @@ public class LoginFlow {
 	}
 
 	private static void completeTutorial(final PlayerProfile profile, final List<TutorialState> states,
-								  final PokemonCallback callback) {
+										final PokemonCallback callback) {
 		if (!states.contains(TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
 			profile.firstTimeExperienceComplete(new PokemonCallback() {
 				@Override
-				public void onCompleted(Exception e) {
-					if (callbackIfException(e, callback)) {
+				public void onCompleted(Exception exception) {
+					if (callbackIfException(exception, callback)) {
 						return;
 					}
 
@@ -173,9 +178,9 @@ public class LoginFlow {
 		callback.onCompleted(null);
 	}
 
-	private static boolean callbackIfException(Exception e, PokemonCallback callback) {
-		if (e != null) {
-			callback.onCompleted(e);
+	private static boolean callbackIfException(Exception exception, PokemonCallback callback) {
+		if (exception != null) {
+			callback.onCompleted(exception);
 			return true;
 		}
 		return false;
