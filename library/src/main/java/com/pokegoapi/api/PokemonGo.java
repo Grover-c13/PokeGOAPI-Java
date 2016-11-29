@@ -15,16 +15,14 @@
 
 package com.pokegoapi.api;
 
-import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import POGOProtos.Networking.Requests.Messages.CheckChallenge.CheckChallengeMessage;
 import POGOProtos.Networking.Requests.Messages.VerifyChallenge.VerifyChallengeMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
+import POGOProtos.Networking.Responses.CheckChallengeResponseOuterClass.CheckChallengeResponse;
 import POGOProtos.Networking.Responses.VerifyChallengeResponseOuterClass.VerifyChallengeResponse;
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.device.ActivityStatus;
 import com.pokegoapi.api.device.DeviceInfo;
@@ -39,11 +37,15 @@ import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.main.CommonRequest;
+import com.pokegoapi.main.AsyncReturn;
+import com.pokegoapi.main.CommonRequests;
+import com.pokegoapi.main.LoginFlow;
+import com.pokegoapi.main.PokemonCallback;
+import com.pokegoapi.main.PokemonRequest;
+import com.pokegoapi.main.PokemonResponse;
+import com.pokegoapi.main.RequestCallback;
 import com.pokegoapi.main.RequestHandler;
-import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.AsyncHelper;
+import com.pokegoapi.main.Utils;
 import com.pokegoapi.util.ClientInterceptor;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
@@ -51,10 +53,13 @@ import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.LinkedBlockingDeque;
 
 
 public class PokemonGo {
@@ -68,8 +73,10 @@ public class PokemonGo {
 	@Getter
 	RequestHandler requestHandler;
 	@Getter
+	@Setter
 	private PlayerProfile playerProfile;
 	@Getter
+	@Setter
 	private Inventories inventories;
 	@Getter
 	private double latitude;
@@ -83,6 +90,7 @@ public class PokemonGo {
 	private double accuracy = 1;
 	private CredentialProvider credentialProvider;
 	@Getter
+	@Setter
 	private Settings settings;
 	private Map map;
 	@Setter
@@ -106,7 +114,9 @@ public class PokemonGo {
 	private String challengeURL;
 
 	@Getter
-	private List<Listener> listeners = new ArrayList<>();
+	private List<Listener> listeners = new ArrayList<Listener>();
+
+	private Queue<Runnable> tasks = new LinkedBlockingDeque<>();
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -128,6 +138,24 @@ public class PokemonGo {
 		longitude = Double.NaN;
 		latitude = Double.NaN;
 		altitude = Double.NaN;
+		Thread taskThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (true) {
+					while (!tasks.isEmpty()) {
+						Runnable task = tasks.poll();
+						task.run();
+					}
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+		taskThread.setName("PokemonGO Task Runner");
+		taskThread.start();
 	}
 
 	/**
@@ -166,90 +194,39 @@ public class PokemonGo {
 	 * Login user with the provided provider
 	 *
 	 * @param credentialProvider the credential provider
-	 * @throws LoginFailedException When login fails
-	 * @throws RemoteServerException When server fails
+	 * @param callback for when the login completes
 	 */
-	public void login(CredentialProvider credentialProvider) throws LoginFailedException, RemoteServerException {
+	public void login(CredentialProvider credentialProvider, PokemonCallback callback) {
 		if (credentialProvider == null) {
 			throw new NullPointerException("Credential Provider is null");
 		}
 		this.credentialProvider = credentialProvider;
 		startTime = currentTimeMillis();
-		playerProfile = new PlayerProfile(this);
-		settings = new Settings(this);
-		inventories = new Inventories(this);
-
-		initialize();
-	}
-
-	private void initialize() throws RemoteServerException, LoginFailedException {
-		fireRequestBlock(new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
-				CommonRequest.getDownloadRemoteConfigVersionMessageRequest()));
-
-		fireRequestBlockTwo();
-
-		List<LoginListener> loginListeners = getListeners(LoginListener.class);
-
-		for (LoginListener listener : loginListeners) {
-			listener.onLogin(this);
-		}
-
-		// From now one we will start to check our accounts is ready to fire requests.
-		// Actually, we can receive valid responses even with this first check,
-		// that mark the tutorial state into LEGAL_SCREEN.
-		// Following, we are going to check if the account binded to this session
-		// have an avatar, a nickname, and all the other things that are usually filled
-		// on the official client BEFORE sending any requests such as the getMapObject etc.
-		ArrayList<TutorialState> tutorialStates = playerProfile.getTutorialState().getTutorialStates();
-		if (tutorialStates.isEmpty()) {
-			playerProfile.activateAccount();
-		}
-
-		if (!tutorialStates.contains(TutorialState.AVATAR_SELECTION)) {
-			playerProfile.setupAvatar();
-		}
-
-		if (!tutorialStates.contains(TutorialState.POKEMON_CAPTURE)) {
-			playerProfile.encounterTutorialComplete();
-		}
-
-		if (!tutorialStates.contains(TutorialState.NAME_SELECTION)) {
-			playerProfile.claimCodeName();
-		}
-
-		if (!tutorialStates.contains(TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE)) {
-			playerProfile.firstTimeExperienceComplete();
-		}
+		LoginFlow.beginLogin(this, callback);
 	}
 
 	/**
-	 * Fire requests block.
+	 * Fires request block.
 	 *
 	 * @param request server request
-	 * @throws LoginFailedException When login fails
-	 * @throws RemoteServerException When server fails
+	 * @param callback for when this completes
 	 */
-	private void fireRequestBlock(ServerRequest request) throws RemoteServerException, LoginFailedException {
-		ServerRequest[] requests = CommonRequest.fillRequest(request, this);
-
-		getRequestHandler().sendServerRequests(requests);
-		try {
-			inventories.updateInventories(GetInventoryResponse.parseFrom(requests[3].getData()));
-			settings.updateSettings(DownloadSettingsResponse.parseFrom(requests[5].getData()));
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException();
-		}
+	public void fireRequestBlock(PokemonRequest request, final PokemonCallback callback) {
+		PokemonRequest[] requests = CommonRequests.fillRequest(request.withCallback(new RequestCallback() {
+			@Override
+			public void handleResponse(PokemonResponse response) throws InvalidProtocolBufferException {
+				callback.onCompleted(response.getException());
+			}
+		}), this);
+		getRequestHandler().sendRequests(requests);
 	}
 
 	/**
-	 * Second requests block. Public since it could be re-fired at any time
-	 *
-	 * @throws LoginFailedException When login fails
-	 * @throws RemoteServerException When server fails
+	 * Asset digest request block.
 	 */
-	public void fireRequestBlockTwo() throws RemoteServerException, LoginFailedException {
-		fireRequestBlock(new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
-				CommonRequest.getGetAssetDigestMessageRequest()));
+	public void fireAssetRequestBlock(PokemonCallback callback) {
+		fireRequestBlock(new PokemonRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
+				CommonRequests.getGetAssetDigestMessageRequest()), callback);
 	}
 
 	/**
@@ -395,6 +372,7 @@ public class PokemonGo {
 
 	/**
 	 * Updates the current challenge
+	 *
 	 * @param url the challenge url, if any
 	 * @param hasChallenge whether the challenge solve is required
 	 */
@@ -411,6 +389,7 @@ public class PokemonGo {
 
 	/**
 	 * Registers the given listener to this api.
+	 *
 	 * @param listener the listener to register
 	 */
 	public void addListener(Listener listener) {
@@ -428,17 +407,44 @@ public class PokemonGo {
 
 	/**
 	 * Returns all listeners for the given type.
+	 *
 	 * @param listenerType the type of listeners to return
 	 * @return all listeners for the given type
 	 */
 	public <T extends Listener> List<T> getListeners(Class<T> listenerType) {
-		List<T> listeners = new ArrayList<>();
+		List<T> listeners = new ArrayList<T>();
 		for (Listener listener : this.listeners) {
 			if (listenerType.isAssignableFrom(listener.getClass())) {
 				listeners.add((T) listener);
 			}
 		}
 		return listeners;
+	}
+
+	/**
+	 * Invokes a method in all listeners of the given type
+	 * @param listenerType the listener to call to
+	 * @param name the method name to call
+	 * @param parameters the parameters to pass to the method
+	 * @param <T> the listener type
+	 * @throws ReflectiveOperationException if an exception occurred while invoking the listener
+	 */
+	public <T extends Listener> void callListener(Class<T> listenerType, String name, Object... parameters)
+			throws ReflectiveOperationException {
+		Class[] parameterTypes = new Class[parameters.length];
+		for (int i = 0; i < parameters.length; i++) {
+			Object parameter = parameters[i];
+			parameterTypes[i] = parameter.getClass();
+		}
+		Method method = listenerType.getMethod(name, parameterTypes);
+		if (method != null) {
+			List<T> listeners = getListeners(listenerType);
+			for (T listener : listeners) {
+				method.invoke(listener, parameters);
+			}
+		} else {
+			throw new NoSuchMethodException("Method \"" + name + "\" does not exist");
+		}
 	}
 
 	/**
@@ -450,23 +456,61 @@ public class PokemonGo {
 
 	/**
 	 * Verifies the current challenge with the given token.
+	 *
 	 * @param token the challenge response token
-	 * @return if the token was valid or not
-	 * @throws LoginFailedException when login fails
-	 * @throws RemoteServerException when server fails
-	 * @throws InvalidProtocolBufferException when the client receives an invalid message from the server
+	 * @param verified callback for when the server responds to this request, true if the token was valid
 	 */
-	public boolean verifyChallenge(String token)
-			throws RemoteServerException, LoginFailedException, InvalidProtocolBufferException {
+	public void verifyChallenge(String token, final AsyncReturn<Boolean> verified) {
 		hasChallenge = false;
 		VerifyChallengeMessage message = VerifyChallengeMessage.newBuilder().setToken(token).build();
-		AsyncServerRequest request = new AsyncServerRequest(RequestType.VERIFY_CHALLENGE, message);
-		ByteString responseData = AsyncHelper.toBlocking(getRequestHandler().sendAsyncServerRequests(request));
-		VerifyChallengeResponse response = VerifyChallengeResponse.parseFrom(responseData);
-		hasChallenge = !response.getSuccess();
-		if (!hasChallenge) {
-			challengeURL = null;
-		}
-		return response.getSuccess();
+		PokemonRequest request = new PokemonRequest(RequestType.VERIFY_CHALLENGE, message);
+		getRequestHandler().sendRequest(request, new RequestCallback() {
+			@Override
+			public void handleResponse(PokemonResponse response) throws InvalidProtocolBufferException {
+				if (Utils.callbackException(response, verified, false)) {
+					return;
+				}
+				VerifyChallengeResponse messageResponse = VerifyChallengeResponse.parseFrom(response.getResponseData());
+				hasChallenge = !messageResponse.getSuccess();
+				if (!hasChallenge) {
+					challengeURL = null;
+				}
+				verified.onReceive(messageResponse.getSuccess(), null);
+			}
+		});
+	}
+
+	/**
+	 * Checks for a challenge / captcha
+	 *
+	 * @param challenge callback for when the server responds with a challenge, null if none exists
+	 */
+	public void checkChallenge(final AsyncReturn<String> challenge) {
+		updateChallenge(null, false);
+		CheckChallengeMessage message = CheckChallengeMessage.newBuilder().build();
+		PokemonRequest request = new PokemonRequest(RequestType.CHECK_CHALLENGE, message);
+		getRequestHandler().sendRequest(request, new RequestCallback() {
+			@Override
+			public void handleResponse(PokemonResponse response) throws InvalidProtocolBufferException {
+				if (Utils.callbackException(response, challenge, null)) {
+					return;
+				}
+				CheckChallengeResponse messageResponse = CheckChallengeResponse.parseFrom(response.getResponseData());
+				String newChallenge = messageResponse.getChallengeUrl();
+				if (newChallenge != null && newChallenge.length() > 0) {
+					updateChallenge(newChallenge, true);
+					challenge.onReceive(newChallenge, null);
+				}
+				challenge.onReceive(null, null);
+			}
+		});
+	}
+
+	/**
+	 * Queues a task to be run on the task runner thread
+	 * @param runnable the task to run
+	 */
+	public void queueTask(Runnable runnable) {
+		this.tasks.add(runnable);
 	}
 }

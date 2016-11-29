@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * The type Server request.
  */
-public class AsyncServerRequest {
+public class PokemonRequest {
 	private static final AtomicLong CURRENT_ID = new AtomicLong(System.currentTimeMillis());
 
 	@Getter
@@ -37,6 +37,9 @@ public class AsyncServerRequest {
 	@Getter
 	private final boolean requireCommonRequest;
 
+	@Getter
+	private RequestCallback callback;
+
 	/**
 	 * Instantiates a new Server request.
 	 *
@@ -44,7 +47,7 @@ public class AsyncServerRequest {
 	 * @param req  the req
 	 * @param requireCommonRequest indicate if this request require common requests
 	 */
-	public AsyncServerRequest(RequestType type, GeneratedMessage req, boolean requireCommonRequest) {
+	public PokemonRequest(RequestType type, GeneratedMessage req, boolean requireCommonRequest) {
 		Request.Builder reqBuilder = Request.newBuilder();
 		reqBuilder.setRequestMessage(req.toByteString());
 		reqBuilder.setRequestType(type);
@@ -59,7 +62,7 @@ public class AsyncServerRequest {
 	 * @param type the type
 	 * @param req  the req
 	 */
-	public AsyncServerRequest(RequestType type, GeneratedMessage req) {
+	public PokemonRequest(RequestType type, GeneratedMessage req) {
 		this(type, req, false);
 	}
 
@@ -69,9 +72,19 @@ public class AsyncServerRequest {
 	 * @param type the type
 	 * @param req  the req
 	 */
-	AsyncServerRequest(RequestType type, Request req) {
+	PokemonRequest(RequestType type, Request req) {
 		this.type = type;
 		this.request = req;
 		this.requireCommonRequest = false;
+	}
+
+	/**
+	 * Sets the callback for this request. RequestHandler#sendRequest will set this if it is not already set
+	 * @param callback the callback for this request
+	 * @return this object
+	 */
+	public PokemonRequest withCallback(RequestCallback callback) {
+		this.callback = callback;
+		return this;
 	}
 }

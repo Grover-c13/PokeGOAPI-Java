@@ -15,9 +15,16 @@
 
 package com.pokegoapi.main;
 
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import com.pokegoapi.api.PokemonGo;
+public interface PokemonCallback {
+	PokemonCallback NULL_CALLBACK = new PokemonCallback() {
+		@Override
+		public void onCompleted(Exception exception) {
+		}
+	};
 
-public interface CommonRequest {
-	PokemonRequest create(final PokemonGo api, final RequestType requestType);
+	/**
+	 * Called when a task completes.
+	 * @param exception exception thrown while doing this task, null if no exception was thrown.
+	 */
+	void onCompleted(Exception exception);
 }

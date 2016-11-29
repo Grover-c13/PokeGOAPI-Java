@@ -15,9 +15,31 @@
 
 package com.pokegoapi.main;
 
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import com.pokegoapi.api.PokemonGo;
+public class SyncedReturn<T> implements AsyncReturn<T> {
+	private final Object lock = new Object();
+	private T result;
+	private Exception exception;
 
-public interface CommonRequest {
-	PokemonRequest create(final PokemonGo api, final RequestType requestType);
+	@Override
+	public void onReceive(T object, Exception exception) {
+		this.result = object;
+		this.exception = exception;
+		synchronized (this.lock) {
+			this.lock.notify();
+		}
+	}
+
+	/**
+	 * Blocks the current thread until a result is received
+	 * @return the received value
+	 */
+	public T get() throws Exception {
+		synchronized (this.lock) {
+			this.lock.wait();
+		}
+		if (this.exception != null) {
+			throw this.exception;
+		}
+		return result;
+	}
 }

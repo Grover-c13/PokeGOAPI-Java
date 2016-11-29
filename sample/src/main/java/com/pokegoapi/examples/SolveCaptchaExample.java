@@ -30,17 +30,14 @@
 
 package com.pokegoapi.examples;
 
-import POGOProtos.Networking.Requests.Messages.CheckChallenge.CheckChallengeMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.CheckChallengeResponseOuterClass.CheckChallengeResponse;
-import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.listener.LoginListener;
 import com.pokegoapi.auth.PtcCredentialProvider;
-import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.util.AsyncHelper;
+import com.pokegoapi.main.AsyncReturn;
+import com.pokegoapi.main.BlockingCallback;
+import com.pokegoapi.main.SyncedReturn;
+import com.pokegoapi.util.CaptchaSolveHelper;
 import com.pokegoapi.util.Log;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
@@ -48,112 +45,85 @@ import javafx.scene.web.WebView;
 import okhttp3.OkHttpClient;
 
 import javax.swing.JFrame;
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLStreamHandler;
-import java.net.URLStreamHandlerFactory;
-import java.util.regex.Pattern;
 
 public class SolveCaptchaExample {
-	public static final String USER_AGENT =
-			"Mozilla/5.0 (Windows NT 10.0; WOW64)" +
-			" AppleWebKit/537.36 (KHTML, like Gecko) " +
-			"Chrome/54.0.2840.99 Safari/537.36";
-
 	/**
 	 * Opens a window for captcha solving if needed
 	 *
 	 * @param args args
 	 */
 	public static void main(String[] args) {
-		/*
-			Registers handler for the custom protocol used to send the token to the Pokemon app.
-
-			If not set, the change listener registered in completeCaptcha would not fire when the token
-			is sent.
-		 */
-		URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
-			@Override
-			public URLStreamHandler createURLStreamHandler(String protocol) {
-				if (protocol.equals("unity")) {
-					return new URLStreamHandler() {
-						@Override
-						protected URLConnection openConnection(URL url) throws IOException {
-							return new URLConnection(url) {
-								@Override
-								public void connect() throws IOException {
-									System.out.println("Received token: " + url.toString()
-											.split(Pattern.quote(":"))[1]);
-								}
-							};
-						}
-					};
-				}
-				return null;
-			}
-		});
-
 		OkHttpClient http = new OkHttpClient();
 		PokemonGo api = new PokemonGo(http);
 		try {
-			api.login(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD));
+			//Add listener to listen for the captcha URL
+			api.addListener(new LoginListener() {
+				@Override
+				public void onLogin(PokemonGo api) {
+					System.out.println("Successfully logged in with SolveCaptchaExample!");
+				}
+
+				@Override
+				public void onChallenge(PokemonGo api, String challengeURL) {
+					System.out.println("Captcha received! URL: " + challengeURL);
+					completeCaptcha(api, challengeURL);
+				}
+			});
+
+			BlockingCallback callback = new BlockingCallback();
+			api.login(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD),
+					callback);
+			//Block thread until login is complete
+			callback.block();
 			api.setLocation(-32.058087, 115.744325, 0);
-
-			//Wait until challenge is requested
-			while (!api.hasChallenge()) {
-				Thread.sleep(100);
-			}
-
-			String challengeURL = api.getChallengeURL();
-
-			completeCaptcha(api, challengeURL);
 		} catch (Exception e) {
-			Log.e("Main", "Failed to login! ", e);
+			Log.e("Main", "Failed to run captcha example! ", e);
 		}
 	}
 
 	private static void completeCaptcha(final PokemonGo api, final String challengeURL) {
 		JFXPanel panel = new JFXPanel();
-		//Create WebView and WebEngine to display the captcha webpage
+		//Create a WebView and WebEngine to display the captcha from challengeURL.
 		WebView view = new WebView();
 		WebEngine engine = view.getEngine();
-		//Set UserAgent so captcha shows in the WebView
-		engine.setUserAgent(USER_AGENT);
+		//Set UserAgent so the captcha shows correctly in the WebView.
+		engine.setUserAgent(CaptchaSolveHelper.USER_AGENT);
 		engine.load(challengeURL);
 		final JFrame frame = new JFrame("Solve Captcha");
-		engine.locationProperty().addListener(new ChangeListener<String>() {
+		//Register listener to receive the token when the captcha has been solved from inside the WebView.
+		CaptchaSolveHelper.Listener listener = new CaptchaSolveHelper.Listener() {
 			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				if (newValue.startsWith("unity:")) {
-					String token = newValue.split(Pattern.quote(":"))[1];
-					try {
-						//Close this window, not valid anymore
-						frame.setVisible(false);
-						if (api.verifyChallenge(token)) {
-							System.out.println("Captcha was correctly solved!");
-						} else {
-							System.out.println("Captcha was incorrectly solved! Retry.");
-							//Removes the current challenge to allow the CheckChallengeMessage to send
-							api.updateChallenge(null, false);
-							CheckChallengeMessage message = CheckChallengeMessage.newBuilder().build();
-							AsyncServerRequest request = new AsyncServerRequest(RequestType.CHECK_CHALLENGE, message);
-							ByteString responseData =
-									AsyncHelper.toBlocking(api.getRequestHandler().sendAsyncServerRequests(request));
-							CheckChallengeResponse response = CheckChallengeResponse.parseFrom(responseData);
-							String newChallenge = response.getChallengeUrl();
-							if (newChallenge != null && newChallenge.length() > 0) {
-								//New challenge URL, open a new window for that
-								api.updateChallenge(newChallenge, true);
-								completeCaptcha(api, newChallenge);
+			public void onTokenReceived(String token) {
+				System.out.println("Token received: " + token + "!");
+				//Remove this listener as we no longer need to listen for tokens, the captcha has been solved.
+				CaptchaSolveHelper.removeListener(this);
+				try {
+					//Close this window, it not valid anymore.
+					frame.setVisible(false);
+					SyncedReturn<Boolean> verified = new SyncedReturn<>();
+					api.verifyChallenge(token, verified);
+					if (verified.get()) {
+						System.out.println("Captcha was correctly solved!");
+					} else {
+						System.out.println("Captcha was incorrectly solved! Please try again.");
+
+						/*
+							Ask for a new challenge url.
+						*/
+						api.checkChallenge(new AsyncReturn<String>() {
+							@Override
+							public void onReceive(String url, Exception exception) {
+								System.out.println("New challenge URL received!");
 							}
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
+						});
 					}
+				} catch (Exception e) {
+					Log.e("Main", "Error while solving captcha!", e);
 				}
 			}
-		});
+		};
+		CaptchaSolveHelper.registerListener(listener);
+
 		//Applies the WebView to this panel
 		panel.setScene(new Scene(view));
 		frame.getContentPane().add(panel);
