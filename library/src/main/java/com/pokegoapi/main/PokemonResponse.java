@@ -16,25 +16,33 @@
 package com.pokegoapi.main;
 
 import com.google.protobuf.ByteString;
-
 import lombok.Getter;
 
-public class ResultOrException {
+public class PokemonResponse {
 	@Getter
-	private final ByteString result;
+	private final ByteString responseData;
 	@Getter
 	private final Exception exception;
 
-	private ResultOrException(ByteString result, Exception exception) {
-		this.result = result;
+	private PokemonResponse(ByteString responseData, Exception exception) {
+		this.responseData = responseData;
 		this.exception = exception;
 	}
 
-	public static ResultOrException getError(Exception exception) {
-		return new ResultOrException(null, exception);
+	/**
+	 * Checks if this response is an error.
+	 *
+	 * @return if this response contains an exception
+	 */
+	public boolean hasErrored() {
+		return this.exception != null;
 	}
 
-	public static ResultOrException getResult(ByteString result) {
-		return new ResultOrException(result, null);
+	public static PokemonResponse getError(Exception exception) {
+		return new PokemonResponse(null, exception);
+	}
+
+	public static PokemonResponse getResult(ByteString result) {
+		return new PokemonResponse(result, null);
 	}
 }

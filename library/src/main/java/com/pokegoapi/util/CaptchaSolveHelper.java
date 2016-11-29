@@ -22,6 +22,8 @@ import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.regex.Pattern;
 
 public class CaptchaSolveHelper {
@@ -31,6 +33,9 @@ public class CaptchaSolveHelper {
 					+ "Chrome/54.0.2840.99 Safari/537.36";
 
 	private static final List<Listener> LISTENERS = new ArrayList<Listener>();
+	private static final Queue<Listener> QUEUED_ADDITION = new LinkedBlockingDeque<>();
+	private static final Queue<Listener> QUEUED_REMOVAL = new LinkedBlockingDeque<>();
+	private static boolean processing;
 
 	static {
 		URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
@@ -44,8 +49,16 @@ public class CaptchaSolveHelper {
 								@Override
 								public void connect() throws IOException {
 									String token = url.toString().split(Pattern.quote(":"))[1];
+									processing = true;
 									for (Listener listener : LISTENERS) {
 										listener.onTokenReceived(token);
+									}
+									processing = false;
+									while (QUEUED_ADDITION.size() > 0) {
+										CaptchaSolveHelper.registerListener(QUEUED_ADDITION.poll());
+									}
+									while (QUEUED_REMOVAL.size() > 0) {
+										CaptchaSolveHelper.removeListener(QUEUED_REMOVAL.poll());
 									}
 								}
 							};
@@ -63,7 +76,11 @@ public class CaptchaSolveHelper {
 	 * @param listener the listener to register
 	 */
 	public static void registerListener(Listener listener) {
-		LISTENERS.add(listener);
+		if (processing) {
+			QUEUED_ADDITION.add(listener);
+		} else {
+			LISTENERS.add(listener);
+		}
 	}
 
 	/**
@@ -72,7 +89,11 @@ public class CaptchaSolveHelper {
 	 * @param listener the listener to remove
 	 */
 	public static void removeListener(Listener listener) {
-		LISTENERS.remove(listener);
+		if (processing) {
+			QUEUED_REMOVAL.add(listener);
+		} else {
+			LISTENERS.remove(listener);
+		}
 	}
 
 	public interface Listener {

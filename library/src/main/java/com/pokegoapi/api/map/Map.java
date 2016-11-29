@@ -15,30 +15,22 @@
 
 package com.pokegoapi.api.map;
 
-import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Map.Fort.FortTypeOuterClass.FortType;
 import POGOProtos.Map.MapCellOuterClass.MapCell;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
-import POGOProtos.Map.Pokemon.WildPokemonOuterClass;
+import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Map.SpawnPointOuterClass;
-import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.CatchPokemonMessage;
-import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
-import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass.FortSearchMessage;
 import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
-import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
-import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
-import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
+import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass.FortDetailsResponse;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.gym.Gym;
@@ -46,24 +38,23 @@ import com.pokegoapi.api.map.fort.FortDetails;
 import com.pokegoapi.api.map.fort.Pokestop;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.NearbyPokemon;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
-import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.MutableInteger;
 import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
-import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.AsyncHelper;
+import com.pokegoapi.main.AsyncReturn;
+import com.pokegoapi.main.PokemonRequest;
+import com.pokegoapi.main.PokemonResponse;
+import com.pokegoapi.main.RequestCallback;
+import com.pokegoapi.main.Utils;
 import com.pokegoapi.util.MapUtil;
-import rx.Observable;
-import rx.functions.Func1;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Map {
@@ -89,36 +80,39 @@ public class Map {
 	/**
 	 * Returns a list of catchable pokemon around the current location.
 	 *
-	 * @return a List of CatchablePokemon at your current location
+	 * @param catchablePokemon callback returning a list of CatchablePokemon at your current location
 	 */
-	public Observable<List<CatchablePokemon>> getCatchablePokemonAsync() {
-
+	public void getCatchablePokemon(final AsyncReturn<List<CatchablePokemon>> catchablePokemon) {
 		if (useCache() && cachedCatchable.size() > 0) {
-			return Observable.just(cachedCatchable);
+			catchablePokemon.onReceive(cachedCatchable, null);
 		}
 
-
-		List<Long> cellIds = getDefaultCells();
-		return getMapObjectsAsync(cellIds).map(new Func1<MapObjects, List<CatchablePokemon>>() {
+		List<Long> defaultCells = getDefaultCells();
+		getMapObjects(defaultCells, new AsyncReturn<MapObjects>() {
 			@Override
-			public List<CatchablePokemon> call(MapObjects mapObjects) {
+			public void onReceive(MapObjects objects, Exception e) {
+				if (Utils.callbackException(e, catchablePokemon, new ArrayList<CatchablePokemon>())) {
+					return;
+				}
 				Set<CatchablePokemon> catchablePokemons = new HashSet<>();
-				for (MapPokemon mapPokemon : mapObjects.getCatchablePokemons()) {
+				for (MapPokemon mapPokemon : objects.getCatchablePokemons()) {
 					catchablePokemons.add(new CatchablePokemon(api, mapPokemon));
 				}
 
-				for (WildPokemonOuterClass.WildPokemon wildPokemon : mapObjects.getWildPokemons()) {
+				for (WildPokemon wildPokemon : objects.getWildPokemons()) {
 					catchablePokemons.add(new CatchablePokemon(api, wildPokemon));
 				}
 
-				for (Pokestop pokestop : mapObjects.getPokestops()) {
+				for (Pokestop pokestop : objects.getPokestops()) {
 					if (pokestop.inRangeForLuredPokemon() && pokestop.getFortData().hasLureInfo()) {
 						catchablePokemons.add(new CatchablePokemon(api, pokestop.getFortData()));
 					}
 				}
+
 				cachedCatchable.clear();
 				cachedCatchable.addAll(catchablePokemons);
-				return cachedCatchable;
+
+				catchablePokemon.onReceive(cachedCatchable, null);
 			}
 		});
 	}
@@ -135,208 +129,174 @@ public class Map {
 	}
 
 	/**
-	 * Returns a list of catchable pokemon around the current location.
+	 * Returns a list of catchable pokemon around the current location, sorted by distance.
 	 *
-	 * @return a List of CatchablePokemon at your current location
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
+	 * @param catchablePokemon callback returning a list of CatchablePokemon at your current location
 	 */
-	public List<CatchablePokemon> getCatchablePokemon() throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(getCatchablePokemonAsync());
-	}
-
-	/**
-	 * Gets catchable pokemon sort by distance.
-	 *
-	 * @return the catchable pokemon sort
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	public java.util.Map<Double, CatchablePokemon> getCatchablePokemonSort()
-			throws LoginFailedException, RemoteServerException {
-		MapUtil<CatchablePokemon> util = new MapUtil<>();
-		return util.sortItems(getCatchablePokemon(), api);
-	}
-
-	/**
-	 * Returns a list of nearby pokemon (non-catchable).
-	 *
-	 * @return a List of NearbyPokemon at your current location
-	 */
-	public Observable<List<NearbyPokemon>> getNearbyPokemonAsync() {
-		return getMapObjectsAsync(getDefaultCells()).map(new Func1<MapObjects, List<NearbyPokemon>>() {
+	public void getSortedCatchablePokemon(final AsyncReturn<java.util.Map<Double, CatchablePokemon>> catchablePokemon) {
+		getCatchablePokemon(new AsyncReturn<List<CatchablePokemon>>() {
 			@Override
-			public List<NearbyPokemon> call(MapObjects result) {
+			public void onReceive(List<CatchablePokemon> pokemon, Exception e) {
+				if (Utils.callbackException(e, catchablePokemon, new TreeMap<Double, CatchablePokemon>())) {
+					return;
+				}
+				MapUtil<CatchablePokemon> util = new MapUtil<>();
+				catchablePokemon.onReceive(util.sortItems(pokemon, api), null);
+			}
+		});
+	}
+
+	/**
+	 * Gets a list of nearby pokemon (non-catchable/sightings).
+	 * @param nearby callback to return list of nearby pokemon
+	 */
+	public void getNearbyPokemon(final AsyncReturn<List<NearbyPokemon>> nearby) {
+		getMapObjects(getDefaultCells(), new AsyncReturn<MapObjects>() {
+			@Override
+			public void onReceive(MapObjects objects, Exception e) {
+				if (Utils.callbackException(e, nearby, new ArrayList<NearbyPokemon>())) {
+					return;
+				}
 				List<NearbyPokemon> pokemons = new ArrayList<>();
-				for (NearbyPokemonOuterClass.NearbyPokemon pokemon : result.getNearbyPokemons()) {
+				for (NearbyPokemonOuterClass.NearbyPokemon pokemon : objects.getNearbyPokemons()) {
 					pokemons.add(new NearbyPokemon(pokemon));
 				}
-
-				return pokemons;
+				nearby.onReceive(pokemons, null);
 			}
 		});
 	}
 
 	/**
-	 * Returns a list of nearby pokemon (non-catchable).
+	 * Gets a list of spawn points.
 	 *
-	 * @return a List of NearbyPokemon at your current location
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
+	 * @param spawnPoints callback to return all spawn points
 	 */
-	public List<NearbyPokemon> getNearbyPokemon() throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(getNearbyPokemonAsync());
-	}
-
-	/**
-	 * Returns a list of spawn points.
-	 *
-	 * @return list of spawn points
-	 */
-	public Observable<List<Point>> getSpawnPointsAsync() {
-		return getMapObjectsAsync(getDefaultCells()).map(new Func1<MapObjects, List<Point>>() {
+	public void getSpawnPoints(final AsyncReturn<List<Point>> spawnPoints) {
+		getMapObjects(new AsyncReturn<MapObjects>() {
 			@Override
-			public List<Point> call(MapObjects result) {
+			public void onReceive(MapObjects objects, Exception e) {
+				if (Utils.callbackException(e, spawnPoints, new ArrayList<Point>())) {
+					return;
+				}
 				List<Point> points = new ArrayList<>();
-
-				for (SpawnPointOuterClass.SpawnPoint point : result.getSpawnPoints()) {
+				for (SpawnPointOuterClass.SpawnPoint point : objects.getSpawnPoints()) {
 					points.add(new Point(point));
 				}
-
-				return points;
+				spawnPoints.onReceive(points, null);
 			}
 		});
 	}
 
 	/**
-	 * Returns a list of spawn points.
+	 * Gets a list of gyms.
 	 *
-	 * @return list of spawn points
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
+	 * @param gymCallback callback to return all gyms
 	 */
-	public List<Point> getSpawnPoints() throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(getSpawnPointsAsync());
-	}
-
-	/**
-	 * Get a list of gyms near the current location.
-	 *
-	 * @return List of gyms
-	 */
-	public Observable<List<Gym>> getGymsAsync() {
-		return getMapObjectsAsync(getDefaultCells()).map(new Func1<MapObjects, List<Gym>>() {
+	public void getGyms(final AsyncReturn<List<Gym>> gymCallback) {
+		getMapObjects(new AsyncReturn<MapObjects>() {
 			@Override
-			public List<Gym> call(MapObjects result) {
+			public void onReceive(MapObjects objects, Exception e) {
+				if (Utils.callbackException(e, gymCallback, new ArrayList<Gym>())) {
+					return;
+				}
 				List<Gym> gyms = new ArrayList<>();
-
-				for (FortData fortdata : result.getGyms()) {
+				for (FortData fortdata : objects.getGyms()) {
 					gyms.add(new Gym(api, fortdata));
 				}
-
-				return gyms;
+				gymCallback.onReceive(gyms, null);
 			}
 		});
 	}
 
 	/**
-	 * Get a list of gyms near the current location.
+	 * Returns a list of gyms around the current location, sorted by distance.
 	 *
-	 * @return List of gyms
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
+	 * @param gyms callback returning a list of Gyms at your current location
 	 */
-	public List<Gym> getGyms() throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(getGymsAsync());
+	public void getSortedGyms(final AsyncReturn<java.util.Map<Double, Gym>> gyms) {
+		getGyms(new AsyncReturn<List<Gym>>() {
+			@Override
+			public void onReceive(List<Gym> gymList, Exception e) {
+				if (Utils.callbackException(e, gyms, new TreeMap<Double, Gym>())) {
+					return;
+				}
+				MapUtil<Gym> util = new MapUtil<>();
+				gyms.onReceive(util.sortItems(gymList, api), null);
+			}
+		});
 	}
 
 	/**
-	 * Gets gym sort by distance.
+	 * Gets a list of decimated spawn points at current location.
 	 *
-	 * @return the gym sort
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
+	 * @param pointsCallback callback for the returned decimated spawn points
 	 */
-	public java.util.Map<Double, Gym> getGymSort() throws LoginFailedException, RemoteServerException {
-		MapUtil<Gym> util = new MapUtil<>();
-		return util.sortItems(getGyms(), api);
-	}
-
-	/**
-	 * Returns a list of decimated spawn points at current location.
-	 *
-	 * @return list of spawn points
-	 */
-	public Observable<List<Point>> getDecimatedSpawnPointsAsync() {
-		return getMapObjectsAsync(getDefaultCells()).map(new Func1<MapObjects, List<Point>>() {
-			public List<Point> call(MapObjects result) {
+	public void getDecimatedSpawnPoints(final AsyncReturn<List<Point>> pointsCallback) {
+		getMapObjects(getDefaultCells(), new AsyncReturn<MapObjects>() {
+			@Override
+			public void onReceive(MapObjects objects, Exception e) {
+				if (Utils.callbackException(e, pointsCallback, new ArrayList<Point>())) {
+					return;
+				}
 				List<Point> points = new ArrayList<>();
-				for (SpawnPointOuterClass.SpawnPoint point : result.getDecimatedSpawnPoints()) {
+				for (SpawnPointOuterClass.SpawnPoint point : objects.getDecimatedSpawnPoints()) {
 					points.add(new Point(point));
 				}
-
-				return points;
+				pointsCallback.onReceive(points, null);
 			}
 		});
 	}
 
 	/**
-	 * Returns a list of decimated spawn points at current location.
+	 * Gets a list of decimated spawn points at current location, sorted by distance.
 	 *
-	 * @return list of spawn points
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
+	 * @param pointsCallback callback for the returned decimated spawn points
 	 */
-	public List<Point> getDecimatedSpawnPoints() throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(getDecimatedSpawnPointsAsync());
-	}
-
-
-	/**
-	 * Gets decimated spawn points sort by distance.
-	 *
-	 * @return the decimated spawn points sort
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	public java.util.Map<Double, Point> getDecimatedSpawnPointsSort() throws LoginFailedException, RemoteServerException {
-		MapUtil<Point> util = new MapUtil<>();
-		return util.sortItems(getDecimatedSpawnPoints(), api);
+	public void getSortedDecimatedSpawnPoints(final AsyncReturn<java.util.Map<Double, Point>> pointsCallback) {
+		getDecimatedSpawnPoints(new AsyncReturn<List<Point>>() {
+			@Override
+			public void onReceive(List<Point> points, Exception e) {
+				if (Utils.callbackException(e, pointsCallback, new TreeMap<Double, Point>())) {
+					return;
+				}
+				MapUtil<Point> util = new MapUtil<>();
+				pointsCallback.onReceive(util.sortItems(points, api), null);
+			}
+		});
 	}
 
 	/**
-	 * Returns MapObjects around your current location.
+	 * Gets map objects at your current location.
 	 *
-	 * @return MapObjects at your current location
+	 * @param mapObjects callback for the returned map objects
 	 */
-	public Observable<MapObjects> getMapObjectsAsync() {
-		return getMapObjectsAsync(getDefaultCells());
+	public void getMapObjects(AsyncReturn<MapObjects> mapObjects) {
+		getMapObjects(getDefaultCells(), mapObjects);
 	}
 
 	/**
-	 * Returns MapObjects around your current location within a given width.
+	 * Gets map objects at your current location with a custom width.
 	 *
-	 * @param width width
-	 * @return MapObjects at your current location
+	 * @param mapObjects callback for the returned map objects
+	 * @param width width to find map objects in
 	 */
-	public Observable<MapObjects> getMapObjectsAsync(int width) {
-		return getMapObjectsAsync(getCellIds(api.getLatitude(), api.getLongitude(), width));
+	public void getMapObjects(int width, AsyncReturn<MapObjects> mapObjects) {
+		getMapObjects(getCellIds(api.getLatitude(), api.getLongitude(), width), mapObjects);
 	}
 
 	/**
-	 * Returns the cells requested.
+	 * Gets map objects for the given cells
 	 *
 	 * @param cellIds List of cellId
-	 * @return MapObjects in the given cells
+	 * @param mapObjects callback for the returned map objects
 	 */
-	public Observable<MapObjects> getMapObjectsAsync(List<Long> cellIds) {
-
+	public void getMapObjects(List<Long> cellIds, final AsyncReturn<MapObjects> mapObjects) {
 		if ((useCache() && (cachedMapObjects.getNearbyPokemons().size() > 0
-							|| cachedMapObjects.getCatchablePokemons().size() > 0
-							|| cachedMapObjects.getWildPokemons().size() > 0
-							|| cachedMapObjects.getDecimatedSpawnPoints().size() > 0
-							|| cachedMapObjects.getSpawnPoints().size() > 0)) || api.hasChallenge()) {
-			return Observable.just(cachedMapObjects);
+				|| cachedMapObjects.getCatchablePokemons().size() > 0
+				|| cachedMapObjects.getWildPokemons().size() > 0
+				|| cachedMapObjects.getDecimatedSpawnPoints().size() > 0
+				|| cachedMapObjects.getSpawnPoints().size() > 0)) || api.hasChallenge()) {
+			mapObjects.onReceive(cachedMapObjects, null);
 		}
 
 		lastMapUpdate = api.currentTimeMillis();
@@ -344,160 +304,58 @@ public class Map {
 				.setLatitude(api.getLatitude())
 				.setLongitude(api.getLongitude());
 
-		int index = 0;
 		for (Long cellId : cellIds) {
 			builder.addCellId(cellId);
 			builder.addSinceTimestampMs(0);
-			index++;
 		}
 
-		final AsyncServerRequest asyncServerRequest = new AsyncServerRequest(
-				RequestType.GET_MAP_OBJECTS, builder.build(), true);
-		return api.getRequestHandler()
-				.sendAsyncServerRequests(asyncServerRequest).map(new Func1<ByteString, MapObjects>() {
+		final PokemonRequest request = new PokemonRequest(
+				RequestType.GET_MAP_OBJECTS, builder.build(), true)
+				.withCallback(new RequestCallback() {
 					@Override
-					public MapObjects call(ByteString byteString) {
-						GetMapObjectsResponse response;
+					public void handleResponse(PokemonResponse response) throws InvalidProtocolBufferException {
+						if (Utils.callbackException(response, mapObjects, cachedMapObjects)) {
+							return;
+						}
 						try {
-							response = GetMapObjectsResponse.parseFrom(byteString);
+							GetMapObjectsResponse messageResponse = GetMapObjectsResponse.parseFrom(response.getResponseData());
+							MapObjects result = new MapObjects(api);
+							cachedMapObjects = result;
+							for (MapCell cell : messageResponse.getMapCellsList()) {
+								result.addNearbyPokemons(cell.getNearbyPokemonsList());
+								result.addCatchablePokemons(cell.getCatchablePokemonsList());
+								result.addWildPokemons(cell.getWildPokemonsList());
+								result.addDecimatedSpawnPoints(cell.getDecimatedSpawnPointsList());
+								result.addSpawnPoints(cell.getSpawnPointsList());
+
+								java.util.Map<FortType, List<FortData>> groupedForts = Stream.of(cell.getFortsList())
+										.collect(Collectors.groupingBy(new Function<FortData, FortType>() {
+											@Override
+											public FortType apply(FortData fortData) {
+												return fortData.getType();
+											}
+										}));
+								result.addGyms(groupedForts.get(FortType.GYM));
+								result.addPokestops(groupedForts.get(FortType.CHECKPOINT));
+							}
+
+							cachedCatchable.clear();
+							mapObjects.onReceive(result, null);
 						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
+							mapObjects.onReceive(cachedMapObjects, new RemoteServerException(e));
 						}
-
-						MapObjects result = new MapObjects(api);
-						cachedMapObjects = result;
-						for (MapCell mapCell : response.getMapCellsList()) {
-							result.addNearbyPokemons(mapCell.getNearbyPokemonsList());
-							result.addCatchablePokemons(mapCell.getCatchablePokemonsList());
-							result.addWildPokemons(mapCell.getWildPokemonsList());
-							result.addDecimatedSpawnPoints(mapCell.getDecimatedSpawnPointsList());
-							result.addSpawnPoints(mapCell.getSpawnPointsList());
-
-							java.util.Map<FortType, List<FortData>> groupedForts = Stream.of(mapCell.getFortsList())
-									.collect(Collectors.groupingBy(new Function<FortData, FortType>() {
-										@Override
-										public FortType apply(FortData fortData) {
-											return fortData.getType();
-										}
-									}));
-							result.addGyms(groupedForts.get(FortType.GYM));
-							result.addPokestops(groupedForts.get(FortType.CHECKPOINT));
-						}
-
-						cachedCatchable.clear();
-						return result;
 					}
 				});
+		api.getRequestHandler().sendRequest(request);
 	}
 
-	/**
-	 * Returns MapObjects around your current location.
-	 *
-	 * @return MapObjects at your current location
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
-	 */
-	public MapObjects getMapObjects() throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(getMapObjectsAsync());
-	}
-
-	/**
-	 * Returns MapObjects around your current location within a given width.
-	 *
-	 * @param width width
-	 * @return MapObjects at your current location
-	 * @throws LoginFailedException  If login fails.
-	 * @throws RemoteServerException If request errors occurred.
-	 */
-	public MapObjects getMapObjects(int width) throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(getMapObjectsAsync(width));
-	}
-
-	/**
-	 * Returns 5x5 cells with the requested lattitude/longitude in the center cell.
-	 *
-	 * @param latitude  latitude
-	 * @param longitude longitude
-	 * @return MapObjects in the given cells
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
-	 */
-	@Deprecated
-	public MapObjects getMapObjects(double latitude, double longitude)
-			throws LoginFailedException, RemoteServerException {
-		return getMapObjects(latitude, longitude, cellWidth);
-	}
-
-	/**
-	 * Returns the cells requested, you should send a latitude/longitude to fake a near location.
-	 *
-	 * @param cellIds   List of cellIds
-	 * @param latitude  latitude
-	 * @param longitude longitude
-	 * @return MapObjects in the given cells
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
-	 */
-	@Deprecated
-	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude)
-			throws LoginFailedException, RemoteServerException {
-		return getMapObjects(cellIds, latitude, longitude, 0);
-	}
-
-	/**
-	 * Returns `width` * `width` cells with the requested latitude/longitude in the center.
-	 *
-	 * @param latitude  latitude
-	 * @param longitude longitude
-	 * @param width     width
-	 * @return MapObjects in the given cells
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
-	 */
-	@Deprecated
-	public MapObjects getMapObjects(double latitude, double longitude, int width)
-			throws LoginFailedException, RemoteServerException {
-		return getMapObjects(getCellIds(latitude, longitude, width), latitude, longitude);
-	}
-
-	/**
-	 * Returns the cells requested.
-	 *
-	 * @param cellIds   cellIds
-	 * @param latitude  latitude
-	 * @param longitude longitude
-	 * @param altitude  altitude
-	 * @return MapObjects in the given cells
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
-	 */
-	@Deprecated
-	public MapObjects getMapObjects(List<Long> cellIds, double latitude, double longitude, double altitude)
-			throws LoginFailedException, RemoteServerException {
-		api.setLatitude(latitude);
-		api.setLongitude(longitude);
-		api.setAltitude(altitude);
-		return getMapObjects(cellIds);
-	}
-
-	/**
-	 * Returns the cells requested.
-	 *
-	 * @param cellIds List of cellId
-	 * @return MapObjects in the given cells
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
-	 */
-	public MapObjects getMapObjects(List<Long> cellIds) throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(getMapObjectsAsync(cellIds));
-	}
 
 	/**
 	 * Get a list of all the Cell Ids.
 	 *
-	 * @param latitude  latitude
+	 * @param latitude latitude
 	 * @param longitude longitude
-	 * @param width     width
+	 * @param width width
 	 * @return List of Cells
 	 */
 	public List<Long> getCellIds(double latitude, double longitude, int width) {
@@ -506,7 +364,6 @@ public class Map {
 
 		MutableInteger index = new MutableInteger(0);
 		MutableInteger jindex = new MutableInteger(0);
-
 
 		int level = cellId.level();
 		int size = 1 << (S2CellId.MAX_LEVEL - level);
@@ -526,160 +383,48 @@ public class Map {
 	/**
 	 * Gets fort details.
 	 *
-	 * @param id  the id
+	 * @param id the id
 	 * @param lon the lon
 	 * @param lat the lat
-	 * @return the fort details
+	 * @param details callback to return fort details
 	 */
-	public Observable<FortDetails> getFortDetailsAsync(String id, double lon, double lat) {
-		FortDetailsMessage reqMsg = FortDetailsMessage.newBuilder()
+	public void getFortDetails(String id, double lon, double lat, final AsyncReturn<FortDetails> details) {
+		FortDetailsMessage message = FortDetailsMessage.newBuilder()
 				.setFortId(id)
 				.setLatitude(lat)
 				.setLongitude(lon)
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.FORT_DETAILS,
-				reqMsg);
-		return api.getRequestHandler()
-				.sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, FortDetails>() {
-					@Override
-					public FortDetails call(ByteString byteString) {
-						FortDetailsResponseOuterClass.FortDetailsResponse response;
-						try {
-							response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(byteString);
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
-						}
-						return new FortDetails(response);
-					}
-				});
+		PokemonRequest request = new PokemonRequest(RequestType.FORT_DETAILS, message);
+		api.getRequestHandler().sendRequest(request, new RequestCallback() {
+			@Override
+			public void handleResponse(PokemonResponse response) throws InvalidProtocolBufferException {
+				if (Utils.callbackException(response, details, null)) {
+					return;
+				}
+				try {
+					FortDetailsResponse messageResponse = FortDetailsResponse.parseFrom(response.getResponseData());
+					details.onReceive(new FortDetails(messageResponse), null);
+				} catch (InvalidProtocolBufferException e) {
+					details.onReceive(null, new RemoteServerException(e));
+				}
+			}
+		});
 	}
 
 	/**
-	 * Gets fort details.
+	 * Sets the default cell width.
 	 *
-	 * @param id  the id
-	 * @param lon the lon
-	 * @param lat the lat
-	 * @return the fort details
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
+	 * @param width the new default cell width
 	 */
-	public FortDetails getFortDetails(String id, double lon, double lat)
-			throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(getFortDetailsAsync(id, lon, lat));
-	}
-
-	/**
-	 * Search fort fort search response.
-	 *
-	 * @param fortData the fort data
-	 * @return the fort search response
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	@Deprecated
-	public FortSearchResponse searchFort(FortData fortData) throws LoginFailedException, RemoteServerException {
-		FortSearchMessage reqMsg = FortSearchMessage.newBuilder()
-				.setFortId(fortData.getId())
-				.setFortLatitude(fortData.getLatitude())
-				.setFortLongitude(fortData.getLongitude())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
-				.build();
-		ServerRequest serverRequest = new ServerRequest(RequestType.FORT_SEARCH, reqMsg);
-
-		api.getRequestHandler().sendServerRequests(serverRequest);
-
-		FortSearchResponse response;
-		try {
-			response = FortSearchResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-		return response;
-	}
-
-	/**
-	 * Encounter pokemon encounter response.
-	 *
-	 * @param catchablePokemon the catchable pokemon
-	 * @return the encounter response
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	@Deprecated
-	public EncounterResponse encounterPokemon(MapPokemon catchablePokemon)
-			throws LoginFailedException, RemoteServerException {
-
-		EncounterMessageOuterClass.EncounterMessage reqMsg = EncounterMessageOuterClass.EncounterMessage.newBuilder()
-				.setEncounterId(catchablePokemon.getEncounterId())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
-				.setSpawnPointId(catchablePokemon.getSpawnPointId())
-				.build();
-		ServerRequest serverRequest = new ServerRequest(RequestType.ENCOUNTER, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-
-		EncounterResponse response;
-		try {
-			response = EncounterResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-		return response;
-	}
-
-	/**
-	 * Catch pokemon catch pokemon response.
-	 *
-	 * @param catchablePokemon      the catchable pokemon
-	 * @param normalizedHitPosition the normalized hit position
-	 * @param normalizedReticleSize the normalized reticle size
-	 * @param spinModifier          the spin modifier
-	 * @param pokeball              the pokeball
-	 * @return the catch pokemon response
-	 * @throws LoginFailedException  the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 */
-	@Deprecated
-	public CatchPokemonResponse catchPokemon(
-			MapPokemon catchablePokemon,
-			double normalizedHitPosition,
-			double normalizedReticleSize,
-			double spinModifier,
-			ItemId pokeball)
-			throws LoginFailedException, RemoteServerException {
-
-		CatchPokemonMessage reqMsg = CatchPokemonMessage.newBuilder()
-				.setEncounterId(catchablePokemon.getEncounterId())
-				.setHitPokemon(true)
-				.setNormalizedHitPosition(normalizedHitPosition)
-				.setNormalizedReticleSize(normalizedReticleSize)
-				.setSpawnPointId(catchablePokemon.getSpawnPointId())
-				.setSpinModifier(spinModifier)
-				.setPokeball(pokeball)
-				.build();
-		ServerRequest serverRequest = new ServerRequest(RequestType.CATCH_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-
-		CatchPokemonResponse response;
-		try {
-			response = CatchPokemonResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-		return response;
-	}
-
-	public void setDefaultWidth(int width) {
+	public void setDefaultCellWidth(int width) {
 		cellWidth = width;
 	}
 
 	/**
-	 * Wether or not to get a fresh copy or use cache;
+	 * Whether or not to get a fresh copy or use cache;
 	 *
-	 * @return true if enough time has elapsed since the last request, false otherwise
+	 * @return false if enough time has elapsed since the last request, true otherwise
 	 */
 	private boolean useCache() {
 		return (api.currentTimeMillis() - lastMapUpdate) < api.getSettings().getMapSettings().getMinRefresh();
@@ -687,7 +432,6 @@ public class Map {
 
 	/**
 	 * Clear map objects cache
-	 *
 	 */
 	public void clearCache() {
 		cachedCatchable.clear();

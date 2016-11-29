@@ -21,12 +21,11 @@ import java.io.InputStream;
 
 public class Utils {
 
-
 	/**
 	 * Converts input streams to byte arrays.
 	 *
 	 * @param input the input
-	 * @param size  the size
+	 * @param size the size
 	 * @return the byte [ ]
 	 * @throws IOException the io exception
 	 */
@@ -38,5 +37,65 @@ public class Utils {
 			output.write(buffer, 0, bytesRead);
 		}
 		return output.toByteArray();
+	}
+
+	/**
+	 * Appends the given requests to the given array
+	 *
+	 * @param requests the base array
+	 * @param append the requests to append
+	 * @return a new array with the appended requests
+	 */
+	public static PokemonRequest[] appendRequests(PokemonRequest[] requests, PokemonRequest... append) {
+		PokemonRequest[] newRequests = new PokemonRequest[requests.length + append.length];
+		System.arraycopy(requests, 0, newRequests, 0, requests.length);
+		System.arraycopy(append, 0, newRequests, requests.length, append.length);
+		return newRequests;
+	}
+
+	/**
+	 * Checks if the given error is not null, and returns to the AsyncReturn with the given error value.
+	 * @param e the exception
+	 * @param asyncReturn the callback to return on
+	 * @param error the default error return value
+	 * @param <T> the return type
+	 * @return true if the exception was not null
+	 */
+	public static <T> boolean callbackException(Exception e, AsyncReturn<T> asyncReturn, T error) {
+		if (e != null) {
+			asyncReturn.onReceive(error, e);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Checks if PokemonResponse contains an error, and completes the callback with the exception.
+	 * @param response the response possibly containing an error
+	 * @param callback the callback to call if an error occurs
+	 * @return true if an error occurred
+	 */
+	public static boolean callbackException(PokemonResponse response, PokemonCallback callback) {
+		if (response.hasErrored()) {
+			callback.onCompleted(response.getException());
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Checks if PokemonResponse contains an error, and returns to the AsyncReturn with the given error value.
+	 * @param response the response possibly containing an error
+	 * @param asyncReturn the callback to return on
+	 * @param error the default error return value
+	 * @param <T> the return type
+	 * @return true if an error occurred
+	 */
+	public static <T> boolean callbackException(PokemonResponse response, AsyncReturn<T> asyncReturn, T error) {
+		if (response.hasErrored()) {
+			asyncReturn.onReceive(error, response.getException());
+			return true;
+		}
+		return false;
 	}
 }

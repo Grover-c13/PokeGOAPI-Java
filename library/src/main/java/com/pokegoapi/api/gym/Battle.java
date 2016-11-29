@@ -15,29 +15,34 @@
 
 package com.pokegoapi.api.gym;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.pokemon.Pokemon;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import POGOProtos.Data.Battle.BattleActionOuterClass.BattleAction;
 import POGOProtos.Data.Battle.BattleActionTypeOuterClass;
 import POGOProtos.Data.Battle.BattlePokemonInfoOuterClass.BattlePokemonInfo;
 import POGOProtos.Data.Battle.BattleStateOuterClass.BattleState;
+import POGOProtos.Data.Gym.GymMembershipOuterClass;
 import POGOProtos.Data.PokemonDataOuterClass;
+import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Networking.Requests.Messages.AttackGymMessageOuterClass.AttackGymMessage;
 import POGOProtos.Networking.Requests.Messages.StartGymBattleMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.StartGymBattleMessageOuterClass.StartGymBattleMessage.Builder;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.AttackGymResponseOuterClass.AttackGymResponse;
+import POGOProtos.Networking.Responses.GetGymDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse.Result;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.pokemon.Pokemon;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncReturn;
+import com.pokegoapi.main.PokemonRequest;
+import com.pokegoapi.main.PokemonResponse;
+import com.pokegoapi.main.RequestCallback;
+import com.pokegoapi.main.Utils;
 import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Battle {
 	private final Gym gym;
@@ -50,13 +55,14 @@ public class Battle {
 	private boolean concluded;
 	@Getter
 	private BattleState outcome;
+	private List<GymMembershipOuterClass.GymMembership> memberships;
 
 	/**
 	 * New battle to track the state of a battle.
 	 *
-	 * @param api  The api instance to submit requests with.
+	 * @param api The api instance to submit requests with.
 	 * @param teams The Pokemon to use for attacking in the battle.
-	 * @param gym  The Gym to fight at.
+	 * @param gym The Gym to fight at.
 	 */
 	public Battle(PokemonGo api, Pokemon[] teams, Gym gym) {
 		this.teams = teams;
@@ -71,57 +77,77 @@ public class Battle {
 	/**
 	 * Start a battle.
 	 *
-	 * @return Result of the attempt to start
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
+	 * @param result callback to return result of the attempt to start
 	 */
-	public Result start() throws LoginFailedException, RemoteServerException {
-
-		Builder builder = StartGymBattleMessageOuterClass.StartGymBattleMessage.newBuilder();
+	public void start(final AsyncReturn<Result> result) {
+		final Builder builder = StartGymBattleMessageOuterClass.StartGymBattleMessage.newBuilder();
 
 		for (Pokemon team : teams) {
 			builder.addAttackingPokemonIds(team.getId());
 		}
 
+		gym.getDetails(new AsyncReturn<GetGymDetailsResponseOuterClass.GetGymDetailsResponse>() {
+			@Override
+			public void onReceive(GetGymDetailsResponseOuterClass.GetGymDetailsResponse details, Exception e) {
+				gym.getGymMembers(new AsyncReturn<List<GymMembershipOuterClass.GymMembership>>() {
+					@Override
+					public void onReceive(List<GymMembershipOuterClass.GymMembership> members, Exception e) {
+						if (Utils.callbackException(e, result, Result.UNRECOGNIZED)) {
+							return;
+						}
+						memberships = members;
+						gym.getDefendingPokemon(new AsyncReturn<List<PokemonData>>() {
+							@Override
+							public void onReceive(List<PokemonData> defenders, Exception e) {
+								if (Utils.callbackException(e, result, Result.UNRECOGNIZED)) {
+									return;
+								}
+								builder.setGymId(gym.getId());
+								builder.setPlayerLongitude(api.getLongitude());
+								builder.setPlayerLatitude(api.getLatitude());
+								builder.setDefendingPokemonId(defenders.get(0).getId()); // may need to be sorted
 
-		List<PokemonDataOuterClass.PokemonData> defenders = gym.getDefendingPokemon();
-		builder.setGymId(gym.getId());
-		builder.setPlayerLongitude(api.getLongitude());
-		builder.setPlayerLatitude(api.getLatitude());
-		builder.setDefendingPokemonId(defenders.get(0).getId()); // may need to be sorted
-
-		ServerRequest serverRequest = new ServerRequest(RequestType.START_GYM_BATTLE, builder.build());
-		api.getRequestHandler().sendServerRequests(serverRequest);
-
-
-		try {
-			battleResponse = StartGymBattleResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException();
-		}
-
-		// need to send blank action
-		this.sendBlankAction();
-
-
-		for (BattleAction action : battleResponse.getBattleLog().getBattleActionsList()) {
-			gymIndex.add(action.getTargetIndex());
-		}
-
-		return battleResponse.getResult();
+								PokemonRequest request = new PokemonRequest(RequestType.START_GYM_BATTLE, builder.build());
+								api.getRequestHandler().sendRequest(request, new RequestCallback() {
+									@Override
+									public void handleResponse(PokemonResponse response) throws InvalidProtocolBufferException {
+										if (Utils.callbackException(response, result, Result.UNRECOGNIZED)) {
+											return;
+										}
+										try {
+											battleResponse = StartGymBattleResponse.parseFrom(response.getResponseData());
+											sendBlankAction(new AsyncReturn<AttackGymResponse>() {
+												@Override
+												public void onReceive(AttackGymResponse attackResponse, Exception e) {
+													if (Utils.callbackException(e, result, Result.UNRECOGNIZED)) {
+														result.onReceive(Result.UNRECOGNIZED, null);
+														return;
+													}
+													for (BattleAction action : battleResponse.getBattleLog().getBattleActionsList()) {
+														gymIndex.add(action.getTargetIndex());
+													}
+													result.onReceive(battleResponse.getResult(), null);
+												}
+											});
+										} catch (InvalidProtocolBufferException e) {
+											result.onReceive(null, new RemoteServerException(e));
+										}
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		});
 	}
 
-
 	/**
-	 * Attack a gym.
-	 *
-	 * @param times the amount of times to attack
-	 * @return Battle
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
+	 * Attacks the given amount of times
+	 * @param times the times to attack this gym
+	 * @param result the result from the attack
 	 */
-	public AttackGymResponse attack(int times) throws LoginFailedException, RemoteServerException {
-
+	public void attack(int times, AsyncReturn<AttackGymResponse> result) {
 		ArrayList<BattleAction> actions = new ArrayList<>();
 
 		for (int i = 0; i < times; i++) {
@@ -135,9 +161,8 @@ public class Battle {
 			actions.add(action);
 		}
 
-		return doActions(actions);
+		performActions(actions, result);
 	}
-
 
 	/**
 	 * Creates a battle pokemon object to send with the request.
@@ -160,8 +185,8 @@ public class Battle {
 	 * @param index of defender(0 to gym lever)
 	 * @return Battle
 	 */
-	private PokemonDataOuterClass.PokemonData getDefender(int index) throws LoginFailedException, RemoteServerException {
-		return gym.getGymMembers().get(0).getPokemonData();
+	private PokemonDataOuterClass.PokemonData getDefender(int index) {
+		return memberships.get(index).getPokemonData();
 	}
 
 	/**
@@ -179,9 +204,9 @@ public class Battle {
 	/**
 	 * Send blank action, used for polling the state of the battle. (i think).
 	 *
-	 * @return AttackGymResponse
+	 * @param result callback to return result
 	 */
-	private AttackGymResponse sendBlankAction() throws LoginFailedException, RemoteServerException {
+	private void sendBlankAction(final AsyncReturn<AttackGymResponse> result) {
 		AttackGymMessage message = AttackGymMessage
 				.newBuilder()
 				.setGymId(gym.getId())
@@ -190,27 +215,28 @@ public class Battle {
 				.setBattleId(battleResponse.getBattleId())
 				.build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestType.ATTACK_GYM, message);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-
-
-		try {
-			return AttackGymResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException();
-		}
+		PokemonRequest request = new PokemonRequest(RequestType.ATTACK_GYM, message);
+		api.getRequestHandler().sendRequest(request, new RequestCallback() {
+			@Override
+			public void handleResponse(PokemonResponse response) throws InvalidProtocolBufferException {
+				if (Utils.callbackException(response, result, null)) {
+					return;
+				}
+				try {
+					result.onReceive(AttackGymResponse.parseFrom(response.getResponseData()), null);
+				} catch (InvalidProtocolBufferException e) {
+					result.onReceive(null, new RemoteServerException(e));
+				}
+			}
+		});
 	}
 
-
 	/**
-	 * Do Actions in battle.
-	 *
-	 * @param actions list of actions to send in this request
-	 * @return AttackGymResponse
+	 * Perfoms the given actions
+	 * @param actions the actions to perform
+	 * @param result async callback for this result
 	 */
-	private AttackGymResponse doActions(List<BattleAction> actions) throws LoginFailedException, RemoteServerException {
-
-
+	private void performActions(List<BattleAction> actions, final AsyncReturn<AttackGymResponse> result) {
 		AttackGymMessage.Builder message = AttackGymMessage
 				.newBuilder()
 				.setGymId(gym.getId())
@@ -222,28 +248,29 @@ public class Battle {
 			message.addAttackActions(action);
 		}
 
+		PokemonRequest request = new PokemonRequest(RequestType.ATTACK_GYM, message.build());
+		api.getRequestHandler().sendRequest(request, new RequestCallback() {
+			@Override
+			public void handleResponse(PokemonResponse response) throws InvalidProtocolBufferException {
+				if (Utils.callbackException(response, result, null)) {
+					return;
+				}
+				try {
+					AttackGymResponse messageResponse = AttackGymResponse.parseFrom(response.getResponseData());
 
-		ServerRequest serverRequest = new ServerRequest(RequestType.ATTACK_GYM, message.build());
-		api.getRequestHandler().sendServerRequests(serverRequest);
+					if (messageResponse.getBattleLog().getState() == BattleState.DEFEATED
+							|| messageResponse.getBattleLog().getState() == BattleState.VICTORY
+							|| messageResponse.getBattleLog().getState() == BattleState.TIMED_OUT) {
+						concluded = true;
+					}
 
+					outcome = messageResponse.getBattleLog().getState();
 
-		try {
-			AttackGymResponse response = AttackGymResponse.parseFrom(serverRequest.getData());
-
-			if (response.getBattleLog().getState() == BattleState.DEFEATED
-					|| response.getBattleLog().getState() == BattleState.VICTORY
-					|| response.getBattleLog().getState() == BattleState.TIMED_OUT) {
-				concluded = true;
+					result.onReceive(messageResponse, null);
+				} catch (Exception e) {
+					result.onReceive(null, new RemoteServerException(e));
+				}
 			}
-
-			outcome = response.getBattleLog().getState();
-
-
-			return response;
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException();
-		}
-
+		});
 	}
-
 }

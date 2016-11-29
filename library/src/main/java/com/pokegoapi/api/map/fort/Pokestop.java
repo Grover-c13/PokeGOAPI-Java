@@ -22,22 +22,20 @@ import POGOProtos.Networking.Requests.Messages.AddFortModifierMessageOuterClass.
 import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
 import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass.FortSearchMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Responses.AddFortModifierResponseOuterClass;
-import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
-import POGOProtos.Networking.Responses.FortSearchResponseOuterClass;
-import com.google.protobuf.ByteString;
+import POGOProtos.Networking.Responses.AddFortModifierResponseOuterClass.AddFortModifierResponse;
+import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass.FortDetailsResponse;
+import POGOProtos.Networking.Responses.FortSearchResponseOuterClass.FortSearchResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.listener.PokestopListener;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
-import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.S2LatLng;
-import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.util.AsyncHelper;
+import com.pokegoapi.main.AsyncReturn;
+import com.pokegoapi.main.PokemonRequest;
+import com.pokegoapi.main.PokemonResponse;
+import com.pokegoapi.main.RequestCallback;
+import com.pokegoapi.main.Utils;
 import lombok.Getter;
-import rx.Observable;
-import rx.functions.Func1;
 
 import java.util.List;
 
@@ -55,7 +53,7 @@ public class Pokestop {
 	/**
 	 * Instantiates a new Pokestop.
 	 *
-	 * @param api      the api
+	 * @param api the api
 	 * @param fortData the fort data
 	 */
 	public Pokestop(PokemonGo api, FortDataOuterClass.FortData fortData) {
@@ -131,127 +129,98 @@ public class Pokestop {
 	/**
 	 * Loots a pokestop for pokeballs and other items.
 	 *
-	 * @return PokestopLootResult
+	 * @param result callback to return the loot result
 	 */
-	public Observable<PokestopLootResult> lootAsync() {
-		FortSearchMessage searchMessage = FortSearchMessage.newBuilder()
+	public void loot(final AsyncReturn<PokestopLootResult> result) {
+		FortSearchMessage message = FortSearchMessage.newBuilder()
 				.setFortId(getId())
 				.setFortLatitude(getLatitude())
 				.setFortLongitude(getLongitude())
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
 				.build();
-
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH,
-				searchMessage);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
-				new Func1<ByteString, PokestopLootResult>() {
-					@Override
-					public PokestopLootResult call(ByteString result) {
-						FortSearchResponseOuterClass.FortSearchResponse response;
-						try {
-							response = FortSearchResponseOuterClass.FortSearchResponse.parseFrom(result);
-						} catch (InvalidProtocolBufferException e) {
-							throw new AsyncRemoteServerException(e);
-						}
-						cooldownCompleteTimestampMs = response.getCooldownCompleteTimestampMs();
-						PokestopLootResult lootResult = new PokestopLootResult(response);
-							List<PokestopListener> listeners = api.getListeners(PokestopListener.class);
-						for (PokestopListener listener : listeners) {
-							listener.onLoot(lootResult);
-						}
-						return lootResult;
+		PokemonRequest request = new PokemonRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH, message);
+		api.getRequestHandler().sendRequest(request, new RequestCallback() {
+			@Override
+			public void handleResponse(PokemonResponse response) throws InvalidProtocolBufferException {
+				if (Utils.callbackException(response, result, null)) {
+					return;
+				}
+				try {
+					FortSearchResponse messageResponse = FortSearchResponse.parseFrom(response.getResponseData());
+					cooldownCompleteTimestampMs = messageResponse.getCooldownCompleteTimestampMs();
+					PokestopLootResult lootResult = new PokestopLootResult(messageResponse);
+					List<PokestopListener> listeners = api.getListeners(PokestopListener.class);
+					for (PokestopListener listener : listeners) {
+						listener.onLoot(lootResult);
 					}
-				});
-	}
-
-	/**
-	 * Loots a pokestop for pokeballs and other items.
-	 *
-	 * @return PokestopLootResult
-	 * @throws LoginFailedException  if login failed
-	 * @throws RemoteServerException if the server failed to respond
-	 */
-	public PokestopLootResult loot() throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(lootAsync());
+					result.onReceive(lootResult, null);
+				} catch (InvalidProtocolBufferException e) {
+					result.onReceive(null, new RemoteServerException(e));
+				}
+			}
+		});
 	}
 
 	/**
 	 * Adds a modifier to this pokestop. (i.e. add a lure module)
 	 *
 	 * @param item the modifier to add to this pokestop
-	 * @return true if success
+	 * @param result callback to return the result of this action
 	 */
-	public Observable<Boolean> addModifierAsync(ItemIdOuterClass.ItemId item) {
-		AddFortModifierMessage msg = AddFortModifierMessage.newBuilder()
+	public void addModifier(ItemIdOuterClass.ItemId item, final AsyncReturn<AddFortModifierResponse.Result> result) {
+		final AddFortModifierMessage message = AddFortModifierMessage.newBuilder()
 				.setModifierType(item)
 				.setFortId(getId())
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
 				.build();
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.ADD_FORT_MODIFIER, msg);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, Boolean>() {
+		PokemonRequest request = new PokemonRequest(RequestTypeOuterClass.RequestType.ADD_FORT_MODIFIER, message);
+		api.getRequestHandler().sendRequest(request, new RequestCallback() {
 			@Override
-			public Boolean call(ByteString result) {
-				try {
-					//sadly the server response does not contain any information to verify if the request was successful
-					AddFortModifierResponseOuterClass.AddFortModifierResponse.parseFrom(result);
-				} catch (InvalidProtocolBufferException e) {
-					throw new AsyncRemoteServerException(e);
+			public void handleResponse(PokemonResponse response) throws InvalidProtocolBufferException {
+				AddFortModifierResponse.Result error = AddFortModifierResponse.Result.NO_RESULT_SET;
+				if (Utils.callbackException(response.getException(), result, error)) {
+					return;
 				}
-				return Boolean.TRUE;
+				try {
+					AddFortModifierResponse messageResponse =
+							AddFortModifierResponse.parseFrom(response.getResponseData());
+					result.onReceive(messageResponse.getResult(), null);
+				} catch (Exception e) {
+					result.onReceive(null, new RemoteServerException(e));
+				}
 			}
 		});
 	}
 
 	/**
-	 * Adds a modifier to this pokestop. (i.e. add a lure module)
-	 *
-	 * @param item the modifier to add to this pokestop
-	 * @throws LoginFailedException  if login failed
-	 * @throws RemoteServerException if the server failed to respond or the modifier could not be added to this pokestop
-	 */
-	public void addModifier(ItemIdOuterClass.ItemId item) throws LoginFailedException, RemoteServerException {
-		AsyncHelper.toBlocking(addModifierAsync(item));
-	}
-
-	/**
 	 * Get more detailed information about a pokestop.
 	 *
-	 * @return FortDetails
+	 * @param details callback to return details for this pokestop
 	 */
-	public Observable<FortDetails> getDetailsAsync() {
-		FortDetailsMessage reqMsg = FortDetailsMessage.newBuilder()
+	public void getDetails(final AsyncReturn<FortDetails> details) {
+		FortDetailsMessage message = FortDetailsMessage.newBuilder()
 				.setFortId(getId())
 				.setLatitude(getLatitude())
 				.setLongitude(getLongitude())
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS, reqMsg);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, FortDetails>() {
+		PokemonRequest request = new PokemonRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS, message);
+		api.getRequestHandler().sendRequest(request, new RequestCallback() {
 			@Override
-			public FortDetails call(ByteString result) {
-				FortDetailsResponseOuterClass.FortDetailsResponse response = null;
-				try {
-					response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(result);
-				} catch (InvalidProtocolBufferException e) {
-					throw new AsyncRemoteServerException(e);
+			public void handleResponse(PokemonResponse response) throws InvalidProtocolBufferException {
+				if (Utils.callbackException(response, details, null)) {
+					return;
 				}
-				return new FortDetails(response);
+				try {
+					FortDetailsResponse messageResponse = FortDetailsResponse.parseFrom(response.getResponseData());
+					details.onReceive(new FortDetails(messageResponse), null);
+				} catch (Exception e) {
+					details.onReceive(null, new RemoteServerException(e));
+				}
 			}
 		});
-	}
-
-
-	/**
-	 * Get more detailed information about a pokestop.
-	 *
-	 * @return FortDetails
-	 * @throws LoginFailedException  if login failed
-	 * @throws RemoteServerException if the server failed to respond
-	 */
-	public FortDetails getDetails() throws LoginFailedException, RemoteServerException {
-		return AsyncHelper.toBlocking(getDetailsAsync());
 	}
 
 	/**
@@ -265,41 +234,41 @@ public class Pokestop {
 	}
 
 	/**
-	 * Returns whether this pokestop has an active lure when detected on map.
+	 * Checks whether this pokestop has an active lure when detected on map.
 	 *
-	 * @return lure status
+	 * @param result callback for lure status
 	 */
-	public boolean hasLure() {
-		try {
-			return hasLure(false);
-		} catch (LoginFailedException | RemoteServerException e) {
-			// No need
-		}
-
-		return false;
+	public void checkLure(AsyncReturn<Boolean> result) {
+		checkLure(false, result);
 	}
 
 	/**
 	 * Returns whether this pokestop has an active lure.
 	 *
 	 * @param updateFortDetails to make a new request and get updated lured status
-	 * @return lure status
-	 * @throws LoginFailedException  If login failed.
-	 * @throws RemoteServerException If server communications failed.
+	 * @param result callback for lure status
 	 */
-	public boolean hasLure(boolean updateFortDetails) throws LoginFailedException, RemoteServerException {
+	public void checkLure(boolean updateFortDetails, final AsyncReturn<Boolean> result) {
+		final boolean cached = fortData.getActiveFortModifierList().contains(ItemIdOuterClass.ItemId.ITEM_TROY_DISK);
 		if (updateFortDetails) {
-			List<FortModifierOuterClass.FortModifier> modifiers = getDetails().getModifier();
-			for (FortModifierOuterClass.FortModifier modifier : modifiers) {
-				if (modifier.getItemId() == ItemIdOuterClass.ItemId.ITEM_TROY_DISK) {
-					return true;
+			getDetails(new AsyncReturn<FortDetails>() {
+				@Override
+				public void onReceive(FortDetails details, Exception e) {
+					if (Utils.callbackException(e, result, cached)) {
+						return;
+					}
+					List<FortModifierOuterClass.FortModifier> modifiers = details.getModifier();
+					for (FortModifierOuterClass.FortModifier modifier : modifiers) {
+						if (modifier.getItemId() == ItemIdOuterClass.ItemId.ITEM_TROY_DISK) {
+							result.onReceive(true, null);
+							return;
+						}
+					}
+					result.onReceive(false, null);
 				}
-			}
-
-			return false;
+			});
+		} else {
+			result.onReceive(cached, null);
 		}
-
-		return fortData.getActiveFortModifierList()
-				.contains(ItemIdOuterClass.ItemId.ITEM_TROY_DISK);
 	}
 }

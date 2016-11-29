@@ -15,9 +15,6 @@
 
 package com.pokegoapi.main;
 
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import com.pokegoapi.api.PokemonGo;
-
-public interface CommonRequest {
-	PokemonRequest create(final PokemonGo api, final RequestType requestType);
+public interface AsyncReturn<T> {
+	void onReceive(T object, Exception e);
 }

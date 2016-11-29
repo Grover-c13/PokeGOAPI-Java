@@ -15,9 +15,8 @@
 
 package com.pokegoapi.main;
 
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import com.pokegoapi.api.PokemonGo;
+import com.google.protobuf.InvalidProtocolBufferException;
 
-public interface CommonRequest {
-	PokemonRequest create(final PokemonGo api, final RequestType requestType);
+public interface RequestCallback {
+	void handleResponse(PokemonResponse response) throws InvalidProtocolBufferException;
 }

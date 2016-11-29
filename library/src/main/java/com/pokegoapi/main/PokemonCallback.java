@@ -13,18 +13,18 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.main;
 
-public class AsyncRemoteServerException extends AsyncPokemonGoException {
-	public AsyncRemoteServerException(String reason) {
-		super(reason);
-	}
+public interface PokemonCallback {
+	PokemonCallback NULL_CALLBACK = new PokemonCallback() {
+		@Override
+		public void onCompleted(Exception e) {
+		}
+	};
 
-	public AsyncRemoteServerException(Exception exception) {
-		super(exception);
-	}
-
-	public AsyncRemoteServerException(String reason, Exception exception) {
-		super(reason, exception);
-	}
+	/**
+	 * Called when a task completes.
+	 * @param e exception thrown while doing this task, null if no exception was thrown.
+	 */
+	void onCompleted(Exception e);
 }

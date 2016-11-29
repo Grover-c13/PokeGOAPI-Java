@@ -15,17 +15,11 @@
 
 package com.pokegoapi.api.inventory;
 
-import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.listener.PokemonListener;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.api.pokemon.HatchedEgg;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -96,29 +90,4 @@ public class Hatchery {
 		}
 		return eggs;
 	}
-
-	/**
-	 * Get if eggs has hatched.
-	 *
-	 * @return list of hatched eggs
-	 * @throws RemoteServerException e
-	 * @throws LoginFailedException  e
-	 * @deprecated Use getHatchedEggs()
-	 */
-	@Deprecated
-	public List<HatchedEgg> queryHatchedEggs() throws RemoteServerException, LoginFailedException {
-		GetHatchedEggsMessage msg = GetHatchedEggsMessage.newBuilder().build();
-		ServerRequest serverRequest = new ServerRequest(RequestType.GET_HATCHED_EGGS, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
-
-		GetHatchedEggsResponse response;
-		try {
-			response = GetHatchedEggsResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
-		}
-		api.getInventories().updateInventories();
-		return updateHatchedEggs(response);
-	}
-
 }

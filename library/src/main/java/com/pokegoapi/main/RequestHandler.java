@@ -24,47 +24,37 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.AsyncPokemonGoException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.Signature;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import rx.Observable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class RequestHandler implements Runnable {
 	private static final String TAG = RequestHandler.class.getSimpleName();
 	private final PokemonGo api;
 	private final Thread asyncHttpThread;
-	private final BlockingQueue<AsyncServerRequest> workQueue = new LinkedBlockingQueue<>();
-	private final Map<Long, ResultOrException> resultMap = new ConcurrentHashMap<>();
+	private final BlockingQueue<PokemonRequest> requestQueue = new LinkedBlockingQueue<>();
 	private String apiEndpoint;
 	private OkHttpClient client;
-	private AtomicLong requestId = new AtomicLong(System.currentTimeMillis());
+	private AtomicLong nextRequestID = new AtomicLong(System.currentTimeMillis());
 	private Random random;
 
 	/**
 	 * Instantiates a new Request handler.
 	 *
-	 * @param api    the api
+	 * @param api the api
 	 * @param client the client
 	 */
 	public RequestHandler(PokemonGo api, OkHttpClient client) {
@@ -78,104 +68,56 @@ public class RequestHandler implements Runnable {
 	}
 
 	/**
-	 * Make an async server request. The answer will be provided in the future
+	 * Sends an array or requests. Callbacks must be set on the PokemonRequest object with PokemonRequest#withCallback
 	 *
-	 * @param asyncServerRequest Request to make
-	 * @return ByteString response to be processed in the future
+	 * @param requests the requests to send
 	 */
-	public Observable<ByteString> sendAsyncServerRequests(final AsyncServerRequest asyncServerRequest) {
-		workQueue.offer(asyncServerRequest);
-		return Observable.from(new Future<ByteString>() {
-			@Override
-			public boolean cancel(boolean mayInterruptIfRunning) {
-				return false;
-			}
-
-			@Override
-			public boolean isCancelled() {
-				return false;
-			}
-
-			@Override
-			public boolean isDone() {
-				return resultMap.containsKey(asyncServerRequest.getId());
-			}
-
-			@Override
-			public ByteString get() throws InterruptedException, ExecutionException {
-				ResultOrException resultOrException = getResult(1, TimeUnit.MINUTES);
-				while (resultOrException == null) {
-					resultOrException = getResult(1, TimeUnit.MINUTES);
-				}
-				if (resultOrException.getException() != null) {
-					throw new ExecutionException(resultOrException.getException());
-				}
-				return resultOrException.getResult();
-			}
-
-			@Override
-			public ByteString get(long timeout, TimeUnit unit)
-					throws InterruptedException, ExecutionException, TimeoutException {
-				ResultOrException resultOrException = getResult(timeout, unit);
-				if (resultOrException == null) {
-					throw new TimeoutException("No result found");
-				}
-				if (resultOrException.getException() != null) {
-					throw new ExecutionException(resultOrException.getException());
-				}
-				return resultOrException.getResult();
-
-			}
-
-			private ResultOrException getResult(long timeout, TimeUnit timeUnit) throws InterruptedException {
-				long wait = api.currentTimeMillis() + timeUnit.toMillis(timeout);
-				while (!isDone()) {
-					Thread.sleep(10);
-					if (wait < api.currentTimeMillis()) {
-						return null;
-					}
-				}
-				return resultMap.remove(asyncServerRequest.getId());
-			}
-		});
-	}
-
-	/**
-	 * Sends multiple ServerRequests in a thread safe manner.
-	 *
-	 * @param serverRequests list of ServerRequests to be sent
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
-	 */
-	public void sendServerRequests(ServerRequest... serverRequests) throws RemoteServerException, LoginFailedException {
-		List<Observable<ByteString>> observables = new ArrayList<>(serverRequests.length);
-		for (ServerRequest request : serverRequests) {
-			AsyncServerRequest asyncServerRequest = new AsyncServerRequest(request.getType(), request.getRequest());
-			observables.add(sendAsyncServerRequests(asyncServerRequest));
-		}
-		for (int i = 0; i != serverRequests.length; i++) {
-			serverRequests[i].handleData(AsyncHelper.toBlocking(observables.get(i)));
+	public void sendRequests(final PokemonRequest... requests) {
+		for (PokemonRequest request : requests) {
+			sendRequest(request);
 		}
 	}
 
 	/**
-	 * Sends multiple ServerRequests in a thread safe manner.
+	 * Sends the given request.
 	 *
-	 * @param serverRequests list of ServerRequests to be sent
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
+	 * @param request the request to send
 	 */
-	private AuthTicket internalSendServerRequests(AuthTicket authTicket, ServerRequest... serverRequests)
+	public void sendRequest(final PokemonRequest request) {
+		sendRequest(request, null);
+	}
+
+	/**
+	 * Sends the given request, with a callback, if not already set on the PokemonRequest object.
+	 *
+	 * @param request the request to send
+	 * @param callback the callback to use
+	 */
+	public void sendRequest(final PokemonRequest request, final RequestCallback callback) {
+		if (callback != null && request.getCallback() == null) {
+			request.withCallback(callback);
+		}
+		requestQueue.offer(request);
+	}
+
+	/**
+	 * Sends multiple PokemonRequests in a thread-safe manner.
+	 *
+	 * @param pokemonRequests requests to be sent
+	 * @throws RemoteServerException if the server fails
+	 * @throws LoginFailedException if the login fails
+	 */
+	private AuthTicket internalSendRequests(AuthTicket authTicket, PokemonRequest... pokemonRequests)
 			throws RemoteServerException, LoginFailedException {
 		AuthTicket newAuthTicket = authTicket;
-		if (serverRequests.length == 0) {
+		if (pokemonRequests.length == 0) {
 			return authTicket;
 		}
 		RequestEnvelope.Builder builder = RequestEnvelope.newBuilder();
 		resetBuilder(builder, authTicket);
 
-		for (ServerRequest serverRequest : serverRequests) {
-			builder.addRequests(serverRequest.getRequest());
+		for (PokemonRequest pokemonRequest : pokemonRequests) {
+			builder.addRequests(pokemonRequest.getRequest());
 		}
 
 		Signature.setSignature(api, builder);
@@ -185,7 +127,7 @@ public class RequestHandler implements Runnable {
 		try {
 			request.writeTo(stream);
 		} catch (IOException e) {
-			Log.wtf(TAG, "Failed to write request to bytearray ouput stream. This should never happen", e);
+			Log.wtf(TAG, "Failed to write request to byte array output stream. This should never happen", e);
 		}
 
 		RequestBody body = RequestBody.create(null, stream.toByteArray());
@@ -196,14 +138,13 @@ public class RequestHandler implements Runnable {
 
 		try (Response response = client.newCall(httpRequest).execute()) {
 			if (response.code() != 200) {
-				throw new RemoteServerException("Got a unexpected http code : " + response.code());
+				throw new RemoteServerException("Received an unexpected http code : " + response.code());
 			}
 
 			ResponseEnvelope responseEnvelop;
 			try (InputStream content = response.body().byteStream()) {
 				responseEnvelop = ResponseEnvelope.parseFrom(content);
 			} catch (IOException e) {
-				// retrieved garbage from the server
 				throw new RemoteServerException("Received malformed response : " + e);
 			}
 
@@ -219,27 +160,27 @@ public class RequestHandler implements Runnable {
 				throw new LoginFailedException(String.format("Invalid Auth status code recieved, token not refreshed? %s %s",
 						responseEnvelop.getApiUrl(), responseEnvelop.getError()));
 			} else if (responseEnvelop.getStatusCode() == ResponseEnvelope.StatusCode.REDIRECT) {
-				// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
-				return internalSendServerRequests(newAuthTicket, serverRequests);
+				return internalSendRequests(newAuthTicket, pokemonRequests);
 			} else if (responseEnvelop.getStatusCode() == ResponseEnvelope.StatusCode.BAD_REQUEST) {
 				throw new RemoteServerException("Your account may be banned! please try from the official client.");
 			}
 
-
-			/**
-			 * map each reply to the numeric response,
-			 * ie first response = first request and send back to the requests to toBlocking.
-			 * */
-			int count = 0;
-			for (ByteString payload : responseEnvelop.getReturnsList()) {
-				ServerRequest serverReq = serverRequests[count];
-				/**
+			int index = 0;
+			for (ByteString responseData : responseEnvelop.getReturnsList()) {
+				PokemonRequest pokemonRequest = pokemonRequests[index];
+				/*
 				 * TODO: Probably all other payloads are garbage as well in this case,
-				 * so might as well throw an exception and leave this loop */
-				if (payload != null) {
-					serverReq.handleData(payload);
+				 * so might as well throw an exception and leave this loop
+				*/
+				final RequestCallback callback = pokemonRequest.getCallback();
+				if (callback != null) {
+					final PokemonResponse pokemonResponse =
+							responseData != null ?
+									PokemonResponse.getResult(responseData) :
+									PokemonResponse.getError(new InvalidProtocolBufferException("Null response"));
+					callback.handleResponse(pokemonResponse);
 				}
-				count++;
+				index++;
 			}
 		} catch (IOException e) {
 			throw new RemoteServerException(e);
@@ -253,8 +194,7 @@ public class RequestHandler implements Runnable {
 	private void resetBuilder(RequestEnvelope.Builder builder, AuthTicket authTicket)
 			throws LoginFailedException, RemoteServerException {
 		builder.setStatusCode(2);
-		builder.setRequestId(getRequestId());
-		//builder.setAuthInfo(api.getAuthInfo());
+		builder.setRequestId(getNextRequestID());
 		if (authTicket != null
 				&& authTicket.getExpireTimestampMs() > 0
 				&& authTicket.getExpireTimestampMs() > api.currentTimeMillis()) {
@@ -269,13 +209,13 @@ public class RequestHandler implements Runnable {
 		builder.setAccuracy(api.getAccuracy());
 	}
 
-	private Long getRequestId() {
-		return requestId.getAndIncrement();
+	private Long getNextRequestID() {
+		return nextRequestID.getAndIncrement();
 	}
 
 	@Override
 	public void run() {
-		List<AsyncServerRequest> requests = new LinkedList<>();
+		List<PokemonRequest> pokemonRequests = new LinkedList<>();
 		AuthTicket authTicket = null;
 		while (true) {
 			try {
@@ -283,57 +223,34 @@ public class RequestHandler implements Runnable {
 			} catch (InterruptedException e) {
 				throw new AsyncPokemonGoException("System shutdown", e);
 			}
-			if (workQueue.isEmpty() || api.hasChallenge()) {
+			if (requestQueue.isEmpty() || api.hasChallenge()) {
 				continue;
 			}
 
-			workQueue.drainTo(requests);
+			requestQueue.drainTo(pokemonRequests);
 
-			ArrayList<ServerRequest> serverRequests = new ArrayList<>();
-			boolean addCommon = false;
-			for (AsyncServerRequest request : requests) {
-				serverRequests.add(new ServerRequest(request.getType(), request.getRequest()));
-				if (request.isRequireCommonRequest())
-					addCommon = true;
+			boolean requiresCommon = false;
+			for (PokemonRequest request : pokemonRequests) {
+				if (request.isRequireCommonRequest()) {
+					requiresCommon = true;
+				}
 			}
 
-			ServerRequest[] commonRequests = new ServerRequest[0];
+			PokemonRequest[] commonRequests;
 
-			if (addCommon) {
-				commonRequests = CommonRequest.getCommonRequests(api);
-				Collections.addAll(serverRequests, commonRequests);
+			if (requiresCommon) {
+				commonRequests = CommonRequests.getCommonRequests(api);
+				Collections.addAll(pokemonRequests, commonRequests);
 			}
 
-			ServerRequest[] arrayServerRequests = serverRequests.toArray(new ServerRequest[serverRequests.size()]);
+			PokemonRequest[] requestArray = pokemonRequests.toArray(new PokemonRequest[pokemonRequests.size()]);
 
 			try {
-				authTicket = internalSendServerRequests(authTicket, arrayServerRequests);
-
-				for (int i = 0; i != requests.size(); i++) {
-					try {
-						resultMap.put(requests.get(i).getId(), ResultOrException.getResult(arrayServerRequests[i].getData()));
-					} catch (InvalidProtocolBufferException e) {
-						resultMap.put(requests.get(i).getId(), ResultOrException.getError(e));
-					}
-				}
-
-				for (int i = 0; i != commonRequests.length; i++) {
-					try {
-						CommonRequest.parse(api, arrayServerRequests[requests.size() + i].getType(),
-								arrayServerRequests[requests.size() + i].getData());
-					} catch (InvalidProtocolBufferException e) {
-						//TODO: notify error even in case of common requests?
-					}
-				}
-
+				authTicket = internalSendRequests(authTicket, requestArray);
 				continue;
 			} catch (RemoteServerException | LoginFailedException e) {
-				for (AsyncServerRequest request : requests) {
-					resultMap.put(request.getId(), ResultOrException.getError(e));
-				}
-				continue;
 			} finally {
-				requests.clear();
+				pokemonRequests.clear();
 			}
 		}
 	}
