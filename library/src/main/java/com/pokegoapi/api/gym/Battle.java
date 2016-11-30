@@ -15,16 +15,6 @@
 
 package com.pokegoapi.api.gym;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.pokemon.Pokemon;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import POGOProtos.Data.Battle.BattleActionOuterClass.BattleAction;
 import POGOProtos.Data.Battle.BattleActionTypeOuterClass;
 import POGOProtos.Data.Battle.BattlePokemonInfoOuterClass.BattlePokemonInfo;
@@ -37,7 +27,16 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.AttackGymResponseOuterClass.AttackGymResponse;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse.Result;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.pokemon.Pokemon;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Battle {
 	private final Gym gym;
@@ -76,7 +75,6 @@ public class Battle {
 	 * @throws RemoteServerException When a buffer exception is thrown
 	 */
 	public Result start() throws LoginFailedException, RemoteServerException {
-
 		Builder builder = StartGymBattleMessageOuterClass.StartGymBattleMessage.newBuilder();
 
 		for (Pokemon team : teams) {
@@ -102,7 +100,6 @@ public class Battle {
 
 		// need to send blank action
 		this.sendBlankAction();
-
 
 		for (BattleAction action : battleResponse.getBattleLog().getBattleActionsList()) {
 			gymIndex.add(action.getTargetIndex());

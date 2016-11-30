@@ -50,7 +50,7 @@ import com.pokegoapi.api.pokemon.StarterPokemon;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.CommonRequest;
+import com.pokegoapi.main.CommonRequests;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 import lombok.Setter;
@@ -102,7 +102,7 @@ public class PlayerProfile {
 
 		ServerRequest getPlayerServerRequest = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
 		api.getRequestHandler().sendServerRequests(
-				CommonRequest.appendCheckChallenge(getPlayerServerRequest));
+				CommonRequests.appendCheckChallenge(api, getPlayerServerRequest));
 
 		try {
 			updateProfile(GetPlayerResponse.parseFrom(getPlayerServerRequest.getData()));
@@ -354,7 +354,7 @@ public class PlayerProfile {
 				.setPlayerAvatar(avatar.getAvatar())
 				.build();
 
-		ServerRequest[] requests = CommonRequest.fillRequest(
+		ServerRequest[] requests = CommonRequests.fillRequest(
 				new ServerRequest(RequestType.SET_AVATAR, setAvatarMessage), api);
 
 		api.getRequestHandler().sendServerRequests(requests);
@@ -398,7 +398,7 @@ public class PlayerProfile {
 				EncounterTutorialCompleteMessage.newBuilder()
 				.setPokemonId(starter.getPokemon());
 
-		ServerRequest[] requests = CommonRequest.fillRequest(
+		ServerRequest[] requests = CommonRequests.fillRequest(
 				new ServerRequest(RequestType.ENCOUNTER_TUTORIAL_COMPLETE,
 				encounterTutorialCompleteBuilder.build()), api);
 
@@ -414,7 +414,7 @@ public class PlayerProfile {
 		final GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
 				.setPlayerLocale(playerLocale.getPlayerLocale())
 				.build();
-		requests = CommonRequest.fillRequest(
+		requests = CommonRequests.fillRequest(
 				new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg), api);
 
 		api.getRequestHandler().sendServerRequests(requests);
@@ -462,7 +462,7 @@ public class PlayerProfile {
 				.setCodename(name)
 				.build();
 
-		ServerRequest[] requests = CommonRequest.fillRequest(
+		ServerRequest[] requests = CommonRequests.fillRequest(
 				new ServerRequest(RequestType.CLAIM_CODENAME,
 						claimCodenameMessage), api);
 
@@ -492,7 +492,7 @@ public class PlayerProfile {
 			final GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
 					.setPlayerLocale(playerLocale.getPlayerLocale())
 					.build();
-			requests = CommonRequest.fillRequest(
+			requests = CommonRequests.fillRequest(
 					new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg), api);
 
 			api.getRequestHandler().sendServerRequests(requests);
@@ -526,7 +526,7 @@ public class PlayerProfile {
 				.setSendMarketingEmails(false)
 				.setSendPushNotifications(false).build();
 
-		ServerRequest[] requests = CommonRequest.fillRequest(
+		ServerRequest[] requests = CommonRequests.fillRequest(
 				new ServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialMessage), api);
 
 		api.getRequestHandler().sendServerRequests(requests);

@@ -677,9 +677,9 @@ public class Map {
 	}
 
 	/**
-	 * Wether or not to get a fresh copy or use cache;
+	 * Whether or not to get a fresh copy or use cache;
 	 *
-	 * @return true if enough time has elapsed since the last request, false otherwise
+	 * @return false if enough time has elapsed since the last request, true otherwise
 	 */
 	private boolean useCache() {
 		return (api.currentTimeMillis() - lastMapUpdate) < api.getSettings().getMapSettings().getMinRefresh();

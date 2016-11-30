@@ -13,15 +13,12 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.main;
+package com.pokegoapi.api.settings;
 
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Pokeball;
 
-public interface CommonRequest {
-	ServerRequest create(PokemonGo api, RequestType requestType);
+import java.util.List;
 
-	void parse(PokemonGo api, ByteString data, RequestType requestType) throws InvalidProtocolBufferException;
+public interface PokeballSelector {
+	Pokeball select(List<Pokeball> pokeballs);
 }

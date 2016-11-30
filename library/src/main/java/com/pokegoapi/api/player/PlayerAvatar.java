@@ -20,6 +20,8 @@ import POGOProtos.Enums.GenderOuterClass.Gender;
 import lombok.Data;
 import lombok.Getter;
 
+import java.security.SecureRandom;
+
 @Data
 public class PlayerAvatar {
 	@Getter
@@ -53,7 +55,7 @@ public class PlayerAvatar {
 				.setShoes(shoes)
 				.setEyes(eyes)
 				.setBackpack(backpack)
-		.build();
+				.build();
 	}
 
 	public int getSkin() {
@@ -126,5 +128,23 @@ public class PlayerAvatar {
 
 	public static int getAvailableBags(Gender gender) {
 		return gender.getNumber() == Gender.MALE_VALUE ? 6 : 3;
+	}
+
+	/**
+	 * Creates a random avatar based on the given gender
+	 * @param gender the gender to generate based on
+	 * @return a randomly generated avatar
+	 */
+	public static PlayerAvatar random(Gender gender) {
+		SecureRandom random = new SecureRandom();
+		return new PlayerAvatar(gender,
+				random.nextInt(PlayerAvatar.getAvailableSkins()),
+				random.nextInt(PlayerAvatar.getAvailableHair()),
+				random.nextInt(PlayerAvatar.getAvailableShirts(gender)),
+				random.nextInt(PlayerAvatar.getAvailablePants(gender)),
+				random.nextInt(PlayerAvatar.getAvailableHats()),
+				random.nextInt(PlayerAvatar.getAvailableShoes()),
+				random.nextInt(PlayerAvatar.getAvailableEyes()),
+				random.nextInt(PlayerAvatar.getAvailableBags(gender)));
 	}
 }

@@ -16,24 +16,12 @@
 package com.pokegoapi.api.settings;
 
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.exceptions.NoSuchItemException;
-
-import java.util.Arrays;
-
 import lombok.Getter;
 import lombok.ToString;
 
-import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
-import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_GREAT_BALL;
-import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_MASTER_BALL;
-import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_POKE_BALL;
-import static POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_ULTRA_BALL;
-import static com.pokegoapi.api.inventory.Pokeball.GREATBALL;
-import static com.pokegoapi.api.inventory.Pokeball.MASTERBALL;
-import static com.pokegoapi.api.inventory.Pokeball.POKEBALL;
-import static com.pokegoapi.api.inventory.Pokeball.ULTRABALL;
+import java.util.List;
 
 /**
  * Created by LoungeKatt on 8/16/16.
@@ -43,13 +31,8 @@ import static com.pokegoapi.api.inventory.Pokeball.ULTRABALL;
 public class AsyncCatchOptions {
 
 	private final PokemonGo api;
-	private boolean useBestPokeball;
-	private boolean skipMasterBall;
 	@Getter
 	private int useRazzBerry;
-	private Pokeball pokeBall;
-	private boolean strictBallType;
-	private boolean smartSelect;
 	private double probability;
 	@Getter
 	private double normalizedHitPosition;
@@ -57,6 +40,9 @@ public class AsyncCatchOptions {
 	private double normalizedReticleSize;
 	@Getter
 	private double spinModifier;
+
+	@Getter
+	private PokeballSelector pokeballSelector;
 
 	/**
 	 * Instantiates a new CatchOptions object.
@@ -66,11 +52,6 @@ public class AsyncCatchOptions {
 	public AsyncCatchOptions(PokemonGo api) {
 		this.api = api;
 		this.useRazzBerry = 0;
-		this.useBestPokeball = false;
-		this.skipMasterBall = false;
-		this.pokeBall = POKEBALL;
-		this.strictBallType = false;
-		this.smartSelect = false;
 		this.probability = 0;
 		this.normalizedHitPosition = 1.0;
 		this.normalizedReticleSize = 1.95 + Math.random() * 0.05;
@@ -78,78 +59,14 @@ public class AsyncCatchOptions {
 	}
 
 	/**
-	 * Gets item ball to catch a pokemon
+	 * Sets this AsyncCatchOptions' pokeball selector
 	 *
-	 * @return the item ball
-	 * @throws NoSuchItemException the no such item exception
+	 * @param selector the new selector
+	 * @return the AsyncCatchOptions object
 	 */
-	public Pokeball getItemBall() throws NoSuchItemException {
-		ItemBag bag = api.getInventories().getItemBag();
-		if (strictBallType) {
-			if (bag.getItem(pokeBall.getBallType()).getCount() > 0) {
-				return pokeBall;
-			} else if (useBestPokeball) {
-				if (!skipMasterBall && bag.getItem(ITEM_MASTER_BALL).getCount() > 0) {
-					return MASTERBALL;
-				} else if (bag.getItem(ITEM_ULTRA_BALL).getCount() > 0) {
-					return ULTRABALL;
-				} else if (bag.getItem(ITEM_GREAT_BALL).getCount() > 0) {
-					return GREATBALL;
-				}
-			}
-			if (bag.getItem(ITEM_POKE_BALL).getCount() > 0) {
-				return POKEBALL;
-			}
-		} else {
-			int index = Arrays.asList(new ItemId[]{ITEM_MASTER_BALL, ITEM_ULTRA_BALL,
-					ITEM_GREAT_BALL, ITEM_POKE_BALL}).indexOf(pokeBall.getBallType());
-
-			if (useBestPokeball) {
-				if (!skipMasterBall && index >= 0 && bag.getItem(ITEM_MASTER_BALL).getCount() > 0) {
-					return MASTERBALL;
-				} else if (index >= 1 && bag.getItem(ITEM_ULTRA_BALL).getCount() > 0) {
-					return ULTRABALL;
-				} else if (index >= 2 && bag.getItem(ITEM_GREAT_BALL).getCount() > 0) {
-					return GREATBALL;
-				} else if (bag.getItem(ITEM_POKE_BALL).getCount() > 0) {
-					return POKEBALL;
-				}
-			} else {
-				if (index <= 3 && bag.getItem(ITEM_POKE_BALL).getCount() > 0) {
-					return POKEBALL;
-				} else if (index <= 2 && bag.getItem(ITEM_GREAT_BALL).getCount() > 0) {
-					return GREATBALL;
-				} else if (index <= 1 && bag.getItem(ITEM_ULTRA_BALL).getCount() > 0) {
-					return ULTRABALL;
-				} else if (!skipMasterBall && bag.getItem(ITEM_MASTER_BALL).getCount() > 0) {
-					return MASTERBALL;
-				}
-			}
-		}
-		if (smartSelect) {
-			strictBallType = false;
-			useBestPokeball = false;
-			skipMasterBall = false;
-			smartSelect = false;
-			return getItemBall();
-		}
-		throw new NoSuchItemException();
-	}
-
-	/**
-	 * Gets item ball to catch a pokemon
-	 *
-	 * @param encounterProbability the capture probability to compare
-	 * @return the item ball
-	 * @throws NoSuchItemException the no such item exception
-	 */
-	public Pokeball getItemBall(double encounterProbability) throws NoSuchItemException {
-		if (encounterProbability >= probability) {
-			useBestPokeball = false;
-		} else {
-			useBestPokeball = true;
-		}
-		return getItemBall();
+	public AsyncCatchOptions withPokeballSelector(PokeballSelector selector) {
+		this.pokeballSelector = selector;
+		return this;
 	}
 
 	/**
@@ -160,68 +77,6 @@ public class AsyncCatchOptions {
 	 */
 	public AsyncCatchOptions useRazzberries(boolean useRazzBerries) {
 		this.useRazzBerry = useRazzBerries ? 1 : 0;
-		return this;
-	}
-
-	/**
-	 * Set a specific Pokeball to use
-	 *
-	 * @param pokeBall the pokeball to use
-	 * @return the AsyncCatchOptions object
-	 */
-	public AsyncCatchOptions usePokeball(Pokeball pokeBall) {
-		this.pokeBall = pokeBall;
-		return this;
-	}
-
-	/**
-	 * Set using the best available ball
-	 *
-	 * @param useBestPokeball true or false
-	 * @return the AsyncCatchOptions object
-	 */
-	public AsyncCatchOptions useBestBall(boolean useBestPokeball) {
-		this.useBestPokeball = useBestPokeball;
-		return this;
-	}
-
-	/**
-	 * <pre>
-	 * Set using only the defined ball type
-	 *   combined with useBestBall: Sets the minimum
-	 *   combined with usePokeball: Sets the maximum
-	 *
-	 *   without either will attempt the ball specified
-	 *       or throw an error
-	 * </pre>
-	 *
-	 * @param strictBallType true or false
-	 * @return the AsyncCatchOptions object
-	 */
-	public AsyncCatchOptions noFallback(boolean strictBallType) {
-		this.strictBallType = strictBallType;
-		return this;
-	}
-
-	/**
-	 * Set whether or not Master balls can be used
-	 *
-	 * @param skipMasterBall true or false
-	 * @return the AsyncCatchOptions object
-	 */
-	public AsyncCatchOptions noMasterBall(boolean skipMasterBall) {
-		this.skipMasterBall = skipMasterBall;
-		return this;
-	}
-
-	/**
-	 * Set whether or not to use adaptive ball selection
-	 *
-	 * @param smartSelect true or false
-	 * @return the AsyncCatchOptions object
-	 */
-	public AsyncCatchOptions useSmartSelect(boolean smartSelect) {
-		this.smartSelect = smartSelect;
 		return this;
 	}
 
@@ -270,4 +125,28 @@ public class AsyncCatchOptions {
 		return this;
 	}
 
+	/**
+	 * Selects a pokeball to use based on
+	 *
+	 * @param pokeballs the pokeballs contained in your inventory
+	 * @return the pokeball to use
+	 * @throws NoSuchItemException if there are no pokeballs to use
+	 */
+	public Pokeball selectPokeball(List<Pokeball> pokeballs) throws NoSuchItemException {
+		if (pokeballs.size() == 0) {
+			throw new NoSuchItemException("Player has no pokeballs");
+		}
+		if (pokeballSelector != null) {
+			Pokeball selected = pokeballSelector.select(pokeballs);
+			if (selected != null) {
+				boolean hasPokeball = pokeballs.contains(selected);
+				if (hasPokeball) {
+					return selected;
+				} else {
+					throw new NoSuchItemException("Player does not have pokeball: " + selected.name());
+				}
+			}
+		}
+		return pokeballs.get(0);
+	}
 }
