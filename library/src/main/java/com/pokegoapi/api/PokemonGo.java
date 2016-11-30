@@ -42,7 +42,7 @@ import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.main.CommonRequest;
+import com.pokegoapi.main.CommonRequests;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
@@ -53,6 +53,7 @@ import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -186,7 +187,7 @@ public class PokemonGo {
 
 	private void initialize() throws RemoteServerException, LoginFailedException {
 		fireRequestBlock(new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
-				CommonRequest.getDownloadRemoteConfigVersionMessageRequest()));
+				CommonRequests.getDownloadRemoteConfigVersionMessageRequest()));
 
 		fireRequestBlockTwo();
 
@@ -232,7 +233,7 @@ public class PokemonGo {
 	 * @throws RemoteServerException When server fails
 	 */
 	private void fireRequestBlock(ServerRequest request) throws RemoteServerException, LoginFailedException {
-		ServerRequest[] requests = CommonRequest.fillRequest(request, this);
+		ServerRequest[] requests = CommonRequests.fillRequest(request, this);
 
 		getRequestHandler().sendServerRequests(requests);
 		try {
@@ -251,7 +252,7 @@ public class PokemonGo {
 	 */
 	public void fireRequestBlockTwo() throws RemoteServerException, LoginFailedException {
 		fireRequestBlock(new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
-				CommonRequest.getGetAssetDigestMessageRequest()));
+				CommonRequests.getGetAssetDigestMessageRequest()));
 	}
 
 	/**
@@ -441,6 +442,32 @@ public class PokemonGo {
 			}
 		}
 		return listeners;
+	}
+
+	/**
+	 * Invokes a method in all listeners of the given type
+	 * @param listenerType the listener to call to
+	 * @param name the method name to call
+	 * @param parameters the parameters to pass to the method
+	 * @param <T> the listener type
+	 * @throws ReflectiveOperationException if an exception occurred while invoking the listener
+	 */
+	public <T extends Listener> void callListener(Class<T> listenerType, String name, Object... parameters)
+			throws ReflectiveOperationException {
+		Class[] parameterTypes = new Class[parameters.length];
+		for (int i = 0; i < parameters.length; i++) {
+			Object parameter = parameters[i];
+			parameterTypes[i] = parameter.getClass();
+		}
+		Method method = listenerType.getMethod(name, parameterTypes);
+		if (method != null) {
+			List<T> listeners = getListeners(listenerType);
+			for (T listener : listeners) {
+				method.invoke(listener, parameters);
+			}
+		} else {
+			throw new NoSuchMethodException("Method \"" + name + "\" does not exist");
+		}
 	}
 
 	/**

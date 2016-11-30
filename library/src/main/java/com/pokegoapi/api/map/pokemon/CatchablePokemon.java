@@ -36,6 +36,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
+import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.listener.PokemonListener;
 import com.pokegoapi.api.map.pokemon.encounter.DiskEncounterResult;
@@ -58,6 +59,7 @@ import lombok.ToString;
 import rx.Observable;
 import rx.functions.Func1;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -273,7 +275,7 @@ public class CatchablePokemon implements MapPoint {
 		return catchPokemon(options.getNormalizedHitPosition(),
 				options.getNormalizedReticleSize(),
 				options.getSpinModifier(),
-				options.getItemBall(),
+				options.selectPokeball(getUseablePokeballs()),
 				options.getMaxPokeballs(),
 				options.getRazzberries());
 	}
@@ -295,7 +297,6 @@ public class CatchablePokemon implements MapPoint {
 			NoSuchItemException, EncounterFailedException {
 
 		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
-		double probability = encounter.getCaptureProbability().getCaptureProbability(0);
 
 		if (options == null) {
 			options = new CatchOptions(api);
@@ -304,7 +305,7 @@ public class CatchablePokemon implements MapPoint {
 		return catchPokemon(options.getNormalizedHitPosition(),
 				options.getNormalizedReticleSize(),
 				options.getSpinModifier(),
-				options.getItemBall(probability),
+				options.selectPokeball(getUseablePokeballs()),
 				options.getMaxPokeballs(),
 				options.getRazzberries());
 	}
@@ -358,7 +359,7 @@ public class CatchablePokemon implements MapPoint {
 		if (options != null) {
 			if (options.getUseRazzBerry() != 0) {
 				final AsyncCatchOptions asyncOptions = options;
-				final Pokeball asyncPokeball = asyncOptions.getItemBall();
+				final Pokeball asyncPokeball = asyncOptions.selectPokeball(getUseablePokeballs());
 				return useItemAsync(ItemId.ITEM_RAZZ_BERRY).flatMap(
 						new Func1<CatchItemResult, Observable<CatchResult>>() {
 							@Override
@@ -379,7 +380,7 @@ public class CatchablePokemon implements MapPoint {
 		return catchPokemonAsync(options.getNormalizedHitPosition(),
 				options.getNormalizedReticleSize(),
 				options.getSpinModifier(),
-				options.getItemBall());
+				options.selectPokeball(getUseablePokeballs()));
 	}
 
 	/**
@@ -400,12 +401,11 @@ public class CatchablePokemon implements MapPoint {
 			NoSuchItemException, EncounterFailedException {
 
 		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
-		double probability = encounter.getCaptureProbability().getCaptureProbability(0);
 
 		if (options != null) {
 			if (options.getUseRazzBerry() != 0) {
 				final AsyncCatchOptions asyncOptions = options;
-				final Pokeball asyncPokeball = asyncOptions.getItemBall(probability);
+				final Pokeball asyncPokeball = asyncOptions.selectPokeball(getUseablePokeballs());
 				return useItemAsync(ItemId.ITEM_RAZZ_BERRY).flatMap(
 						new Func1<CatchItemResult, Observable<CatchResult>>() {
 							@Override
@@ -426,7 +426,7 @@ public class CatchablePokemon implements MapPoint {
 		return catchPokemonAsync(options.getNormalizedHitPosition(),
 				options.getNormalizedReticleSize(),
 				options.getSpinModifier(),
-				options.getItemBall(probability));
+				options.selectPokeball(getUseablePokeballs()));
 	}
 
 	/**
@@ -575,6 +575,17 @@ public class CatchablePokemon implements MapPoint {
 		});
 	}
 
+	private List<Pokeball> getUseablePokeballs() {
+		List<Pokeball> pokeballs = new ArrayList<>();
+		ItemBag bag = api.getInventories().getItemBag();
+		for (Pokeball pokeball : Pokeball.values()) {
+			if (bag.getItem(pokeball.getBallType()).getCount() > 0) {
+				pokeballs.add(pokeball);
+			}
+		}
+		return pokeballs;
+	}
+
 	/**
 	 * Tries to use an item on a catchable pokemon (ie razzberry).
 	 *
@@ -582,7 +593,6 @@ public class CatchablePokemon implements MapPoint {
 	 * @return CatchItemResult info about the new modifiers about the pokemon (can move, item capture multi) eg
 	 */
 	public Observable<CatchItemResult> useItemAsync(ItemId item) {
-
 		UseItemCaptureMessage reqMsg = UseItemCaptureMessage
 				.newBuilder()
 				.setEncounterId(this.getEncounterId())

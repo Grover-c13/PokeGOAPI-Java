@@ -300,7 +300,7 @@ public class RequestHandler implements Runnable {
 			ServerRequest[] commonRequests = new ServerRequest[0];
 
 			if (addCommon) {
-				commonRequests = CommonRequest.getCommonRequests(api);
+				commonRequests = CommonRequests.getCommonRequests(api);
 				Collections.addAll(serverRequests, commonRequests);
 			}
 
@@ -319,7 +319,7 @@ public class RequestHandler implements Runnable {
 
 				for (int i = 0; i != commonRequests.length; i++) {
 					try {
-						CommonRequest.parse(api, arrayServerRequests[requests.size() + i].getType(),
+						CommonRequests.parse(api, arrayServerRequests[requests.size() + i].getType(),
 								arrayServerRequests[requests.size() + i].getData());
 					} catch (InvalidProtocolBufferException e) {
 						//TODO: notify error even in case of common requests?

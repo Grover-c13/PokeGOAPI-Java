@@ -20,13 +20,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class Utils {
-
-
 	/**
 	 * Converts input streams to byte arrays.
 	 *
 	 * @param input the input
-	 * @param size  the size
+	 * @param size the size
 	 * @return the byte [ ]
 	 * @throws IOException the io exception
 	 */
@@ -39,4 +37,19 @@ public class Utils {
 		}
 		return output.toByteArray();
 	}
+
+	/**
+	 * Appends the given requests to the given array
+	 *
+	 * @param requests the base array
+	 * @param append the requests to append
+	 * @return a new array with the appended requests
+	 */
+	public static ServerRequest[] appendRequests(ServerRequest[] requests, ServerRequest... append) {
+		ServerRequest[] newRequests = new ServerRequest[requests.length + append.length];
+		System.arraycopy(requests, 0, newRequests, 0, requests.length);
+		System.arraycopy(append, 0, newRequests, requests.length, append.length);
+		return newRequests;
+	}
+
 }
