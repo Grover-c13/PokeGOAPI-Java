@@ -243,7 +243,6 @@ class EvolutionInfo {
 	private static final PokemonId[] DRATINI_EVOLUTION = {DRATINI, DRAGONAIR, DRAGONITE};
 	private static final PokemonId[] MEWTWO_EVOLUTION = {MEWTWO};
 	private static final PokemonId[] MEW_EVOLUTION = {MEW};
-
 	private static final Map<PokemonId, PokemonId[]> EVOLUTION_INFO = new EnumMap<>(PokemonId.class);
 
 	static {
