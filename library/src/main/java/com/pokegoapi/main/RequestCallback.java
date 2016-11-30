@@ -13,18 +13,10 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.main;
 
-public class AsyncRemoteServerException extends AsyncPokemonGoException {
-	public AsyncRemoteServerException(String reason) {
-		super(reason);
-	}
+import com.google.protobuf.InvalidProtocolBufferException;
 
-	public AsyncRemoteServerException(Exception exception) {
-		super(exception);
-	}
-
-	public AsyncRemoteServerException(String reason, Exception exception) {
-		super(reason, exception);
-	}
+public interface RequestCallback {
+	void handleResponse(PokemonResponse response) throws InvalidProtocolBufferException;
 }
