@@ -1,3 +1,7 @@
+/*
+ *    Updated to 0.45 by PokebotPub 
+ */
+
 package com.pokegoapi.api.pokemon;
 
 import java.util.ArrayList;
@@ -158,6 +162,108 @@ import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.WEEZING;
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.WIGGLYTUFF;
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.ZAPDOS;
 import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.ZUBAT;
+
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.CHIKORITA;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.BAYLEEF;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.MEGANIUM;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.CYNDAQUIL;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.QUILAVA;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.TYPHLOSION;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.TOTODILE;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.CROCONAW;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.FERALIGATR;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.SENTRET;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.FURRET;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.HOOTHOOT;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.NOCTOWL;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.LEDYBA;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.LEDIAN;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.SPINARAK;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.ARIADOS;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.CROBAT;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.CHINCHOU;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.LANTURN;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.PICHU;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.CLEFFA;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.IGGLYBUFF;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.TOGEPI;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.TOGETIC;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.NATU;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.XATU;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.MAREEP;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.FLAAFFY;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.AMPHAROS;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.BELLOSSOM;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.MARILL;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.AZUMARILL;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.SUDOWOODO;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.POLITOED;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.HOPPIP;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.SKIPLOOM;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.JUMPLUFF;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.AIPOM;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.SUNKERN;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.SUNFLORA;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.YANMA;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.WOOPER;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.QUAGSIRE;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.ESPEON;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.UMBREON;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.MURKROW;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.SLOWKING;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.MISDREAVUS;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.UNOWN;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.WOBBUFFET;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.GIRAFARIG;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.PINECO;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.FORRETRESS;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.DUNSPARCE;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.GLIGAR;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.STEELIX;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.SNUBBULL;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.GRANBULL;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.QWILFISH;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.SCIZOR;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.SHUCKLE;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.HERACROSS;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.SNEASEL;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.TEDDIURSA;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.URSARING;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.SLUGMA;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.MAGCARGO;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.SWINUB;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.PILOSWINE;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.CORSOLA;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.REMORAID;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.OCTILLERY;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.DELIBIRD;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.MANTINE;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.SKARMORY;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.HOUNDOUR;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.HOUNDOOM;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.KINGDRA;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.PHANPY;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.DONPHAN;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.PORYGON2;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.STANTLER;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.SMEARGLE;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.TYROGUE;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.HITMONTOP;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.SMOOCHUM;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.ELEKID;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.MAGBY;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.MILTANK;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.BLISSEY;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.RAIKOU;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.ENTEI;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.SUICUNE;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.LARVITAR;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.PUPITAR;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.TYRANITAR;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.LUGIA;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.HO_OH;
+import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.CELEBI;
+
 import static java.util.Arrays.asList;
 
 class EvolutionInfo {
@@ -170,15 +276,10 @@ class EvolutionInfo {
 	private static final PokemonId[] RATTATA_EVOLUTION = {RATTATA, RATICATE};
 	private static final PokemonId[] SPEAROW_EVOLUTION = {SPEAROW, FEAROW};
 	private static final PokemonId[] EKANS_EVOLUTION = {EKANS, ARBOK};
-	private static final PokemonId[] PIKACHU_EVOLUTION = {PIKACHU, RAICHU};
 	private static final PokemonId[] SANDSHREW_EVOLUTION = {SANDSHREW, SANDSLASH};
 	private static final PokemonId[] NIDORAN_FEMALE_EVOLUTION = {NIDORAN_FEMALE, NIDORINA, NIDOQUEEN};
 	private static final PokemonId[] NIDORAN_MALE_EVOLUTION = {NIDORAN_MALE, NIDORINO, NIDOKING};
-	private static final PokemonId[] CLEFAIRY_EVOLUTION = {CLEFAIRY, CLEFABLE};
 	private static final PokemonId[] VULPIX_EVOLUTION = {VULPIX, NINETALES};
-	private static final PokemonId[] JIGGLYPUFF_EVOLUTION = {JIGGLYPUFF, WIGGLYTUFF};
-	private static final PokemonId[] ZUBAT_EVOLUTION = {ZUBAT, GOLBAT};
-	private static final PokemonId[] ODDISH_EVOLUTION = {ODDISH, GLOOM, VILEPLUME};
 	private static final PokemonId[] PARAS_EVOLUTION = {PARAS, PARASECT};
 	private static final PokemonId[] VENONAT_EVOLUTION = {VENONAT, VENOMOTH};
 	private static final PokemonId[] DIGLETT_EVOLUTION = {DIGLETT, DUGTRIO};
@@ -186,14 +287,12 @@ class EvolutionInfo {
 	private static final PokemonId[] PSYDUCK_EVOLUTION = {PSYDUCK, GOLDUCK};
 	private static final PokemonId[] MANKEY_EVOLUTION = {MANKEY, PRIMEAPE};
 	private static final PokemonId[] GROWLITHE_EVOLUTION = {GROWLITHE, ARCANINE};
-	private static final PokemonId[] POLIWAG_EVOLUTION = {POLIWAG, POLIWHIRL, POLIWRATH};
 	private static final PokemonId[] ABRA_EVOLUTION = {ABRA, KADABRA, ALAKAZAM};
 	private static final PokemonId[] MACHOP_EVOLUTION = {MACHOP, MACHOKE, MACHAMP};
 	private static final PokemonId[] BELLSPROUT_EVOLUTION = {BELLSPROUT, WEEPINBELL, VICTREEBEL};
 	private static final PokemonId[] TENTACOOL_EVOLUTION = {TENTACOOL, TENTACRUEL};
 	private static final PokemonId[] GEODUDE_EVOLUTION = {GEODUDE, GRAVELER, GOLEM};
 	private static final PokemonId[] PONYTA_EVOLUTION = {PONYTA, RAPIDASH};
-	private static final PokemonId[] SLOWPOKE_EVOLUTION = {SLOWPOKE, SLOWBRO};
 	private static final PokemonId[] MAGNEMITE_EVOLUTION = {MAGNEMITE, MAGNETON};
 	private static final PokemonId[] FARFETCHD_EVOLUTION = {FARFETCHD};
 	private static final PokemonId[] DODUO_EVOLUTION = {DODUO, DODRIO};
@@ -201,38 +300,26 @@ class EvolutionInfo {
 	private static final PokemonId[] GRIMER_EVOLUTION = {GRIMER, MUK};
 	private static final PokemonId[] SHELLDER_EVOLUTION = {SHELLDER, CLOYSTER};
 	private static final PokemonId[] GASTLY_EVOLUTION = {GASTLY, HAUNTER, GENGAR};
-	private static final PokemonId[] ONIX_EVOLUTION = {ONIX};
 	private static final PokemonId[] DROWZEE_EVOLUTION = {DROWZEE, HYPNO};
 	private static final PokemonId[] KRABBY_EVOLUTION = {KRABBY, KINGLER};
 	private static final PokemonId[] VOLTORB_EVOLUTION = {VOLTORB, ELECTRODE};
 	private static final PokemonId[] EXEGGCUTE_EVOLUTION = {EXEGGCUTE, EXEGGUTOR};
 	private static final PokemonId[] CUBONE_EVOLUTION = {CUBONE, MAROWAK};
-	private static final PokemonId[] HITMONLEE_EVOLUTION = {HITMONLEE, HITMONCHAN};
 	private static final PokemonId[] LICKITUNG_EVOLUTION = {LICKITUNG};
 	private static final PokemonId[] KOFFING_EVOLUTION = {KOFFING, WEEZING};
 	private static final PokemonId[] RHYHORN_EVOLUTION = {RHYHORN, RHYDON};
-	private static final PokemonId[] CHANSEY_EVOLUTION = {CHANSEY};
 	private static final PokemonId[] TANGELA_EVOLUTION = {TANGELA};
 	private static final PokemonId[] KANGASKHAN_EVOLUTION = {KANGASKHAN};
-	private static final PokemonId[] HORSEA_EVOLUTION = {HORSEA, SEADRA};
 	private static final PokemonId[] GOLDEEN_EVOLUTION = {GOLDEEN, SEAKING};
 	private static final PokemonId[] STARYU_EVOLUTION = {STARYU, STARMIE};
 	private static final PokemonId[] MR_MIME_EVOLUTION = {MR_MIME};
-	private static final PokemonId[] SCYTHER_EVOLUTION = {SCYTHER};
-	private static final PokemonId[] JYNX_EVOLUTION = {JYNX};
-	private static final PokemonId[] ELECTABUZZ_EVOLUTION = {ELECTABUZZ};
-	private static final PokemonId[] MAGMAR_EVOLUTION = {MAGMAR};
 	private static final PokemonId[] PINSIR_EVOLUTION = {PINSIR};
 	private static final PokemonId[] TAUROS_EVOLUTION = {TAUROS};
 	private static final PokemonId[] MAGIKARP_EVOLUTION = {MAGIKARP, GYARADOS};
 	private static final PokemonId[] LAPRAS_EVOLUTION = {LAPRAS};
 	private static final PokemonId[] DITTO_EVOLUTION = {DITTO};
 
-	// needs to be handled exceptionally
-	private static final PokemonId[] EEVEE_EVOLUTION = {EEVEE, VAPOREON, JOLTEON, FLAREON};
-	private static final List<PokemonId> EEVEE_FINAL_EVOLUTIONS = asList(VAPOREON, JOLTEON, FLAREON);
 
-	private static final PokemonId[] PORYGON_EVOLUTION = {PORYGON};
 	private static final PokemonId[] OMANYTE_EVOLUTION = {OMANYTE, OMASTAR};
 	private static final PokemonId[] KABUTO_EVOLUTION = {KABUTO, KABUTOPS};
 	private static final PokemonId[] AERODACTYL_EVOLUTION = {AERODACTYL};
@@ -243,6 +330,102 @@ class EvolutionInfo {
 	private static final PokemonId[] DRATINI_EVOLUTION = {DRATINI, DRAGONAIR, DRAGONITE};
 	private static final PokemonId[] MEWTWO_EVOLUTION = {MEWTWO};
 	private static final PokemonId[] MEW_EVOLUTION = {MEW};
+	
+	
+	
+	
+	
+	private static final PokemonId[] CHIKORITA_EVOLUTION = {CHIKORITA,BAYLEEF,MEGANIUM};
+	private static final PokemonId[] CYNDAQUIL_EVOLUTION = {CYNDAQUIL,QUILAVA,TYPHLOSION};
+	private static final PokemonId[] TOTODILE_EVOLUTION = {TOTODILE,CROCONAW,FERALIGATR};
+	private static final PokemonId[] SENTRET_EVOLUTION = {SENTRET,FURRET};
+	private static final PokemonId[] HOOTHOOT_EVOLUTION = {HOOTHOOT,NOCTOWL};
+	private static final PokemonId[] LEDYBA_EVOLUTION = {LEDYBA,LEDIAN};
+	private static final PokemonId[] SPINARAK_EVOLUTION = {SPINARAK,ARIADOS};
+	private static final PokemonId[] CHINCHOU_EVOLUTION = {CHINCHOU,LANTURN};
+	
+	
+	private static final PokemonId[] PICHU_EVOLUTION = {PICHU, PIKACHU, RAICHU}; // PICHU FIRST, PIKACHU_EVOLUTION TO PICHU_EVOLUTION
+	private static final PokemonId[] CLEFFA_EVOLUTION = {CLEFFA, CLEFAIRY, CLEFABLE}; // CLEFFA FIRST, CLEFAIRY_EVOLUTION TO CLEFFA_EVOLUTION
+	private static final PokemonId[] IGGLYBUFF_EVOLUTION = {IGGLYBUFF, JIGGLYPUFF, WIGGLYTUFF}; // IGGLYBUFF FIRST, JIGGLYPUFF_EVOLUTION TO IGGLYBUFF_EVOLUTION
+	private static final PokemonId[] SMOOCHUM_EVOLUTION = {SMOOCHUM, JYNX}; // SMOOCHUM FIRST, JYNX_EVOLUTION TO SMOOCHUM_EVOLUTION
+	private static final PokemonId[] ELEKID_EVOLUTION = {ELEKID,ELECTABUZZ}; // ELEKID FIRST, ELECTABUZZ_EVOLUTION TO ELEKID_EVOLUTION
+	private static final PokemonId[] MAGBY_EVOLUTION = {MAGBY, MAGMAR}; // MAGBY FIRST, MAGMAR_EVOLUTION TO MAGBY_EVOLUTION
+	private static final PokemonId[] CHANSEY_EVOLUTION = {CHANSEY, BLISSEY};
+	private static final PokemonId[] ONIX_EVOLUTION = {ONIX, STEELIX};
+	private static final PokemonId[] SCYTHER_EVOLUTION = {SCYTHER, SCIZOR};
+	private static final PokemonId[] HORSEA_EVOLUTION = {HORSEA, SEADRA, KINGDRA};
+	private static final PokemonId[] PORYGON_EVOLUTION = {PORYGON, PORYGON2};
+	private static final PokemonId[] ZUBAT_EVOLUTION = {ZUBAT, GOLBAT,CROBAT};
+	
+	
+	// needs to be handled exceptionally
+	private static final PokemonId[] EEVEE_EVOLUTION = {EEVEE, VAPOREON, JOLTEON, FLAREON, ESPEON, UMBREON};
+	private static final List<PokemonId> EEVEE_FINAL_EVOLUTIONS = asList(VAPOREON, JOLTEON, FLAREON, ESPEON, UMBREON);
+		
+	private static final PokemonId[] ODDISH_EVOLUTION = {ODDISH, GLOOM, VILEPLUME, BELLOSSOM}; // GLOOM IS EVOLUTION TO VILEPLUME OR BELLOSSOM
+	private static final List<PokemonId> ODDISH_FINAL_EVOLUTIONS = asList(VILEPLUME, BELLOSSOM);
+
+	private static final PokemonId[] POLIWAG_EVOLUTION = {POLIWAG, POLIWHIRL, POLIWRATH, POLITOED}; // POLIWHIRL IS EVOLUTION TO POLIWRATH OR POLITOED
+	private static final List<PokemonId> POLIWAG_FINAL_EVOLUTIONS = asList(POLIWRATH, POLITOED);
+
+	private static final PokemonId[] SLOWPOKE_EVOLUTION = {SLOWPOKE, SLOWBRO, SLOWKING}; // SLOWPOKE IS EVOLUTION IS TO SLOWKING OR SLOWBRO
+	private static final List<PokemonId> SLOWPOKE_FINAL_EVOLUTIONS = asList(SLOWBRO, SLOWKING);
+
+	private static final PokemonId[] TYROGUE_EVOLUTION = {TYROGUE, HITMONLEE, HITMONCHAN, HITMONTOP}; // TYROGUE IS FIRST, HITMONLEE_EVOLUTION TO SMOOCHUM_EVOLUTION AND TYROGUE EVOLUTION IS TO HITMONLEE OR HITMONCHAN OR HITMONTOP
+	private static final List<PokemonId> TYROGUE_FINAL_EVOLUTIONS = asList(HITMONLEE, HITMONCHAN, HITMONTOP);
+	
+
+	
+	private static final PokemonId[] TOGEPI_EVOLUTION = {TOGEPI, TOGETIC};
+	private static final PokemonId[] NATU_EVOLUTION = {NATU, XATU};
+	private static final PokemonId[] MAREEP_EVOLUTION = {MAREEP, FLAAFFY, AMPHAROS};
+	private static final PokemonId[] MARILL_EVOLUTION = {MARILL, AZUMARILL};
+	private static final PokemonId[] SUDOWOODO_EVOLUTION = {SUDOWOODO};
+	private static final PokemonId[] HOPPIP_EVOLUTION = {HOPPIP, SKIPLOOM, JUMPLUFF};
+	private static final PokemonId[] AIPOM_EVOLUTION = {AIPOM};
+	private static final PokemonId[] SUNKERN_EVOLUTION = {SUNKERN, SUNFLORA};
+	private static final PokemonId[] YANMA_EVOLUTION = {YANMA};
+	private static final PokemonId[] WOOPER_EVOLUTION = {WOOPER, QUAGSIRE};
+	private static final PokemonId[] MURKROW_EVOLUTION = {MURKROW};
+	private static final PokemonId[] MISDREAVUS_EVOLUTION = {MISDREAVUS};
+	private static final PokemonId[] UNOWN_EVOLUTION = {UNOWN};
+	private static final PokemonId[] WOBBUFFET_EVOLUTION = {WOBBUFFET};
+	private static final PokemonId[] GIRAFARIG_EVOLUTION = {GIRAFARIG};
+	private static final PokemonId[] PINECO_EVOLUTION = {PINECO, FORRETRESS};
+	private static final PokemonId[] DUNSPARCE_EVOLUTION = {DUNSPARCE};
+	private static final PokemonId[] GLIGAR_EVOLUTION = {GLIGAR};
+	private static final PokemonId[] SNUBBULL_EVOLUTION = {SNUBBULL, GRANBULL};
+	private static final PokemonId[] QWILFISH_EVOLUTION = {QWILFISH};
+	private static final PokemonId[] SHUCKLE_EVOLUTION = {SHUCKLE};
+	private static final PokemonId[] HERACROSS_EVOLUTION = {HERACROSS};
+	private static final PokemonId[] SNEASEL_EVOLUTION = {SNEASEL};
+	private static final PokemonId[] TEDDIURSA_EVOLUTION = {TEDDIURSA,URSARING};
+	private static final PokemonId[] SLUGMA_EVOLUTION = {SLUGMA, MAGCARGO};
+	private static final PokemonId[] SWINUB_EVOLUTION = {SWINUB, PILOSWINE};
+	private static final PokemonId[] CORSOLA_EVOLUTION = {CORSOLA};
+	private static final PokemonId[] REMORAID_EVOLUTION = {REMORAID, OCTILLERY};
+	private static final PokemonId[] DELIBIRD_EVOLUTION = {DELIBIRD};
+	private static final PokemonId[] MANTINE_EVOLUTION = {MANTINE};
+	private static final PokemonId[] SKARMORY_EVOLUTION = {SKARMORY};
+	private static final PokemonId[] HOUNDOUR_EVOLUTION = {HOUNDOUR, HOUNDOOM};
+	private static final PokemonId[] PHANPY_EVOLUTION = {PHANPY, DONPHAN};
+	private static final PokemonId[] STANTLER_EVOLUTION = {STANTLER};
+	private static final PokemonId[] SMEARGLE_EVOLUTION = {SMEARGLE};
+	private static final PokemonId[] MILTANK_EVOLUTION = {MILTANK};
+	private static final PokemonId[] RAIKOU_EVOLUTION = {RAIKOU};
+	private static final PokemonId[] ENTEI_EVOLUTION = {ENTEI};
+	private static final PokemonId[] SUICUNE_EVOLUTION = {SUICUNE};
+	private static final PokemonId[] LARVITAR_EVOLUTION = {LARVITAR, PUPITAR, TYRANITAR};
+	private static final PokemonId[] LUGIA_EVOLUTION = {LUGIA};
+	private static final PokemonId[] HO_OH_EVOLUTION = {HO_OH};
+	private static final PokemonId[] CELEBI_EVOLUTION = {CELEBI};
+	
+	
+	
+	
+	
+	
 
 	private static final Map<PokemonId, PokemonId[]> EVOLUTION_INFO = new EnumMap<>(PokemonId.class);
 
@@ -271,8 +454,9 @@ class EvolutionInfo {
 		EVOLUTION_INFO.put(FEAROW, SPEAROW_EVOLUTION);
 		EVOLUTION_INFO.put(EKANS, EKANS_EVOLUTION);
 		EVOLUTION_INFO.put(ARBOK, EKANS_EVOLUTION);
-		EVOLUTION_INFO.put(PIKACHU, PIKACHU_EVOLUTION);
-		EVOLUTION_INFO.put(RAICHU, PIKACHU_EVOLUTION);
+		EVOLUTION_INFO.put(PICHU, PICHU_EVOLUTION);
+		EVOLUTION_INFO.put(PIKACHU, PICHU_EVOLUTION);
+		EVOLUTION_INFO.put(RAICHU, PICHU_EVOLUTION);
 		EVOLUTION_INFO.put(SANDSHREW, SANDSHREW_EVOLUTION);
 		EVOLUTION_INFO.put(SANDSLASH, SANDSHREW_EVOLUTION);
 		EVOLUTION_INFO.put(NIDORAN_FEMALE, NIDORAN_FEMALE_EVOLUTION);
@@ -281,17 +465,17 @@ class EvolutionInfo {
 		EVOLUTION_INFO.put(NIDORAN_MALE, NIDORAN_MALE_EVOLUTION);
 		EVOLUTION_INFO.put(NIDORINO, NIDORAN_MALE_EVOLUTION);
 		EVOLUTION_INFO.put(NIDOKING, NIDORAN_MALE_EVOLUTION);
-		EVOLUTION_INFO.put(CLEFAIRY, CLEFAIRY_EVOLUTION);
-		EVOLUTION_INFO.put(CLEFABLE, CLEFAIRY_EVOLUTION);
+		EVOLUTION_INFO.put(CLEFFA, CLEFFA_EVOLUTION);
+		EVOLUTION_INFO.put(CLEFAIRY, CLEFFA_EVOLUTION);
+		EVOLUTION_INFO.put(CLEFABLE, CLEFFA_EVOLUTION);
 		EVOLUTION_INFO.put(VULPIX, VULPIX_EVOLUTION);
 		EVOLUTION_INFO.put(NINETALES, VULPIX_EVOLUTION);
-		EVOLUTION_INFO.put(JIGGLYPUFF, JIGGLYPUFF_EVOLUTION);
-		EVOLUTION_INFO.put(WIGGLYTUFF, JIGGLYPUFF_EVOLUTION);
+		EVOLUTION_INFO.put(IGGLYBUFF, IGGLYBUFF_EVOLUTION);
+		EVOLUTION_INFO.put(JIGGLYPUFF, IGGLYBUFF_EVOLUTION);
+		EVOLUTION_INFO.put(WIGGLYTUFF, IGGLYBUFF_EVOLUTION);
 		EVOLUTION_INFO.put(ZUBAT, ZUBAT_EVOLUTION);
 		EVOLUTION_INFO.put(GOLBAT, ZUBAT_EVOLUTION);
-		EVOLUTION_INFO.put(ODDISH, ODDISH_EVOLUTION);
-		EVOLUTION_INFO.put(GLOOM, ODDISH_EVOLUTION);
-		EVOLUTION_INFO.put(VILEPLUME, ODDISH_EVOLUTION);
+		EVOLUTION_INFO.put(CROBAT, ZUBAT_EVOLUTION);
 		EVOLUTION_INFO.put(PARAS, PARAS_EVOLUTION);
 		EVOLUTION_INFO.put(PARASECT, PARAS_EVOLUTION);
 		EVOLUTION_INFO.put(VENONAT, VENONAT_EVOLUTION);
@@ -306,9 +490,6 @@ class EvolutionInfo {
 		EVOLUTION_INFO.put(PRIMEAPE, MANKEY_EVOLUTION);
 		EVOLUTION_INFO.put(GROWLITHE, GROWLITHE_EVOLUTION);
 		EVOLUTION_INFO.put(ARCANINE, GROWLITHE_EVOLUTION);
-		EVOLUTION_INFO.put(POLIWAG, POLIWAG_EVOLUTION);
-		EVOLUTION_INFO.put(POLIWHIRL, POLIWAG_EVOLUTION);
-		EVOLUTION_INFO.put(POLIWRATH, POLIWAG_EVOLUTION);
 		EVOLUTION_INFO.put(ABRA, ABRA_EVOLUTION);
 		EVOLUTION_INFO.put(KADABRA, ABRA_EVOLUTION);
 		EVOLUTION_INFO.put(ALAKAZAM, ABRA_EVOLUTION);
@@ -325,8 +506,6 @@ class EvolutionInfo {
 		EVOLUTION_INFO.put(GOLEM, GEODUDE_EVOLUTION);
 		EVOLUTION_INFO.put(PONYTA, PONYTA_EVOLUTION);
 		EVOLUTION_INFO.put(RAPIDASH, PONYTA_EVOLUTION);
-		EVOLUTION_INFO.put(SLOWPOKE, SLOWPOKE_EVOLUTION);
-		EVOLUTION_INFO.put(SLOWBRO, SLOWPOKE_EVOLUTION);
 		EVOLUTION_INFO.put(MAGNEMITE, MAGNEMITE_EVOLUTION);
 		EVOLUTION_INFO.put(MAGNETON, MAGNEMITE_EVOLUTION);
 		EVOLUTION_INFO.put(FARFETCHD, FARFETCHD_EVOLUTION);
@@ -342,6 +521,7 @@ class EvolutionInfo {
 		EVOLUTION_INFO.put(HAUNTER, GASTLY_EVOLUTION);
 		EVOLUTION_INFO.put(GENGAR, GASTLY_EVOLUTION);
 		EVOLUTION_INFO.put(ONIX, ONIX_EVOLUTION);
+		EVOLUTION_INFO.put(STEELIX, ONIX_EVOLUTION);
 		EVOLUTION_INFO.put(DROWZEE, DROWZEE_EVOLUTION);
 		EVOLUTION_INFO.put(HYPNO, DROWZEE_EVOLUTION);
 		EVOLUTION_INFO.put(KRABBY, KRABBY_EVOLUTION);
@@ -352,27 +532,31 @@ class EvolutionInfo {
 		EVOLUTION_INFO.put(EXEGGUTOR, EXEGGCUTE_EVOLUTION);
 		EVOLUTION_INFO.put(CUBONE, CUBONE_EVOLUTION);
 		EVOLUTION_INFO.put(MAROWAK, CUBONE_EVOLUTION);
-		EVOLUTION_INFO.put(HITMONLEE, HITMONLEE_EVOLUTION);
-		EVOLUTION_INFO.put(HITMONCHAN, HITMONLEE_EVOLUTION);
 		EVOLUTION_INFO.put(LICKITUNG, LICKITUNG_EVOLUTION);
 		EVOLUTION_INFO.put(KOFFING, KOFFING_EVOLUTION);
 		EVOLUTION_INFO.put(WEEZING, KOFFING_EVOLUTION);
 		EVOLUTION_INFO.put(RHYHORN, RHYHORN_EVOLUTION);
 		EVOLUTION_INFO.put(RHYDON, RHYHORN_EVOLUTION);
 		EVOLUTION_INFO.put(CHANSEY, CHANSEY_EVOLUTION);
+		EVOLUTION_INFO.put(BLISSEY, CHANSEY_EVOLUTION);
 		EVOLUTION_INFO.put(TANGELA, TANGELA_EVOLUTION);
 		EVOLUTION_INFO.put(KANGASKHAN, KANGASKHAN_EVOLUTION);
 		EVOLUTION_INFO.put(HORSEA, HORSEA_EVOLUTION);
 		EVOLUTION_INFO.put(SEADRA, HORSEA_EVOLUTION);
+		EVOLUTION_INFO.put(KINGDRA, HORSEA_EVOLUTION);
 		EVOLUTION_INFO.put(GOLDEEN, GOLDEEN_EVOLUTION);
 		EVOLUTION_INFO.put(SEAKING, GOLDEEN_EVOLUTION);
 		EVOLUTION_INFO.put(STARYU, STARYU_EVOLUTION);
 		EVOLUTION_INFO.put(STARMIE, STARYU_EVOLUTION);
 		EVOLUTION_INFO.put(MR_MIME, MR_MIME_EVOLUTION);
 		EVOLUTION_INFO.put(SCYTHER, SCYTHER_EVOLUTION);
-		EVOLUTION_INFO.put(JYNX, JYNX_EVOLUTION);
-		EVOLUTION_INFO.put(ELECTABUZZ, ELECTABUZZ_EVOLUTION);
-		EVOLUTION_INFO.put(MAGMAR, MAGMAR_EVOLUTION);
+		EVOLUTION_INFO.put(SCIZOR, SCYTHER_EVOLUTION);
+		EVOLUTION_INFO.put(SMOOCHUM, SMOOCHUM_EVOLUTION);
+		EVOLUTION_INFO.put(JYNX, SMOOCHUM_EVOLUTION);
+		EVOLUTION_INFO.put(ELEKID, ELEKID_EVOLUTION);
+		EVOLUTION_INFO.put(ELECTABUZZ, ELEKID_EVOLUTION);
+		EVOLUTION_INFO.put(MAGBY, MAGBY_EVOLUTION);
+		EVOLUTION_INFO.put(MAGMAR, MAGBY_EVOLUTION);
 		EVOLUTION_INFO.put(PINSIR, PINSIR_EVOLUTION);
 		EVOLUTION_INFO.put(TAUROS, TAUROS_EVOLUTION);
 		EVOLUTION_INFO.put(MAGIKARP, MAGIKARP_EVOLUTION);
@@ -385,8 +569,35 @@ class EvolutionInfo {
 		EVOLUTION_INFO.put(VAPOREON, EEVEE_EVOLUTION);
 		EVOLUTION_INFO.put(JOLTEON, EEVEE_EVOLUTION);
 		EVOLUTION_INFO.put(FLAREON, EEVEE_EVOLUTION);
+		EVOLUTION_INFO.put(ESPEON, EEVEE_EVOLUTION);
+		EVOLUTION_INFO.put(UMBREON, EEVEE_EVOLUTION);
 
+		EVOLUTION_INFO.put(ODDISH, ODDISH_EVOLUTION);
+		EVOLUTION_INFO.put(GLOOM, ODDISH_EVOLUTION);
+		EVOLUTION_INFO.put(VILEPLUME, ODDISH_EVOLUTION);
+		EVOLUTION_INFO.put(BELLOSSOM, ODDISH_EVOLUTION);
+
+		
+		EVOLUTION_INFO.put(POLIWAG, POLIWAG_EVOLUTION);
+		EVOLUTION_INFO.put(POLIWHIRL, POLIWAG_EVOLUTION);
+		EVOLUTION_INFO.put(POLIWRATH, POLIWAG_EVOLUTION);
+		EVOLUTION_INFO.put(POLITOED, POLIWAG_EVOLUTION);
+		
+		
+		EVOLUTION_INFO.put(SLOWPOKE, SLOWPOKE_EVOLUTION);
+		EVOLUTION_INFO.put(SLOWBRO, SLOWPOKE_EVOLUTION);
+		EVOLUTION_INFO.put(SLOWKING, SLOWPOKE_EVOLUTION);
+		
+		EVOLUTION_INFO.put(TYROGUE, TYROGUE_EVOLUTION);
+		EVOLUTION_INFO.put(HITMONLEE, TYROGUE_EVOLUTION);
+		EVOLUTION_INFO.put(HITMONCHAN, TYROGUE_EVOLUTION);
+		EVOLUTION_INFO.put(HITMONCHAN, TYROGUE_EVOLUTION);
+		EVOLUTION_INFO.put(HITMONTOP, TYROGUE_EVOLUTION);
+		//end exceptionally
+		
+		
 		EVOLUTION_INFO.put(PORYGON, PORYGON_EVOLUTION);
+		EVOLUTION_INFO.put(PORYGON2, PORYGON_EVOLUTION);
 		EVOLUTION_INFO.put(OMANYTE, OMANYTE_EVOLUTION);
 		EVOLUTION_INFO.put(OMASTAR, OMANYTE_EVOLUTION);
 		EVOLUTION_INFO.put(KABUTO, KABUTO_EVOLUTION);
@@ -401,6 +612,111 @@ class EvolutionInfo {
 		EVOLUTION_INFO.put(DRAGONITE, DRATINI_EVOLUTION);
 		EVOLUTION_INFO.put(MEWTWO, MEWTWO_EVOLUTION);
 		EVOLUTION_INFO.put(MEW, MEW_EVOLUTION);
+		
+		
+		
+		EVOLUTION_INFO.put(TOGEPI, TOGEPI_EVOLUTION);
+		EVOLUTION_INFO.put(TOGETIC, TOGEPI_EVOLUTION);
+		
+		EVOLUTION_INFO.put(NATU, NATU_EVOLUTION);
+		EVOLUTION_INFO.put(XATU, NATU_EVOLUTION);
+		
+		EVOLUTION_INFO.put(MAREEP, MAREEP_EVOLUTION);
+		EVOLUTION_INFO.put(FLAAFFY, MAREEP_EVOLUTION);
+		EVOLUTION_INFO.put(AMPHAROS, MAREEP_EVOLUTION);
+		
+		EVOLUTION_INFO.put(MARILL, MARILL_EVOLUTION);
+		EVOLUTION_INFO.put(AZUMARILL, MARILL_EVOLUTION);
+		
+		EVOLUTION_INFO.put(SUDOWOODO, SUDOWOODO_EVOLUTION);
+		
+		EVOLUTION_INFO.put(HOPPIP, HOPPIP_EVOLUTION);
+		EVOLUTION_INFO.put(SKIPLOOM, HOPPIP_EVOLUTION);
+		EVOLUTION_INFO.put(JUMPLUFF, HOPPIP_EVOLUTION);
+		
+		EVOLUTION_INFO.put(AIPOM, AIPOM_EVOLUTION);
+		
+		EVOLUTION_INFO.put(SUNKERN, SUNKERN_EVOLUTION);
+		EVOLUTION_INFO.put(SUNFLORA, SUNKERN_EVOLUTION);
+		
+		EVOLUTION_INFO.put(YANMA, YANMA_EVOLUTION);
+		
+		EVOLUTION_INFO.put(WOOPER, WOOPER_EVOLUTION);
+		EVOLUTION_INFO.put(QUAGSIRE, WOOPER_EVOLUTION);
+		
+		EVOLUTION_INFO.put(MURKROW, MURKROW_EVOLUTION);
+		
+		EVOLUTION_INFO.put(MISDREAVUS, MISDREAVUS_EVOLUTION);
+		
+		EVOLUTION_INFO.put(UNOWN, UNOWN_EVOLUTION);
+		
+		EVOLUTION_INFO.put(WOBBUFFET, WOBBUFFET_EVOLUTION);
+		
+		EVOLUTION_INFO.put(GIRAFARIG, GIRAFARIG_EVOLUTION);
+		
+		EVOLUTION_INFO.put(PINECO, PINECO_EVOLUTION);
+		EVOLUTION_INFO.put(FORRETRESS, PINECO_EVOLUTION);
+		
+		EVOLUTION_INFO.put(DUNSPARCE, DUNSPARCE_EVOLUTION);
+		
+		EVOLUTION_INFO.put(GLIGAR, GLIGAR_EVOLUTION);
+		
+		EVOLUTION_INFO.put(SNUBBULL, SNUBBULL_EVOLUTION);
+		EVOLUTION_INFO.put(GRANBULL, SNUBBULL_EVOLUTION);
+		
+		EVOLUTION_INFO.put(QWILFISH, QWILFISH_EVOLUTION);
+		
+		EVOLUTION_INFO.put(SHUCKLE, SHUCKLE_EVOLUTION);
+		
+		EVOLUTION_INFO.put(HERACROSS, HERACROSS_EVOLUTION);
+		
+		EVOLUTION_INFO.put(SNEASEL, SNEASEL_EVOLUTION);
+		
+		EVOLUTION_INFO.put(TEDDIURSA, TEDDIURSA_EVOLUTION);
+		EVOLUTION_INFO.put(URSARING, TEDDIURSA_EVOLUTION);
+		
+		EVOLUTION_INFO.put(SLUGMA, SLUGMA_EVOLUTION);
+		EVOLUTION_INFO.put(MAGCARGO, SLUGMA_EVOLUTION);
+		
+		EVOLUTION_INFO.put(SWINUB, SWINUB_EVOLUTION);
+		EVOLUTION_INFO.put(PILOSWINE, SWINUB_EVOLUTION);
+		
+		EVOLUTION_INFO.put(CORSOLA, CORSOLA_EVOLUTION);
+		
+		EVOLUTION_INFO.put(REMORAID, REMORAID_EVOLUTION);
+		EVOLUTION_INFO.put(OCTILLERY, REMORAID_EVOLUTION);
+		
+		EVOLUTION_INFO.put(DELIBIRD, DELIBIRD_EVOLUTION);
+		
+		EVOLUTION_INFO.put(MANTINE, MANTINE_EVOLUTION);
+		
+		EVOLUTION_INFO.put(SKARMORY, SKARMORY_EVOLUTION);
+		
+		EVOLUTION_INFO.put(HOUNDOUR, HOUNDOUR_EVOLUTION);
+		EVOLUTION_INFO.put(HOUNDOOM, HOUNDOUR_EVOLUTION);
+		
+		EVOLUTION_INFO.put(PHANPY, PHANPY_EVOLUTION);
+		EVOLUTION_INFO.put(DONPHAN, PHANPY_EVOLUTION);
+		
+		EVOLUTION_INFO.put(STANTLER, STANTLER_EVOLUTION);
+		
+		EVOLUTION_INFO.put(SMEARGLE, SMEARGLE_EVOLUTION);
+		
+		EVOLUTION_INFO.put(MILTANK, MILTANK_EVOLUTION);
+		
+		EVOLUTION_INFO.put(RAIKOU, RAIKOU_EVOLUTION);
+		
+		EVOLUTION_INFO.put(ENTEI, ENTEI_EVOLUTION);
+		
+		EVOLUTION_INFO.put(SUICUNE, SUICUNE_EVOLUTION);
+		
+		EVOLUTION_INFO.put(LARVITAR, LARVITAR_EVOLUTION);
+		EVOLUTION_INFO.put(PUPITAR, LARVITAR_EVOLUTION);
+		EVOLUTION_INFO.put(TYRANITAR, LARVITAR_EVOLUTION);
+		
+		EVOLUTION_INFO.put(LUGIA, LUGIA_EVOLUTION);
+		EVOLUTION_INFO.put(HO_OH, HO_OH_EVOLUTION);
+		EVOLUTION_INFO.put(CELEBI, CELEBI_EVOLUTION);
 	}
 
 	/**
