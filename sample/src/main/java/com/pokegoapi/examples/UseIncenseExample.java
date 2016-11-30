@@ -30,10 +30,11 @@
 
 package com.pokegoapi.examples;
 
+
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.auth.GoogleAutoCredentialProvider;
-import com.pokegoapi.main.BlockingCallback;
-import com.pokegoapi.main.PokemonCallback;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.SystemTimeImpl;
 import okhttp3.OkHttpClient;
@@ -53,23 +54,15 @@ public class UseIncenseExample {
 					new GoogleAutoCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
 			//new PtcLogin(http).login(ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
 
-			BlockingCallback callback = new BlockingCallback();
-			go.login(authProvider, callback);
-			callback.block();
+			go.login(authProvider);
 
-			go.setLocation(-32.058087, 115.744325, 0);
-			go.getInventories().getItemBag().useIncense(new PokemonCallback() {
-				@Override
-				public void onCompleted(Exception exception) {
-					System.out.println("Incense was used!");
-					if (exception != null) {
-						Log.e("Main", "Error while placing incense", exception);
-					}
-				}
-			});
+			go.setLocation(45.817521, 16.028199, 0);
+			go.getInventories().getItemBag().useIncense();
 
-		} catch (Exception e) {
+		} catch (LoginFailedException | RemoteServerException e) {
+			// failed to login, invalid credentials, auth issue or server issue.
 			Log.e("Main", "Failed to login or server issue: ", e);
+
 		}
 	}
 }

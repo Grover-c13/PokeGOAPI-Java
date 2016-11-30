@@ -15,13 +15,15 @@
 
 package com.pokegoapi.api.pokemon;
 
-import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
-import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.EggIncubator;
-import com.pokegoapi.main.AsyncReturn;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+
+import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
+import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
 import lombok.Setter;
 
 /**
@@ -40,13 +42,16 @@ public class EggPokemon {
 	 * Incubate this egg.
 	 *
 	 * @param incubator : the incubator
-	 * @param status callback to return the status of the egg
+	 * @return status of putting egg in incubator
+	 * @throws LoginFailedException  if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 */
-	public void incubate(EggIncubator incubator, AsyncReturn<UseItemEggIncubatorResponse.Result> status) {
+	public UseItemEggIncubatorResponse.Result incubate(EggIncubator incubator)
+			throws LoginFailedException, RemoteServerException {
 		if (incubator.isInUse()) {
-			throw new IllegalArgumentException("Incubator already in use");
+			throw new IllegalArgumentException("Incubator already used");
 		}
-		incubator.hatchEgg(this, status);
+		return incubator.hatchEgg(this);
 	}
 
 	/**
@@ -124,5 +129,5 @@ public class EggPokemon {
 
 		return false;
 	}
-	// TODO: add wrapper objects for incubators and allow to be got.
+	// TODO: add wrapper objects for encubators and allow to be got.
 }

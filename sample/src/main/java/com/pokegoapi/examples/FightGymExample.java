@@ -30,9 +30,8 @@
 
 package com.pokegoapi.examples;
 
-import POGOProtos.Networking.Responses.AttackGymResponseOuterClass.AttackGymResponse;
-import POGOProtos.Networking.Responses.GetGymDetailsResponseOuterClass.GetGymDetailsResponse;
-import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse;
+
+import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse.Result;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.gym.Battle;
 import com.pokegoapi.api.gym.Gym;
@@ -41,106 +40,64 @@ import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.AsyncReturn;
-import com.pokegoapi.main.PokemonCallback;
-import com.pokegoapi.main.SyncedReturn;
 import com.pokegoapi.util.Log;
 import okhttp3.OkHttpClient;
 
 import java.util.List;
 
 public class FightGymExample {
+
+	/**
+	 * Catches a pokemon at an area.
+	 */
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
-		CredentialProvider credentials;
-		final PokemonGo api = new PokemonGo(http);
+		CredentialProvider auth = null;
+		PokemonGo go = new PokemonGo(http);
 		try {
-			credentials = new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
-			api.login(credentials, new PokemonCallback() {
-				@Override
-				public void onCompleted(Exception exception) {
-					if (exception != null) {
-						Log.e("Main", "Failed to login or server issue: ", exception);
-					}
-					onLogin(api);
-				}
-			});
+			auth = new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
+			go.login(auth);
+			// or google
+			//auth = new GoogleCredentialProvider(http, token); // currently uses oauth flow so no user or pass needed
+			// set location
+			go.setLocation(-32.011011, 115.932831, 0);
 
-		} catch (LoginFailedException | RemoteServerException e) {
-			Log.e("Main", "Failed to login to PTC: ", e);
-		}
-	}
+			List<Pokemon> pokemons = go.getInventories().getPokebank().getPokemons();
+			Pokemon[] attackers = new Pokemon[6];
 
-	private static void onLogin(final PokemonGo api) {
-		api.setLocation(-32.011011, 115.932831, 0);
-
-		if (api.getPlayerProfile().getStats().getLevel() >= 5) {
-			final List<Pokemon> pokemon = api.getInventories().getPokebank().getPokemons();
-			final Pokemon[] attackers = new Pokemon[6];
-
-			//Select 6 pokemon to attack the gym with
 			for (int i = 0; i < 6; i++) {
-				attackers[i] = pokemon.get(i);
+				attackers[i] = pokemons.get(i);
 			}
 
-			api.getMap().getGyms(new AsyncReturn<List<Gym>>() {
-				@Override
-				public void onReceive(final List<Gym> gyms, Exception exception) {
-					if (exception != null) {
-						Log.e("Main", "Failed to load gyms in area: ", exception);
-					} else {
-						api.queueTask(new Runnable() {
-							@Override
-							public void run() {
-								for (Gym gym : gyms) {
-									attackGym(attackers, gym);
-									try {
-										Thread.sleep(1000);
-									} catch (InterruptedException e1) {
-										e1.printStackTrace();
-									}
-								}
-								System.exit(0);
-							}
-						});
-					}
-				}
-			});
-		} else {
-			System.out.println("Not yet level 5! Can't attack gyms!");
-		}
-	}
 
-	private static void attackGym(final Pokemon[] pokemon, final Gym gym) {
-		SyncedReturn<GetGymDetailsResponse> detailsReturn = new SyncedReturn<>();
-		gym.getDetails(detailsReturn);
-		try {
-			GetGymDetailsResponse details = detailsReturn.get();
-			//Ensure this gym is attackable
-			if (details.getGymState().getMembershipsCount() > 0) {
-				final Battle battle = gym.battle(pokemon);
-				SyncedReturn<StartGymBattleResponse.Result> startReturn = new SyncedReturn<>();
-				battle.start(startReturn);
-				StartGymBattleResponse.Result result = startReturn.get();
-				if (result == StartGymBattleResponse.Result.SUCCESS) {
-					while (!battle.isConcluded()) {
-						SyncedReturn<AttackGymResponse> attackReturn = new SyncedReturn<>();
-						battle.attack(5, attackReturn);
-						AttackGymResponse attackResult = attackReturn.get();
-						System.out.println("Attack: " + attackResult.getResult());
-						try {
+			for (Gym gym : go.getMap().getGyms()) {
+				if (gym.isAttackable()) {
+					Battle battle = gym.battle(attackers);
+					// start the battle
+					Result result = battle.start();
+
+					if (result == Result.SUCCESS) {
+						// started battle successfully
+
+						// loop while battle is not finished
+						while (!battle.isConcluded()) {
+							System.out.println("attack:" + battle.attack(5));
 							Thread.sleep(500);
-						} catch (InterruptedException e1) {
-							e1.printStackTrace();
 						}
+
+						System.out.println("Battle result:" + battle.getOutcome());
+
+					} else {
+						System.out.println("FAILED:" + result);
 					}
-					System.out.println("Battle result: " + battle.getOutcome());
-				} else {
-					System.out.println("Failed to start gym battle: " + result);
 				}
+
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+
+		} catch (LoginFailedException | RemoteServerException | InterruptedException e) {
+			// failed to login, invalid credentials, auth issue or server issue.
+			Log.e("Main", "Failed to login or server issue: ", e);
+
 		}
 	}
 }

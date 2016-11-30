@@ -16,12 +16,12 @@
 package com.pokegoapi.examples;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
-import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
+import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.auth.PtcCredentialProvider;
-import com.pokegoapi.main.AsyncReturn;
-import com.pokegoapi.main.BlockingCallback;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
 import okhttp3.OkHttpClient;
 
@@ -37,10 +37,8 @@ public class TransferOnePidgeyExample {
 		PokemonGo go = new PokemonGo(http);
 		try {
 			// check readme for other example
-			BlockingCallback callback = new BlockingCallback();
 			go.login(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN,
-					ExampleLoginDetails.PASSWORD), callback);
-			callback.block();
+					ExampleLoginDetails.PASSWORD));
 
 			List<Pokemon> pidgeys =
 					go.getInventories().getPokebank().getPokemonByPokemonId(PokemonIdOuterClass.PokemonId.PIDGEY);
@@ -49,16 +47,14 @@ public class TransferOnePidgeyExample {
 				Pokemon pest = pidgeys.get(0);
 				// print the pokemon data
 				pest.debug();
-				pest.transferPokemon(new AsyncReturn<ReleasePokemonResponse.Result>() {
-					@Override
-					public void onReceive(ReleasePokemonResponse.Result result, Exception exception) {
-						Log.i("Main", "Transferred Pidgey result:" + result);
-					}
-				});
+				ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result result = pest.transferPokemon();
+
+				Log.i("Main", "Transfered Pidgey result:" + result);
 			} else {
 				Log.i("Main", "You have no pidgeys :O");
 			}
-		} catch (Exception e) {
+		} catch (LoginFailedException | RemoteServerException e) {
+			// failed to login, invalid credentials, auth issue or server issue.
 			Log.e("Main", "Failed to login. Invalid credentials or server issue: ", e);
 		}
 	}

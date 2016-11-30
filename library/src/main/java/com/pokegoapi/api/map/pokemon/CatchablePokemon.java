@@ -275,7 +275,7 @@ public class CatchablePokemon implements MapPoint {
 		return catchPokemon(options.getNormalizedHitPosition(),
 				options.getNormalizedReticleSize(),
 				options.getSpinModifier(),
-				options.selectPokeball(getUseablePokeballs()),
+				options.getItemBall(),
 				options.getMaxPokeballs(),
 				options.getRazzberries());
 	}
@@ -297,6 +297,7 @@ public class CatchablePokemon implements MapPoint {
 			NoSuchItemException, EncounterFailedException {
 
 		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
+		double probability = encounter.getCaptureProbability().getCaptureProbability(0);
 
 		if (options == null) {
 			options = new CatchOptions(api);
@@ -305,7 +306,7 @@ public class CatchablePokemon implements MapPoint {
 		return catchPokemon(options.getNormalizedHitPosition(),
 				options.getNormalizedReticleSize(),
 				options.getSpinModifier(),
-				options.selectPokeball(getUseablePokeballs()),
+				options.getItemBall(probability),
 				options.getMaxPokeballs(),
 				options.getRazzberries());
 	}
@@ -359,7 +360,7 @@ public class CatchablePokemon implements MapPoint {
 		if (options != null) {
 			if (options.getUseRazzBerry() != 0) {
 				final AsyncCatchOptions asyncOptions = options;
-				final Pokeball asyncPokeball = asyncOptions.selectPokeball(getUseablePokeballs());
+				final Pokeball asyncPokeball = asyncOptions.getItemBall();
 				return useItemAsync(ItemId.ITEM_RAZZ_BERRY).flatMap(
 						new Func1<CatchItemResult, Observable<CatchResult>>() {
 							@Override
@@ -380,7 +381,7 @@ public class CatchablePokemon implements MapPoint {
 		return catchPokemonAsync(options.getNormalizedHitPosition(),
 				options.getNormalizedReticleSize(),
 				options.getSpinModifier(),
-				options.selectPokeball(getUseablePokeballs()));
+				options.getItemBall());
 	}
 
 	/**

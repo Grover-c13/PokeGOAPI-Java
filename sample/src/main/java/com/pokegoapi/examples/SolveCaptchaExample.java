@@ -33,9 +33,6 @@ package com.pokegoapi.examples;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.listener.LoginListener;
 import com.pokegoapi.auth.PtcCredentialProvider;
-import com.pokegoapi.main.AsyncReturn;
-import com.pokegoapi.main.BlockingCallback;
-import com.pokegoapi.main.SyncedReturn;
 import com.pokegoapi.util.CaptchaSolveHelper;
 import com.pokegoapi.util.Log;
 import javafx.embed.swing.JFXPanel;
@@ -56,6 +53,9 @@ public class SolveCaptchaExample {
 		OkHttpClient http = new OkHttpClient();
 		PokemonGo api = new PokemonGo(http);
 		try {
+			api.login(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD));
+			api.setLocation(-32.058087, 115.744325, 0);
+
 			//Add listener to listen for the captcha URL
 			api.addListener(new LoginListener() {
 				@Override
@@ -70,12 +70,6 @@ public class SolveCaptchaExample {
 				}
 			});
 
-			BlockingCallback callback = new BlockingCallback();
-			api.login(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD),
-					callback);
-			//Block thread until login is complete
-			callback.block();
-			api.setLocation(-32.058087, 115.744325, 0);
 		} catch (Exception e) {
 			Log.e("Main", "Failed to run captcha example! ", e);
 		}
@@ -100,22 +94,17 @@ public class SolveCaptchaExample {
 				try {
 					//Close this window, it not valid anymore.
 					frame.setVisible(false);
-					SyncedReturn<Boolean> verified = new SyncedReturn<>();
-					api.verifyChallenge(token, verified);
-					if (verified.get()) {
+					if (api.verifyChallenge(token)) {
 						System.out.println("Captcha was correctly solved!");
 					} else {
 						System.out.println("Captcha was incorrectly solved! Please try again.");
 
 						/*
-							Ask for a new challenge url.
+							Ask for a new challenge url, don't need to check the result,
+							because the LoginListener will be called when this completed.
 						*/
-						api.checkChallenge(new AsyncReturn<String>() {
-							@Override
-							public void onReceive(String url, Exception exception) {
-								System.out.println("New challenge URL received!");
-							}
-						});
+
+						api.checkChallenge();
 					}
 				} catch (Exception e) {
 					Log.e("Main", "Error while solving captcha!", e);

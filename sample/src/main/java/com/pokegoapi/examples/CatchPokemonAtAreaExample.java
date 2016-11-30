@@ -31,22 +31,16 @@
 package com.pokegoapi.examples;
 
 
-import POGOProtos.Enums.PokemonIdOuterClass;
-import POGOProtos.Inventory.Item.ItemIdOuterClass;
-import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.ItemBag;
-import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.map.pokemon.CatchResult;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
 import com.pokegoapi.api.settings.CatchOptions;
 import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.AsyncReturn;
-import com.pokegoapi.main.PokemonCallback;
-import com.pokegoapi.main.SyncedReturn;
 import com.pokegoapi.util.Log;
 import okhttp3.OkHttpClient;
 
@@ -56,92 +50,43 @@ public class CatchPokemonAtAreaExample {
 
 	/**
 	 * Catches a pokemon at an area.
-	 *
-	 * @param args args
+     * @param args args
 	 */
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
-		final PokemonGo api = new PokemonGo(http);
+		RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth = null;
+		PokemonGo go = new PokemonGo(http);
 		try {
-			PtcCredentialProvider provider
-					= new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
-			api.login(provider, new PokemonCallback() {
-				@Override
-				public void onCompleted(Exception exception) {
-					if (exception != null) {
-						Log.e("Main", "Failed to login or server issue: ", exception);
-					}
-					onLogin(api);
+			go.login(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN,
+					ExampleLoginDetails.PASSWORD));
+			//or google
+			//new PokemonGo(GoogleCredentialProvider(http,listner));
+			//Subsiquently
+			//new PokemonGo(GoogleCredentialProvider(http,refreshtoken));
+			// set location
+			go.setLocation(-32.058087, 115.744325, 0);
+
+			List<CatchablePokemon> catchablePokemon = go.getMap().getCatchablePokemon();
+			System.out.println("Pokemon in area:" + catchablePokemon.size());
+
+			for (CatchablePokemon cp : catchablePokemon) {
+				// You need to Encounter first.
+				EncounterResult encResult = cp.encounterPokemon();
+				// if encounter was succesful, catch
+				if (encResult.wasSuccessful()) {
+					System.out.println("Encounted:" + cp.getPokemonId());
+					CatchOptions options = new CatchOptions(go);
+					options.useRazzberry(true);
+					CatchResult result = cp.catchPokemon(options);
+					System.out.println("Attempt to catch:" + cp.getPokemonId() + " " + result.getStatus());
 				}
-			});
 
-		} catch (LoginFailedException | RemoteServerException e) {
-			Log.e("Main", "Failed to login to PTC", e);
-		}
-	}
-
-	public static void onLogin(final PokemonGo api) {
-		api.setLocation(-32.058087, 115.744325, 0);
-
-		api.getMap().getCatchablePokemon(new AsyncReturn<List<CatchablePokemon>>() {
-			@Override
-			public void onReceive(final List<CatchablePokemon> catchablePokemon, Exception exception) {
-				//Queue task to run on task thread so it doesn't block the request thread
-				api.queueTask(new Runnable() {
-					@Override
-					public void run() {
-						System.out.println("Pokemon in area: " + catchablePokemon.size());
-
-						for (final CatchablePokemon catchable : catchablePokemon) {
-							SyncedReturn<EncounterResult> syncedEncounter = new SyncedReturn<>();
-							catchable.encounterPokemon(syncedEncounter);
-							try {
-								//Block until encounter
-								EncounterResult result = syncedEncounter.get();
-								//Can only catch if the encounter was successful
-								if (result.wasSuccessful()) {
-									catchPokemon(catchable, api);
-								}
-							} catch (Exception encounterException) {
-								Log.e("Main", "Exception while encountering Pokemon!", encounterException);
-							}
-						}
-						System.exit(0);
-					}
-				});
 			}
-		});
-	}
 
-	private static void catchPokemon(CatchablePokemon catchable, PokemonGo api) {
-		System.out.println("Encountered " + catchable.getPokemonId() + " at "
-				+ catchable.getLatitude() + ", " + catchable.getLongitude());
-		ItemBag bag = api.getInventories().getItemBag();
-		boolean hasRazzberry = bag.getItem(ItemIdOuterClass.ItemId.ITEM_RAZZ_BERRY).getCount() > 0;
-		CatchOptions options = new CatchOptions(api)
-				.withPokeballSelector(new CatchOptions.PokeballSelector() {
-					@Override
-					public Pokeball select(List<Pokeball> pokeballs, double probability) {
-						//Use the lowest tier useable pokeball
-						return pokeballs.get(0);
-					}
-				})
-				.useRazzberry(hasRazzberry);
-		//Attempts to capture this pokemon. -1 to give no limit for pokeball and razzberry throws
-		SyncedReturn<CatchResult> syncedCapture = new SyncedReturn<>();
-		catchable.capture(options, syncedCapture, -1, -1);
-		try {
-			CatchResult catchResult = syncedCapture.get();
-			CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus status = catchResult.getStatus();
-			if (catchResult.isFailed()) {
-				Log.i("Main", "Pokemon capture failed with status: " + status);
-			} else {
-				PokemonIdOuterClass.PokemonId pokemon = catchable.getPokemonId();
-				Log.i("Main", "Catch of " + pokemon + " was successful!");
-			}
-			Thread.sleep(5000);
-		} catch (Exception e) {
-			Log.e("Main", "Exception while capturing Pokemon!", e);
+		} catch (LoginFailedException | NoSuchItemException | RemoteServerException e) {
+			// failed to login, invalid credentials, auth issue or server issue.
+			Log.e("Main", "Failed to login or server issue: ", e);
+
 		}
 	}
 }

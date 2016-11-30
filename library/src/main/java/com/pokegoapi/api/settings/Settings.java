@@ -1,15 +1,15 @@
 package com.pokegoapi.api.settings;
 
-import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.PokemonCallback;
-import com.pokegoapi.main.PokemonRequest;
-import com.pokegoapi.main.PokemonResponse;
-import com.pokegoapi.main.RequestCallback;
+import com.pokegoapi.main.ServerRequest;
+
+import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
+import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import lombok.Getter;
 
 /**
@@ -81,33 +81,28 @@ public class Settings {
 		this.fortSettings = new FortSettings();
 		this.inventorySettings = new InventorySettings();
 		this.gpsSettings = new GpsSettings();
-		this.hash = "";
+		this.hash = new String();
 	}
 
 	/**
 	 * Updates settings latest data.
 	 *
-	 * @param callback callback for when the settings have completed updating
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
 	 */
-	public void updateSettings(final PokemonCallback callback) {
-		DownloadSettingsMessageOuterClass.DownloadSettingsMessage message =
+	public void updateSettings() throws RemoteServerException, LoginFailedException {
+		DownloadSettingsMessageOuterClass.DownloadSettingsMessage msg =
 				DownloadSettingsMessageOuterClass.DownloadSettingsMessage.newBuilder().build();
-		PokemonRequest request = new PokemonRequest(RequestTypeOuterClass.RequestType.DOWNLOAD_SETTINGS, message)
-				.withCallback(new RequestCallback() {
-					@Override
-					public void handleResponse(PokemonResponse response) throws InvalidProtocolBufferException {
-						Exception exception = null;
-						DownloadSettingsResponse downloadResponse;
-						try {
-							downloadResponse = DownloadSettingsResponse.parseFrom(response.getResponseData());
-							updateSettings(downloadResponse);
-						} catch (InvalidProtocolBufferException e) {
-							exception = new RemoteServerException(e);
-						}
-						callback.onCompleted(exception);
-					}
-				});
-		api.getRequestHandler().sendRequest(request);
+		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.DOWNLOAD_SETTINGS, msg);
+		api.getRequestHandler().sendServerRequests(serverRequest); //here you marked everything as read
+		DownloadSettingsResponseOuterClass.DownloadSettingsResponse response;
+		try {
+			response = DownloadSettingsResponseOuterClass.DownloadSettingsResponse.parseFrom(serverRequest.getData());
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
+
+		updateSettings(response);
 	}
 
 	/**

@@ -29,12 +29,9 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.api.pokemon.Pokemon;
+import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.PokemonCallback;
-import com.pokegoapi.main.PokemonRequest;
-import com.pokegoapi.main.PokemonResponse;
-import com.pokegoapi.main.RequestCallback;
-import com.pokegoapi.main.Utils;
+import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -76,19 +73,21 @@ public class Inventories {
 	/**
 	 * Updates the inventories with latest data.
 	 *
-	 * @param callback for when this update completes
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
 	 */
-	public void updateInventories(PokemonCallback callback) {
-		updateInventories(false, callback);
+	public void updateInventories() throws LoginFailedException, RemoteServerException {
+		updateInventories(false);
 	}
 
 	/**
 	 * Updates the inventories with the latest data.
 	 *
 	 * @param forceUpdate For a full update if true
-	 * @param callback for when this update completes
+	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException the remote server exception
 	 */
-	public void updateInventories(boolean forceUpdate, final PokemonCallback callback) {
+	public void updateInventories(boolean forceUpdate) throws LoginFailedException, RemoteServerException {
 		if (forceUpdate) {
 			lastInventoryUpdate = 0;
 			itemBag.reset();
@@ -98,24 +97,20 @@ public class Inventories {
 			incubators.clear();
 			hatchery.reset();
 		}
-		GetInventoryMessage message = GetInventoryMessage.newBuilder()
+		GetInventoryMessage invReqMsg = GetInventoryMessage.newBuilder()
 				.setLastTimestampMs(lastInventoryUpdate)
 				.build();
-		PokemonRequest request = new PokemonRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY, message);
-		api.getRequestHandler().sendRequest(request, new RequestCallback() {
-			@Override
-			public void handleResponse(PokemonResponse response) throws InvalidProtocolBufferException {
-				if (Utils.callbackException(response, callback)) {
-					return;
-				}
-				try {
-					GetInventoryResponse messageResponse = GetInventoryResponse.parseFrom(response.getResponseData());
-					updateInventories(messageResponse);
-				} catch (InvalidProtocolBufferException e) {
-					callback.onCompleted(new RemoteServerException(e));
-				}
-			}
-		});
+		ServerRequest inventoryRequest = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY, invReqMsg);
+		api.getRequestHandler().sendServerRequests(inventoryRequest);
+
+		GetInventoryResponse response;
+		try {
+			response = GetInventoryResponse.parseFrom(inventoryRequest.getData());
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
+
+		updateInventories(response);
 	}
 
 	/**
