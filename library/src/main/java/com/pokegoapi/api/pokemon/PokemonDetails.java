@@ -288,6 +288,8 @@ public class PokemonDetails {
 			highestUpgradedFamily = getPokemonId();
 		} else if (getPokemonId() == EEVEE) {
 			highestUpgradedFamily = FLAREON;
+		} else if(asList(VAPOREON, JOLTEON, FLAREON).contains(getPokemonId())){
+			highestUpgradedFamily = getPokemonId();
 		} else {
 			highestUpgradedFamily = PokemonMetaRegistry.getHighestForFamily(getPokemonFamily());
 		}
