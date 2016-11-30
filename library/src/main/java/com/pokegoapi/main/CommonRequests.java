@@ -197,6 +197,13 @@ public class CommonRequests {
 		return requests;
 	}
 
+	/**
+	 * Parses the given common request
+	 * @param api the current api
+	 * @param type the request type
+	 * @param data the response data
+	 * @throws InvalidProtocolBufferException if the server returns an invalid response
+	 */
 	public static void parse(PokemonGo api, RequestType type, ByteString data) throws InvalidProtocolBufferException {
 		CommonRequest commonRequest = COMMON_REQUESTS.get(type);
 		if (commonRequest != null) {

@@ -21,6 +21,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 
 public interface CommonRequest {
-    ServerRequest create(PokemonGo api, RequestType requestType);
-    void parse(PokemonGo api, ByteString data, RequestType requestType) throws InvalidProtocolBufferException;
+	ServerRequest create(PokemonGo api, RequestType requestType);
+
+	void parse(PokemonGo api, ByteString data, RequestType requestType) throws InvalidProtocolBufferException;
 }
