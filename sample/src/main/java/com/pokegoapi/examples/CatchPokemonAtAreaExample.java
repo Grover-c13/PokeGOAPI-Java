@@ -31,12 +31,13 @@
 package com.pokegoapi.examples;
 
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.map.pokemon.CatchResult;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
 import com.pokegoapi.api.settings.CatchOptions;
+import com.pokegoapi.api.settings.PokeballSelector;
 import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
@@ -50,11 +51,11 @@ public class CatchPokemonAtAreaExample {
 
 	/**
 	 * Catches a pokemon at an area.
-     * @param args args
+	 *
+	 * @param args args
 	 */
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
-		RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth = null;
 		PokemonGo go = new PokemonGo(http);
 		try {
 			go.login(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN,
@@ -67,18 +68,24 @@ public class CatchPokemonAtAreaExample {
 			go.setLocation(-32.058087, 115.744325, 0);
 
 			List<CatchablePokemon> catchablePokemon = go.getMap().getCatchablePokemon();
-			System.out.println("Pokemon in area:" + catchablePokemon.size());
+			System.out.println("Pokemon in area: " + catchablePokemon.size());
 
 			for (CatchablePokemon cp : catchablePokemon) {
 				// You need to Encounter first.
 				EncounterResult encResult = cp.encounterPokemon();
 				// if encounter was succesful, catch
 				if (encResult.wasSuccessful()) {
-					System.out.println("Encounted:" + cp.getPokemonId());
-					CatchOptions options = new CatchOptions(go);
-					options.useRazzberry(true);
+					System.out.println("Encountered: " + cp.getPokemonId());
+					CatchOptions options = new CatchOptions(go)
+							.useRazzberry(true)
+							.withPokeballSelector(PokeballSelector.SMART);
+					List<Pokeball> useablePokeballs = go.getInventories().getItemBag().getUseablePokeballs();
+					double probability = cp.getCaptureProbability();
+					Pokeball pokeball = PokeballSelector.SMART.select(useablePokeballs, probability);
+					System.out.println("Attempting to catch: " + cp.getPokemonId() + " with " + pokeball
+							+ " (" + probability + ")");
 					CatchResult result = cp.catchPokemon(options);
-					System.out.println("Attempt to catch:" + cp.getPokemonId() + " " + result.getStatus());
+					System.out.println("Result:" + result.getStatus());
 				}
 
 			}

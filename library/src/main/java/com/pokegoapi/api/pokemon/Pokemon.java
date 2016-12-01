@@ -197,7 +197,7 @@ public class Pokemon extends PokemonDetails {
 	 * @return the boolean
 	 */
 	public boolean canEvolve() {
-		return !Evolutions.canEvolve(getPokemonId()) && (getCandy() >= getCandiesToEvolve());
+		return Evolutions.canEvolve(getPokemonId()) && (getCandy() >= getCandiesToEvolve());
 	}
 
 	/**
