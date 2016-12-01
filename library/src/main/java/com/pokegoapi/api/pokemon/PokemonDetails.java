@@ -11,11 +11,7 @@ import com.pokegoapi.util.Log;
 import lombok.Getter;
 import lombok.Setter;
 
-import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.EEVEE;
-import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.FLAREON;
-import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.JOLTEON;
-import static POGOProtos.Enums.PokemonIdOuterClass.PokemonId.VAPOREON;
-import static java.util.Arrays.asList;
+import java.util.List;
 
 public class PokemonDetails {
 	private static final String TAG = Pokemon.class.getSimpleName();
@@ -283,14 +279,8 @@ public class PokemonDetails {
 	 * @return Max cp of this pokemon
 	 */
 	private int getMaxCpFullEvolveAndPowerup(int playerLevel) {
-		PokemonIdOuterClass.PokemonId highestUpgradedFamily;
-		if (asList(VAPOREON, JOLTEON, FLAREON).contains(getPokemonId())) {
-			highestUpgradedFamily = getPokemonId();
-		} else if (getPokemonId() == EEVEE) {
-			highestUpgradedFamily = FLAREON;
-		} else {
-			highestUpgradedFamily = PokemonMetaRegistry.getHighestForFamily(getPokemonFamily());
-		}
+		List<PokemonIdOuterClass.PokemonId> highest = Evolutions.getHighest(getPokemonId());
+		PokemonIdOuterClass.PokemonId highestUpgradedFamily = highest.get(0);
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
 		int attack = getIndividualAttack() + pokemonMeta.getBaseAttack();
 		int defense = getIndividualDefense() + pokemonMeta.getBaseDefense();
@@ -304,11 +294,9 @@ public class PokemonDetails {
 	 * @return New CP after evolve
 	 */
 	public int getCpAfterEvolve() {
-		if (asList(VAPOREON, JOLTEON, FLAREON).contains(getPokemonId())) {
-			return getCp();
-		}
-		PokemonIdOuterClass.PokemonId highestUpgradedFamily = PokemonMetaRegistry.getHighestForFamily(getPokemonFamily());
-		if (getPokemonId() == highestUpgradedFamily) {
+		List<PokemonIdOuterClass.PokemonId> highest = Evolutions.getHighest(getPokemonId());
+		PokemonIdOuterClass.PokemonId highestUpgradedFamily = highest.get(0);
+		if (highest.contains(getPokemonId())) {
 			return getCp();
 		}
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
@@ -332,32 +320,10 @@ public class PokemonDetails {
 	 * @return New CP after evolve
 	 */
 	public int getCpAfterFullEvolve() {
-		PokemonIdOuterClass.PokemonId highestUpgradedFamily = PokemonMetaRegistry.getHighestForFamily(getPokemonFamily());
+		List<PokemonIdOuterClass.PokemonId> highest = Evolutions.getHighest(getPokemonId());
+		PokemonIdOuterClass.PokemonId highestUpgradedFamily = highest.get(0);
 
-		if (getPokemonFamily() == PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_EEVEE) {
-			if (getPokemonId() == PokemonIdOuterClass.PokemonId.EEVEE) {
-				final PokemonIdOuterClass.PokemonId[] eeveelutions = new PokemonIdOuterClass.PokemonId[]{
-					PokemonIdOuterClass.PokemonId.VAPOREON,
-					PokemonIdOuterClass.PokemonId.FLAREON,
-					PokemonIdOuterClass.PokemonId.JOLTEON
-				};
-				int highestCp = 0;
-
-				for (PokemonIdOuterClass.PokemonId pokemonId : eeveelutions) {
-					final PokemonMeta meta = PokemonMetaRegistry.getMeta(pokemonId);
-					final int cp = PokemonCpUtils.getMaxCp(meta.getBaseAttack(), meta.getBaseDefense(), meta.getBaseStamina());
-					if (cp > highestCp) {
-						highestCp = cp;
-					}
-				}
-			} else {
-				// This is one of the eeveelutions, so PokemonMetaRegistry.getHightestForFamily() returns Eevee.
-				// We correct that here
-				highestUpgradedFamily = getPokemonId();
-			}
-		}
-
-		if (getPokemonId() == highestUpgradedFamily) {
+		if (highest.contains(getPokemonId())) {
 			return getCp();
 		}
 

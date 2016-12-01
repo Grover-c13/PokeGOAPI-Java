@@ -48,5 +48,16 @@ public class CheckEvolutionExample {
 				}
 			}
 		}
+		System.out.println();
+		System.out.println("Highest: ");
+		for (PokemonId pokemon : PokemonId.values()) {
+			List<PokemonId> highest = Evolutions.getHighest(pokemon);
+			if (highest.size() > 0) {
+				//Check this is not the highest pokemon
+				if (!(highest.size() == 1 && highest.contains(pokemon))) {
+					System.out.println(pokemon + " -> " + highest);
+				}
+			}
+		}
 	}
 }

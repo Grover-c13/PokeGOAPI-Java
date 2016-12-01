@@ -172,6 +172,30 @@ public class Evolutions {
 	}
 
 	/**
+	 * Gets the highest evolution pokemon in the given evolution chain.
+	 *
+	 * @param pokemon the pokemon to find the highest evolution for
+	 * @return the highest evolution for the given pokemon
+	 */
+	public static List<PokemonId> getHighest(PokemonId pokemon) {
+		List<PokemonId> highest = new ArrayList<>();
+		Evolution evolution = getEvolution(pokemon);
+		if (evolution != null) {
+			if (evolution.getEvolutions() != null) {
+				for (PokemonId child : evolution.getEvolutions()) {
+					highest.addAll(getHighest(child));
+				}
+			} else {
+				highest.add(pokemon);
+			}
+			return highest;
+		} else {
+			highest.add(pokemon);
+			return highest;
+		}
+	}
+
+	/**
 	 * Returns if this pokemon can be evolved any more than it already is
 	 *
 	 * @param pokemon the pokemon

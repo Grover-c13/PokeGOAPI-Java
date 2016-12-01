@@ -23,93 +23,10 @@ import lombok.Getter;
 import java.util.EnumMap;
 
 public class PokemonMetaRegistry {
-
-	@Getter
-	private static EnumMap<PokemonFamilyId, PokemonId> highestForFamily = new EnumMap<>(PokemonFamilyId.class);
 	@Getter
 	private static EnumMap<PokemonId, PokemonMeta> meta = new EnumMap<>(PokemonId.class);
 
 	static {
-		highestForFamily.put(PokemonFamilyId.FAMILY_BULBASAUR, PokemonId.VENUSAUR);
-		highestForFamily.put(PokemonFamilyId.FAMILY_CHARMANDER, PokemonId.CHARIZARD);
-		highestForFamily.put(PokemonFamilyId.FAMILY_SQUIRTLE, PokemonId.BLASTOISE);
-		highestForFamily.put(PokemonFamilyId.FAMILY_CATERPIE, PokemonId.BUTTERFREE);
-		highestForFamily.put(PokemonFamilyId.FAMILY_WEEDLE, PokemonId.BEEDRILL);
-		highestForFamily.put(PokemonFamilyId.FAMILY_PIDGEY, PokemonId.PIDGEOT);
-		highestForFamily.put(PokemonFamilyId.FAMILY_RATTATA, PokemonId.RATICATE);
-		highestForFamily.put(PokemonFamilyId.FAMILY_SPEAROW, PokemonId.FEAROW);
-		highestForFamily.put(PokemonFamilyId.FAMILY_EKANS, PokemonId.ARBOK);
-		highestForFamily.put(PokemonFamilyId.FAMILY_PIKACHU, PokemonId.RAICHU);
-		highestForFamily.put(PokemonFamilyId.FAMILY_SANDSHREW, PokemonId.SANDSLASH);
-		highestForFamily.put(PokemonFamilyId.FAMILY_NIDORAN_FEMALE, PokemonId.NIDOQUEEN);
-		highestForFamily.put(PokemonFamilyId.FAMILY_NIDORAN_MALE, PokemonId.NIDOKING);
-		highestForFamily.put(PokemonFamilyId.FAMILY_CLEFAIRY, PokemonId.CLEFABLE);
-		highestForFamily.put(PokemonFamilyId.FAMILY_VULPIX, PokemonId.NINETALES);
-		highestForFamily.put(PokemonFamilyId.FAMILY_JIGGLYPUFF, PokemonId.WIGGLYTUFF);
-		highestForFamily.put(PokemonFamilyId.FAMILY_ZUBAT, PokemonId.GOLBAT);
-		highestForFamily.put(PokemonFamilyId.FAMILY_ODDISH, PokemonId.VILEPLUME);
-		highestForFamily.put(PokemonFamilyId.FAMILY_PARAS, PokemonId.PARASECT);
-		highestForFamily.put(PokemonFamilyId.FAMILY_VENONAT, PokemonId.VENOMOTH);
-		highestForFamily.put(PokemonFamilyId.FAMILY_DIGLETT, PokemonId.DUGTRIO);
-		highestForFamily.put(PokemonFamilyId.FAMILY_MEOWTH, PokemonId.PERSIAN);
-		highestForFamily.put(PokemonFamilyId.FAMILY_PSYDUCK, PokemonId.GOLDUCK);
-		highestForFamily.put(PokemonFamilyId.FAMILY_MANKEY, PokemonId.PRIMEAPE);
-		highestForFamily.put(PokemonFamilyId.FAMILY_GROWLITHE, PokemonId.ARCANINE);
-		highestForFamily.put(PokemonFamilyId.FAMILY_POLIWAG, PokemonId.POLIWRATH);
-		highestForFamily.put(PokemonFamilyId.FAMILY_ABRA, PokemonId.ALAKAZAM);
-		highestForFamily.put(PokemonFamilyId.FAMILY_MACHOP, PokemonId.MACHAMP);
-		highestForFamily.put(PokemonFamilyId.FAMILY_BELLSPROUT, PokemonId.VICTREEBEL);
-		highestForFamily.put(PokemonFamilyId.FAMILY_TENTACOOL, PokemonId.TENTACRUEL);
-		highestForFamily.put(PokemonFamilyId.FAMILY_GEODUDE, PokemonId.GOLEM);
-		highestForFamily.put(PokemonFamilyId.FAMILY_PONYTA, PokemonId.RAPIDASH);
-		highestForFamily.put(PokemonFamilyId.FAMILY_SLOWPOKE, PokemonId.SLOWBRO);
-		highestForFamily.put(PokemonFamilyId.FAMILY_MAGNEMITE, PokemonId.MAGNETON);
-		highestForFamily.put(PokemonFamilyId.FAMILY_FARFETCHD, PokemonId.FARFETCHD);
-		highestForFamily.put(PokemonFamilyId.FAMILY_DODUO, PokemonId.DODRIO);
-		highestForFamily.put(PokemonFamilyId.FAMILY_SEEL, PokemonId.DEWGONG);
-		highestForFamily.put(PokemonFamilyId.FAMILY_GRIMER, PokemonId.MUK);
-		highestForFamily.put(PokemonFamilyId.FAMILY_SHELLDER, PokemonId.CLOYSTER);
-		highestForFamily.put(PokemonFamilyId.FAMILY_GASTLY, PokemonId.GENGAR);
-		highestForFamily.put(PokemonFamilyId.FAMILY_ONIX, PokemonId.ONIX);
-		highestForFamily.put(PokemonFamilyId.FAMILY_DROWZEE, PokemonId.HYPNO);
-		highestForFamily.put(PokemonFamilyId.FAMILY_KRABBY, PokemonId.KINGLER);
-		highestForFamily.put(PokemonFamilyId.FAMILY_VOLTORB, PokemonId.ELECTRODE);
-		highestForFamily.put(PokemonFamilyId.FAMILY_EXEGGCUTE, PokemonId.EXEGGUTOR);
-		highestForFamily.put(PokemonFamilyId.FAMILY_CUBONE, PokemonId.MAROWAK);
-		highestForFamily.put(PokemonFamilyId.FAMILY_HITMONLEE, PokemonId.HITMONLEE);
-		highestForFamily.put(PokemonFamilyId.FAMILY_HITMONCHAN, PokemonId.HITMONCHAN);
-		highestForFamily.put(PokemonFamilyId.FAMILY_LICKITUNG, PokemonId.LICKITUNG);
-		highestForFamily.put(PokemonFamilyId.FAMILY_KOFFING, PokemonId.WEEZING);
-		highestForFamily.put(PokemonFamilyId.FAMILY_RHYHORN, PokemonId.RHYDON);
-		highestForFamily.put(PokemonFamilyId.FAMILY_CHANSEY, PokemonId.CHANSEY);
-		highestForFamily.put(PokemonFamilyId.FAMILY_TANGELA, PokemonId.TANGELA);
-		highestForFamily.put(PokemonFamilyId.FAMILY_KANGASKHAN, PokemonId.KANGASKHAN);
-		highestForFamily.put(PokemonFamilyId.FAMILY_HORSEA, PokemonId.SEADRA);
-		highestForFamily.put(PokemonFamilyId.FAMILY_GOLDEEN, PokemonId.SEAKING);
-		highestForFamily.put(PokemonFamilyId.FAMILY_STARYU, PokemonId.STARMIE);
-		highestForFamily.put(PokemonFamilyId.FAMILY_MR_MIME, PokemonId.MR_MIME);
-		highestForFamily.put(PokemonFamilyId.FAMILY_SCYTHER, PokemonId.SCYTHER);
-		highestForFamily.put(PokemonFamilyId.FAMILY_JYNX, PokemonId.JYNX);
-		highestForFamily.put(PokemonFamilyId.FAMILY_ELECTABUZZ, PokemonId.ELECTABUZZ);
-		highestForFamily.put(PokemonFamilyId.FAMILY_MAGMAR, PokemonId.MAGMAR);
-		highestForFamily.put(PokemonFamilyId.FAMILY_PINSIR, PokemonId.PINSIR);
-		highestForFamily.put(PokemonFamilyId.FAMILY_TAUROS, PokemonId.TAUROS);
-		highestForFamily.put(PokemonFamilyId.FAMILY_MAGIKARP, PokemonId.GYARADOS);
-		highestForFamily.put(PokemonFamilyId.FAMILY_LAPRAS, PokemonId.LAPRAS);
-		highestForFamily.put(PokemonFamilyId.FAMILY_DITTO, PokemonId.DITTO);
-		highestForFamily.put(PokemonFamilyId.FAMILY_EEVEE, PokemonId.EEVEE);
-		highestForFamily.put(PokemonFamilyId.FAMILY_PORYGON, PokemonId.PORYGON);
-		highestForFamily.put(PokemonFamilyId.FAMILY_OMANYTE, PokemonId.OMASTAR);
-		highestForFamily.put(PokemonFamilyId.FAMILY_KABUTO, PokemonId.KABUTOPS);
-		highestForFamily.put(PokemonFamilyId.FAMILY_AERODACTYL, PokemonId.AERODACTYL);
-		highestForFamily.put(PokemonFamilyId.FAMILY_SNORLAX, PokemonId.SNORLAX);
-		highestForFamily.put(PokemonFamilyId.FAMILY_ARTICUNO, PokemonId.ARTICUNO);
-		highestForFamily.put(PokemonFamilyId.FAMILY_ZAPDOS, PokemonId.ZAPDOS);
-		highestForFamily.put(PokemonFamilyId.FAMILY_MOLTRES, PokemonId.MOLTRES);
-		highestForFamily.put(PokemonFamilyId.FAMILY_DRATINI, PokemonId.DRAGONITE);
-		highestForFamily.put(PokemonFamilyId.FAMILY_MEWTWO, PokemonId.MEWTWO);
-		highestForFamily.put(PokemonFamilyId.FAMILY_MEW, PokemonId.MEW);
-
 		PokemonMeta metap;
 		metap = new PokemonMeta();
 		metap.setTemplateId(" V0001_POKEMON_BULBASAUR");
@@ -6611,16 +6528,4 @@ public class PokemonMetaRegistry {
 	public static PokemonMeta getMeta(PokemonId id) {
 		return meta.get(id);
 	}
-
-	/**
-	 * Return the highest evolution for given family ID.
-	 * !!! CARE TO EVEE THAT DOESNT HAVE BETTER EVOLUTION !!!
-	 *
-	 * @param family the id of the pokemon family
-	 * @return PokemonId
-	 */
-	public static PokemonId getHighestForFamily(PokemonFamilyId family) {
-		return highestForFamily.get(family);
-	}
-
 }
