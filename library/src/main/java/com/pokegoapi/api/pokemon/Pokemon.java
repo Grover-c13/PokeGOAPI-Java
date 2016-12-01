@@ -197,7 +197,7 @@ public class Pokemon extends PokemonDetails {
 	 * @return the boolean
 	 */
 	public boolean canEvolve() {
-		return !EvolutionInfo.isFullyEvolved(getPokemonId()) && (getCandy() >= getCandiesToEvolve());
+		return !Evolutions.canEvolve(getPokemonId()) && (getCandy() >= getCandiesToEvolve());
 	}
 
 	/**
@@ -412,8 +412,8 @@ public class Pokemon extends PokemonDetails {
 		}
 	}
 
-	public EvolutionForm getEvolutionForm() {
-		return new EvolutionForm(getPokemonId());
+	public Evolution getEvolution() {
+		return Evolutions.getEvolution(this.getPokemonId());
 	}
 
 	/**
