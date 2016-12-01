@@ -20,5 +20,39 @@ import com.pokegoapi.api.inventory.Pokeball;
 import java.util.List;
 
 public interface PokeballSelector {
-	Pokeball select(List<Pokeball> pokeballs);
+	/**
+	 * Selects the lowest possible pokeball
+	 */
+	PokeballSelector LOWEST = new PokeballSelector() {
+		@Override
+		public Pokeball select(List<Pokeball> pokeballs, double captureProbability) {
+			return pokeballs.get(0);
+		}
+	};
+	/**
+	 * Selects the highest possible pokeball
+	 */
+	PokeballSelector HIGHEST = new PokeballSelector() {
+		@Override
+		public Pokeball select(List<Pokeball> pokeballs, double captureProbability) {
+			return pokeballs.get(pokeballs.size() - 1);
+		}
+	};
+	/**
+	 * Selects a pokeball to use based on the capture probability of the current pokemon
+	 */
+	PokeballSelector SMART = new PokeballSelector() {
+		@Override
+		public Pokeball select(List<Pokeball> pokeballs, double captureProbability) {
+			Pokeball desired = pokeballs.get(0);
+			for (Pokeball pokeball : pokeballs) {
+				if (captureProbability <= pokeball.getCaptureProbability()) {
+					desired = pokeball;
+				}
+			}
+			return desired;
+		}
+	};
+
+	Pokeball select(List<Pokeball> pokeballs, double captureProbability);
 }

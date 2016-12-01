@@ -32,8 +32,10 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -225,5 +227,18 @@ public class ItemBag {
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
+	}
+
+	/**
+	 * @return a list of useable pokeballs that are in the inventory
+	 */
+	public List<Pokeball> getUseablePokeballs() {
+		List<Pokeball> pokeballs = new ArrayList<>();
+		for (Pokeball pokeball : Pokeball.values()) {
+			if (getItem(pokeball.getBallType()).getCount() > 0) {
+				pokeballs.add(pokeball);
+			}
+		}
+		return pokeballs;
 	}
 }

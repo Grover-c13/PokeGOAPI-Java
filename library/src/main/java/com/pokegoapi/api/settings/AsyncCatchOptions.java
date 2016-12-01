@@ -126,18 +126,19 @@ public class AsyncCatchOptions {
 	}
 
 	/**
-	 * Selects a pokeball to use based on
+	 * Selects a pokeball to use
 	 *
 	 * @param pokeballs the pokeballs contained in your inventory
+	 * @param captureProbability the probability of this capture
 	 * @return the pokeball to use
 	 * @throws NoSuchItemException if there are no pokeballs to use
 	 */
-	public Pokeball selectPokeball(List<Pokeball> pokeballs) throws NoSuchItemException {
+	public Pokeball selectPokeball(List<Pokeball> pokeballs, double captureProbability) throws NoSuchItemException {
 		if (pokeballs.size() == 0) {
 			throw new NoSuchItemException("Player has no pokeballs");
 		}
 		if (pokeballSelector != null) {
-			Pokeball selected = pokeballSelector.select(pokeballs);
+			Pokeball selected = pokeballSelector.select(pokeballs, captureProbability);
 			if (selected != null) {
 				boolean hasPokeball = pokeballs.contains(selected);
 				if (hasPokeball) {

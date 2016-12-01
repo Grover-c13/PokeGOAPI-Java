@@ -19,15 +19,18 @@ import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import lombok.Getter;
 
 public enum Pokeball {
-	POKEBALL(ItemId.ITEM_POKE_BALL),
-	GREATBALL(ItemId.ITEM_GREAT_BALL),
-	ULTRABALL(ItemId.ITEM_ULTRA_BALL),
-	MASTERBALL(ItemId.ITEM_MASTER_BALL);
+	POKEBALL(ItemId.ITEM_POKE_BALL, 1.0),
+	GREATBALL(ItemId.ITEM_GREAT_BALL, 0.4),
+	ULTRABALL(ItemId.ITEM_ULTRA_BALL, 0.2),
+	MASTERBALL(ItemId.ITEM_MASTER_BALL, 0.0);
 
 	@Getter
 	private final ItemId ballType;
+	@Getter
+	private final double captureProbability;
 
-	Pokeball(ItemId type) {
+	Pokeball(ItemId type, double probability) {
 		ballType = type;
+		captureProbability = probability;
 	}
 }
