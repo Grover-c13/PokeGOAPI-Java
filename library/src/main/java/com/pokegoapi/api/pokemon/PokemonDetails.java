@@ -231,7 +231,7 @@ public class PokemonDetails {
 	 * Calculate the maximum CP for this individual pokemon and this player's level
 	 *
 	 * @return The maximum CP for this pokemon
-	 * @throws NoSuchItemException   If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
+	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
 	 */
 	public int getMaxCpForPlayer() throws NoSuchItemException {
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
@@ -258,76 +258,60 @@ public class PokemonDetails {
 	/**
 	 * Calculated the max cp of this pokemon, if you upgrade it fully and the player is at level 40
 	 *
+	 * @param highestEvolution the full evolution path
 	 * @return Max cp of this pokemon
 	 */
-	public int getCpFullEvolveAndPowerup() {
-		return getMaxCpFullEvolveAndPowerup(40);
+	public int getCpFullEvolveAndPowerup(PokemonIdOuterClass.PokemonId highestEvolution) {
+		return getMaxCpFullEvolveAndPowerup(40, highestEvolution);
 	}
 
 	/**
 	 * Calculated the max cp of this pokemon, if you upgrade it fully with your current player level
 	 *
+	 * @param highestEvolution the full evolution path
 	 * @return Max cp of this pokemon
 	 */
-	public int getMaxCpFullEvolveAndPowerupForPlayer() {
-		return getMaxCpFullEvolveAndPowerup(api.getPlayerProfile().getStats().getLevel());
+	public int getMaxCpFullEvolveAndPowerupForPlayer(PokemonIdOuterClass.PokemonId highestEvolution) {
+		return getMaxCpFullEvolveAndPowerup(api.getPlayerProfile().getStats().getLevel(), highestEvolution);
 	}
 
 	/**
 	 * Calculated the max cp of this pokemon, if you upgrade it fully with your current player level
 	 *
+	 * @param playerLevel the current player level
+	 * @param highestEvolution the full evolution path
 	 * @return Max cp of this pokemon
 	 */
-	private int getMaxCpFullEvolveAndPowerup(int playerLevel) {
-		List<PokemonIdOuterClass.PokemonId> highest = Evolutions.getHighest(getPokemonId());
-		PokemonIdOuterClass.PokemonId highestUpgradedFamily = highest.get(0);
-		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
-		int attack = getIndividualAttack() + pokemonMeta.getBaseAttack();
-		int defense = getIndividualDefense() + pokemonMeta.getBaseDefense();
-		int stamina = getIndividualStamina() + pokemonMeta.getBaseStamina();
+	private int getMaxCpFullEvolveAndPowerup(int playerLevel, PokemonIdOuterClass.PokemonId highestEvolution) {
+		PokemonMeta evolutionMeta = PokemonMetaRegistry.getMeta(highestEvolution);
+		int attack = getIndividualAttack() + evolutionMeta.getBaseAttack();
+		int defense = getIndividualDefense() + evolutionMeta.getBaseDefense();
+		int stamina = getIndividualStamina() + evolutionMeta.getBaseStamina();
 		return PokemonCpUtils.getMaxCpForPlayer(attack, defense, stamina, playerLevel);
 	}
 
 	/**
 	 * Calculate the CP after evolving this Pokemon
 	 *
+	 * @param evolution the pokemon evolving into
 	 * @return New CP after evolve
 	 */
-	public int getCpAfterEvolve() {
-		List<PokemonIdOuterClass.PokemonId> highest = Evolutions.getHighest(getPokemonId());
-		PokemonIdOuterClass.PokemonId highestUpgradedFamily = highest.get(0);
-		if (highest.contains(getPokemonId())) {
-			return getCp();
-		}
-		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
-		PokemonIdOuterClass.PokemonId secondHighest = pokemonMeta.getParentId();
-		if (getPokemonId() == secondHighest) {
-			int attack = getIndividualAttack() + pokemonMeta.getBaseAttack();
-			int defense = getIndividualDefense() + pokemonMeta.getBaseDefense();
-			int stamina = getIndividualStamina() + pokemonMeta.getBaseStamina();
-			return PokemonCpUtils.getCp(attack, defense, stamina, getCombinedCpMultiplier());
-		}
-		pokemonMeta = PokemonMetaRegistry.getMeta(secondHighest);
-		int attack = getIndividualAttack() + pokemonMeta.getBaseAttack();
-		int defense = getIndividualDefense() + pokemonMeta.getBaseDefense();
-		int stamina = getIndividualStamina() + pokemonMeta.getBaseStamina();
+	public int getCpAfterEvolve(PokemonIdOuterClass.PokemonId evolution) {
+		PokemonMeta evolutionMeta = PokemonMetaRegistry.getMeta(evolution);
+		int attack = getIndividualAttack() + evolutionMeta.getBaseAttack();
+		int defense = getIndividualDefense() + evolutionMeta.getBaseDefense();
+		int stamina = getIndividualStamina() + evolutionMeta.getBaseStamina();
 		return PokemonCpUtils.getCp(attack, defense, stamina, getCombinedCpMultiplier());
 	}
 
 	/**
 	 * Calculate the CP after fully evolving this Pokemon
 	 *
+	 * @param highestEvolution the pokemon at the top of the evolution chain being evolved into
 	 * @return New CP after evolve
 	 */
-	public int getCpAfterFullEvolve() {
-		List<PokemonIdOuterClass.PokemonId> highest = Evolutions.getHighest(getPokemonId());
-		PokemonIdOuterClass.PokemonId highestUpgradedFamily = highest.get(0);
-
-		if (highest.contains(getPokemonId())) {
-			return getCp();
-		}
-
-		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestUpgradedFamily);
+	public int getCpAfterFullEvolve(PokemonIdOuterClass.PokemonId highestEvolution) {
+		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestEvolution);
 		int attack = getProto().getIndividualAttack() + pokemonMeta.getBaseAttack();
 		int defense = getProto().getIndividualDefense() + pokemonMeta.getBaseDefense();
 		int stamina = getProto().getIndividualStamina() + pokemonMeta.getBaseStamina();
