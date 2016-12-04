@@ -15,18 +15,18 @@
 
 package com.pokegoapi.api.inventory;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.pokemon.EggPokemon;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
-
 import POGOProtos.Inventory.EggIncubatorOuterClass;
 import POGOProtos.Inventory.EggIncubatorTypeOuterClass.EggIncubatorType;
 import POGOProtos.Networking.Requests.Messages.UseItemEggIncubatorMessageOuterClass.UseItemEggIncubatorMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.pokemon.EggPokemon;
+import com.pokegoapi.exceptions.CaptchaActiveException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.ServerRequest;
 
 public class EggIncubator {
 	private final EggIncubatorOuterClass.EggIncubator proto;
@@ -59,9 +59,10 @@ public class EggIncubator {
 	 * @return status of putting egg in incubator
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public UseItemEggIncubatorResponse.Result hatchEgg(EggPokemon egg)
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 
 		UseItemEggIncubatorMessage reqMsg = UseItemEggIncubatorMessage.newBuilder()
 				.setItemId(proto.getId())

@@ -15,9 +15,11 @@
 
 package com.pokegoapi.util;
 
+import com.pokegoapi.exceptions.AsyncCaptchaActiveException;
 import com.pokegoapi.exceptions.AsyncLoginFailedException;
 import com.pokegoapi.exceptions.AsyncPokemonGoException;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 
@@ -32,8 +34,10 @@ public class AsyncHelper {
 	 * @return Result of the observable
 	 * @throws LoginFailedException  If an AsyncLoginFailedException was thrown
 	 * @throws RemoteServerException If an AsyncRemoteServerException was thrown
+	 * @throws CaptchaActiveException if an AsyncCaptchaActiveException was thrown
 	 */
-	public static <T> T toBlocking(Observable<T> observable) throws LoginFailedException, RemoteServerException {
+	public static <T> T toBlocking(Observable<T> observable)
+			throws LoginFailedException, RemoteServerException, CaptchaActiveException {
 		try {
 			return observable.toBlocking().first();
 		} catch (RuntimeException e) {
@@ -43,28 +47,8 @@ public class AsyncHelper {
 			if (e.getCause() instanceof AsyncRemoteServerException) {
 				throw new RemoteServerException(e.getMessage(), e.getCause());
 			}
-			throw new AsyncPokemonGoException("Unknown exception occurred. ", e);
-		}
-	}
-
-	/**
-	 * Convert an observable to the actual result, recovering the actual exception and throwing that
-	 *
-	 * @param observable Observable to handle
-	 * @param <T>        Result type
-	 * @return Result of the observable
-	 * @throws LoginFailedException  If an AsyncLoginFailedException was thrown
-	 * @throws RemoteServerException If an AsyncRemoteServerException was thrown
-	 */
-	public static <T> T toCompose(Observable<T> observable) throws LoginFailedException, RemoteServerException {
-		try {
-			return observable.toBlocking().first();
-		} catch (RuntimeException e) {
-			if (e.getCause() instanceof AsyncLoginFailedException) {
-				throw new LoginFailedException(e.getMessage(), e.getCause());
-			}
-			if (e.getCause() instanceof AsyncRemoteServerException) {
-				throw new RemoteServerException(e.getMessage(), e.getCause());
+			if (e.getCause() instanceof AsyncCaptchaActiveException) {
+				throw new CaptchaActiveException(e.getCause());
 			}
 			throw new AsyncPokemonGoException("Unknown exception occurred. ", e);
 		}

@@ -50,7 +50,7 @@ public class Crypto {
 	 * Shuffles bytes.
 	 *
 	 * @param input input data
-	 * @param msSinceStart
+	 * @param msSinceStart time since start
 	 * @return shuffled bytes
 	 */
 	public static CipherText encrypt(byte[] input, long msSinceStart) {
@@ -3519,7 +3519,7 @@ public class Crypto {
 		 * Create new CipherText with contents and IV.
 		 *
 		 * @param input the contents
-		 * @param ms
+		 * @param ms the time
 		 */
 		public CipherText(byte[] input, long ms, Rand rand) {
 			this.inputLen = input.length;

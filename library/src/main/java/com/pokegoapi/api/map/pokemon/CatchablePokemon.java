@@ -43,8 +43,10 @@ import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.NormalEncounterResult;
 import com.pokegoapi.api.settings.AsyncCatchOptions;
 import com.pokegoapi.api.settings.CatchOptions;
+import com.pokegoapi.exceptions.AsyncCaptchaActiveException;
 import com.pokegoapi.exceptions.AsyncLoginFailedException;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.EncounterFailedException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
@@ -156,8 +158,10 @@ public class CatchablePokemon implements MapPoint {
 	 * @return the encounter result
 	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public EncounterResult encounterPokemon() throws LoginFailedException, RemoteServerException {
+	public EncounterResult encounterPokemon()
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		return AsyncHelper.toBlocking(encounterPokemonAsync());
 	}
 
@@ -221,8 +225,9 @@ public class CatchablePokemon implements MapPoint {
 	 * @return the encounter result
 	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public EncounterResult encounterNormalPokemon() throws LoginFailedException,
+	public EncounterResult encounterNormalPokemon() throws LoginFailedException, CaptchaActiveException,
 			RemoteServerException {
 		return AsyncHelper.toBlocking(encounterNormalPokemonAsync());
 	}
@@ -271,9 +276,10 @@ public class CatchablePokemon implements MapPoint {
 	 * @return CatchResult
 	 * @throws LoginFailedException if failed to login
 	 * @throws RemoteServerException if the server failed to respond
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 * @throws NoSuchItemException the no such item exception
 	 */
-	public CatchResult catchPokemon(CatchOptions options) throws LoginFailedException,
+	public CatchResult catchPokemon(CatchOptions options) throws LoginFailedException, CaptchaActiveException,
 			RemoteServerException, NoSuchItemException {
 		if (options == null) {
 			options = new CatchOptions(api);
@@ -297,10 +303,11 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws NoSuchItemException the no such item exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 * @throws EncounterFailedException the encounter failed exception
 	 */
 	public CatchResult catchPokemon(EncounterResult encounter, CatchOptions options)
-			throws LoginFailedException, RemoteServerException,
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException,
 			NoSuchItemException, EncounterFailedException {
 
 		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
@@ -326,8 +333,9 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws LoginFailedException if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws NoSuchItemException the no such item exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public CatchResult catchPokemon() throws LoginFailedException,
+	public CatchResult catchPokemon() throws LoginFailedException, CaptchaActiveException,
 			RemoteServerException, NoSuchItemException {
 
 		return catchPokemon(new CatchOptions(api));
@@ -344,10 +352,12 @@ public class CatchablePokemon implements MapPoint {
 	 * @return CatchResult of resulted try to catch pokemon
 	 * @throws LoginFailedException if failed to login
 	 * @throws RemoteServerException if the server failed to respond
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public CatchResult catchPokemon(double normalizedHitPosition,
 									double normalizedReticleSize, double spinModifier, Pokeball type,
-									int amount) throws LoginFailedException, RemoteServerException {
+									int amount)
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 
 		return catchPokemon(normalizedHitPosition, normalizedReticleSize, spinModifier, type, amount, 0);
 	}
@@ -360,9 +370,10 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws LoginFailedException if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws NoSuchItemException the no such item exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public Observable<CatchResult> catchPokemon(AsyncCatchOptions options)
-			throws LoginFailedException, RemoteServerException, NoSuchItemException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, NoSuchItemException {
 		if (options != null) {
 			if (options.getUseRazzBerry() != 0) {
 				final AsyncCatchOptions asyncOptions = options;
@@ -401,10 +412,11 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws NoSuchItemException the no such item exception
 	 * @throws EncounterFailedException the encounter failed exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public Observable<CatchResult> catchPokemon(EncounterResult encounter,
 												AsyncCatchOptions options)
-			throws LoginFailedException, RemoteServerException,
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException,
 			NoSuchItemException, EncounterFailedException {
 
 		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
@@ -448,11 +460,12 @@ public class CatchablePokemon implements MapPoint {
 	 * @return CatchResult of resulted try to catch pokemon
 	 * @throws LoginFailedException if failed to login
 	 * @throws RemoteServerException if the server failed to respond
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public CatchResult catchPokemon(double normalizedHitPosition,
 									double normalizedReticleSize, double spinModifier, Pokeball type,
 									int amount, int razberriesLimit)
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 
 		Item razzberriesInventory = api.getInventories().getItemBag().getItem(ItemId.ITEM_RAZZ_BERRY);
 		int razzberriesCountInventory = razzberriesInventory.getCount();
@@ -576,6 +589,8 @@ public class CatchablePokemon implements MapPoint {
 					throw new AsyncRemoteServerException(e);
 				} catch (LoginFailedException e) {
 					throw new AsyncLoginFailedException(e);
+				} catch (CaptchaActiveException e) {
+					throw new AsyncCaptchaActiveException(e);
 				}
 			}
 		});
@@ -623,8 +638,10 @@ public class CatchablePokemon implements MapPoint {
 	 * @return CatchItemResult info about the new modifiers about the pokemon (can move, item capture multi) eg
 	 * @throws LoginFailedException if failed to login
 	 * @throws RemoteServerException if the server failed to respond
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public CatchItemResult useItem(ItemId item) throws LoginFailedException, RemoteServerException {
+	public CatchItemResult useItem(ItemId item)
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		return AsyncHelper.toBlocking(useItemAsync(item));
 	}
 

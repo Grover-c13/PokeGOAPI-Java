@@ -15,15 +15,15 @@
 
 package com.pokegoapi.api.pokemon;
 
+import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
+import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.EggIncubator;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-
-import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
-import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
 import lombok.Setter;
 
 /**
@@ -45,9 +45,10 @@ public class EggPokemon {
 	 * @return status of putting egg in incubator
 	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public UseItemEggIncubatorResponse.Result incubate(EggIncubator incubator)
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		if (incubator.isInUse()) {
 			throw new IllegalArgumentException("Incubator already used");
 		}

@@ -29,6 +29,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.api.pokemon.Pokemon;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
@@ -75,8 +76,9 @@ public class Inventories {
 	 *
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void updateInventories() throws LoginFailedException, RemoteServerException {
+	public void updateInventories() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		updateInventories(false);
 	}
 
@@ -86,8 +88,10 @@ public class Inventories {
 	 * @param forceUpdate For a full update if true
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void updateInventories(boolean forceUpdate) throws LoginFailedException, RemoteServerException {
+	public void updateInventories(boolean forceUpdate)
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		if (forceUpdate) {
 			lastInventoryUpdate = 0;
 			itemBag.reset();

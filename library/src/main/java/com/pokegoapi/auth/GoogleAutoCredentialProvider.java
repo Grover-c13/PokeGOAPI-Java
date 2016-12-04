@@ -1,12 +1,11 @@
 package com.pokegoapi.auth;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
-
 import lombok.Getter;
 import okhttp3.OkHttpClient;
 import svarzee.gps.gpsoauth.AuthToken;
@@ -41,9 +40,10 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	 * @param password   google password
 	 * @throws LoginFailedException  - login failed possibly due to invalid credentials
 	 * @throws RemoteServerException - some server/network failure
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public GoogleAutoCredentialProvider(OkHttpClient httpClient, String username, String password)
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		this.gpsoauth = new Gpsoauth(httpClient);
 		this.username = username;
 		this.tokenInfo = login(username, password);
@@ -57,9 +57,10 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	 * @param time       time instance used to refresh token
 	 * @throws LoginFailedException  login failed possibly due to invalid credentials
 	 * @throws RemoteServerException some server/network failure
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public GoogleAutoCredentialProvider(OkHttpClient httpClient, String username, String password, Time time)
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		this.gpsoauth = new Gpsoauth(httpClient);
 		this.username = username;
 		this.tokenInfo = login(username, password);
@@ -67,7 +68,7 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	}
 
 	private TokenInfo login(String username, String password)
-			throws RemoteServerException, LoginFailedException {
+			throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		try {
 			String masterToken = gpsoauth.performMasterLoginForToken(username, password, GOOGLE_LOGIN_ANDROID_ID);
 			AuthToken authToken = gpsoauth.performOAuthForToken(username, masterToken, GOOGLE_LOGIN_ANDROID_ID,
@@ -86,9 +87,10 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	 * @return the token info
 	 * @throws RemoteServerException login failed possibly due to invalid credentials
 	 * @throws LoginFailedException  some server/network failure
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	private TokenInfo refreshToken(String username, String refreshToken)
-			throws RemoteServerException, LoginFailedException {
+			throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		try {
 			AuthToken authToken = gpsoauth.performOAuthForToken(username, refreshToken, GOOGLE_LOGIN_ANDROID_ID,
 					GOOGLE_LOGIN_SERVICE, GOOGLE_LOGIN_APP, GOOGLE_LOGIN_CLIENT_SIG);
@@ -104,9 +106,10 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	 * @return token id
 	 * @throws RemoteServerException login failed possibly due to invalid credentials
 	 * @throws LoginFailedException  some server/network failure
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	@Override
-	public String getTokenId() throws RemoteServerException, LoginFailedException {
+	public String getTokenId() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		if (isTokenIdExpired()) {
 			this.tokenInfo = refreshToken(username, tokenInfo.refreshToken);
 		}
@@ -117,9 +120,10 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	 * @return auth info
 	 * @throws RemoteServerException login failed possibly due to invalid credentials
 	 * @throws LoginFailedException  some server/network failure
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	@Override
-	public AuthInfo getAuthInfo() throws RemoteServerException, LoginFailedException {
+	public AuthInfo getAuthInfo() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		AuthInfo.Builder builder = AuthInfo.newBuilder();
 		builder.setProvider("google");
 		builder.setToken(AuthInfo.JWT.newBuilder().setContents(getTokenId()).setUnknown2(59).build());

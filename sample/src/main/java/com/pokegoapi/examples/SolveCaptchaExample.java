@@ -42,6 +42,9 @@ import javafx.scene.web.WebView;
 import okhttp3.OkHttpClient;
 
 import javax.swing.JFrame;
+import javax.swing.WindowConstants;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class SolveCaptchaExample {
 	/**
@@ -94,6 +97,8 @@ public class SolveCaptchaExample {
 				try {
 					//Close this window, it not valid anymore.
 					frame.setVisible(false);
+					frame.dispose();
+
 					if (api.verifyChallenge(token)) {
 						System.out.println("Captcha was correctly solved!");
 					} else {
@@ -118,5 +123,13 @@ public class SolveCaptchaExample {
 		frame.getContentPane().add(panel);
 		frame.setSize(500, 500);
 		frame.setVisible(true);
+		//Don't allow this window to be closed
+		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				System.out.println("Please solve the captcha before closing the window!");
+			}
+		});
 	}
 }

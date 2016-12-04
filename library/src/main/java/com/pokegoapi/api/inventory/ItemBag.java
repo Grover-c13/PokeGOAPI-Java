@@ -27,6 +27,7 @@ import POGOProtos.Networking.Responses.UseIncenseResponseOuterClass.UseIncenseRe
 import POGOProtos.Networking.Responses.UseItemXpBoostResponseOuterClass.UseItemXpBoostResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
@@ -60,13 +61,15 @@ public class ItemBag {
 	/**
 	 * Discards the given item.
 	 *
-	 * @param id       the id
+	 * @param id the id
 	 * @param quantity the quantity
 	 * @return the result
 	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
+	 * @throws LoginFailedException the login failed exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public Result removeItem(ItemId id, int quantity) throws RemoteServerException, LoginFailedException {
+	public Result removeItem(ItemId id, int quantity)
+			throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		Item item = getItem(id);
 		if (item.getCount() < quantity) {
 			throw new IllegalArgumentException("You cannot remove more quantity than you have");
@@ -147,9 +150,10 @@ public class ItemBag {
 	 *
 	 * @param type type of item
 	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
+	 * @throws LoginFailedException the login failed exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void useItem(ItemId type) throws RemoteServerException, LoginFailedException {
+	public void useItem(ItemId type) throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		if (type == ItemId.UNRECOGNIZED) {
 			throw new IllegalArgumentException("You cannot use item for UNRECOGNIZED");
 		}
@@ -171,9 +175,10 @@ public class ItemBag {
 	 *
 	 * @param type type of item
 	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
+	 * @throws LoginFailedException the login failed exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void useIncense(ItemId type) throws RemoteServerException, LoginFailedException {
+	public void useIncense(ItemId type) throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		UseIncenseMessage useIncenseMessage =
 				UseIncenseMessage.newBuilder()
 						.setIncenseType(type)
@@ -197,9 +202,10 @@ public class ItemBag {
 	 * use an item with itemID
 	 *
 	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
+	 * @throws LoginFailedException the login failed exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void useIncense() throws RemoteServerException, LoginFailedException {
+	public void useIncense() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		useIncense(ItemId.ITEM_INCENSE_ORDINARY);
 	}
 
@@ -208,9 +214,11 @@ public class ItemBag {
 	 *
 	 * @return the xp boost response
 	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
+	 * @throws LoginFailedException the login failed exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public UseItemXpBoostResponse useLuckyEgg() throws RemoteServerException, LoginFailedException {
+	public UseItemXpBoostResponse useLuckyEgg()
+			throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		UseItemXpBoostMessage xpMsg = UseItemXpBoostMessage
 				.newBuilder()
 				.setItemId(ItemId.ITEM_LUCKY_EGG)

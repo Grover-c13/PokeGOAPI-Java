@@ -1,15 +1,15 @@
 package com.pokegoapi.api.settings;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.ServerRequest;
-
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.exceptions.CaptchaActiveException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 
 /**
@@ -89,8 +89,9 @@ public class Settings {
 	 *
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void updateSettings() throws RemoteServerException, LoginFailedException {
+	public void updateSettings() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		DownloadSettingsMessageOuterClass.DownloadSettingsMessage msg =
 				DownloadSettingsMessageOuterClass.DownloadSettingsMessage.newBuilder().build();
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.DOWNLOAD_SETTINGS, msg);

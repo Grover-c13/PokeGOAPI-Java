@@ -30,6 +30,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.listener.PokestopListener;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.S2LatLng;
@@ -171,8 +172,9 @@ public class Pokestop {
 	 * @return PokestopLootResult
 	 * @throws LoginFailedException  if login failed
 	 * @throws RemoteServerException if the server failed to respond
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public PokestopLootResult loot() throws LoginFailedException, RemoteServerException {
+	public PokestopLootResult loot() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		return AsyncHelper.toBlocking(lootAsync());
 	}
 
@@ -210,8 +212,10 @@ public class Pokestop {
 	 * @param item the modifier to add to this pokestop
 	 * @throws LoginFailedException  if login failed
 	 * @throws RemoteServerException if the server failed to respond or the modifier could not be added to this pokestop
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void addModifier(ItemIdOuterClass.ItemId item) throws LoginFailedException, RemoteServerException {
+	public void addModifier(ItemIdOuterClass.ItemId item)
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		AsyncHelper.toBlocking(addModifierAsync(item));
 	}
 
@@ -249,8 +253,9 @@ public class Pokestop {
 	 * @return FortDetails
 	 * @throws LoginFailedException  if login failed
 	 * @throws RemoteServerException if the server failed to respond
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public FortDetails getDetails() throws LoginFailedException, RemoteServerException {
+	public FortDetails getDetails() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		return AsyncHelper.toBlocking(getDetailsAsync());
 	}
 
@@ -272,7 +277,7 @@ public class Pokestop {
 	public boolean hasLure() {
 		try {
 			return hasLure(false);
-		} catch (LoginFailedException | RemoteServerException e) {
+		} catch (LoginFailedException | RemoteServerException | CaptchaActiveException e) {
 			// No need
 		}
 
@@ -286,8 +291,10 @@ public class Pokestop {
 	 * @return lure status
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communications failed.
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public boolean hasLure(boolean updateFortDetails) throws LoginFailedException, RemoteServerException {
+	public boolean hasLure(boolean updateFortDetails)
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		if (updateFortDetails) {
 			List<FortModifierOuterClass.FortModifier> modifiers = getDetails().getModifier();
 			for (FortModifierOuterClass.FortModifier modifier : modifiers) {

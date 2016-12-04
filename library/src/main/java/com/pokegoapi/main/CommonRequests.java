@@ -161,6 +161,7 @@ public class CommonRequests {
 	/**
 	 * Append CheckChallenge request to the given ServerRequest
 	 *
+	 * @param api the current api instance
 	 * @param requests The main requests we want to fire
 	 * @return an array of ServerRequests
 	 */

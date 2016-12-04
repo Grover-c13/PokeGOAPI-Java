@@ -33,6 +33,7 @@ package com.pokegoapi.examples;
 
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.auth.GoogleAutoCredentialProvider;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
@@ -59,9 +60,9 @@ public class UseIncenseExample {
 			go.setLocation(45.817521, 16.028199, 0);
 			go.getInventories().getItemBag().useIncense();
 
-		} catch (LoginFailedException | RemoteServerException e) {
+		} catch (LoginFailedException | RemoteServerException | CaptchaActiveException e) {
 			// failed to login, invalid credentials, auth issue or server issue.
-			Log.e("Main", "Failed to login or server issue: ", e);
+			Log.e("Main", "Failed to login, captcha or server issue: ", e);
 
 		}
 	}
