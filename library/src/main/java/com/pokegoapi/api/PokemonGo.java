@@ -112,6 +112,9 @@ public class PokemonGo {
 	@Getter
 	private List<Listener> listeners = new ArrayList<Listener>();
 
+	@Getter
+	private boolean loggingIn;
+
 	/**
 	 * Instantiates a new Pokemon go.
 	 *
@@ -176,6 +179,7 @@ public class PokemonGo {
 	 */
 	public void login(CredentialProvider credentialProvider)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+		this.loggingIn = true;
 		if (credentialProvider == null) {
 			throw new NullPointerException("Credential Provider is null");
 		}
@@ -186,6 +190,8 @@ public class PokemonGo {
 		inventories = new Inventories(this);
 
 		initialize();
+
+		this.loggingIn = false;
 	}
 
 	private void initialize() throws RemoteServerException, CaptchaActiveException, LoginFailedException {

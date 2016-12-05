@@ -165,4 +165,9 @@ public class EggIncubator {
 	public boolean isInUse() {
 		return getKmTarget() > api.getPlayerProfile().getStats().getKmWalked();
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof EggIncubator && ((EggIncubator) obj).getId().equals(getId());
+	}
 }

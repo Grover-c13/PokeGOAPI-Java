@@ -166,7 +166,9 @@ public class Inventories {
 
 			if (itemData.hasEggIncubators()) {
 				for (EggIncubatorOuterClass.EggIncubator incubator : itemData.getEggIncubators().getEggIncubatorList()) {
-					incubators.add(new EggIncubator(api, incubator));
+					EggIncubator eggIncubator = new EggIncubator(api, incubator);
+					incubators.remove(eggIncubator);
+					incubators.add(eggIncubator);
 				}
 			}
 

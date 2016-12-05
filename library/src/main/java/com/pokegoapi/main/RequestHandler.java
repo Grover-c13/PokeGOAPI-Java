@@ -22,6 +22,7 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.exceptions.AsyncCaptchaActiveException;
 import com.pokegoapi.exceptions.AsyncPokemonGoException;
 import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -39,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -297,29 +299,33 @@ public class RequestHandler implements Runnable {
 			boolean addCommon = false;
 
 			ArrayList<ServerRequest> serverRequests = new ArrayList<>();
+			Map<ServerRequest, AsyncServerRequest> requestMap = new HashMap<>();
 
-			if (api.hasChallenge()) {
+			if (api.hasChallenge() & !api.isLoggingIn()) {
 				for (AsyncServerRequest request : requests) {
-					if (request.getType() == RequestTypeOuterClass.RequestType.CHECK_CHALLENGE
-							|| request.getType() == RequestTypeOuterClass.RequestType.VERIFY_CHALLENGE) {
-						serverRequests.add(new ServerRequest(request.getType(), request.getRequest()));
+					RequestTypeOuterClass.RequestType type = request.getType();
+					if (type == RequestTypeOuterClass.RequestType.CHECK_CHALLENGE
+							|| type == RequestTypeOuterClass.RequestType.VERIFY_CHALLENGE) {
+						ServerRequest serverRequest = new ServerRequest(type, request.getRequest());
+						serverRequests.add(serverRequest);
+						requestMap.put(serverRequest, request);
 					} else {
-						resultMap.put(request.getId(), ResultOrException.getError(new CaptchaActiveException()));
+						resultMap.put(request.getId(), ResultOrException.getError(new AsyncCaptchaActiveException()));
 					}
 				}
 			} else {
 				for (AsyncServerRequest request : requests) {
-					serverRequests.add(new ServerRequest(request.getType(), request.getRequest()));
+					ServerRequest serverRequest = new ServerRequest(request.getType(), request.getRequest());
+					serverRequests.add(serverRequest);
+					requestMap.put(serverRequest, request);
 					if (request.isRequireCommonRequest()) {
 						addCommon = true;
 					}
 				}
 			}
 
-			ServerRequest[] commonRequests = new ServerRequest[0];
-
 			if (addCommon) {
-				commonRequests = CommonRequests.getCommonRequests(api);
+				ServerRequest[] commonRequests = CommonRequests.getCommonRequests(api);
 				Collections.addAll(serverRequests, commonRequests);
 			}
 
@@ -328,20 +334,15 @@ public class RequestHandler implements Runnable {
 			try {
 				authTicket = internalSendServerRequests(authTicket, arrayServerRequests);
 
-				for (int i = 0; i != requests.size(); i++) {
+				for (Map.Entry<ServerRequest, AsyncServerRequest> entry : requestMap.entrySet()) {
+					ServerRequest serverRequest = entry.getKey();
+					AsyncServerRequest request = entry.getValue();
 					try {
-						resultMap.put(requests.get(i).getId(), ResultOrException.getResult(arrayServerRequests[i].getData()));
+						ByteString data = serverRequest.getData();
+						resultMap.put(request.getId(), ResultOrException.getResult(data));
+						CommonRequests.parse(api, request.getType(), data);
 					} catch (InvalidProtocolBufferException e) {
-						resultMap.put(requests.get(i).getId(), ResultOrException.getError(e));
-					}
-				}
-
-				for (int i = 0; i != commonRequests.length; i++) {
-					try {
-						CommonRequests.parse(api, arrayServerRequests[requests.size() + i].getType(),
-								arrayServerRequests[requests.size() + i].getData());
-					} catch (InvalidProtocolBufferException e) {
-						//TODO: notify error even in case of common requests?
+						resultMap.put(request.getId(), ResultOrException.getError(e));
 					}
 				}
 
