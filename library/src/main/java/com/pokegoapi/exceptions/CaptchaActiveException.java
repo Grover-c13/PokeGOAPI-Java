@@ -15,15 +15,14 @@
 
 package com.pokegoapi.exceptions;
 
-/**
- * Exception thrown when a message is requested to send, but a captcha is currently active
- */
-public class CaptchaActiveException extends Exception {
-	public CaptchaActiveException() {
-		super();
-	}
+import lombok.Getter;
 
-	public CaptchaActiveException(Throwable exception) {
-		super(exception);
+public class CaptchaActiveException extends Exception {
+	@Getter
+	private String captcha;
+
+	public CaptchaActiveException(AsyncCaptchaActiveException exception) {
+		super(exception.getMessage(), exception);
+		this.captcha = exception.getCaptcha();
 	}
 }

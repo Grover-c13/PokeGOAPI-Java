@@ -48,7 +48,7 @@ public class AsyncHelper {
 				throw new RemoteServerException(e.getMessage(), e.getCause());
 			}
 			if (e.getCause() instanceof AsyncCaptchaActiveException) {
-				throw new CaptchaActiveException(e.getCause());
+				throw new CaptchaActiveException((AsyncCaptchaActiveException) e.getCause());
 			}
 			throw new AsyncPokemonGoException("Unknown exception occurred. ", e);
 		}
