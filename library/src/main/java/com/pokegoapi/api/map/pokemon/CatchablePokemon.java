@@ -47,6 +47,7 @@ import com.pokegoapi.exceptions.AsyncCaptchaActiveException;
 import com.pokegoapi.exceptions.AsyncLoginFailedException;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.CaptchaActiveException;
+import com.pokegoapi.exceptions.EncounterFailedException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -303,13 +304,13 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws NoSuchItemException the no such item exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws CaptchaActiveException the encounter failed exception
+	 * @throws EncounterFailedException the encounter failed exception
 	 */
 	public CatchResult catchPokemon(EncounterResult encounter, CatchOptions options)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException,
+			throws LoginFailedException, EncounterFailedException, RemoteServerException,
 			NoSuchItemException, CaptchaActiveException {
 
-		if (!encounter.wasSuccessful()) throw new RemoteServerException();
+		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
 		double probability = encounter.getCaptureProbability().getCaptureProbability(0);
 
 		if (options == null) {
@@ -415,10 +416,10 @@ public class CatchablePokemon implements MapPoint {
 	 */
 	public Observable<CatchResult> catchPokemon(EncounterResult encounter,
 												AsyncCatchOptions options)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException,
+			throws LoginFailedException, EncounterFailedException, RemoteServerException,
 			NoSuchItemException, CaptchaActiveException {
 
-		if (!encounter.wasSuccessful()) throw new RemoteServerException();
+		if (!encounter.wasSuccessful()) throw new EncounterFailedException();
 
 		if (options != null) {
 			if (options.getUseRazzBerry() != 0) {
