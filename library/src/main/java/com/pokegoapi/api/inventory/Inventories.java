@@ -36,6 +36,7 @@ import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -51,11 +52,14 @@ public class Inventories {
 	@Getter
 	private Pokedex pokedex;
 	@Getter
-	private final List<EggIncubator> incubators = new ArrayList<>();
+	private final List<EggIncubator> incubators = Collections.synchronizedList(new ArrayList<EggIncubator>());
 	@Getter
 	private Hatchery hatchery;
 	@Getter
 	private long lastInventoryUpdate = 0;
+
+	@Getter
+	private final Object lock = new Object();
 
 	/**
 	 * Creates Inventories and initializes content.
@@ -98,7 +102,9 @@ public class Inventories {
 			pokebank.reset();
 			candyjar.reset();
 			pokedex.reset();
-			incubators.clear();
+			synchronized (this.lock) {
+				incubators.clear();
+			}
 			hatchery.reset();
 		}
 		GetInventoryMessage invReqMsg = GetInventoryMessage.newBuilder()
@@ -167,8 +173,10 @@ public class Inventories {
 			if (itemData.hasEggIncubators()) {
 				for (EggIncubatorOuterClass.EggIncubator incubator : itemData.getEggIncubators().getEggIncubatorList()) {
 					EggIncubator eggIncubator = new EggIncubator(api, incubator);
-					incubators.remove(eggIncubator);
-					incubators.add(eggIncubator);
+					synchronized (this.lock) {
+						incubators.remove(eggIncubator);
+						incubators.add(eggIncubator);
+					}
 				}
 			}
 

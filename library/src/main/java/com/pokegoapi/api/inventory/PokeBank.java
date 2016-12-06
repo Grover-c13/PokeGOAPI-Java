@@ -30,12 +30,16 @@ import java.util.List;
 public class PokeBank {
 	@Getter
 	private final List<Pokemon> pokemons = Collections.synchronizedList(new ArrayList<Pokemon>());
+	@Getter
+	private final Object lock = new Object();
 
 	public PokeBank() {
 	}
 
 	public void reset() {
-		pokemons.clear();
+		synchronized (this.lock) {
+			pokemons.clear();
+		}
 	}
 
 	/**
@@ -44,14 +48,16 @@ public class PokeBank {
 	 * @param pokemon Pokemon to add to the inventory
 	 */
 	public void addPokemon(final Pokemon pokemon) {
-		List<Pokemon> alreadyAdded = Stream.of(pokemons).filter(new Predicate<Pokemon>() {
-			@Override
-			public boolean test(Pokemon testPokemon) {
-				return pokemon.getId() == testPokemon.getId();
+		synchronized (this.lock) {
+			List<Pokemon> alreadyAdded = Stream.of(pokemons).filter(new Predicate<Pokemon>() {
+				@Override
+				public boolean test(Pokemon testPokemon) {
+					return pokemon.getId() == testPokemon.getId();
+				}
+			}).collect(Collectors.<Pokemon>toList());
+			if (alreadyAdded.size() < 1) {
+				pokemons.add(pokemon);
 			}
-		}).collect(Collectors.<Pokemon>toList());
-		if (alreadyAdded.size() < 1) {
-			pokemons.add(pokemon);
 		}
 	}
 
@@ -62,12 +68,14 @@ public class PokeBank {
 	 * @return the pokemon by pokemon id
 	 */
 	public List<Pokemon> getPokemonByPokemonId(final PokemonIdOuterClass.PokemonId id) {
-		return Stream.of(pokemons).filter(new Predicate<Pokemon>() {
-			@Override
-			public boolean test(Pokemon pokemon) {
-				return pokemon.getPokemonId().equals(id);
-			}
-		}).collect(Collectors.<Pokemon>toList());
+		synchronized (this.lock) {
+			return Stream.of(pokemons).filter(new Predicate<Pokemon>() {
+				@Override
+				public boolean test(Pokemon pokemon) {
+					return pokemon.getPokemonId().equals(id);
+				}
+			}).collect(Collectors.<Pokemon>toList());
+		}
 	}
 
 	/**
@@ -76,16 +84,18 @@ public class PokeBank {
 	 * @param pokemon the pokemon to remove.
 	 */
 	public void removePokemon(final Pokemon pokemon) {
-		List<Pokemon> previous = new ArrayList<>();
-		previous.addAll(pokemons);
+		synchronized (this.lock) {
+			List<Pokemon> previous = new ArrayList<>();
+			previous.addAll(pokemons);
 
-		pokemons.clear();
-		pokemons.addAll(Stream.of(previous).filter(new Predicate<Pokemon>() {
-			@Override
-			public boolean test(Pokemon pokemn) {
-				return pokemn.getId() != pokemon.getId();
-			}
-		}).collect(Collectors.<Pokemon>toList()));
+			pokemons.clear();
+			pokemons.addAll(Stream.of(previous).filter(new Predicate<Pokemon>() {
+				@Override
+				public boolean test(Pokemon pokemn) {
+					return pokemn.getId() != pokemon.getId();
+				}
+			}).collect(Collectors.<Pokemon>toList()));
+		}
 	}
 
 	/**
@@ -95,9 +105,11 @@ public class PokeBank {
 	 * @return the pokemon
 	 */
 	public Pokemon getPokemonById(final Long id) {
-		for (Pokemon pokemon : pokemons) {
-			if (pokemon.getId() == id) {
-				return pokemon;
+		synchronized (this.lock) {
+			for (Pokemon pokemon : pokemons) {
+				if (pokemon.getId() == id) {
+					return pokemon;
+				}
 			}
 		}
 		return null;

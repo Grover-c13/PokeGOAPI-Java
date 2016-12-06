@@ -30,30 +30,37 @@ import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class Hatchery {
 	@Getter
-	private final Set<EggPokemon> eggs = new HashSet<EggPokemon>();
+	private final Set<EggPokemon> eggs = Collections.synchronizedSet(new HashSet<EggPokemon>());
 	@Getter
-	private final Set<HatchedEgg> hatchedEggs = new HashSet<HatchedEgg>();
+	private final Set<HatchedEgg> hatchedEggs = Collections.synchronizedSet(new HashSet<HatchedEgg>());
 	@Getter
 	private PokemonGo api;
+
+	private final Object lock = new Object();
 
 	public Hatchery(PokemonGo api) {
 		this.api = api;
 	}
 
 	public void reset() {
-		eggs.clear();
-		hatchedEggs.clear();
+		synchronized (this.lock) {
+			eggs.clear();
+			hatchedEggs.clear();
+		}
 	}
 
 	public void addEgg(EggPokemon egg) {
 		egg.setApi(api);
-		eggs.add(egg);
+		synchronized (this.lock) {
+			eggs.add(egg);
+		}
 	}
 
 	/**
@@ -61,7 +68,9 @@ public class Hatchery {
 	 * @param egg the egg to add
 	 */
 	public void addHatchedEgg(HatchedEgg egg) {
-		hatchedEggs.add(egg);
+		synchronized (this.lock) {
+			hatchedEggs.add(egg);
+		}
 		boolean remove = false;
 		List<PokemonListener> listeners = api.getListeners(PokemonListener.class);
 		for (PokemonListener listener : listeners) {
@@ -77,7 +86,9 @@ public class Hatchery {
 	 * @param egg the egg to remove
 	 */
 	public void removeHatchedEgg(HatchedEgg egg) {
-		hatchedEggs.remove(egg);
+		synchronized (this.lock) {
+			hatchedEggs.remove(egg);
+		}
 	}
 
 	/**

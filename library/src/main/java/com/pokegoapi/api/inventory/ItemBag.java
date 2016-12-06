@@ -35,8 +35,10 @@ import com.pokegoapi.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -44,18 +46,23 @@ import java.util.List;
  */
 public class ItemBag {
 	private final PokemonGo api;
-	private final HashMap<ItemId, Item> items = new HashMap<>();
+	private final Map<ItemId, Item> items = Collections.synchronizedMap(new HashMap<ItemId, Item>());
+	private final Object lock = new Object();
 
 	public ItemBag(PokemonGo api) {
 		this.api = api;
 	}
 
 	public void reset() {
-		items.clear();
+		synchronized (this.lock) {
+			items.clear();
+		}
 	}
 
 	public void addItem(Item item) {
-		items.put(item.getItemId(), item);
+		synchronized (this.lock) {
+			items.put(item.getItemId(), item);
+		}
 	}
 
 	/**
@@ -106,7 +113,9 @@ public class ItemBag {
 	 * @return The item removed, if any
 	 */
 	public Item removeItem(ItemId id) {
-		return items.remove(id);
+		synchronized (this.lock) {
+			return items.remove(id);
+		}
 	}
 
 	/**
@@ -120,16 +129,20 @@ public class ItemBag {
 			throw new IllegalArgumentException("You cannot get item for UNRECOGNIZED");
 		}
 
-		// prevent returning null
-		if (!items.containsKey(type)) {
-			return new Item(ItemData.newBuilder().setCount(0).setItemId(type).build(), this);
-		}
+		synchronized (this.lock) {
+			// prevent returning null
+			if (!items.containsKey(type)) {
+				return new Item(ItemData.newBuilder().setCount(0).setItemId(type).build(), this);
+			}
 
-		return items.get(type);
+			return items.get(type);
+		}
 	}
 
 	public Collection<Item> getItems() {
-		return items.values();
+		synchronized (this.lock) {
+			return items.values();
+		}
 	}
 
 	/**
@@ -138,11 +151,13 @@ public class ItemBag {
 	 * @return used space
 	 */
 	public int getItemsCount() {
-		int ct = 0;
-		for (Item item : items.values()) {
-			ct += item.getCount();
+		synchronized (this.lock) {
+			int ct = 0;
+			for (Item item : items.values()) {
+				ct += item.getCount();
+			}
+			return ct;
 		}
-		return ct;
 	}
 
 	/**
