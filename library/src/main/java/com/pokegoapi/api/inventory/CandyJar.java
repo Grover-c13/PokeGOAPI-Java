@@ -26,13 +26,17 @@ import java.util.Map;
 @ToString
 public class CandyJar {
 	private final PokemonGo api;
-	private final Map<PokemonFamilyId, Integer> candies = Collections.synchronizedMap(new HashMap<PokemonFamilyId, Integer>());
+	private final Map<PokemonFamilyId, Integer> candies =
+			Collections.synchronizedMap(new HashMap<PokemonFamilyId, Integer>());
 	private final Object lock = new Object();
 
 	public CandyJar(PokemonGo api) {
 		this.api = api;
 	}
 
+	/**
+	 * Resets this candy jar and removes all candies
+	 */
 	public void reset() {
 		synchronized (this.lock) {
 			candies.clear();

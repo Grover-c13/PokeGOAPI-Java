@@ -310,7 +310,9 @@ public class RequestHandler implements Runnable {
 						serverRequests.add(serverRequest);
 						requestMap.put(serverRequest, request);
 					} else {
-						resultMap.put(request.getId(), ResultOrException.getError(new AsyncCaptchaActiveException(api.getChallengeURL())));
+						AsyncCaptchaActiveException exception = new AsyncCaptchaActiveException(api.getChallengeURL());
+						ResultOrException error = ResultOrException.getError(exception);
+						resultMap.put(request.getId(), error);
 					}
 				}
 			} else {

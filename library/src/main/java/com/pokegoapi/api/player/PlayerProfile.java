@@ -73,7 +73,8 @@ public class PlayerProfile {
 	private PlayerAvatar avatar;
 	private DailyBonus dailyBonus;
 	private ContactSettings contactSettings;
-	private Map<Currency, Integer> currencies = Collections.synchronizedMap(new EnumMap<Currency, Integer>(Currency.class));
+	private Map<Currency, Integer> currencies =
+			Collections.synchronizedMap(new EnumMap<Currency, Integer>(Currency.class));
 	@Setter
 	private Stats stats;
 	private TutorialState tutorialState;

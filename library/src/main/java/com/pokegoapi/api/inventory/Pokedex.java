@@ -23,7 +23,8 @@ import java.util.EnumMap;
 import java.util.Map;
 
 public class Pokedex {
-	private final Map<PokemonId, PokedexEntry> pokedexMap = Collections.synchronizedMap(new EnumMap<PokemonId, PokedexEntry>(PokemonId.class));
+	private final Map<PokemonId, PokedexEntry> pokedexMap =
+			Collections.synchronizedMap(new EnumMap<PokemonId, PokedexEntry>(PokemonId.class));
 	private final Object lock = new Object();
 
 	public void reset() {
