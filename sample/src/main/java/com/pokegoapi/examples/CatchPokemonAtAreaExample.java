@@ -39,6 +39,7 @@ import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
 import com.pokegoapi.api.settings.CatchOptions;
 import com.pokegoapi.api.settings.PokeballSelector;
 import com.pokegoapi.auth.PtcCredentialProvider;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -90,9 +91,9 @@ public class CatchPokemonAtAreaExample {
 
 			}
 
-		} catch (LoginFailedException | NoSuchItemException | RemoteServerException e) {
+		} catch (LoginFailedException | NoSuchItemException | RemoteServerException | CaptchaActiveException e) {
 			// failed to login, invalid credentials, auth issue or server issue.
-			Log.e("Main", "Failed to login or server issue: ", e);
+			Log.e("Main", "Failed to login, captcha or server issue: ", e);
 
 		}
 	}

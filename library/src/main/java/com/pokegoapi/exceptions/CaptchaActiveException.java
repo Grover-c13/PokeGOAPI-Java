@@ -13,21 +13,16 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.auth;
+package com.pokegoapi.exceptions;
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
+import lombok.Getter;
 
-/**
- * Any Credential Provider can extend this.
- */
-public abstract class CredentialProvider {
+public class CaptchaActiveException extends Exception {
+	@Getter
+	private String captcha;
 
-	public abstract String getTokenId() throws LoginFailedException, CaptchaActiveException, RemoteServerException;
-
-	public abstract AuthInfo getAuthInfo() throws LoginFailedException, CaptchaActiveException, RemoteServerException;
-
-	public abstract boolean isTokenIdExpired();
+	public CaptchaActiveException(AsyncCaptchaActiveException exception) {
+		super(exception.getMessage(), exception);
+		this.captcha = exception.getCaptcha();
+	}
 }

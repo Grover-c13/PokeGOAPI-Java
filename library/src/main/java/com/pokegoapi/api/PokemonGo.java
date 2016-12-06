@@ -39,6 +39,7 @@ import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
@@ -111,6 +112,9 @@ public class PokemonGo {
 	@Getter
 	private List<Listener> listeners = new ArrayList<Listener>();
 
+	@Getter
+	private boolean loggingIn;
+
 	/**
 	 * Instantiates a new Pokemon go.
 	 *
@@ -171,8 +175,11 @@ public class PokemonGo {
 	 * @param credentialProvider the credential provider
 	 * @throws LoginFailedException When login fails
 	 * @throws RemoteServerException When server fails
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void login(CredentialProvider credentialProvider) throws LoginFailedException, RemoteServerException {
+	public void login(CredentialProvider credentialProvider)
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+		this.loggingIn = true;
 		if (credentialProvider == null) {
 			throw new NullPointerException("Credential Provider is null");
 		}
@@ -183,9 +190,11 @@ public class PokemonGo {
 		inventories = new Inventories(this);
 
 		initialize();
+
+		this.loggingIn = false;
 	}
 
-	private void initialize() throws RemoteServerException, LoginFailedException {
+	private void initialize() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		fireRequestBlock(new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
 				CommonRequests.getDownloadRemoteConfigVersionMessageRequest()));
 
@@ -231,8 +240,10 @@ public class PokemonGo {
 	 * @param request server request
 	 * @throws LoginFailedException When login fails
 	 * @throws RemoteServerException When server fails
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	private void fireRequestBlock(ServerRequest request) throws RemoteServerException, LoginFailedException {
+	private void fireRequestBlock(ServerRequest request)
+			throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		ServerRequest[] requests = CommonRequests.fillRequest(request, this);
 
 		getRequestHandler().sendServerRequests(requests);
@@ -249,8 +260,9 @@ public class PokemonGo {
 	 *
 	 * @throws LoginFailedException When login fails
 	 * @throws RemoteServerException When server fails
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void fireRequestBlockTwo() throws RemoteServerException, LoginFailedException {
+	public void fireRequestBlockTwo() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		fireRequestBlock(new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
 				CommonRequests.getGetAssetDigestMessageRequest()));
 	}
@@ -279,9 +291,10 @@ public class PokemonGo {
 	 * @return AuthInfo object
 	 * @throws LoginFailedException when login fails
 	 * @throws RemoteServerException When server fails
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public AuthInfo getAuthInfo()
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		return credentialProvider.getAuthInfo();
 	}
 
@@ -398,6 +411,7 @@ public class PokemonGo {
 
 	/**
 	 * Updates the current challenge
+	 *
 	 * @param url the challenge url, if any
 	 * @param hasChallenge whether the challenge solve is required
 	 */
@@ -414,6 +428,7 @@ public class PokemonGo {
 
 	/**
 	 * Registers the given listener to this api.
+	 *
 	 * @param listener the listener to register
 	 */
 	public void addListener(Listener listener) {
@@ -431,6 +446,7 @@ public class PokemonGo {
 
 	/**
 	 * Returns all listeners for the given type.
+	 *
 	 * @param listenerType the type of listeners to return
 	 * @return all listeners for the given type
 	 */
@@ -446,6 +462,7 @@ public class PokemonGo {
 
 	/**
 	 * Invokes a method in all listeners of the given type
+	 *
 	 * @param listenerType the listener to call to
 	 * @param name the method name to call
 	 * @param parameters the parameters to pass to the method
@@ -479,14 +496,16 @@ public class PokemonGo {
 
 	/**
 	 * Verifies the current challenge with the given token.
+	 *
 	 * @param token the challenge response token
 	 * @return if the token was valid or not
 	 * @throws LoginFailedException when login fails
 	 * @throws RemoteServerException when server fails
 	 * @throws InvalidProtocolBufferException when the client receives an invalid message from the server
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public boolean verifyChallenge(String token)
-			throws RemoteServerException, LoginFailedException, InvalidProtocolBufferException {
+			throws RemoteServerException, CaptchaActiveException, LoginFailedException, InvalidProtocolBufferException {
 		hasChallenge = false;
 		VerifyChallengeMessage message = VerifyChallengeMessage.newBuilder().setToken(token).build();
 		AsyncServerRequest request = new AsyncServerRequest(RequestType.VERIFY_CHALLENGE, message);
@@ -501,14 +520,15 @@ public class PokemonGo {
 
 	/**
 	 * Checks for a challenge / captcha
+	 *
 	 * @return the new challenge URL, if any
 	 * @throws LoginFailedException when login fails
 	 * @throws RemoteServerException when server fails
 	 * @throws InvalidProtocolBufferException when the client receives an invalid message from the server
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public String checkChallenge()
-			throws RemoteServerException, LoginFailedException, InvalidProtocolBufferException {
-		updateChallenge(null, false);
+			throws RemoteServerException, CaptchaActiveException, LoginFailedException, InvalidProtocolBufferException {
 		CheckChallengeMessage message = CheckChallengeMessage.newBuilder().build();
 		AsyncServerRequest request = new AsyncServerRequest(RequestType.CHECK_CHALLENGE, message);
 		ByteString responseData =

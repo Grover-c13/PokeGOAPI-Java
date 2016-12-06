@@ -37,6 +37,7 @@ import com.pokegoapi.api.player.Avatar;
 import com.pokegoapi.api.player.PlayerAvatar;
 import com.pokegoapi.api.pokemon.StarterPokemon;
 import com.pokegoapi.auth.PtcCredentialProvider;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
@@ -93,7 +94,7 @@ public class TutorialHandleExample {
 				}
 			});
 			api.login(provider);
-		} catch (LoginFailedException | RemoteServerException e) {
+		} catch (LoginFailedException | RemoteServerException | CaptchaActiveException e) {
 			Log.e("Main", "Failed to login!", e);
 		}
 	}

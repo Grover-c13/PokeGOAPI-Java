@@ -15,18 +15,13 @@
 
 package com.pokegoapi.auth;
 
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import com.squareup.moshi.Moshi;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
@@ -35,6 +30,11 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 
 public class PtcCredentialProvider extends CredentialProvider {
@@ -66,9 +66,10 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 * @param time     a Time implementation
 	 * @throws LoginFailedException  When login fails
 	 * @throws RemoteServerException When server fails
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public PtcCredentialProvider(OkHttpClient client, String username, String password, Time time)
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		this.time = time;
 		this.username = username;
 		this.password = password;
@@ -118,9 +119,10 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 * @param password password
 	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public PtcCredentialProvider(OkHttpClient client, String username, String password)
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		this(client, username, password, new SystemTimeImpl());
 	}
 
@@ -132,8 +134,10 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 * @param password PTC password
 	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	private void login(String username, String password) throws LoginFailedException, RemoteServerException {
+	private void login(String username, String password)
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		//TODO: stop creating an okhttp client per request
 		Request get = new Request.Builder()
 				.url(LOGIN_URL)
@@ -253,7 +257,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 	}
 
 	@Override
-	public String getTokenId() throws LoginFailedException, RemoteServerException {
+	public String getTokenId() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		if (isTokenIdExpired()) {
 			login(username, password);
 		}
@@ -266,9 +270,10 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
 	 * @throws LoginFailedException  if failed to login
 	 * @throws RemoteServerException if the server failed to respond
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	@Override
-	public AuthInfo getAuthInfo() throws LoginFailedException, RemoteServerException {
+	public AuthInfo getAuthInfo() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		if (isTokenIdExpired()) {
 			login(username, password);
 		}

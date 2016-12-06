@@ -30,6 +30,7 @@ import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGym
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
@@ -53,9 +54,9 @@ public class Battle {
 	/**
 	 * New battle to track the state of a battle.
 	 *
-	 * @param api  The api instance to submit requests with.
+	 * @param api The api instance to submit requests with.
 	 * @param teams The Pokemon to use for attacking in the battle.
-	 * @param gym  The Gym to fight at.
+	 * @param gym The Gym to fight at.
 	 */
 	public Battle(PokemonGo api, Pokemon[] teams, Gym gym) {
 		this.teams = teams;
@@ -71,10 +72,11 @@ public class Battle {
 	 * Start a battle.
 	 *
 	 * @return Result of the attempt to start
-	 * @throws LoginFailedException  if the login failed
+	 * @throws LoginFailedException if the login failed
 	 * @throws RemoteServerException When a buffer exception is thrown
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public Result start() throws LoginFailedException, RemoteServerException {
+	public Result start() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		Builder builder = StartGymBattleMessageOuterClass.StartGymBattleMessage.newBuilder();
 
 		for (Pokemon team : teams) {
@@ -114,10 +116,12 @@ public class Battle {
 	 *
 	 * @param times the amount of times to attack
 	 * @return Battle
-	 * @throws LoginFailedException  if the login failed
+	 * @throws LoginFailedException if the login failed
 	 * @throws RemoteServerException When a buffer exception is thrown
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public AttackGymResponse attack(int times) throws LoginFailedException, RemoteServerException {
+	public AttackGymResponse attack(int times)
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 
 		ArrayList<BattleAction> actions = new ArrayList<>();
 
@@ -157,7 +161,8 @@ public class Battle {
 	 * @param index of defender(0 to gym lever)
 	 * @return Battle
 	 */
-	private PokemonDataOuterClass.PokemonData getDefender(int index) throws LoginFailedException, RemoteServerException {
+	private PokemonDataOuterClass.PokemonData getDefender(int index)
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		return gym.getGymMembers().get(0).getPokemonData();
 	}
 
@@ -178,7 +183,8 @@ public class Battle {
 	 *
 	 * @return AttackGymResponse
 	 */
-	private AttackGymResponse sendBlankAction() throws LoginFailedException, RemoteServerException {
+	private AttackGymResponse sendBlankAction()
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		AttackGymMessage message = AttackGymMessage
 				.newBuilder()
 				.setGymId(gym.getId())
@@ -205,7 +211,8 @@ public class Battle {
 	 * @param actions list of actions to send in this request
 	 * @return AttackGymResponse
 	 */
-	private AttackGymResponse doActions(List<BattleAction> actions) throws LoginFailedException, RemoteServerException {
+	private AttackGymResponse doActions(List<BattleAction> actions)
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 
 
 		AttackGymMessage.Builder message = AttackGymMessage

@@ -38,6 +38,7 @@ import com.pokegoapi.api.gym.Gym;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.auth.PtcCredentialProvider;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
@@ -94,9 +95,9 @@ public class FightGymExample {
 
 			}
 
-		} catch (LoginFailedException | RemoteServerException | InterruptedException e) {
+		} catch (LoginFailedException | RemoteServerException | InterruptedException | CaptchaActiveException e) {
 			// failed to login, invalid credentials, auth issue or server issue.
-			Log.e("Main", "Failed to login or server issue: ", e);
+			Log.e("Main", "Failed to login, captcha or server issue: ", e);
 
 		}
 	}

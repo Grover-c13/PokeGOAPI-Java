@@ -20,6 +20,7 @@ import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.auth.PtcCredentialProvider;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
@@ -53,9 +54,9 @@ public class TransferOnePidgeyExample {
 			} else {
 				Log.i("Main", "You have no pidgeys :O");
 			}
-		} catch (LoginFailedException | RemoteServerException e) {
+		} catch (LoginFailedException | RemoteServerException | CaptchaActiveException e) {
 			// failed to login, invalid credentials, auth issue or server issue.
-			Log.e("Main", "Failed to login. Invalid credentials or server issue: ", e);
+			Log.e("Main", "Failed to login. Invalid credentials, captcha or server issue: ", e);
 		}
 	}
 }

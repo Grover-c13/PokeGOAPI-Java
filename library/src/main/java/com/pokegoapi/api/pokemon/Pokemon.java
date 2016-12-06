@@ -15,20 +15,6 @@
 
 package com.pokegoapi.api.pokemon;
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.Item;
-import com.pokegoapi.api.map.pokemon.EvolutionResult;
-import com.pokegoapi.api.player.PlayerProfile;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.NoSuchItemException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.AsyncHelper;
-
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.EvolvePokemonMessageOuterClass.EvolvePokemonMessage;
@@ -47,6 +33,20 @@ import POGOProtos.Networking.Responses.SetFavoritePokemonResponseOuterClass.SetF
 import POGOProtos.Networking.Responses.UpgradePokemonResponseOuterClass.UpgradePokemonResponse;
 import POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass.UseItemPotionResponse;
 import POGOProtos.Networking.Responses.UseItemReviveResponseOuterClass.UseItemReviveResponse;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Item;
+import com.pokegoapi.api.map.pokemon.EvolutionResult;
+import com.pokegoapi.api.player.PlayerProfile;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
+import com.pokegoapi.exceptions.CaptchaActiveException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.NoSuchItemException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.util.AsyncHelper;
 import lombok.Getter;
 import lombok.Setter;
 import rx.Observable;
@@ -79,8 +79,9 @@ public class Pokemon extends PokemonDetails {
 	 * @return the result
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public Result transferPokemon() throws LoginFailedException, RemoteServerException {
+	public Result transferPokemon() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.RELEASE_POKEMON, reqMsg);
@@ -111,9 +112,10 @@ public class Pokemon extends PokemonDetails {
 	 * @return the nickname pokemon response . result
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public NicknamePokemonResponse.Result renamePokemon(String nickname)
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		NicknamePokemonMessage reqMsg = NicknamePokemonMessage.newBuilder()
 				.setPokemonId(getId())
 				.setNickname(nickname)
@@ -142,9 +144,10 @@ public class Pokemon extends PokemonDetails {
 	 * @return the SetFavoritePokemonResponse.Result
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public SetFavoritePokemonResponse.Result setFavoritePokemon(boolean markFavorite)
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		SetFavoritePokemonMessage reqMsg = SetFavoritePokemonMessage.newBuilder()
 				.setPokemonId(getId())
 				.setIsFavorite(markFavorite)
@@ -207,8 +210,10 @@ public class Pokemon extends PokemonDetails {
 	 * @return The result
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public UpgradePokemonResponse.Result powerUp() throws LoginFailedException, RemoteServerException {
+	public UpgradePokemonResponse.Result powerUp()
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		return AsyncHelper.toBlocking(powerUpAsync());
 	}
 
@@ -246,8 +251,9 @@ public class Pokemon extends PokemonDetails {
 	 * @return the evolution result
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public EvolutionResult evolve() throws LoginFailedException, RemoteServerException {
+	public EvolutionResult evolve() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.EVOLVE_POKEMON, reqMsg);
@@ -293,9 +299,10 @@ public class Pokemon extends PokemonDetails {
 	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communication issues occurred.
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public UseItemPotionResponse.Result heal()
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 
 		if (!isInjured())
 			return UseItemPotionResponse.Result.ERROR_CANNOT_USE;
@@ -323,9 +330,10 @@ public class Pokemon extends PokemonDetails {
 	 * @return Result, ERROR_CANNOT_USE if the requirements aren't met
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communications failed.
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public UseItemPotionResponse.Result usePotion(ItemId itemId)
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 
 		Item potion = api.getInventories().getItemBag().getItem(itemId);
 		//some sanity check, to prevent wrong use of this call
@@ -356,12 +364,13 @@ public class Pokemon extends PokemonDetails {
 	/**
 	 * Revive a pokemon, using various fallbacks for revive items
 	 *
-	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
+	 * @return Result, ERROR_CANNOT_USE if the requirements aren't met
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communications failed.
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public UseItemReviveResponse.Result revive()
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 
 		if (!isFainted())
 			return UseItemReviveResponse.Result.ERROR_CANNOT_USE;
@@ -380,12 +389,13 @@ public class Pokemon extends PokemonDetails {
 	 * to be revived.
 	 *
 	 * @param itemId {@link ItemId} of the Revive to use.
-	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
+	 * @return Result, ERROR_CANNOT_USE if the requirements aren't met
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communications failed.
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public UseItemReviveResponse.Result useRevive(ItemId itemId)
-			throws LoginFailedException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 
 		Item item = api.getInventories().getItemBag().getItem(itemId);
 		if (!item.isRevive() || item.getCount() < 1 || !isFainted())

@@ -13,21 +13,24 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.auth;
+package com.pokegoapi.exceptions;
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
+import lombok.Getter;
 
 /**
- * Any Credential Provider can extend this.
+ * Exception thrown when a message is requested to send, but a captcha is currently active
  */
-public abstract class CredentialProvider {
+public class AsyncCaptchaActiveException extends AsyncPokemonGoException {
+	@Getter
+	private String captcha;
 
-	public abstract String getTokenId() throws LoginFailedException, CaptchaActiveException, RemoteServerException;
+	public AsyncCaptchaActiveException(String captcha) {
+		super("Captcha must be solved before sending messages!");
+		this.captcha = captcha;
+	}
 
-	public abstract AuthInfo getAuthInfo() throws LoginFailedException, CaptchaActiveException, RemoteServerException;
-
-	public abstract boolean isTokenIdExpired();
+	public AsyncCaptchaActiveException(Exception exception, String captcha) {
+		super("Captcha must be solved before sending messages!", exception);
+		this.captcha = captcha;
+	}
 }
