@@ -56,6 +56,7 @@ import okhttp3.OkHttpClient;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -110,7 +111,9 @@ public class PokemonGo {
 	private String challengeURL;
 
 	@Getter
-	private List<Listener> listeners = new ArrayList<Listener>();
+	private List<Listener> listeners = Collections.synchronizedList(new ArrayList<Listener>());
+
+	private final Object lock = new Object();
 
 	@Getter
 	private boolean loggingIn;
@@ -452,9 +455,11 @@ public class PokemonGo {
 	 */
 	public <T extends Listener> List<T> getListeners(Class<T> listenerType) {
 		List<T> listeners = new ArrayList<T>();
-		for (Listener listener : this.listeners) {
-			if (listenerType.isAssignableFrom(listener.getClass())) {
-				listeners.add((T) listener);
+		synchronized (this.lock) {
+			for (Listener listener : this.listeners) {
+				if (listenerType.isAssignableFrom(listener.getClass())) {
+					listeners.add((T) listener);
+				}
 			}
 		}
 		return listeners;

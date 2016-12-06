@@ -54,9 +54,11 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.CommonRequests;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.security.SecureRandom;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -71,10 +73,14 @@ public class PlayerProfile {
 	private PlayerAvatar avatar;
 	private DailyBonus dailyBonus;
 	private ContactSettings contactSettings;
-	private Map<Currency, Integer> currencies = new EnumMap<>(Currency.class);
+	private Map<Currency, Integer> currencies =
+			Collections.synchronizedMap(new EnumMap<Currency, Integer>(Currency.class));
 	@Setter
 	private Stats stats;
 	private TutorialState tutorialState;
+
+	@Getter
+	private final Object lock = new Object();
 
 	/**
 	 * @param api the api
@@ -196,7 +202,9 @@ public class PlayerProfile {
 	 */
 	public void addCurrency(String name, int amount) throws InvalidCurrencyException {
 		try {
-			currencies.put(Currency.valueOf(name), amount);
+			synchronized (this.lock) {
+				currencies.put(Currency.valueOf(name), amount);
+			}
 		} catch (Exception e) {
 			throw new InvalidCurrencyException();
 		}
@@ -244,7 +252,12 @@ public class PlayerProfile {
 	 * @return the currency
 	 */
 	public int getCurrency(Currency currency) {
-		return currencies.get(currency);
+		synchronized (this.lock) {
+			if (!currencies.containsKey(currency)) {
+				return 0;
+			}
+			return currencies.get(currency);
+		}
 	}
 
 	public enum Currency {
