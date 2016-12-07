@@ -38,8 +38,8 @@ public class TransferOnePidgeyExample {
 		PokemonGo go = new PokemonGo(http);
 		try {
 			// check readme for other example
-			go.login(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN,
-					ExampleLoginDetails.PASSWORD));
+			go.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN,
+					ExampleConstants.PASSWORD));
 
 			List<Pokemon> pidgeys =
 					go.getInventories().getPokebank().getPokemonByPokemonId(PokemonIdOuterClass.PokemonId.PIDGEY);

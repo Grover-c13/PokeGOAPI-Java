@@ -121,6 +121,9 @@ public class PokemonMeta {
 	@Getter
 	@Setter
 	private int number;
+	@Getter
+	@Setter
+	private double buddyDistance;
 
 
 }

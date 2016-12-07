@@ -55,7 +55,7 @@ public class TutorialHandleExample {
 		final PokemonGo api = new PokemonGo(http);
 		try {
 			PtcCredentialProvider provider
-					= new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
+					= new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD);
 			// Add listener to listen for all tutorial related events, must be registered before login is called,
 			// otherwise it will not be used
 			api.addListener(new TutorialListener() {
@@ -68,7 +68,7 @@ public class TutorialHandleExample {
 					}
 					System.out.println("Selecting codename");
 					//Set the PTC name as the POGO username
-					return ExampleLoginDetails.LOGIN;
+					return ExampleConstants.LOGIN;
 				}
 
 				@Override

@@ -156,7 +156,8 @@ public class RequestHandler implements Runnable {
 			throws RemoteServerException, LoginFailedException, CaptchaActiveException {
 		List<Observable<ByteString>> observables = new ArrayList<>(serverRequests.length);
 		for (ServerRequest request : serverRequests) {
-			AsyncServerRequest asyncServerRequest = new AsyncServerRequest(request.getType(), request.getRequest());
+			AsyncServerRequest asyncServerRequest = new AsyncServerRequest(request.getType(), request.getRequest())
+					.withCommons(request.isRequireCommon());
 			observables.add(sendAsyncServerRequests(asyncServerRequest));
 		}
 		for (int i = 0; i != serverRequests.length; i++) {
@@ -336,18 +337,20 @@ public class RequestHandler implements Runnable {
 			try {
 				authTicket = internalSendServerRequests(authTicket, arrayServerRequests);
 
-				for (Map.Entry<ServerRequest, AsyncServerRequest> entry : requestMap.entrySet()) {
-					ServerRequest serverRequest = entry.getKey();
-					AsyncServerRequest request = entry.getValue();
+				for (ServerRequest request : serverRequests) {
+					AsyncServerRequest asyncRequest = requestMap.get(request);
 					try {
-						ByteString data = serverRequest.getData();
-						resultMap.put(request.getId(), ResultOrException.getResult(data));
+						ByteString data = request.getData();
+						if (asyncRequest != null) {
+							resultMap.put(asyncRequest.getId(), ResultOrException.getResult(data));
+						}
 						CommonRequests.parse(api, request.getType(), data);
 					} catch (InvalidProtocolBufferException e) {
-						resultMap.put(request.getId(), ResultOrException.getError(e));
+						if (asyncRequest != null) {
+							resultMap.put(asyncRequest.getId(), ResultOrException.getError(e));
+						}
 					}
 				}
-
 				continue;
 			} catch (RemoteServerException | LoginFailedException | CaptchaActiveException e) {
 				for (AsyncServerRequest request : requests) {

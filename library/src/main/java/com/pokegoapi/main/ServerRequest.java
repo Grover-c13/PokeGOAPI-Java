@@ -34,6 +34,8 @@ public class ServerRequest {
 	@Getter
 	private RequestTypeOuterClass.RequestType type;
 	private ByteString data;
+	@Getter
+	private boolean requireCommon;
 
 	/**
 	 * Instantiates a new Server request.
@@ -80,5 +82,14 @@ public class ServerRequest {
 			throw new InvalidProtocolBufferException("Contents of buffer are null");
 		}
 		return data;
+	}
+
+	/**
+	 * Adds a common request to this request
+	 * @return this object
+	 */
+	public ServerRequest withCommons() {
+		this.requireCommon = true;
+		return this;
 	}
 }

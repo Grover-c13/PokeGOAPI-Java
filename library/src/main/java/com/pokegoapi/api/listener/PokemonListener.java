@@ -1,6 +1,7 @@
 package com.pokegoapi.api.listener;
 
 import POGOProtos.Enums.EncounterTypeOuterClass.EncounterType;
+import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
@@ -36,4 +37,12 @@ public interface PokemonListener extends Listener {
 	 * @return true to abort the capture and false to retry
 	 */
 	boolean onCatchEscape(PokemonGo api, CatchablePokemon pokemon, Pokeball pokeball, int throwCount);
+
+	/**
+	 * Called when your buddy pokemon finds candies
+	 * @param api the current api
+	 * @param family the candy family type
+	 * @param candyCount the amount of candies found
+	 */
+	void onBuddyFindCandy(PokemonGo api, PokemonFamilyId family, int candyCount);
 }

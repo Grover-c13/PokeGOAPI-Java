@@ -73,9 +73,8 @@ public class SolveCaptchaExample {
 				}
 			});
 
-			api.login(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD));
-//			api.setLocation(-32.058087, 115.744325, 0);
-			api.setLocation(51.507340, -0.127760, 0);
+			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD));
+			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 
 			while (!api.hasChallenge()) {
 			}

@@ -52,12 +52,12 @@ public class UseIncenseExample {
 
 		try {
 			GoogleAutoCredentialProvider authProvider =
-					new GoogleAutoCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
-			//new PtcLogin(http).login(ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
+					new GoogleAutoCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD);
+			//new PtcLogin(http).login(ExampleConstants.LOGIN, ExampleConstants.PASSWORD);
 
 			go.login(authProvider);
 
-			go.setLocation(45.817521, 16.028199, 0);
+			go.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 			go.getInventories().getItemBag().useIncense();
 
 		} catch (LoginFailedException | RemoteServerException | CaptchaActiveException e) {

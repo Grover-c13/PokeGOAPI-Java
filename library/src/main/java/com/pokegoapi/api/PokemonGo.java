@@ -23,8 +23,6 @@ import POGOProtos.Networking.Requests.Messages.VerifyChallenge.VerifyChallengeMe
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckChallengeResponseOuterClass.CheckChallengeResponse;
-import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import POGOProtos.Networking.Responses.VerifyChallengeResponseOuterClass.VerifyChallengeResponse;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -188,9 +186,9 @@ public class PokemonGo {
 		}
 		this.credentialProvider = credentialProvider;
 		startTime = currentTimeMillis();
-		playerProfile = new PlayerProfile(this);
-		settings = new Settings(this);
 		inventories = new Inventories(this);
+		settings = new Settings(this);
+		playerProfile = new PlayerProfile(this);
 
 		initialize();
 
@@ -247,15 +245,7 @@ public class PokemonGo {
 	 */
 	private void fireRequestBlock(ServerRequest request)
 			throws RemoteServerException, CaptchaActiveException, LoginFailedException {
-		ServerRequest[] requests = CommonRequests.fillRequest(request, this);
-
-		getRequestHandler().sendServerRequests(requests);
-		try {
-			inventories.updateInventories(GetInventoryResponse.parseFrom(requests[3].getData()));
-			settings.updateSettings(DownloadSettingsResponse.parseFrom(requests[5].getData()));
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException();
-		}
+		getRequestHandler().sendServerRequests(request.withCommons());
 	}
 
 	/**

@@ -21,19 +21,24 @@ import POGOProtos.Networking.Requests.Messages.CheckChallenge.CheckChallengeMess
 import POGOProtos.Networking.Requests.Messages.DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass.DownloadSettingsMessage;
 import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.GetAssetDigestMessage;
+import POGOProtos.Networking.Requests.Messages.GetBuddyWalked.GetBuddyWalkedMessage;
 import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
 import POGOProtos.Networking.Responses.CheckChallengeResponseOuterClass.CheckChallengeResponse;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
+import POGOProtos.Networking.Responses.GetBuddyWalkedResponseOuterClass.GetBuddyWalkedResponse;
 import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.listener.PokemonListener;
 import com.pokegoapi.util.Constant;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -73,7 +78,7 @@ public class CommonRequests {
 		COMMON_REQUESTS.put(RequestType.GET_INVENTORY, new CommonRequest() {
 			@Override
 			public ServerRequest create(PokemonGo api, RequestType requestType) {
-				return new ServerRequest(requestType, GetInventoryMessage.getDefaultInstance());
+				return new ServerRequest(requestType, CommonRequests.getDefaultGetInventoryMessage(api));
 			}
 
 			@Override
@@ -92,12 +97,18 @@ public class CommonRequests {
 			@Override
 			public void parse(PokemonGo api, ByteString data, RequestType requestType)
 					throws InvalidProtocolBufferException {
+				CheckAwardedBadgesResponse response = CheckAwardedBadgesResponse.parseFrom(data);
+				try {
+					api.getPlayerProfile().updateAwardedMedals(response);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		});
 		COMMON_REQUESTS.put(RequestType.DOWNLOAD_SETTINGS, new CommonRequest() {
 			@Override
 			public ServerRequest create(PokemonGo api, RequestType requestType) {
-				return new ServerRequest(requestType, DownloadSettingsMessage.getDefaultInstance());
+				return new ServerRequest(requestType, CommonRequests.getDownloadSettingsMessageRequest(api));
 			}
 
 			@Override
@@ -105,6 +116,25 @@ public class CommonRequests {
 					throws InvalidProtocolBufferException {
 				DownloadSettingsResponse response = DownloadSettingsResponse.parseFrom(data);
 				api.getSettings().updateSettings(response);
+			}
+		});
+		COMMON_REQUESTS.put(RequestType.GET_BUDDY_WALKED, new CommonRequest() {
+			@Override
+			public ServerRequest create(PokemonGo api, RequestType requestType) {
+				return new ServerRequest(requestType, GetBuddyWalkedMessage.getDefaultInstance());
+			}
+
+			@Override
+			public void parse(PokemonGo api, ByteString data, RequestType requestType)
+					throws InvalidProtocolBufferException {
+				GetBuddyWalkedResponse response = GetBuddyWalkedResponse.parseFrom(data);
+				int candies = response.getCandyEarnedCount();
+				if (response.getSuccess() && candies > 0) {
+					List<PokemonListener> listeners = api.getListeners(PokemonListener.class);
+					for (PokemonListener listener : listeners) {
+						listener.onBuddyFindCandy(api, response.getFamilyCandyId(), candies);
+					}
+				}
 			}
 		});
 	}
@@ -159,18 +189,6 @@ public class CommonRequests {
 	}
 
 	/**
-	 * Append CheckChallenge request to the given ServerRequest
-	 *
-	 * @param api the current api instance
-	 * @param requests The main requests we want to fire
-	 * @return an array of ServerRequests
-	 */
-	public static ServerRequest[] appendCheckChallenge(PokemonGo api, ServerRequest... requests) {
-		RequestType type = RequestType.CHECK_CHALLENGE;
-		return Utils.appendRequests(requests, COMMON_REQUESTS.get(type).create(api, type));
-	}
-
-	/**
 	 * Most of the requests from the official client are fired together with the following
 	 * requests. We will append our request on top of the array and we will send it
 	 * together with the others.
@@ -178,7 +196,10 @@ public class CommonRequests {
 	 * @param request The main request we want to fire
 	 * @param api The current instance of PokemonGO
 	 * @return an array of ServerRequest
+	 *
+	 * @deprecated Use ServerRequest#withCommons
 	 */
+	@Deprecated
 	public static ServerRequest[] fillRequest(ServerRequest request, PokemonGo api) {
 		return Utils.appendRequests(new ServerRequest[]{request}, getCommonRequests(api));
 	}

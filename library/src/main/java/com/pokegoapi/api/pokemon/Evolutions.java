@@ -305,7 +305,7 @@ public class Evolutions {
 		List<PokemonId> highest = new ArrayList<>();
 		Evolution evolution = getEvolution(pokemon);
 		if (evolution != null) {
-			if (evolution.getEvolutions() != null) {
+			if (evolution.getEvolutions() != null && evolution.getEvolutions().size() > 0) {
 				for (PokemonId child : evolution.getEvolutions()) {
 					highest.addAll(getHighest(child));
 				}
