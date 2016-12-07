@@ -530,7 +530,7 @@ public class PokemonGo {
 				AsyncHelper.toBlocking(getRequestHandler().sendAsyncServerRequests(request));
 		CheckChallengeResponse response = CheckChallengeResponse.parseFrom(responseData);
 		String newChallenge = response.getChallengeUrl();
-		if (newChallenge != null && newChallenge.length() > 0) {
+		if (response.getShowChallenge() && newChallenge != null && newChallenge.length() > 0) {
 			updateChallenge(newChallenge, true);
 			return newChallenge;
 		}
