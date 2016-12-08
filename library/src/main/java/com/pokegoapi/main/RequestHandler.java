@@ -305,8 +305,7 @@ public class RequestHandler implements Runnable {
 			if (api.hasChallenge() & !api.isLoggingIn()) {
 				for (AsyncServerRequest request : requests) {
 					RequestTypeOuterClass.RequestType type = request.getType();
-					if (type == RequestTypeOuterClass.RequestType.CHECK_CHALLENGE
-							|| type == RequestTypeOuterClass.RequestType.VERIFY_CHALLENGE) {
+					if (type == RequestTypeOuterClass.RequestType.VERIFY_CHALLENGE) {
 						ServerRequest serverRequest = new ServerRequest(type, request.getRequest());
 						serverRequests.add(serverRequest);
 						requestMap.put(serverRequest, request);
