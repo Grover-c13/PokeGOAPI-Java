@@ -35,7 +35,7 @@ public class AsyncServerRequest {
 	@Getter
 	private final Request request;
 	@Getter
-	private final boolean requireCommonRequest;
+	private boolean requireCommonRequest;
 
 	/**
 	 * Instantiates a new Server request.
@@ -73,5 +73,15 @@ public class AsyncServerRequest {
 		this.type = type;
 		this.request = req;
 		this.requireCommonRequest = false;
+	}
+
+	/**
+	 * Adds a common request to this request if the given parameter is true
+	 * @param requireCommon if this request should add commons
+	 * @return this object
+	 */
+	public AsyncServerRequest withCommons(boolean requireCommon) {
+		this.requireCommonRequest = requireCommon;
+		return this;
 	}
 }

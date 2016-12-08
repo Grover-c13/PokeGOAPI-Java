@@ -69,6 +69,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SLUDGE_BOMB
 		});
 		metap.setNumber(1);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.BULBASAUR, metap);
 
 		metap = new PokemonMeta();
@@ -112,6 +113,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SOLAR_BEAM
 		});
 		metap.setNumber(2);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.IVYSAUR, metap);
 
 		metap = new PokemonMeta();
@@ -155,6 +157,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SOLAR_BEAM
 		});
 		metap.setNumber(3);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.VENUSAUR, metap);
 
 		metap = new PokemonMeta();
@@ -198,6 +201,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.FLAMETHROWER
 		});
 		metap.setNumber(4);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.CHARMANDER, metap);
 
 		metap = new PokemonMeta();
@@ -241,6 +245,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.FLAMETHROWER
 		});
 		metap.setNumber(5);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.CHARMELEON, metap);
 
 		metap = new PokemonMeta();
@@ -284,6 +289,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.FLAMETHROWER
 		});
 		metap.setNumber(6);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.CHARIZARD, metap);
 
 		metap = new PokemonMeta();
@@ -327,6 +333,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.WATER_PULSE
 		});
 		metap.setNumber(7);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.SQUIRTLE, metap);
 
 		metap = new PokemonMeta();
@@ -370,6 +377,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.ICE_BEAM
 		});
 		metap.setNumber(8);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.WARTORTLE, metap);
 
 		metap = new PokemonMeta();
@@ -413,6 +421,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.ICE_BEAM
 		});
 		metap.setNumber(9);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.BLASTOISE, metap);
 
 		metap = new PokemonMeta();
@@ -453,6 +462,7 @@ public class PokemonMetaRegistry {
 		metap.setCinematicMoves(new PokemonMove[]{
 				PokemonMove.STRUGGLE
 		});
+		metap.setBuddyDistance(1.0);
 		metap.setNumber(10);
 		meta.put(PokemonId.CATERPIE, metap);
 
@@ -495,6 +505,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.STRUGGLE
 		});
 		metap.setNumber(11);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.METAPOD, metap);
 
 		metap = new PokemonMeta();
@@ -538,6 +549,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SIGNAL_BEAM
 		});
 		metap.setNumber(12);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.BUTTERFREE, metap);
 
 		metap = new PokemonMeta();
@@ -579,6 +591,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.STRUGGLE
 		});
 		metap.setNumber(13);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.WEEDLE, metap);
 
 		metap = new PokemonMeta();
@@ -620,6 +633,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.STRUGGLE
 		});
 		metap.setNumber(14);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.KAKUNA, metap);
 
 		metap = new PokemonMeta();
@@ -663,6 +677,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.X_SCISSOR
 		});
 		metap.setNumber(15);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.BEEDRILL, metap);
 
 		metap = new PokemonMeta();
@@ -706,6 +721,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.TWISTER
 		});
 		metap.setNumber(16);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.PIDGEY, metap);
 
 		metap = new PokemonMeta();
@@ -749,6 +765,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.TWISTER
 		});
 		metap.setNumber(17);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.PIDGEOTTO, metap);
 
 		metap = new PokemonMeta();
@@ -792,6 +809,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.HURRICANE
 		});
 		metap.setNumber(18);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.PIDGEOT, metap);
 
 		metap = new PokemonMeta();
@@ -835,6 +853,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.HYPER_FANG
 		});
 		metap.setNumber(19);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.RATTATA, metap);
 
 		metap = new PokemonMeta();
@@ -878,6 +897,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.HYPER_FANG
 		});
 		metap.setNumber(20);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.RATICATE, metap);
 
 		metap = new PokemonMeta();
@@ -921,6 +941,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.TWISTER
 		});
 		metap.setNumber(21);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.SPEAROW, metap);
 
 		metap = new PokemonMeta();
@@ -964,6 +985,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.TWISTER
 		});
 		metap.setNumber(22);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.FEAROW, metap);
 
 		metap = new PokemonMeta();
@@ -1007,6 +1029,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.WRAP
 		});
 		metap.setNumber(23);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.EKANS, metap);
 
 		metap = new PokemonMeta();
@@ -1050,6 +1073,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SLUDGE_WAVE
 		});
 		metap.setNumber(24);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.ARBOK, metap);
 
 		metap = new PokemonMeta();
@@ -1093,6 +1117,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.THUNDERBOLT
 		});
 		metap.setNumber(25);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.PIKACHU, metap);
 
 		metap = new PokemonMeta();
@@ -1136,6 +1161,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.THUNDER_PUNCH
 		});
 		metap.setNumber(26);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.RAICHU, metap);
 
 		metap = new PokemonMeta();
@@ -1179,6 +1205,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.ROCK_TOMB
 		});
 		metap.setNumber(27);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.SANDSHREW, metap);
 
 		metap = new PokemonMeta();
@@ -1222,6 +1249,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.ROCK_TOMB
 		});
 		metap.setNumber(28);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.SANDSLASH, metap);
 
 		metap = new PokemonMeta();
@@ -1265,6 +1293,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SLUDGE_BOMB
 		});
 		metap.setNumber(29);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.NIDORAN_FEMALE, metap);
 
 		metap = new PokemonMeta();
@@ -1308,6 +1337,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SLUDGE_BOMB
 		});
 		metap.setNumber(30);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.NIDORINA, metap);
 
 		metap = new PokemonMeta();
@@ -1351,6 +1381,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.STONE_EDGE
 		});
 		metap.setNumber(31);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.NIDOQUEEN, metap);
 
 		metap = new PokemonMeta();
@@ -1394,6 +1425,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SLUDGE_BOMB
 		});
 		metap.setNumber(32);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.NIDORAN_MALE, metap);
 
 		metap = new PokemonMeta();
@@ -1437,6 +1469,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SLUDGE_BOMB
 		});
 		metap.setNumber(33);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.NIDORINO, metap);
 
 		metap = new PokemonMeta();
@@ -1480,6 +1513,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SLUDGE_WAVE
 		});
 		metap.setNumber(34);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.NIDOKING, metap);
 
 		metap = new PokemonMeta();
@@ -1523,6 +1557,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.MOONBLAST
 		});
 		metap.setNumber(35);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.CLEFAIRY, metap);
 
 		metap = new PokemonMeta();
@@ -1566,6 +1601,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.PSYCHIC
 		});
 		metap.setNumber(36);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.CLEFABLE, metap);
 
 		metap = new PokemonMeta();
@@ -1609,6 +1645,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.FLAMETHROWER
 		});
 		metap.setNumber(37);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.VULPIX, metap);
 
 		metap = new PokemonMeta();
@@ -1652,6 +1689,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.HEAT_WAVE
 		});
 		metap.setNumber(38);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.NINETALES, metap);
 
 		metap = new PokemonMeta();
@@ -1696,6 +1734,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.PLAY_ROUGH
 		});
 		metap.setNumber(39);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.JIGGLYPUFF, metap);
 
 		metap = new PokemonMeta();
@@ -1739,6 +1778,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.PLAY_ROUGH
 		});
 		metap.setNumber(40);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.WIGGLYTUFF, metap);
 
 		metap = new PokemonMeta();
@@ -1782,6 +1822,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SLUDGE_BOMB
 		});
 		metap.setNumber(41);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.ZUBAT, metap);
 
 		metap = new PokemonMeta();
@@ -1825,6 +1866,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.POISON_FANG
 		});
 		metap.setNumber(42);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.GOLBAT, metap);
 
 		metap = new PokemonMeta();
@@ -1868,6 +1910,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SLUDGE_BOMB
 		});
 		metap.setNumber(43);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.ODDISH, metap);
 
 		metap = new PokemonMeta();
@@ -1911,6 +1954,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SLUDGE_BOMB
 		});
 		metap.setNumber(44);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.GLOOM, metap);
 
 		metap = new PokemonMeta();
@@ -1954,6 +1998,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SOLAR_BEAM
 		});
 		metap.setNumber(45);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.VILEPLUME, metap);
 
 		metap = new PokemonMeta();
@@ -1997,6 +2042,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.X_SCISSOR
 		});
 		metap.setNumber(46);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.PARAS, metap);
 
 		metap = new PokemonMeta();
@@ -2040,6 +2086,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.X_SCISSOR
 		});
 		metap.setNumber(47);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.PARASECT, metap);
 
 		metap = new PokemonMeta();
@@ -2083,6 +2130,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SIGNAL_BEAM
 		});
 		metap.setNumber(48);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.VENONAT, metap);
 
 		metap = new PokemonMeta();
@@ -2126,6 +2174,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.PSYCHIC
 		});
 		metap.setNumber(49);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.VENOMOTH, metap);
 
 		metap = new PokemonMeta();
@@ -2170,6 +2219,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.ROCK_TOMB
 		});
 		metap.setNumber(50);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.DIGLETT, metap);
 
 		metap = new PokemonMeta();
@@ -2214,6 +2264,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.STONE_EDGE
 		});
 		metap.setNumber(51);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.DUGTRIO, metap);
 
 		metap = new PokemonMeta();
@@ -2257,6 +2308,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.NIGHT_SLASH
 		});
 		metap.setNumber(52);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.MEOWTH, metap);
 
 		metap = new PokemonMeta();
@@ -2300,6 +2352,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.POWER_GEM
 		});
 		metap.setNumber(53);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.PERSIAN, metap);
 
 		metap = new PokemonMeta();
@@ -2343,6 +2396,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.PSYBEAM
 		});
 		metap.setNumber(54);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.PSYDUCK, metap);
 
 		metap = new PokemonMeta();
@@ -2386,6 +2440,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.PSYCHIC
 		});
 		metap.setNumber(55);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.GOLDUCK, metap);
 
 		metap = new PokemonMeta();
@@ -2429,6 +2484,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.LOW_SWEEP
 		});
 		metap.setNumber(56);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.MANKEY, metap);
 
 		metap = new PokemonMeta();
@@ -2472,6 +2528,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.NIGHT_SLASH
 		});
 		metap.setNumber(57);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.PRIMEAPE, metap);
 
 		metap = new PokemonMeta();
@@ -2515,6 +2572,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.FLAMETHROWER
 		});
 		metap.setNumber(58);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.GROWLITHE, metap);
 
 		metap = new PokemonMeta();
@@ -2558,6 +2616,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.FLAMETHROWER
 		});
 		metap.setNumber(59);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.ARCANINE, metap);
 
 		metap = new PokemonMeta();
@@ -2601,6 +2660,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.MUD_BOMB
 		});
 		metap.setNumber(60);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.POLIWAG, metap);
 
 		metap = new PokemonMeta();
@@ -2644,6 +2704,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SCALD
 		});
 		metap.setNumber(61);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.POLIWHIRL, metap);
 
 		metap = new PokemonMeta();
@@ -2687,6 +2748,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SUBMISSION
 		});
 		metap.setNumber(62);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.POLIWRATH, metap);
 
 		metap = new PokemonMeta();
@@ -2729,6 +2791,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SIGNAL_BEAM
 		});
 		metap.setNumber(63);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.ABRA, metap);
 
 		metap = new PokemonMeta();
@@ -2772,6 +2835,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SHADOW_BALL
 		});
 		metap.setNumber(64);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.KADABRA, metap);
 
 		metap = new PokemonMeta();
@@ -2815,6 +2879,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SHADOW_BALL
 		});
 		metap.setNumber(65);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.ALAKAZAM, metap);
 
 		metap = new PokemonMeta();
@@ -2858,6 +2923,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.LOW_SWEEP
 		});
 		metap.setNumber(66);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.MACHOP, metap);
 
 		metap = new PokemonMeta();
@@ -2901,6 +2967,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SUBMISSION
 		});
 		metap.setNumber(67);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.MACHOKE, metap);
 
 		metap = new PokemonMeta();
@@ -2944,6 +3011,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SUBMISSION
 		});
 		metap.setNumber(68);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.MACHAMP, metap);
 
 		metap = new PokemonMeta();
@@ -2987,6 +3055,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.WRAP
 		});
 		metap.setNumber(69);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.BELLSPROUT, metap);
 
 		metap = new PokemonMeta();
@@ -3030,6 +3099,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SLUDGE_BOMB
 		});
 		metap.setNumber(70);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.WEEPINBELL, metap);
 
 		metap = new PokemonMeta();
@@ -3073,6 +3143,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SOLAR_BEAM
 		});
 		metap.setNumber(71);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.VICTREEBEL, metap);
 
 		metap = new PokemonMeta();
@@ -3116,6 +3187,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.WRAP
 		});
 		metap.setNumber(72);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.TENTACOOL, metap);
 
 		metap = new PokemonMeta();
@@ -3159,6 +3231,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SLUDGE_WAVE
 		});
 		metap.setNumber(73);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.TENTACRUEL, metap);
 
 		metap = new PokemonMeta();
@@ -3202,6 +3275,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.ROCK_TOMB
 		});
 		metap.setNumber(74);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.GEODUDE, metap);
 
 		metap = new PokemonMeta();
@@ -3246,6 +3320,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.STONE_EDGE
 		});
 		metap.setNumber(75);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.GRAVELER, metap);
 
 		metap = new PokemonMeta();
@@ -3290,6 +3365,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.STONE_EDGE
 		});
 		metap.setNumber(76);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.GOLEM, metap);
 
 		metap = new PokemonMeta();
@@ -3333,6 +3409,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.FLAME_WHEEL
 		});
 		metap.setNumber(77);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.PONYTA, metap);
 
 		metap = new PokemonMeta();
@@ -3376,6 +3453,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.HEAT_WAVE
 		});
 		metap.setNumber(78);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.RAPIDASH, metap);
 
 		metap = new PokemonMeta();
@@ -3419,6 +3497,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.WATER_PULSE
 		});
 		metap.setNumber(79);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.SLOWPOKE, metap);
 
 		metap = new PokemonMeta();
@@ -3462,6 +3541,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.WATER_PULSE
 		});
 		metap.setNumber(80);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.SLOWBRO, metap);
 
 		metap = new PokemonMeta();
@@ -3505,6 +3585,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.THUNDERBOLT
 		});
 		metap.setNumber(81);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.MAGNEMITE, metap);
 
 		metap = new PokemonMeta();
@@ -3548,6 +3629,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.MAGNET_BOMB
 		});
 		metap.setNumber(82);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.MAGNETON, metap);
 
 		metap = new PokemonMeta();
@@ -3591,6 +3673,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.LEAF_BLADE
 		});
 		metap.setNumber(83);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.FARFETCHD, metap);
 
 		metap = new PokemonMeta();
@@ -3634,6 +3717,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SWIFT
 		});
 		metap.setNumber(84);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.DODUO, metap);
 
 		metap = new PokemonMeta();
@@ -3677,6 +3761,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.DRILL_PECK
 		});
 		metap.setNumber(85);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.DODRIO, metap);
 
 		metap = new PokemonMeta();
@@ -3721,6 +3806,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.ICY_WIND
 		});
 		metap.setNumber(86);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.SEEL, metap);
 
 		metap = new PokemonMeta();
@@ -3764,6 +3850,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.ICY_WIND
 		});
 		metap.setNumber(87);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.DEWGONG, metap);
 
 		metap = new PokemonMeta();
@@ -3808,6 +3895,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SLUDGE_BOMB
 		});
 		metap.setNumber(88);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.GRIMER, metap);
 
 		metap = new PokemonMeta();
@@ -3852,6 +3940,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SLUDGE_WAVE
 		});
 		metap.setNumber(89);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.MUK, metap);
 
 		metap = new PokemonMeta();
@@ -3895,6 +3984,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.WATER_PULSE
 		});
 		metap.setNumber(90);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.SHELLDER, metap);
 
 		metap = new PokemonMeta();
@@ -3938,6 +4028,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.ICY_WIND
 		});
 		metap.setNumber(91);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.CLOYSTER, metap);
 
 		metap = new PokemonMeta();
@@ -3980,7 +4071,9 @@ public class PokemonMetaRegistry {
 				PokemonMove.OMINOUS_WIND,
 				PokemonMove.SLUDGE_BOMB
 		});
+		metap.setBuddyDistance(3.0);
 		metap.setNumber(92);
+
 		meta.put(PokemonId.GASTLY, metap);
 
 		metap = new PokemonMeta();
@@ -4024,6 +4117,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SLUDGE_BOMB
 		});
 		metap.setNumber(93);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.HAUNTER, metap);
 
 		metap = new PokemonMeta();
@@ -4068,6 +4162,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SLUDGE_WAVE
 		});
 		metap.setNumber(94);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.GENGAR, metap);
 
 		metap = new PokemonMeta();
@@ -4111,6 +4206,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.STONE_EDGE
 		});
 		metap.setNumber(95);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.ONIX, metap);
 
 		metap = new PokemonMeta();
@@ -4154,6 +4250,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.PSYSHOCK
 		});
 		metap.setNumber(96);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.DROWZEE, metap);
 
 		metap = new PokemonMeta();
@@ -4197,6 +4294,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SHADOW_BALL
 		});
 		metap.setNumber(97);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.HYPNO, metap);
 
 		metap = new PokemonMeta();
@@ -4240,6 +4338,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.WATER_PULSE
 		});
 		metap.setNumber(98);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.KRABBY, metap);
 
 		metap = new PokemonMeta();
@@ -4283,6 +4382,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.X_SCISSOR
 		});
 		metap.setNumber(99);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.KINGLER, metap);
 
 		metap = new PokemonMeta();
@@ -4326,6 +4426,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.THUNDERBOLT
 		});
 		metap.setNumber(100);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.VOLTORB, metap);
 
 		metap = new PokemonMeta();
@@ -4369,6 +4470,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.THUNDERBOLT
 		});
 		metap.setNumber(101);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.ELECTRODE, metap);
 
 		metap = new PokemonMeta();
@@ -4411,6 +4513,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SEED_BOMB
 		});
 		metap.setNumber(102);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.EXEGGCUTE, metap);
 
 		metap = new PokemonMeta();
@@ -4454,6 +4557,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SOLAR_BEAM
 		});
 		metap.setNumber(103);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.EXEGGUTOR, metap);
 
 		metap = new PokemonMeta();
@@ -4497,6 +4601,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.DIG
 		});
 		metap.setNumber(104);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.CUBONE, metap);
 
 		metap = new PokemonMeta();
@@ -4540,6 +4645,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.EARTHQUAKE
 		});
 		metap.setNumber(105);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.MAROWAK, metap);
 
 		metap = new PokemonMeta();
@@ -4584,6 +4690,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.STONE_EDGE
 		});
 		metap.setNumber(106);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.HITMONLEE, metap);
 
 		metap = new PokemonMeta();
@@ -4628,6 +4735,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.THUNDER_PUNCH
 		});
 		metap.setNumber(107);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.HITMONCHAN, metap);
 
 		metap = new PokemonMeta();
@@ -4671,6 +4779,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.STOMP
 		});
 		metap.setNumber(108);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.LICKITUNG, metap);
 
 		metap = new PokemonMeta();
@@ -4714,6 +4823,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SLUDGE_BOMB
 		});
 		metap.setNumber(109);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.KOFFING, metap);
 
 		metap = new PokemonMeta();
@@ -4757,6 +4867,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SLUDGE_BOMB
 		});
 		metap.setNumber(110);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.WEEZING, metap);
 
 		metap = new PokemonMeta();
@@ -4800,6 +4911,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.STOMP
 		});
 		metap.setNumber(111);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.RHYHORN, metap);
 
 		metap = new PokemonMeta();
@@ -4843,6 +4955,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.STONE_EDGE
 		});
 		metap.setNumber(112);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.RHYDON, metap);
 
 		metap = new PokemonMeta();
@@ -4887,6 +5000,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.PSYCHIC
 		});
 		metap.setNumber(113);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.CHANSEY, metap);
 
 		metap = new PokemonMeta();
@@ -4929,6 +5043,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SOLAR_BEAM
 		});
 		metap.setNumber(114);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.TANGELA, metap);
 
 		metap = new PokemonMeta();
@@ -4972,6 +5087,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.STOMP
 		});
 		metap.setNumber(115);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.KANGASKHAN, metap);
 
 		metap = new PokemonMeta();
@@ -5015,6 +5131,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.FLASH_CANNON
 		});
 		metap.setNumber(116);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.HORSEA, metap);
 
 		metap = new PokemonMeta();
@@ -5058,6 +5175,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.HYDRO_PUMP
 		});
 		metap.setNumber(117);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.SEADRA, metap);
 
 		metap = new PokemonMeta();
@@ -5101,6 +5219,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.WATER_PULSE
 		});
 		metap.setNumber(118);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.GOLDEEN, metap);
 
 		metap = new PokemonMeta();
@@ -5144,6 +5263,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.MEGAHORN
 		});
 		metap.setNumber(119);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.SEAKING, metap);
 
 		metap = new PokemonMeta();
@@ -5188,6 +5308,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SWIFT
 		});
 		metap.setNumber(120);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.STARYU, metap);
 
 		metap = new PokemonMeta();
@@ -5233,6 +5354,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.PSYCHIC
 		});
 		metap.setNumber(121);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.STARMIE, metap);
 
 		metap = new PokemonMeta();
@@ -5276,6 +5398,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SHADOW_BALL
 		});
 		metap.setNumber(122);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.MR_MIME, metap);
 
 		metap = new PokemonMeta();
@@ -5319,6 +5442,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.X_SCISSOR
 		});
 		metap.setNumber(123);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.SCYTHER, metap);
 
 		metap = new PokemonMeta();
@@ -5362,6 +5486,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.PSYSHOCK
 		});
 		metap.setNumber(124);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.JYNX, metap);
 
 		metap = new PokemonMeta();
@@ -5405,6 +5530,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.THUNDERBOLT
 		});
 		metap.setNumber(125);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.ELECTABUZZ, metap);
 
 		metap = new PokemonMeta();
@@ -5448,6 +5574,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.FLAMETHROWER
 		});
 		metap.setNumber(126);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.MAGMAR, metap);
 
 		metap = new PokemonMeta();
@@ -5491,6 +5618,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.X_SCISSOR
 		});
 		metap.setNumber(127);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.PINSIR, metap);
 
 		metap = new PokemonMeta();
@@ -5534,6 +5662,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.IRON_HEAD
 		});
 		metap.setNumber(128);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.TAUROS, metap);
 
 		metap = new PokemonMeta();
@@ -5574,6 +5703,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.STRUGGLE
 		});
 		metap.setNumber(129);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.MAGIKARP, metap);
 
 		metap = new PokemonMeta();
@@ -5617,6 +5747,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.TWISTER
 		});
 		metap.setNumber(130);
+		metap.setBuddyDistance(1.0);
 		meta.put(PokemonId.GYARADOS, metap);
 
 		metap = new PokemonMeta();
@@ -5659,6 +5790,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.DRAGON_PULSE,
 				PokemonMove.ICE_BEAM
 		});
+		metap.setBuddyDistance(5.0);
 		metap.setNumber(131);
 		meta.put(PokemonId.LAPRAS, metap);
 
@@ -5700,6 +5832,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.STRUGGLE
 		});
 		metap.setNumber(132);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.DITTO, metap);
 
 		metap = new PokemonMeta();
@@ -5743,6 +5876,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SWIFT
 		});
 		metap.setNumber(133);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.EEVEE, metap);
 
 		metap = new PokemonMeta();
@@ -5785,6 +5919,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.WATER_PULSE
 		});
 		metap.setNumber(134);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.VAPOREON, metap);
 
 		metap = new PokemonMeta();
@@ -5827,6 +5962,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.THUNDERBOLT
 		});
 		metap.setNumber(135);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.JOLTEON, metap);
 
 		metap = new PokemonMeta();
@@ -5869,6 +6005,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.HEAT_WAVE
 		});
 		metap.setNumber(136);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.FLAREON, metap);
 
 		metap = new PokemonMeta();
@@ -5913,6 +6050,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SIGNAL_BEAM
 		});
 		metap.setNumber(137);
+		metap.setBuddyDistance(3.0);
 		meta.put(PokemonId.PORYGON, metap);
 
 		metap = new PokemonMeta();
@@ -5956,6 +6094,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.ROCK_TOMB
 		});
 		metap.setNumber(138);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.OMANYTE, metap);
 
 		metap = new PokemonMeta();
@@ -6000,6 +6139,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.ROCK_SLIDE
 		});
 		metap.setNumber(139);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.OMASTAR, metap);
 
 		metap = new PokemonMeta();
@@ -6043,6 +6183,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.ROCK_TOMB
 		});
 		metap.setNumber(140);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.KABUTO, metap);
 
 		metap = new PokemonMeta();
@@ -6086,6 +6227,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.WATER_PULSE
 		});
 		metap.setNumber(141);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.KABUTOPS, metap);
 
 		metap = new PokemonMeta();
@@ -6129,6 +6271,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.IRON_HEAD
 		});
 		metap.setNumber(142);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.AERODACTYL, metap);
 
 		metap = new PokemonMeta();
@@ -6172,6 +6315,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.HYPER_BEAM
 		});
 		metap.setNumber(143);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.SNORLAX, metap);
 
 		metap = new PokemonMeta();
@@ -6214,6 +6358,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.ICY_WIND
 		});
 		metap.setNumber(144);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.ARTICUNO, metap);
 
 		metap = new PokemonMeta();
@@ -6256,6 +6401,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.THUNDERBOLT
 		});
 		metap.setNumber(145);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.ZAPDOS, metap);
 
 		metap = new PokemonMeta();
@@ -6298,6 +6444,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.HEAT_WAVE
 		});
 		metap.setNumber(146);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.MOLTRES, metap);
 
 		metap = new PokemonMeta();
@@ -6340,6 +6487,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.WRAP
 		});
 		metap.setNumber(147);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.DRATINI, metap);
 
 		metap = new PokemonMeta();
@@ -6382,6 +6530,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.WRAP
 		});
 		metap.setNumber(148);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.DRAGONAIR, metap);
 
 		metap = new PokemonMeta();
@@ -6425,6 +6574,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.HYPER_BEAM
 		});
 		metap.setNumber(149);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.DRAGONITE, metap);
 
 		metap = new PokemonMeta();
@@ -6468,6 +6618,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.SHADOW_BALL
 		});
 		metap.setNumber(150);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.MEWTWO, metap);
 
 		metap = new PokemonMeta();
@@ -6515,6 +6666,7 @@ public class PokemonMetaRegistry {
 				PokemonMove.THUNDER
 		});
 		metap.setNumber(151);
+		metap.setBuddyDistance(5.0);
 		meta.put(PokemonId.MEW, metap);
 
 	}

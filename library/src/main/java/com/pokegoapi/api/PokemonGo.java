@@ -23,8 +23,6 @@ import POGOProtos.Networking.Requests.Messages.VerifyChallenge.VerifyChallengeMe
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckChallengeResponseOuterClass.CheckChallengeResponse;
-import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import POGOProtos.Networking.Responses.VerifyChallengeResponseOuterClass.VerifyChallengeResponse;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -36,6 +34,7 @@ import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.listener.Listener;
 import com.pokegoapi.api.listener.LoginListener;
 import com.pokegoapi.api.map.Map;
+import com.pokegoapi.api.map.Point;
 import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
@@ -188,9 +187,9 @@ public class PokemonGo {
 		}
 		this.credentialProvider = credentialProvider;
 		startTime = currentTimeMillis();
-		playerProfile = new PlayerProfile(this);
-		settings = new Settings(this);
 		inventories = new Inventories(this);
+		settings = new Settings(this);
+		playerProfile = new PlayerProfile(this);
 
 		initialize();
 
@@ -247,15 +246,7 @@ public class PokemonGo {
 	 */
 	private void fireRequestBlock(ServerRequest request)
 			throws RemoteServerException, CaptchaActiveException, LoginFailedException {
-		ServerRequest[] requests = CommonRequests.fillRequest(request, this);
-
-		getRequestHandler().sendServerRequests(requests);
-		try {
-			inventories.updateInventories(GetInventoryResponse.parseFrom(requests[3].getData()));
-			settings.updateSettings(DownloadSettingsResponse.parseFrom(requests[5].getData()));
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException();
-		}
+		getRequestHandler().sendServerRequests(request.withCommons());
 	}
 
 	/**
@@ -540,10 +531,17 @@ public class PokemonGo {
 				AsyncHelper.toBlocking(getRequestHandler().sendAsyncServerRequests(request));
 		CheckChallengeResponse response = CheckChallengeResponse.parseFrom(responseData);
 		String newChallenge = response.getChallengeUrl();
-		if (newChallenge != null && newChallenge.length() > 0) {
+		if (response.getShowChallenge() && newChallenge != null && newChallenge.length() > 0) {
 			updateChallenge(newChallenge, true);
 			return newChallenge;
 		}
 		return null;
+	}
+
+	/**
+	 * @return the current player position in Point form
+	 */
+	public Point getPoint() {
+		return new Point(this.getLatitude(), this.getLongitude());
 	}
 }

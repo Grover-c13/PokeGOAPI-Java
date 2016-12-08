@@ -56,12 +56,12 @@ public class FightGymExample {
 		CredentialProvider auth = null;
 		PokemonGo go = new PokemonGo(http);
 		try {
-			auth = new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
+			auth = new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD);
 			go.login(auth);
 			// or google
 			//auth = new GoogleCredentialProvider(http, token); // currently uses oauth flow so no user or pass needed
 			// set location
-			go.setLocation(-32.011011, 115.932831, 0);
+			go.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 
 			List<Pokemon> pokemons = go.getInventories().getPokebank().getPokemons();
 			Pokemon[] attackers = new Pokemon[6];

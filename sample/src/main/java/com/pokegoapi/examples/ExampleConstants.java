@@ -18,7 +18,10 @@ package com.pokegoapi.examples;
 /**
  * Created by court on 19/07/2016.
  */
-public class ExampleLoginDetails {
-	public static String LOGIN = "";
-	public static String PASSWORD = "";
+public class ExampleConstants {
+	public static final String LOGIN = "";
+	public static final String PASSWORD = "";
+	public static final double LATITUDE = -32.058087;
+	public static final double LONGITUDE = 115.744325;
+	public static final double ALTITUDE = 0.0;
 }

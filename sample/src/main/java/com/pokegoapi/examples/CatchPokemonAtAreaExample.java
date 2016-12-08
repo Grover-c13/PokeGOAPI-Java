@@ -59,14 +59,14 @@ public class CatchPokemonAtAreaExample {
 		OkHttpClient http = new OkHttpClient();
 		PokemonGo go = new PokemonGo(http);
 		try {
-			go.login(new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN,
-					ExampleLoginDetails.PASSWORD));
+			go.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN,
+					ExampleConstants.PASSWORD));
 			//or google
 			//new PokemonGo(GoogleCredentialProvider(http,listner));
 			//Subsiquently
 			//new PokemonGo(GoogleCredentialProvider(http,refreshtoken));
 			// set location
-			go.setLocation(-32.058087, 115.744325, 0);
+			go.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 
 			List<CatchablePokemon> catchablePokemon = go.getMap().getCatchablePokemon();
 			System.out.println("Pokemon in area: " + catchablePokemon.size());
@@ -82,11 +82,15 @@ public class CatchPokemonAtAreaExample {
 							.withPokeballSelector(PokeballSelector.SMART);
 					List<Pokeball> useablePokeballs = go.getInventories().getItemBag().getUseablePokeballs();
 					double probability = cp.getCaptureProbability();
-					Pokeball pokeball = PokeballSelector.SMART.select(useablePokeballs, probability);
-					System.out.println("Attempting to catch: " + cp.getPokemonId() + " with " + pokeball
-							+ " (" + probability + ")");
-					CatchResult result = cp.catchPokemon(options);
-					System.out.println("Result:" + result.getStatus());
+					if (useablePokeballs.size() > 0) {
+						Pokeball pokeball = PokeballSelector.SMART.select(useablePokeballs, probability);
+						System.out.println("Attempting to catch: " + cp.getPokemonId() + " with " + pokeball
+								+ " (" + probability + ")");
+						CatchResult result = cp.catchPokemon(options);
+						System.out.println("Result:" + result.getStatus());
+					} else {
+						System.out.println("Skipping Pokemon, we have no Pokeballs!");
+					}
 				}
 
 			}
