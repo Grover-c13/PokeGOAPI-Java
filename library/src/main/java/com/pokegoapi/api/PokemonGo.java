@@ -34,6 +34,7 @@ import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.listener.Listener;
 import com.pokegoapi.api.listener.LoginListener;
 import com.pokegoapi.api.map.Map;
+import com.pokegoapi.api.map.Point;
 import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
@@ -535,5 +536,12 @@ public class PokemonGo {
 			return newChallenge;
 		}
 		return null;
+	}
+
+	/**
+	 * @return the current player position in Point form
+	 */
+	public Point getPoint() {
+		return new Point(this.getLatitude(), this.getLongitude());
 	}
 }
