@@ -104,10 +104,6 @@ public class PlayerProfile {
 	public PlayerProfile(PokemonGo api) throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		this.api = api;
 		this.playerLocale = new PlayerLocale();
-
-		if (playerData == null) {
-			updateProfile();
-		}
 	}
 
 	/**

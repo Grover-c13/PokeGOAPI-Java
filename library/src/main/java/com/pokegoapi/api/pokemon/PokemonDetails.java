@@ -8,24 +8,88 @@ import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.util.Log;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.List;
 
 public class PokemonDetails {
 	private static final String TAG = Pokemon.class.getSimpleName();
 	protected final PokemonGo api;
-	@Getter
-	@Setter
-	private PokemonData proto;
 	private PokemonMeta meta;
+	private long id;
+	private PokemonIdOuterClass.PokemonId pokemonId;
+	private int cp;
+	private int maxStamina;
+	private int stamina;
+	private PokemonMove move1;
+	private PokemonMove move2;
+	private String deployedFortId;
+	private String ownerName;
+	private boolean isEgg;
+	private double eggKmWalkedTarget;
+	private double eggKmWalkedStart;
+	private int origin;
+	private float height;
+	private float weight;
+	private int individualAttack;
+	private int individualDefense;
+	private int individualStamina;
+	private float cpMultiplier;
+	private float additionalCpMultiplier;
+	private ItemId pokeball;
+	private long capturedCellId;
+	private int battlesAttacked;
+	private int battlesDefended;
+	private String eggIncubatorId;
+	private long creationTimeMs;
+	private int favorite;
+	private String nickname;
+	private int fromFort;
+	private String protoData;
+	private int numUpgrades;
 
 	public PokemonDetails(PokemonGo api, PokemonData proto) {
 		this.api = api;
-		this.proto = proto;
+		this.applyProto(proto);
 	}
 
+	/**
+	 * Applies the given PokemonData proto to these PokemonDetails
+	 */
+	public void applyProto(PokemonData proto) {
+		id = proto.getId();
+		pokemonId = proto.getPokemonId();
+		cp = proto.getCp();
+		maxStamina = proto.getStaminaMax();
+		stamina = proto.getStamina();
+		move1 = proto.getMove1();
+		move2 = proto.getMove2();
+		deployedFortId = proto.getDeployedFortId();
+		ownerName = proto.getOwnerName();
+		isEgg = proto.getIsEgg();
+		eggKmWalkedTarget = proto.getEggKmWalkedTarget();
+		eggKmWalkedStart = proto.getEggKmWalkedStart();
+		origin = proto.getOrigin();
+		height = proto.getHeightM();
+		weight = proto.getWeightKg();
+		individualAttack = proto.getIndividualAttack();
+		individualDefense = proto.getIndividualDefense();
+		individualStamina = proto.getIndividualStamina();
+		cpMultiplier = proto.getCpMultiplier();
+		additionalCpMultiplier = proto.getAdditionalCpMultiplier();
+		pokeball = proto.getPokeball();
+		capturedCellId = proto.getCapturedCellId();
+		battlesAttacked = proto.getBattlesAttacked();
+		battlesDefended = proto.getBattlesDefended();
+		eggIncubatorId = proto.getEggIncubatorId();
+		creationTimeMs = proto.getCreationTimeMs();
+		favorite = proto.getFavorite();
+		nickname = proto.getNickname();
+		fromFort = proto.getFromFort();
+		numUpgrades = proto.getNumUpgrades();
+		protoData = proto.toString();
+	}
+
+	/**
+	 * @return the amount of candy available for this pokemon
+	 */
 	public int getCandy() {
 		return api.getInventories().getCandyjar().getCandies(getPokemonFamily());
 	}
@@ -35,75 +99,79 @@ public class PokemonDetails {
 	}
 
 	public PokemonData getDefaultInstanceForType() {
-		return proto.getDefaultInstanceForType();
+		return PokemonData.getDefaultInstance();
 	}
 
 	public long getId() {
-		return proto.getId();
+		return id;
 	}
 
 	public PokemonIdOuterClass.PokemonId getPokemonId() {
-		return proto.getPokemonId();
+		return pokemonId;
 	}
 
 	public int getCp() {
-		return proto.getCp();
+		return cp;
 	}
 
 	public int getMaxStamina() {
-		return proto.getStaminaMax();
+		return maxStamina;
+	}
+
+	public int getStamina() {
+		return stamina;
 	}
 
 	public PokemonMove getMove1() {
-		return proto.getMove1();
+		return move1;
 	}
 
 	public PokemonMove getMove2() {
-		return proto.getMove2();
+		return move2;
 	}
 
 	public String getDeployedFortId() {
-		return proto.getDeployedFortId();
+		return deployedFortId;
 	}
 
 	public String getOwnerName() {
-		return proto.getOwnerName();
+		return ownerName;
 	}
 
-	public boolean getIsEgg() {
-		return proto.getIsEgg();
+	public boolean isEgg() {
+		return isEgg;
 	}
 
 	public double getEggKmWalkedTarget() {
-		return proto.getEggKmWalkedTarget();
+		return eggKmWalkedTarget;
 	}
 
 	public double getEggKmWalkedStart() {
-		return proto.getEggKmWalkedStart();
+		return eggKmWalkedStart;
 	}
 
 	public int getOrigin() {
-		return proto.getOrigin();
+		return origin;
 	}
 
 	public float getHeightM() {
-		return proto.getHeightM();
+		return height;
 	}
 
 	public float getWeightKg() {
-		return proto.getWeightKg();
+		return weight;
 	}
 
 	public int getIndividualAttack() {
-		return proto.getIndividualAttack();
+		return individualAttack;
 	}
 
 	public int getIndividualDefense() {
-		return proto.getIndividualDefense();
+		return individualDefense;
 	}
 
 	public int getIndividualStamina() {
-		return proto.getIndividualStamina();
+		return individualStamina;
 	}
 
 	/**
@@ -116,11 +184,11 @@ public class PokemonDetails {
 	}
 
 	public float getCpMultiplier() {
-		return proto.getCpMultiplier();
+		return cpMultiplier;
 	}
 
 	public float getAdditionalCpMultiplier() {
-		return proto.getAdditionalCpMultiplier();
+		return additionalCpMultiplier;
 	}
 
 	public float getCombinedCpMultiplier() {
@@ -128,27 +196,27 @@ public class PokemonDetails {
 	}
 
 	public ItemId getPokeball() {
-		return proto.getPokeball();
+		return pokeball;
 	}
 
 	public long getCapturedS2CellId() {
-		return proto.getCapturedCellId();
+		return capturedCellId;
 	}
 
 	public int getBattlesAttacked() {
-		return proto.getBattlesAttacked();
+		return battlesAttacked;
 	}
 
 	public int getBattlesDefended() {
-		return proto.getBattlesDefended();
+		return battlesDefended;
 	}
 
 	public String getEggIncubatorId() {
-		return proto.getEggIncubatorId();
+		return eggIncubatorId;
 	}
 
 	public long getCreationTimeMs() {
-		return proto.getCreationTimeMs();
+		return creationTimeMs;
 	}
 
 	/**
@@ -157,24 +225,24 @@ public class PokemonDetails {
 	 * @return true if the Pokémon is set as favorite
 	 */
 	public boolean isFavorite() {
-		return proto.getFavorite() > 0;
+		return favorite > 0;
 	}
 
 	@Deprecated
 	public boolean getFavorite() {
-		return proto.getFavorite() > 0;
+		return favorite > 0;
 	}
 
 	public String getNickname() {
-		return proto.getNickname();
+		return nickname;
 	}
 
 	public boolean getFromFort() {
-		return proto.getFromFort() > 0;
+		return fromFort > 0;
 	}
 
 	public void debug() {
-		Log.d(TAG, proto.toString());
+		Log.d(TAG, protoData);
 	}
 
 	public int getBaseStam() {
@@ -217,9 +285,9 @@ public class PokemonDetails {
 	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
 	 */
 	public int getMaxCp() throws NoSuchItemException {
-		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
+		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(pokemonId);
 		if (pokemonMeta == null) {
-			throw new NoSuchItemException("Cannot find meta data for " + proto.getPokemonId().name());
+			throw new NoSuchItemException("Cannot find meta data for " + pokemonId.name());
 		}
 		int attack = getIndividualAttack() + pokemonMeta.getBaseAttack();
 		int defense = getIndividualDefense() + pokemonMeta.getBaseDefense();
@@ -234,9 +302,9 @@ public class PokemonDetails {
 	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
 	 */
 	public int getMaxCpForPlayer() throws NoSuchItemException {
-		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(proto.getPokemonId());
+		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(pokemonId);
 		if (pokemonMeta == null) {
-			throw new NoSuchItemException("Cannot find meta data for " + proto.getPokemonId().name());
+			throw new NoSuchItemException("Cannot find meta data for " + pokemonId.name());
 		}
 		int attack = getIndividualAttack() + pokemonMeta.getBaseAttack();
 		int defense = getIndividualDefense() + pokemonMeta.getBaseDefense();
@@ -312,9 +380,9 @@ public class PokemonDetails {
 	 */
 	public int getCpAfterFullEvolve(PokemonIdOuterClass.PokemonId highestEvolution) {
 		PokemonMeta pokemonMeta = PokemonMetaRegistry.getMeta(highestEvolution);
-		int attack = getProto().getIndividualAttack() + pokemonMeta.getBaseAttack();
-		int defense = getProto().getIndividualDefense() + pokemonMeta.getBaseDefense();
-		int stamina = getProto().getIndividualStamina() + pokemonMeta.getBaseStamina();
+		int attack = getIndividualAttack() + pokemonMeta.getBaseAttack();
+		int defense = getIndividualDefense() + pokemonMeta.getBaseDefense();
+		int stamina = getIndividualStamina() + pokemonMeta.getBaseStamina();
 		return PokemonCpUtils.getCp(attack, defense, stamina, getCombinedCpMultiplier());
 	}
 
@@ -322,7 +390,7 @@ public class PokemonDetails {
 	 * @return The number of powerups already done
 	 */
 	public int getNumerOfPowerupsDone() {
-		return getProto().getNumUpgrades();
+		return numUpgrades;
 	}
 
 	/**
