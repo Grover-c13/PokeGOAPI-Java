@@ -42,6 +42,10 @@ public class Point implements MapPoint {
 
 	@Override
 	public String toString() {
-		return this.latitude + ", " + this.longitude;
+		StringBuilder builder = new StringBuilder();
+		builder.append(this.latitude);
+		builder.append(", ");
+		builder.append(this.longitude);
+		return builder.toString();
 	}
 }

@@ -238,7 +238,7 @@ public class Pokemon extends PokemonDetails {
 							throw new AsyncRemoteServerException(e);
 						}
 						//set new pokemon details
-						setProto(response.getUpgradedPokemon());
+						applyProto(response.getUpgradedPokemon());
 						return response.getResult();
 					}
 				});

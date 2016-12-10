@@ -190,6 +190,7 @@ public class PokemonGo {
 		inventories = new Inventories(this);
 		settings = new Settings(this);
 		playerProfile = new PlayerProfile(this);
+		playerProfile.updateProfile();
 
 		initialize();
 

@@ -20,7 +20,9 @@ import com.pokegoapi.api.PokemonGo;
 
 public class Buddy {
 	private final PokemonGo api;
-	private final BuddyPokemon proto;
+	private long id;
+	private double lastKMAwarded;
+	private double startKM;
 	private Pokemon pokemon;
 	private double buddyDistance;
 
@@ -31,7 +33,9 @@ public class Buddy {
 	 */
 	public Buddy(PokemonGo api, BuddyPokemon proto) {
 		this.api = api;
-		this.proto = proto;
+		this.id = proto.getId();
+		this.lastKMAwarded = proto.getLastKmAwarded();
+		this.startKM = proto.getStartKmWalked();
 	}
 
 	/**
@@ -39,7 +43,7 @@ public class Buddy {
 	 */
 	public Pokemon getPokemon() {
 		if (pokemon == null) {
-			pokemon = api.getInventories().getPokebank().getPokemonById(proto.getId());
+			pokemon = api.getInventories().getPokebank().getPokemonById(this.id);
 			buddyDistance = PokemonMetaRegistry.getMeta(pokemon.getPokemonId()).getBuddyDistance();
 		}
 		return pokemon;
@@ -59,14 +63,14 @@ public class Buddy {
 	 * @return the last walk distance when a candy was received
 	 */
 	public double getLastReceiveKM() {
-		return proto.getLastKmAwarded();
+		return lastKMAwarded;
 	}
 
 	/**
 	 * @return the distance when the distance started progressing
 	 */
 	public double getStartKM() {
-		return proto.getStartKmWalked();
+		return startKM;
 	}
 
 	/**
