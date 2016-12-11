@@ -83,7 +83,7 @@ public class TravelToPokestopExample {
 						//Set the API location to that point
 						api.setLatitude(point.getLatitude());
 						api.setLongitude(point.getLongitude());
-						System.out.println("Move to " + point);
+						System.out.println("Time left: " + (int) (path.getTimeLeft(api) / 1000) + " seconds.");
 						//Sleep for 2 seconds before setting the location again
 						Thread.sleep(2000);
 					}

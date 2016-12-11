@@ -75,4 +75,13 @@ public class Path {
 		this.intermediate.setLongitude(longitude);
 		return this.intermediate;
 	}
+
+	/**
+	 * Gets the amount of millis left before this path is complete
+	 * @param api the current API
+	 * @return the amount of millis left before this path completes
+	 */
+	public long getTimeLeft(PokemonGo api) {
+		return Math.max(0, endTime - api.currentTimeMillis());
+	}
 }

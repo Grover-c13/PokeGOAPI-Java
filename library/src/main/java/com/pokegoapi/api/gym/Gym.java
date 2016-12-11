@@ -47,6 +47,7 @@ public class Gym implements MapPoint {
 	private FortData proto;
 	private GetGymDetailsResponse details;
 	private PokemonGo api;
+	private long points;
 
 	/**
 	 * Gym object.
@@ -57,17 +58,19 @@ public class Gym implements MapPoint {
 	public Gym(PokemonGo api, FortData proto) {
 		this.api = api;
 		this.proto = proto;
-		this.details = null;
+		this.points = proto.getGymPoints();
 	}
 
 	public String getId() {
 		return proto.getId();
 	}
 
+	@Override
 	public double getLatitude() {
 		return proto.getLatitude();
 	}
 
+	@Override
 	public double getLongitude() {
 		return proto.getLongitude();
 	}
@@ -89,7 +92,7 @@ public class Gym implements MapPoint {
 	}
 
 	public long getPoints() {
-		return proto.getGymPoints();
+		return points;
 	}
 
 	public boolean getIsInBattle() {
@@ -100,8 +103,16 @@ public class Gym implements MapPoint {
 		return this.getGymMembers().size() != 0;
 	}
 
-	public Battle battle(Pokemon[] team) {
-		return new Battle(api, team, this);
+	public Battle battle() {
+		return new Battle(api, this);
+	}
+
+	/**
+	 * Clears the details cache for this gym, and when requested again will send a request to the server instead of
+	 * using the cached values.
+	 */
+	public void clearDetails() {
+		details = null;
 	}
 
 	private GetGymDetailsResponse details() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
@@ -248,4 +259,11 @@ public class Gym implements MapPoint {
 		return api;
 	}
 
+	/**
+	 * Updates this gym's point count by the given delta
+	 * @param delta the amount to change the points by
+	 */
+	public void updatePoints(int delta) {
+		this.points += delta;
+	}
 }
