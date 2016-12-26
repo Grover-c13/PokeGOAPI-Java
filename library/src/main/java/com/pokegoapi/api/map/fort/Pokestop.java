@@ -159,7 +159,9 @@ public class Pokestop {
 						PokestopLootResult lootResult = new PokestopLootResult(response);
 						List<PokestopListener> listeners = api.getListeners(PokestopListener.class);
 						for (PokestopListener listener : listeners) {
-							listener.onLoot(lootResult);
+							// listener.onLoot(lootResult);
+							// return the pokestop, also change in listener
+							listener.onLoot(lootResult, Pokestop.this);
 						}
 						return lootResult;
 					}
