@@ -30,14 +30,14 @@ import POGOProtos.Networking.Requests.Messages.StartGymBattleMessageOuterClass.S
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.AttackGymResponseOuterClass.AttackGymResponse;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse;
+import POGOProtos.Settings.Master.MoveSettingsOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
-import com.pokegoapi.api.pokemon.PokemonMoveMeta;
-import com.pokegoapi.api.pokemon.PokemonMoveMetaRegistry;
 import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 import lombok.Setter;
@@ -84,6 +84,7 @@ public class Battle {
 		}
 	});
 	private Set<ServerAction> activeActions = new HashSet<>();
+	private Set<ServerAction> damagingActions = new HashSet<>();
 
 	@Getter
 	private Map<String, BattleParticipant> participants = new HashMap<>();
@@ -227,11 +228,22 @@ public class Battle {
 			if (time >= action.getEnd()) {
 				handler.onActionEnd(api, this, action);
 				completedActions.add(action);
+			} else {
+				if (damagingActions.contains(action)) {
+					if (time > action.getDamageWindowEnd()) {
+						handler.onDamageEnd(api, this, action);
+						damagingActions.remove(action);
+					}
+				} else {
+					if (time > action.getDamageWindowStart()) {
+						damagingActions.add(action);
+						handler.onDamageStart(api, this, action);
+					}
+				}
 			}
 		}
 		activeActions.removeAll(completedActions);
-		//TODO Unsure of the correct time interval to send actions
-		if (time - lastSendTime > 100 && active) {
+		if (time - lastSendTime > PokemonMeta.battleSettings.getAttackServerInterval() && active) {
 			try {
 				sendActions(handler);
 			} catch (Exception e) {
@@ -254,18 +266,24 @@ public class Battle {
 		startTime = log.getBattleStartTimestampMs();
 		endTime = log.getBattleEndTimestampMs();
 		BattleState state = log.getState();
-		active = state == BattleState.ACTIVE;
 		if (log.getBattleActionsCount() > 0) {
-			lastRetrievedAction = log.getBattleActions(log.getBattleActionsCount() - 1);
+			long latestTime = Long.MIN_VALUE;
+			for (BattleAction action : log.getBattleActionsList()) {
+				if (action.getActionStartMs() > latestTime) {
+					lastRetrievedAction = action;
+					latestTime = action.getActionStartMs();
+				}
+			}
 		}
 		results = null;
 		for (BattleAction action : log.getBattleActionsList()) {
-			results = action.getBattleResults();
-			if (results != null) {
+			if (results != null && results.hasGymState()) {
+				results = action.getBattleResults();
 				gym.updatePoints(results.getGymPointsDelta());
 				break;
 			}
 		}
+		active = results == null;
 		if (state != battleState) {
 			switch (state) {
 				case TIMED_OUT:
@@ -277,10 +295,19 @@ public class Battle {
 					handler.onDefeated(api, this);
 					break;
 				case VICTORY:
-					gym.clearDetails();
-					int deltaPoints = results != null ? results.getGymPointsDelta() : 0;
-					handler.onVictory(api, this, deltaPoints, gym.getPoints() + deltaPoints);
+					if (results != null) {
+						int deltaPoints = results.getGymPointsDelta();
+						gym.updateState(results.getGymState());
+						handler.onVictory(api, this, deltaPoints, gym.getPoints() + deltaPoints);
+					}
 					break;
+			}
+			if (!active) {
+				try {
+					api.getInventories().updateInventories(true);
+				} catch (Exception e) {
+					handler.onException(api, this, e);
+				}
 			}
 			battleState = state;
 		}
@@ -296,7 +323,6 @@ public class Battle {
 	 * @param action the action being handled
 	 */
 	private void handleAction(BattleHandler handler, ServerAction action) {
-		//TODO Handle dodge, swap, special & faint
 		switch (action.getType()) {
 			case ACTION_PLAYER_JOIN:
 				onPlayerJoin(handler, action);
@@ -308,18 +334,20 @@ public class Battle {
 				handleAttack(handler, action);
 				break;
 			case ACTION_DODGE:
+				handleDodge(handler, action);
 				break;
 			case ACTION_FAINT:
+				handleFaint(handler, action);
 				break;
 			case ACTION_SPECIAL_ATTACK:
-				break;
-			case ACTION_SWAP_POKEMON:
+				handleSpecialAttack(handler, action);
 				break;
 		}
 	}
 
 	/**
 	 * Handles a player join action
+	 *
 	 * @param handler to handle this battle
 	 * @param action the join action
 	 */
@@ -334,6 +362,7 @@ public class Battle {
 
 	/**
 	 * Handles a player quit action
+	 *
 	 * @param handler to handle this battle
 	 * @param action the quit action
 	 */
@@ -348,6 +377,7 @@ public class Battle {
 
 	/**
 	 * Handles an attack action
+	 *
 	 * @param handler to handle this battle
 	 * @param action the attack action
 	 */
@@ -358,34 +388,88 @@ public class Battle {
 			attacker = activeAttacker;
 		}
 
-		attacked.updateEnergy(action.getEnergyDelta());
 		long damageWindowStart = action.getDamageWindowStart();
 		long damageWindowEnd = action.getDamageWindowEnd();
-		long duration = action.getDuration();
+		int duration = action.getDuration();
 
 		handler.onAttacked(api, this, attacked, attacker, duration, damageWindowStart, damageWindowEnd, action);
 	}
 
 	/**
+	 * Handles a special attack action
+	 *
+	 * @param handler to handle this battle
+	 * @param action the attack action
+	 */
+	private void handleSpecialAttack(BattleHandler handler, ServerAction action) {
+		BattlePokemon attacked = getActivePokemon(action.getTargetIndex());
+		BattlePokemon attacker = getActivePokemon(action.getAttackerIndex());
+		if (action.getAttackerIndex() == 0) {
+			attacker = activeAttacker;
+		}
+
+		long damageWindowStart = action.getDamageWindowStart();
+		long damageWindowEnd = action.getDamageWindowEnd();
+		int duration = action.getDuration();
+
+		handler.onAttackedSpecial(api, this, attacked, attacker, duration, damageWindowStart, damageWindowEnd, action);
+	}
+
+	/**
+	 * Handles a faint action
+	 *
+	 * @param handler to handle this battle
+	 * @param action the faint action
+	 */
+	private void handleFaint(BattleHandler handler, ServerAction action) {
+		BattlePokemon pokemon = getActivePokemon(action.getAttackerIndex());
+		if (action.getAttackerIndex() == 0) {
+			pokemon = activeAttacker;
+		}
+
+		int duration = action.getDuration();
+		handler.onFaint(api, this, pokemon, duration, action);
+	}
+
+	/**
+	 * Handles a dodge action
+	 *
+	 * @param handler to handle this battle
+	 * @param action the dodge action
+	 */
+	private void handleDodge(BattleHandler handler, ServerAction action) {
+		BattlePokemon pokemon = getActivePokemon(action.getAttackerIndex());
+		if (action.getAttackerIndex() == 0) {
+			pokemon = activeAttacker;
+		}
+
+		int duration = action.getDuration();
+		handler.onDodge(api, this, pokemon, duration, action);
+	}
+
+	/**
 	 * Converts the client time to the server time based on serverTimeOffset
+	 *
 	 * @param clientTime the client time to convert
 	 * @return the converted time
 	 */
-	private long toServerTime(long clientTime) {
+	public long toServerTime(long clientTime) {
 		return clientTime + serverTimeOffset;
 	}
 
 	/**
 	 * Converts the server time to the client time based on serverTimeOffset
+	 *
 	 * @param serverTime the server time to convert
 	 * @return the converted time
 	 */
-	private long toClientTime(long serverTime) {
+	public long toClientTime(long serverTime) {
 		return serverTime - serverTimeOffset;
 	}
 
 	/**
 	 * Sends all currently queued actions to the server
+	 *
 	 * @param handler to handle this battle
 	 * @throws CaptchaActiveException if a captcha is active
 	 * @throws LoginFailedException if login fails
@@ -398,23 +482,30 @@ public class Battle {
 				.setBattleId(battleId)
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude());
-		if (queuedActions.size() > 0) {
-			while (queuedActions.size() > 0) {
-				ClientAction action = queuedActions.element();
-				if (action.getEndTime() < lastSendTime) {
-					queuedActions.remove();
-					BattleAction.Builder actionBuilder = BattleAction.newBuilder()
-							.setActionStartMs(action.getStartTime())
-							.setDurationMs(action.getDuration())
-							.setTargetIndex(-1)
-							.setActivePokemonId(activeAttacker.getPokemon().getId())
-							.setDamageWindowsStartTimestampMs(action.getEndTime() - 200)
-							.setDamageWindowsEndTimestampMs(action.getEndTime())
-							.setType(action.getType());
-					builder.addAttackActions(actionBuilder.build());
-				} else {
-					break;
+		while (queuedActions.size() > 0) {
+			ClientAction action = queuedActions.element();
+			if (action.getEndTime() < lastSendTime) {
+				queuedActions.remove();
+				long activePokemon = activeAttacker.getPokemon().getId();
+				if (action.getPokemon() != null) {
+					activePokemon = action.getPokemon().getId();
 				}
+				long start = action.getStartTime();
+				BattleAction.Builder actionBuilder = BattleAction.newBuilder()
+						.setActionStartMs(start)
+						.setDurationMs(action.getDuration())
+						.setTargetIndex(-1)
+						.setActivePokemonId(activePokemon)
+						.setType(action.getType());
+				if (action.isHasDamageWindow()) {
+					long damageWindowsStart = start + action.getDamageWindowStart();
+					long damageWindowEnd = start + action.getDamageWindowEnd();
+					actionBuilder.setDamageWindowsStartTimestampMs(damageWindowsStart);
+					actionBuilder.setDamageWindowsEndTimestampMs(damageWindowEnd);
+				}
+				builder.addAttackActions(actionBuilder.build());
+			} else {
+				break;
 			}
 		}
 		if (lastRetrievedAction != null && sentActions) {
@@ -434,6 +525,7 @@ public class Battle {
 
 	/**
 	 * Handles the response from an AttackGymMessage
+	 *
 	 * @param handler to handle this battle
 	 * @param response the response to handle
 	 */
@@ -453,8 +545,14 @@ public class Battle {
 				handler.onDefenderSwap(api, this, activeDefender);
 			}
 
-			handler.onAttackerHealthUpdate(api, this, lastAttacker.getHealth(), activeAttacker.getHealth(), activeAttacker.getMaxHealth());
-			handler.onDefenderHealthUpdate(api, this, lastDefender.getHealth(), activeDefender.getHealth(), activeDefender.getMaxHealth());
+			int lastAttackerHealth = lastAttacker.getHealth();
+			int lastDefenderHealth = lastDefender.getHealth();
+			int attackerHealth = activeAttacker.getHealth();
+			int defenderHealth = activeDefender.getHealth();
+			int attackerMaxHealth = activeAttacker.getMaxHealth();
+			int defenderMaxHealth = activeDefender.getMaxHealth();
+			handler.onAttackerHealthUpdate(api, this, lastAttackerHealth, attackerHealth, attackerMaxHealth);
+			handler.onDefenderHealthUpdate(api, this, lastDefenderHealth, defenderHealth, defenderMaxHealth);
 
 			BattleLog log = response.getBattleLog();
 			updateLog(handler, log);
@@ -465,6 +563,7 @@ public class Battle {
 
 	/**
 	 * Gets the currently active pokemon for the given BattleParticipant
+	 *
 	 * @param participant the participant
 	 * @return the active pokemon
 	 */
@@ -474,6 +573,7 @@ public class Battle {
 
 	/**
 	 * Gets the currently active pokemon for the given participant name
+	 *
 	 * @param participantName the participant's name
 	 * @return the active pokemon
 	 */
@@ -487,6 +587,7 @@ public class Battle {
 
 	/**
 	 * Gets the currently active pokemon for the given participant index
+	 *
 	 * @param index the participant index
 	 * @return the active pokemon
 	 */
@@ -500,6 +601,7 @@ public class Battle {
 
 	/**
 	 * Gets the participant for the given index
+	 *
 	 * @param index the index to get a participant at
 	 * @return the participant for
 	 */
@@ -509,36 +611,49 @@ public class Battle {
 
 	/**
 	 * Performs an action with the given duration
+	 *
 	 * @param type the action to perform
 	 * @param duration the duration of this action
+	 * @return the action performed
 	 */
-	public void performAction(BattleActionType type, int duration) {
-		queuedActions.add(new ClientAction(type, api.currentTimeMillis(), duration));
+	public ClientAction performAction(BattleActionType type, int duration) {
+		ClientAction action = new ClientAction(type, api.currentTimeMillis(), duration);
+		queuedActions.add(action);
+		return action;
 	}
 
 	/**
 	 * Performs an attack action
+	 *
 	 * @return the duration of this attack
 	 */
 	public int attack() {
 		PokemonData pokemon = activeAttacker.getPokemon();
 		PokemonMove move = pokemon.getMove1();
-		int duration = PokemonMoveMetaRegistry.getMeta(move).getTime();
-		performAction(BattleActionType.ACTION_ATTACK, duration);
+		MoveSettingsOuterClass.MoveSettings moveSettings = PokemonMeta.getMoveSettings(move);
+		int duration = moveSettings.getDurationMs();
+		long time = api.currentTimeMillis();
+		ClientAction action = new ClientAction(BattleActionType.ACTION_ATTACK, time, duration);
+		action.setDamageWindow(moveSettings.getDamageWindowStartMs(), moveSettings.getDamageWindowEndMs());
+		queuedActions.add(action);
 		return duration;
 	}
 
 	/**
 	 * Performs a special attack action
+	 *
 	 * @return the duration of this attack
 	 */
 	public int attackSpecial() {
 		PokemonData pokemon = activeAttacker.getPokemon();
 		PokemonMove move = pokemon.getMove2();
-		PokemonMoveMeta meta = PokemonMoveMetaRegistry.getMeta(move);
-		int duration = meta.getTime();
-		if (activeAttacker.getEnergy() >= meta.getEnergy()) {
-			performAction(BattleActionType.ACTION_SPECIAL_ATTACK, duration);
+		MoveSettingsOuterClass.MoveSettings moveSettings = PokemonMeta.getMoveSettings(move);
+		int duration = moveSettings.getDurationMs();
+		if (activeAttacker.getEnergy() >= -moveSettings.getEnergyDelta()) {
+			long time = api.currentTimeMillis();
+			ClientAction action = new ClientAction(BattleActionType.ACTION_SPECIAL_ATTACK, time, duration);
+			action.setDamageWindow(moveSettings.getDamageWindowStartMs(), moveSettings.getDamageWindowEndMs());
+			queuedActions.add(action);
 			return duration;
 		} else {
 			throw new RuntimeException("Not enough energy to use special attack!");
@@ -547,11 +662,26 @@ public class Battle {
 
 	/**
 	 * Performs a dodge action
+	 *
 	 * @return the duration of this action
 	 */
 	public int dodge() {
-		int duration = 500;
+		int duration = PokemonMeta.battleSettings.getDodgeDurationMs();
 		performAction(BattleActionType.ACTION_DODGE, duration);
+		return duration;
+	}
+
+	/**
+	 * Swaps your current attacking Pokemon
+	 *
+	 * @param pokemon the pokemon to swap to
+	 * @return the duration of this action
+	 */
+	public int swap(Pokemon pokemon) {
+		int duration = PokemonMeta.battleSettings.getSwapDurationMs();
+		ClientAction action = new ClientAction(BattleActionType.ACTION_SWAP_POKEMON, api.currentTimeMillis(), duration);
+		action.setPokemon(pokemon);
+		queuedActions.add(action);
 		return duration;
 	}
 
@@ -570,7 +700,7 @@ public class Battle {
 		@Getter
 		private final long end;
 		@Getter
-		private final long duration;
+		private final int duration;
 		@Getter
 		private final int energyDelta;
 		@Getter
@@ -615,12 +745,33 @@ public class Battle {
 		private final long endTime;
 		@Getter
 		private final int duration;
+		@Getter
+		@Setter
+		private Pokemon pokemon;
+		@Getter
+		private int damageWindowStart;
+		@Getter
+		private int damageWindowEnd;
+		@Getter
+		private boolean hasDamageWindow;
 
 		ClientAction(BattleActionType type, long startTime, int duration) {
 			this.type = type;
 			this.startTime = toServerTime(startTime);
 			this.endTime = this.startTime + duration;
 			this.duration = duration;
+		}
+
+		/**
+		 * Sets the damage window for this action
+		 *
+		 * @param start the start offset
+		 * @param end the end offset
+		 */
+		public void setDamageWindow(int start, int end) {
+			this.damageWindowStart = start;
+			this.damageWindowEnd = end;
+			this.hasDamageWindow = true;
 		}
 	}
 
@@ -642,19 +793,12 @@ public class Battle {
 			this.pokemon = activePokemon.getPokemonData();
 			this.maxHealth = pokemon.getStaminaMax();
 		}
-
-		/**
-		 * Updates the energy of this pokemon based on the given delta
-		 * @param delta the delta to update the energy from
-		 */
-		public void updateEnergy(int delta) {
-			this.energy += delta;
-		}
 	}
 
 	public interface BattleHandler {
 		/**
 		 * Called to create a team of Pokemon to use in the battle
+		 *
 		 * @param api the current API
 		 * @param battle the current battle
 		 * @return the team to use in this battle
@@ -663,6 +807,7 @@ public class Battle {
 
 		/**
 		 * Called when this battle begins
+		 *
 		 * @param api the current API
 		 * @param battle the current battle
 		 * @param result the result from the start message
@@ -671,6 +816,7 @@ public class Battle {
 
 		/**
 		 * Called when this battle end, and you won
+		 *
 		 * @param api the current API
 		 * @param battle the current battle
 		 * @param deltaPoints the amount of points (prestige) added or removed after completing this battle
@@ -680,6 +826,7 @@ public class Battle {
 
 		/**
 		 * Called when this battle ends, and you were defeated
+		 *
 		 * @param api the current API
 		 * @param battle the current battle
 		 */
@@ -687,6 +834,7 @@ public class Battle {
 
 		/**
 		 * Called when this battle times out
+		 *
 		 * @param api the current API
 		 * @param battle the current battle
 		 */
@@ -694,6 +842,7 @@ public class Battle {
 
 		/**
 		 * Called when an action is started
+		 *
 		 * @param api the current API
 		 * @param battle the current battle
 		 * @param action the action started
@@ -702,6 +851,7 @@ public class Battle {
 
 		/**
 		 * Called when an action is completed
+		 *
 		 * @param api the current API
 		 * @param battle the current battle
 		 * @param action the action completed
@@ -709,7 +859,26 @@ public class Battle {
 		void onActionEnd(PokemonGo api, Battle battle, ServerAction action);
 
 		/**
+		 * Called when an action's damage window opens
+		 *
+		 * @param api the current API
+		 * @param battle the current battle
+		 * @param action the action
+		 */
+		void onDamageStart(PokemonGo api, Battle battle, ServerAction action);
+
+		/**
+		 * Called when an action's damage window closes
+		 *
+		 * @param api the current API
+		 * @param battle the current battle
+		 * @param action the action
+		 */
+		void onDamageEnd(PokemonGo api, Battle battle, ServerAction action);
+
+		/**
 		 * Called when a player joins this battle
+		 *
 		 * @param api the current API
 		 * @param battle the current battle
 		 * @param joined the player that joined
@@ -719,6 +888,7 @@ public class Battle {
 
 		/**
 		 * Called when a player leaves this battle
+		 *
 		 * @param api the current API
 		 * @param battle the current battle
 		 * @param left player that left
@@ -728,6 +898,7 @@ public class Battle {
 
 		/**
 		 * Called when a Pokemon is attacked in this battle
+		 *
 		 * @param api the current API
 		 * @param battle the current battle
 		 * @param attacked the attacked pokemon
@@ -737,11 +908,27 @@ public class Battle {
 		 * @param damageWindowEnd the end of the damage window
 		 * @param action the attack action
 		 */
-		void onAttacked(PokemonGo api, Battle battle, BattlePokemon attacked, BattlePokemon attacker, long duration,
+		void onAttacked(PokemonGo api, Battle battle, BattlePokemon attacked, BattlePokemon attacker, int duration,
 						long damageWindowStart, long damageWindowEnd, ServerAction action);
 
 		/**
+		 * Called when a Pokemon is attacked with the special move in this battle
+		 *
+		 * @param api the current API
+		 * @param battle the current battle
+		 * @param attacked the attacked pokemon
+		 * @param attacker the pokemon attacking the attacked pokemon
+		 * @param duration the duration of the attack
+		 * @param damageWindowStart the start of the damage window
+		 * @param damageWindowEnd the end of the damage window
+		 * @param action the attack action
+		 */
+		void onAttackedSpecial(PokemonGo api, Battle battle, BattlePokemon attacked, BattlePokemon attacker,
+							   int duration, long damageWindowStart, long damageWindowEnd, ServerAction action);
+
+		/**
 		 * Called when an exception occurs during this battle
+		 *
 		 * @param api the current API
 		 * @param battle the current battle
 		 * @param exception the exception that occurred
@@ -750,6 +937,7 @@ public class Battle {
 
 		/**
 		 * Called when invalid actions are sent to the server
+		 *
 		 * @param api the current API
 		 * @param battle the current battle
 		 */
@@ -757,6 +945,7 @@ public class Battle {
 
 		/**
 		 * Called when the attacker's health is updated
+		 *
 		 * @param api the current API
 		 * @param battle the current battle
 		 * @param lastHealth the attacker's last health
@@ -767,6 +956,7 @@ public class Battle {
 
 		/**
 		 * Called when the defender's health is updated
+		 *
 		 * @param api the current API
 		 * @param battle the current battle
 		 * @param lastHealth the defender's last health
@@ -777,6 +967,7 @@ public class Battle {
 
 		/**
 		 * Called when the attacker Pokemon changes
+		 *
 		 * @param api the current API
 		 * @param battle the current battle
 		 * @param newAttacker the new attacker pokemon
@@ -785,10 +976,33 @@ public class Battle {
 
 		/**
 		 * Called when the defender Pokemon changes
+		 *
 		 * @param api the current API
 		 * @param battle the current battle
 		 * @param newDefender the new defender pokemon
 		 */
 		void onDefenderSwap(PokemonGo api, Battle battle, BattlePokemon newDefender);
+
+		/**
+		 * Called when the given Pokemon faints.
+		 *
+		 * @param api the current API
+		 * @param battle the current battle
+		 * @param pokemon the fainted pokemon
+		 * @param duration the duration of this action
+		 * @param action the faint action
+		 */
+		void onFaint(PokemonGo api, Battle battle, BattlePokemon pokemon, int duration, ServerAction action);
+
+		/**
+		 * Called when the given Pokemon dodges.
+		 *
+		 * @param api the current API
+		 * @param battle the current battle
+		 * @param pokemon the dodging pokemon
+		 * @param duration the duration of this action
+		 * @param action the dodge action
+		 */
+		void onDodge(PokemonGo api, Battle battle, BattlePokemon pokemon, int duration, ServerAction action);
 	}
 }

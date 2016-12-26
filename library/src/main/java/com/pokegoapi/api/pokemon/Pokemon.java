@@ -304,7 +304,7 @@ public class Pokemon extends PokemonDetails {
 	public UseItemPotionResponse.Result heal()
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 
-		if (!isInjured())
+		if (!isInjured() || isFainted())
 			return UseItemPotionResponse.Result.ERROR_CANNOT_USE;
 
 		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_POTION).getCount() > 0)
@@ -347,12 +347,13 @@ public class Pokemon extends PokemonDetails {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_POTION, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest.withCommons());
 
 		UseItemPotionResponse response;
 		try {
 			response = UseItemPotionResponse.parseFrom(serverRequest.getData());
 			if (response.getResult() == UseItemPotionResponse.Result.SUCCESS) {
+				potion.setCount(potion.getCount() - 1);
 				setStamina(response.getStamina());
 			}
 			return response.getResult();
@@ -408,12 +409,13 @@ public class Pokemon extends PokemonDetails {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_REVIVE, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest.withCommons());
 
 		UseItemReviveResponse response;
 		try {
 			response = UseItemReviveResponse.parseFrom(serverRequest.getData());
 			if (response.getResult() == UseItemReviveResponse.Result.SUCCESS) {
+				item.setCount(item.getCount() - 1);
 				setStamina(response.getStamina());
 			}
 			return response.getResult();

@@ -13,34 +13,27 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.api.pokemon;
+package com.pokegoapi.api.listener;
 
-import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
-import lombok.Getter;
-import lombok.Setter;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.map.MapObjects;
 
-public class PokemonMoveMeta {
+/**
+ * Listener to handle all heartbeat related events such as map updates
+ */
+public interface HeartbeatListener extends Listener {
+	/**
+	 * Called when the map is updated
+	 * @param api the current API
+	 * @param mapObjects the updated map objects
+	 */
+	void onMapUpdate(PokemonGo api, MapObjects mapObjects);
 
-	@Getter
-	@Setter
-	private PokemonMove move;
-	@Getter
-	@Setter
-	private PokemonType type;
-	@Getter
-	@Setter
-	private int power;
-	@Getter
-	@Setter
-	private int accuracy;
-	@Getter
-	@Setter
-	private double critChance;
-	@Getter
-	@Setter
-	private int time;
-	@Getter
-	@Setter
-	private int energy;
-
+	/**
+	 * Called when an exception occurs while the map is being updated.
+	 *
+	 * @param api the current API
+	 * @param exception the exception that occurred while updating the map
+	 */
+	void onMapUpdateException(PokemonGo api, Exception exception);
 }

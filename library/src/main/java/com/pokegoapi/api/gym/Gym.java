@@ -16,6 +16,7 @@
 package com.pokegoapi.api.gym;
 
 import POGOProtos.Data.Gym.GymMembershipOuterClass.GymMembership;
+import POGOProtos.Data.Gym.GymStateOuterClass.GymState;
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.TeamColorOuterClass;
@@ -32,9 +33,11 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.CaptchaActiveException;
+import com.pokegoapi.exceptions.InsufficientLevelException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.MapPoint;
 import rx.Observable;
@@ -104,6 +107,10 @@ public class Gym implements MapPoint {
 	}
 
 	public Battle battle() {
+		int minimumPlayerLevel = PokemonMeta.battleSettings.getMinimumPlayerLevel();
+		if (api.getPlayerProfile().getLevel() < minimumPlayerLevel) {
+			throw new InsufficientLevelException("You must be at least " + minimumPlayerLevel + " to battle a gym!");
+		}
 		return new Battle(api, this);
 	}
 
@@ -265,5 +272,14 @@ public class Gym implements MapPoint {
 	 */
 	public void updatePoints(int delta) {
 		this.points += delta;
+	}
+
+	/**
+	 * Updates this gym with the given gym state
+	 * @param state the state to update from
+	 */
+	public void updateState(GymState state) {
+		proto = state.getFortData();
+		clearDetails();
 	}
 }

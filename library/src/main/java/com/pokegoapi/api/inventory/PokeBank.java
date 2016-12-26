@@ -16,24 +16,38 @@
 package com.pokegoapi.api.inventory;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
+import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
+import com.pokegoapi.exceptions.CaptchaActiveException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 public class PokeBank {
 	@Getter
 	private final List<Pokemon> pokemons = Collections.synchronizedList(new ArrayList<Pokemon>());
 	@Getter
 	private final Object lock = new Object();
+	@Getter
+	private final PokemonGo api;
 
-	public PokeBank() {
+	public PokeBank(PokemonGo api) {
+		this.api = api;
 	}
 
 	public void reset() {
@@ -113,5 +127,37 @@ public class PokeBank {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Releases multiple pokemon in a single request
+	 * @param pokemons the pokemon to release
+	 * @return the responses for all the requests
+	 * @throws CaptchaActiveException if a captcha is active and a message cannot be sent
+	 * @throws LoginFailedException the login fails
+	 * @throws RemoteServerException if the server errors
+	 */
+	public Map<Pokemon, ReleasePokemonResponse> releasePokemon(Pokemon... pokemons)
+			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
+		ServerRequest[] requests = new ServerRequest[pokemons.length];
+		for (int i = 0; i < requests.length; i++) {
+			ReleasePokemonMessage message = ReleasePokemonMessage.newBuilder()
+					.setPokemonId(pokemons[i].getId())
+					.build();
+			requests[i] = new ServerRequest(RequestType.RELEASE_POKEMON, message);
+		}
+		api.getRequestHandler().sendServerRequests(requests);
+		try {
+			Map<Pokemon, ReleasePokemonResponse> responses = new HashMap<>();
+			for (int i = 0; i < requests.length; i++) {
+				ServerRequest request = requests[i];
+				ByteString data = request.getData();
+				ReleasePokemonResponse response = ReleasePokemonResponse.parseFrom(data);
+				responses.put(pokemons[i], response);
+			}
+			return responses;
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
 	}
 }

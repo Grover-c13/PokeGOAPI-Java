@@ -43,7 +43,7 @@ import com.pokegoapi.util.Log;
 import com.pokegoapi.util.path.Path;
 import okhttp3.OkHttpClient;
 
-import java.util.Collection;
+import java.util.Set;
 
 public class TravelToPokestopExample {
 
@@ -56,25 +56,27 @@ public class TravelToPokestopExample {
 		OkHttpClient http = new OkHttpClient();
 		PokemonGo api = new PokemonGo(http);
 		try {
-			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD));
-			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
+			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD),
+					ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 
-			Collection<Pokestop> pokestops = api.getMap().getMapObjects().getPokestops();
+			Set<Pokestop> pokestops = api.getMap().getMapObjects().getPokestops();
 			System.out.println("Found " + pokestops.size() + " pokestops in the current area.");
 
 			Pokestop destinationPokestop = null;
 			for (Pokestop pokestop : pokestops) {
-				if (!pokestop.inRange()) {
+				//Check if not in range and if it is not on cooldown
+				if (!pokestop.inRange() && pokestop.canLoot(true)) {
 					destinationPokestop = pokestop;
+					break;
 				}
 			}
 
 			if (destinationPokestop != null) {
 				Point destination = new Point(destinationPokestop.getLatitude(), destinationPokestop.getLongitude());
 				//Use the current player position as the source and the pokestop position as the destination
-				//Travel to Pokestop at 15KMPH
-				Path path = new Path(api.getPoint(), destination, 15.0);
-				System.out.println("Traveling to " + destination + " at 15KMPH!");
+				//Travel to Pokestop at 20KMPH
+				Path path = new Path(api.getPoint(), destination, 20.0);
+				System.out.println("Traveling to " + destination + " at 20KMPH!");
 				path.start(api);
 				try {
 					while (!path.isComplete()) {
@@ -88,7 +90,7 @@ public class TravelToPokestopExample {
 						Thread.sleep(2000);
 					}
 				} catch (InterruptedException e) {
-					//Do nothing
+					return;
 				}
 				System.out.println("Finished traveling to pokestop!");
 				if (destinationPokestop.inRange()) {

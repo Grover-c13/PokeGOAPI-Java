@@ -17,6 +17,7 @@ package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Data.BuddyPokemonOuterClass.BuddyPokemon;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.main.PokemonMeta;
 
 public class Buddy {
 	private final PokemonGo api;
@@ -44,7 +45,7 @@ public class Buddy {
 	public Pokemon getPokemon() {
 		if (pokemon == null) {
 			pokemon = api.getInventories().getPokebank().getPokemonById(this.id);
-			buddyDistance = PokemonMetaRegistry.getMeta(pokemon.getPokemonId()).getBuddyDistance();
+			buddyDistance = PokemonMeta.getPokemonSettings(pokemon.getPokemonId()).getKmBuddyDistance();
 		}
 		return pokemon;
 	}
@@ -77,13 +78,13 @@ public class Buddy {
 	 * @return the target distance walked for this buddy's next candy
 	 */
 	public double getTargetKM() {
-		return getStartKM() + buddyDistance;
+		return getLastReceiveKM() + buddyDistance;
 	}
 
 	/**
 	 * @return the current buddy walk progress, from 0-buddyDistance
 	 */
 	public double getProgressKM() {
-		return getTargetKM() - api.getPlayerProfile().getStats().getKmWalked();
+		return getTargetKM() - (api.getPlayerProfile().getStats().getKmWalked() - getLastReceiveKM());
 	}
 }

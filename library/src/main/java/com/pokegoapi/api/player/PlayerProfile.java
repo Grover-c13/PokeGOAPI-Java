@@ -52,6 +52,7 @@ import com.pokegoapi.api.pokemon.Buddy;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.api.pokemon.StarterPokemon;
 import com.pokegoapi.exceptions.CaptchaActiveException;
+import com.pokegoapi.exceptions.InsufficientLevelException;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -94,6 +95,9 @@ public class PlayerProfile {
 
 	@Getter
 	private int level = 1;
+
+	@Getter
+	private boolean banned;
 
 	/**
 	 * @param api the api
@@ -151,6 +155,7 @@ public class PlayerProfile {
 	 * @param playerResponse the response
 	 */
 	public void updateProfile(GetPlayerResponse playerResponse) {
+		banned = playerResponse.getBanned();
 		updateProfile(playerResponse.getPlayerData());
 	}
 
@@ -178,7 +183,7 @@ public class PlayerProfile {
 		// Tutorial state
 		tutorialState = new TutorialState(playerData.getTutorialStateList());
 
-		if (playerData.hasBuddyPokemon()) {
+		if (playerData.hasBuddyPokemon() && playerData.getBuddyPokemon().getId() != 0) {
 			buddy = new Buddy(api, playerData.getBuddyPokemon());
 		} else {
 			buddy = null;
@@ -195,13 +200,14 @@ public class PlayerProfile {
 	 * @throws LoginFailedException when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws InsufficientLevelException if you have not yet reached the desired level
 	 * @see PlayerLevelUpRewards
 	 */
 	public PlayerLevelUpRewards acceptLevelUpRewards(int level)
 			throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		// Check if we even have achieved this level yet
 		if (level > stats.getLevel()) {
-			return new PlayerLevelUpRewards(PlayerLevelUpRewards.Status.NOT_UNLOCKED_YET);
+			throw new InsufficientLevelException();
 		}
 		LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder()
 				.setLevel(level)
@@ -556,6 +562,10 @@ public class PlayerProfile {
 	 */
 	public void claimCodeName(String lastFailure)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+		if (getPlayerData().getRemainingCodenameClaims() <= 0) {
+			throw new RuntimeException("You have no remaining codename claims!");
+		}
+
 		String name = randomCodenameGenerator();
 
 		List<TutorialListener> listeners = api.getListeners(TutorialListener.class);
@@ -578,12 +588,12 @@ public class PlayerProfile {
 		String updatedCodename = null;
 		try {
 			ClaimCodenameResponse claimCodenameResponse = ClaimCodenameResponse.parseFrom(request.getData());
-			if (claimCodenameResponse.getStatus() != ClaimCodenameResponse.Status.SUCCESS) {
-				if (claimCodenameResponse.getUpdatedPlayer().getRemainingCodenameClaims() > 0) {
-					claimCodeName(name);
-				}
-			} else {
+			if (claimCodenameResponse.getStatus() == ClaimCodenameResponse.Status.SUCCESS) {
 				updatedCodename = claimCodenameResponse.getCodename();
+			} else {
+				claimCodeName(name);
+			}
+			if (claimCodenameResponse.hasUpdatedPlayer()) {
 				updateProfile(claimCodenameResponse.getUpdatedPlayer());
 			}
 		} catch (InvalidProtocolBufferException e) {

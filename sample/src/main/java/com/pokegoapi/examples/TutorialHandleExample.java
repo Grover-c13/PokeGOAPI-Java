@@ -54,8 +54,6 @@ public class TutorialHandleExample {
 		OkHttpClient http = new OkHttpClient();
 		final PokemonGo api = new PokemonGo(http);
 		try {
-			PtcCredentialProvider provider
-					= new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD);
 			// Add listener to listen for all tutorial related events, must be registered before login is called,
 			// otherwise it will not be used
 			api.addListener(new TutorialListener() {
@@ -93,7 +91,8 @@ public class TutorialHandleExample {
 							Avatar.FemaleBackpack.GRAY_BLACK_YELLOW_POKEBALL.id());
 				}
 			});
-			api.login(provider);
+			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD),
+					ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 		} catch (LoginFailedException | RemoteServerException | CaptchaActiveException e) {
 			Log.e("Main", "Failed to login!", e);
 		}

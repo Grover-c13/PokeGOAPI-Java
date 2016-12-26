@@ -17,6 +17,8 @@ package com.pokegoapi.api.player;
 
 import POGOProtos.Data.PlayerBadgeOuterClass.PlayerBadge;
 import POGOProtos.Enums.BadgeTypeOuterClass.BadgeType;
+import POGOProtos.Settings.Master.BadgeSettingsOuterClass.BadgeSettings;
+import com.pokegoapi.main.PokemonMeta;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -44,6 +46,14 @@ public class Medal {
 		this.startValue = badge.getStartValue();
 		this.currentValue = badge.getCurrentValue();
 		this.endValue = badge.getEndValue();
+	}
+
+	/**
+	 * Gets settings for this badge type
+	 * @return the settings
+	 */
+	public BadgeSettings getSettings() {
+		return PokemonMeta.getBadgeSettings(type);
 	}
 
 	@Override

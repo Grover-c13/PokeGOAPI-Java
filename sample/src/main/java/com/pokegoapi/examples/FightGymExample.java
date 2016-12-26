@@ -30,22 +30,26 @@
 
 package com.pokegoapi.examples;
 
+import POGOProtos.Data.Battle.BattleActionTypeOuterClass.BattleActionType;
 import POGOProtos.Data.Battle.BattleParticipantOuterClass.BattleParticipant;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse.Result;
+import POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass.UseItemPotionResponse;
+import POGOProtos.Networking.Responses.UseItemReviveResponseOuterClass.UseItemReviveResponse;
+import POGOProtos.Settings.Master.MoveSettingsOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.gym.Battle;
+import com.pokegoapi.api.gym.Battle.ServerAction;
 import com.pokegoapi.api.gym.Gym;
+import com.pokegoapi.api.map.MapObjects;
 import com.pokegoapi.api.map.Point;
 import com.pokegoapi.api.pokemon.Pokemon;
-import com.pokegoapi.api.pokemon.PokemonMoveMeta;
-import com.pokegoapi.api.pokemon.PokemonMoveMetaRegistry;
-import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.MapUtil;
 import com.pokegoapi.util.path.Path;
@@ -57,29 +61,33 @@ import java.util.Comparator;
 import java.util.List;
 
 public class FightGymExample {
-
 	/**
-	 * Catches a pokemon at an area.
+	 * Fights gyms in the nearby area.
 	 */
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
-		CredentialProvider auth;
 		final PokemonGo api = new PokemonGo(http);
 		try {
-			auth = new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD);
-			api.login(auth);
-			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
+			//Login and set location
+			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD),
+					ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 
 			List<Pokemon> pokemons = api.getInventories().getPokebank().getPokemons();
-			List<Pokemon> possible = new ArrayList<>();
+
+			//List to put all pokemon that can be used in a gym battle
+			List<Pokemon> possiblePokemon = new ArrayList<>();
 
 			for (Pokemon pokemon : pokemons) {
 				//Check if pokemon has full health and is not deployed in a gym
 				if (pokemon.getDeployedFortId().length() == 0) {
-					possible.add(pokemon);
 					if (pokemon.getStamina() < pokemon.getMaxStamina()) {
-						healPokemonFull(pokemon);
+						healPokemonFull(api, pokemon);
+						if (!(pokemon.isInjured() || pokemon.isFainted())) {
+							possiblePokemon.add(pokemon);
+						}
 						Thread.sleep(1000);
+					} else {
+						possiblePokemon.add(pokemon);
 					}
 				} else {
 					System.out.println(pokemon.getPokemonId() + " already deployed.");
@@ -87,21 +95,23 @@ public class FightGymExample {
 			}
 
 			//Sort by highest CP
-			Collections.sort(possible, new Comparator<Pokemon>() {
+			Collections.sort(possiblePokemon, new Comparator<Pokemon>() {
 				@Override
 				public int compare(Pokemon primary, Pokemon secondary) {
 					return Integer.compare(secondary.getCp(), primary.getCp());
 				}
 			});
 
+			//Pick the top 6 pokemon from the possible list
 			final Pokemon[] attackers = new Pokemon[6];
 
 			for (int i = 0; i < 6; i++) {
-				attackers[i] = possible.get(i);
+				attackers[i] = possiblePokemon.get(i);
 			}
 
 			//Sort from closest to farthest
-			List<Gym> gyms = api.getMap().getGyms();
+			MapObjects mapObjects = api.getMap().getMapObjects();
+			List<Gym> gyms = new ArrayList<>(mapObjects.getGyms());
 			Collections.sort(gyms, new Comparator<Gym>() {
 				@Override
 				public int compare(Gym primary, Gym secondary) {
@@ -114,11 +124,12 @@ public class FightGymExample {
 			});
 
 			for (Gym gym : gyms) {
+				//Check if gym is attackable, and check if it is not owned by your team
 				if (gym.isAttackable() && gym.getOwnedByTeam() != api.getPlayerProfile().getPlayerData().getTeam()) {
-					//Documented pathing in TravelToPokestopExample
+					//Walk to gym; Documented pathing in TravelToPokestopExample
 					Point destination = new Point(gym.getLatitude(), gym.getLongitude());
-					Path path = new Path(api.getPoint(), destination, 25.0);
-					System.out.println("Traveling to " + destination + " at 25KMPH!");
+					Path path = new Path(api.getPoint(), destination, 50.0);
+					System.out.println("Traveling to " + destination + " at 50KMPH!");
 					path.start(api);
 					try {
 						while (!path.isComplete()) {
@@ -131,30 +142,34 @@ public class FightGymExample {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
+
 					System.out.println("Beginning battle with gym.");
+
 					//Create battle object
 					Battle battle = gym.battle();
 
-					//Start battle (method blocks until battle is complete)
+					//Start battle
 					battle.start(new FightHandler(attackers));
 					while (battle.isActive()) {
 						handleAttack(battle);
 					}
+
 					//Heal all pokemon after battle
-					for (Pokemon pokemon : pokemons) {
+					for (Pokemon pokemon : possiblePokemon) {
 						if (pokemon.getStamina() < pokemon.getMaxStamina()) {
-							healPokemonFull(pokemon);
+							healPokemonFull(api, pokemon);
 							Thread.sleep(1000);
 						}
 					}
+
+					//If prestige reaches 0, deploy your pokemon
 					if (battle.getGym().getPoints() <= 0) {
-						Pokemon best = possible.get(0);
+						Pokemon best = possiblePokemon.get(0);
 						System.out.println("Deploying " + best.getPokemonId() + " to gym.");
 						battle.getGym().deployPokemon(best);
 					}
 				}
 			}
-
 		} catch (LoginFailedException | RemoteServerException | InterruptedException | CaptchaActiveException e) {
 			// failed to login, invalid credentials, auth issue or server issue.
 			Log.e("Main", "Failed to login, captcha or server issue: ", e);
@@ -164,28 +179,35 @@ public class FightGymExample {
 	private static void handleAttack(Battle battle) throws InterruptedException {
 		int duration;
 		PokemonMove specialMove = battle.getActiveAttacker().getPokemon().getMove2();
-		PokemonMoveMeta specialMeta = PokemonMoveMetaRegistry.getMeta(specialMove);
+		MoveSettingsOuterClass.MoveSettings moveSettings = PokemonMeta.getMoveSettings(specialMove);
 		//Check if we have sufficient energy to perform a special attack
 		int energy = battle.getActiveAttacker().getEnergy();
-		int desiredEnergy = -specialMeta.getEnergy();
-		if (energy >= desiredEnergy) {
+		int desiredEnergy = -moveSettings.getEnergyDelta();
+		if (energy <= desiredEnergy) {
 			duration = battle.attack();
 		} else {
 			duration = battle.attackSpecial();
 		}
 		//Attack and sleep for the duration of the attack + some extra time
-		System.out.println("Attack " + duration + ", energy: " + energy + " / " + desiredEnergy);
-		Thread.sleep(duration + 10);
+		Thread.sleep(duration + (long) (Math.random() * 10));
 	}
 
-	private static void healPokemonFull(Pokemon pokemon)
+	private static void healPokemonFull(PokemonGo api, Pokemon pokemon)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		System.out.println("Healing " + pokemon.getPokemonId());
-		if (pokemon.isFainted()) {
-			pokemon.revive();
-		}
-		while (pokemon.getStamina() < pokemon.getMaxStamina()) {
-			pokemon.heal();
+		//Continue healing the pokemon until fully healed
+		while (pokemon.isInjured() || pokemon.isFainted()) {
+			if (pokemon.isFainted()) {
+				if (pokemon.revive() == UseItemReviveResponse.Result.ERROR_CANNOT_USE) {
+					System.out.println("We have no revives! Cannot revive pokemon.");
+					break;
+				}
+			} else {
+				if (pokemon.heal() == UseItemPotionResponse.Result.ERROR_CANNOT_USE) {
+					System.out.println("We have no potions! Cannot heal pokemon.");
+					break;
+				}
+			}
 		}
 	}
 
@@ -229,18 +251,24 @@ public class FightGymExample {
 
 		@Override
 		public void onActionStart(PokemonGo api, Battle battle, Battle.ServerAction action) {
+			//Dodge all special attacks
+			if (action.getType() == BattleActionType.ACTION_SPECIAL_ATTACK) {
+				System.out.println("Dodging special attack!");
+				battle.dodge();
+			}
+			System.out.println(toIndexName(action) + " performed " + action.getType());
 		}
 
 		@Override
 		public void onActionEnd(PokemonGo api, Battle battle, Battle.ServerAction action) {
 		}
 
-		private String toIndexName(Battle.ServerAction action) {
-			String name = "Me";
-			if (action.getAttackerIndex() == -1) {
-				name = "Defender";
-			}
-			return name;
+		@Override
+		public void onDamageStart(PokemonGo api, Battle battle, ServerAction action) {
+		}
+
+		@Override
+		public void onDamageEnd(PokemonGo api, Battle battle, ServerAction action) {
 		}
 
 		@Override
@@ -255,11 +283,21 @@ public class FightGymExample {
 
 		@Override
 		public void onAttacked(PokemonGo api, Battle battle, Battle.BattlePokemon attacked,
-							   Battle.BattlePokemon attacker, long duration,
+							   Battle.BattlePokemon attacker, int duration,
 							   long damageWindowStart, long damageWindowEnd, Battle.ServerAction action) {
 			PokemonId attackedPokemon = attacked.getPokemon().getPokemonId();
 			PokemonId attackerPokemon = attacker.getPokemon().getPokemonId();
 			System.out.println(attackedPokemon + " attacked by " + attackerPokemon + " (" + toIndexName(action) + ")");
+		}
+
+		@Override
+		public void onAttackedSpecial(PokemonGo api, Battle battle, Battle.BattlePokemon attacked,
+									  Battle.BattlePokemon attacker, int duration,
+									  long damageWindowStart, long damageWindowEnd, Battle.ServerAction action) {
+			PokemonId attackedPokemon = attacked.getPokemon().getPokemonId();
+			PokemonId attackerPokemon = attacker.getPokemon().getPokemonId();
+			System.out.println(attackedPokemon
+					+ " attacked with special attack by " + attackerPokemon + " (" + toIndexName(action) + ")");
 		}
 
 		@Override
@@ -291,6 +329,32 @@ public class FightGymExample {
 		@Override
 		public void onDefenderSwap(PokemonGo api, Battle battle, Battle.BattlePokemon newDefender) {
 			System.out.println("Defender change: " + newDefender.getPokemon().getPokemonId());
+		}
+
+		@Override
+		public void onFaint(PokemonGo api, Battle battle, Battle.BattlePokemon pokemon, int duration,
+							Battle.ServerAction action) {
+			System.out.println(toIndexName(action) + " fainted!");
+		}
+
+		@Override
+		public void onDodge(PokemonGo api, Battle battle, Battle.BattlePokemon pokemon, int duration,
+							Battle.ServerAction action) {
+			System.out.println(toIndexName(action) + " dodged!");
+		}
+
+		/**
+		 * Converts the attacker index to a readable name
+		 *
+		 * @param action the action containing an index
+		 * @return a readable name for the attacker
+		 */
+		private String toIndexName(Battle.ServerAction action) {
+			String name = "Attacker";
+			if (action.getAttackerIndex() == -1) {
+				name = "Defender";
+			}
+			return name;
 		}
 	}
 }

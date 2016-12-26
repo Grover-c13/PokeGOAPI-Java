@@ -132,7 +132,7 @@ public class ItemBag {
 		synchronized (this.lock) {
 			// prevent returning null
 			if (!items.containsKey(type)) {
-				return new Item(ItemData.newBuilder().setCount(0).setItemId(type).build(), this);
+				return new Item(api, ItemData.newBuilder().setCount(0).setItemId(type).build(), this);
 			}
 
 			return items.get(type);
@@ -263,5 +263,35 @@ public class ItemBag {
 			}
 		}
 		return pokeballs;
+	}
+
+	/**
+	 * @return true if the current player has incense active
+	 */
+	public boolean isIncenseActive() {
+		synchronized (lock) {
+			for (Map.Entry<ItemId, Item> entry : items.entrySet()) {
+				Item item = entry.getValue();
+				if (item.isApplied() && item.isIncense()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * @return true if the current player has a lucky egg active
+	 */
+	public boolean isLuckyEggActive() {
+		synchronized (lock) {
+			for (Map.Entry<ItemId, Item> entry : items.entrySet()) {
+				Item item = entry.getValue();
+				if (item.isApplied() && item.isLuckyEgg()) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

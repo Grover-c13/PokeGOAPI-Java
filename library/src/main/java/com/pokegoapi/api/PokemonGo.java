@@ -23,6 +23,7 @@ import POGOProtos.Networking.Requests.Messages.VerifyChallenge.VerifyChallengeMe
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckChallengeResponseOuterClass.CheckChallengeResponse;
+import POGOProtos.Networking.Responses.DownloadRemoteConfigVersionResponseOuterClass.DownloadRemoteConfigVersionResponse;
 import POGOProtos.Networking.Responses.VerifyChallengeResponseOuterClass.VerifyChallengeResponse;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -43,16 +44,20 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.CommonRequests;
+import com.pokegoapi.main.Heartbeat;
+import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.ClientInterceptor;
+import com.pokegoapi.util.Log;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -108,6 +113,7 @@ public class PokemonGo {
 	private boolean hasChallenge;
 	@Getter
 	private String challengeURL;
+	private final Object challengeLock = new Object();
 
 	@Getter
 	private List<Listener> listeners = Collections.synchronizedList(new ArrayList<Listener>());
@@ -116,6 +122,9 @@ public class PokemonGo {
 
 	@Getter
 	private boolean loggingIn;
+
+	@Getter
+	private Heartbeat heartbeat = new Heartbeat(this);
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -179,8 +188,10 @@ public class PokemonGo {
 	 * @throws RemoteServerException When server fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void login(CredentialProvider credentialProvider)
+	public void login(CredentialProvider credentialProvider, double latitude, double longitude, double altitude)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+		setLocation(latitude, longitude, altitude);
+
 		this.loggingIn = true;
 		if (credentialProvider == null) {
 			throw new NullPointerException("Credential Provider is null");
@@ -192,14 +203,40 @@ public class PokemonGo {
 		playerProfile = new PlayerProfile(this);
 		playerProfile.updateProfile();
 
+		try {
+			if (hasChallenge()) {
+				Log.d(TAG, "Challenge active!");
+				awaitChallenge();
+			}
+		} catch (InterruptedException e) {
+			throw new LoginFailedException(e);
+		}
+
 		initialize();
 
 		this.loggingIn = false;
+
+		heartbeat.start();
 	}
 
 	private void initialize() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
-		fireRequestBlock(new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
-				CommonRequests.getDownloadRemoteConfigVersionMessageRequest()));
+		ServerRequest request = new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
+				CommonRequests.getDownloadRemoteConfigVersionMessageRequest());
+		fireRequestBlock(request);
+
+		try {
+			ByteString data = request.getData();
+			if (PokemonMeta.checkVersion(DownloadRemoteConfigVersionResponse.parseFrom(data))) {
+				ServerRequest templatesRequest = new ServerRequest(RequestType.DOWNLOAD_ITEM_TEMPLATES,
+						CommonRequests.getDownloadItemTemplatesRequest());
+				fireRequestBlock(templatesRequest);
+				PokemonMeta.update(templatesRequest.getData(), true);
+			}
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 
 		fireRequestBlockTwo();
 
@@ -228,7 +265,8 @@ public class PokemonGo {
 			playerProfile.encounterTutorialComplete();
 		}
 
-		if (!tutorialStates.contains(TutorialState.NAME_SELECTION)) {
+		int remainingCodenameClaims = getPlayerProfile().getPlayerData().getRemainingCodenameClaims();
+		if (!tutorialStates.contains(TutorialState.NAME_SELECTION) && remainingCodenameClaims > 0) {
 			playerProfile.claimCodeName();
 		}
 
@@ -248,6 +286,11 @@ public class PokemonGo {
 	private void fireRequestBlock(ServerRequest request)
 			throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		getRequestHandler().sendServerRequests(request.withCommons());
+		try {
+			awaitChallenge();
+		} catch (InterruptedException e) {
+			throw new LoginFailedException(e);
+		}
 	}
 
 	/**
@@ -313,9 +356,6 @@ public class PokemonGo {
 	 * @param accuracy the accuracy of this location
 	 */
 	public void setLocation(double latitude, double longitude, double altitude, double accuracy) {
-		if (latitude != this.latitude || longitude != this.longitude) {
-			getMap().clearCache();
-		}
 		setLatitude(latitude);
 		setLongitude(longitude);
 		setAltitude(altitude);
@@ -418,6 +458,10 @@ public class PokemonGo {
 			for (LoginListener listener : listeners) {
 				listener.onChallenge(this, url);
 			}
+		} else {
+			synchronized (challengeLock) {
+				challengeLock.notifyAll();
+			}
 		}
 	}
 
@@ -511,6 +555,9 @@ public class PokemonGo {
 		hasChallenge = !response.getSuccess();
 		if (!hasChallenge) {
 			challengeURL = null;
+			synchronized (challengeLock) {
+				challengeLock.notifyAll();
+			}
 		}
 		return response.getSuccess();
 	}
@@ -544,5 +591,17 @@ public class PokemonGo {
 	 */
 	public Point getPoint() {
 		return new Point(this.getLatitude(), this.getLongitude());
+	}
+
+	/**
+	 * Blocks this thread until the current challenge is solved
+	 * @throws InterruptedException if this thread is interrupted while blocking
+	 */
+	public void awaitChallenge() throws InterruptedException {
+		if (hasChallenge()) {
+			synchronized (challengeLock) {
+				challengeLock.wait();
+			}
+		}
 	}
 }

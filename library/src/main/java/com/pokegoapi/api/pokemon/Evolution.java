@@ -28,19 +28,15 @@ public class Evolution {
 	private PokemonId pokemon;
 	@Getter
 	private List<PokemonId> evolutions = new ArrayList<>();
-	@Getter
-	private int stage;
 
 	/**
 	 * Constructor for this evolution class
 	 * @param parents the parents of this evolution
 	 * @param pokemon the pokmon being evolved
-	 * @param stage the evolution stage, starting at 0
 	 */
-	public Evolution(PokemonId[] parents, PokemonId pokemon, int stage) {
+	public Evolution(PokemonId[] parents, PokemonId pokemon) {
 		this.parents = parents;
 		this.pokemon = pokemon;
-		this.stage = stage;
 	}
 
 	/**

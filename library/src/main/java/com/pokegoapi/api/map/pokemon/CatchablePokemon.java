@@ -25,12 +25,16 @@ import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.CatchPokemonMessage;
 import POGOProtos.Networking.Requests.Messages.DiskEncounterMessageOuterClass.DiskEncounterMessage;
 import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass.EncounterMessage;
+import POGOProtos.Networking.Requests.Messages.IncenseEncounterMessageOuterClass.IncenseEncounterMessage;
 import POGOProtos.Networking.Requests.Messages.UseItemCaptureMessageOuterClass.UseItemCaptureMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus;
 import POGOProtos.Networking.Responses.DiskEncounterResponseOuterClass.DiskEncounterResponse;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
+import POGOProtos.Networking.Responses.GetIncensePokemonResponseOuterClass.GetIncensePokemonResponse;
+import POGOProtos.Networking.Responses.IncenseEncounterResponseOuterClass.IncenseEncounterResponse;
+import POGOProtos.Networking.Responses.IncenseEncounterResponseOuterClass.IncenseEncounterResponse.Result;
 import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass.UseItemCaptureResponse;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -40,6 +44,7 @@ import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.listener.PokemonListener;
 import com.pokegoapi.api.map.pokemon.encounter.DiskEncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
+import com.pokegoapi.api.map.pokemon.encounter.IncenseEncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.NormalEncounterResult;
 import com.pokegoapi.api.settings.AsyncCatchOptions;
 import com.pokegoapi.api.settings.CatchOptions;
@@ -90,6 +95,9 @@ public class CatchablePokemon implements MapPoint {
 
 	@Getter
 	private double captureProbability;
+
+	@Getter
+	private boolean despawned = false;
 
 	/**
 	 * Instantiates a new Catchable pokemon.
@@ -153,6 +161,24 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	/**
+	 * Instantiates a new Catchable pokemon.
+	 *
+	 * @param api the api
+	 * @param proto the proto
+	 */
+	public CatchablePokemon(PokemonGo api, GetIncensePokemonResponse proto) {
+		this.api = api;
+		this.spawnPointId = proto.getEncounterLocation();
+		this.encounterId = proto.getEncounterId();
+		this.pokemonId = proto.getPokemonId();
+		this.pokemonIdValue = proto.getPokemonIdValue();
+		this.expirationTimestampMs = proto.getDisappearTimestampMs();
+		this.latitude = proto.getLatitude();
+		this.longitude = proto.getLongitude();
+		this.encounterKind = EncounterKind.INCENSE;
+	}
+
+	/**
 	 * Encounter pokemon
 	 *
 	 * @return the encounter result
@@ -175,6 +201,8 @@ public class CatchablePokemon implements MapPoint {
 			return encounterNormalPokemonAsync();
 		} else if (encounterKind == EncounterKind.DISK) {
 			return encounterDiskPokemonAsync();
+		} else if (encounterKind == EncounterKind.INCENSE) {
+			return encounterIncensePokemonAsync();
 		}
 
 		throw new IllegalStateException("Catchable pokemon missing encounter type");
@@ -265,6 +293,41 @@ public class CatchablePokemon implements MapPoint {
 									= response.getCaptureProbability().getCaptureProbability(0);
 						}
 						return new DiskEncounterResult(api, response);
+					}
+				});
+	}
+
+	/**
+	 * Encounter pokemon
+	 *
+	 * @return the encounter result
+	 */
+	public Observable<EncounterResult> encounterIncensePokemonAsync() {
+		IncenseEncounterMessage reqMsg = IncenseEncounterMessage.newBuilder()
+				.setEncounterId(getEncounterId())
+				.setEncounterLocation(getSpawnPointId()).build();
+		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.INCENSE_ENCOUNTER, reqMsg);
+		return api.getRequestHandler()
+				.sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, EncounterResult>() {
+					@Override
+					public EncounterResult call(ByteString result) {
+						IncenseEncounterResponse response;
+						try {
+							response = IncenseEncounterResponse.parseFrom(result);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+						encountered = response.getResult() == Result.INCENSE_ENCOUNTER_SUCCESS;
+						if (encountered) {
+							List<PokemonListener> listeners = api.getListeners(PokemonListener.class);
+							for (PokemonListener listener : listeners) {
+								listener.onEncounter(api, getEncounterId(),
+										CatchablePokemon.this, EncounterType.INCENSE);
+							}
+							CatchablePokemon.this.captureProbability
+									= response.getCaptureProbability().getCaptureProbability(0);
+						}
+						return new IncenseEncounterResult(api, response);
 					}
 				});
 	}
@@ -560,7 +623,6 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	private Observable<CatchResult> catchPokemonAsync(AsyncServerRequest serverRequest) {
-		final CatchablePokemon instance = this;
 		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, CatchResult>() {
 			@Override
 			public CatchResult call(ByteString result) {
@@ -573,13 +635,13 @@ public class CatchablePokemon implements MapPoint {
 				}
 				try {
 
-					// pokemon is caught of flees
+					// pokemon is caught or flee, and no longer on the map
 					if (response.getStatus() == CatchStatus.CATCH_FLEE
 							|| response.getStatus() == CatchStatus.CATCH_SUCCESS) {
-						api.getMap().removeCatchable(instance);
+						despawned = true;
 					}
 
-					// escapes
+					// escaped pokeball
 					if (response.getStatus() == CatchStatus.CATCH_ESCAPE) {
 						api.getInventories().updateInventories();
 					}
@@ -681,8 +743,18 @@ public class CatchablePokemon implements MapPoint {
 		return encounterKind == EncounterKind.DISK;
 	}
 
+	/**
+	 * Return true when the catchable pokemon is a lured pokemon from incense
+	 *
+	 * @return true for pokemon lured by incense
+	 */
+	public boolean isFromIncense() {
+		return encounterKind == EncounterKind.INCENSE;
+	}
+
 	private enum EncounterKind {
 		NORMAL,
-		DISK;
+		DISK,
+		INCENSE;
 	}
 }

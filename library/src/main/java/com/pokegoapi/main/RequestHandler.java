@@ -19,6 +19,7 @@ import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -154,6 +155,9 @@ public class RequestHandler implements Runnable {
 	 */
 	public void sendServerRequests(ServerRequest... serverRequests)
 			throws RemoteServerException, LoginFailedException, CaptchaActiveException {
+		if (api.hasChallenge()) {
+			throw new CaptchaActiveException(new AsyncCaptchaActiveException("Captcha active! Cannot send requests!"));
+		}
 		List<Observable<ByteString>> observables = new ArrayList<>(serverRequests.length);
 		for (ServerRequest request : serverRequests) {
 			AsyncServerRequest asyncServerRequest = new AsyncServerRequest(request.getType(), request.getRequest())
@@ -224,20 +228,24 @@ public class RequestHandler implements Runnable {
 			}
 
 			if (responseEnvelop.getStatusCode() == ResponseEnvelope.StatusCode.INVALID_AUTH_TOKEN) {
-				throw new LoginFailedException(String.format("Invalid Auth status code recieved, token not refreshed? %s %s",
-						responseEnvelop.getApiUrl(), responseEnvelop.getError()));
+				String msg = String.format("Invalid Auth status code received, token not refreshed? %s %s",
+						responseEnvelop.getApiUrl(), responseEnvelop.getError());
+				throw new LoginFailedException(msg);
 			} else if (responseEnvelop.getStatusCode() == ResponseEnvelope.StatusCode.REDIRECT) {
-				// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
+				// API_ENDPOINT was not correctly set, should be at this point, though, so redo the request
 				return internalSendServerRequests(newAuthTicket, serverRequests);
 			} else if (responseEnvelop.getStatusCode() == ResponseEnvelope.StatusCode.BAD_REQUEST) {
-				throw new RemoteServerException("Your account may be banned! please try from the official client.");
+				if (api.getPlayerProfile().isBanned()) {
+					throw new LoginFailedException("Cannot send request, your account has been banned!");
+				} else {
+					throw new RemoteServerException("A bad request was sent!");
+				}
 			}
 
-
-			/**
+			/*
 			 * map each reply to the numeric response,
 			 * ie first response = first request and send back to the requests to toBlocking.
-			 * */
+			 */
 			int count = 0;
 			for (ByteString payload : responseEnvelop.getReturnsList()) {
 				ServerRequest serverReq = serverRequests[count];
@@ -251,7 +259,7 @@ public class RequestHandler implements Runnable {
 			}
 		} catch (IOException e) {
 			throw new RemoteServerException(e);
-		} catch (RemoteServerException e) {
+		} catch (RemoteServerException | LoginFailedException e) {
 			// catch it, so the auto-close of resources triggers, but don't wrap it in yet another RemoteServer Exception
 			throw e;
 		}
@@ -305,7 +313,8 @@ public class RequestHandler implements Runnable {
 			if (api.hasChallenge() & !api.isLoggingIn()) {
 				for (AsyncServerRequest request : requests) {
 					RequestTypeOuterClass.RequestType type = request.getType();
-					if (type == RequestTypeOuterClass.RequestType.VERIFY_CHALLENGE) {
+					if (type == RequestTypeOuterClass.RequestType.VERIFY_CHALLENGE
+							|| type == RequestType.CHECK_CHALLENGE) {
 						ServerRequest serverRequest = new ServerRequest(type, request.getRequest());
 						serverRequests.add(serverRequest);
 						requestMap.put(serverRequest, request);
