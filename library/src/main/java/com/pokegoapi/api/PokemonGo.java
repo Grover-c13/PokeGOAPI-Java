@@ -218,7 +218,7 @@ public class PokemonGo {
 	private void initialize() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		ServerRequest request = new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
 				CommonRequests.getDownloadRemoteConfigVersionMessageRequest());
-		fireRequestBlock(request);
+		fireRequestBlock(request, RequestType.GET_BUDDY_WALKED);
 
 		try {
 			ByteString data = request.getData();
@@ -275,13 +275,14 @@ public class PokemonGo {
 	 * Fire requests block.
 	 *
 	 * @param request server request
+	 * @param exclude the commmon requests to exclude
 	 * @throws LoginFailedException When login fails
 	 * @throws RemoteServerException When server fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	private void fireRequestBlock(ServerRequest request)
+	private void fireRequestBlock(ServerRequest request, RequestType... exclude)
 			throws RemoteServerException, CaptchaActiveException, LoginFailedException {
-		getRequestHandler().sendServerRequests(request.withCommons());
+		getRequestHandler().sendServerRequests(request.withCommons().exclude(exclude));
 		try {
 			awaitChallenge();
 		} catch (InterruptedException e) {

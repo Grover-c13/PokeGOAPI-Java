@@ -20,6 +20,9 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import com.google.protobuf.GeneratedMessage;
 import lombok.Getter;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -36,6 +39,8 @@ public class AsyncServerRequest {
 	private final Request request;
 	@Getter
 	private boolean requireCommonRequest;
+	@Getter
+	private Set<RequestType> exclude = new HashSet<>();
 
 	/**
 	 * Instantiates a new Server request.
@@ -82,6 +87,26 @@ public class AsyncServerRequest {
 	 */
 	public AsyncServerRequest withCommons(boolean requireCommon) {
 		this.requireCommonRequest = requireCommon;
+		return this;
+	}
+
+	/**
+	 * Excludes the given requests from the next packet
+	 * @param types the types to exclude
+	 * @return this object
+	 */
+	public AsyncServerRequest exclude(RequestType... types) {
+		Collections.addAll(exclude, types);
+		return this;
+	}
+
+	/**
+	 * Excludes the given requests from the next packet
+	 * @param types the types to exclude
+	 * @return this object
+	 */
+	public AsyncServerRequest exclude(Set<RequestType> types) {
+		exclude.addAll(types);
 		return this;
 	}
 }

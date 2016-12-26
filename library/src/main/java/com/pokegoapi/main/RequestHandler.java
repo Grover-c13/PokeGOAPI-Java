@@ -40,12 +40,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -161,7 +162,7 @@ public class RequestHandler implements Runnable {
 		List<Observable<ByteString>> observables = new ArrayList<>(serverRequests.length);
 		for (ServerRequest request : serverRequests) {
 			AsyncServerRequest asyncServerRequest = new AsyncServerRequest(request.getType(), request.getRequest())
-					.withCommons(request.isRequireCommon());
+					.withCommons(request.isRequireCommon()).exclude(request.getExclude());
 			observables.add(sendAsyncServerRequests(asyncServerRequest));
 		}
 		for (int i = 0; i != serverRequests.length; i++) {
@@ -309,35 +310,48 @@ public class RequestHandler implements Runnable {
 
 			ArrayList<ServerRequest> serverRequests = new ArrayList<>();
 			Map<ServerRequest, AsyncServerRequest> requestMap = new HashMap<>();
+			Set<RequestType> exclude = new HashSet<>();
 
-			if (api.hasChallenge() & !api.isLoggingIn()) {
+			for (AsyncServerRequest request : requests) {
+				exclude.addAll(request.getExclude());
+			}
+
+			if (api.hasChallenge() && !api.isLoggingIn()) {
 				for (AsyncServerRequest request : requests) {
 					RequestTypeOuterClass.RequestType type = request.getType();
-					if (type == RequestTypeOuterClass.RequestType.VERIFY_CHALLENGE
-							|| type == RequestType.CHECK_CHALLENGE) {
-						ServerRequest serverRequest = new ServerRequest(type, request.getRequest());
-						serverRequests.add(serverRequest);
-						requestMap.put(serverRequest, request);
-					} else {
-						AsyncCaptchaActiveException exception = new AsyncCaptchaActiveException(api.getChallengeURL());
-						ResultOrException error = ResultOrException.getError(exception);
-						resultMap.put(request.getId(), error);
+					if (!exclude.contains(type)) {
+						if (type == RequestTypeOuterClass.RequestType.VERIFY_CHALLENGE
+								|| type == RequestType.CHECK_CHALLENGE) {
+							ServerRequest serverRequest = new ServerRequest(type, request.getRequest());
+							serverRequests.add(serverRequest);
+							requestMap.put(serverRequest, request);
+						} else {
+							AsyncCaptchaActiveException exception = new AsyncCaptchaActiveException(api.getChallengeURL());
+							ResultOrException error = ResultOrException.getError(exception);
+							resultMap.put(request.getId(), error);
+						}
 					}
 				}
 			} else {
 				for (AsyncServerRequest request : requests) {
-					ServerRequest serverRequest = new ServerRequest(request.getType(), request.getRequest());
-					serverRequests.add(serverRequest);
-					requestMap.put(serverRequest, request);
-					if (request.isRequireCommonRequest()) {
-						addCommon = true;
+					if (!exclude.contains(request.getType())) {
+						ServerRequest serverRequest = new ServerRequest(request.getType(), request.getRequest());
+						serverRequests.add(serverRequest);
+						requestMap.put(serverRequest, request);
+						if (request.isRequireCommonRequest()) {
+							addCommon = true;
+						}
 					}
 				}
 			}
 
 			if (addCommon) {
 				ServerRequest[] commonRequests = CommonRequests.getCommonRequests(api);
-				Collections.addAll(serverRequests, commonRequests);
+				for (ServerRequest request : commonRequests) {
+					if (!exclude.contains(request.getType())) {
+						serverRequests.add(request);
+					}
+				}
 			}
 
 			ServerRequest[] arrayServerRequests = serverRequests.toArray(new ServerRequest[serverRequests.size()]);
