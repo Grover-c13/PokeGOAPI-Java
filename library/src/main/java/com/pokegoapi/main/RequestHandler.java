@@ -316,6 +316,10 @@ public class RequestHandler implements Runnable {
 				exclude.addAll(request.getExclude());
 			}
 
+			if (api.isLoggingIn()) {
+				exclude.add(RequestType.CHECK_CHALLENGE);
+			}
+
 			if (api.hasChallenge() && !api.isLoggingIn()) {
 				for (AsyncServerRequest request : requests) {
 					RequestTypeOuterClass.RequestType type = request.getType();

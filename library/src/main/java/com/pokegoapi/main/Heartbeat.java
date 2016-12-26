@@ -54,10 +54,10 @@ public class Heartbeat {
 		MapSettings mapSettings = api.getSettings().getMapSettings();
 		minMapRefresh = (long) mapSettings.getMinRefresh();
 		maxMapRefresh = (long) mapSettings.getMaxRefresh();
-		beat();
 		Thread heartbeatThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
+				beat();
 				while (true) {
 					try {
 						Thread.sleep(10);
@@ -114,6 +114,7 @@ public class Heartbeat {
 
 	/**
 	 * Enqueues the given task
+	 *
 	 * @param task the task to enqueue
 	 */
 	public void enqueueTask(Runnable task) {

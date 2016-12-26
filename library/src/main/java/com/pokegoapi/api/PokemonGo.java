@@ -50,7 +50,6 @@ import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.ClientInterceptor;
-import com.pokegoapi.util.Log;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import lombok.Getter;
@@ -201,15 +200,6 @@ public class PokemonGo {
 		playerProfile = new PlayerProfile(this);
 		playerProfile.updateProfile();
 
-		try {
-			if (hasChallenge()) {
-				Log.d(TAG, "Challenge active!");
-				awaitChallenge();
-			}
-		} catch (InterruptedException e) {
-			throw new LoginFailedException(e);
-		}
-
 		initialize();
 
 		this.loggingIn = false;
@@ -353,13 +343,13 @@ public class PokemonGo {
 	 * @param accuracy the accuracy of this location
 	 */
 	public void setLocation(double latitude, double longitude, double altitude, double accuracy) {
-		if (!heartbeat.active() && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
-			heartbeat.start();
-		}
 		setLatitude(latitude);
 		setLongitude(longitude);
 		setAltitude(altitude);
 		setAccuracy(accuracy);
+		if (!heartbeat.active() && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
+			heartbeat.start();
+		}
 	}
 
 	public long currentTimeMillis() {
