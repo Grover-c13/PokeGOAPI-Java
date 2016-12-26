@@ -91,8 +91,8 @@ public class TutorialHandleExample {
 							Avatar.FemaleBackpack.GRAY_BLACK_YELLOW_POKEBALL.id());
 				}
 			});
-			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD),
-					ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
+			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD));
+			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 		} catch (LoginFailedException | RemoteServerException | CaptchaActiveException e) {
 			Log.e("Main", "Failed to login!", e);
 		}

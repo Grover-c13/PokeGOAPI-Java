@@ -105,9 +105,6 @@ public class Hatchery {
 	 */
 	public List<HatchedEgg> updateHatchedEggs(GetHatchedEggsResponse response)
 			throws RemoteServerException, LoginFailedException, CaptchaActiveException {
-		if (response.getPokemonIdCount() > 0) {
-			api.getInventories().updateInventories();
-		}
 		List<HatchedEgg> eggs = new ArrayList<>();
 		for (int i = 0; i < response.getPokemonIdCount(); i++) {
 			HatchedEgg egg = new HatchedEgg(response.getPokemonId(i),

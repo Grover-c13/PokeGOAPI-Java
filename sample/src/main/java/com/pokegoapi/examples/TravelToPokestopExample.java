@@ -56,8 +56,8 @@ public class TravelToPokestopExample {
 		OkHttpClient http = new OkHttpClient();
 		PokemonGo api = new PokemonGo(http);
 		try {
-			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD),
-					ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
+			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD));
+			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 
 			Set<Pokestop> pokestops = api.getMap().getMapObjects().getPokestops();
 			System.out.println("Found " + pokestops.size() + " pokestops in the current area.");

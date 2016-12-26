@@ -188,10 +188,8 @@ public class PokemonGo {
 	 * @throws RemoteServerException When server fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void login(CredentialProvider credentialProvider, double latitude, double longitude, double altitude)
+	public void login(CredentialProvider credentialProvider)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
-		setLocation(latitude, longitude, altitude);
-
 		this.loggingIn = true;
 		if (credentialProvider == null) {
 			throw new NullPointerException("Credential Provider is null");
@@ -215,8 +213,6 @@ public class PokemonGo {
 		initialize();
 
 		this.loggingIn = false;
-
-		heartbeat.start();
 	}
 
 	private void initialize() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
@@ -356,6 +352,9 @@ public class PokemonGo {
 	 * @param accuracy the accuracy of this location
 	 */
 	public void setLocation(double latitude, double longitude, double altitude, double accuracy) {
+		if (!heartbeat.active() && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
+			heartbeat.start();
+		}
 		setLatitude(latitude);
 		setLongitude(longitude);
 		setAltitude(altitude);
@@ -603,5 +602,13 @@ public class PokemonGo {
 				challengeLock.wait();
 			}
 		}
+	}
+
+	/**
+	 * Enqueues the given task
+	 * @param task the task to enqueue
+	 */
+	public void enqueueTask(Runnable task) {
+		heartbeat.enqueueTask(task);
 	}
 }

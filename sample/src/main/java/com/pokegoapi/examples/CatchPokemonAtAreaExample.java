@@ -69,8 +69,8 @@ public class CatchPokemonAtAreaExample {
 		OkHttpClient http = new OkHttpClient();
 		final PokemonGo api = new PokemonGo(http);
 		try {
-			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD),
-					ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
+			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD));
+			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 
 			// Catch all pokemon in the current area
 			catchArea(api);

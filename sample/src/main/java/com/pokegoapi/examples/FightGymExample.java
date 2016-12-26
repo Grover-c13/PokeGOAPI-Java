@@ -69,8 +69,8 @@ public class FightGymExample {
 		final PokemonGo api = new PokemonGo(http);
 		try {
 			//Login and set location
-			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD),
-					ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
+			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD));
+			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 
 			List<Pokemon> pokemons = api.getInventories().getPokebank().getPokemons();
 

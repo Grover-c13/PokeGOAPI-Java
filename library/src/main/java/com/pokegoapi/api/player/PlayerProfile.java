@@ -373,10 +373,11 @@ public class PlayerProfile {
 
 	/**
 	 * Sets the player statistics
+	 *
 	 * @param stats the statistics to apply
 	 */
 	public void setStats(Stats stats) {
-		int newLevel = stats.getLevel();
+		final int newLevel = stats.getLevel();
 		if (this.stats != null) {
 			if (newLevel > this.level) {
 				boolean acceptRewards = false;
@@ -385,11 +386,16 @@ public class PlayerProfile {
 					acceptRewards |= listener.onLevelUp(api, level, newLevel);
 				}
 				if (acceptRewards) {
-					try {
-						this.acceptLevelUpRewards(newLevel);
-					} catch (Exception e) {
-						//Ignore
-					}
+					api.enqueueTask(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								acceptLevelUpRewards(newLevel);
+							} catch (Exception e) {
+								//Ignore
+							}
+						}
+					});
 				}
 			}
 		}
