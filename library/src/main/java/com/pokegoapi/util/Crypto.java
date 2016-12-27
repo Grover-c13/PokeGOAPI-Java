@@ -38,12 +38,8 @@ public class Crypto {
 
 	private static byte makeIntegrityByte(Rand rand) {
 		rand.state = (0x41C64E6D * rand.state) + 0x3039;
-		long shiftedRand = rand.state >> 16;
-		byte lastbyte = Long.valueOf(shiftedRand).byteValue();
-
-		byte v74 = (byte) ((lastbyte ^ 0x0C) & lastbyte);
-		byte v75 = (byte) (((~v74 & 0x67) | (v74 & 0x98)) ^ 0x6F | (v74 & 8));
-		return v75;
+		byte b = Long.valueOf(rand.state >> 16).byteValue();
+		return (byte) (b & 0xE3 | 0x10);
 	}
 
 	/**
