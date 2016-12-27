@@ -15,6 +15,7 @@
 
 package com.pokegoapi.api.inventory;
 
+import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
@@ -50,6 +51,9 @@ public class PokeBank {
 		this.api = api;
 	}
 
+	/**
+	 * Resets the Pokebank and removes all pokemon
+	 */
 	public void reset() {
 		synchronized (this.lock) {
 			pokemons.clear();
@@ -137,23 +141,36 @@ public class PokeBank {
 	 * @throws LoginFailedException the login fails
 	 * @throws RemoteServerException if the server errors
 	 */
-	public Map<Pokemon, ReleasePokemonResponse> releasePokemon(Pokemon... pokemons)
+	public Map<PokemonFamilyId, ReleasePokemonResponse> releasePokemon(Pokemon... pokemons)
 			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
-		ServerRequest[] requests = new ServerRequest[pokemons.length];
-		for (int i = 0; i < requests.length; i++) {
-			ReleasePokemonMessage message = ReleasePokemonMessage.newBuilder()
-					.setPokemonId(pokemons[i].getId())
-					.build();
-			requests[i] = new ServerRequest(RequestType.RELEASE_POKEMON, message);
+		Map<PokemonFamilyId, List<Long>> familyPokemon = new HashMap<>();
+		for (Pokemon pokemon : pokemons) {
+			List<Long> ids = familyPokemon.get(pokemon.getPokemonFamily());
+			if (ids == null) {
+				ids = new ArrayList<>();
+				familyPokemon.put(pokemon.getPokemonFamily(), ids);
+			}
+			ids.add(pokemon.getId());
 		}
-		api.getRequestHandler().sendServerRequests(requests);
+		Map<PokemonFamilyId, ServerRequest> requests = new HashMap<>();
+		ServerRequest[] requestArray = new ServerRequest[familyPokemon.size()];
+		int index = 0;
+		for (Map.Entry<PokemonFamilyId, List<Long>> entry : familyPokemon.entrySet()) {
+			ReleasePokemonMessage message = ReleasePokemonMessage.newBuilder()
+					.addAllPokemonIds(entry.getValue())
+					.build();
+			ServerRequest request = new ServerRequest(RequestType.RELEASE_POKEMON, message);
+			requests.put(entry.getKey(), request);
+			requestArray[index++] = request;
+		}
+		api.getRequestHandler().sendServerRequests(requestArray);
 		try {
-			Map<Pokemon, ReleasePokemonResponse> responses = new HashMap<>();
-			for (int i = 0; i < requests.length; i++) {
-				ServerRequest request = requests[i];
+			Map<PokemonFamilyId, ReleasePokemonResponse> responses = new HashMap<>();
+			for (Map.Entry<PokemonFamilyId, ServerRequest> entry : requests.entrySet()) {
+				ServerRequest request = entry.getValue();
 				ByteString data = request.getData();
 				ReleasePokemonResponse response = ReleasePokemonResponse.parseFrom(data);
-				responses.put(pokemons[i], response);
+				responses.put(entry.getKey(), response);
 			}
 			return responses;
 		} catch (InvalidProtocolBufferException e) {

@@ -641,10 +641,7 @@ public class CatchablePokemon implements MapPoint {
 						despawned = true;
 					}
 
-					// escaped pokeball
-					if (response.getStatus() == CatchStatus.CATCH_ESCAPE) {
-						api.getInventories().updateInventories();
-					}
+					api.getInventories().updateInventories();
 					return new CatchResult(response);
 				} catch (RemoteServerException e) {
 					throw new AsyncRemoteServerException(e);

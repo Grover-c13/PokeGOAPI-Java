@@ -22,7 +22,6 @@ import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
 import POGOProtos.Enums.BadgeTypeOuterClass.BadgeType;
 import POGOProtos.Enums.GenderOuterClass.Gender;
 import POGOProtos.Enums.TutorialStateOuterClass;
-import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
 import POGOProtos.Networking.Requests.Messages.ClaimCodenameMessageOuterClass.ClaimCodenameMessage;
 import POGOProtos.Networking.Requests.Messages.EncounterTutorialCompleteMessageOuterClass.EncounterTutorialCompleteMessage;
@@ -43,7 +42,6 @@ import POGOProtos.Networking.Responses.SetAvatarResponseOuterClass.SetAvatarResp
 import POGOProtos.Networking.Responses.SetBuddyPokemonResponseOuterClass.SetBuddyPokemonResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Stats;
 import com.pokegoapi.api.listener.PlayerListener;
@@ -127,23 +125,6 @@ public class PlayerProfile {
 
 		try {
 			updateProfile(GetPlayerResponse.parseFrom(request.getData()));
-
-			GetPlayerProfileMessage profileMessage = GetPlayerProfileMessage.newBuilder()
-					.setPlayerName(playerData.getUsername())
-					.build();
-
-			ServerRequest profileRequest = new ServerRequest(RequestType.GET_PLAYER_PROFILE, profileMessage);
-			api.getRequestHandler().sendServerRequests(profileRequest.withCommons());
-
-			GetPlayerProfileResponse response = GetPlayerProfileResponse.parseFrom(profileRequest.getData());
-			if (response.getResult() == GetPlayerProfileResponse.Result.SUCCESS) {
-				medals.clear();
-				List<PlayerBadge> badges = response.getBadgesList();
-				for (PlayerBadge badge : badges) {
-					medals.put(badge.getBadgeType(), new Medal(badge));
-				}
-				this.startTime = response.getStartTime();
-			}
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
@@ -191,6 +172,36 @@ public class PlayerProfile {
 	}
 
 	/**
+	 * Performs a GET_PLAYER_PROFILE request.
+	 *
+	 * @throws RemoteServerException if the server has an issue or an invalid request is sent
+	 * @throws CaptchaActiveException if a captcha is active, and the message cannot be sent
+	 * @throws LoginFailedException if login fails
+	 */
+	public void getProfile() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+		GetPlayerProfileMessage profileMessage = GetPlayerProfileMessage.newBuilder()
+				.setPlayerName(playerData.getUsername())
+				.build();
+
+		ServerRequest profileRequest = new ServerRequest(RequestType.GET_PLAYER_PROFILE, profileMessage);
+		api.getRequestHandler().sendServerRequests(profileRequest.withCommons());
+
+		try {
+			GetPlayerProfileResponse response = GetPlayerProfileResponse.parseFrom(profileRequest.getData());
+			if (response.getResult() == GetPlayerProfileResponse.Result.SUCCESS) {
+				medals.clear();
+				List<PlayerBadge> badges = response.getBadgesList();
+				for (PlayerBadge badge : badges) {
+					medals.put(badge.getBadgeType(), new Medal(badge));
+				}
+				this.startTime = response.getStartTime();
+			}
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
+	}
+
+	/**
 	 * Accept the rewards granted and the items unlocked by gaining a trainer level up. Rewards are retained by the
 	 * server until a player actively accepts them.
 	 * The rewarded items are automatically inserted into the players item bag.
@@ -222,10 +233,7 @@ public class PlayerProfile {
 		}
 		// Add the awarded items to our bag
 		ItemBag bag = api.getInventories().getItemBag();
-		for (ItemAward itemAward : response.getItemsAwardedList()) {
-			Item item = bag.getItem(itemAward.getItemId());
-			item.setCount(item.getCount() + itemAward.getItemCount());
-		}
+		bag.addAwardedItems(response);
 		// Build a new rewards object and return it
 		return new PlayerLevelUpRewards(response);
 	}
@@ -503,7 +511,7 @@ public class PlayerProfile {
 
 		markTutorial(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION);
 
-		api.fireRequestBlockTwo();
+		api.getAssetDigest();
 	}
 
 	/**

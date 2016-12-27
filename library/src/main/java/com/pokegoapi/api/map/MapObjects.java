@@ -39,6 +39,7 @@ public class MapObjects {
 
 	/**
 	 * Creates a MapObjects object
+	 *
 	 * @param api the api for these MapObjects
 	 */
 	public MapObjects(PokemonGo api) {
@@ -59,6 +60,7 @@ public class MapObjects {
 
 	/**
 	 * Adds the given nearby pokemon to this object
+	 *
 	 * @param nearby the nearby protos
 	 */
 	public void addNearby(List<NearbyPokemonOuterClass.NearbyPokemon> nearby) {
@@ -69,6 +71,7 @@ public class MapObjects {
 
 	/**
 	 * Adds the given pokemon to this object
+	 *
 	 * @param mapPokemon the map pokemon protos
 	 */
 	public void addMapPokemon(List<MapPokemon> mapPokemon) {
@@ -79,6 +82,7 @@ public class MapObjects {
 
 	/**
 	 * Adds the given pokemon to this object
+	 *
 	 * @param wildPokemon the wild pokemon protos
 	 */
 	public void addWildPokemon(List<WildPokemon> wildPokemon) {
@@ -89,6 +93,7 @@ public class MapObjects {
 
 	/**
 	 * Adds the given spawnpoints to this object
+	 *
 	 * @param spawnPoints the spawnpoint protos
 	 */
 	public void addSpawnpoints(List<SpawnPoint> spawnPoints) {
@@ -99,6 +104,7 @@ public class MapObjects {
 
 	/**
 	 * Adds the given decimated spawnpoints to this object
+	 *
 	 * @param spawnPoints the spawnpoint protos
 	 */
 	public void addDecimatedSpawnpoints(List<SpawnPoint> spawnPoints) {
@@ -109,6 +115,7 @@ public class MapObjects {
 
 	/**
 	 * Adds the given forts to this object
+	 *
 	 * @param forts the fort protos
 	 */
 	public void addForts(List<FortData> forts) {
@@ -120,6 +127,8 @@ public class MapObjects {
 				case GYM:
 					this.gyms.add(new Gym(api, fortData));
 					break;
+				default:
+					break;
 			}
 			if (fortData.hasLureInfo()) {
 				this.pokemon.add(new CatchablePokemon(api, fortData));
@@ -129,6 +138,7 @@ public class MapObjects {
 
 	/**
 	 * Adds an incense pokemon from the given GetIncensePokemon response
+	 *
 	 * @param response the response containing the incense pokemon, if any
 	 */
 	public void addIncensePokemon(GetIncensePokemonResponse response) {
@@ -139,6 +149,7 @@ public class MapObjects {
 
 	/**
 	 * Adds all the MapObjects from the given MapCell to this object
+	 *
 	 * @param cell the cell to add
 	 */
 	public void addCell(MapCell cell) {
@@ -156,7 +167,8 @@ public class MapObjects {
 	public Set<CatchablePokemon> getPokemon() {
 		Set<CatchablePokemon> pokemon = new HashSet<>();
 		for (CatchablePokemon catchable : this.pokemon) {
-			if ((catchable.getExpirationTimestampMs() == -1 || api.currentTimeMillis() < catchable.getExpirationTimestampMs()) && !catchable.isDespawned()) {
+			long expirationTime = catchable.getExpirationTimestampMs();
+			if ((expirationTime == -1 || api.currentTimeMillis() < expirationTime) && !catchable.isDespawned()) {
 				pokemon.add(catchable);
 			}
 		}
@@ -165,6 +177,7 @@ public class MapObjects {
 
 	/**
 	 * Gets the pokestop with the requested ID
+	 *
 	 * @param id the id to search for
 	 * @return the pokestop with the requested ID, null if none with that ID are visible
 	 */
@@ -179,6 +192,7 @@ public class MapObjects {
 
 	/**
 	 * Gets the gym with the requested ID
+	 *
 	 * @param id the id to search for
 	 * @return the gym with the requested ID, null if none with that ID are visible
 	 */

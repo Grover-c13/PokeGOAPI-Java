@@ -78,11 +78,11 @@ public class Battle {
 
 	private Queue<ServerAction> serverActionQueue
 			= new PriorityBlockingQueue<>(11, new Comparator<ServerAction>() {
-		@Override
-		public int compare(ServerAction o1, ServerAction o2) {
-			return Long.compare(o1.getStart(), o2.getStart());
-		}
-	});
+				@Override
+				public int compare(ServerAction o1, ServerAction o2) {
+					return Long.compare(o1.getStart(), o2.getStart());
+				}
+			});
 	private Set<ServerAction> activeActions = new HashSet<>();
 	private Set<ServerAction> damagingActions = new HashSet<>();
 
@@ -265,7 +265,6 @@ public class Battle {
 		battleType = log.getBattleType();
 		startTime = log.getBattleStartTimestampMs();
 		endTime = log.getBattleEndTimestampMs();
-		BattleState state = log.getState();
 		if (log.getBattleActionsCount() > 0) {
 			long latestTime = Long.MIN_VALUE;
 			for (BattleAction action : log.getBattleActionsList()) {
@@ -284,6 +283,7 @@ public class Battle {
 			}
 		}
 		active = results == null;
+		BattleState state = log.getState();
 		if (state != battleState) {
 			switch (state) {
 				case TIMED_OUT:
@@ -300,6 +300,8 @@ public class Battle {
 						gym.updateState(results.getGymState());
 						handler.onVictory(api, this, deltaPoints, gym.getPoints() + deltaPoints);
 					}
+					break;
+				default:
 					break;
 			}
 			if (!active) {
@@ -341,6 +343,8 @@ public class Battle {
 				break;
 			case ACTION_SPECIAL_ATTACK:
 				handleSpecialAttack(handler, action);
+				break;
+			default:
 				break;
 		}
 	}
@@ -531,8 +535,8 @@ public class Battle {
 	 */
 	private void handleAttackResponse(BattleHandler handler, AttackGymResponse response) {
 		if (response.getResult() == AttackGymResponse.Result.SUCCESS) {
-			BattlePokemon lastAttacker = activeAttacker;
-			BattlePokemon lastDefender = activeDefender;
+			final BattlePokemon lastDefender = activeDefender;
+			final BattlePokemon lastAttacker = activeAttacker;
 
 			activeAttacker = new BattlePokemon(response.getActiveAttacker());
 			activeDefender = new BattlePokemon(response.getActiveDefender());
@@ -924,7 +928,7 @@ public class Battle {
 		 * @param action the attack action
 		 */
 		void onAttackedSpecial(PokemonGo api, Battle battle, BattlePokemon attacked, BattlePokemon attacker,
-							   int duration, long damageWindowStart, long damageWindowEnd, ServerAction action);
+								int duration, long damageWindowStart, long damageWindowEnd, ServerAction action);
 
 		/**
 		 * Called when an exception occurs during this battle

@@ -85,6 +85,8 @@ public class Buddy {
 	 * @return the current buddy walk progress, from 0-buddyDistance
 	 */
 	public double getProgressKM() {
-		return getTargetKM() - (api.getPlayerProfile().getStats().getKmWalked() - getLastReceiveKM());
+		double walked = api.getPlayerProfile().getStats().getKmWalked();
+		double startedKM = Math.max(getStartKM(), getLastReceiveKM());
+		return walked - startedKM;
 	}
 }

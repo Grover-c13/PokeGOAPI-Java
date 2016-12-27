@@ -19,11 +19,14 @@ import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Requests.Messages.CheckChallenge.CheckChallengeMessage;
+import POGOProtos.Networking.Requests.Messages.DownloadItemTemplatesMessageOuterClass.DownloadItemTemplatesMessage;
+import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
 import POGOProtos.Networking.Requests.Messages.VerifyChallenge.VerifyChallengeMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckChallengeResponseOuterClass.CheckChallengeResponse;
 import POGOProtos.Networking.Responses.DownloadRemoteConfigVersionResponseOuterClass.DownloadRemoteConfigVersionResponse;
+import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
+import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse.Result;
 import POGOProtos.Networking.Responses.VerifyChallengeResponseOuterClass.VerifyChallengeResponse;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -198,7 +201,6 @@ public class PokemonGo {
 		inventories = new Inventories(this);
 		settings = new Settings(this);
 		playerProfile = new PlayerProfile(this);
-		playerProfile.updateProfile();
 
 		initialize();
 
@@ -206,15 +208,19 @@ public class PokemonGo {
 	}
 
 	private void initialize() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
-		ServerRequest request = new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
+		playerProfile.updateProfile();
+
+		ServerRequest downloadConfigRequest = new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
 				CommonRequests.getDownloadRemoteConfigVersionMessageRequest());
-		fireRequestBlock(request, RequestType.GET_BUDDY_WALKED);
+		fireRequestBlock(downloadConfigRequest, RequestType.GET_BUDDY_WALKED);
+		getAssetDigest();
 
 		try {
-			ByteString data = request.getData();
-			if (PokemonMeta.checkVersion(DownloadRemoteConfigVersionResponse.parseFrom(data))) {
-				ServerRequest templatesRequest = new ServerRequest(RequestType.DOWNLOAD_ITEM_TEMPLATES,
-						CommonRequests.getDownloadItemTemplatesRequest());
+			ByteString configVersionData = downloadConfigRequest.getData();
+			if (PokemonMeta.checkVersion(DownloadRemoteConfigVersionResponse.parseFrom(configVersionData))) {
+				DownloadItemTemplatesMessage message = CommonRequests.getDownloadItemTemplatesRequest();
+				ServerRequest templatesRequest = new ServerRequest(RequestType.DOWNLOAD_ITEM_TEMPLATES, message)
+						.withCommons();
 				fireRequestBlock(templatesRequest);
 				PokemonMeta.update(templatesRequest.getData(), true);
 			}
@@ -224,7 +230,22 @@ public class PokemonGo {
 			throw new RuntimeException(e);
 		}
 
-		fireRequestBlockTwo();
+		playerProfile.getProfile();
+
+		try {
+			LevelUpRewardsMessage rewardsMessage = LevelUpRewardsMessage.newBuilder()
+					.setLevel(playerProfile.getLevel())
+					.build();
+			ServerRequest levelUpRewards = new ServerRequest(RequestType.LEVEL_UP_REWARDS, rewardsMessage);
+			fireRequestBlock(levelUpRewards);
+			ByteString levelUpData = levelUpRewards.getData();
+			LevelUpRewardsResponse levelUpRewardsResponse = LevelUpRewardsResponse.parseFrom(levelUpData);
+			if (levelUpRewardsResponse.getResult() == Result.SUCCESS) {
+				inventories.getItemBag().addAwardedItems(levelUpRewardsResponse);
+			}
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
 
 		List<LoginListener> loginListeners = getListeners(LoginListener.class);
 
@@ -287,9 +308,9 @@ public class PokemonGo {
 	 * @throws RemoteServerException When server fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void fireRequestBlockTwo() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
-		fireRequestBlock(new ServerRequest(RequestTypeOuterClass.RequestType.GET_ASSET_DIGEST,
-				CommonRequests.getGetAssetDigestMessageRequest()));
+	public void getAssetDigest() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+		fireRequestBlock(new ServerRequest(RequestType.GET_ASSET_DIGEST,
+				CommonRequests.getGetAssetDigestMessageRequest()).exclude(RequestType.GET_BUDDY_WALKED));
 	}
 
 	/**
@@ -585,6 +606,7 @@ public class PokemonGo {
 
 	/**
 	 * Blocks this thread until the current challenge is solved
+	 *
 	 * @throws InterruptedException if this thread is interrupted while blocking
 	 */
 	public void awaitChallenge() throws InterruptedException {
@@ -597,6 +619,7 @@ public class PokemonGo {
 
 	/**
 	 * Enqueues the given task
+	 *
 	 * @param task the task to enqueue
 	 */
 	public void enqueueTask(Runnable task) {

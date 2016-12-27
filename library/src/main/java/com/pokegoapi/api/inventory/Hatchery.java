@@ -49,6 +49,9 @@ public class Hatchery {
 		this.api = api;
 	}
 
+	/**
+	 * Resets the hatchery and removes all eggs
+	 */
 	public void reset() {
 		synchronized (this.lock) {
 			eggs.clear();
@@ -56,6 +59,10 @@ public class Hatchery {
 		}
 	}
 
+	/**
+	 * Adds the given egg to this hatchery
+	 * @param egg the egg to add
+	 */
 	public void addEgg(EggPokemon egg) {
 		egg.setApi(api);
 		synchronized (this.lock) {

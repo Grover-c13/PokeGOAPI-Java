@@ -106,6 +106,10 @@ public class Gym implements MapPoint {
 		return this.getGymMembers().size() != 0;
 	}
 
+	/**
+	 * Creates a battle for this gym
+	 * @return the battle object
+	 */
 	public Battle battle() {
 		int minimumPlayerLevel = PokemonMeta.battleSettings.getMinimumPlayerLevel();
 		if (api.getPlayerProfile().getLevel() < minimumPlayerLevel) {
