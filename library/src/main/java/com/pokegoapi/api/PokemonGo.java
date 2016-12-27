@@ -203,8 +203,6 @@ public class PokemonGo {
 		playerProfile = new PlayerProfile(this);
 
 		initialize();
-
-		this.loggingIn = false;
 	}
 
 	private void initialize() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
@@ -252,6 +250,8 @@ public class PokemonGo {
 		for (LoginListener listener : loginListeners) {
 			listener.onLogin(this);
 		}
+
+		this.loggingIn = false;
 
 		// From now one we will start to check our accounts is ready to fire requests.
 		// Actually, we can receive valid responses even with this first check,

@@ -316,7 +316,7 @@ public class RequestHandler implements Runnable {
 				exclude.addAll(request.getExclude());
 			}
 
-			if (api.isLoggingIn()) {
+			if (api.isLoggingIn() && api.hasChallenge()) {
 				exclude.add(RequestType.CHECK_CHALLENGE);
 			}
 
