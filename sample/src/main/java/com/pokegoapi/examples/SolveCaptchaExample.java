@@ -68,6 +68,8 @@ public class SolveCaptchaExample {
 						public void run() {
 						}
 					});
+					//Stop the JavaFX thread from exiting
+					Platform.setImplicitExit(false);
 				}
 			});
 

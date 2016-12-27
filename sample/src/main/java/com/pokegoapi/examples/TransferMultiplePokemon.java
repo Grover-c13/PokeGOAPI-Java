@@ -63,12 +63,12 @@ public class TransferMultiplePokemon {
 			}
 			System.out.println("Releasing " + transferPokemons.size() + " pokemon.");
 			Pokemon[] transferArray = transferPokemons.toArray(new Pokemon[transferPokemons.size()]);
-			Map<PokemonFamilyId, ReleasePokemonResponse> responses = pokebank.releasePokemon(transferArray);
+			Map<PokemonFamilyId, Integer> responses = pokebank.releasePokemon(transferArray);
 
 			//Loop through all responses and find the total amount of candies earned for each family
 			Map<PokemonFamilyId, Integer> candies = new HashMap<>();
-			for (Map.Entry<PokemonFamilyId, ReleasePokemonResponse> entry : responses.entrySet()) {
-				int candyAwarded = entry.getValue().getCandyAwarded();
+			for (Map.Entry<PokemonFamilyId, Integer> entry : responses.entrySet()) {
+				int candyAwarded = entry.getValue();
 				PokemonFamilyId family = entry.getKey();
 				Integer candy = candies.get(family);
 				if (candy == null) {

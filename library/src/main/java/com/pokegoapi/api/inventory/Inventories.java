@@ -36,6 +36,7 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -86,23 +87,25 @@ public class Inventories {
 	/**
 	 * Updates the inventories with latest data.
 	 *
+	 * @return the response to the update message
 	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void updateInventories() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
-		updateInventories(false);
+	public GetInventoryResponse updateInventories() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+		return updateInventories(false);
 	}
 
 	/**
 	 * Updates the inventories with the latest data.
 	 *
 	 * @param forceUpdate For a full update if true
+	 * @return the response to the update message
 	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void updateInventories(boolean forceUpdate)
+	public GetInventoryResponse updateInventories(boolean forceUpdate)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		if (forceUpdate) {
 			lastInventoryUpdate = 0;
@@ -129,6 +132,8 @@ public class Inventories {
 		}
 
 		updateInventories(response);
+
+		return response;
 	}
 
 	/**
@@ -137,6 +142,8 @@ public class Inventories {
 	 * @param response the get inventory response
 	 */
 	public void updateInventories(GetInventoryResponse response) {
+		lastInventoryUpdate = api.currentTimeMillis();
+
 		for (InventoryItemOuterClass.InventoryItem inventoryItem
 				: response.getInventoryDelta().getInventoryItemsList()) {
 			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
@@ -212,8 +219,6 @@ public class Inventories {
 				appliedItems.remove(item);
 				itemBag.getItem(item).removeApplied();
 			}
-
-			lastInventoryUpdate = api.currentTimeMillis();
 		}
 	}
 }

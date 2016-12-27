@@ -137,6 +137,10 @@ public class PokemonDetails {
 		return deployedFortId;
 	}
 
+	public boolean isDeployed() {
+		return deployedFortId != null && deployedFortId.trim().length() > 0;
+	}
+
 	public String getOwnerName() {
 		return ownerName;
 	}
