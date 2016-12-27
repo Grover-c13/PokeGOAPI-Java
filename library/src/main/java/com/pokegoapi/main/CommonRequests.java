@@ -41,6 +41,7 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Constant;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +51,16 @@ import java.util.Map;
  */
 
 public class CommonRequests {
+	private static final RequestType[] PARSE_REQUESTS = new RequestType[]{
+			RequestType.DOWNLOAD_SETTINGS,
+			RequestType.CHECK_CHALLENGE,
+			RequestType.GET_INVENTORY,
+			RequestType.GET_HATCHED_EGGS,
+			RequestType.CHECK_AWARDED_BADGES,
+			RequestType.GET_BUDDY_WALKED
+	};
 	private static Map<RequestType, CommonRequest> COMMON_REQUESTS = new LinkedHashMap<>();
+	private static Map<RequestType, ByteString> RECEIVED_COMMONS = new HashMap<>();
 
 	static {
 		COMMON_REQUESTS.put(RequestType.CHECK_CHALLENGE, new CommonRequest() {
@@ -234,9 +244,8 @@ public class CommonRequests {
 	}
 
 	/**
-	 * Parses the given common request
+	 * Queues the given common request to be parsed
 	 *
-	 * @param api the current api
 	 * @param type the request type
 	 * @param data the response data
 	 * @throws InvalidProtocolBufferException if the server returns an invalid response
@@ -244,11 +253,30 @@ public class CommonRequests {
 	 * @throws RemoteServerException if the server throws an error
 	 * @throws LoginFailedException if login fails
 	 */
-	public static void parse(PokemonGo api, RequestType type, ByteString data)
+	public static void queue(RequestType type, ByteString data)
 			throws InvalidProtocolBufferException, CaptchaActiveException, RemoteServerException, LoginFailedException {
-		CommonRequest commonRequest = COMMON_REQUESTS.get(type);
-		if (commonRequest != null) {
-			commonRequest.parse(api, data, type);
+		RECEIVED_COMMONS.put(type, data);
+	}
+
+	/**
+	 * Handles the queued common requests and clears the map
+	 * @param api the current api
+	 * @throws InvalidProtocolBufferException if the server returns an invalid response
+	 * @throws CaptchaActiveException if a captcha is active
+	 * @throws RemoteServerException if the server throws an error
+	 * @throws LoginFailedException if login fails
+	 */
+	public static void handleQueue(PokemonGo api)
+			throws InvalidProtocolBufferException, RemoteServerException, CaptchaActiveException, LoginFailedException {
+		for (RequestType type : PARSE_REQUESTS) {
+			ByteString data = RECEIVED_COMMONS.get(type);
+			if (data != null) {
+				CommonRequest commonRequest = COMMON_REQUESTS.get(type);
+				if (commonRequest != null) {
+					commonRequest.parse(api, data, type);
+				}
+			}
 		}
+		RECEIVED_COMMONS.clear();
 	}
 }

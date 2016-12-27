@@ -370,12 +370,18 @@ public class RequestHandler implements Runnable {
 						if (asyncRequest != null) {
 							resultMap.put(asyncRequest.getId(), ResultOrException.getResult(data));
 						}
-						CommonRequests.parse(api, request.getType(), data);
+						CommonRequests.queue(request.getType(), data);
 					} catch (InvalidProtocolBufferException e) {
 						if (asyncRequest != null) {
 							resultMap.put(asyncRequest.getId(), ResultOrException.getError(e));
 						}
 					}
+				}
+
+				try {
+					CommonRequests.handleQueue(api);
+				} catch (InvalidProtocolBufferException e) {
+					continue;
 				}
 				continue;
 			} catch (RemoteServerException | LoginFailedException | CaptchaActiveException e) {

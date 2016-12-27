@@ -36,7 +36,6 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -130,8 +129,6 @@ public class Inventories {
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
-
-		updateInventories(response);
 
 		return response;
 	}
