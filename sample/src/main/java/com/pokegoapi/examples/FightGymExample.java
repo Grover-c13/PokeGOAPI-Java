@@ -52,6 +52,7 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.MapUtil;
+import com.pokegoapi.util.hash.HashProvider;
 import com.pokegoapi.util.path.Path;
 import okhttp3.OkHttpClient;
 
@@ -69,7 +70,8 @@ public class FightGymExample {
 		final PokemonGo api = new PokemonGo(http);
 		try {
 			//Login and set location
-			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD));
+			HashProvider hasher = ExampleConstants.getHashProvider();
+			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD), hasher);
 			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 
 			List<Pokemon> pokemons = api.getInventories().getPokebank().getPokemons();

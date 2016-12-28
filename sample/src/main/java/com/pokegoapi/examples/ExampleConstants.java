@@ -15,6 +15,10 @@
 
 package com.pokegoapi.examples;
 
+import com.pokegoapi.util.hash.HashProvider;
+import com.pokegoapi.util.hash.legacy.LegacyHashProvider;
+import com.pokegoapi.util.hash.pokehash.PokeHashProvider;
+
 /**
  * Created by court on 19/07/2016.
  */
@@ -24,4 +28,18 @@ public class ExampleConstants {
 	public static final double LATITUDE = -32.058087;
 	public static final double LONGITUDE = 115.744325;
 	public static final double ALTITUDE = 0.0;
+	public static final String POKEHASH_KEY = "";
+
+	/**
+	 * Creates the appropriate hash provider, based on if the POKEHASH_KEY property is sent or not
+	 * @return a hash provider
+	 */
+	public static HashProvider getHashProvider() {
+		boolean hasKey = POKEHASH_KEY != null && POKEHASH_KEY.length() > 0;
+		if (hasKey) {
+			return new PokeHashProvider(POKEHASH_KEY);
+		} else {
+			return new LegacyHashProvider();
+		}
+	}
 }

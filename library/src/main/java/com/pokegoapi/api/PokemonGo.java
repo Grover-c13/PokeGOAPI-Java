@@ -55,6 +55,7 @@ import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.ClientInterceptor;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
+import com.pokegoapi.util.hash.HashProvider;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
@@ -128,6 +129,9 @@ public class PokemonGo {
 	@Getter
 	private Heartbeat heartbeat = new Heartbeat(this);
 
+	@Getter
+	private HashProvider hashProvider;
+
 	/**
 	 * Instantiates a new Pokemon go.
 	 *
@@ -186,17 +190,22 @@ public class PokemonGo {
 	 * Login user with the provided provider
 	 *
 	 * @param credentialProvider the credential provider
+	 * @param hashProvider to provide hashes
 	 * @throws LoginFailedException When login fails
 	 * @throws RemoteServerException When server fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void login(CredentialProvider credentialProvider)
+	public void login(CredentialProvider credentialProvider, HashProvider hashProvider)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		this.loggingIn = true;
 		if (credentialProvider == null) {
-			throw new NullPointerException("Credential Provider is null");
+			throw new NullPointerException("Credential Provider can not be null!");
+		} else if (hashProvider == null) {
+			throw new NullPointerException("Hash Provider can not be null!");
 		}
 		this.credentialProvider = credentialProvider;
+		this.hashProvider = hashProvider;
+
 		startTime = currentTimeMillis();
 		inventories = new Inventories(this);
 		settings = new Settings(this);
@@ -209,7 +218,7 @@ public class PokemonGo {
 		playerProfile.updateProfile();
 
 		ServerRequest downloadConfigRequest = new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
-				CommonRequests.getDownloadRemoteConfigVersionMessageRequest());
+				CommonRequests.getDownloadRemoteConfigVersionMessageRequest(this));
 		fireRequestBlock(downloadConfigRequest, RequestType.GET_BUDDY_WALKED);
 		getAssetDigest();
 
@@ -310,7 +319,7 @@ public class PokemonGo {
 	 */
 	public void getAssetDigest() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		fireRequestBlock(new ServerRequest(RequestType.GET_ASSET_DIGEST,
-				CommonRequests.getGetAssetDigestMessageRequest()).exclude(RequestType.GET_BUDDY_WALKED));
+				CommonRequests.getGetAssetDigestMessageRequest(this)).exclude(RequestType.GET_BUDDY_WALKED));
 	}
 
 	/**
@@ -624,5 +633,12 @@ public class PokemonGo {
 	 */
 	public void enqueueTask(Runnable task) {
 		heartbeat.enqueueTask(task);
+	}
+
+	/**
+	 * @return the version of the API being used
+	 */
+	public int getVersion() {
+		return hashProvider.getHashVersion();
 	}
 }

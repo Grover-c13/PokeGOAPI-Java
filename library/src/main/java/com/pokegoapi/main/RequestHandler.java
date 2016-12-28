@@ -28,6 +28,7 @@ import com.pokegoapi.exceptions.AsyncPokemonGoException;
 import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.Signature;
@@ -177,9 +178,10 @@ public class RequestHandler implements Runnable {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if hashing fails
 	 */
 	private AuthTicket internalSendServerRequests(AuthTicket authTicket, ServerRequest... serverRequests)
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
 		AuthTicket newAuthTicket = authTicket;
 		if (serverRequests.length == 0) {
 			return authTicket;
@@ -384,7 +386,7 @@ public class RequestHandler implements Runnable {
 					continue;
 				}
 				continue;
-			} catch (RemoteServerException | LoginFailedException | CaptchaActiveException e) {
+			} catch (RemoteServerException | LoginFailedException | CaptchaActiveException | HashException e) {
 				for (AsyncServerRequest request : requests) {
 					resultMap.put(request.getId(), ResultOrException.getError(e));
 				}

@@ -12,84 +12,18 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.pokegoapi.util;
 
-import java.math.BigInteger;
+package com.pokegoapi.util.hash.crypto;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
 
-public class Crypto {
-	private static class Rand {
-		public long state;
+public final class Shuffle {
+	private Shuffle() {
 	}
 
-	private static byte[] makeIv(Rand rand) {
-		byte[] iv = new byte[256];
-		for (int i = 0; i < 256; i++) {
-			rand.state = (0x41C64E6D * rand.state) + 0x3039;
-			long shiftedRand = rand.state >> 16;
-			iv[i] = Long.valueOf(shiftedRand).byteValue();
-		}
-		return iv;
-	}
-
-	private static byte makeIntegrityByte(Rand rand) {
-		rand.state = (0x41C64E6D * rand.state) + 0x3039;
-		long shiftedRand = rand.state >> 16;
-		byte lastbyte = Long.valueOf(shiftedRand).byteValue();
-
-		byte v74 = (byte) ((lastbyte ^ 0x0C) & lastbyte);
-		byte v75 = (byte) (((~v74 & 0x67) | (v74 & 0x98)) ^ 0x6F | (v74 & 8));
-		return v75;
-	}
-
-	/**
-	 * Shuffles bytes.
-	 *
-	 * @param input input data
-	 * @param msSinceStart time since start
-	 * @return shuffled bytes
-	 */
-	public static CipherText encrypt(byte[] input, long msSinceStart) {
-		Rand rand = new Rand();
-
-		byte[] arr3;
-		CipherText output;
-
-		rand.state = msSinceStart;
-
-		byte[] iv = makeIv(rand);
-		output = new CipherText(input, msSinceStart, rand);
-
-		for (int i = 0; i < output.content.size(); ++i) {
-			byte[] current = output.content.get(i);
-
-			for (int j = 0; j < 256; j++) {
-				current[j] ^= iv[j];
-			}
-
-			int[] temp2 = new int[0x100 / 4];
-			// only use 256 bytes from input.
-			IntBuffer intBuf = ByteBuffer.wrap(Arrays.copyOf(current, 0x100))//
-					.order(ByteOrder.BIG_ENDIAN)//
-					.asIntBuffer();
-			intBuf.get(temp2);
-			arr3 = shuffle2(temp2);
-
-			for (int k = 0; k < 256; ++k)
-				iv[k] = arr3[k];
-
-			for (int k = 0; k < 256; ++k)
-				current[k] = arr3[k];
-		}
-
-		return output;
-	}
-
-	private static byte[] shuffle2(int[] vector) {
+	public static byte[] shuffle2(int[] vector) {
 		int[] tmp = new int[193];
 		tmp[0] = vector[7] ^ vector[15];
 		tmp[1] = ~vector[7];
@@ -1391,7 +1325,7 @@ public class Crypto {
 		return shuffle2_2(tmp, vector);
 	}
 
-	private static byte[] shuffle2_2(int[] tmp, int vector[]) {
+	public static byte[] shuffle2_2(int[] tmp, int vector[]) {
 		tmp[124] = tmp[79] | tmp[38];
 		tmp[12] =
 				tmp[23] ^ tmp[45] ^ (tmp[132] ^ tmp[45]) & tmp[38] ^ (tmp[28] & ~(tmp[21] ^ tmp[12] ^ (tmp[11] ^ (tmp[21] | tmp[114])) & tmp[65] ^ tmp[56] & (tmp[1] ^ tmp[38] & ~tmp[4])) ^ tmp[56] & ~(tmp[81]
@@ -3498,61 +3432,5 @@ public class Crypto {
 		intBuf_out.put(vector);
 
 		return byteBuf_out.array();
-	}
-
-
-	public static class CipherText {
-		Rand rand;
-		byte[] prefix;
-		public ArrayList<byte[]> content;
-
-		int totalsize;
-		int inputLen;
-
-		byte[] intToBytes(long x) {
-			ByteBuffer buffer = ByteBuffer.allocate(4);
-			buffer.putInt(new BigInteger(String.valueOf(x)).intValue());
-			return buffer.array();
-		}
-
-		/**
-		 * Create new CipherText with contents and IV.
-		 *
-		 * @param input the contents
-		 * @param ms the time
-		 */
-		public CipherText(byte[] input, long ms, Rand rand) {
-			this.inputLen = input.length;
-			this.rand = rand;
-			prefix = new byte[32];
-			content = new ArrayList<>();
-			int roundedsize = input.length + (256 - (input.length % 256));
-			for (int i = 0; i < roundedsize / 256; ++i) {
-				content.add(new byte[256]);
-			}
-			totalsize = roundedsize + 5;
-
-			prefix = intToBytes(ms);
-
-			for (int i = 0; i < input.length; ++i)
-				content.get(i / 256)[i % 256] = input[i];
-			byte[] last = content.get(content.size() - 1);
-			last[last.length - 1] = (byte) (256 - (input.length % 256));
-
-		}
-
-		/**
-		 * Convert this Ciptext to a ByteBuffer
-		 *
-		 * @return contents as bytebuffer
-		 */
-		public ByteBuffer toByteBuffer() {
-			ByteBuffer buff = ByteBuffer.allocate(totalsize).put(prefix);
-			for (int i = 0; i < content.size(); ++i)
-				buff.put(content.get(i));
-
-			buff.put(totalsize - 1, makeIntegrityByte(rand));
-			return buff;
-		}
 	}
 }
