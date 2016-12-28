@@ -22,7 +22,6 @@ import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
 import POGOProtos.Enums.BadgeTypeOuterClass.BadgeType;
 import POGOProtos.Enums.GenderOuterClass.Gender;
 import POGOProtos.Enums.TutorialStateOuterClass;
-import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
 import POGOProtos.Networking.Requests.Messages.ClaimCodenameMessageOuterClass.ClaimCodenameMessage;
 import POGOProtos.Networking.Requests.Messages.EncounterTutorialCompleteMessageOuterClass.EncounterTutorialCompleteMessage;
@@ -43,7 +42,6 @@ import POGOProtos.Networking.Responses.SetAvatarResponseOuterClass.SetAvatarResp
 import POGOProtos.Networking.Responses.SetBuddyPokemonResponseOuterClass.SetBuddyPokemonResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Stats;
 import com.pokegoapi.api.listener.PlayerListener;
@@ -52,6 +50,7 @@ import com.pokegoapi.api.pokemon.Buddy;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.api.pokemon.StarterPokemon;
 import com.pokegoapi.exceptions.CaptchaActiveException;
+import com.pokegoapi.exceptions.InsufficientLevelException;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -95,6 +94,9 @@ public class PlayerProfile {
 	@Getter
 	private int level = 1;
 
+	@Getter
+	private boolean banned;
+
 	/**
 	 * @param api the api
 	 * @throws LoginFailedException when the auth is invalid
@@ -123,23 +125,6 @@ public class PlayerProfile {
 
 		try {
 			updateProfile(GetPlayerResponse.parseFrom(request.getData()));
-
-			GetPlayerProfileMessage profileMessage = GetPlayerProfileMessage.newBuilder()
-					.setPlayerName(playerData.getUsername())
-					.build();
-
-			ServerRequest profileRequest = new ServerRequest(RequestType.GET_PLAYER_PROFILE, profileMessage);
-			api.getRequestHandler().sendServerRequests(profileRequest.withCommons());
-
-			GetPlayerProfileResponse response = GetPlayerProfileResponse.parseFrom(profileRequest.getData());
-			if (response.getResult() == GetPlayerProfileResponse.Result.SUCCESS) {
-				medals.clear();
-				List<PlayerBadge> badges = response.getBadgesList();
-				for (PlayerBadge badge : badges) {
-					medals.put(badge.getBadgeType(), new Medal(badge));
-				}
-				this.startTime = response.getStartTime();
-			}
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
@@ -151,6 +136,7 @@ public class PlayerProfile {
 	 * @param playerResponse the response
 	 */
 	public void updateProfile(GetPlayerResponse playerResponse) {
+		banned = playerResponse.getBanned();
 		updateProfile(playerResponse.getPlayerData());
 	}
 
@@ -178,10 +164,40 @@ public class PlayerProfile {
 		// Tutorial state
 		tutorialState = new TutorialState(playerData.getTutorialStateList());
 
-		if (playerData.hasBuddyPokemon()) {
+		if (playerData.hasBuddyPokemon() && playerData.getBuddyPokemon().getId() != 0) {
 			buddy = new Buddy(api, playerData.getBuddyPokemon());
 		} else {
 			buddy = null;
+		}
+	}
+
+	/**
+	 * Performs a GET_PLAYER_PROFILE request.
+	 *
+	 * @throws RemoteServerException if the server has an issue or an invalid request is sent
+	 * @throws CaptchaActiveException if a captcha is active, and the message cannot be sent
+	 * @throws LoginFailedException if login fails
+	 */
+	public void getProfile() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+		GetPlayerProfileMessage profileMessage = GetPlayerProfileMessage.newBuilder()
+				.setPlayerName(playerData.getUsername())
+				.build();
+
+		ServerRequest profileRequest = new ServerRequest(RequestType.GET_PLAYER_PROFILE, profileMessage);
+		api.getRequestHandler().sendServerRequests(profileRequest.withCommons());
+
+		try {
+			GetPlayerProfileResponse response = GetPlayerProfileResponse.parseFrom(profileRequest.getData());
+			if (response.getResult() == GetPlayerProfileResponse.Result.SUCCESS) {
+				medals.clear();
+				List<PlayerBadge> badges = response.getBadgesList();
+				for (PlayerBadge badge : badges) {
+					medals.put(badge.getBadgeType(), new Medal(badge));
+				}
+				this.startTime = response.getStartTime();
+			}
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
 		}
 	}
 
@@ -195,13 +211,14 @@ public class PlayerProfile {
 	 * @throws LoginFailedException when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws InsufficientLevelException if you have not yet reached the desired level
 	 * @see PlayerLevelUpRewards
 	 */
 	public PlayerLevelUpRewards acceptLevelUpRewards(int level)
 			throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		// Check if we even have achieved this level yet
 		if (level > stats.getLevel()) {
-			return new PlayerLevelUpRewards(PlayerLevelUpRewards.Status.NOT_UNLOCKED_YET);
+			throw new InsufficientLevelException();
 		}
 		LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder()
 				.setLevel(level)
@@ -216,10 +233,7 @@ public class PlayerProfile {
 		}
 		// Add the awarded items to our bag
 		ItemBag bag = api.getInventories().getItemBag();
-		for (ItemAward itemAward : response.getItemsAwardedList()) {
-			Item item = bag.getItem(itemAward.getItemId());
-			item.setCount(item.getCount() + itemAward.getItemCount());
-		}
+		bag.addAwardedItems(response);
 		// Build a new rewards object and return it
 		return new PlayerLevelUpRewards(response);
 	}
@@ -367,10 +381,11 @@ public class PlayerProfile {
 
 	/**
 	 * Sets the player statistics
+	 *
 	 * @param stats the statistics to apply
 	 */
 	public void setStats(Stats stats) {
-		int newLevel = stats.getLevel();
+		final int newLevel = stats.getLevel();
 		if (this.stats != null) {
 			if (newLevel > this.level) {
 				boolean acceptRewards = false;
@@ -379,11 +394,16 @@ public class PlayerProfile {
 					acceptRewards |= listener.onLevelUp(api, level, newLevel);
 				}
 				if (acceptRewards) {
-					try {
-						this.acceptLevelUpRewards(newLevel);
-					} catch (Exception e) {
-						//Ignore
-					}
+					api.enqueueTask(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								acceptLevelUpRewards(newLevel);
+							} catch (Exception e) {
+								//Ignore
+							}
+						}
+					});
 				}
 			}
 		}
@@ -491,7 +511,7 @@ public class PlayerProfile {
 
 		markTutorial(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION);
 
-		api.fireRequestBlockTwo();
+		api.getAssetDigest();
 	}
 
 	/**
@@ -556,6 +576,10 @@ public class PlayerProfile {
 	 */
 	public void claimCodeName(String lastFailure)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+		if (getPlayerData().getRemainingCodenameClaims() <= 0) {
+			throw new RuntimeException("You have no remaining codename claims!");
+		}
+
 		String name = randomCodenameGenerator();
 
 		List<TutorialListener> listeners = api.getListeners(TutorialListener.class);
@@ -578,12 +602,12 @@ public class PlayerProfile {
 		String updatedCodename = null;
 		try {
 			ClaimCodenameResponse claimCodenameResponse = ClaimCodenameResponse.parseFrom(request.getData());
-			if (claimCodenameResponse.getStatus() != ClaimCodenameResponse.Status.SUCCESS) {
-				if (claimCodenameResponse.getUpdatedPlayer().getRemainingCodenameClaims() > 0) {
-					claimCodeName(name);
-				}
-			} else {
+			if (claimCodenameResponse.getStatus() == ClaimCodenameResponse.Status.SUCCESS) {
 				updatedCodename = claimCodenameResponse.getCodename();
+			} else {
+				claimCodeName(name);
+			}
+			if (claimCodenameResponse.hasUpdatedPlayer()) {
 				updateProfile(claimCodenameResponse.getUpdatedPlayer());
 			}
 		} catch (InvalidProtocolBufferException e) {

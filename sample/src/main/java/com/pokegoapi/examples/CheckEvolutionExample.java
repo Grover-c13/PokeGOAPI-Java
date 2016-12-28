@@ -16,7 +16,6 @@
 package com.pokegoapi.examples;
 
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
-import com.pokegoapi.api.pokemon.Evolution;
 import com.pokegoapi.api.pokemon.Evolutions;
 
 import java.util.List;
@@ -31,10 +30,9 @@ public class CheckEvolutionExample {
 	public static void main(String[] args) {
 		System.out.println("Evolutions: ");
 		for (PokemonId pokemon : PokemonId.values()) {
-			Evolution evolution = Evolutions.getEvolution(pokemon);
 			List<PokemonId> evolutions = Evolutions.getEvolutions(pokemon);
 			if (evolutions.size() > 0) {
-				System.out.println(pokemon + " -> " + evolutions + " (Stage: " + evolution.getStage() + ")");
+				System.out.println(pokemon + " -> " + evolutions);
 			}
 		}
 		System.out.println();

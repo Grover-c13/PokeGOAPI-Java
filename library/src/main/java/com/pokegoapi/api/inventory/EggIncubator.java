@@ -20,12 +20,15 @@ import POGOProtos.Inventory.EggIncubatorTypeOuterClass.EggIncubatorType;
 import POGOProtos.Networking.Requests.Messages.UseItemEggIncubatorMessageOuterClass.UseItemEggIncubatorMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
+import POGOProtos.Settings.Master.Item.EggIncubatorAttributesOuterClass.EggIncubatorAttributes;
+import POGOProtos.Settings.Master.ItemSettingsOuterClass.ItemSettings;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.main.ServerRequest;
 
 public class EggIncubator {
@@ -41,6 +44,17 @@ public class EggIncubator {
 	public EggIncubator(PokemonGo api, EggIncubatorOuterClass.EggIncubator proto) {
 		this.api = api;
 		this.proto = proto;
+	}
+
+	/**
+	 * @returns the attributes of this incubator, null if there are none
+	 */
+	public EggIncubatorAttributes getAttributes() {
+		ItemSettings settings = PokemonMeta.getItemSettings(proto.getItemId());
+		if (settings != null) {
+			return settings.getEggIncubator();
+		}
+		return null;
 	}
 
 	/**

@@ -59,6 +59,20 @@ public class SolveCaptchaExample {
 		OkHttpClient http = new OkHttpClient();
 		PokemonGo api = new PokemonGo(http);
 		try {
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					//Startup JFX
+					PlatformImpl.startup(new Runnable() {
+						@Override
+						public void run() {
+						}
+					});
+					//Stop the JavaFX thread from exiting
+					Platform.setImplicitExit(false);
+				}
+			});
+
 			//Add listener to listen for the captcha URL
 			api.addListener(new LoginListener() {
 				@Override
@@ -88,13 +102,6 @@ public class SolveCaptchaExample {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				//Startup JFX
-				PlatformImpl.startup(new Runnable() {
-					@Override
-					public void run() {
-					}
-				});
-
 				//Run on JFX Thread
 				Platform.runLater(new Runnable() {
 					@Override
@@ -123,11 +130,10 @@ public class SolveCaptchaExample {
 										System.out.println("Captcha was correctly solved!");
 									} else {
 										System.out.println("Captcha was incorrectly solved! Please try again.");
-
-						/*
-							Ask for a new challenge url, don't need to check the result,
-							because the LoginListener will be called when this completed.
-						*/
+										/*
+											Ask for a new challenge url, don't need to check the result,
+											because the LoginListener will be called when this completed.
+										*/
 										api.checkChallenge();
 									}
 								} catch (Exception e) {

@@ -27,6 +27,9 @@ public class Pokedex {
 			Collections.synchronizedMap(new EnumMap<PokemonId, PokedexEntry>(PokemonId.class));
 	private final Object lock = new Object();
 
+	/**
+	 * Resets the pokedex and removes all entries
+	 */
 	public void reset() {
 		synchronized (this.lock) {
 			pokedexMap.clear();

@@ -19,6 +19,7 @@ import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -39,12 +40,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -154,10 +156,13 @@ public class RequestHandler implements Runnable {
 	 */
 	public void sendServerRequests(ServerRequest... serverRequests)
 			throws RemoteServerException, LoginFailedException, CaptchaActiveException {
+		if (api.hasChallenge()) {
+			throw new CaptchaActiveException(new AsyncCaptchaActiveException("Captcha active! Cannot send requests!"));
+		}
 		List<Observable<ByteString>> observables = new ArrayList<>(serverRequests.length);
 		for (ServerRequest request : serverRequests) {
 			AsyncServerRequest asyncServerRequest = new AsyncServerRequest(request.getType(), request.getRequest())
-					.withCommons(request.isRequireCommon());
+					.withCommons(request.isRequireCommon()).exclude(request.getExclude());
 			observables.add(sendAsyncServerRequests(asyncServerRequest));
 		}
 		for (int i = 0; i != serverRequests.length; i++) {
@@ -224,20 +229,24 @@ public class RequestHandler implements Runnable {
 			}
 
 			if (responseEnvelop.getStatusCode() == ResponseEnvelope.StatusCode.INVALID_AUTH_TOKEN) {
-				throw new LoginFailedException(String.format("Invalid Auth status code recieved, token not refreshed? %s %s",
-						responseEnvelop.getApiUrl(), responseEnvelop.getError()));
+				String msg = String.format("Invalid Auth status code received, token not refreshed? %s %s",
+						responseEnvelop.getApiUrl(), responseEnvelop.getError());
+				throw new LoginFailedException(msg);
 			} else if (responseEnvelop.getStatusCode() == ResponseEnvelope.StatusCode.REDIRECT) {
-				// 53 means that the api_endpoint was not correctly set, should be at this point, though, so redo the request
+				// API_ENDPOINT was not correctly set, should be at this point, though, so redo the request
 				return internalSendServerRequests(newAuthTicket, serverRequests);
 			} else if (responseEnvelop.getStatusCode() == ResponseEnvelope.StatusCode.BAD_REQUEST) {
-				throw new RemoteServerException("Your account may be banned! please try from the official client.");
+				if (api.getPlayerProfile().isBanned()) {
+					throw new LoginFailedException("Cannot send request, your account has been banned!");
+				} else {
+					throw new RemoteServerException("A bad request was sent!");
+				}
 			}
 
-
-			/**
+			/*
 			 * map each reply to the numeric response,
 			 * ie first response = first request and send back to the requests to toBlocking.
-			 * */
+			 */
 			int count = 0;
 			for (ByteString payload : responseEnvelop.getReturnsList()) {
 				ServerRequest serverReq = serverRequests[count];
@@ -251,7 +260,7 @@ public class RequestHandler implements Runnable {
 			}
 		} catch (IOException e) {
 			throw new RemoteServerException(e);
-		} catch (RemoteServerException e) {
+		} catch (RemoteServerException | LoginFailedException e) {
 			// catch it, so the auto-close of resources triggers, but don't wrap it in yet another RemoteServer Exception
 			throw e;
 		}
@@ -301,34 +310,52 @@ public class RequestHandler implements Runnable {
 
 			ArrayList<ServerRequest> serverRequests = new ArrayList<>();
 			Map<ServerRequest, AsyncServerRequest> requestMap = new HashMap<>();
+			Set<RequestType> exclude = new HashSet<>();
 
-			if (api.hasChallenge() & !api.isLoggingIn()) {
+			for (AsyncServerRequest request : requests) {
+				exclude.addAll(request.getExclude());
+			}
+
+			if (api.isLoggingIn() && api.hasChallenge()) {
+				exclude.add(RequestType.CHECK_CHALLENGE);
+			}
+
+			if (api.hasChallenge() && !api.isLoggingIn()) {
 				for (AsyncServerRequest request : requests) {
 					RequestTypeOuterClass.RequestType type = request.getType();
-					if (type == RequestTypeOuterClass.RequestType.VERIFY_CHALLENGE) {
-						ServerRequest serverRequest = new ServerRequest(type, request.getRequest());
-						serverRequests.add(serverRequest);
-						requestMap.put(serverRequest, request);
-					} else {
-						AsyncCaptchaActiveException exception = new AsyncCaptchaActiveException(api.getChallengeURL());
-						ResultOrException error = ResultOrException.getError(exception);
-						resultMap.put(request.getId(), error);
+					if (!exclude.contains(type)) {
+						if (type == RequestTypeOuterClass.RequestType.VERIFY_CHALLENGE
+								|| type == RequestType.CHECK_CHALLENGE) {
+							ServerRequest serverRequest = new ServerRequest(type, request.getRequest());
+							serverRequests.add(serverRequest);
+							requestMap.put(serverRequest, request);
+						} else {
+							AsyncCaptchaActiveException exception = new AsyncCaptchaActiveException(api.getChallengeURL());
+							ResultOrException error = ResultOrException.getError(exception);
+							resultMap.put(request.getId(), error);
+						}
 					}
 				}
 			} else {
 				for (AsyncServerRequest request : requests) {
-					ServerRequest serverRequest = new ServerRequest(request.getType(), request.getRequest());
-					serverRequests.add(serverRequest);
-					requestMap.put(serverRequest, request);
-					if (request.isRequireCommonRequest()) {
-						addCommon = true;
+					if (!exclude.contains(request.getType())) {
+						ServerRequest serverRequest = new ServerRequest(request.getType(), request.getRequest());
+						serverRequests.add(serverRequest);
+						requestMap.put(serverRequest, request);
+						if (request.isRequireCommonRequest()) {
+							addCommon = true;
+						}
 					}
 				}
 			}
 
 			if (addCommon) {
 				ServerRequest[] commonRequests = CommonRequests.getCommonRequests(api);
-				Collections.addAll(serverRequests, commonRequests);
+				for (ServerRequest request : commonRequests) {
+					if (!exclude.contains(request.getType())) {
+						serverRequests.add(request);
+					}
+				}
 			}
 
 			ServerRequest[] arrayServerRequests = serverRequests.toArray(new ServerRequest[serverRequests.size()]);
@@ -343,12 +370,18 @@ public class RequestHandler implements Runnable {
 						if (asyncRequest != null) {
 							resultMap.put(asyncRequest.getId(), ResultOrException.getResult(data));
 						}
-						CommonRequests.parse(api, request.getType(), data);
+						CommonRequests.queue(request.getType(), data);
 					} catch (InvalidProtocolBufferException e) {
 						if (asyncRequest != null) {
 							resultMap.put(asyncRequest.getId(), ResultOrException.getError(e));
 						}
 					}
+				}
+
+				try {
+					CommonRequests.handleQueue(api);
+				} catch (InvalidProtocolBufferException e) {
+					continue;
 				}
 				continue;
 			} catch (RemoteServerException | LoginFailedException | CaptchaActiveException e) {

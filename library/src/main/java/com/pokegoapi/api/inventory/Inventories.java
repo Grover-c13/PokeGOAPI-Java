@@ -17,6 +17,8 @@ package com.pokegoapi.api.inventory;
 
 import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
+import POGOProtos.Inventory.AppliedItemOuterClass.AppliedItem;
+import POGOProtos.Inventory.AppliedItemsOuterClass.AppliedItems;
 import POGOProtos.Inventory.EggIncubatorOuterClass;
 import POGOProtos.Inventory.InventoryItemDataOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
@@ -37,7 +39,11 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 public class Inventories {
@@ -58,6 +64,8 @@ public class Inventories {
 	@Getter
 	private long lastInventoryUpdate = 0;
 
+	private Map<ItemId, AppliedItem> appliedItems = new HashMap<>();
+
 	@Getter
 	private final Object lock = new Object();
 
@@ -69,7 +77,7 @@ public class Inventories {
 	public Inventories(PokemonGo api) {
 		this.api = api;
 		itemBag = new ItemBag(api);
-		pokebank = new PokeBank();
+		pokebank = new PokeBank(api);
 		candyjar = new CandyJar(api);
 		pokedex = new Pokedex();
 		hatchery = new Hatchery(api);
@@ -78,23 +86,25 @@ public class Inventories {
 	/**
 	 * Updates the inventories with latest data.
 	 *
-	 * @throws LoginFailedException  the login failed exception
+	 * @return the response to the update message
+	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void updateInventories() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
-		updateInventories(false);
+	public GetInventoryResponse updateInventories() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+		return updateInventories(false);
 	}
 
 	/**
 	 * Updates the inventories with the latest data.
 	 *
 	 * @param forceUpdate For a full update if true
-	 * @throws LoginFailedException  the login failed exception
+	 * @return the response to the update message
+	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void updateInventories(boolean forceUpdate)
+	public GetInventoryResponse updateInventories(boolean forceUpdate)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		if (forceUpdate) {
 			lastInventoryUpdate = 0;
@@ -120,7 +130,7 @@ public class Inventories {
 			throw new RemoteServerException(e);
 		}
 
-		updateInventories(response);
+		return response;
 	}
 
 	/**
@@ -129,6 +139,8 @@ public class Inventories {
 	 * @param response the get inventory response
 	 */
 	public void updateInventories(GetInventoryResponse response) {
+		lastInventoryUpdate = api.currentTimeMillis();
+
 		for (InventoryItemOuterClass.InventoryItem inventoryItem
 				: response.getInventoryDelta().getInventoryItemsList()) {
 			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
@@ -148,7 +160,7 @@ public class Inventories {
 					&& itemData.getItem().getItemId() != ItemId.ITEM_UNKNOWN) {
 				ItemData item = itemData.getItem();
 				if (item.getCount() > 0) {
-					itemBag.addItem(new Item(item, itemBag));
+					itemBag.addItem(new Item(api, item, itemBag));
 				}
 			}
 
@@ -180,7 +192,30 @@ public class Inventories {
 				}
 			}
 
-			lastInventoryUpdate = api.currentTimeMillis();
+			if (itemData.hasAppliedItems()) {
+				AppliedItems appliedItems = itemData.getAppliedItems();
+				for (AppliedItem appliedItem : appliedItems.getItemList()) {
+					this.appliedItems.put(appliedItem.getItemId(), appliedItem);
+				}
+			}
+
+			Set<ItemId> stale = new HashSet<>();
+			for (Map.Entry<ItemId, AppliedItem> entry : appliedItems.entrySet()) {
+				ItemId itemId = entry.getKey();
+				AppliedItem applied = entry.getValue();
+				if (api.currentTimeMillis() >= applied.getExpireMs()) {
+					stale.add(itemId);
+				} else {
+					Item item = itemBag.getItem(itemId);
+					item.setApplied(applied);
+					itemBag.addItem(item);
+				}
+			}
+
+			for (ItemId item : stale) {
+				appliedItems.remove(item);
+				itemBag.getItem(item).removeApplied();
+			}
 		}
 	}
 }

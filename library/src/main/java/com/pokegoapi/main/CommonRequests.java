@@ -18,6 +18,7 @@ package com.pokegoapi.main;
 import POGOProtos.Enums.PlatformOuterClass.Platform;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
 import POGOProtos.Networking.Requests.Messages.CheckChallenge.CheckChallengeMessage;
+import POGOProtos.Networking.Requests.Messages.DownloadItemTemplatesMessageOuterClass.DownloadItemTemplatesMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass.DownloadSettingsMessage;
 import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.GetAssetDigestMessage;
@@ -35,8 +36,12 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.listener.PokemonListener;
+import com.pokegoapi.exceptions.CaptchaActiveException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Constant;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +51,16 @@ import java.util.Map;
  */
 
 public class CommonRequests {
+	private static final RequestType[] PARSE_REQUESTS = new RequestType[]{
+			RequestType.DOWNLOAD_SETTINGS,
+			RequestType.CHECK_CHALLENGE,
+			RequestType.GET_INVENTORY,
+			RequestType.GET_HATCHED_EGGS,
+			RequestType.CHECK_AWARDED_BADGES,
+			RequestType.GET_BUDDY_WALKED
+	};
 	private static Map<RequestType, CommonRequest> COMMON_REQUESTS = new LinkedHashMap<>();
+	private static Map<RequestType, ByteString> RECEIVED_COMMONS = new HashMap<>();
 
 	static {
 		COMMON_REQUESTS.put(RequestType.CHECK_CHALLENGE, new CommonRequest() {
@@ -57,7 +71,8 @@ public class CommonRequests {
 
 			@Override
 			public void parse(PokemonGo api, ByteString data, RequestType requestType)
-					throws InvalidProtocolBufferException {
+					throws InvalidProtocolBufferException,
+					CaptchaActiveException, RemoteServerException, LoginFailedException {
 				CheckChallengeResponse response = CheckChallengeResponse.parseFrom(data);
 				api.updateChallenge(response.getChallengeUrl(), response.getShowChallenge());
 			}
@@ -70,7 +85,8 @@ public class CommonRequests {
 
 			@Override
 			public void parse(PokemonGo api, ByteString data, RequestType requestType)
-					throws InvalidProtocolBufferException {
+					throws InvalidProtocolBufferException,
+					CaptchaActiveException, RemoteServerException, LoginFailedException {
 				GetHatchedEggsResponse response = GetHatchedEggsResponse.parseFrom(data);
 				api.getInventories().getHatchery().updateHatchedEggs(response);
 			}
@@ -83,7 +99,8 @@ public class CommonRequests {
 
 			@Override
 			public void parse(PokemonGo api, ByteString data, RequestType requestType)
-					throws InvalidProtocolBufferException {
+					throws InvalidProtocolBufferException,
+					CaptchaActiveException, RemoteServerException, LoginFailedException {
 				GetInventoryResponse response = GetInventoryResponse.parseFrom(data);
 				api.getInventories().updateInventories(response);
 			}
@@ -96,13 +113,10 @@ public class CommonRequests {
 
 			@Override
 			public void parse(PokemonGo api, ByteString data, RequestType requestType)
-					throws InvalidProtocolBufferException {
+					throws InvalidProtocolBufferException,
+					CaptchaActiveException, RemoteServerException, LoginFailedException {
 				CheckAwardedBadgesResponse response = CheckAwardedBadgesResponse.parseFrom(data);
-				try {
-					api.getPlayerProfile().updateAwardedMedals(response);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				api.getPlayerProfile().updateAwardedMedals(response);
 			}
 		});
 		COMMON_REQUESTS.put(RequestType.DOWNLOAD_SETTINGS, new CommonRequest() {
@@ -113,7 +127,8 @@ public class CommonRequests {
 
 			@Override
 			public void parse(PokemonGo api, ByteString data, RequestType requestType)
-					throws InvalidProtocolBufferException {
+					throws InvalidProtocolBufferException,
+					CaptchaActiveException, RemoteServerException, LoginFailedException {
 				DownloadSettingsResponse response = DownloadSettingsResponse.parseFrom(data);
 				api.getSettings().updateSettings(response);
 			}
@@ -126,7 +141,8 @@ public class CommonRequests {
 
 			@Override
 			public void parse(PokemonGo api, ByteString data, RequestType requestType)
-					throws InvalidProtocolBufferException {
+					throws InvalidProtocolBufferException,
+					CaptchaActiveException, RemoteServerException, LoginFailedException {
 				GetBuddyWalkedResponse response = GetBuddyWalkedResponse.parseFrom(data);
 				int candies = response.getCandyEarnedCount();
 				if (response.getSuccess() && candies > 0) {
@@ -177,6 +193,15 @@ public class CommonRequests {
 	}
 
 	/**
+	 * Constant for repetitive usage of DownloadItemTemplatesMessage request
+	 *
+	 * @return the DownloadItemTemplatesMessage
+	 */
+	public static DownloadItemTemplatesMessage getDownloadItemTemplatesRequest() {
+		return DownloadItemTemplatesMessage.newBuilder().build();
+	}
+
+	/**
 	 * Constant for repetitive usage of GetInventoryMessage request
 	 *
 	 * @param api The current instance of PokemonGO
@@ -196,7 +221,6 @@ public class CommonRequests {
 	 * @param request The main request we want to fire
 	 * @param api The current instance of PokemonGO
 	 * @return an array of ServerRequest
-	 *
 	 * @deprecated Use ServerRequest#withCommons
 	 */
 	@Deprecated
@@ -220,16 +244,39 @@ public class CommonRequests {
 	}
 
 	/**
-	 * Parses the given common request
-	 * @param api the current api
+	 * Queues the given common request to be parsed
+	 *
 	 * @param type the request type
 	 * @param data the response data
 	 * @throws InvalidProtocolBufferException if the server returns an invalid response
+	 * @throws CaptchaActiveException if a captcha is active
+	 * @throws RemoteServerException if the server throws an error
+	 * @throws LoginFailedException if login fails
 	 */
-	public static void parse(PokemonGo api, RequestType type, ByteString data) throws InvalidProtocolBufferException {
-		CommonRequest commonRequest = COMMON_REQUESTS.get(type);
-		if (commonRequest != null) {
-			commonRequest.parse(api, data, type);
+	public static void queue(RequestType type, ByteString data)
+			throws InvalidProtocolBufferException, CaptchaActiveException, RemoteServerException, LoginFailedException {
+		RECEIVED_COMMONS.put(type, data);
+	}
+
+	/**
+	 * Handles the queued common requests and clears the map
+	 * @param api the current api
+	 * @throws InvalidProtocolBufferException if the server returns an invalid response
+	 * @throws CaptchaActiveException if a captcha is active
+	 * @throws RemoteServerException if the server throws an error
+	 * @throws LoginFailedException if login fails
+	 */
+	public static void handleQueue(PokemonGo api)
+			throws InvalidProtocolBufferException, RemoteServerException, CaptchaActiveException, LoginFailedException {
+		for (RequestType type : PARSE_REQUESTS) {
+			ByteString data = RECEIVED_COMMONS.get(type);
+			if (data != null) {
+				CommonRequest commonRequest = COMMON_REQUESTS.get(type);
+				if (commonRequest != null) {
+					commonRequest.parse(api, data, type);
+				}
+			}
 		}
+		RECEIVED_COMMONS.clear();
 	}
 }

@@ -56,7 +56,7 @@ public class Pokestop {
 	/**
 	 * Instantiates a new Pokestop.
 	 *
-	 * @param api      the api
+	 * @param api the api
 	 * @param fortData the fort data
 	 */
 	public Pokestop(PokemonGo api, FortDataOuterClass.FortData fortData) {
@@ -157,9 +157,11 @@ public class Pokestop {
 						}
 						cooldownCompleteTimestampMs = response.getCooldownCompleteTimestampMs();
 						PokestopLootResult lootResult = new PokestopLootResult(response);
-							List<PokestopListener> listeners = api.getListeners(PokestopListener.class);
+						List<PokestopListener> listeners = api.getListeners(PokestopListener.class);
 						for (PokestopListener listener : listeners) {
-							listener.onLoot(lootResult);
+							// listener.onLoot(lootResult);
+							// return the pokestop, also change in listener
+							listener.onLoot(lootResult, Pokestop.this);
 						}
 						return lootResult;
 					}
@@ -170,7 +172,7 @@ public class Pokestop {
 	 * Loots a pokestop for pokeballs and other items.
 	 *
 	 * @return PokestopLootResult
-	 * @throws LoginFailedException  if login failed
+	 * @throws LoginFailedException if login failed
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
@@ -210,7 +212,7 @@ public class Pokestop {
 	 * Adds a modifier to this pokestop. (i.e. add a lure module)
 	 *
 	 * @param item the modifier to add to this pokestop
-	 * @throws LoginFailedException  if login failed
+	 * @throws LoginFailedException if login failed
 	 * @throws RemoteServerException if the server failed to respond or the modifier could not be added to this pokestop
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
@@ -251,7 +253,7 @@ public class Pokestop {
 	 * Get more detailed information about a pokestop.
 	 *
 	 * @return FortDetails
-	 * @throws LoginFailedException  if login failed
+	 * @throws LoginFailedException if login failed
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
@@ -289,7 +291,7 @@ public class Pokestop {
 	 *
 	 * @param updateFortDetails to make a new request and get updated lured status
 	 * @return lure status
-	 * @throws LoginFailedException  If login failed.
+	 * @throws LoginFailedException If login failed.
 	 * @throws RemoteServerException If server communications failed.
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */

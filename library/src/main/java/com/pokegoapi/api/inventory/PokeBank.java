@@ -15,27 +15,50 @@
 
 package com.pokegoapi.api.inventory;
 
+import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass;
+import POGOProtos.Inventory.CandyOuterClass.Candy;
+import POGOProtos.Inventory.InventoryItemDataOuterClass.InventoryItemData;
+import POGOProtos.Inventory.InventoryItemOuterClass.InventoryItem;
+import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
+import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
+import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
+import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
+import com.pokegoapi.exceptions.CaptchaActiveException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 public class PokeBank {
 	@Getter
 	private final List<Pokemon> pokemons = Collections.synchronizedList(new ArrayList<Pokemon>());
 	@Getter
 	private final Object lock = new Object();
+	@Getter
+	private final PokemonGo api;
 
-	public PokeBank() {
+	public PokeBank(PokemonGo api) {
+		this.api = api;
 	}
 
+	/**
+	 * Resets the Pokebank and removes all pokemon
+	 */
 	public void reset() {
 		synchronized (this.lock) {
 			pokemons.clear();
@@ -113,5 +136,55 @@ public class PokeBank {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Releases multiple pokemon in a single request
+	 *
+	 * @param pokemons the pokemon to release
+	 * @return the amount of candies for each pokemon family
+	 * @throws CaptchaActiveException if a captcha is active and a message cannot be sent
+	 * @throws LoginFailedException the login fails
+	 * @throws RemoteServerException if the server errors
+	 */
+	public Map<PokemonFamilyId, Integer> releasePokemon(Pokemon... pokemons)
+			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
+		ReleasePokemonMessage.Builder releaseBuilder = ReleasePokemonMessage.newBuilder();
+		for (Pokemon pokemon : pokemons) {
+			if (!pokemon.isDeployed()) {
+				releaseBuilder.addPokemonIds(pokemon.getId());
+			}
+		}
+		GetInventoryMessage inventoryMessage = GetInventoryMessage.newBuilder()
+				.setLastTimestampMs(api.getInventories().getLastInventoryUpdate())
+				.build();
+		ServerRequest inventoryRequest = new ServerRequest(RequestType.GET_INVENTORY, inventoryMessage);
+		ServerRequest releaseRequest = new ServerRequest(RequestType.RELEASE_POKEMON, releaseBuilder.build());
+		api.getRequestHandler().sendServerRequests(releaseRequest, inventoryRequest);
+		Map<PokemonFamilyId, Integer> lastCandies = new HashMap<>(api.getInventories().getCandyjar().getCandies());
+		try {
+			GetInventoryResponse inventoryResponse = GetInventoryResponse.parseFrom(inventoryRequest.getData());
+			ReleasePokemonResponse releaseResponse = ReleasePokemonResponse.parseFrom(releaseRequest.getData());
+			Map<PokemonFamilyId, Integer> candyCount = new HashMap<>();
+			if (releaseResponse.getResult() == Result.SUCCESS && inventoryResponse.getSuccess()) {
+				List<InventoryItem> items = inventoryResponse.getInventoryDelta().getInventoryItemsList();
+				for (InventoryItem item : items) {
+					InventoryItemData data = item.getInventoryItemData();
+					if (data != null && data.hasCandy()) {
+						Candy candy = data.getCandy();
+						PokemonFamilyId family = candy.getFamilyId();
+						Integer lastCandy = lastCandies.get(family);
+						if (lastCandy == null) {
+							lastCandy = 0;
+						}
+						candyCount.put(family, candy.getCandy() - lastCandy);
+					}
+				}
+				api.getInventories().updateInventories(inventoryResponse);
+			}
+			return candyCount;
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
 	}
 }

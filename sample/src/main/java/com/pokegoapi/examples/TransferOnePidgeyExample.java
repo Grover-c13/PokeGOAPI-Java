@@ -35,14 +35,13 @@ public class TransferOnePidgeyExample {
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
 
-		PokemonGo go = new PokemonGo(http);
+		PokemonGo api = new PokemonGo(http);
 		try {
-			// check readme for other example
-			go.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN,
-					ExampleConstants.PASSWORD));
+			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD));
+			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 
 			List<Pokemon> pidgeys =
-					go.getInventories().getPokebank().getPokemonByPokemonId(PokemonIdOuterClass.PokemonId.PIDGEY);
+					api.getInventories().getPokebank().getPokemonByPokemonId(PokemonIdOuterClass.PokemonId.PIDGEY);
 
 			if (pidgeys.size() > 0) {
 				Pokemon pest = pidgeys.get(0);

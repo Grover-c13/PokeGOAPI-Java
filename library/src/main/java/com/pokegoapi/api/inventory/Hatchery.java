@@ -49,6 +49,9 @@ public class Hatchery {
 		this.api = api;
 	}
 
+	/**
+	 * Resets the hatchery and removes all eggs
+	 */
 	public void reset() {
 		synchronized (this.lock) {
 			eggs.clear();
@@ -56,6 +59,10 @@ public class Hatchery {
 		}
 	}
 
+	/**
+	 * Adds the given egg to this hatchery
+	 * @param egg the egg to add
+	 */
 	public void addEgg(EggPokemon egg) {
 		egg.setApi(api);
 		synchronized (this.lock) {
@@ -65,6 +72,7 @@ public class Hatchery {
 
 	/**
 	 * Adds the given hatched egg to the hatchedEggs set.
+	 *
 	 * @param egg the egg to add
 	 */
 	public void addHatchedEgg(HatchedEgg egg) {
@@ -83,6 +91,7 @@ public class Hatchery {
 
 	/**
 	 * Removes the given egg from the hatchedEggs set.
+	 *
 	 * @param egg the egg to remove
 	 */
 	public void removeHatchedEgg(HatchedEgg egg) {
@@ -93,11 +102,17 @@ public class Hatchery {
 
 	/**
 	 * Adds the hatched eggs obtained from the given GetHatchedEggs response
+	 *
 	 * @param response the GetHatchedEggs response
 	 * @return the hatched eggs contained in the response
+	 *
+	 * @throws RemoteServerException if a bad request was sent
+	 * @throws LoginFailedException if login failed
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public List<HatchedEgg> updateHatchedEggs(GetHatchedEggsResponse response) {
-		List<HatchedEgg> eggs = new ArrayList<HatchedEgg>();
+	public List<HatchedEgg> updateHatchedEggs(GetHatchedEggsResponse response)
+			throws RemoteServerException, LoginFailedException, CaptchaActiveException {
+		List<HatchedEgg> eggs = new ArrayList<>();
 		for (int i = 0; i < response.getPokemonIdCount(); i++) {
 			HatchedEgg egg = new HatchedEgg(response.getPokemonId(i),
 					response.getExperienceAwarded(i),
@@ -114,9 +129,8 @@ public class Hatchery {
 	 *
 	 * @return list of hatched eggs
 	 * @throws RemoteServerException e
-	 * @throws LoginFailedException  e
+	 * @throws LoginFailedException e
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 *
 	 * @deprecated Use getHatchedEggs()
 	 */
 	@Deprecated

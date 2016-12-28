@@ -21,12 +21,13 @@ import com.pokegoapi.util.MapUtil;
 import lombok.Getter;
 
 public class Path {
-	private final Point source;
-	private final Point destination;
-	private final Point intermediate;
-	private final double speed;
+	private Point source;
+	private Point destination;
+	private Point intermediate;
+	private double speed;
 	private long startTime;
 	private long endTime;
+	@Getter
 	private long totalTime;
 	@Getter
 	private boolean complete;
@@ -43,6 +44,7 @@ public class Path {
 		double metersPerHour = speed * 1000;
 		this.speed = metersPerHour / 60 / 60 / 1000;
 		this.intermediate = new Point(source.getLatitude(), source.getLongitude());
+		this.totalTime = (long) (MapUtil.distFrom(source, destination) / this.speed);
 	}
 
 	/**
@@ -52,7 +54,6 @@ public class Path {
 	 */
 	public long start(PokemonGo api) {
 		startTime = api.currentTimeMillis();
-		totalTime = (long) (MapUtil.distFrom(source, destination) / speed);
 		endTime = startTime + totalTime;
 		complete = false;
 		return totalTime;
@@ -64,6 +65,10 @@ public class Path {
 	 * @return the intermediate point for the given time
 	 */
 	public Point calculateIntermediate(PokemonGo api) {
+		if (totalTime <= 0) {
+			this.complete = true;
+			return this.destination;
+		}
 		long time = Math.min(api.currentTimeMillis(), endTime) - startTime;
 		if (time >= totalTime) {
 			this.complete = true;
@@ -74,5 +79,27 @@ public class Path {
 		this.intermediate.setLatitude(latitude);
 		this.intermediate.setLongitude(longitude);
 		return this.intermediate;
+	}
+
+	/**
+	 * Gets the amount of millis left before this path is complete
+	 * @param api the current API
+	 * @return the amount of millis left before this path completes
+	 */
+	public long getTimeLeft(PokemonGo api) {
+		return Math.max(0, endTime - api.currentTimeMillis());
+	}
+
+	/**
+	 * Changes the speed of this path
+	 * @param api the current API
+	 * @param speed the new speed to travel at
+	 */
+	public void setSpeed(PokemonGo api, double speed) {
+		double metersPerHour = speed * 1000;
+		this.speed = metersPerHour / 60 / 60 / 1000;
+		this.source = calculateIntermediate(api);
+		this.totalTime = (long) (MapUtil.distFrom(source, destination) / this.speed);
+		start(api);
 	}
 }

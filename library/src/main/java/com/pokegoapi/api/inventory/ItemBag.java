@@ -15,12 +15,14 @@
 
 package com.pokegoapi.api.inventory;
 
+import POGOProtos.Inventory.Item.ItemAwardOuterClass.ItemAward;
 import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.RecycleInventoryItemMessageOuterClass.RecycleInventoryItemMessage;
 import POGOProtos.Networking.Requests.Messages.UseIncenseMessageOuterClass.UseIncenseMessage;
 import POGOProtos.Networking.Requests.Messages.UseItemXpBoostMessageOuterClass.UseItemXpBoostMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass;
 import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result;
 import POGOProtos.Networking.Responses.UseIncenseResponseOuterClass.UseIncenseResponse;
@@ -53,12 +55,19 @@ public class ItemBag {
 		this.api = api;
 	}
 
+	/**
+	 * Resets this item bag and removes all items
+	 */
 	public void reset() {
 		synchronized (this.lock) {
 			items.clear();
 		}
 	}
 
+	/**
+	 * Adds the given item to this bag
+	 * @param item the item to add
+	 */
 	public void addItem(Item item) {
 		synchronized (this.lock) {
 			items.put(item.getItemId(), item);
@@ -132,13 +141,16 @@ public class ItemBag {
 		synchronized (this.lock) {
 			// prevent returning null
 			if (!items.containsKey(type)) {
-				return new Item(ItemData.newBuilder().setCount(0).setItemId(type).build(), this);
+				return new Item(api, ItemData.newBuilder().setCount(0).setItemId(type).build(), this);
 			}
 
 			return items.get(type);
 		}
 	}
 
+	/**
+	 * @return all the items in this bag
+	 */
 	public Collection<Item> getItems() {
 		synchronized (this.lock) {
 			return items.values();
@@ -263,5 +275,46 @@ public class ItemBag {
 			}
 		}
 		return pokeballs;
+	}
+
+	/**
+	 * @return true if the current player has incense active
+	 */
+	public boolean isIncenseActive() {
+		synchronized (lock) {
+			for (Map.Entry<ItemId, Item> entry : items.entrySet()) {
+				Item item = entry.getValue();
+				if (item.isApplied() && item.isIncense()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * @return true if the current player has a lucky egg active
+	 */
+	public boolean isLuckyEggActive() {
+		synchronized (lock) {
+			for (Map.Entry<ItemId, Item> entry : items.entrySet()) {
+				Item item = entry.getValue();
+				if (item.isApplied() && item.isLuckyEgg()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Adds the awarded items contained in the level up response
+	 * @param levelUpResponse the response to add items from
+	 */
+	public void addAwardedItems(LevelUpRewardsResponse levelUpResponse) {
+		for (ItemAward itemAward : levelUpResponse.getItemsAwardedList()) {
+			Item item = getItem(itemAward.getItemId());
+			item.setCount(item.getCount() + itemAward.getItemCount());
+		}
 	}
 }
