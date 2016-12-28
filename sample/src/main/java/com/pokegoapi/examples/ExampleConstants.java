@@ -31,7 +31,7 @@ public class ExampleConstants {
 	public static final String POKEHASH_KEY = "";
 
 	/**
-	 * Creates the appropriate hash provider, based on if the POKEHASH_KEY property is sent or not
+	 * Creates the appropriate hash provider, based on if the POKEHASH_KEY property is set or not
 	 * @return a hash provider
 	 */
 	public static HashProvider getHashProvider() {

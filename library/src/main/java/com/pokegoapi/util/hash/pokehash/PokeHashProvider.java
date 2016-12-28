@@ -48,6 +48,10 @@ public class PokeHashProvider implements HashProvider {
 
 	private final String key;
 
+	/**
+	 * Creates a PokeHashProvider with the given key
+	 * @param key the key for the PokeHash API
+	 */
 	public PokeHashProvider(String key) {
 		this.key = key;
 		if (key == null) {

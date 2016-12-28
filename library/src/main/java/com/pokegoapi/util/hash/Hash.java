@@ -27,6 +27,12 @@ public class Hash {
 	@Getter
 	private final List<Long> requestHashes;
 
+	/**
+	 * Creates a hash object
+	 * @param locationAuthHash the hash of the location & auth ticket
+	 * @param locationHash the hash of the location
+	 * @param requestHashes the hash of each request
+	 */
 	public Hash(int locationAuthHash, int locationHash, List<Long> requestHashes) {
 		this.locationAuthHash = locationAuthHash;
 		this.locationHash = locationHash;

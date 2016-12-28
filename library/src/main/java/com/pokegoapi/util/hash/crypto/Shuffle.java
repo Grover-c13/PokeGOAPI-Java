@@ -1,18 +1,3 @@
-/*
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.pokegoapi.util.hash.crypto;
 
 import java.nio.ByteBuffer;
@@ -3427,10 +3412,10 @@ public final class Shuffle {
 		vector[62] = ~(tmp[61] ^ (tmp[181] ^ tmp[119] & tmp[134]));
 		vector[63] = tmp[30];
 
-		ByteBuffer byteBuf_out = ByteBuffer.allocate(0x100).order(ByteOrder.BIG_ENDIAN);
-		IntBuffer intBuf_out = byteBuf_out.asIntBuffer();
-		intBuf_out.put(vector);
+		ByteBuffer byteBufOut = ByteBuffer.allocate(0x100).order(ByteOrder.BIG_ENDIAN);
+		IntBuffer intBufOut = byteBufOut.asIntBuffer();
+		intBufOut.put(vector);
 
-		return byteBuf_out.array();
+		return byteBufOut.array();
 	}
 }

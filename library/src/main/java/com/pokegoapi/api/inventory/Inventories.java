@@ -15,11 +15,13 @@
 
 package com.pokegoapi.api.inventory;
 
+import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Inventory.AppliedItemOuterClass.AppliedItem;
 import POGOProtos.Inventory.AppliedItemsOuterClass.AppliedItems;
 import POGOProtos.Inventory.EggIncubatorOuterClass;
+import POGOProtos.Inventory.EggIncubatorsOuterClass.EggIncubators;
 import POGOProtos.Inventory.InventoryItemDataOuterClass;
 import POGOProtos.Inventory.InventoryItemOuterClass;
 import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
@@ -146,12 +148,13 @@ public class Inventories {
 			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
 
 			// hatchery
-			if (itemData.getPokemonData().getPokemonId() == PokemonId.MISSINGNO && itemData.getPokemonData().getIsEgg()) {
-				hatchery.addEgg(new EggPokemon(itemData.getPokemonData()));
+			PokemonData pokemonData = itemData.getPokemonData();
+			if (pokemonData.getPokemonId() == PokemonId.MISSINGNO && pokemonData.getIsEgg()) {
+				hatchery.addEgg(new EggPokemon(pokemonData));
 			}
 
 			// pokebank
-			if (itemData.getPokemonData().getPokemonId() != PokemonId.MISSINGNO) {
+			if (pokemonData.getPokemonId() != PokemonId.MISSINGNO) {
 				pokebank.addPokemon(new Pokemon(api, inventoryItem.getInventoryItemData().getPokemonData()));
 			}
 
@@ -183,7 +186,8 @@ public class Inventories {
 			}
 
 			if (itemData.hasEggIncubators()) {
-				for (EggIncubatorOuterClass.EggIncubator incubator : itemData.getEggIncubators().getEggIncubatorList()) {
+				EggIncubators eggIncubators = itemData.getEggIncubators();
+				for (EggIncubatorOuterClass.EggIncubator incubator : eggIncubators.getEggIncubatorList()) {
 					EggIncubator eggIncubator = new EggIncubator(api, incubator);
 					synchronized (this.lock) {
 						incubators.remove(eggIncubator);

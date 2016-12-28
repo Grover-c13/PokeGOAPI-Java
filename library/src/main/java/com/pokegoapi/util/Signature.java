@@ -48,7 +48,6 @@ public class Signature {
 			return;
 		}
 
-		HashProvider provider = api.getHashProvider();
 
 		byte[] authTicket = builder.getAuthTicket().toByteArray();
 
@@ -56,8 +55,6 @@ public class Signature {
 			return;
 		}
 
-		long currentTime = api.currentTimeMillis();
-		long timeSinceStart = currentTime - api.getStartTime();
 
 		byte[][] requestData = new byte[builder.getRequestsCount()][];
 		for (int i = 0; i < builder.getRequestsCount(); i++) {
@@ -78,10 +75,13 @@ public class Signature {
 			accuracy = 0.0;
 		}
 
+		long currentTime = api.currentTimeMillis();
 		byte[] sessionHash = api.getSessionHash();
+		HashProvider provider = api.getHashProvider();
 		Hash hash = provider.provide(currentTime, latitude, longitude, accuracy, authTicket, sessionHash, requestData);
 		Crypto crypto = provider.getCrypto();
 
+		long timeSinceStart = currentTime - api.getStartTime();
 		SignatureOuterClass.Signature.Builder signatureBuilder = SignatureOuterClass.Signature.newBuilder()
 				.setLocationHash1(hash.getLocationAuthHash())
 				.setLocationHash2(hash.getLocationHash())

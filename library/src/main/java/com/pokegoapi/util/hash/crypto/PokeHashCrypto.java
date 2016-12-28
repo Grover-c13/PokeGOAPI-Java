@@ -20,7 +20,7 @@ public class PokeHashCrypto extends Crypto {
 
 	@Override
 	protected byte makeIntegrityByte(Rand rand) {
-		byte b = Long.valueOf(rand.state >> 16).byteValue();
-		return (byte) (b & 0xE3 | 0x10);
+		byte randState = Long.valueOf(rand.state >> 16).byteValue();
+		return (byte) (randState & 0xE3 | 0x10);
 	}
 }

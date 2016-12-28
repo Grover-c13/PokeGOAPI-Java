@@ -52,7 +52,6 @@ public class Crypto {
 	/**
 	 * Shuffles bytes.
 	 *
-	 * @param crypto the crypto instance to use
 	 * @param input input data
 	 * @param msSinceStart time since start
 	 * @return shuffled bytes
@@ -99,9 +98,9 @@ public class Crypto {
 		int totalsize;
 		int inputLen;
 
-		byte[] intToBytes(long x) {
+		byte[] intBytes(long value) {
 			ByteBuffer buffer = ByteBuffer.allocate(4);
-			buffer.putInt(new BigInteger(String.valueOf(x)).intValue());
+			buffer.putInt(new BigInteger(String.valueOf(value)).intValue());
 			return buffer.array();
 		}
 
@@ -124,7 +123,7 @@ public class Crypto {
 			}
 			totalsize = roundedsize + 5;
 
-			prefix = intToBytes(ms);
+			prefix = intBytes(ms);
 
 			for (int i = 0; i < input.length; ++i)
 				content.get(i / 256)[i % 256] = input[i];
