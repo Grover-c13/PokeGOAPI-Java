@@ -20,7 +20,7 @@ package com.pokegoapi.util;
  */
 
 public class Constant {
-	public static final int APP_VERSION = 4500;
+	public static final int APP_VERSION = 5100;
 
-	public static final long UNK25 = -1553869577012279119L;
+	public static final long UNK25 = -8832040574896607694L;
 }

@@ -118,6 +118,10 @@ public class PokemonGo {
 	private final Object challengeLock = new Object();
 
 	@Getter
+	@Setter
+	private String hashKey;
+
+	@Getter
 	private List<Listener> listeners = Collections.synchronizedList(new ArrayList<Listener>());
 
 	private final Object lock = new Object();

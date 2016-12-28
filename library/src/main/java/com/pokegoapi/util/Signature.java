@@ -19,11 +19,15 @@ import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Platform.PlatformRequestTypeOuterClass;
 import POGOProtos.Networking.Platform.Requests.SendEncryptedSignatureRequestOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.device.LocationFixes;
 import com.pokegoapi.exceptions.RemoteServerException;
+import okhttp3.OkHttpClient;
 
+import java.io.IOException;
+import java.lang.System;
 import java.nio.ByteBuffer;
 import java.util.Random;
 
@@ -37,21 +41,40 @@ public class Signature {
 	 */
 	public static void setSignature(PokemonGo api, RequestEnvelopeOuterClass.RequestEnvelope.Builder builder)
 			throws RemoteServerException {
-
 		if (builder.getAuthTicket() == null) {
 			return;
 		}
 
 		byte[] authTicket = builder.getAuthTicket().toByteArray();
+		if (authTicket.length == 0) return;
+
 		long currentTime = api.currentTimeMillis();
 		long timeSince = currentTime - api.getStartTime();
 
 		Random random = new Random();
 
+		BosslandHash.HashRequestContent request = new BosslandHash.HashRequestContent();
+		request.setAuthTicket(authTicket);
+		request.setSessionData(api.getSessionHash());
+		request.setTimestamp(currentTime);
+		request.setLongitude(api.getLongitude());
+		request.setLatitude(api.getLatitude());
+		request.setAltitude(api.getAccuracy());
+		for (int i = 0; i < builder.getRequestsList().size(); i++)
+			request.getRequests().add(builder.getRequests(i).toByteArray());
+
+		BosslandHash.HashResponseContent response = null;
+		try {
+			response = BosslandHash.request(api, api.getRequestHandler().getClient(), request);
+		} catch (IOException e) {
+			return;
+		}
+
 		SignatureOuterClass.Signature.Builder sigBuilder;
+
 		sigBuilder = SignatureOuterClass.Signature.newBuilder()
-				.setLocationHash1(getLocationHash1(api, authTicket))
-				.setLocationHash2(getLocationHash2(api))
+				.setLocationHash1((int) ((response.getLocationAuthHash() & 0xFFFFFFFFL) ^ (response.getLocationAuthHash() >>> 32)))
+				.setLocationHash2((int) ((response.getLocationHash() & 0xFFFFFFFFL) ^ (response.getLocationHash() >>> 32)))
 				.setTimestamp(currentTime)
 				.setTimestampSinceStart(timeSince)
 				.setDeviceInfo(api.getDeviceInfo())
@@ -66,7 +89,7 @@ public class Signature {
 		}
 
 		for (int i = 0; i < builder.getRequestsList().size(); i++) {
-			sigBuilder.addRequestHash(getRequestHash(builder.getRequests(i).toByteArray(), authTicket));
+			sigBuilder.addRequestHash(response.getRequestHashes().get(i));
 		}
 
 		SignatureOuterClass.Signature signature = sigBuilder.build();

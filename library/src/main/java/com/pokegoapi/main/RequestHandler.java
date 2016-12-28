@@ -39,6 +39,7 @@ import rx.Observable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.System;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -82,6 +83,8 @@ public class RequestHandler implements Runnable {
 		asyncHttpThread.start();
 		random = new Random();
 	}
+
+	public OkHttpClient getClient() { return client; }
 
 	/**
 	 * Make an async server request. The answer will be provided in the future
