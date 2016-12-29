@@ -40,6 +40,7 @@ import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
+import com.pokegoapi.util.hash.HashProvider;
 import com.pokegoapi.util.path.Path;
 import okhttp3.OkHttpClient;
 
@@ -56,7 +57,8 @@ public class TravelToPokestopExample {
 		OkHttpClient http = new OkHttpClient();
 		PokemonGo api = new PokemonGo(http);
 		try {
-			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD));
+			HashProvider hasher = ExampleConstants.getHashProvider();
+			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD), hasher);
 			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 
 			Set<Pokestop> pokestops = api.getMap().getMapObjects().getPokestops();

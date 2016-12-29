@@ -39,7 +39,6 @@ import com.pokegoapi.api.listener.PokemonListener;
 import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.util.Constant;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -158,25 +157,27 @@ public class CommonRequests {
 	/**
 	 * Constant for repetitive usage of DownloadRemoteConfigVersionMessage request
 	 *
+	 * @param api the current API instance
 	 * @return DownloadRemoteConfigVersionMessage
 	 */
-	public static DownloadRemoteConfigVersionMessage getDownloadRemoteConfigVersionMessageRequest() {
+	public static DownloadRemoteConfigVersionMessage getDownloadRemoteConfigVersionMessageRequest(PokemonGo api) {
 		return DownloadRemoteConfigVersionMessage
 				.newBuilder()
 				.setPlatform(Platform.IOS)
-				.setAppVersion(Constant.APP_VERSION)
+				.setAppVersion(api.getVersion())
 				.build();
 	}
 
 	/**
 	 * Constant for repetitive usage of GetAssetDigestMessage request
 	 *
+	 * @param api the current API instance
 	 * @return GetAssetDigestMessage
 	 */
-	public static GetAssetDigestMessage getGetAssetDigestMessageRequest() {
+	public static GetAssetDigestMessage getGetAssetDigestMessageRequest(PokemonGo api) {
 		return GetAssetDigestMessage.newBuilder()
 				.setPlatform(Platform.IOS)
-				.setAppVersion(Constant.APP_VERSION)
+				.setAppVersion(api.getVersion())
 				.build();
 	}
 

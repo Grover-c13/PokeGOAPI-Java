@@ -185,7 +185,7 @@ public class Pokemon extends PokemonDetails {
 	 *
 	 * @param considerMaxCPLimitForPlayerLevel Consider max cp limit for actual player level
 	 * @return the boolean
-	 * @throws NoSuchItemException   If the PokemonId value cannot be found in the {@link PokemonMetaRegistry}.
+	 * @throws NoSuchItemException   If the PokemonId value cannot be found in the {@link com.pokegoapi.main.PokemonMeta}.
 	 */
 	public boolean canPowerUp(boolean considerMaxCPLimitForPlayerLevel)
 			throws NoSuchItemException {
@@ -463,5 +463,15 @@ public class Pokemon extends PokemonDetails {
 	 */
 	public double getIvInPercentage() {
 		return ((Math.floor((this.getIvRatio() * 100) * 100)) / 100);
+	}
+
+	@Override
+	public int hashCode() {
+		return (int) getId();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Pokemon && ((Pokemon) obj).getId() == getId();
 	}
 }

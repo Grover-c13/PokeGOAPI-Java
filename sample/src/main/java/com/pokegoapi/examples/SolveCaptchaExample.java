@@ -35,6 +35,7 @@ import com.pokegoapi.api.listener.LoginListener;
 import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.util.CaptchaSolveHelper;
 import com.pokegoapi.util.Log;
+import com.pokegoapi.util.hash.HashProvider;
 import com.sun.javafx.application.PlatformImpl;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -87,7 +88,8 @@ public class SolveCaptchaExample {
 				}
 			});
 
-			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD));
+			HashProvider hasher = ExampleConstants.getHashProvider();
+			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD), hasher);
 			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 
 			while (!api.hasChallenge()) {

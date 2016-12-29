@@ -141,16 +141,16 @@ public class PokeBank {
 	/**
 	 * Releases multiple pokemon in a single request
 	 *
-	 * @param pokemons the pokemon to release
+	 * @param releasePokemon the pokemon to release
 	 * @return the amount of candies for each pokemon family
 	 * @throws CaptchaActiveException if a captcha is active and a message cannot be sent
 	 * @throws LoginFailedException the login fails
 	 * @throws RemoteServerException if the server errors
 	 */
-	public Map<PokemonFamilyId, Integer> releasePokemon(Pokemon... pokemons)
+	public Map<PokemonFamilyId, Integer> releasePokemon(Pokemon... releasePokemon)
 			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
 		ReleasePokemonMessage.Builder releaseBuilder = ReleasePokemonMessage.newBuilder();
-		for (Pokemon pokemon : pokemons) {
+		for (Pokemon pokemon : releasePokemon) {
 			if (!pokemon.isDeployed()) {
 				releaseBuilder.addPokemonIds(pokemon.getId());
 			}
@@ -167,6 +167,14 @@ public class PokeBank {
 			ReleasePokemonResponse releaseResponse = ReleasePokemonResponse.parseFrom(releaseRequest.getData());
 			Map<PokemonFamilyId, Integer> candyCount = new HashMap<>();
 			if (releaseResponse.getResult() == Result.SUCCESS && inventoryResponse.getSuccess()) {
+				synchronized (this.lock) {
+					for (Pokemon pokemon : releasePokemon) {
+						this.pokemons.remove(pokemon);
+					}
+				}
+				for (Pokemon pokemon : releasePokemon) {
+					api.getInventories().getPokebank().removePokemon(pokemon);
+				}
 				List<InventoryItem> items = inventoryResponse.getInventoryDelta().getInventoryItemsList();
 				for (InventoryItem item : items) {
 					InventoryItemData data = item.getInventoryItemData();
