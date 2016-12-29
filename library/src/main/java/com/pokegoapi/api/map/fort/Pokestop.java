@@ -311,4 +311,14 @@ public class Pokestop {
 		return fortData.getActiveFortModifierList()
 				.contains(ItemIdOuterClass.ItemId.ITEM_TROY_DISK);
 	}
+
+	@Override
+	public int hashCode() {
+		return getId().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Pokestop && ((Pokestop) obj).getId().equals(getId());
+	}
 }
