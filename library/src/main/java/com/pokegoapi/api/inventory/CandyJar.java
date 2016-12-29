@@ -106,4 +106,14 @@ public class CandyJar {
 			}
 		}
 	}
+
+	/**
+	 * Gets all candies in the jar
+	 * @return the candies
+	 */
+	public Map<PokemonFamilyId, Integer> getCandies() {
+		synchronized (lock) {
+			return candies;
+		}
+	}
 }

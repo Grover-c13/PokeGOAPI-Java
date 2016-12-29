@@ -13,19 +13,27 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.main;
+package com.pokegoapi.api.listener;
 
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.api.map.MapObjects;
 
-public interface CommonRequest {
-	ServerRequest create(PokemonGo api, RequestType requestType);
+/**
+ * Listener to handle all heartbeat related events such as map updates
+ */
+public interface HeartbeatListener extends Listener {
+	/**
+	 * Called when the map is updated
+	 * @param api the current API
+	 * @param mapObjects the updated map objects
+	 */
+	void onMapUpdate(PokemonGo api, MapObjects mapObjects);
 
-	void parse(PokemonGo api, ByteString data, RequestType requestType)
-			throws InvalidProtocolBufferException, CaptchaActiveException, RemoteServerException, LoginFailedException;
+	/**
+	 * Called when an exception occurs while the map is being updated.
+	 *
+	 * @param api the current API
+	 * @param exception the exception that occurred while updating the map
+	 */
+	void onMapUpdateException(PokemonGo api, Exception exception);
 }

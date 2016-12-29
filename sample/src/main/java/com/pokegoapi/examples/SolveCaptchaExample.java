@@ -35,6 +35,7 @@ import com.pokegoapi.api.listener.LoginListener;
 import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.util.CaptchaSolveHelper;
 import com.pokegoapi.util.Log;
+import com.pokegoapi.util.hash.HashProvider;
 import com.sun.javafx.application.PlatformImpl;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -59,6 +60,20 @@ public class SolveCaptchaExample {
 		OkHttpClient http = new OkHttpClient();
 		PokemonGo api = new PokemonGo(http);
 		try {
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					//Startup JFX
+					PlatformImpl.startup(new Runnable() {
+						@Override
+						public void run() {
+						}
+					});
+					//Stop the JavaFX thread from exiting
+					Platform.setImplicitExit(false);
+				}
+			});
+
 			//Add listener to listen for the captcha URL
 			api.addListener(new LoginListener() {
 				@Override
@@ -73,7 +88,8 @@ public class SolveCaptchaExample {
 				}
 			});
 
-			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD));
+			HashProvider hasher = ExampleConstants.getHashProvider();
+			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD), hasher);
 			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 
 			while (!api.hasChallenge()) {
@@ -88,13 +104,6 @@ public class SolveCaptchaExample {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				//Startup JFX
-				PlatformImpl.startup(new Runnable() {
-					@Override
-					public void run() {
-					}
-				});
-
 				//Run on JFX Thread
 				Platform.runLater(new Runnable() {
 					@Override
@@ -123,11 +132,10 @@ public class SolveCaptchaExample {
 										System.out.println("Captcha was correctly solved!");
 									} else {
 										System.out.println("Captcha was incorrectly solved! Please try again.");
-
-						/*
-							Ask for a new challenge url, don't need to check the result,
-							because the LoginListener will be called when this completed.
-						*/
+										/*
+											Ask for a new challenge url, don't need to check the result,
+											because the LoginListener will be called when this completed.
+										*/
 										api.checkChallenge();
 									}
 								} catch (Exception e) {

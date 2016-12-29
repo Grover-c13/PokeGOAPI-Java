@@ -15,214 +15,193 @@
 
 package com.pokegoapi.api.map;
 
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.map.fort.Pokestop;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
+import POGOProtos.Map.MapCellOuterClass.MapCell;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
-import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass.NearbyPokemon;
+import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Map.SpawnPointOuterClass.SpawnPoint;
+import POGOProtos.Networking.Responses.GetIncensePokemonResponseOuterClass.GetIncensePokemonResponse;
+import POGOProtos.Networking.Responses.GetIncensePokemonResponseOuterClass.GetIncensePokemonResponse.Result;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.gym.Gym;
+import com.pokegoapi.api.map.fort.Pokestop;
+import com.pokegoapi.api.map.pokemon.CatchablePokemon;
+import com.pokegoapi.api.map.pokemon.NearbyPokemon;
 import lombok.Getter;
-import lombok.ToString;
 
-@ToString
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class MapObjects {
-
-	@Getter
-	private final Collection<NearbyPokemon> nearbyPokemons = Collections.synchronizedCollection(
-			new ArrayList<NearbyPokemon>()
-	);
-	@Getter
-	private final Collection<MapPokemon> catchablePokemons = Collections.synchronizedCollection(
-			new ArrayList<MapPokemon>()
-	);
-	@Getter
-	private final Collection<WildPokemon> wildPokemons = Collections.synchronizedCollection(
-			new ArrayList<WildPokemon>()
-	);
-	@Getter
-	private final Collection<SpawnPoint> decimatedSpawnPoints = Collections.synchronizedCollection(
-			new ArrayList<SpawnPoint>()
-	);
-	@Getter
-	private final Collection<SpawnPoint> spawnPoints = Collections.synchronizedCollection(
-			new ArrayList<SpawnPoint>()
-	);
-	@Getter
-	private final Collection<FortData> gyms = Collections.synchronizedCollection(
-			new ArrayList<FortData>()
-	);
-	@Getter
-	private final Collection<Pokestop> pokestops = Collections.synchronizedCollection(
-			new ArrayList<Pokestop>()
-	);
-	boolean complete = false;
-	private final PokemonGo api;
+	private PokemonGo api;
 
 	/**
-	 * Instantiates a new Map objects.
+	 * Creates a MapObjects object
 	 *
-	 * @param api the api
+	 * @param api the api for these MapObjects
 	 */
 	public MapObjects(PokemonGo api) {
 		this.api = api;
 	}
 
-	/**
-	 * Add nearby pokemons.
-	 *
-	 * @param nearbyPokemons the nearby pokemons
-	 */
-	public void addNearbyPokemons(Collection<NearbyPokemon> nearbyPokemons) {
-		if (nearbyPokemons == null || nearbyPokemons.isEmpty()) {
-			return;
-		}
-		complete = true;
-		this.nearbyPokemons.addAll(nearbyPokemons);
-	}
+	@Getter
+	private Set<NearbyPokemon> nearby = new HashSet<>();
+	private Set<CatchablePokemon> pokemon = new HashSet<>();
+	@Getter
+	private Set<Point> spawnpoints = new HashSet<>();
+	@Getter
+	private Set<Point> decimatedSpawnPoints = new HashSet<>();
+	@Getter
+	private Set<Pokestop> pokestops = new HashSet<>();
+	@Getter
+	private Set<Gym> gyms = new HashSet<>();
 
 	/**
-	 * Add catchable pokemons.
+	 * Adds the given nearby pokemon to this object
 	 *
-	 * @param catchablePokemons the catchable pokemons
+	 * @param nearby the nearby protos
 	 */
-	public void addCatchablePokemons(Collection<MapPokemon> catchablePokemons) {
-		if (catchablePokemons == null || catchablePokemons.isEmpty()) {
-			return;
-		}
-		complete = true;
-		this.catchablePokemons.addAll(catchablePokemons);
-	}
-
-	/**
-	 * Add wild pokemons.
-	 *
-	 * @param wildPokemons the wild pokemons
-	 */
-	public void addWildPokemons(Collection<WildPokemon> wildPokemons) {
-		if (wildPokemons == null || wildPokemons.isEmpty()) {
-			return;
-		}
-		complete = true;
-		this.wildPokemons.addAll(wildPokemons);
-	}
-
-	/**
-	 * Add decimated spawn points.
-	 *
-	 * @param decimatedSpawnPoints the decimated spawn points
-	 */
-	public void addDecimatedSpawnPoints(Collection<SpawnPoint> decimatedSpawnPoints) {
-		if (decimatedSpawnPoints == null || decimatedSpawnPoints.isEmpty()) {
-			return;
-		}
-		complete = true;
-		this.decimatedSpawnPoints.addAll(decimatedSpawnPoints);
-	}
-
-	/**
-	 * Add spawn points.
-	 *
-	 * @param spawnPoints the spawn points
-	 */
-	public void addSpawnPoints(Collection<SpawnPoint> spawnPoints) {
-		if (spawnPoints == null || spawnPoints.isEmpty()) {
-			return;
-		}
-		complete = true;
-		this.spawnPoints.addAll(spawnPoints);
-	}
-
-	/**
-	 * Add gyms.
-	 *
-	 * @param gyms the gyms
-	 */
-	public void addGyms(Collection<FortData> gyms) {
-		if (gyms == null || gyms.isEmpty()) {
-			return;
-		}
-		complete = true;
-		this.gyms.addAll(gyms);
-	}
-
-	/**
-	 * Add pokestops.
-	 *
-	 * @param pokestops the pokestops
-	 */
-	public void addPokestops(Collection<FortData> pokestops) {
-		if (pokestops == null || pokestops.isEmpty()) {
-			return;
-		}
-		complete = true;
-		for (FortData pokestop : pokestops) {
-			this.pokestops.add(new Pokestop(api, pokestop));
+	public void addNearby(List<NearbyPokemonOuterClass.NearbyPokemon> nearby) {
+		for (NearbyPokemonOuterClass.NearbyPokemon nearbyPokemon : nearby) {
+			this.nearby.add(new NearbyPokemon(nearbyPokemon));
 		}
 	}
 
 	/**
-	 * Returns whether any data was returned. When a user requests too many cells/wrong cell level/cells too far away
-	 * from the users location, the server returns empty MapCells.
+	 * Adds the given pokemon to this object
 	 *
-	 * @return whether or not the return returned any data at all;
+	 * @param mapPokemon the map pokemon protos
 	 */
-	public boolean isComplete() {
-		return complete;
+	public void addMapPokemon(List<MapPokemon> mapPokemon) {
+		for (MapPokemon pokemon : mapPokemon) {
+			this.pokemon.add(new CatchablePokemon(api, pokemon));
+		}
 	}
 
+	/**
+	 * Adds the given pokemon to this object
+	 *
+	 * @param wildPokemon the wild pokemon protos
+	 */
+	public void addWildPokemon(List<WildPokemon> wildPokemon) {
+		for (WildPokemon pokemon : wildPokemon) {
+			this.pokemon.add(new CatchablePokemon(api, pokemon));
+		}
+	}
 
 	/**
-	 * updates the object.
+	 * Adds the given spawnpoints to this object
 	 *
-	 * @param other Update this {@link MapObjects} data with the provided data.
+	 * @param spawnPoints the spawnpoint protos
 	 */
-	@Deprecated
-	public void update(MapObjects other) {
+	public void addSpawnpoints(List<SpawnPoint> spawnPoints) {
+		for (SpawnPoint spawnPoint : spawnPoints) {
+			this.spawnpoints.add(new Point(spawnPoint));
+		}
+	}
 
-		nearbyPokemons.clear();
-		addNearbyPokemons(other.getNearbyPokemons());
+	/**
+	 * Adds the given decimated spawnpoints to this object
+	 *
+	 * @param spawnPoints the spawnpoint protos
+	 */
+	public void addDecimatedSpawnpoints(List<SpawnPoint> spawnPoints) {
+		for (SpawnPoint spawnPoint : spawnPoints) {
+			this.decimatedSpawnPoints.add(new Point(spawnPoint));
+		}
+	}
 
-		catchablePokemons.clear();
-		addCatchablePokemons(other.getCatchablePokemons());
-
-		wildPokemons.clear();
-		addWildPokemons(other.getWildPokemons());
-
-		decimatedSpawnPoints.clear();
-		addDecimatedSpawnPoints(other.getDecimatedSpawnPoints());
-
-		spawnPoints.clear();
-		addSpawnPoints(other.getSpawnPoints());
-
-
-		/* for (FortData otherGym: other.getGyms()) {
-			Iterator<FortData> iterator = gyms.iterator();
-			while (iterator.hasNext()) {
-				FortData gym = iterator.next();
-				if (otherGym.getId().equals(gym.getId())) {
-					gyms.remove(gym);
+	/**
+	 * Adds the given forts to this object
+	 *
+	 * @param forts the fort protos
+	 */
+	public void addForts(List<FortData> forts) {
+		for (FortData fortData : forts) {
+			switch (fortData.getType()) {
+				case CHECKPOINT:
+					this.pokestops.add(new Pokestop(api, fortData));
 					break;
-				}
-			}
-			gyms.add(otherGym);
-		}
-
-		/*for (Pokestop otherPokestop: other.getPokestops()) {
-			Iterator<Pokestop> iterator = pokestops.iterator();
-			while (iterator.hasNext()) {
-				Pokestop pokestop = iterator.next();
-				if (otherPokestop.getId().equals(pokestop.getId())) {
-					pokestops.remove(pokestop);
+				case GYM:
+					this.gyms.add(new Gym(api, fortData));
 					break;
-				}
+				default:
+					break;
 			}
-			pokestops.add(otherPokestop);
-		}*/
+			if (fortData.hasLureInfo()) {
+				this.pokemon.add(new CatchablePokemon(api, fortData));
+			}
+		}
+	}
+
+	/**
+	 * Adds an incense pokemon from the given GetIncensePokemon response
+	 *
+	 * @param response the response containing the incense pokemon, if any
+	 */
+	public void addIncensePokemon(GetIncensePokemonResponse response) {
+		if (response.getResult() == Result.INCENSE_ENCOUNTER_AVAILABLE) {
+			this.pokemon.add(new CatchablePokemon(api, response));
+		}
+	}
+
+	/**
+	 * Adds all the MapObjects from the given MapCell to this object
+	 *
+	 * @param cell the cell to add
+	 */
+	public void addCell(MapCell cell) {
+		this.addNearby(cell.getNearbyPokemonsList());
+		this.addMapPokemon(cell.getCatchablePokemonsList());
+		this.addWildPokemon(cell.getWildPokemonsList());
+		this.addSpawnpoints(cell.getSpawnPointsList());
+		this.addDecimatedSpawnpoints(cell.getDecimatedSpawnPointsList());
+		this.addForts(cell.getFortsList());
+	}
+
+	/**
+	 * @return a set of all visible pokemon on the map
+	 */
+	public Set<CatchablePokemon> getPokemon() {
+		Set<CatchablePokemon> pokemon = new HashSet<>();
+		for (CatchablePokemon catchable : this.pokemon) {
+			long expirationTime = catchable.getExpirationTimestampMs();
+			if ((expirationTime == -1 || api.currentTimeMillis() < expirationTime) && !catchable.isDespawned()) {
+				pokemon.add(catchable);
+			}
+		}
+		return pokemon;
+	}
+
+	/**
+	 * Gets the pokestop with the requested ID
+	 *
+	 * @param id the id to search for
+	 * @return the pokestop with the requested ID, null if none with that ID are visible
+	 */
+	public Pokestop getPokestop(String id) {
+		for (Pokestop pokestop : pokestops) {
+			if (pokestop.getId().equals(id)) {
+				return pokestop;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Gets the gym with the requested ID
+	 *
+	 * @param id the id to search for
+	 * @return the gym with the requested ID, null if none with that ID are visible
+	 */
+	public Gym getGym(String id) {
+		for (Gym gym : gyms) {
+			if (gym.getId().equals(id)) {
+				return gym;
+			}
+		}
+		return null;
 	}
 }

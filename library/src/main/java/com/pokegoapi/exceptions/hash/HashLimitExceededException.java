@@ -13,34 +13,18 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.api.pokemon;
+package com.pokegoapi.exceptions.hash;
 
-import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
-import lombok.Getter;
-import lombok.Setter;
+public class HashLimitExceededException extends HashException {
+	public HashLimitExceededException() {
+		super();
+	}
 
-public class PokemonMoveMeta {
+	public HashLimitExceededException(String reason) {
+		super(reason);
+	}
 
-	@Getter
-	@Setter
-	private PokemonMove move;
-	@Getter
-	@Setter
-	private PokemonType type;
-	@Getter
-	@Setter
-	private int power;
-	@Getter
-	@Setter
-	private int accuracy;
-	@Getter
-	@Setter
-	private double critChance;
-	@Getter
-	@Setter
-	private int time;
-	@Getter
-	@Setter
-	private int energy;
-
+	public HashLimitExceededException(Throwable exception) {
+		super(exception);
+	}
 }

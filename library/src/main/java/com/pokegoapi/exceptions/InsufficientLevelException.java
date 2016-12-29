@@ -13,19 +13,22 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.main;
+package com.pokegoapi.exceptions;
 
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
+public class InsufficientLevelException extends RuntimeException {
+	public InsufficientLevelException() {
+		super();
+	}
 
-public interface CommonRequest {
-	ServerRequest create(PokemonGo api, RequestType requestType);
+	public InsufficientLevelException(String reason) {
+		super(reason);
+	}
 
-	void parse(PokemonGo api, ByteString data, RequestType requestType)
-			throws InvalidProtocolBufferException, CaptchaActiveException, RemoteServerException, LoginFailedException;
+	public InsufficientLevelException(Throwable exception) {
+		super(exception);
+	}
+
+	public InsufficientLevelException(String reason, Throwable exception) {
+		super(reason, exception);
+	}
 }

@@ -16,10 +16,17 @@
 package com.pokegoapi.main;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
 public class Utils {
+	private static final File TEMP_DIR = new File(System.getProperty("java.io.tmpdir"), "pokego-java");
+
+	static {
+		TEMP_DIR.mkdir();
+	}
+
 	/**
 	 * Converts input streams to byte arrays.
 	 *
@@ -52,4 +59,29 @@ public class Utils {
 		return newRequests;
 	}
 
+	/**
+	 * Creates a temp file at the given location
+	 * @param name the name of the file
+	 * @return the temp file
+	 * @throws IOException if there is a problem while creating the file
+	 */
+	public static File createTempFile(String name) throws IOException {
+		final File temp = Utils.getTempFile(name);
+		if (!temp.getParentFile().exists()) {
+			temp.getParentFile().mkdirs();
+		}
+		if (!(temp.exists()) && !(temp.createNewFile())) {
+			throw new IOException("Could not create temp file: " + temp.getAbsolutePath());
+		}
+		return temp;
+	}
+
+	/**
+	 * Gets the temp file at a given location without creating it
+	 * @param name the name of this file
+	 * @return the requested temp file
+	 */
+	public static File getTempFile(String name) {
+		return new File(TEMP_DIR, name);
+	}
 }

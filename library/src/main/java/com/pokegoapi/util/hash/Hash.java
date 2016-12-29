@@ -13,19 +13,29 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.main;
+package com.pokegoapi.util.hash;
 
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
+import lombok.Getter;
 
-public interface CommonRequest {
-	ServerRequest create(PokemonGo api, RequestType requestType);
+import java.util.List;
 
-	void parse(PokemonGo api, ByteString data, RequestType requestType)
-			throws InvalidProtocolBufferException, CaptchaActiveException, RemoteServerException, LoginFailedException;
+public class Hash {
+	@Getter
+	private final int locationAuthHash;
+	@Getter
+	private final int locationHash;
+	@Getter
+	private final List<Long> requestHashes;
+
+	/**
+	 * Creates a hash object
+	 * @param locationAuthHash the hash of the location & auth ticket
+	 * @param locationHash the hash of the location
+	 * @param requestHashes the hash of each request
+	 */
+	public Hash(int locationAuthHash, int locationHash, List<Long> requestHashes) {
+		this.locationAuthHash = locationAuthHash;
+		this.locationHash = locationHash;
+		this.requestHashes = requestHashes;
+	}
 }

@@ -41,6 +41,7 @@ import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
+import com.pokegoapi.util.hash.HashProvider;
 import okhttp3.OkHttpClient;
 
 public class TutorialHandleExample {
@@ -54,8 +55,6 @@ public class TutorialHandleExample {
 		OkHttpClient http = new OkHttpClient();
 		final PokemonGo api = new PokemonGo(http);
 		try {
-			PtcCredentialProvider provider
-					= new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD);
 			// Add listener to listen for all tutorial related events, must be registered before login is called,
 			// otherwise it will not be used
 			api.addListener(new TutorialListener() {
@@ -93,7 +92,9 @@ public class TutorialHandleExample {
 							Avatar.FemaleBackpack.GRAY_BLACK_YELLOW_POKEBALL.id());
 				}
 			});
-			api.login(provider);
+			HashProvider hasher = ExampleConstants.getHashProvider();
+			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD), hasher);
+			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 		} catch (LoginFailedException | RemoteServerException | CaptchaActiveException e) {
 			Log.e("Main", "Failed to login!", e);
 		}

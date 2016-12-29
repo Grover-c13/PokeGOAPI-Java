@@ -13,19 +13,14 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.main;
+package com.pokegoapi.util.hash.crypto;
 
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
+public class PokeHashCrypto extends Crypto {
+	public static final Crypto POKE_HASH = new PokeHashCrypto();
 
-public interface CommonRequest {
-	ServerRequest create(PokemonGo api, RequestType requestType);
-
-	void parse(PokemonGo api, ByteString data, RequestType requestType)
-			throws InvalidProtocolBufferException, CaptchaActiveException, RemoteServerException, LoginFailedException;
+	@Override
+	protected byte makeIntegrityByte(Rand rand) {
+		byte randState = Long.valueOf(rand.state >> 16).byteValue();
+		return (byte) (randState & 0xE3 | 0x10);
+	}
 }
