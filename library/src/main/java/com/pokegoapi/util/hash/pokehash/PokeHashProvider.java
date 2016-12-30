@@ -40,7 +40,7 @@ import java.util.List;
  * This requires a key and is not free like the legacy provider.
  */
 public class PokeHashProvider implements HashProvider {
-	private static final String HASH_ENDPOINT = "https://pokehash.buddyauth.com/api/v122/hash";
+	private static final String HASH_ENDPOINT = "https://pokehash.buddyauth.com/api/v121_2/hash";
 
 	private static final int VERSION = 5100;
 	private static final long UNK25 = -8832040574896607694L;
