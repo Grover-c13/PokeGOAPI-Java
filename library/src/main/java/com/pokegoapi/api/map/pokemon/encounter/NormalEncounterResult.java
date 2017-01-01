@@ -24,7 +24,7 @@ import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 
-public class NormalEncounterResult extends PokemonDetails implements EncounterResult {
+public class NormalEncounterResult extends Encounter implements EncounterResult {
 	private EncounterResponse response;
 
 	public NormalEncounterResult(PokemonGo api, EncounterResponse response) {

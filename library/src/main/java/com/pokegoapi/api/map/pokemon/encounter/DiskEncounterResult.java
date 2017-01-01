@@ -26,7 +26,7 @@ import com.pokegoapi.api.pokemon.PokemonDetails;
 
 import lombok.Getter;
 
-public class DiskEncounterResult extends PokemonDetails implements EncounterResult {
+public class DiskEncounterResult extends Encounter implements EncounterResult {
 	@Getter
 	private DiskEncounterResponse response;
 

@@ -25,7 +25,7 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.PokemonDetails;
 import lombok.Getter;
 
-public class IncenseEncounterResult extends PokemonDetails implements EncounterResult {
+public class IncenseEncounterResult extends Encounter implements EncounterResult {
 	@Getter
 	private IncenseEncounterResponse response;
 
