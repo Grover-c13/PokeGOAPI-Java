@@ -160,8 +160,8 @@ public class PokeBank {
 				.build();
 		ServerRequest inventoryRequest = new ServerRequest(RequestType.GET_INVENTORY, inventoryMessage);
 		ServerRequest releaseRequest = new ServerRequest(RequestType.RELEASE_POKEMON, releaseBuilder.build());
-		api.getRequestHandler().sendServerRequests(releaseRequest, inventoryRequest);
 		Map<PokemonFamilyId, Integer> lastCandies = new HashMap<>(api.getInventories().getCandyjar().getCandies());
+		api.getRequestHandler().sendServerRequests(releaseRequest, inventoryRequest);
 		try {
 			GetInventoryResponse inventoryResponse = GetInventoryResponse.parseFrom(inventoryRequest.getData());
 			ReleasePokemonResponse releaseResponse = ReleasePokemonResponse.parseFrom(releaseRequest.getData());
@@ -194,5 +194,12 @@ public class PokeBank {
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
+	}
+
+	/**
+	 * @return the maximum amount of pokemon this pokebank can store
+	 */
+	public int getMaxStorage() {
+		return api.getPlayerProfile().getPlayerData().getMaxPokemonStorage();
 	}
 }

@@ -18,6 +18,7 @@ package com.pokegoapi.api.pokemon;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Networking.Responses.DownloadItemTemplatesResponseOuterClass.DownloadItemTemplatesResponse.ItemTemplate;
 import POGOProtos.Settings.Master.PokemonSettingsOuterClass.PokemonSettings;
+import com.pokegoapi.main.PokemonMeta;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ public class Evolutions {
 
 	/**
 	 * Initializes these evolutions from PokemonSettings
+	 *
 	 * @param templates the templates to initialize from
 	 */
 	public static void initialize(List<ItemTemplate> templates) {
@@ -37,15 +39,21 @@ public class Evolutions {
 			if (template.hasPokemonSettings()) {
 				PokemonSettings settings = template.getPokemonSettings();
 				PokemonId[] parents = {};
+				PokemonId pokemon = settings.getPokemonId();
 				if (settings.getParentPokemonId() != null) {
-					parents = new PokemonId[]{settings.getParentPokemonId()};
+					PokemonSettings parentSettings = PokemonMeta.getPokemonSettings(settings.getParentPokemonId());
+					List<PokemonId> parentEvolutions = parentSettings != null ? parentSettings.getEvolutionIdsList()
+							: null;
+					if (parentEvolutions != null && parentEvolutions.contains(pokemon)) {
+						parents = new PokemonId[]{settings.getParentPokemonId()};
+					}
 				}
-				Evolution evolution = new Evolution(parents, settings.getPokemonId());
-				EVOLUTIONS.put(settings.getPokemonId(), evolution);
+				Evolution evolution = new Evolution(parents, pokemon);
+				EVOLUTIONS.put(pokemon, evolution);
 				for (PokemonId parent : parents) {
 					Evolution parentEvolution = EVOLUTIONS.get(parent);
 					if (parentEvolution != null) {
-						parentEvolution.addEvolution(settings.getPokemonId());
+						parentEvolution.addEvolution(pokemon);
 					}
 				}
 			}
