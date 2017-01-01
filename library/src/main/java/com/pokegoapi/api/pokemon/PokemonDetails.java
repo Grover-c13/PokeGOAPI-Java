@@ -1,6 +1,7 @@
 package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
+import POGOProtos.Data.PokemonDisplayOuterClass.PokemonDisplay;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
@@ -47,6 +48,9 @@ public class PokemonDetails {
 	private int fromFort;
 	private String protoData;
 	private int numUpgrades;
+	private PokemonDisplay pokemonDisplay;
+	private int buddyCandyAwarded;
+	private float buddyTotalKmWalked;
 
 	public PokemonDetails(PokemonGo api, PokemonData proto) {
 		this.api = api;
@@ -87,6 +91,9 @@ public class PokemonDetails {
 		nickname = proto.getNickname();
 		fromFort = proto.getFromFort();
 		numUpgrades = proto.getNumUpgrades();
+		pokemonDisplay = proto.getPokemonDisplay();
+		buddyCandyAwarded = proto.getBuddyCandyAwarded();
+		buddyTotalKmWalked = proto.getBuddyTotalKmWalked();
 		protoData = proto.toString();
 	}
 
@@ -420,5 +427,26 @@ public class PokemonDetails {
 	 */
 	public int getStardustCostsForPowerup() {
 		return PokemonCpUtils.getStartdustCostsForPowerup(getCombinedCpMultiplier());
+	}
+
+	/**
+	 * @return Information about Costumes, Shiny and Gender
+	 */
+	public PokemonDisplay getPokemonDisplay() {
+		return pokemonDisplay;
+	}
+
+	/**
+	 * @return The amount of candy awarded by Buddy
+	 */
+	public int getBuddyCandyAwarded() {
+		return buddyCandyAwarded;
+	}
+
+	/**
+	 * @return The amount of km walked by Buddy
+	 */
+	public float getBuddyTotalKmWalked() {
+		return buddyTotalKmWalked;
 	}
 }
