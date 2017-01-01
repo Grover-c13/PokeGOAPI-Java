@@ -19,7 +19,7 @@ public abstract class Encounter extends PokemonDetails implements EncounterResul
 		return (ivAttack + ivDefense + ivStamina) * 100 / 45.0;
 	}
 
-	public abstract EncounterResponse.Status getStatus ();
+	abstract public EncounterResponse.Status getStatus ();
 
 	abstract public boolean wasSuccessful ();
 
