@@ -6,24 +6,31 @@ import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResp
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.PokemonDetails;
 
+
 public abstract class Encounter extends PokemonDetails implements EncounterResult {
 
-	public Encounter (PokemonGo api, PokemonData proto) {
+	public Encounter(PokemonGo api, PokemonData proto) {
 		super(api, proto);
 	}
 
-	@Override public double getPercentageIV () {
+	@Override
+	public double getPercentageIV() {
 		double ivStamina = getPokemonData().getIndividualStamina();
 		double ivAttack = getPokemonData().getIndividualAttack();
 		double ivDefense = getPokemonData().getIndividualDefense();
 		return (ivAttack + ivDefense + ivStamina) * 100 / 45.0;
 	}
 
-	abstract public EncounterResponse.Status getStatus ();
+	/**
+	 * Return the status of the encounter
+	 *
+	 * @return status of results
+	 */
+	public abstract EncounterResponse.Status getStatus();
 
-	abstract public boolean wasSuccessful ();
+	abstract public boolean wasSuccessful();
 
-	abstract public CaptureProbability getCaptureProbability ();
+	abstract public CaptureProbability getCaptureProbability();
 
-	abstract public PokemonData getPokemonData ();
+	abstract public PokemonData getPokemonData();
 }
