@@ -13,7 +13,6 @@ public abstract class Encounter extends PokemonDetails implements EncounterResul
 		super(api, proto);
 	}
 
-	@Override
 	public double getPercentageIV() {
 		double ivStamina = getPokemonData().getIndividualStamina();
 		double ivAttack = getPokemonData().getIndividualAttack();
