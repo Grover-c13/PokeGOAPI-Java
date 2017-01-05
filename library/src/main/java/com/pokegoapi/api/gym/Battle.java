@@ -42,9 +42,11 @@ import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -78,11 +80,11 @@ public class Battle {
 
 	private Queue<ServerAction> serverActionQueue
 			= new PriorityBlockingQueue<>(11, new Comparator<ServerAction>() {
-				@Override
-				public int compare(ServerAction o1, ServerAction o2) {
-					return Long.compare(o1.getStart(), o2.getStart());
-				}
-			});
+		@Override
+		public int compare(ServerAction o1, ServerAction o2) {
+			return Long.compare(o1.getStart(), o2.getStart());
+		}
+	});
 	private Set<ServerAction> activeActions = new HashSet<>();
 	private Set<ServerAction> damagingActions = new HashSet<>();
 
@@ -112,10 +114,19 @@ public class Battle {
 
 	private BattleAction lastRetrievedAction;
 
+	private Set<Long> faintedPokemon = new HashSet<>();
+
 	private boolean sentActions;
 
 	@Getter
 	private BattleResults results;
+
+	private int defenderIndex = 0;
+	private int defenderCount;
+
+	private int gymPointsDelta;
+
+	private Set<ServerAction> handledActions = new HashSet<>();
 
 	public Battle(PokemonGo api, Gym gym) {
 		this.api = api;
@@ -132,6 +143,7 @@ public class Battle {
 	 */
 	public void start(final BattleHandler handler)
 			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
+		battleId = null;
 		participantIndices.clear();
 		participants.clear();
 		activePokemon.clear();
@@ -139,6 +151,45 @@ public class Battle {
 		activeActions.clear();
 		serverTimeOffset = 0;
 		active = false;
+		team = handler.createTeam(api, this);
+		faintedPokemon.clear();
+		defenderIndex = 0;
+		defenderCount = gym.getDefendingPokemon().size();
+		gymPointsDelta = 0;
+		handledActions.clear();
+
+		Thread updateThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (active || battleId == null) {
+					if (battleId != null) {
+						updateBattle(handler);
+					}
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+						active = false;
+					}
+				}
+			}
+		});
+		updateThread.setDaemon(true);
+		updateThread.setName("Gym Battle Update Thread");
+		updateThread.start();
+
+		attackDefender(handler);
+	}
+
+	/**
+	 * Starts this battle with a single defender
+	 *
+	 * @param handler to handle this battle
+	 * @throws CaptchaActiveException if a captcha is active
+	 * @throws LoginFailedException if the login failed
+	 * @throws RemoteServerException if the server errors
+	 */
+	private void attackDefender(final BattleHandler handler)
+			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
 		lastRetrievedAction = null;
 		queuedActions.clear();
 		battleState = BattleState.STATE_UNSET;
@@ -146,63 +197,58 @@ public class Battle {
 		lastSendTime = lastServerTime;
 		sentActions = false;
 
-		team = handler.createTeam(api, this);
-		StartGymBattleMessage.Builder builder = StartGymBattleMessage.newBuilder()
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
-				.setGymId(gym.getId())
-				.setDefendingPokemonId(gym.getDefendingPokemon().get(0).getId());
+		List<Pokemon> attackers = new ArrayList<>();
+
 		for (Pokemon pokemon : team) {
-			builder.addAttackingPokemonIds(pokemon.getId());
-			if (pokemon.getStamina() < pokemon.getMaxStamina()) {
-				throw new RuntimeException("Pokemon must have full stamina to battle in a gym!");
-			} else {
-				String deployedFortId = pokemon.getDeployedFortId();
-				if (pokemon.getFromFort() && deployedFortId != null && deployedFortId.length() > 0) {
-					throw new RuntimeException("Cannot deploy Pokemon that is already in a gym!");
-				}
+			if (!faintedPokemon.contains(pokemon.getId())) {
+				attackers.add(pokemon);
 			}
 		}
-		try {
-			StartGymBattleMessage message = builder.build();
-			ServerRequest request = new ServerRequest(RequestType.START_GYM_BATTLE, message);
 
-			api.getRequestHandler().sendServerRequests(request);
-			StartGymBattleResponse response = StartGymBattleResponse.parseFrom(request.getData());
-
-			if (response.getResult() == StartGymBattleResponse.Result.SUCCESS) {
-				battleId = response.getBattleId();
-				attacker = response.getAttacker();
-				defender = response.getDefender();
-
-				activeDefender = new BattlePokemon(defender.getActivePokemon());
-				activeAttacker = new BattlePokemon(attacker.getActivePokemon());
-
-				updateLog(handler, response.getBattleLog());
-			}
-
-			sendActions(handler);
-
-			handler.onStart(api, this, response.getResult());
-
-			Thread updateThread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					while (active) {
-						updateBattle(handler);
-						try {
-							Thread.sleep(10);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
+		if (attackers.size() > 0 && defenderIndex < defenderCount) {
+			StartGymBattleMessage.Builder builder = StartGymBattleMessage.newBuilder()
+					.setPlayerLatitude(api.getLatitude())
+					.setPlayerLongitude(api.getLongitude())
+					.setGymId(gym.getId())
+					.setDefendingPokemonId(gym.getDefendingPokemon().get(defenderIndex).getId());
+			for (Pokemon pokemon : attackers) {
+				builder.addAttackingPokemonIds(pokemon.getId());
+				if (pokemon.getStamina() < pokemon.getMaxStamina()) {
+					throw new IllegalArgumentException("Pokemon must have full stamina to battle in a gym!");
+				} else {
+					String deployedFortId = pokemon.getDeployedFortId();
+					if (pokemon.getFromFort() && deployedFortId != null && deployedFortId.length() > 0) {
+						throw new IllegalArgumentException("Cannot deploy Pokemon that is already in a gym!");
 					}
 				}
-			});
-			updateThread.setDaemon(true);
-			updateThread.setName("Gym Battle Update Thread");
-			updateThread.start();
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			}
+			try {
+				StartGymBattleMessage message = builder.build();
+				ServerRequest request = new ServerRequest(RequestType.START_GYM_BATTLE, message);
+
+				api.getRequestHandler().sendServerRequests(request);
+				StartGymBattleResponse response = StartGymBattleResponse.parseFrom(request.getData());
+
+				if (response.getResult() == StartGymBattleResponse.Result.SUCCESS) {
+					battleId = response.getBattleId();
+					attacker = response.getAttacker();
+					defender = response.getDefender();
+
+					activeDefender = new BattlePokemon(defender.getActivePokemon());
+					activeAttacker = new BattlePokemon(attacker.getActivePokemon());
+
+					updateLog(handler, response.getBattleLog());
+				}
+
+				sendActions(handler);
+
+				handler.onStart(api, this, response.getResult());
+			} catch (InvalidProtocolBufferException e) {
+				battleId = "";
+				throw new RemoteServerException(e);
+			}
+		} else {
+			active = false;
 		}
 	}
 
@@ -243,13 +289,23 @@ public class Battle {
 			}
 		}
 		activeActions.removeAll(completedActions);
+		boolean nextDefender = false;
 		if (time - lastSendTime > PokemonMeta.battleSettings.getAttackServerInterval() && active) {
 			try {
-				sendActions(handler);
+				nextDefender = sendActions(handler);
 			} catch (Exception e) {
 				handler.onException(api, this, e);
 			}
 			lastSendTime = time;
+		}
+		if (nextDefender) {
+			defenderIndex++;
+			try {
+				attackDefender(handler);
+				Thread.sleep(1500);
+			} catch (Exception e) {
+				handler.onException(api, this, e);
+			}
 		}
 	}
 
@@ -258,10 +314,10 @@ public class Battle {
 	 *
 	 * @param handler to handle this battle
 	 * @param log the log to update with
+	 * @return if this battle should move on to the next defender
 	 */
-	private void updateLog(BattleHandler handler, BattleLog log) {
+	private boolean updateLog(BattleHandler handler, BattleLog log) {
 		serverTimeOffset = log.getServerMs() - api.currentTimeMillis();
-		lastServerTime = log.getServerMs();
 		battleType = log.getBattleType();
 		startTime = log.getBattleStartTimestampMs();
 		endTime = log.getBattleEndTimestampMs();
@@ -276,14 +332,17 @@ public class Battle {
 		}
 		results = null;
 		for (BattleAction action : log.getBattleActionsList()) {
-			if (results != null && results.hasGymState()) {
-				results = action.getBattleResults();
-				gym.updatePoints(results.getGymPointsDelta());
-				break;
+			BattleResults results = action.getBattleResults();
+			if (results.hasGymState()) {
+				this.results = action.getBattleResults();
 			}
 		}
-		active = results == null;
+		if (results != null) {
+			gym.updatePoints(results.getGymPointsDelta());
+			gymPointsDelta += results.getGymPointsDelta();
+		}
 		BattleState state = log.getState();
+		active = defenderIndex < defenderCount && !(state == BattleState.TIMED_OUT || state == BattleState.STATE_UNSET);
 		if (state != battleState) {
 			switch (state) {
 				case TIMED_OUT:
@@ -295,10 +354,9 @@ public class Battle {
 					handler.onDefeated(api, this);
 					break;
 				case VICTORY:
-					if (results != null) {
-						int deltaPoints = results.getGymPointsDelta();
+					if (!active) {
 						gym.updateState(results.getGymState());
-						handler.onVictory(api, this, deltaPoints, gym.getPoints() + deltaPoints);
+						handler.onVictory(api, this, gymPointsDelta, gym.getPoints());
 					}
 					break;
 				default:
@@ -314,8 +372,14 @@ public class Battle {
 			battleState = state;
 		}
 		for (BattleAction action : log.getBattleActionsList()) {
-			serverActionQueue.add(new ServerAction(action));
+			ServerAction serverAction = new ServerAction(action);
+			if (!handledActions.contains(serverAction)) {
+				serverActionQueue.add(serverAction);
+				handledActions.add(serverAction);
+			}
 		}
+		lastServerTime = log.getServerMs();
+		return battleState != BattleState.ACTIVE && battleState != BattleState.STATE_UNSET && battleState != BattleState.TIMED_OUT;
 	}
 
 	/**
@@ -386,8 +450,8 @@ public class Battle {
 	 * @param action the attack action
 	 */
 	private void handleAttack(BattleHandler handler, ServerAction action) {
-		BattlePokemon attacked = getActivePokemon(action.getTargetIndex());
-		BattlePokemon attacker = getActivePokemon(action.getAttackerIndex());
+		BattlePokemon attacked = getActivePokemon(action.getTargetIndex(), true);
+		BattlePokemon attacker = getActivePokemon(action.getAttackerIndex(), false);
 		if (action.getAttackerIndex() == 0) {
 			attacker = activeAttacker;
 		}
@@ -406,8 +470,8 @@ public class Battle {
 	 * @param action the attack action
 	 */
 	private void handleSpecialAttack(BattleHandler handler, ServerAction action) {
-		BattlePokemon attacked = getActivePokemon(action.getTargetIndex());
-		BattlePokemon attacker = getActivePokemon(action.getAttackerIndex());
+		BattlePokemon attacked = getActivePokemon(action.getTargetIndex(), false);
+		BattlePokemon attacker = getActivePokemon(action.getAttackerIndex(), true);
 		if (action.getAttackerIndex() == 0) {
 			attacker = activeAttacker;
 		}
@@ -426,13 +490,15 @@ public class Battle {
 	 * @param action the faint action
 	 */
 	private void handleFaint(BattleHandler handler, ServerAction action) {
-		BattlePokemon pokemon = getActivePokemon(action.getAttackerIndex());
+		BattlePokemon pokemon = getActivePokemon(action.getAttackerIndex(), true);
 		if (action.getAttackerIndex() == 0) {
 			pokemon = activeAttacker;
 		}
 
 		int duration = action.getDuration();
 		handler.onFaint(api, this, pokemon, duration, action);
+
+		faintedPokemon.add(pokemon.getPokemon().getId());
 	}
 
 	/**
@@ -442,7 +508,7 @@ public class Battle {
 	 * @param action the dodge action
 	 */
 	private void handleDodge(BattleHandler handler, ServerAction action) {
-		BattlePokemon pokemon = getActivePokemon(action.getAttackerIndex());
+		BattlePokemon pokemon = getActivePokemon(action.getAttackerIndex(), true);
 		if (action.getAttackerIndex() == 0) {
 			pokemon = activeAttacker;
 		}
@@ -475,11 +541,12 @@ public class Battle {
 	 * Sends all currently queued actions to the server
 	 *
 	 * @param handler to handle this battle
+	 * @return if this battle should switch to the next defender
 	 * @throws CaptchaActiveException if a captcha is active
 	 * @throws LoginFailedException if login fails
 	 * @throws RemoteServerException if the server errors
 	 */
-	private void sendActions(BattleHandler handler)
+	private boolean sendActions(BattleHandler handler)
 			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
 		AttackGymMessage.Builder builder = AttackGymMessage.newBuilder()
 				.setGymId(gym.getId())
@@ -518,13 +585,15 @@ public class Battle {
 		AttackGymMessage message = builder.build();
 		ServerRequest request = new ServerRequest(RequestType.ATTACK_GYM, message);
 		api.getRequestHandler().sendServerRequests(request);
+		boolean nextDefender;
 		try {
 			AttackGymResponse response = AttackGymResponse.parseFrom(request.getData());
-			handleAttackResponse(handler, response);
+			nextDefender = handleAttackResponse(handler, response);
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
 		sentActions = true;
+		return nextDefender;
 	}
 
 	/**
@@ -532,8 +601,9 @@ public class Battle {
 	 *
 	 * @param handler to handle this battle
 	 * @param response the response to handle
+	 * @return if this battle should move on to the next defender
 	 */
-	private void handleAttackResponse(BattleHandler handler, AttackGymResponse response) {
+	private boolean handleAttackResponse(BattleHandler handler, AttackGymResponse response) {
 		if (response.getResult() == AttackGymResponse.Result.SUCCESS) {
 			final BattlePokemon lastDefender = activeDefender;
 			final BattlePokemon lastAttacker = activeAttacker;
@@ -559,10 +629,11 @@ public class Battle {
 			handler.onDefenderHealthUpdate(api, this, lastDefenderHealth, defenderHealth, defenderMaxHealth);
 
 			BattleLog log = response.getBattleLog();
-			updateLog(handler, log);
+			return updateLog(handler, log);
 		} else if (response.getResult() == AttackGymResponse.Result.ERROR_INVALID_ATTACK_ACTIONS) {
 			handler.onInvalidActions(api, this);
 		}
+		return false;
 	}
 
 	/**
@@ -593,12 +664,17 @@ public class Battle {
 	 * Gets the currently active pokemon for the given participant index
 	 *
 	 * @param index the participant index
+	 * @param attacker if the index is that of the attacker
 	 * @return the active pokemon
 	 */
-	public BattlePokemon getActivePokemon(int index) {
-		BattleParticipant participant = getParticipant(index);
-		if (participant != null) {
-			return activePokemon.get(participant);
+	public BattlePokemon getActivePokemon(int index, boolean attacker) {
+		if (attacker || index != -1) {
+			BattleParticipant participant = getParticipant(index);
+			if (participant != null) {
+				return activePokemon.get(participant);
+			}
+		} else {
+			return activeDefender;
 		}
 		return null;
 	}
@@ -737,6 +813,16 @@ public class Battle {
 		@Override
 		public int hashCode() {
 			return (int) start;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof ServerAction) {
+				ServerAction action = (ServerAction) obj;
+				return action.getType() == type && action.getStart() == start && action.getDuration() == duration &&
+						action.getAttackerIndex() == attackerIndex && action.getTargetIndex() == targetIndex;
+			}
+			return false;
 		}
 	}
 
@@ -928,7 +1014,7 @@ public class Battle {
 		 * @param action the attack action
 		 */
 		void onAttackedSpecial(PokemonGo api, Battle battle, BattlePokemon attacked, BattlePokemon attacker,
-								int duration, long damageWindowStart, long damageWindowEnd, ServerAction action);
+							   int duration, long damageWindowStart, long damageWindowEnd, ServerAction action);
 
 		/**
 		 * Called when an exception occurs during this battle
