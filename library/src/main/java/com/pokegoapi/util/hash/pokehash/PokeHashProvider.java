@@ -26,6 +26,7 @@ import com.squareup.moshi.Moshi.Builder;
 import lombok.Getter;
 import net.iharder.Base64;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -39,7 +40,7 @@ import java.util.List;
  * This requires a key and is not free like the legacy provider.
  */
 public class PokeHashProvider implements HashProvider {
-	private static final String HASH_ENDPOINT = "http://pokehash.buddyauth.com/api/v122/hash";
+	private static final String HASH_ENDPOINT = "https://pokehash.buddyauth.com/api/v121_2/hash";
 
 	private static final int VERSION = 5100;
 	private static final long UNK25 = -8832040574896607694L;
@@ -64,7 +65,7 @@ public class PokeHashProvider implements HashProvider {
 						byte[] sessionData, byte[][] requests) throws HashException {
 		Request request = new Request(latitude, longitude, altitude, timestamp, authTicket, sessionData, requests);
 		try {
-			HttpURLConnection connection = (HttpURLConnection) new URL(HASH_ENDPOINT).openConnection();
+			HttpsURLConnection connection = (HttpsURLConnection) new URL(HASH_ENDPOINT).openConnection();
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("X-AuthToken", key);
 			connection.setRequestProperty("content-type", "application/json");

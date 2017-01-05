@@ -99,8 +99,8 @@ public class PlayerProfile {
 
 	/**
 	 * @param api the api
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
+	 * @throws LoginFailedException   when the auth is invalid
+	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public PlayerProfile(PokemonGo api) throws LoginFailedException, CaptchaActiveException, RemoteServerException {
@@ -111,8 +111,8 @@ public class PlayerProfile {
 	/**
 	 * Updates the player profile with the latest data.
 	 *
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
+	 * @throws LoginFailedException   when the auth is invalid
+	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public void updateProfile() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
@@ -174,9 +174,9 @@ public class PlayerProfile {
 	/**
 	 * Performs a GET_PLAYER_PROFILE request.
 	 *
-	 * @throws RemoteServerException if the server has an issue or an invalid request is sent
+	 * @throws RemoteServerException  if the server has an issue or an invalid request is sent
 	 * @throws CaptchaActiveException if a captcha is active, and the message cannot be sent
-	 * @throws LoginFailedException if login fails
+	 * @throws LoginFailedException   if login fails
 	 */
 	public void getProfile() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
 		GetPlayerProfileMessage profileMessage = GetPlayerProfileMessage.newBuilder()
@@ -208,9 +208,9 @@ public class PlayerProfile {
 	 *
 	 * @param level the trainer level that you want to accept the rewards for
 	 * @return a PlayerLevelUpRewards object containing information about the items rewarded and unlocked for this level
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws LoginFailedException       when the auth is invalid
+	 * @throws RemoteServerException      when the server is down/having issues
+	 * @throws CaptchaActiveException     if a captcha is active and the message can't be sent
 	 * @throws InsufficientLevelException if you have not yet reached the desired level
 	 * @see PlayerLevelUpRewards
 	 */
@@ -241,7 +241,7 @@ public class PlayerProfile {
 	/**
 	 * Add currency.
 	 *
-	 * @param name the name
+	 * @param name   the name
 	 * @param amount the amount
 	 * @throws InvalidCurrencyException the invalid currency exception
 	 */
@@ -258,8 +258,8 @@ public class PlayerProfile {
 	/**
 	 * Check and equip badges.
 	 *
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException When a buffer exception is thrown
+	 * @throws LoginFailedException   when the auth is invalid
+	 * @throws RemoteServerException  When a buffer exception is thrown
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 * @deprecated use getMedals, which uses common requests to check for badges
 	 */
@@ -297,8 +297,8 @@ public class PlayerProfile {
 	 *
 	 * @param response the response to get badges from
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws LoginFailedException if login fails
-	 * @throws RemoteServerException if the server has an issue
+	 * @throws LoginFailedException   if login fails
+	 * @throws RemoteServerException  if the server has an issue
 	 */
 	public void updateAwardedMedals(CheckAwardedBadgesResponse response)
 			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
@@ -432,8 +432,8 @@ public class PlayerProfile {
 	 *
 	 * @param pokemon the pokemon to set as your buddy
 	 * @return if this task was successfull
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
+	 * @throws LoginFailedException   when the auth is invalid
+	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public boolean setBuddy(Pokemon pokemon) throws CaptchaActiveException, LoginFailedException, RemoteServerException {
@@ -454,8 +454,8 @@ public class PlayerProfile {
 	/**
 	 * Set the account to legal screen in order to receive valid response
 	 *
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
+	 * @throws LoginFailedException   when the auth is invalid
+	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public void activateAccount() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
@@ -465,8 +465,8 @@ public class PlayerProfile {
 	/**
 	 * Setup an avatar for the current account
 	 *
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
+	 * @throws LoginFailedException   when the auth is invalid
+	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public void setupAvatar() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
@@ -517,8 +517,8 @@ public class PlayerProfile {
 	/**
 	 * Encounter tutorial complete. In other words, catch the first Pokémon
 	 *
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
+	 * @throws LoginFailedException   when the auth is invalid
+	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public void encounterTutorialComplete() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
@@ -558,23 +558,23 @@ public class PlayerProfile {
 	/**
 	 * Setup an user name for our account
 	 *
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
+	 * @throws LoginFailedException   when the auth is invalid
+	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void claimCodeName() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
-		claimCodeName(null);
+	public String claimCodeName() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+		return claimCodeName(null);
 	}
 
 	/**
 	 * Setup an user name for our account
 	 *
 	 * @param lastFailure the last name used that was already taken; null for first try.
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
+	 * @throws LoginFailedException   when the auth is invalid
+	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void claimCodeName(String lastFailure)
+	public String claimCodeName(String lastFailure)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		if (getPlayerData().getRemainingCodenameClaims() <= 0) {
 			throw new RuntimeException("You have no remaining codename claims!");
@@ -602,41 +602,38 @@ public class PlayerProfile {
 		String updatedCodename = null;
 		try {
 			ClaimCodenameResponse claimCodenameResponse = ClaimCodenameResponse.parseFrom(request.getData());
-			if (claimCodenameResponse.getStatus() == ClaimCodenameResponse.Status.SUCCESS) {
-				updatedCodename = claimCodenameResponse.getCodename();
-			} else {
-				claimCodeName(name);
+			if (claimCodenameResponse.getStatus() != ClaimCodenameResponse.Status.SUCCESS) {
+				return claimCodeName(name);
 			}
+			updatedCodename = claimCodenameResponse.getCodename();
+
 			if (claimCodenameResponse.hasUpdatedPlayer()) {
 				updateProfile(claimCodenameResponse.getUpdatedPlayer());
+			}
+
+			if (updatedCodename != null) {
+				markTutorial(TutorialStateOuterClass.TutorialState.NAME_SELECTION);
+
+				final GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
+						.setPlayerLocale(playerLocale.getPlayerLocale())
+						.build();
+				request = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
+
+				api.getRequestHandler().sendServerRequests(request.withCommons());
+
+				updateProfile(GetPlayerResponse.parseFrom(request.getData()));
 			}
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
-
-		if (updatedCodename != null) {
-			markTutorial(TutorialStateOuterClass.TutorialState.NAME_SELECTION);
-
-			final GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
-					.setPlayerLocale(playerLocale.getPlayerLocale())
-					.build();
-			request = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
-
-			api.getRequestHandler().sendServerRequests(request.withCommons());
-
-			try {
-				updateProfile(GetPlayerResponse.parseFrom(request.getData()));
-			} catch (InvalidProtocolBufferException e) {
-				throw new RemoteServerException(e);
-			}
-		}
+		return updatedCodename;
 	}
 
 	/**
 	 * The last step, mark the last tutorial state as completed
 	 *
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
+	 * @throws LoginFailedException   when the auth is invalid
+	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public void firstTimeExperienceComplete()

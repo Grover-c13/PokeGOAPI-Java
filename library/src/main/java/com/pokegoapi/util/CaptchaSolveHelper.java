@@ -27,10 +27,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.regex.Pattern;
 
 public class CaptchaSolveHelper {
-	public static final String USER_AGENT =
-			"Mozilla/5.0 (Windows NT 10.0; WOW64) "
-					+ "AppleWebKit/537.36 (KHTML, like Gecko) "
-					+ "Chrome/54.0.2840.99 Safari/537.36";
+	public static final String USER_AGENT = "Niantic App";
 
 	private static final List<Listener> LISTENERS = new ArrayList<>();
 	private static final Queue<Listener> QUEUED_ADDITION = new LinkedBlockingDeque<>();

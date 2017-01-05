@@ -317,4 +317,11 @@ public class ItemBag {
 			item.setCount(item.getCount() + itemAward.getItemCount());
 		}
 	}
+
+	/**
+	 * @return the maximum amount of items this item bag can store
+	 */
+	public int getMaxStorage() {
+		return api.getPlayerProfile().getPlayerData().getMaxItemStorage();
+	}
 }

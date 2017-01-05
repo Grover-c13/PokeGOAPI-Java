@@ -286,4 +286,14 @@ public class Gym implements MapPoint {
 		proto = state.getFortData();
 		clearDetails();
 	}
+
+	@Override
+	public int hashCode() {
+		return getId().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Gym && ((Gym) obj).getId().equals(getId());
+	}
 }

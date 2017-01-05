@@ -40,6 +40,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Item;
+import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.listener.PokemonListener;
 import com.pokegoapi.api.map.pokemon.encounter.DiskEncounterResult;
@@ -530,10 +531,13 @@ public class CatchablePokemon implements MapPoint {
 									int amount, int razberriesLimit)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 
-		Item razzberriesInventory = api.getInventories().getItemBag().getItem(ItemId.ITEM_RAZZ_BERRY);
+		ItemBag itemBag = api.getInventories().getItemBag();
+		Item razzberriesInventory = itemBag.getItem(ItemId.ITEM_RAZZ_BERRY);
 		int razzberriesCountInventory = razzberriesInventory.getCount();
 		int razberries = 0;
 		int numThrows = 0;
+		Item pokeballItem = itemBag.getItem(type.getBallType());
+		int pokeballCount = pokeballItem.getCount();
 		CatchResult result;
 
 		if (razzberriesCountInventory < razberriesLimit) {
@@ -554,6 +558,13 @@ public class CatchablePokemon implements MapPoint {
 			if (result == null) {
 				Log.wtf(TAG, "Got a null result after catch attempt");
 				break;
+			}
+
+			if (result.getStatus() != CatchStatus.CATCH_ERROR) {
+				pokeballItem.setCount(--pokeballCount);
+				if (pokeballCount <= 0) {
+					break;
+				}
 			}
 
 			// continue for the following cases:
@@ -589,6 +600,7 @@ public class CatchablePokemon implements MapPoint {
 			}
 
 			numThrows++;
+
 		}
 		while (amount < 0 || numThrows < amount);
 
