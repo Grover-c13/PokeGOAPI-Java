@@ -151,7 +151,7 @@ public class PokeBank {
 			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
 		ReleasePokemonMessage.Builder releaseBuilder = ReleasePokemonMessage.newBuilder();
 		for (Pokemon pokemon : releasePokemon) {
-			if (!pokemon.isDeployed()) {
+			if (!pokemon.isDeployed() && !pokemon.isFavorite()) {
 				releaseBuilder.addPokemonIds(pokemon.getId());
 			}
 		}
