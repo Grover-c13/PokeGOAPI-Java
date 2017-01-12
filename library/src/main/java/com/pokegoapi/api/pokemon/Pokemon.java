@@ -82,6 +82,8 @@ public class Pokemon extends PokemonDetails {
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public Result transferPokemon() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+		if (this.isFavorite())
+			return Result.FAILED;
 		ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.RELEASE_POKEMON, reqMsg);
