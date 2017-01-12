@@ -15,16 +15,13 @@
 
 package com.pokegoapi.api.map.pokemon.encounter;
 
-
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.pokemon.PokemonDetails;
-
 import POGOProtos.Data.Capture.CaptureProbabilityOuterClass.CaptureProbability;
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
+import com.pokegoapi.api.PokemonGo;
 
-public class NormalEncounterResult extends PokemonDetails implements EncounterResult {
+public class NormalEncounterResult extends Encounter implements EncounterResult {
 	private EncounterResponse response;
 
 	public NormalEncounterResult(PokemonGo api, EncounterResponse response) {
@@ -32,37 +29,36 @@ public class NormalEncounterResult extends PokemonDetails implements EncounterRe
 		this.response = response;
 	}
 
-	/**
-	 * Return the status of the encounter
-	 *
-	 * @return status of results
-	 */
-	public EncounterResponse.Status getStatus() {
-		return response == null ? null : response.getStatus();
-	}
-
-	public boolean wasSuccessful() {
-		return response != null
-				&& getStatus() != null && getStatus().equals(EncounterResponse.Status.ENCOUNTER_SUCCESS);
-	}
-
 	public EncounterResponse.Background getBackground() {
 		return response.getBackground();
-	}
-
-	public CaptureProbability getCaptureProbability() {
-		return response.getCaptureProbability();
 	}
 
 	public WildPokemon getWildPokemon() {
 		return response.getWildPokemon();
 	}
 
-	public PokemonData getPokemonData() {
-		return response.getWildPokemon().getPokemonData();
-	}
-
 	public EncounterResponse toPrimitive() {
 		return response;
+	}
+
+	@Override
+	public EncounterResponse.Status getStatus() {
+		return response == null ? null : response.getStatus();
+	}
+
+	@Override
+	public boolean wasSuccessful() {
+		return response != null
+				&& getStatus() != null && getStatus().equals(EncounterResponse.Status.ENCOUNTER_SUCCESS);
+	}
+
+	@Override
+	public CaptureProbability getCaptureProbability() {
+		return response.getCaptureProbability();
+	}
+
+	@Override
+	public PokemonData getPokemonData() {
+		return response.getWildPokemon().getPokemonData();
 	}
 }

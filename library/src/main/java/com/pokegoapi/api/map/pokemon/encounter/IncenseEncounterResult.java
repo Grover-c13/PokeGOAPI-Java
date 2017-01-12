@@ -15,17 +15,15 @@
 
 package com.pokegoapi.api.map.pokemon.encounter;
 
-
 import POGOProtos.Data.Capture.CaptureProbabilityOuterClass;
 import POGOProtos.Data.PokemonDataOuterClass;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 import POGOProtos.Networking.Responses.IncenseEncounterResponseOuterClass.IncenseEncounterResponse;
 import POGOProtos.Networking.Responses.IncenseEncounterResponseOuterClass.IncenseEncounterResponse.Result;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.pokemon.PokemonDetails;
 import lombok.Getter;
 
-public class IncenseEncounterResult extends PokemonDetails implements EncounterResult {
+public class IncenseEncounterResult extends Encounter implements EncounterResult {
 	@Getter
 	private IncenseEncounterResponse response;
 
@@ -36,10 +34,8 @@ public class IncenseEncounterResult extends PokemonDetails implements EncounterR
 
 	@Override
 	public boolean wasSuccessful() {
-		return response != null
-				&& response.getResult() == Result.INCENSE_ENCOUNTER_SUCCESS;
+		return response != null && response.getResult() == Result.INCENSE_ENCOUNTER_SUCCESS;
 	}
-
 
 	/**
 	 * Return the status of the encounter
