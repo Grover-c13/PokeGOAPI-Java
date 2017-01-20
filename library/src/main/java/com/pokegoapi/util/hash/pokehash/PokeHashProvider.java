@@ -42,7 +42,7 @@ import java.util.List;
 public class PokeHashProvider implements HashProvider {
 	private static final String HASH_ENDPOINT = "https://pokehash.buddyauth.com/api/v123_1/hash";
 
-	private static final int VERSION = 5300;
+	private static final int VERSION = 5301;
 	private static final long UNK25 = -76506539888958491L;
 
 	private static final Moshi MOSHI = new Builder().build();

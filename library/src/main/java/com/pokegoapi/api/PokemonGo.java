@@ -277,6 +277,10 @@ public class PokemonGo {
 			playerProfile.setupAvatar();
 		}
 
+		if (!heartbeat.active()) {
+			heartbeat.start();
+		}
+
 		if (!tutorialStates.contains(TutorialState.POKEMON_CAPTURE)) {
 			playerProfile.encounterTutorialComplete();
 		}
@@ -377,9 +381,6 @@ public class PokemonGo {
 		setLongitude(longitude);
 		setAltitude(altitude);
 		setAccuracy(accuracy);
-		if (!heartbeat.active() && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
-			heartbeat.start();
-		}
 	}
 
 	public long currentTimeMillis() {

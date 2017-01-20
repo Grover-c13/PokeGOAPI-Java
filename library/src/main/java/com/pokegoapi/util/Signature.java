@@ -19,6 +19,8 @@ import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Platform.PlatformRequestTypeOuterClass.PlatformRequestType;
 import POGOProtos.Networking.Platform.Requests.SendEncryptedSignatureRequestOuterClass.SendEncryptedSignatureRequest;
+import POGOProtos.Networking.Requests.RequestOuterClass.Request;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.device.LocationFixes;
@@ -111,10 +113,19 @@ public class Signature {
 				.setEncryptedSignature(ByteString.copyFrom(encrypted)).build()
 				.toByteString();
 
-		RequestEnvelope.PlatformRequest platformRequest = RequestEnvelope.PlatformRequest.newBuilder()
+		RequestEnvelope.PlatformRequest signatureRequest = RequestEnvelope.PlatformRequest.newBuilder()
 				.setType(PlatformRequestType.SEND_ENCRYPTED_SIGNATURE)
 				.setRequestMessage(signatureBytes)
 				.build();
-		builder.addPlatformRequests(platformRequest);
+		builder.addPlatformRequests(signatureRequest);
+
+		for (Request request : builder.getRequestsList()) {
+			RequestType requestType = request.getRequestType();
+			if (requestType == RequestType.GET_MAP_OBJECTS || requestType == RequestType.GET_PLAYER) {
+				builder.addPlatformRequests(RequestEnvelope.PlatformRequest.newBuilder().setTypeValue(8)
+						.setRequestMessage(ByteString.EMPTY).build());
+				break;
+			}
+		}
 	}
 }

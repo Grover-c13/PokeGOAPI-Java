@@ -80,11 +80,12 @@ public class Battle {
 
 	private Queue<ServerAction> serverActionQueue
 			= new PriorityBlockingQueue<>(11, new Comparator<ServerAction>() {
-		@Override
-		public int compare(ServerAction o1, ServerAction o2) {
-			return Long.compare(o1.getStart(), o2.getStart());
-		}
-	});
+				@Override
+				public int compare(ServerAction o1, ServerAction o2) {
+					return Long.compare(o1.getStart(), o2.getStart());
+				}
+			});
+
 	private Set<ServerAction> activeActions = new HashSet<>();
 	private Set<ServerAction> damagingActions = new HashSet<>();
 
@@ -379,7 +380,8 @@ public class Battle {
 			}
 		}
 		lastServerTime = log.getServerMs();
-		return battleState != BattleState.ACTIVE && battleState != BattleState.STATE_UNSET && battleState != BattleState.TIMED_OUT;
+		return battleState != BattleState.ACTIVE && battleState != BattleState.STATE_UNSET
+				&& battleState != BattleState.TIMED_OUT;
 	}
 
 	/**
@@ -819,8 +821,8 @@ public class Battle {
 		public boolean equals(Object obj) {
 			if (obj instanceof ServerAction) {
 				ServerAction action = (ServerAction) obj;
-				return action.getType() == type && action.getStart() == start && action.getDuration() == duration &&
-						action.getAttackerIndex() == attackerIndex && action.getTargetIndex() == targetIndex;
+				return action.getType() == type && action.getStart() == start && action.getDuration() == duration
+						&& action.getAttackerIndex() == attackerIndex && action.getTargetIndex() == targetIndex;
 			}
 			return false;
 		}
@@ -1014,7 +1016,7 @@ public class Battle {
 		 * @param action the attack action
 		 */
 		void onAttackedSpecial(PokemonGo api, Battle battle, BattlePokemon attacked, BattlePokemon attacker,
-							   int duration, long damageWindowStart, long damageWindowEnd, ServerAction action);
+								int duration, long damageWindowStart, long damageWindowEnd, ServerAction action);
 
 		/**
 		 * Called when an exception occurs during this battle

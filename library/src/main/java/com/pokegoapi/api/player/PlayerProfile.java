@@ -472,7 +472,7 @@ public class PlayerProfile {
 	public void setupAvatar() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		SecureRandom random = new SecureRandom();
 
-		Gender gender = random.nextInt(100) % 2 == 0 ? Gender.FEMALE : Gender.MALE;
+		PlayerGender gender = random.nextInt(100) % 2 == 0 ? PlayerGender.FEMALE : PlayerGender.MALE;
 		PlayerAvatar avatar = new PlayerAvatar(gender,
 				random.nextInt(PlayerAvatar.getAvailableSkins()),
 				random.nextInt(PlayerAvatar.getAvailableHair()),

@@ -93,7 +93,8 @@ public class Inventories {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public GetInventoryResponse updateInventories() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	public GetInventoryResponse updateInventories()
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		return updateInventories(false);
 	}
 
