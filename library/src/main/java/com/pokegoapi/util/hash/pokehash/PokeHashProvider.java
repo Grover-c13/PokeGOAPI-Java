@@ -26,7 +26,6 @@ import com.squareup.moshi.Moshi.Builder;
 import lombok.Getter;
 import net.iharder.Base64;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -40,7 +39,9 @@ import java.util.List;
  * This requires a key and is not free like the legacy provider.
  */
 public class PokeHashProvider implements HashProvider {
-	private static final String HASH_ENDPOINT = "https://pokehash.buddyauth.com/api/v123_1/hash";
+	private static final String DEFAULT_ENDPOINT = "https://pokehash.buddyauth.com/api/v123_1/hash";
+
+	private String endpoint = DEFAULT_ENDPOINT;
 
 	private static final int VERSION = 5301;
 	private static final long UNK25 = -76506539888958491L;
@@ -60,15 +61,24 @@ public class PokeHashProvider implements HashProvider {
 		}
 	}
 
+	/**
+	 * Sets the endpoint for this hash provider
+	 * @param endpoint the endpoint to use
+	 */
+	public void setEndpoint(String endpoint) {
+		this.endpoint = endpoint;
+	}
+
 	@Override
 	public Hash provide(long timestamp, double latitude, double longitude, double altitude, byte[] authTicket,
 						byte[] sessionData, byte[][] requests) throws HashException {
 		Request request = new Request(latitude, longitude, altitude, timestamp, authTicket, sessionData, requests);
 		try {
-			HttpsURLConnection connection = (HttpsURLConnection) new URL(HASH_ENDPOINT).openConnection();
+			HttpURLConnection connection = (HttpURLConnection) new URL(endpoint).openConnection();
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("X-AuthToken", key);
 			connection.setRequestProperty("content-type", "application/json");
+			connection.setRequestProperty("User-Agent", "PokeGOAPI-Java");
 			connection.setDoOutput(true);
 
 			String requestJSON = MOSHI.adapter(Request.class).toJson(request);
