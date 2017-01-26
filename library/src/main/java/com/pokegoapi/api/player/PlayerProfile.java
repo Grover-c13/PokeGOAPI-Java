@@ -30,7 +30,7 @@ import POGOProtos.Networking.Requests.Messages.GetPlayerProfileMessageOuterClass
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
 import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass.MarkTutorialCompleteMessage;
 import POGOProtos.Networking.Requests.Messages.SetAvatarMessageOuterClass.SetAvatarMessage;
-import POGOProtos.Networking.Requests.Messages.SetBuddyPokemon;
+import POGOProtos.Networking.Requests.Messages.SetBuddyPokemonMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
 import POGOProtos.Networking.Responses.ClaimCodenameResponseOuterClass.ClaimCodenameResponse;
@@ -437,7 +437,7 @@ public class PlayerProfile {
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public boolean setBuddy(Pokemon pokemon) throws CaptchaActiveException, LoginFailedException, RemoteServerException {
-		SetBuddyPokemon.SetBuddyPokemonMessage message = SetBuddyPokemon.SetBuddyPokemonMessage.newBuilder()
+		SetBuddyPokemonMessageOuterClass.SetBuddyPokemonMessage message = SetBuddyPokemonMessageOuterClass.SetBuddyPokemonMessage.newBuilder()
 				.setPokemonId(pokemon.getId())
 				.build();
 		ServerRequest request = new ServerRequest(RequestType.SET_BUDDY_POKEMON, message);
