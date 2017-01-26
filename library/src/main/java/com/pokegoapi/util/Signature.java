@@ -122,7 +122,8 @@ public class Signature {
 		for (Request request : builder.getRequestsList()) {
 			RequestType requestType = request.getRequestType();
 			if (requestType == RequestType.GET_MAP_OBJECTS || requestType == RequestType.GET_PLAYER) {
-				builder.addPlatformRequests(RequestEnvelope.PlatformRequest.newBuilder().setTypeValue(8)
+				builder.addPlatformRequests(RequestEnvelope.PlatformRequest.newBuilder()
+						.setType(PlatformRequestType.UNKNOWN_PTR_8)
 						.setRequestMessage(ByteString.EMPTY).build());
 				break;
 			}
