@@ -37,7 +37,7 @@ public class AsyncHelper {
 	 * @throws LoginFailedException If an AsyncLoginFailedException was thrown
 	 * @throws RemoteServerException If an AsyncRemoteServerException was thrown
 	 * @throws CaptchaActiveException if an AsyncCaptchaActiveException was thrown
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public static <T> T toBlocking(Observable<T> observable)
 			throws LoginFailedException, RemoteServerException, CaptchaActiveException, HashException {
@@ -56,7 +56,7 @@ public class AsyncHelper {
 	 * @throws LoginFailedException if a login exception is thrown
 	 * @throws RemoteServerException if a remove server exception is thrown
 	 * @throws CaptchaActiveException if a captcha exception is thrown
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	private static void handleBlockingException(Throwable throwable)
 			throws LoginFailedException, RemoteServerException, CaptchaActiveException, HashException {

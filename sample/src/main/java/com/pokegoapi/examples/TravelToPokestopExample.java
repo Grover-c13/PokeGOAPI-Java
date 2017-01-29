@@ -109,7 +109,7 @@ public class TravelToPokestopExample {
 		} catch (LoginFailedException | RemoteServerException | CaptchaActiveException e) {
 			Log.e("Main", "Failed to login, captcha or server issue: ", e);
 		} catch (HashException e) {
-			Log.e("Main ", "Failed to login to the Hash Service. Invalid credentials, captcha or server issue: ", e);
+			Log.e("Main ", "Failed to login to the Hash Service: ", e);
 		}
 	}
 }

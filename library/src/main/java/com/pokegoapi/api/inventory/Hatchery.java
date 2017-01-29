@@ -132,7 +132,7 @@ public class Hatchery {
 	 * @throws RemoteServerException e
 	 * @throws LoginFailedException e
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 * @deprecated Use getHatchedEggs()
 	 */
 	@Deprecated

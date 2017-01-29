@@ -176,7 +176,7 @@ public class Pokestop {
 	 * @throws LoginFailedException if login failed
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public PokestopLootResult loot() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		return AsyncHelper.toBlocking(lootAsync());
@@ -217,7 +217,7 @@ public class Pokestop {
 	 * @throws LoginFailedException if login failed
 	 * @throws RemoteServerException if the server failed to respond or the modifier could not be added to this pokestop
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public void addModifier(ItemIdOuterClass.ItemId item)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
@@ -259,7 +259,7 @@ public class Pokestop {
 	 * @throws LoginFailedException if login failed
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public FortDetails getDetails() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		return AsyncHelper.toBlocking(getDetailsAsync());
@@ -298,7 +298,7 @@ public class Pokestop {
 	 * @throws LoginFailedException If login failed.
 	 * @throws RemoteServerException If server communications failed.
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public boolean hasLure(boolean updateFortDetails)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {

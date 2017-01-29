@@ -187,7 +187,7 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public EncounterResult encounterPokemon()
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
@@ -257,7 +257,7 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public EncounterResult encounterNormalPokemon() throws LoginFailedException, CaptchaActiveException,
 			RemoteServerException, HashException {
@@ -345,7 +345,7 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 * @throws NoSuchItemException the no such item exception
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public CatchResult catchPokemon(CatchOptions options) throws LoginFailedException, CaptchaActiveException,
 			RemoteServerException, NoSuchItemException, HashException {
@@ -373,7 +373,7 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws NoSuchItemException the no such item exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 * @throws EncounterFailedException the encounter failed exception
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public CatchResult catchPokemon(EncounterResult encounter, CatchOptions options)
 			throws LoginFailedException, EncounterFailedException, RemoteServerException,
@@ -403,7 +403,7 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws NoSuchItemException the no such item exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public CatchResult catchPokemon() throws LoginFailedException, CaptchaActiveException,
 			RemoteServerException, NoSuchItemException, HashException {
@@ -423,7 +423,7 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws LoginFailedException if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public CatchResult catchPokemon(double normalizedHitPosition,
 									double normalizedReticleSize, double spinModifier, Pokeball type,
@@ -532,7 +532,7 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws LoginFailedException if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public CatchResult catchPokemon(double normalizedHitPosition,
 									double normalizedReticleSize, double spinModifier, Pokeball type,
@@ -717,7 +717,7 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws LoginFailedException if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public CatchItemResult useItem(ItemId item)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {

@@ -139,7 +139,7 @@ public class CatchPokemonAtAreaExample {
 			// failed to login, invalid credentials, auth issue or server issue.
 			Log.e("Main", "Failed to login, captcha or server issue: ", e);
 		} catch (HashException e) {
-			Log.e("Main ", "Failed to login to the Hash Service. Invalid credentials, captcha or server issue: ", e);
+			Log.e("Main ", "Failed to login to the Hash Service: ", e);
 		}
 	}
 
@@ -210,7 +210,7 @@ public class CatchPokemonAtAreaExample {
 		} catch (InterruptedException e) {
 			return;
 		} catch (HashException e) {
-			Log.e("Main ", "Failed to login to the Hash Service. Invalid credentials, captcha or server issue: ", e);
+			Log.e("Main ", "Failed to login to the Hash Service: ", e);
 		}
 	}
 }

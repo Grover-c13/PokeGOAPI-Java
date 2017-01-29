@@ -130,7 +130,7 @@ public class Battle {
 	 * @throws CaptchaActiveException if a captcha is active
 	 * @throws LoginFailedException if the login failed
 	 * @throws RemoteServerException if the server errors
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public void start(final BattleHandler handler)
 			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
@@ -480,7 +480,7 @@ public class Battle {
 	 * @throws CaptchaActiveException if a captcha is active
 	 * @throws LoginFailedException if login fails
 	 * @throws RemoteServerException if the server errors
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	private void sendActions(BattleHandler handler)
 			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {

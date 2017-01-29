@@ -75,7 +75,7 @@ public class EggIncubator {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public UseItemEggIncubatorResponse.Result hatchEgg(EggPokemon egg)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {

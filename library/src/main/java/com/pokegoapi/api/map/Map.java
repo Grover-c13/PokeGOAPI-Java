@@ -61,7 +61,7 @@ public class Map {
 	 * @throws CaptchaActiveException if a captcha is active and the map cannot be updates
 	 * @throws RemoteServerException if the server gives an error while updating this map
 	 * @throws LoginFailedException if login fails
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public void update() throws CaptchaActiveException, RemoteServerException, LoginFailedException, HashException {
 		if (!(Double.isNaN(api.getLatitude()) || Double.isNaN(api.getLongitude()))) {
@@ -83,7 +83,7 @@ public class Map {
 	 * @throws CaptchaActiveException if a captcha is active and the map cannot be updated
 	 * @throws RemoteServerException if the server gives an error while updating this map
 	 * @throws LoginFailedException if login fails
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	protected MapObjects requestMapObjects()
 			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
@@ -116,7 +116,7 @@ public class Map {
 	 * @throws CaptchaActiveException if a captcha is active and the incense pokemon cannot be requested
 	 * @throws RemoteServerException if the server gives an error while updating the current
 	 * @throws LoginFailedException if login fails
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	protected GetIncensePokemonResponse requestIncensePokemon()
 			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {

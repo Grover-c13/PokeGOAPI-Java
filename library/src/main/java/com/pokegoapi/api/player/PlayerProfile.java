@@ -115,7 +115,7 @@ public class PlayerProfile {
 	 * @throws LoginFailedException   when the auth is invalid
 	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public void updateProfile() throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
 		GetPlayerMessage message = GetPlayerMessage.newBuilder()
@@ -179,7 +179,7 @@ public class PlayerProfile {
 	 * @throws RemoteServerException  if the server has an issue or an invalid request is sent
 	 * @throws CaptchaActiveException if a captcha is active, and the message cannot be sent
 	 * @throws LoginFailedException   if login fails
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public void getProfile() throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
 		GetPlayerProfileMessage profileMessage = GetPlayerProfileMessage.newBuilder()
@@ -215,7 +215,7 @@ public class PlayerProfile {
 	 * @throws RemoteServerException      when the server is down/having issues
 	 * @throws CaptchaActiveException     if a captcha is active and the message can't be sent
 	 * @throws InsufficientLevelException if you have not yet reached the desired level
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 * @see PlayerLevelUpRewards
 	 */
 	public PlayerLevelUpRewards acceptLevelUpRewards(int level)
@@ -265,7 +265,7 @@ public class PlayerProfile {
 	 * @throws LoginFailedException   when the auth is invalid
 	 * @throws RemoteServerException  When a buffer exception is thrown
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 * @deprecated use getMedals, which uses common requests to check for badges
 	 */
 	@Deprecated
@@ -440,7 +440,7 @@ public class PlayerProfile {
 	 * @throws LoginFailedException   when the auth is invalid
 	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public boolean setBuddy(Pokemon pokemon) throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
 		SetBuddyPokemon.SetBuddyPokemonMessage message = SetBuddyPokemon.SetBuddyPokemonMessage.newBuilder()
@@ -463,7 +463,7 @@ public class PlayerProfile {
 	 * @throws LoginFailedException   when the auth is invalid
 	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public void activateAccount() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		markTutorial(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN);
@@ -475,7 +475,7 @@ public class PlayerProfile {
 	 * @throws LoginFailedException   when the auth is invalid
 	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public void setupAvatar() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		SecureRandom random = new SecureRandom();
@@ -528,7 +528,7 @@ public class PlayerProfile {
 	 * @throws LoginFailedException   when the auth is invalid
 	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public void encounterTutorialComplete() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		StarterPokemon starter = StarterPokemon.random();
@@ -570,7 +570,7 @@ public class PlayerProfile {
 	 * @throws LoginFailedException   when the auth is invalid
 	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public String claimCodeName() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		return claimCodeName(null);
@@ -583,7 +583,7 @@ public class PlayerProfile {
 	 * @throws LoginFailedException   when the auth is invalid
 	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public String claimCodeName(String lastFailure)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
@@ -646,7 +646,7 @@ public class PlayerProfile {
 	 * @throws LoginFailedException   when the auth is invalid
 	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public void firstTimeExperienceComplete()
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {

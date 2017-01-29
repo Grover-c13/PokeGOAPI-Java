@@ -81,7 +81,7 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public Result transferPokemon() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		if (this.isFavorite())
@@ -117,7 +117,7 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public NicknamePokemonResponse.Result renamePokemon(String nickname)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
@@ -150,7 +150,7 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public SetFavoritePokemonResponse.Result setFavoritePokemon(boolean markFavorite)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
@@ -217,7 +217,7 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public UpgradePokemonResponse.Result powerUp()
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
@@ -259,7 +259,7 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public EvolutionResult evolve() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
@@ -308,7 +308,7 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communication issues occurred.
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public UseItemPotionResponse.Result heal()
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
@@ -340,7 +340,7 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communications failed.
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public UseItemPotionResponse.Result usePotion(ItemId itemId)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
@@ -379,7 +379,7 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communications failed.
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public UseItemReviveResponse.Result revive()
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
@@ -405,7 +405,7 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communications failed.
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public UseItemReviveResponse.Result useRevive(ItemId itemId)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {

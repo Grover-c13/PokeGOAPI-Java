@@ -93,7 +93,7 @@ public class Inventories {
 	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public GetInventoryResponse updateInventories() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		return updateInventories(false);
@@ -107,7 +107,7 @@ public class Inventories {
 	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an HashException was thrown
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public GetInventoryResponse updateInventories(boolean forceUpdate)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
