@@ -54,6 +54,7 @@ import com.pokegoapi.exceptions.InsufficientLevelException;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 import lombok.Getter;
@@ -114,8 +115,9 @@ public class PlayerProfile {
 	 * @throws LoginFailedException   when the auth is invalid
 	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
-	public void updateProfile() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+	public void updateProfile() throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
 		GetPlayerMessage message = GetPlayerMessage.newBuilder()
 				.setPlayerLocale(playerLocale.getPlayerLocale())
 				.build();
@@ -177,8 +179,9 @@ public class PlayerProfile {
 	 * @throws RemoteServerException  if the server has an issue or an invalid request is sent
 	 * @throws CaptchaActiveException if a captcha is active, and the message cannot be sent
 	 * @throws LoginFailedException   if login fails
+	 * @throws HashException if an HashException was thrown
 	 */
-	public void getProfile() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+	public void getProfile() throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
 		GetPlayerProfileMessage profileMessage = GetPlayerProfileMessage.newBuilder()
 				.setPlayerName(playerData.getUsername())
 				.build();
@@ -212,10 +215,11 @@ public class PlayerProfile {
 	 * @throws RemoteServerException      when the server is down/having issues
 	 * @throws CaptchaActiveException     if a captcha is active and the message can't be sent
 	 * @throws InsufficientLevelException if you have not yet reached the desired level
+	 * @throws HashException if an HashException was thrown
 	 * @see PlayerLevelUpRewards
 	 */
 	public PlayerLevelUpRewards acceptLevelUpRewards(int level)
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
 		// Check if we even have achieved this level yet
 		if (level > stats.getLevel()) {
 			throw new InsufficientLevelException();
@@ -261,10 +265,11 @@ public class PlayerProfile {
 	 * @throws LoginFailedException   when the auth is invalid
 	 * @throws RemoteServerException  When a buffer exception is thrown
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 * @deprecated use getMedals, which uses common requests to check for badges
 	 */
 	@Deprecated
-	public void checkAndEquipBadges() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	public void checkAndEquipBadges() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		CheckAwardedBadgesMessage msg = CheckAwardedBadgesMessage.newBuilder().build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.CHECK_AWARDED_BADGES, msg);
 		api.getRequestHandler().sendServerRequests(serverRequest);
@@ -435,8 +440,9 @@ public class PlayerProfile {
 	 * @throws LoginFailedException   when the auth is invalid
 	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
-	public boolean setBuddy(Pokemon pokemon) throws CaptchaActiveException, LoginFailedException, RemoteServerException {
+	public boolean setBuddy(Pokemon pokemon) throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
 		SetBuddyPokemon.SetBuddyPokemonMessage message = SetBuddyPokemon.SetBuddyPokemonMessage.newBuilder()
 				.setPokemonId(pokemon.getId())
 				.build();
@@ -457,8 +463,9 @@ public class PlayerProfile {
 	 * @throws LoginFailedException   when the auth is invalid
 	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
-	public void activateAccount() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	public void activateAccount() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		markTutorial(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN);
 	}
 
@@ -468,8 +475,9 @@ public class PlayerProfile {
 	 * @throws LoginFailedException   when the auth is invalid
 	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
-	public void setupAvatar() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	public void setupAvatar() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		SecureRandom random = new SecureRandom();
 
 		Gender gender = random.nextInt(100) % 2 == 0 ? Gender.FEMALE : Gender.MALE;
@@ -520,8 +528,9 @@ public class PlayerProfile {
 	 * @throws LoginFailedException   when the auth is invalid
 	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
-	public void encounterTutorialComplete() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	public void encounterTutorialComplete() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		StarterPokemon starter = StarterPokemon.random();
 
 		List<TutorialListener> listeners = api.getListeners(TutorialListener.class);
@@ -561,8 +570,9 @@ public class PlayerProfile {
 	 * @throws LoginFailedException   when the auth is invalid
 	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
-	public String claimCodeName() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	public String claimCodeName() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		return claimCodeName(null);
 	}
 
@@ -573,9 +583,10 @@ public class PlayerProfile {
 	 * @throws LoginFailedException   when the auth is invalid
 	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
 	public String claimCodeName(String lastFailure)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		if (getPlayerData().getRemainingCodenameClaims() <= 0) {
 			throw new RuntimeException("You have no remaining codename claims!");
 		}
@@ -635,14 +646,15 @@ public class PlayerProfile {
 	 * @throws LoginFailedException   when the auth is invalid
 	 * @throws RemoteServerException  when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
 	public void firstTimeExperienceComplete()
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		markTutorial(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE);
 	}
 
 	private void markTutorial(TutorialStateOuterClass.TutorialState state)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		final MarkTutorialCompleteMessage tutorialMessage = MarkTutorialCompleteMessage.newBuilder()
 				.addTutorialsCompleted(state)
 				.setSendMarketingEmails(false)

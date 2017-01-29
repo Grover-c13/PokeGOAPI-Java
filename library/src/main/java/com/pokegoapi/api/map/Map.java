@@ -26,6 +26,7 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.google.common.geometry.MutableInteger;
 import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
@@ -60,8 +61,9 @@ public class Map {
 	 * @throws CaptchaActiveException if a captcha is active and the map cannot be updates
 	 * @throws RemoteServerException if the server gives an error while updating this map
 	 * @throws LoginFailedException if login fails
+	 * @throws HashException if an HashException was thrown
 	 */
-	public void update() throws CaptchaActiveException, RemoteServerException, LoginFailedException {
+	public void update() throws CaptchaActiveException, RemoteServerException, LoginFailedException, HashException {
 		if (!(Double.isNaN(api.getLatitude()) || Double.isNaN(api.getLongitude()))) {
 			MapObjects mapObjects = requestMapObjects();
 			if (api.getInventories().getItemBag().isIncenseActive()) {
@@ -81,9 +83,10 @@ public class Map {
 	 * @throws CaptchaActiveException if a captcha is active and the map cannot be updated
 	 * @throws RemoteServerException if the server gives an error while updating this map
 	 * @throws LoginFailedException if login fails
+	 * @throws HashException if an HashException was thrown
 	 */
 	protected MapObjects requestMapObjects()
-			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
+			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
 		List<Long> cells = getDefaultCells();
 		GetMapObjectsMessage.Builder builder = GetMapObjectsMessage.newBuilder();
 		builder.setLatitude(api.getLatitude());
@@ -113,9 +116,10 @@ public class Map {
 	 * @throws CaptchaActiveException if a captcha is active and the incense pokemon cannot be requested
 	 * @throws RemoteServerException if the server gives an error while updating the current
 	 * @throws LoginFailedException if login fails
+	 * @throws HashException if an HashException was thrown
 	 */
 	protected GetIncensePokemonResponse requestIncensePokemon()
-			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
+			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
 		GetIncensePokemonMessage message = GetIncensePokemonMessage.newBuilder()
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())

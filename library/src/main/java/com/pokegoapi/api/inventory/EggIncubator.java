@@ -28,6 +28,7 @@ import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.main.ServerRequest;
 
@@ -74,9 +75,10 @@ public class EggIncubator {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
 	public UseItemEggIncubatorResponse.Result hatchEgg(EggPokemon egg)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 
 		UseItemEggIncubatorMessage reqMsg = UseItemEggIncubatorMessage.newBuilder()
 				.setItemId(proto.getId())

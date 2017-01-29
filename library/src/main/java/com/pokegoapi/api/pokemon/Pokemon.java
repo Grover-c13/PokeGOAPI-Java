@@ -44,6 +44,7 @@ import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
@@ -80,8 +81,9 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
-	public Result transferPokemon() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	public Result transferPokemon() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		if (this.isFavorite())
 			return Result.FAILED;
 		ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
@@ -115,9 +117,10 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
 	public NicknamePokemonResponse.Result renamePokemon(String nickname)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		NicknamePokemonMessage reqMsg = NicknamePokemonMessage.newBuilder()
 				.setPokemonId(getId())
 				.setNickname(nickname)
@@ -147,9 +150,10 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
 	public SetFavoritePokemonResponse.Result setFavoritePokemon(boolean markFavorite)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		SetFavoritePokemonMessage reqMsg = SetFavoritePokemonMessage.newBuilder()
 				.setPokemonId(getId())
 				.setIsFavorite(markFavorite)
@@ -213,9 +217,10 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
 	public UpgradePokemonResponse.Result powerUp()
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		return AsyncHelper.toBlocking(powerUpAsync());
 	}
 
@@ -254,8 +259,9 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
-	public EvolutionResult evolve() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	public EvolutionResult evolve() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.EVOLVE_POKEMON, reqMsg);
@@ -302,9 +308,10 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communication issues occurred.
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
 	public UseItemPotionResponse.Result heal()
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 
 		if (!isInjured() || isFainted())
 			return UseItemPotionResponse.Result.ERROR_CANNOT_USE;
@@ -333,9 +340,10 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communications failed.
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
 	public UseItemPotionResponse.Result usePotion(ItemId itemId)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 
 		Item potion = api.getInventories().getItemBag().getItem(itemId);
 		//some sanity check, to prevent wrong use of this call
@@ -371,9 +379,10 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communications failed.
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
 	public UseItemReviveResponse.Result revive()
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 
 		if (!isFainted())
 			return UseItemReviveResponse.Result.ERROR_CANNOT_USE;
@@ -396,9 +405,10 @@ public class Pokemon extends PokemonDetails {
 	 * @throws LoginFailedException  If login failed.
 	 * @throws RemoteServerException If server communications failed.
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
 	public UseItemReviveResponse.Result useRevive(ItemId itemId)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 
 		Item item = api.getInventories().getItemBag().getItem(itemId);
 		if (!item.isRevive() || item.getCount() < 1 || !isFainted())

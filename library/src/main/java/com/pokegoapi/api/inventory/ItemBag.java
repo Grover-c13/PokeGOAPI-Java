@@ -32,6 +32,7 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 
@@ -83,9 +84,10 @@ public class ItemBag {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
 	public Result removeItem(ItemId id, int quantity)
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
 		Item item = getItem(id);
 		if (item.getCount() < quantity) {
 			throw new IllegalArgumentException("You cannot remove more quantity than you have");
@@ -179,8 +181,9 @@ public class ItemBag {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
-	public void useItem(ItemId type) throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+	public void useItem(ItemId type) throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
 		if (type == ItemId.UNRECOGNIZED) {
 			throw new IllegalArgumentException("You cannot use item for UNRECOGNIZED");
 		}
@@ -204,8 +207,9 @@ public class ItemBag {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
-	public void useIncense(ItemId type) throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+	public void useIncense(ItemId type) throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
 		UseIncenseMessage useIncenseMessage =
 				UseIncenseMessage.newBuilder()
 						.setIncenseType(type)
@@ -231,8 +235,9 @@ public class ItemBag {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
-	public void useIncense() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+	public void useIncense() throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
 		useIncense(ItemId.ITEM_INCENSE_ORDINARY);
 	}
 
@@ -243,9 +248,10 @@ public class ItemBag {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
 	public UseItemXpBoostResponse useLuckyEgg()
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
 		UseItemXpBoostMessage xpMsg = UseItemXpBoostMessage
 				.newBuilder()
 				.setItemId(ItemId.ITEM_LUCKY_EGG)

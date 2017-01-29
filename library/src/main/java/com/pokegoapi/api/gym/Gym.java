@@ -36,6 +36,7 @@ import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.InsufficientLevelException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.main.ServerRequest;
@@ -102,7 +103,7 @@ public class Gym implements MapPoint {
 		return proto.getIsInBattle();
 	}
 
-	public boolean isAttackable() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	public boolean isAttackable() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		return this.getGymMembers().size() != 0;
 	}
 
@@ -126,7 +127,7 @@ public class Gym implements MapPoint {
 		details = null;
 	}
 
-	private GetGymDetailsResponse details() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	private GetGymDetailsResponse details() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		if (details == null) {
 			GetGymDetailsMessage reqMsg = GetGymDetailsMessage
 					.newBuilder()
@@ -152,31 +153,31 @@ public class Gym implements MapPoint {
 		return details;
 	}
 
-	public String getName() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	public String getName() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		return details().getName();
 	}
 
-	public ProtocolStringList getUrlsList() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	public ProtocolStringList getUrlsList() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		return details().getUrlsList();
 	}
 
 	public GetGymDetailsResponse.Result getResult()
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		return details().getResult();
 	}
 
-	public boolean inRange() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	public boolean inRange() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		GetGymDetailsResponse.Result result = getResult();
 		return (result != GetGymDetailsResponse.Result.ERROR_NOT_IN_RANGE);
 	}
 
-	public String getDescription() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	public String getDescription() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		return details().getDescription();
 	}
 
 
 	public List<GymMembership> getGymMembers()
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		return details().getGymState().getMembershipsList();
 	}
 
@@ -187,9 +188,10 @@ public class Gym implements MapPoint {
 	 * @throws LoginFailedException  if the login failed
 	 * @throws RemoteServerException When a buffer exception is thrown
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if there is a problem with the Hash key / Service
 	 */
 	public List<PokemonData> getDefendingPokemon()
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		List<PokemonData> data = new ArrayList<PokemonData>();
 
 		for (GymMembership gymMember : getGymMembers()) {
@@ -207,9 +209,10 @@ public class Gym implements MapPoint {
 	 * @throws LoginFailedException  if the login failed
 	 * @throws RemoteServerException When a buffer exception is thrown
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if there is a problem with the Hash key / Service
 	 */
 	public FortDeployPokemonResponse.Result deployPokemon(Pokemon pokemon)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
 				.setFortId(getId())
 				.setPlayerLatitude(api.getLatitude())

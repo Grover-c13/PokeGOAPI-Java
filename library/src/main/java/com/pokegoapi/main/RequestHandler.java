@@ -154,9 +154,10 @@ public class RequestHandler implements Runnable {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an HashException was thrown
 	 */
 	public void sendServerRequests(ServerRequest... serverRequests)
-			throws RemoteServerException, LoginFailedException, CaptchaActiveException {
+			throws RemoteServerException, LoginFailedException, CaptchaActiveException, HashException {
 		if (api.hasChallenge()) {
 			throw new CaptchaActiveException(new AsyncCaptchaActiveException("Captcha active! Cannot send requests!"));
 		}

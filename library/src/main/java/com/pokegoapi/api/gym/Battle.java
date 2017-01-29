@@ -37,6 +37,7 @@ import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
@@ -129,9 +130,10 @@ public class Battle {
 	 * @throws CaptchaActiveException if a captcha is active
 	 * @throws LoginFailedException if the login failed
 	 * @throws RemoteServerException if the server errors
+	 * @throws HashException if an HashException was thrown
 	 */
 	public void start(final BattleHandler handler)
-			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
+			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
 		participantIndices.clear();
 		participants.clear();
 		activePokemon.clear();
@@ -478,9 +480,10 @@ public class Battle {
 	 * @throws CaptchaActiveException if a captcha is active
 	 * @throws LoginFailedException if login fails
 	 * @throws RemoteServerException if the server errors
+	 * @throws HashException if an HashException was thrown
 	 */
 	private void sendActions(BattleHandler handler)
-			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
+			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
 		AttackGymMessage.Builder builder = AttackGymMessage.newBuilder()
 				.setGymId(gym.getId())
 				.setBattleId(battleId)

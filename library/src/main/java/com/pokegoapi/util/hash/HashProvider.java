@@ -50,4 +50,5 @@ public interface HashProvider {
 	 * @return the unknown 25 value used with this hash
 	 */
 	long getUNK25();
+
 }

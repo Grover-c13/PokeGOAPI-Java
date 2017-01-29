@@ -16,6 +16,7 @@
 package com.pokegoapi.exceptions.hash;
 
 public class HashException extends Exception {
+
 	public HashException() {
 		super();
 	}
@@ -31,4 +32,5 @@ public class HashException extends Exception {
 	public HashException(String reason, Throwable exception) {
 		super(reason, exception);
 	}
+
 }
