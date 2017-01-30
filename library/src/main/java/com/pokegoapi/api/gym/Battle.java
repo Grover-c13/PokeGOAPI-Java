@@ -79,11 +79,11 @@ public class Battle {
 
 	private Queue<ServerAction> serverActionQueue
 			= new PriorityBlockingQueue<>(11, new Comparator<ServerAction>() {
-				@Override
-				public int compare(ServerAction o1, ServerAction o2) {
-					return Long.compare(o1.getStart(), o2.getStart());
-				}
-			});
+		@Override
+		public int compare(ServerAction o1, ServerAction o2) {
+			return Long.compare(o1.getStart(), o2.getStart());
+		}
+	});
 	private Set<ServerAction> activeActions = new HashSet<>();
 	private Set<ServerAction> damagingActions = new HashSet<>();
 
@@ -128,9 +128,9 @@ public class Battle {
 	 *
 	 * @param handler to handle this battle
 	 * @throws CaptchaActiveException if a captcha is active
-	 * @throws LoginFailedException if the login failed
-	 * @throws RemoteServerException if the server errors
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws LoginFailedException   if the login failed
+	 * @throws RemoteServerException  if the server errors
+	 * @throws HashException          if an exception occurred while requesting hash
 	 */
 	public void start(final BattleHandler handler)
 			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
@@ -259,7 +259,7 @@ public class Battle {
 	 * Updates this battle with the given log
 	 *
 	 * @param handler to handle this battle
-	 * @param log the log to update with
+	 * @param log     the log to update with
 	 */
 	private void updateLog(BattleHandler handler, BattleLog log) {
 		serverTimeOffset = log.getServerMs() - api.currentTimeMillis();
@@ -324,7 +324,7 @@ public class Battle {
 	 * Handles an action from the server
 	 *
 	 * @param handler to handle this battle
-	 * @param action the action being handled
+	 * @param action  the action being handled
 	 */
 	private void handleAction(BattleHandler handler, ServerAction action) {
 		switch (action.getType()) {
@@ -355,7 +355,7 @@ public class Battle {
 	 * Handles a player join action
 	 *
 	 * @param handler to handle this battle
-	 * @param action the join action
+	 * @param action  the join action
 	 */
 	private void onPlayerJoin(BattleHandler handler, ServerAction action) {
 		BattleParticipant joined = action.getJoined();
@@ -370,7 +370,7 @@ public class Battle {
 	 * Handles a player quit action
 	 *
 	 * @param handler to handle this battle
-	 * @param action the quit action
+	 * @param action  the quit action
 	 */
 	private void onPlayerQuit(BattleHandler handler, ServerAction action) {
 		BattleParticipant left = action.getLeft();
@@ -385,7 +385,7 @@ public class Battle {
 	 * Handles an attack action
 	 *
 	 * @param handler to handle this battle
-	 * @param action the attack action
+	 * @param action  the attack action
 	 */
 	private void handleAttack(BattleHandler handler, ServerAction action) {
 		BattlePokemon attacked = getActivePokemon(action.getTargetIndex());
@@ -405,7 +405,7 @@ public class Battle {
 	 * Handles a special attack action
 	 *
 	 * @param handler to handle this battle
-	 * @param action the attack action
+	 * @param action  the attack action
 	 */
 	private void handleSpecialAttack(BattleHandler handler, ServerAction action) {
 		BattlePokemon attacked = getActivePokemon(action.getTargetIndex());
@@ -425,7 +425,7 @@ public class Battle {
 	 * Handles a faint action
 	 *
 	 * @param handler to handle this battle
-	 * @param action the faint action
+	 * @param action  the faint action
 	 */
 	private void handleFaint(BattleHandler handler, ServerAction action) {
 		BattlePokemon pokemon = getActivePokemon(action.getAttackerIndex());
@@ -441,7 +441,7 @@ public class Battle {
 	 * Handles a dodge action
 	 *
 	 * @param handler to handle this battle
-	 * @param action the dodge action
+	 * @param action  the dodge action
 	 */
 	private void handleDodge(BattleHandler handler, ServerAction action) {
 		BattlePokemon pokemon = getActivePokemon(action.getAttackerIndex());
@@ -478,9 +478,9 @@ public class Battle {
 	 *
 	 * @param handler to handle this battle
 	 * @throws CaptchaActiveException if a captcha is active
-	 * @throws LoginFailedException if login fails
-	 * @throws RemoteServerException if the server errors
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws LoginFailedException   if login fails
+	 * @throws RemoteServerException  if the server errors
+	 * @throws HashException          if an exception occurred while requesting hash
 	 */
 	private void sendActions(BattleHandler handler)
 			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
@@ -533,7 +533,7 @@ public class Battle {
 	/**
 	 * Handles the response from an AttackGymMessage
 	 *
-	 * @param handler to handle this battle
+	 * @param handler  to handle this battle
 	 * @param response the response to handle
 	 */
 	private void handleAttackResponse(BattleHandler handler, AttackGymResponse response) {
@@ -619,7 +619,7 @@ public class Battle {
 	/**
 	 * Performs an action with the given duration
 	 *
-	 * @param type the action to perform
+	 * @param type     the action to perform
 	 * @param duration the duration of this action
 	 * @return the action performed
 	 */
@@ -686,7 +686,8 @@ public class Battle {
 	 */
 	public int swap(Pokemon pokemon) {
 		int duration = PokemonMeta.battleSettings.getSwapDurationMs();
-		ClientAction action = new ClientAction(BattleActionType.ACTION_SWAP_POKEMON, api.currentTimeMillis(), duration);
+		ClientAction action = new ClientAction(BattleActionType.ACTION_SWAP_POKEMON, api.currentTimeMillis(),
+				duration);
 		action.setPokemon(pokemon);
 		queuedActions.add(action);
 		return duration;
@@ -773,7 +774,7 @@ public class Battle {
 		 * Sets the damage window for this action
 		 *
 		 * @param start the start offset
-		 * @param end the end offset
+		 * @param end   the end offset
 		 */
 		public void setDamageWindow(int start, int end) {
 			this.damageWindowStart = start;
@@ -806,7 +807,7 @@ public class Battle {
 		/**
 		 * Called to create a team of Pokemon to use in the battle
 		 *
-		 * @param api the current API
+		 * @param api    the current API
 		 * @param battle the current battle
 		 * @return the team to use in this battle
 		 */
@@ -815,7 +816,7 @@ public class Battle {
 		/**
 		 * Called when this battle begins
 		 *
-		 * @param api the current API
+		 * @param api    the current API
 		 * @param battle the current battle
 		 * @param result the result from the start message
 		 */
@@ -824,17 +825,17 @@ public class Battle {
 		/**
 		 * Called when this battle end, and you won
 		 *
-		 * @param api the current API
-		 * @param battle the current battle
+		 * @param api         the current API
+		 * @param battle      the current battle
 		 * @param deltaPoints the amount of points (prestige) added or removed after completing this battle
-		 * @param newPoints the new amount of points on this gym
+		 * @param newPoints   the new amount of points on this gym
 		 */
 		void onVictory(PokemonGo api, Battle battle, int deltaPoints, long newPoints);
 
 		/**
 		 * Called when this battle ends, and you were defeated
 		 *
-		 * @param api the current API
+		 * @param api    the current API
 		 * @param battle the current battle
 		 */
 		void onDefeated(PokemonGo api, Battle battle);
@@ -842,7 +843,7 @@ public class Battle {
 		/**
 		 * Called when this battle times out
 		 *
-		 * @param api the current API
+		 * @param api    the current API
 		 * @param battle the current battle
 		 */
 		void onTimedOut(PokemonGo api, Battle battle);
@@ -850,7 +851,7 @@ public class Battle {
 		/**
 		 * Called when an action is started
 		 *
-		 * @param api the current API
+		 * @param api    the current API
 		 * @param battle the current battle
 		 * @param action the action started
 		 */
@@ -859,7 +860,7 @@ public class Battle {
 		/**
 		 * Called when an action is completed
 		 *
-		 * @param api the current API
+		 * @param api    the current API
 		 * @param battle the current battle
 		 * @param action the action completed
 		 */
@@ -868,7 +869,7 @@ public class Battle {
 		/**
 		 * Called when an action's damage window opens
 		 *
-		 * @param api the current API
+		 * @param api    the current API
 		 * @param battle the current battle
 		 * @param action the action
 		 */
@@ -877,7 +878,7 @@ public class Battle {
 		/**
 		 * Called when an action's damage window closes
 		 *
-		 * @param api the current API
+		 * @param api    the current API
 		 * @param battle the current battle
 		 * @param action the action
 		 */
@@ -886,7 +887,7 @@ public class Battle {
 		/**
 		 * Called when a player joins this battle
 		 *
-		 * @param api the current API
+		 * @param api    the current API
 		 * @param battle the current battle
 		 * @param joined the player that joined
 		 * @param action the action for the joining player
@@ -896,9 +897,9 @@ public class Battle {
 		/**
 		 * Called when a player leaves this battle
 		 *
-		 * @param api the current API
+		 * @param api    the current API
 		 * @param battle the current battle
-		 * @param left player that left
+		 * @param left   player that left
 		 * @param action the action for the leaving player
 		 */
 		void onPlayerLeave(PokemonGo api, Battle battle, BattleParticipant left, ServerAction action);
@@ -906,14 +907,14 @@ public class Battle {
 		/**
 		 * Called when a Pokemon is attacked in this battle
 		 *
-		 * @param api the current API
-		 * @param battle the current battle
-		 * @param attacked the attacked pokemon
-		 * @param attacker the pokemon attacking the attacked pokemon
-		 * @param duration the duration of the attack
+		 * @param api               the current API
+		 * @param battle            the current battle
+		 * @param attacked          the attacked pokemon
+		 * @param attacker          the pokemon attacking the attacked pokemon
+		 * @param duration          the duration of the attack
 		 * @param damageWindowStart the start of the damage window
-		 * @param damageWindowEnd the end of the damage window
-		 * @param action the attack action
+		 * @param damageWindowEnd   the end of the damage window
+		 * @param action            the attack action
 		 */
 		void onAttacked(PokemonGo api, Battle battle, BattlePokemon attacked, BattlePokemon attacker, int duration,
 						long damageWindowStart, long damageWindowEnd, ServerAction action);
@@ -921,23 +922,23 @@ public class Battle {
 		/**
 		 * Called when a Pokemon is attacked with the special move in this battle
 		 *
-		 * @param api the current API
-		 * @param battle the current battle
-		 * @param attacked the attacked pokemon
-		 * @param attacker the pokemon attacking the attacked pokemon
-		 * @param duration the duration of the attack
+		 * @param api               the current API
+		 * @param battle            the current battle
+		 * @param attacked          the attacked pokemon
+		 * @param attacker          the pokemon attacking the attacked pokemon
+		 * @param duration          the duration of the attack
 		 * @param damageWindowStart the start of the damage window
-		 * @param damageWindowEnd the end of the damage window
-		 * @param action the attack action
+		 * @param damageWindowEnd   the end of the damage window
+		 * @param action            the attack action
 		 */
 		void onAttackedSpecial(PokemonGo api, Battle battle, BattlePokemon attacked, BattlePokemon attacker,
-								int duration, long damageWindowStart, long damageWindowEnd, ServerAction action);
+							   int duration, long damageWindowStart, long damageWindowEnd, ServerAction action);
 
 		/**
 		 * Called when an exception occurs during this battle
 		 *
-		 * @param api the current API
-		 * @param battle the current battle
+		 * @param api       the current API
+		 * @param battle    the current battle
 		 * @param exception the exception that occurred
 		 */
 		void onException(PokemonGo api, Battle battle, Exception exception);
@@ -945,7 +946,7 @@ public class Battle {
 		/**
 		 * Called when invalid actions are sent to the server
 		 *
-		 * @param api the current API
+		 * @param api    the current API
 		 * @param battle the current battle
 		 */
 		void onInvalidActions(PokemonGo api, Battle battle);
@@ -953,30 +954,30 @@ public class Battle {
 		/**
 		 * Called when the attacker's health is updated
 		 *
-		 * @param api the current API
-		 * @param battle the current battle
+		 * @param api        the current API
+		 * @param battle     the current battle
 		 * @param lastHealth the attacker's last health
-		 * @param health the attacker's new health
-		 * @param maxHealth the maximum health for the attacker
+		 * @param health     the attacker's new health
+		 * @param maxHealth  the maximum health for the attacker
 		 */
 		void onAttackerHealthUpdate(PokemonGo api, Battle battle, int lastHealth, int health, int maxHealth);
 
 		/**
 		 * Called when the defender's health is updated
 		 *
-		 * @param api the current API
-		 * @param battle the current battle
+		 * @param api        the current API
+		 * @param battle     the current battle
 		 * @param lastHealth the defender's last health
-		 * @param health the defender's new health
-		 * @param maxHealth the maximum health for the defender
+		 * @param health     the defender's new health
+		 * @param maxHealth  the maximum health for the defender
 		 */
 		void onDefenderHealthUpdate(PokemonGo api, Battle battle, int lastHealth, int health, int maxHealth);
 
 		/**
 		 * Called when the attacker Pokemon changes
 		 *
-		 * @param api the current API
-		 * @param battle the current battle
+		 * @param api         the current API
+		 * @param battle      the current battle
 		 * @param newAttacker the new attacker pokemon
 		 */
 		void onAttackerSwap(PokemonGo api, Battle battle, BattlePokemon newAttacker);
@@ -984,8 +985,8 @@ public class Battle {
 		/**
 		 * Called when the defender Pokemon changes
 		 *
-		 * @param api the current API
-		 * @param battle the current battle
+		 * @param api         the current API
+		 * @param battle      the current battle
 		 * @param newDefender the new defender pokemon
 		 */
 		void onDefenderSwap(PokemonGo api, Battle battle, BattlePokemon newDefender);
@@ -993,22 +994,22 @@ public class Battle {
 		/**
 		 * Called when the given Pokemon faints.
 		 *
-		 * @param api the current API
-		 * @param battle the current battle
-		 * @param pokemon the fainted pokemon
+		 * @param api      the current API
+		 * @param battle   the current battle
+		 * @param pokemon  the fainted pokemon
 		 * @param duration the duration of this action
-		 * @param action the faint action
+		 * @param action   the faint action
 		 */
 		void onFaint(PokemonGo api, Battle battle, BattlePokemon pokemon, int duration, ServerAction action);
 
 		/**
 		 * Called when the given Pokemon dodges.
 		 *
-		 * @param api the current API
-		 * @param battle the current battle
-		 * @param pokemon the dodging pokemon
+		 * @param api      the current API
+		 * @param battle   the current battle
+		 * @param pokemon  the dodging pokemon
 		 * @param duration the duration of this action
-		 * @param action the dodge action
+		 * @param action   the dodge action
 		 */
 		void onDodge(PokemonGo api, Battle battle, BattlePokemon pokemon, int duration, ServerAction action);
 	}

@@ -24,7 +24,8 @@ import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.L
 import POGOProtos.Networking.Requests.Messages.VerifyChallenge.VerifyChallengeMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckChallengeResponseOuterClass.CheckChallengeResponse;
-import POGOProtos.Networking.Responses.DownloadRemoteConfigVersionResponseOuterClass.DownloadRemoteConfigVersionResponse;
+import POGOProtos.Networking.Responses.DownloadRemoteConfigVersionResponseOuterClass
+		.DownloadRemoteConfigVersionResponse;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse.Result;
 import POGOProtos.Networking.Responses.VerifyChallengeResponseOuterClass.VerifyChallengeResponse;
@@ -137,8 +138,8 @@ public class PokemonGo {
 	 * Instantiates a new Pokemon go.
 	 *
 	 * @param client the http client
-	 * @param time a time implementation
-	 * @param seed the seed to generate same device
+	 * @param time   a time implementation
+	 * @param seed   the seed to generate same device
 	 */
 	public PokemonGo(OkHttpClient client, Time time, long seed) {
 		this.time = time;
@@ -160,7 +161,7 @@ public class PokemonGo {
 	 * Deprecated: specify a time implementation
 	 *
 	 * @param client the http client
-	 * @param seed the seed to generate same device
+	 * @param seed   the seed to generate same device
 	 */
 	public PokemonGo(OkHttpClient client, long seed) {
 		this(client, new SystemTimeImpl(), seed);
@@ -171,7 +172,7 @@ public class PokemonGo {
 	 * Deprecated: specify a time implementation
 	 *
 	 * @param client the http client
-	 * @param time a time implementation
+	 * @param time   a time implementation
 	 */
 	public PokemonGo(OkHttpClient client, Time time) {
 		this(client, time, hash(UUID.randomUUID().toString()));
@@ -191,9 +192,9 @@ public class PokemonGo {
 	 * Login user with the provided provider
 	 *
 	 * @param credentialProvider the credential provider
-	 * @param hashProvider to provide hashes
-	 * @throws LoginFailedException When login fails
-	 * @throws RemoteServerException When server fails
+	 * @param hashProvider       to provide hashes
+	 * @throws LoginFailedException   When login fails
+	 * @throws RemoteServerException  When server fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public void login(CredentialProvider credentialProvider, HashProvider hashProvider)
@@ -215,7 +216,8 @@ public class PokemonGo {
 		initialize();
 	}
 
-	private void initialize() throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
+	private void initialize() throws RemoteServerException, CaptchaActiveException, LoginFailedException,
+			HashException {
 		playerProfile.updateProfile();
 
 		ServerRequest downloadConfigRequest = new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
@@ -297,8 +299,8 @@ public class PokemonGo {
 	 *
 	 * @param request server request
 	 * @param exclude the commmon requests to exclude
-	 * @throws LoginFailedException When login fails
-	 * @throws RemoteServerException When server fails
+	 * @throws LoginFailedException   When login fails
+	 * @throws RemoteServerException  When server fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	private void fireRequestBlock(ServerRequest request, RequestType... exclude)
@@ -314,11 +316,12 @@ public class PokemonGo {
 	/**
 	 * Second requests block. Public since it could be re-fired at any time
 	 *
-	 * @throws LoginFailedException When login fails
-	 * @throws RemoteServerException When server fails
+	 * @throws LoginFailedException   When login fails
+	 * @throws RemoteServerException  When server fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void getAssetDigest() throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
+	public void getAssetDigest() throws RemoteServerException, CaptchaActiveException, LoginFailedException,
+			HashException {
 		fireRequestBlock(new ServerRequest(RequestType.GET_ASSET_DIGEST,
 				CommonRequests.getGetAssetDigestMessageRequest(this)).exclude(RequestType.GET_BUDDY_WALKED));
 	}
@@ -345,8 +348,8 @@ public class PokemonGo {
 	 * Fetches valid AuthInfo
 	 *
 	 * @return AuthInfo object
-	 * @throws LoginFailedException when login fails
-	 * @throws RemoteServerException When server fails
+	 * @throws LoginFailedException   when login fails
+	 * @throws RemoteServerException  When server fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public AuthInfo getAuthInfo()
@@ -357,9 +360,9 @@ public class PokemonGo {
 	/**
 	 * Sets location.
 	 *
-	 * @param latitude the latitude
+	 * @param latitude  the latitude
 	 * @param longitude the longitude
-	 * @param altitude the altitude
+	 * @param altitude  the altitude
 	 */
 	public void setLocation(double latitude, double longitude, double altitude) {
 		setLocation(latitude, longitude, altitude, accuracy);
@@ -368,10 +371,10 @@ public class PokemonGo {
 	/**
 	 * Sets location with accuracy.
 	 *
-	 * @param latitude the latitude
+	 * @param latitude  the latitude
 	 * @param longitude the longitude
-	 * @param altitude the altitude
-	 * @param accuracy the accuracy of this location
+	 * @param altitude  the altitude
+	 * @param accuracy  the accuracy of this location
 	 */
 	public void setLocation(double latitude, double longitude, double altitude, double accuracy) {
 		setLatitude(latitude);
@@ -442,7 +445,7 @@ public class PokemonGo {
 	 * Gets the sensor info
 	 *
 	 * @param currentTime the current time
-	 * @param random the random object
+	 * @param random      the random object
 	 * @return the sensor info
 	 */
 	public SignatureOuterClass.Signature.SensorInfo getSensorSignature(long currentTime, Random random) {
@@ -468,7 +471,7 @@ public class PokemonGo {
 	/**
 	 * Updates the current challenge
 	 *
-	 * @param url the challenge url, if any
+	 * @param url          the challenge url, if any
 	 * @param hasChallenge whether the challenge solve is required
 	 */
 	public void updateChallenge(String url, boolean hasChallenge) {
@@ -526,9 +529,9 @@ public class PokemonGo {
 	 * Invokes a method in all listeners of the given type
 	 *
 	 * @param listenerType the listener to call to
-	 * @param name the method name to call
-	 * @param parameters the parameters to pass to the method
-	 * @param <T> the listener type
+	 * @param name         the method name to call
+	 * @param parameters   the parameters to pass to the method
+	 * @param <T>          the listener type
 	 * @throws ReflectiveOperationException if an exception occurred while invoking the listener
 	 */
 	public <T extends Listener> void callListener(Class<T> listenerType, String name, Object... parameters)
@@ -561,14 +564,15 @@ public class PokemonGo {
 	 *
 	 * @param token the challenge response token
 	 * @return if the token was valid or not
-	 * @throws LoginFailedException when login fails
-	 * @throws RemoteServerException when server fails
+	 * @throws LoginFailedException           when login fails
+	 * @throws RemoteServerException          when server fails
 	 * @throws InvalidProtocolBufferException when the client receives an invalid message from the server
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if there is a problem with the Hash key / Service
+	 * @throws CaptchaActiveException         if a captcha is active and the message can't be sent
+	 * @throws HashException                  if there is a problem with the Hash key / Service
 	 */
 	public boolean verifyChallenge(String token)
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException, InvalidProtocolBufferException, HashException {
+			throws RemoteServerException, CaptchaActiveException, LoginFailedException,
+			InvalidProtocolBufferException, HashException {
 		hasChallenge = false;
 		VerifyChallengeMessage message = VerifyChallengeMessage.newBuilder().setToken(token).build();
 		AsyncServerRequest request = new AsyncServerRequest(RequestType.VERIFY_CHALLENGE, message);
@@ -588,14 +592,15 @@ public class PokemonGo {
 	 * Checks for a challenge / captcha
 	 *
 	 * @return the new challenge URL, if any
-	 * @throws LoginFailedException when login fails
-	 * @throws RemoteServerException when server fails
+	 * @throws LoginFailedException           when login fails
+	 * @throws RemoteServerException          when server fails
 	 * @throws InvalidProtocolBufferException when the client receives an invalid message from the server
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if there is a problem with the Hash key / Service
+	 * @throws CaptchaActiveException         if a captcha is active and the message can't be sent
+	 * @throws HashException                  if there is a problem with the Hash key / Service
 	 */
 	public String checkChallenge()
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException, InvalidProtocolBufferException, HashException {
+			throws RemoteServerException, CaptchaActiveException, LoginFailedException,
+			InvalidProtocolBufferException, HashException {
 		CheckChallengeMessage message = CheckChallengeMessage.newBuilder().build();
 		AsyncServerRequest request = new AsyncServerRequest(RequestType.CHECK_CHALLENGE, message);
 		ByteString responseData =

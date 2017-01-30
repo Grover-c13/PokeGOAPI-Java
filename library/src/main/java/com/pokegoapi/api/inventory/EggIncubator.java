@@ -72,10 +72,10 @@ public class EggIncubator {
 	 *
 	 * @param egg the egg
 	 * @return status of putting egg in incubator
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
+	 * @throws RemoteServerException  the remote server exception
+	 * @throws LoginFailedException   the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws HashException          if an exception occurred while requesting hash
 	 */
 	public UseItemEggIncubatorResponse.Result hatchEgg(EggPokemon egg)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
@@ -85,7 +85,8 @@ public class EggIncubator {
 				.setPokemonId(egg.getId())
 				.build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR, reqMsg);
+		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR,
+				reqMsg);
 		api.getRequestHandler().sendServerRequests(serverRequest);
 
 		UseItemEggIncubatorResponse response;

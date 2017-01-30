@@ -21,7 +21,7 @@ import java.io.StringWriter;
 /**
  * Created by Will on 7/20/16.
  */
-@SuppressWarnings({ "checkstyle:methodname", "checkstyle:javadocmethod" })
+@SuppressWarnings({"checkstyle:methodname", "checkstyle:javadocmethod"})
 public class Log {
 
 	private static Logger logger;
@@ -44,8 +44,7 @@ public class Log {
 	 * Sets the level of the Logger. For example, if the level is Error, all
 	 * ERROR and ASSERT messages will be logged, but nothing else.
 	 *
-	 * @param level
-	 *            the level to log at
+	 * @param level the level to log at
 	 */
 	public static void setLevel(Level level) {
 		Log.level = level;

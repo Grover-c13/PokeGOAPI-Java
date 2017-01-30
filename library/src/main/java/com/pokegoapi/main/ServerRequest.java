@@ -93,6 +93,7 @@ public class ServerRequest {
 
 	/**
 	 * Adds a common request to this request
+	 *
 	 * @return this object
 	 */
 	public ServerRequest withCommons() {
@@ -102,6 +103,7 @@ public class ServerRequest {
 
 	/**
 	 * Excludes the given requests from the next packet
+	 *
 	 * @param types the types to exclude
 	 * @return this object
 	 */

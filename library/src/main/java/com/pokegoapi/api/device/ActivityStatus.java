@@ -37,7 +37,7 @@ public class ActivityStatus {
 	/**
 	 * Gets the default activity status for the given api
 	 *
-	 * @param api the api
+	 * @param api    the api
 	 * @param random random object
 	 * @return the default activity status for the given api
 	 */

@@ -145,9 +145,9 @@ public class PokeBank {
 	 * @param releasePokemon the pokemon to release
 	 * @return the amount of candies for each pokemon family
 	 * @throws CaptchaActiveException if a captcha is active and a message cannot be sent
-	 * @throws LoginFailedException the login fails
-	 * @throws RemoteServerException if the server errors
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws LoginFailedException   the login fails
+	 * @throws RemoteServerException  if the server errors
+	 * @throws HashException          if an exception occurred while requesting hash
 	 */
 	public Map<PokemonFamilyId, Integer> releasePokemon(Pokemon... releasePokemon)
 			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {

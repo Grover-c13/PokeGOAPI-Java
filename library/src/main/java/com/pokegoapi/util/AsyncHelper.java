@@ -32,12 +32,12 @@ public class AsyncHelper {
 	 * Convert an observable to the actual result, recovering the actual exception and throwing that
 	 *
 	 * @param observable Observable to handle
-	 * @param <T> Result type
+	 * @param <T>        Result type
 	 * @return Result of the observable
-	 * @throws LoginFailedException If an AsyncLoginFailedException was thrown
-	 * @throws RemoteServerException If an AsyncRemoteServerException was thrown
+	 * @throws LoginFailedException   If an AsyncLoginFailedException was thrown
+	 * @throws RemoteServerException  If an AsyncRemoteServerException was thrown
 	 * @throws CaptchaActiveException if an AsyncCaptchaActiveException was thrown
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws HashException          if an exception occurred while requesting hash
 	 */
 	public static <T> T toBlocking(Observable<T> observable)
 			throws LoginFailedException, RemoteServerException, CaptchaActiveException, HashException {
@@ -53,10 +53,10 @@ public class AsyncHelper {
 	 * Handles toBlocking exception recursively
 	 *
 	 * @param throwable the exception
-	 * @throws LoginFailedException if a login exception is thrown
-	 * @throws RemoteServerException if a remove server exception is thrown
+	 * @throws LoginFailedException   if a login exception is thrown
+	 * @throws RemoteServerException  if a remove server exception is thrown
 	 * @throws CaptchaActiveException if a captcha exception is thrown
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws HashException          if an exception occurred while requesting hash
 	 */
 	private static void handleBlockingException(Throwable throwable)
 			throws LoginFailedException, RemoteServerException, CaptchaActiveException, HashException {
@@ -73,7 +73,7 @@ public class AsyncHelper {
 			throw (RemoteServerException) cause;
 		} else if (cause instanceof CaptchaActiveException) {
 			throw (CaptchaActiveException) cause;
-		} else if(cause instanceof HashException) {
+		} else if (cause instanceof HashException) {
 			throw (HashException) cause;
 		} else if (cause instanceof ExecutionException) {
 			handleBlockingException(cause);

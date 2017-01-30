@@ -67,6 +67,7 @@ public class ItemBag {
 
 	/**
 	 * Adds the given item to this bag
+	 *
 	 * @param item the item to add
 	 */
 	public void addItem(Item item) {
@@ -78,13 +79,13 @@ public class ItemBag {
 	/**
 	 * Discards the given item.
 	 *
-	 * @param id the id
+	 * @param id       the id
 	 * @param quantity the quantity
 	 * @return the result
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException the login failed exception
+	 * @throws RemoteServerException  the remote server exception
+	 * @throws LoginFailedException   the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws HashException          if an exception occurred while requesting hash
 	 */
 	public Result removeItem(ItemId id, int quantity)
 			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
@@ -178,12 +179,13 @@ public class ItemBag {
 	 * use an item with itemID
 	 *
 	 * @param type type of item
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException the login failed exception
+	 * @throws RemoteServerException  the remote server exception
+	 * @throws LoginFailedException   the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws HashException          if an exception occurred while requesting hash
 	 */
-	public void useItem(ItemId type) throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
+	public void useItem(ItemId type) throws RemoteServerException, CaptchaActiveException, LoginFailedException,
+			HashException {
 		if (type == ItemId.UNRECOGNIZED) {
 			throw new IllegalArgumentException("You cannot use item for UNRECOGNIZED");
 		}
@@ -204,12 +206,13 @@ public class ItemBag {
 	 * use an incense
 	 *
 	 * @param type type of item
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException the login failed exception
+	 * @throws RemoteServerException  the remote server exception
+	 * @throws LoginFailedException   the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws HashException          if an exception occurred while requesting hash
 	 */
-	public void useIncense(ItemId type) throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
+	public void useIncense(ItemId type) throws RemoteServerException, CaptchaActiveException, LoginFailedException,
+			HashException {
 		UseIncenseMessage useIncenseMessage =
 				UseIncenseMessage.newBuilder()
 						.setIncenseType(type)
@@ -232,12 +235,13 @@ public class ItemBag {
 	/**
 	 * use an item with itemID
 	 *
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException the login failed exception
+	 * @throws RemoteServerException  the remote server exception
+	 * @throws LoginFailedException   the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws HashException          if an exception occurred while requesting hash
 	 */
-	public void useIncense() throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
+	public void useIncense() throws RemoteServerException, CaptchaActiveException, LoginFailedException,
+			HashException {
 		useIncense(ItemId.ITEM_INCENSE_ORDINARY);
 	}
 
@@ -245,10 +249,10 @@ public class ItemBag {
 	 * use a lucky egg
 	 *
 	 * @return the xp boost response
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException the login failed exception
+	 * @throws RemoteServerException  the remote server exception
+	 * @throws LoginFailedException   the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws HashException          if an exception occurred while requesting hash
 	 */
 	public UseItemXpBoostResponse useLuckyEgg()
 			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
@@ -315,6 +319,7 @@ public class ItemBag {
 
 	/**
 	 * Adds the awarded items contained in the level up response
+	 *
 	 * @param levelUpResponse the response to add items from
 	 */
 	public void addAwardedItems(LevelUpRewardsResponse levelUpResponse) {

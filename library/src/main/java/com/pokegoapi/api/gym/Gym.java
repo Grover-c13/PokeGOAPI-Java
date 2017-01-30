@@ -103,12 +103,14 @@ public class Gym implements MapPoint {
 		return proto.getIsInBattle();
 	}
 
-	public boolean isAttackable() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
+	public boolean isAttackable() throws LoginFailedException, CaptchaActiveException, RemoteServerException,
+			HashException {
 		return this.getGymMembers().size() != 0;
 	}
 
 	/**
 	 * Creates a battle for this gym
+	 *
 	 * @return the battle object
 	 */
 	public Battle battle() {
@@ -127,7 +129,8 @@ public class Gym implements MapPoint {
 		details = null;
 	}
 
-	private GetGymDetailsResponse details() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
+	private GetGymDetailsResponse details() throws LoginFailedException, CaptchaActiveException,
+			RemoteServerException, HashException {
 		if (details == null) {
 			GetGymDetailsMessage reqMsg = GetGymDetailsMessage
 					.newBuilder()
@@ -157,7 +160,8 @@ public class Gym implements MapPoint {
 		return details().getName();
 	}
 
-	public ProtocolStringList getUrlsList() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
+	public ProtocolStringList getUrlsList() throws LoginFailedException, CaptchaActiveException,
+			RemoteServerException, HashException {
 		return details().getUrlsList();
 	}
 
@@ -166,12 +170,14 @@ public class Gym implements MapPoint {
 		return details().getResult();
 	}
 
-	public boolean inRange() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
+	public boolean inRange() throws LoginFailedException, CaptchaActiveException, RemoteServerException,
+			HashException {
 		GetGymDetailsResponse.Result result = getResult();
 		return (result != GetGymDetailsResponse.Result.ERROR_NOT_IN_RANGE);
 	}
 
-	public String getDescription() throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
+	public String getDescription() throws LoginFailedException, CaptchaActiveException, RemoteServerException,
+			HashException {
 		return details().getDescription();
 	}
 
@@ -185,10 +191,10 @@ public class Gym implements MapPoint {
 	 * Get a list of pokemon defending this gym.
 	 *
 	 * @return List of pokemon
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
+	 * @throws LoginFailedException   if the login failed
+	 * @throws RemoteServerException  When a buffer exception is thrown
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if there is a problem with the Hash key / Service
+	 * @throws HashException          if there is a problem with the Hash key / Service
 	 */
 	public List<PokemonData> getDefendingPokemon()
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
@@ -206,10 +212,10 @@ public class Gym implements MapPoint {
 	 *
 	 * @param pokemon The pokemon to deploy
 	 * @return Result of attempt to deploy pokemon
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
+	 * @throws LoginFailedException   if the login failed
+	 * @throws RemoteServerException  When a buffer exception is thrown
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if there is a problem with the Hash key / Service
+	 * @throws HashException          if there is a problem with the Hash key / Service
 	 */
 	public FortDeployPokemonResponse.Result deployPokemon(Pokemon pokemon)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
@@ -236,8 +242,8 @@ public class Gym implements MapPoint {
 	 *
 	 * @param pokemon The pokemon to deploy
 	 * @return Result of attempt to deploy pokemon
-	 * @throws LoginFailedException  if the login failed
-	 * @throws RemoteServerException When a buffer exception is thrown
+	 * @throws LoginFailedException   if the login failed
+	 * @throws RemoteServerException  When a buffer exception is thrown
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public Observable<FortDeployPokemonResponse.Result> deployPokemonAsync(Pokemon pokemon)
@@ -251,21 +257,21 @@ public class Gym implements MapPoint {
 
 		AsyncServerRequest asyncServerRequest = new AsyncServerRequest(RequestType.FORT_DEPLOY_POKEMON, reqMsg);
 		return api.getRequestHandler()
-			.sendAsyncServerRequests(asyncServerRequest)
-			.map(new Func1<ByteString, FortDeployPokemonResponse.Result>() {
+				.sendAsyncServerRequests(asyncServerRequest)
+				.map(new Func1<ByteString, FortDeployPokemonResponse.Result>() {
 
-				@Override
-				public FortDeployPokemonResponse.Result call(ByteString response) {
+					@Override
+					public FortDeployPokemonResponse.Result call(ByteString response) {
 
-					try {
-						return FortDeployPokemonResponse.parseFrom(response).getResult();
-					} catch (InvalidProtocolBufferException e) {
-						throw new AsyncRemoteServerException(e);
+						try {
+							return FortDeployPokemonResponse.parseFrom(response).getResult();
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+
 					}
 
-				}
-
-			});
+				});
 
 	}
 
@@ -275,6 +281,7 @@ public class Gym implements MapPoint {
 
 	/**
 	 * Updates this gym's point count by the given delta
+	 *
 	 * @param delta the amount to change the points by
 	 */
 	public void updatePoints(int delta) {
@@ -283,6 +290,7 @@ public class Gym implements MapPoint {
 
 	/**
 	 * Updates this gym with the given gym state
+	 *
 	 * @param state the state to update from
 	 */
 	public void updateState(GymState state) {

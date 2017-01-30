@@ -85,7 +85,7 @@ public class PokeDictionary {
 	 * Fallback to the default locale if names do not exist for the given {@link Locale}.
 	 *
 	 * @param itemId Item id
-	 * @param locale    target name locale
+	 * @param locale target name locale
 	 * @return the item name in locale
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */

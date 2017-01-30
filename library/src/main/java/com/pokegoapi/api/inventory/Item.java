@@ -48,8 +48,8 @@ public class Item {
 	/**
 	 * Constructs a new item.
 	 *
-	 * @param api the current api
-	 * @param proto the protocol to construct this item from
+	 * @param api     the current api
+	 * @param proto   the protocol to construct this item from
 	 * @param itemBag the item bag containing this item
 	 */
 	public Item(PokemonGo api, ItemDataOuterClass.ItemData proto, ItemBag itemBag) {
@@ -127,6 +127,7 @@ public class Item {
 
 	/**
 	 * Sets this item to applied with the given AppliedItem proto
+	 *
 	 * @param item the proto to import from
 	 */
 	public void setApplied(AppliedItem item) {
@@ -137,6 +138,7 @@ public class Item {
 
 	/**
 	 * Checks if this item is applied
+	 *
 	 * @return if this item is applied / active
 	 */
 	public boolean isApplied() {

@@ -29,7 +29,8 @@ public class Buddy {
 
 	/**
 	 * Creates a buddy object
-	 * @param api the current api
+	 *
+	 * @param api   the current api
 	 * @param proto the buddy proto
 	 */
 	public Buddy(PokemonGo api, BuddyPokemon proto) {

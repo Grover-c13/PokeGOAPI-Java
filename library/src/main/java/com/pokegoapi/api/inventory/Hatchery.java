@@ -62,6 +62,7 @@ public class Hatchery {
 
 	/**
 	 * Adds the given egg to this hatchery
+	 *
 	 * @param egg the egg to add
 	 */
 	public void addEgg(EggPokemon egg) {
@@ -106,9 +107,8 @@ public class Hatchery {
 	 *
 	 * @param response the GetHatchedEggs response
 	 * @return the hatched eggs contained in the response
-	 *
-	 * @throws RemoteServerException if a bad request was sent
-	 * @throws LoginFailedException if login failed
+	 * @throws RemoteServerException  if a bad request was sent
+	 * @throws LoginFailedException   if login failed
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public List<HatchedEgg> updateHatchedEggs(GetHatchedEggsResponse response)
@@ -129,10 +129,10 @@ public class Hatchery {
 	 * Get if eggs has hatched.
 	 *
 	 * @return list of hatched eggs
-	 * @throws RemoteServerException e
-	 * @throws LoginFailedException e
+	 * @throws RemoteServerException  e
+	 * @throws LoginFailedException   e
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws HashException          if an exception occurred while requesting hash
 	 * @deprecated Use getHatchedEggs()
 	 */
 	@Deprecated

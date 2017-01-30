@@ -93,7 +93,8 @@ public class MapUtil<K extends MapPoint> {
 	public Map<Double, K> sortItems(List<K> items, PokemonGo api) {
 		Map<Double, K> result = new TreeMap<>();
 		for (K point : items) {
-			result.put(distFrom(api.getLatitude(), api.getLongitude(), point.getLatitude(), point.getLongitude()), point);
+			result.put(distFrom(api.getLatitude(), api.getLongitude(), point.getLatitude(), point.getLongitude()),
+					point);
 		}
 		return result;
 	}

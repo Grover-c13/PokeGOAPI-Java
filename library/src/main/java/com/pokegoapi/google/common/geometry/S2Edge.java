@@ -22,39 +22,39 @@ package com.pokegoapi.google.common.geometry;
  */
 public final class S2Edge {
 
-  private final S2Point start;
-  private final S2Point end;
+	private final S2Point start;
+	private final S2Point end;
 
-  public S2Edge(S2Point start, S2Point end) {
-    this.start = start;
-    this.end = end;
-  }
+	public S2Edge(S2Point start, S2Point end) {
+		this.start = start;
+		this.end = end;
+	}
 
-  public S2Point getStart() {
-    return start;
-  }
+	public S2Point getStart() {
+		return start;
+	}
 
-  public S2Point getEnd() {
-    return end;
-  }
+	public S2Point getEnd() {
+		return end;
+	}
 
-  @Override
-  public String toString() {
-    return String.format("Edge: (%s -> %s)\n   or [%s -> %s]",
-        start.toDegreesString(), end.toDegreesString(), start, end);
-  }
+	@Override
+	public String toString() {
+		return String.format("Edge: (%s -> %s)\n   or [%s -> %s]",
+				start.toDegreesString(), end.toDegreesString(), start, end);
+	}
 
-  @Override
-  public int hashCode() {
-    return getStart().hashCode() - getEnd().hashCode();
-  }
+	@Override
+	public int hashCode() {
+		return getStart().hashCode() - getEnd().hashCode();
+	}
 
-  @Override
-  public boolean equals(Object o) {
-    if (o == null || !(o instanceof S2Edge)) {
-      return false;
-    }
-    S2Edge other = (S2Edge) o;
-    return getStart().equals(other.getStart()) && getEnd().equals(other.getEnd());
-  }
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || !(o instanceof S2Edge)) {
+			return false;
+		}
+		S2Edge other = (S2Edge) o;
+		return getStart().equals(other.getStart()) && getEnd().equals(other.getEnd());
+	}
 }

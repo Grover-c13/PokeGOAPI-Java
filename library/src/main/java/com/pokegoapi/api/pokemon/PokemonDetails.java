@@ -351,7 +351,7 @@ public class PokemonDetails {
 	/**
 	 * Calculated the max cp of this pokemon, if you upgrade it fully with your current player level
 	 *
-	 * @param playerLevel the current player level
+	 * @param playerLevel      the current player level
 	 * @param highestEvolution the full evolution path
 	 * @return Max cp of this pokemon
 	 */

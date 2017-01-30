@@ -45,8 +45,8 @@ public class AsyncServerRequest {
 	/**
 	 * Instantiates a new Server request.
 	 *
-	 * @param type the type
-	 * @param req  the req
+	 * @param type                 the type
+	 * @param req                  the req
 	 * @param requireCommonRequest indicate if this request require common requests
 	 */
 	public AsyncServerRequest(RequestType type, GeneratedMessage req, boolean requireCommonRequest) {
@@ -82,6 +82,7 @@ public class AsyncServerRequest {
 
 	/**
 	 * Adds a common request to this request if the given parameter is true
+	 *
 	 * @param requireCommon if this request should add commons
 	 * @return this object
 	 */
@@ -92,6 +93,7 @@ public class AsyncServerRequest {
 
 	/**
 	 * Excludes the given requests from the next packet
+	 *
 	 * @param types the types to exclude
 	 * @return this object
 	 */
@@ -102,6 +104,7 @@ public class AsyncServerRequest {
 
 	/**
 	 * Excludes the given requests from the next packet
+	 *
 	 * @param types the types to exclude
 	 * @return this object
 	 */
