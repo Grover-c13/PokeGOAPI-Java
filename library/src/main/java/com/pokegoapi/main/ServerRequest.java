@@ -48,7 +48,7 @@ public class ServerRequest {
 	 * Instantiates a new Server request.
 	 *
 	 * @param type the type
-	 * @param req  the req
+	 * @param req the req
 	 */
 	public ServerRequest(RequestTypeOuterClass.RequestType type, GeneratedMessage req) {
 		RequestOuterClass.Request.Builder reqBuilder = RequestOuterClass.Request.newBuilder();
@@ -61,7 +61,7 @@ public class ServerRequest {
 	/**
 	 * Instantiates a new Server request.
 	 *
-	 * @param type    the type
+	 * @param type the type
 	 * @param request the req
 	 */
 	ServerRequest(RequestTypeOuterClass.RequestType type, RequestOuterClass.Request request) {

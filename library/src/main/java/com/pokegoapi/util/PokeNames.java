@@ -28,7 +28,7 @@ public class PokeNames {
 	 * Returns the Name for a Pokedex ID including known translations.
 	 *
 	 * @param pokedex Pokemon index number
-	 * @param locale  target name locale
+	 * @param locale target name locale
 	 * @return the Pokemon name in locale
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 * @deprecated Replaced by {@link PokeDictionary#getDisplayName(int, Locale)}
@@ -41,7 +41,7 @@ public class PokeNames {
 	/**
 	 * Returns translated Pokemon name from ENGLISH locale.
 	 *
-	 * @param engName   pokemon ENGLISH name
+	 * @param engName pokemon ENGLISH name
 	 * @param newLocale the locale you want translate to
 	 * @return translated pokemon name
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
@@ -56,7 +56,7 @@ public class PokeNames {
 	 * Returns the Pokemon index from the Pokemon name list.
 	 *
 	 * @param pokeName pokemon name in locale
-	 * @param locale   the locale on this name
+	 * @param locale the locale on this name
 	 * @return pokedex
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 * @deprecated Replaced by {@link PokeDictionary#getPokedexFromName(String, Locale)}

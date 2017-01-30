@@ -44,10 +44,10 @@ public class EggPokemon {
 	 *
 	 * @param incubator : the incubator
 	 * @return status of putting egg in incubator
-	 * @throws LoginFailedException   if failed to login
-	 * @throws RemoteServerException  if the server failed to respond
+	 * @throws LoginFailedException if failed to login
+	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException          if an exception occurred while requesting hash
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public UseItemEggIncubatorResponse.Result incubate(EggIncubator incubator)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {

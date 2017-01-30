@@ -26,7 +26,7 @@ public class NiaHash {
 	 * Computes 32-bit hash with salt
 	 *
 	 * @param buffer input to the hash function
-	 * @param salt   salt for the hash function
+	 * @param salt salt for the hash function
 	 * @return hash for given inputs
 	 */
 	public static int hash32Salt(byte[] buffer, byte[] salt) {
@@ -42,7 +42,7 @@ public class NiaHash {
 	 * Computes 64-bit hash with salt
 	 *
 	 * @param buffer input to the hash function
-	 * @param salt   salt for the hash function
+	 * @param salt salt for the hash function
 	 * @return hash for given inputs
 	 */
 	public static long hash64Salt(byte[] buffer, byte[] salt) {
@@ -60,7 +60,7 @@ public class NiaHash {
 	/**
 	 * Computes hash for given input
 	 *
-	 * @param in     input to hash function
+	 * @param in input to hash function
 	 * @param length length of input
 	 * @return hash for given input
 	 */

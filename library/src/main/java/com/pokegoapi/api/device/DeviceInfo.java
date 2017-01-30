@@ -307,7 +307,7 @@ public class DeviceInfo {
 	 * </pre>
 	 *
 	 * @param firmwareFingerprint FirmwareFingerprint,
-	 *                            for example: "google/angler/angler:7.0/NPD90G/3051502:user/release-keys"
+	 * for example: "google/angler/angler:7.0/NPD90G/3051502:user/release-keys"
 	 */
 	public void setFirmwareFingerprint(String firmwareFingerprint) {
 		deviceInfoBuilder.setFirmwareFingerprint(firmwareFingerprint);

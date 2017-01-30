@@ -48,8 +48,8 @@ public class Item {
 	/**
 	 * Constructs a new item.
 	 *
-	 * @param api     the current api
-	 * @param proto   the protocol to construct this item from
+	 * @param api the current api
+	 * @param proto the protocol to construct this item from
 	 * @param itemBag the item bag containing this item
 	 */
 	public Item(PokemonGo api, ItemDataOuterClass.ItemData proto, ItemBag itemBag) {

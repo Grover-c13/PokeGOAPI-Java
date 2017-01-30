@@ -45,8 +45,8 @@ public class AsyncServerRequest {
 	/**
 	 * Instantiates a new Server request.
 	 *
-	 * @param type                 the type
-	 * @param req                  the req
+	 * @param type the type
+	 * @param req the req
 	 * @param requireCommonRequest indicate if this request require common requests
 	 */
 	public AsyncServerRequest(RequestType type, GeneratedMessage req, boolean requireCommonRequest) {
@@ -62,7 +62,7 @@ public class AsyncServerRequest {
 	 * Instantiates a new Server request.
 	 *
 	 * @param type the type
-	 * @param req  the req
+	 * @param req the req
 	 */
 	public AsyncServerRequest(RequestType type, GeneratedMessage req) {
 		this(type, req, false);
@@ -72,7 +72,7 @@ public class AsyncServerRequest {
 	 * Instantiates a new Server request.
 	 *
 	 * @param type the type
-	 * @param req  the req
+	 * @param req the req
 	 */
 	AsyncServerRequest(RequestType type, Request req) {
 		this.type = type;

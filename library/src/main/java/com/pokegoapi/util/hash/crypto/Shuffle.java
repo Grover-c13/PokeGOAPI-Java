@@ -136,7 +136,7 @@ public final class Shuffle {
 				vector[38] ^ tmp[83] ^ (tmp[40] & (vector[19] ^ (vector[35] | tmp[86] ^ vector[27] & (tmp[81] ^
 						tmp[87])) ^ vector[11] & tmp[82]) ^ (vector[35] | tmp[79] ^ (tmp[82] ^ vector[27] & ~
 						(vector[57]
-						^ vector[11] & tmp[81]))) ^ (vector[27] | tmp[79] ^ tmp[84]));
+								^ vector[11] & tmp[81]))) ^ (vector[27] | tmp[79] ^ tmp[84]));
 		tmp[4] = vector[54] ^ tmp[0] ^ (tmp[15] ^ (vector[61] & ~(tmp[8] ^ (vector[31] | tmp[65] ^ (tmp[6] ^
 				vector[39] & (vector[15] | tmp[5]))) ^ vector[23] & ~(vector[15] ^ vector[39] & tmp[4]))
 				^ vector[23] & (vector[39] | ~tmp[6]) ^ (vector[31] | vector[39] & tmp[0] & ~vector[23])));
@@ -230,7 +230,7 @@ public final class Shuffle {
 		tmp[19] = ~vector[43];
 		tmp[28] = tmp[9] ^ (vector[20] ^ ((vector[35] | tmp[28]) ^ ((vector[43] | tmp[73] ^ vector[35] & tmp[38]) ^
 				vector[51] & ~(tmp[69] ^ tmp[19] & (vector[5] ^ tmp[69] ^ vector[35] & tmp[35])
-				^ vector[27] & vector[35]))));
+						^ vector[27] & vector[35]))));
 		tmp[98] = tmp[28] & ~tmp[32];
 		tmp[97] = tmp[32] | tmp[28];
 		tmp[122] = tmp[32] & tmp[28];
@@ -243,7 +243,7 @@ public final class Shuffle {
 		tmp[25] =
 				tmp[35] ^ (vector[56] ^ (tmp[69] ^ (tmp[19] & (tmp[71] ^ vector[35] & ~(vector[5] ^ tmp[72])) ^
 						vector[51] & ~(tmp[75] ^ vector[35] & ~(vector[5] ^ vector[59] & tmp[25]) ^ tmp[19] & (tmp[37]
-						^ tmp[34])) ^ vector[35] & ~(tmp[21] ^ vector[59] & tmp[36]))));
+								^ tmp[34])) ^ vector[35] & ~(tmp[21] ^ vector[59] & tmp[36]))));
 		tmp[34] = ~tmp[7];
 		tmp[37] = tmp[25] & tmp[34];
 		tmp[72] = ~tmp[90];
@@ -274,7 +274,7 @@ public final class Shuffle {
 				vector[0] ^ (vector[25] ^ (tmp[66] ^ (tmp[70] & (tmp[45] ^ vector[57] & (tmp[62] ^ tmp[80])) ^
 						vector[57] & ~(tmp[44] ^ tmp[85])))) ^ (vector[33] | tmp[45] ^ tmp[74] ^ vector[57] & ~
 						(vector[3]
-						^ tmp[66]) ^ (vector[49] | vector[3] ^ tmp[80] ^ vector[57] & tmp[40]));
+								^ tmp[66]) ^ (vector[49] | vector[3] ^ tmp[80] ^ vector[57] & tmp[40]));
 		tmp[66] = tmp[45] ^ vector[3] & vector[41] ^ vector[57] & ~(tmp[46] ^ vector[41] & tmp[43]) ^ (vector[36] ^
 				(vector[49] | vector[3] ^ vector[57] & (tmp[45] ^ tmp[66])) ^ (vector[33]
 				| vector[57] & tmp[85] ^ (tmp[31] ^ tmp[70] & tmp[31])));
@@ -312,7 +312,7 @@ public final class Shuffle {
 						^ tmp[64] & (tmp[85] ^ tmp[62] ^ tmp[47]) ^ tmp[26] & ~(tmp[72] & tmp[85]));
 		tmp[43] = tmp[71] ^ (vector[37] ^ tmp[85]) ^ tmp[25] & tmp[21] ^ (tmp[64] & ~(tmp[44] ^ tmp[47]) ^ (tmp[18] |
 				tmp[83] ^ (tmp[84] ^ ((tmp[26] | tmp[71] ^ tmp[46]) ^ tmp[64] & (tmp[43] ^ (tmp[26]
-				| tmp[31]))))));
+						| tmp[31]))))));
 		tmp[57] = tmp[55] ^ (vector[26] ^ ((vector[9] | tmp[60] ^ vector[63] & ~(tmp[3] ^ tmp[50] & tmp[57])) ^
 				vector[63] & (tmp[56] ^ (vector[33] | tmp[54]))));
 		tmp[54] = tmp[57] & ~tmp[96];
@@ -342,7 +342,7 @@ public final class Shuffle {
 		tmp[33] = tmp[7] | tmp[13];
 		tmp[62] = vector[7] ^ (tmp[89] | tmp[84] & (tmp[47] ^ (tmp[101] ^ tmp[57])) ^ (tmp[39] ^ tmp[0] & tmp[19])) ^
 				(tmp[96] ^ tmp[19] ^ tmp[0] & (tmp[13] ^ (tmp[7] | tmp[75])) ^ (tmp[45]
-				| tmp[87] & tmp[62] ^ (tmp[44] ^ tmp[0] & ~(tmp[72] ^ tmp[62]))));
+						| tmp[87] & tmp[62] ^ (tmp[44] ^ tmp[0] & ~(tmp[72] ^ tmp[62]))));
 		tmp[10] = tmp[47] ^ tmp[75] ^ (vector[47] ^ ((tmp[45] | tmp[46] ^ tmp[0] & tmp[47]) ^ (tmp[21] & (tmp[0] &
 				~tmp[46] ^ tmp[57] & tmp[87] ^ tmp[9] & (tmp[101] ^ tmp[10])) ^ tmp[0] & (tmp[71]
 				^ tmp[33]))));
@@ -387,7 +387,7 @@ public final class Shuffle {
 		tmp[19] =
 				vector[61] ^ tmp[22] & ~(tmp[4] ^ (tmp[4] | tmp[38])) ^ (tmp[47] ^ (tmp[38] | tmp[8] ^ tmp[13])) ^
 						tmp[34] & (tmp[56] ^ (tmp[4] ^ tmp[82] & ~tmp[38]) ^ tmp[22] & (tmp[85] ^ tmp[38] & ~(tmp[81]
-						^ tmp[19])));
+								^ tmp[19])));
 		tmp[82] = tmp[70] & tmp[19];
 		tmp[85] = tmp[70] | tmp[19];
 		tmp[13] = ~tmp[70] & tmp[19];
@@ -474,11 +474,11 @@ public final class Shuffle {
 		tmp[34] =
 				vector[45] ^ (tmp[72] ^ (tmp[37] ^ tmp[53]) ^ (tmp[42] | tmp[37] ^ tmp[7] & tmp[57])) ^ tmp[137] & (
 						(tmp[42] | tmp[69] ^ (tmp[37] | tmp[57])) ^ (tmp[124] ^ (tmp[7] | tmp[9]) ^ tmp[74] & (
-						tmp[34] ^ tmp[53])));
+								tmp[34] ^ tmp[53])));
 		tmp[53] ^=
 				tmp[7] ^ (vector[25] ^ (tmp[57] | tmp[63])) ^ (tmp[42] | tmp[69] ^ (tmp[72] | tmp[98])) ^ (tmp[18] |
 						tmp[58] ^ tmp[57] & (tmp[124] ^ tmp[87] & tmp[63]) ^ tmp[131] & ((tmp[69] | tmp[57]) ^ (
-						tmp[63] ^ tmp[87] & tmp[53])));
+								tmp[63] ^ tmp[87] & tmp[53])));
 		tmp[87] = ~tmp[53];
 		tmp[69] = tmp[50] & tmp[53];
 		tmp[11] = vector[31] & ~(tmp[17] ^ tmp[110] & (vector[63] & (tmp[11] ^ tmp[107])) ^ vector[55] & tmp[5]) ^
@@ -502,7 +502,7 @@ public final class Shuffle {
 		tmp[104] =
 				vector[17] ^ tmp[20] ^ ((tmp[36] | tmp[106] ^ (tmp[95] ^ tmp[88]) & tmp[2]) ^ tmp[105] & tmp[11]) ^
 						tmp[66] & ~(tmp[94] ^ (tmp[93] | tmp[11]) ^ tmp[124] & (tmp[32] & tmp[104] ^ tmp[1] ^ (
-						tmp[99] | tmp[11])));
+								tmp[99] | tmp[11])));
 		tmp[93] = vector[3] ^ tmp[105] ^ tmp[103] & tmp[2] ^ ((tmp[36] | tmp[27] & tmp[78] ^ tmp[32] & ~tmp[91] ^
 				(tmp[92] ^ tmp[91] | tmp[11])) ^ tmp[66] & ~(tmp[124] & (tmp[102] ^ tmp[11] & ~tmp[93])
 				^ (tmp[27] ^ tmp[103]) & tmp[11]));
@@ -679,7 +679,7 @@ public final class Shuffle {
 		tmp[105] = tmp[23] & tmp[103];
 		tmp[88] = tmp[90] ^ (tmp[94] ^ tmp[40] & tmp[84]) ^ ((tmp[40] | tmp[88]) ^ tmp[95]) & tmp[29] ^ (tmp[122] |
 				tmp[15] ^ tmp[106] ^ tmp[101] & (tmp[15] ^ tmp[79] & tmp[93])
-				^ (tmp[71] ^ tmp[40] & ~tmp[88]) & tmp[29]);
+						^ (tmp[71] ^ tmp[40] & ~tmp[88]) & tmp[29]);
 		tmp[15] = tmp[46] & tmp[29];
 		tmp[71] = tmp[23] ^ tmp[15];
 		tmp[101] = tmp[119] & tmp[15];
@@ -786,7 +786,7 @@ public final class Shuffle {
 		tmp[98] = tmp[145] & tmp[65];
 		tmp[54] = tmp[80] ^ tmp[133] ^ ((tmp[75] | tmp[133] & tmp[87] ^ tmp[145] & tmp[47] ^ tmp[3] & ~tmp[97]) ^
 				(tmp[53] | tmp[65] ^ tmp[98] ^ (tmp[3] & ~(tmp[56] ^ tmp[54]) ^ tmp[49] & (tmp[54]
-				^ tmp[3] & tmp[54]))) ^ tmp[3] & (tmp[54] ^ tmp[128]) ^ tmp[145] & ~tmp[67]);
+						^ tmp[3] & tmp[54]))) ^ tmp[3] & (tmp[54] ^ tmp[128]) ^ tmp[145] & ~tmp[67]);
 		tmp[56] = ~tmp[54];
 		tmp[47] = tmp[134] & tmp[54];
 		tmp[98] = (tmp[3] & tmp[123] ^ (tmp[75] | tmp[69] ^ (tmp[142] ^ tmp[98]))) & ~tmp[53] ^ (tmp[145] ^ (tmp[86] &
@@ -880,7 +880,7 @@ public final class Shuffle {
 				^ tmp[73] & ~tmp[136]);
 		tmp[57] = tmp[10] ^ (tmp[42] ^ (tmp[112] ^ tmp[128]) ^ tmp[45] & (tmp[57] ^ (tmp[114] ^ tmp[73] & tmp[4])) ^
 				tmp[131] & ~(tmp[49] ^ tmp[73] & (tmp[52] ^ tmp[57]) ^ tmp[45] & (tmp[97]
-				^ tmp[73] & ~tmp[142])));
+						^ tmp[73] & ~tmp[142])));
 		tmp[117] =
 				tmp[62] ^ tmp[114] ^ (tmp[150] ^ (tmp[45] & ~(tmp[0] ^ tmp[73] & (tmp[114] ^ tmp[80])) ^ tmp[73] &
 						tmp[141])) ^ tmp[131] & ~(tmp[142] ^ tmp[73] & ~(tmp[80] ^ tmp[117]) ^ (tmp[129] | tmp[65])
@@ -1059,7 +1059,7 @@ public final class Shuffle {
 		tmp[149] ^=
 				tmp[109] ^ tmp[78] & tmp[132] ^ (tmp[39] | tmp[143]) ^ tmp[57] & (tmp[132] ^ tmp[78] & ~tmp[15]) ^
 						(tmp[112] | tmp[67] ^ tmp[78] & ~tmp[52] ^ tmp[57] & ~(tmp[132] ^ tmp[25] ^ tmp[78] & (
-						tmp[25] ^ tmp[48])));
+								tmp[25] ^ tmp[48])));
 		tmp[97] = tmp[39] | tmp[2];
 		tmp[89] = tmp[152] ^ tmp[12] ^ tmp[78] & ~(tmp[5] ^ tmp[89]) ^ ((tmp[112] | tmp[109] ^ tmp[78] & tmp[67] ^
 				tmp[57] & (tmp[97] ^ tmp[78] & (tmp[58] ^ tmp[97]))) ^ tmp[57] & ~(tmp[52] ^ tmp[78] & (
@@ -1177,7 +1177,7 @@ public final class Shuffle {
 		tmp[56] =
 				tmp[32] ^ tmp[37] ^ (tmp[93] ^ (tmp[120] ^ tmp[85] & (tmp[32] | ~(tmp[35] & tmp[66] ^ tmp[100])))) ^
 						(tmp[154] | tmp[120] ^ tmp[85] & (tmp[32] & ~tmp[144] ^ tmp[56]) ^ tmp[32] & ~(tmp[66]
-						^ tmp[120] & ~tmp[66]));
+								^ tmp[120] & ~tmp[66]));
 		tmp[93] = tmp[77] & tmp[56];
 		tmp[37] = ~tmp[56];
 		tmp[27] = tmp[44] | tmp[93];
@@ -1198,7 +1198,7 @@ public final class Shuffle {
 		tmp[153] =
 				tmp[41] ^ (tmp[35] ^ tmp[56] & ~(tmp[99] ^ tmp[76])) ^ tmp[119] & (tmp[56] | ~(tmp[90] ^ tmp[95])) ^
 						tmp[17] & (tmp[0] ^ (tmp[47] ^ (tmp[119] & ~(tmp[153] ^ tmp[56] & ~tmp[153]) ^ tmp[56] & ~(
-						tmp[16] ^ tmp[166] & tmp[76]))));
+								tmp[16] ^ tmp[166] & tmp[76]))));
 		tmp[166] = tmp[77] | tmp[56];
 		tmp[47] = tmp[166] & ~tmp[77];
 		tmp[103] &= tmp[166];
@@ -1365,7 +1365,7 @@ public final class Shuffle {
 		tmp[159] =
 				tmp[7] ^ (tmp[149] | tmp[83] & ~tmp[148]) ^ (tmp[80] ^ (tmp[92] ^ (tmp[83] | tmp[27] ^ tmp[70]))) ^
 						tmp[141] & ~(tmp[118] ^ (tmp[83] & ~tmp[149] & ~tmp[145] ^ (tmp[159] ^ tmp[37] & (tmp[43]
-						^ tmp[159]))));
+								^ tmp[159]))));
 		tmp[148] = ~tmp[141];
 		tmp[41] = tmp[117] ^ (tmp[97] ^ (tmp[25] ^ (tmp[118] & ~(tmp[107] ^ tmp[41] ^ (tmp[128] | tmp[25] ^ tmp[40]))
 				^ tmp[69] & (tmp[40] ^ tmp[25] & tmp[135])))
@@ -1533,7 +1533,7 @@ public final class Shuffle {
 		tmp[78] = tmp[163] & tmp[32];
 		tmp[101] = tmp[10] ^ (tmp[119] ^ tmp[38] & ~tmp[30]) ^ tmp[56] & ~(tmp[45] ^ (tmp[10] | tmp[38])) ^ tmp[28] &
 				(tmp[75] ^ tmp[56] & ~(tmp[21] ^ tmp[75] ^ (tmp[101] ^ tmp[1]) & tmp[65])
-				^ (tmp[11] ^ tmp[30]) & tmp[65]);
+						^ (tmp[11] ^ tmp[30]) & tmp[65]);
 		tmp[2] ^= tmp[37] ^ tmp[71] ^ tmp[115] & ~(tmp[17] ^ tmp[171]) ^ (tmp[146] | tmp[176]) ^ (tmp[101] | tmp[17] ^
 				tmp[57] ^ (tmp[115] & ~(tmp[122] ^ tmp[156] & tmp[122] ^ tmp[137] & ~tmp[123])
 				^ tmp[156] & (tmp[178] ^ tmp[122])));
@@ -1652,7 +1652,7 @@ public final class Shuffle {
 		tmp[42] ^=
 				tmp[149] ^ (tmp[102] ^ tmp[168] & ~tmp[78]) ^ (tmp[59] | tmp[155] ^ tmp[168] & ~tmp[127]) ^ tmp[148] &
 						(tmp[27] ^ tmp[39] ^ tmp[168] & (tmp[0] ^ tmp[78]) ^ (tmp[59] | tmp[96] ^ (tmp[168]
-						| tmp[42] ^ tmp[78])));
+								| tmp[42] ^ tmp[78])));
 		tmp[40] ^= tmp[39];
 		tmp[78] =
 				tmp[25] ^ (tmp[168] & ~tmp[27] ^ tmp[40] ^ (tmp[59] | tmp[27] ^ tmp[145] & tmp[102] ^ tmp[168] & ~
@@ -1704,13 +1704,13 @@ public final class Shuffle {
 		tmp[100] ^=
 				tmp[125] ^ (tmp[177] ^ tmp[52] & tmp[123]) ^ ((tmp[121] | tmp[35] ^ tmp[32] ^ (tmp[90] | tmp[52])) ^
 						tmp[13] & (tmp[50] & (tmp[72] & tmp[100] ^ tmp[32]) ^ (tmp[85] ^ tmp[34]) ^ (tmp[90]
-						| tmp[5])));
+								| tmp[5])));
 		tmp[32] = tmp[87] & tmp[100];
 		tmp[52] = tmp[93] ^ tmp[35] & tmp[177];
 		tmp[85] ^=
 				(tmp[121] | tmp[90] & ~tmp[85] ^ tmp[52]) ^ (tmp[18] ^ (tmp[173] ^ (tmp[90] | tmp[115] ^ tmp[116]))) ^
 						tmp[13] & (tmp[115] ^ tmp[90] & (tmp[93] ^ tmp[116]) ^ tmp[50] & ((tmp[115] | tmp[90])
-						^ tmp[52]));
+								^ tmp[52]));
 		tmp[72] =
 				tmp[35] ^ (tmp[92] ^ tmp[173]) ^ (tmp[90] | tmp[89]) ^ (tmp[121] | tmp[116] ^ tmp[123] & (tmp[120] ^
 						tmp[34])) ^ (tmp[48] | tmp[5] ^ (tmp[50] & (tmp[116] ^ (tmp[120] ^ tmp[120] & tmp[72]))
@@ -1728,14 +1728,14 @@ public final class Shuffle {
 		tmp[74] =
 				tmp[148] & (tmp[74] ^ (tmp[158] ^ tmp[129] & (tmp[94] ^ tmp[74])) ^ (tmp[46] ^ tmp[36]) & tmp[177]) ^
 						(tmp[55] ^ (tmp[58] ^ tmp[170] ^ (tmp[93] | tmp[53])) ^ tmp[177] & ~(tmp[138] ^ (tmp[23]
-						^ tmp[46])));
+								^ tmp[46])));
 		tmp[38] = tmp[21] ^ tmp[125] ^ tmp[56] & ~(tmp[132] ^ tmp[68] & tmp[114] ^ (tmp[11] ^ tmp[1]) & tmp[65]) ^
 				(tmp[106] ^ tmp[28] & ~(tmp[45] ^ tmp[56] & ~(tmp[4] ^ (tmp[1] | tmp[38])) ^ (
-				tmp[162] ^ tmp[136] | tmp[38]))) ^ (tmp[162] ^ tmp[75] | tmp[38]);
+						tmp[162] ^ tmp[136] | tmp[38]))) ^ (tmp[162] ^ tmp[75] | tmp[38]);
 		tmp[15] =
 				tmp[28] ^ (tmp[80] ^ tmp[26] & (tmp[15] ^ (tmp[59] ^ (tmp[139] | tmp[16]))) ^ tmp[139] & tmp[70]) ^
 						tmp[38] & ~(tmp[69] ^ (tmp[59] ^ tmp[67] & (tmp[70] ^ (tmp[41] | tmp[105]))) ^ tmp[26] & (
-						tmp[133] ^ tmp[43] & tmp[67] ^ tmp[135] & tmp[133]));
+								tmp[133] ^ tmp[43] & tmp[67] ^ tmp[135] & tmp[133]));
 		tmp[28] = ~tmp[15];
 		tmp[1] = tmp[20] & tmp[28];
 		tmp[4] = tmp[178] ^ tmp[15];
@@ -1877,11 +1877,11 @@ public final class Shuffle {
 		tmp[113] =
 				tmp[166] ^ (tmp[137] ^ tmp[154] & tmp[62]) ^ (tmp[109] & (tmp[113] | tmp[117]) ^ tmp[27] & tmp[117]) ^
 						(tmp[140] | (tmp[130] | tmp[160] ^ tmp[145] ^ tmp[117] & ~(tmp[113] ^ tmp[14])) ^ (
-						tmp[117] | tmp[174] ^ tmp[39]));
+								tmp[117] | tmp[174] ^ tmp[39]));
 		tmp[124] =
 				tmp[110] ^ tmp[62] ^ (tmp[51] ^ ((tmp[130] | tmp[174] ^ tmp[154] & tmp[117]) ^ tmp[40] & tmp[117])) ^
 						tmp[64] & (tmp[124] ^ tmp[109] & ((tmp[51] | tmp[172]) ^ (tmp[19] ^ tmp[117] & ~tmp[124]))
-						^ (tmp[40] | tmp[117]));
+								^ (tmp[40] | tmp[117]));
 		tmp[154] = tmp[28] & tmp[124];
 		tmp[40] = tmp[127] & tmp[124];
 		tmp[110] = tmp[93] & tmp[124];
@@ -2058,7 +2058,7 @@ public final class Shuffle {
 						^ tmp[122] & ~tmp[137])) ^ tmp[133] & (tmp[102] ^ tmp[122] & ~(tmp[28] | tmp[108])));
 		tmp[93] = tmp[12] & ~(tmp[177] & tmp[122] ^ tmp[133] & (tmp[137] ^ (tmp[177] ^ tmp[99] | tmp[122]))) ^
 				(tmp[150] ^ tmp[143] ^ (tmp[133] & ~(tmp[110] ^ (tmp[40] ^ (tmp[108] | tmp[93])) & tmp[122])
-				^ tmp[47] & tmp[44]));
+						^ tmp[47] & tmp[44]));
 		tmp[127] = tmp[111] ^ tmp[143] ^ tmp[122] & ~tmp[47] ^ (tmp[133] & ~(tmp[40] ^ tmp[154] & tmp[122]) ^ tmp[12]
 				& ~((tmp[108] ^ tmp[154]) & tmp[44] ^ tmp[133] & (tmp[127]
 				^ (tmp[127] ^ tmp[108] & tmp[124]) & tmp[122])));
@@ -2126,14 +2126,14 @@ public final class Shuffle {
 		tmp[120] =
 				(tmp[113] | tmp[98] ^ tmp[80] & tmp[17]) ^ (tmp[37] ^ tmp[86]) ^ (tmp[80] | tmp[56] ^ tmp[34]) ^
 						tmp[70] & (tmp[34] ^ (tmp[98] ^ (tmp[113] | tmp[128] ^ tmp[98] & tmp[36])) ^ tmp[36] & (tmp[40]
-						^ tmp[120]));
+								^ tmp[120]));
 		tmp[37] = ~tmp[120];
 		tmp[90] = tmp[84] & tmp[37];
 		tmp[61] = tmp[84] | tmp[120];
 		tmp[151] =
 				tmp[174] ^ tmp[158] ^ (tmp[36] & tmp[44] ^ (tmp[113] | tmp[17] ^ tmp[34] ^ (tmp[80] | tmp[128]))) ^
 						(tmp[32] | tmp[40] ^ (tmp[154] ^ (tmp[80] | tmp[128] ^ tmp[11] & ~tmp[17])) ^ tmp[62] & (
-						tmp[128] ^ (tmp[80] | tmp[128] ^ tmp[11] & tmp[151])));
+								tmp[128] ^ (tmp[80] | tmp[128] ^ tmp[11] & tmp[151])));
 		tmp[34] = tmp[178] | tmp[151];
 		tmp[154] = ~tmp[121];
 		tmp[40] = tmp[56] & tmp[32];
@@ -2141,7 +2141,7 @@ public final class Shuffle {
 				tmp[80] ^ (tmp[2] ^ tmp[75]) ^ tmp[11] & tmp[17] ^ tmp[62] & (tmp[98] ^ (tmp[104] ^ (tmp[11] |
 						tmp[80]))) ^ tmp[70] & (tmp[3] ^ (tmp[57] ^ (tmp[36] & tmp[104] ^ (tmp[113] | tmp[104] ^
 						(tmp[80]
-						| tmp[11] ^ tmp[57])))));
+								| tmp[11] ^ tmp[57])))));
 		tmp[67] = tmp[133] ^ tmp[162] ^ (tmp[85] ^ (tmp[154] & (tmp[67] ^ (tmp[129] | tmp[32])) ^ tmp[24] & tmp[32]))
 				^ tmp[108] & (tmp[32] & ~tmp[67] ^ (tmp[56] ^ tmp[154] & (tmp[48] ^ tmp[40])));
 		tmp[85] = tmp[74] ^ tmp[67];
@@ -2238,7 +2238,7 @@ public final class Shuffle {
 		tmp[187] =
 				tmp[132] ^ ((tmp[93] | tmp[187] ^ tmp[164] & tmp[187] ^ tmp[178] & (tmp[185] ^ tmp[164] & tmp[15])) ^
 						(tmp[115] ^ tmp[164] & (tmp[154] ^ tmp[96]) ^ tmp[129] & tmp[169] ^ tmp[178] & ~(tmp[115]
-						^ tmp[164] & tmp[190])));
+								^ tmp[164] & tmp[190])));
 		tmp[191] = tmp[46] & tmp[189];
 		tmp[192] = tmp[138] & tmp[189];
 		tmp[100] = tmp[164] & (tmp[100] ^ tmp[192]);
@@ -2256,7 +2256,7 @@ public final class Shuffle {
 		tmp[114] =
 				tmp[105] ^ (tmp[27] ^ (tmp[141] ^ tmp[63] & (tmp[68] ^ tmp[66])) ^ tmp[147] & ~(tmp[132] & tmp[68])) ^
 						(tmp[22] ^ tmp[132] & ~(tmp[14] & tmp[141] ^ tmp[114]) ^ tmp[147] & (tmp[73] ^ tmp[166])
-						| tmp[88]);
+								| tmp[88]);
 		tmp[106] = tmp[171] ^ (tmp[45] ^ (tmp[39] | tmp[161]) ^ (tmp[126] ^ tmp[144] & ~(tmp[142] ^ (tmp[33] ^ tmp[33]
 				& tmp[106]))))
 				^ (tmp[172] ^ (tmp[132] ^ (tmp[39] | tmp[45])) ^ tmp[144] & (tmp[132] ^ tmp[30] & tmp[142] ^ (tmp[39]
@@ -2267,7 +2267,7 @@ public final class Shuffle {
 		tmp[66] = tmp[34] & tmp[106];
 		tmp[50] = tmp[119] ^ (tmp[157] ^ ((tmp[39] | tmp[82]) ^ tmp[30] & tmp[82]) ^ tmp[144] & ~tmp[50]) ^ tmp[88] &
 				~(tmp[125] ^ (tmp[126] ^ (tmp[144] & tmp[50] ^ (tmp[39] | tmp[83] ^ (tmp[126]
-				| tmp[82])))));
+						| tmp[82])))));
 		tmp[125] = ~tmp[50];
 		tmp[119] = ~tmp[40];
 		tmp[166] = tmp[20] | tmp[50];
@@ -2309,7 +2309,7 @@ public final class Shuffle {
 		tmp[21] =
 				tmp[140] ^ (tmp[83] ^ (tmp[39] ^ tmp[82]) ^ tmp[144] & (tmp[126] | (tmp[132] | tmp[39]))) ^ tmp[88] &
 						~(tmp[142] ^ tmp[6] & (tmp[126] ^ tmp[172]) ^ (tmp[83] | tmp[142]) ^ tmp[144] & ~(tmp[83]
-						^ (tmp[39] | tmp[126] ^ tmp[21])));
+								^ (tmp[39] | tmp[126] ^ tmp[21])));
 		tmp[148] = tmp[14] ^ (tmp[145] ^ (tmp[165] ^ tmp[159] & (tmp[148] ^ (tmp[102] | tmp[130] ^ (tmp[165] |
 				tmp[145]))) ^ tmp[102] & tmp[176])) ^ (tmp[25] ^ (tmp[151] | tmp[25]) | tmp[21]);
 		tmp[176] = ~tmp[21];
@@ -2348,8 +2348,9 @@ public final class Shuffle {
 		tmp[41] = tmp[122] | tmp[38];
 		tmp[8] = tmp[79] ^ tmp[68] ^ (tmp[155] ^ (tmp[124] | tmp[41])) ^ (tmp[141] | tmp[9] ^ tmp[146] & tmp[55]) ^
 				(tmp[77] | tmp[41] ^ (tmp[9] ^ (
-				(tmp[141] | tmp[38] ^ (tmp[124] | tmp[8] & tmp[122] ^ tmp[111])) ^ (tmp[124] | tmp[38] ^ tmp[2] &
-						tmp[16]))));
+						(tmp[141] | tmp[38] ^ (tmp[124] | tmp[8] & tmp[122] ^ tmp[111])) ^ (tmp[124] | tmp[38] ^
+								tmp[2] &
+								tmp[16]))));
 		tmp[86] =
 				tmp[135] & tmp[53] ^ (tmp[93] ^ tmp[72]) ^ (tmp[60] ^ ((tmp[160] ^ tmp[86] | tmp[50]) ^ ~(tmp[53] &
 						(tmp[163] ^ tmp[128]) ^ (tmp[135] ^ tmp[158] ^ (tmp[54] ^ tmp[170]) & tmp[125])) & tmp[8]));
@@ -2524,7 +2525,8 @@ public final class Shuffle {
 		tmp[23] = ~tmp[121];
 		tmp[97] ^= tmp[59] ^ tmp[114] & ~(tmp[104] ^ tmp[70]) ^ (tmp[139] ^ (tmp[104] | tmp[114])) & tmp[68] ^
 				(tmp[127]
-				| (tmp[104] ^ (tmp[19] | tmp[104])) & tmp[114] ^ tmp[30] ^ (tmp[139] ^ tmp[114] & ~tmp[22]) & tmp[68]);
+						| (tmp[104] ^ (tmp[19] | tmp[104])) & tmp[114] ^ tmp[30] ^ (tmp[139] ^ tmp[114] & ~tmp[22]) &
+						tmp[68]);
 		tmp[7] = tmp[66] | tmp[97];
 		tmp[102] = ~tmp[97];
 		tmp[118] = tmp[7] & tmp[102];
@@ -2701,7 +2703,7 @@ public final class Shuffle {
 		tmp[102] &= tmp[72];
 		tmp[64] = ((tmp[62] | tmp[18]) ^ (tmp[170] ^ (tmp[175] ^ tmp[95]) & tmp[23])) & tmp[114] ^ (tmp[40] ^
 				(tmp[123] ^ tmp[54] ^ tmp[99] & (tmp[18] ^ tmp[121] & (tmp[125] ^ tmp[157] & tmp[54]))
-				^ tmp[121] & ~(tmp[91] ^ tmp[157] & ~tmp[64])));
+						^ tmp[121] & ~(tmp[91] ^ tmp[157] & ~tmp[64])));
 		tmp[91] = ~tmp[3];
 		tmp[170] = (tmp[171] ^ tmp[1] ^ tmp[121] & (tmp[1] ^ tmp[125]) ^ tmp[99] & (tmp[4] ^ tmp[54] ^ tmp[95] &
 				tmp[121]) | tmp[190]) ^ (tmp[162] ^ (tmp[157] ^ tmp[166] ^ tmp[121] & (tmp[135] | tmp[157])
@@ -3061,7 +3063,7 @@ public final class Shuffle {
 						tmp[106] | tmp[76] ^ (tmp[67] | tmp[179]))));
 		tmp[145] = (tmp[76] | tmp[179]) ^ (tmp[170] ^ tmp[175]) ^ tmp[63] & (tmp[25] ^ tmp[167] & tmp[103]) ^
 				(tmp[102] | tmp[112] ^ tmp[63] & (tmp[145] ^ tmp[145] & tmp[103])
-				^ (tmp[163] | tmp[112]) & tmp[103]);
+						^ (tmp[163] | tmp[112]) & tmp[103]);
 		tmp[163] = tmp[90] & tmp[103];
 		tmp[25] = tmp[72] ^ (tmp[90] ^ tmp[113]) ^ ((tmp[106] | tmp[175] ^ tmp[179] & ~(tmp[1] ^ tmp[25])) ^ (tmp[102]
 				| tmp[175] ^ (tmp[106] | tmp[90] ^ tmp[34] ^ tmp[163]) ^ tmp[179] & ~tmp[113])
@@ -3099,7 +3101,7 @@ public final class Shuffle {
 		tmp[63] = tmp[116] ^ tmp[156];
 		tmp[147] ^= tmp[115] ^ tmp[190] ^ tmp[31] & ~tmp[63] ^ (tmp[124] | tmp[82] ^ tmp[31] & tmp[63]) ^ tmp[112] & ~
 				(tmp[170] ^ tmp[3] & (tmp[91] ^ (tmp[31] | tmp[91])) ^ tmp[31] & ~(tmp[190]
-				^ tmp[134] & tmp[140]));
+						^ tmp[134] & tmp[140]));
 		tmp[55] = tmp[16] | tmp[147];
 		tmp[54] = ~tmp[147];
 		tmp[167] = tmp[16] ^ tmp[147];
@@ -3169,7 +3171,7 @@ public final class Shuffle {
 		tmp[79] =
 				tmp[85] & ~(tmp[84] & tmp[50] ^ (tmp[50] ^ tmp[77] & (tmp[44] ^ (tmp[71] | tmp[92])))) ^ (tmp[118] ^
 						(tmp[41] ^ (tmp[59] ^ ((tmp[94] | tmp[79] ^ tmp[117] ^ (tmp[71] | tmp[59])) ^ tmp[84] & (
-						tmp[83] ^ tmp[15])))));
+								tmp[83] ^ tmp[15])))));
 		tmp[15] = tmp[121] & tmp[79];
 		tmp[84] = tmp[121] & ~tmp[79];
 		tmp[92] = tmp[57] ^ (tmp[27] ^ tmp[77] & (tmp[117] ^ (tmp[71] | tmp[98] ^ tmp[59]))) ^ (tmp[108] ^ (tmp[2] ^
@@ -3558,7 +3560,7 @@ public final class Shuffle {
 				tmp[92] ^ tmp[115] & tmp[94] ^ (tmp[93] | tmp[29] ^ tmp[50]) ^ tmp[76] & (tmp[112] ^ tmp[35]) ^
 						(tmp[186] | tmp[77] ^ tmp[81] ^ (tmp[34] | tmp[181] ^ (tmp[67] ^ tmp[30])) ^ tmp[70] &
 								(tmp[139]
-						^ tmp[48]));
+										^ tmp[48]));
 		tmp[29] = tmp[67] ^ (tmp[29] | tmp[122]);
 		tmp[94] = ~tmp[139];
 		tmp[81] =
@@ -3623,7 +3625,7 @@ public final class Shuffle {
 		tmp[187] =
 				tmp[189] ^ tmp[161] ^ (tmp[16] ^ tmp[137]) ^ tmp[93] & ~(tmp[24] ^ (tmp[91] ^ tmp[54] & tmp[76])) ^
 						tmp[27] & (tmp[137] ^ (tmp[161] | tmp[178] ^ tmp[35]) ^ tmp[93] & ~(tmp[187] ^ (tmp[17] ^ (
-						tmp[161] | tmp[176] ^ tmp[159]))));
+								tmp[161] | tmp[176] ^ tmp[159]))));
 		tmp[182] =
 				tmp[27] & ~(tmp[182] ^ tmp[54] & tmp[91] ^ tmp[143] & ~(tmp[178] | tmp[176]) ^ tmp[93] & ~(tmp[178] ^
 						(tmp[91] ^ (tmp[161] | tmp[91])))) ^ (tmp[176] & tmp[54] ^ (tmp[170] ^ tmp[178]) ^ (
@@ -3644,7 +3646,7 @@ public final class Shuffle {
 		tmp[76] = ~tmp[159];
 		tmp[8] = ~tmp[151] & (tmp[133] ^ tmp[71]) ^ tmp[78] ^ (tmp[31] ^ tmp[10] & (tmp[175] ^ (tmp[43] ^ tmp[71]))) ^
 				tmp[170] & (tmp[151] & tmp[71] ^ (tmp[8] ^ tmp[71]) ^ (tmp[79]
-				| tmp[43] ^ tmp[87] ^ tmp[58] & ~tmp[8]));
+						| tmp[43] ^ tmp[87] ^ tmp[58] & ~tmp[8]));
 		tmp[31] = ~tmp[8];
 		tmp[117] =
 				tmp[147] ^ (tmp[123] ^ tmp[172] ^ tmp[13] & ~tmp[117]) ^ (tmp[57] & ~(tmp[167] ^ (tmp[66] ^ tmp[13] &
@@ -3828,7 +3830,7 @@ public final class Shuffle {
 				tmp[142] & (tmp[48] ^ tmp[22] ^ (tmp[1] | tmp[22]) ^ tmp[11] & ~(tmp[109] ^ (tmp[1] | tmp[22] ^
 						tmp[50]))) ^ (tmp[186] ^ ((tmp[1] | tmp[50] & tmp[5]) ^ (tmp[59] ^ tmp[10]) ^ tmp[11] &
 						(tmp[59]
-						^ tmp[50] & tmp[55])));
+								^ tmp[50] & tmp[55])));
 		vector[5] = tmp[182];
 		vector[6] =
 				(tmp[182] | tmp[78] ^ tmp[98] ^ tmp[24] & tmp[121] ^ tmp[6] & ~(tmp[60] ^ tmp[136] ^ (tmp[118] |
@@ -3884,7 +3886,7 @@ public final class Shuffle {
 		vector[30] =
 				tmp[63] ^ (tmp[154] ^ (tmp[68] ^ tmp[30] & tmp[35]) ^ (tmp[82] | tmp[88] ^ tmp[30] & tmp[86]) ^
 						(tmp[97] | tmp[113] ^ tmp[30] & (tmp[149] ^ tmp[49] & ~tmp[166]) ^ tmp[108] & (tmp[135] ^ (
-						tmp[144] ^ tmp[30] & ~tmp[145]))));
+								tmp[144] ^ tmp[30] & ~tmp[145]))));
 		vector[31] = tmp[74];
 		vector[32] = ~(tmp[72] ^ (tmp[53] & ~(tmp[74] ^ tmp[127]) ^ (tmp[117] ^ tmp[168] ^ tmp[3] & tmp[120] &
 				tmp[127]) ^ tmp[1] & ~(tmp[51] & tmp[175] ^ tmp[53] & (tmp[147] ^ tmp[7] & tmp[127]))));
@@ -3896,7 +3898,7 @@ public final class Shuffle {
 		vector[37] = tmp[142];
 		vector[38] = ~(tmp[173] ^ ((tmp[152] | tmp[130]) ^ tmp[150] ^ tmp[60] & (tmp[185] ^ (tmp[152] | tmp[150])) ^
 				(tmp[159] | tmp[60] & (tmp[92] & tmp[12] ^ tmp[185]) ^ (tmp[185]
-				^ tmp[152] & ~tmp[130]))));
+						^ tmp[152] & ~tmp[130]))));
 		vector[39] = tmp[117];
 		vector[40] = ~(tmp[95] ^ (tmp[30] ^ (tmp[153] ^ tmp[135]) ^ (tmp[144] ^ tmp[129] & tmp[49]) & tmp[108] ^
 				tmp[43] & (tmp[86] ^ (tmp[30] | tmp[113]) ^ tmp[108] & (tmp[88] ^ tmp[30] & ~tmp[135]))));

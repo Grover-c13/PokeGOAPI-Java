@@ -38,10 +38,10 @@ public class Signature {
 	/**
 	 * Given a fully built request, set the signature correctly.
 	 *
-	 * @param api     the api
+	 * @param api the api
 	 * @param builder the RequestEnvelope builder
 	 * @throws RemoteServerException if an invalid request is sent
-	 * @throws HashException         if hashing fails
+	 * @throws HashException if hashing fails
 	 */
 	public static void setSignature(PokemonGo api, RequestEnvelope.Builder builder)
 			throws RemoteServerException, HashException {

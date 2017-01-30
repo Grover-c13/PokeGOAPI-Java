@@ -16,8 +16,7 @@
 package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Enums.PokemonIdOuterClass;
-import POGOProtos.Networking.Responses.DownloadItemTemplatesResponseOuterClass.DownloadItemTemplatesResponse
-		.ItemTemplate;
+import POGOProtos.Networking.Responses.DownloadItemTemplatesResponseOuterClass.DownloadItemTemplatesResponse.ItemTemplate;
 import POGOProtos.Settings.Master.PlayerLevelSettingsOuterClass;
 import POGOProtos.Settings.Master.Pokemon.StatsAttributesOuterClass;
 import POGOProtos.Settings.Master.PokemonSettingsOuterClass;
@@ -88,7 +87,7 @@ public class PokemonCpUtils {
 	/**
 	 * Get the maximum CP from the values
 	 *
-	 * @param attack  All attack values combined
+	 * @param attack All attack values combined
 	 * @param defense All defense values combined
 	 * @param stamina All stamina values combined
 	 * @return Maximum CP for these levels
@@ -119,9 +118,9 @@ public class PokemonCpUtils {
 	/**
 	 * Get the maximum CP from the values
 	 *
-	 * @param attack      All attack values combined
-	 * @param defense     All defense values combined
-	 * @param stamina     All stamina values combined
+	 * @param attack All attack values combined
+	 * @param defense All defense values combined
+	 * @param stamina All stamina values combined
 	 * @param playerLevel The player level
 	 * @return Maximum CP for these levels
 	 */
@@ -134,9 +133,9 @@ public class PokemonCpUtils {
 	/**
 	 * Calculate CP based on raw values
 	 *
-	 * @param attack               All attack values combined
-	 * @param defense              All defense values combined
-	 * @param stamina              All stamina values combined
+	 * @param attack All attack values combined
+	 * @param defense All defense values combined
+	 * @param stamina All stamina values combined
 	 * @param combinedCpMultiplier All CP multiplier values combined
 	 * @return CP
 	 */
@@ -148,7 +147,7 @@ public class PokemonCpUtils {
 	/**
 	 * Get the CP after powerup
 	 *
-	 * @param cp                   Current CP level
+	 * @param cp Current CP level
 	 * @param combinedCpMultiplier All CP multiplier values combined
 	 * @return New CP
 	 */
@@ -170,7 +169,7 @@ public class PokemonCpUtils {
 	/**
 	 * Get the new additional multiplier after powerup
 	 *
-	 * @param cpMultiplier           Multiplier
+	 * @param cpMultiplier Multiplier
 	 * @param additionalCpMultiplier Additional multiplier
 	 * @return Additional CP multiplier after upgrade
 	 */

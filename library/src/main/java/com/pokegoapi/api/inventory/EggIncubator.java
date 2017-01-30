@@ -39,7 +39,7 @@ public class EggIncubator {
 	/**
 	 * Create new EggIncubator with given proto.
 	 *
-	 * @param api   the api
+	 * @param api the api
 	 * @param proto the proto
 	 */
 	public EggIncubator(PokemonGo api, EggIncubatorOuterClass.EggIncubator proto) {
@@ -72,10 +72,10 @@ public class EggIncubator {
 	 *
 	 * @param egg the egg
 	 * @return status of putting egg in incubator
-	 * @throws RemoteServerException  the remote server exception
-	 * @throws LoginFailedException   the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException          if an exception occurred while requesting hash
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public UseItemEggIncubatorResponse.Result hatchEgg(EggPokemon egg)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {

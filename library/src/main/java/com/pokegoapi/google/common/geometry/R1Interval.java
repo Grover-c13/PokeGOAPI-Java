@@ -250,7 +250,7 @@ public final strictfp class R1Interval {
 	 * Return true if length of the symmetric difference between the two intervals
 	 * is at most the given tolerance.
 	 *
-	 * @param y        y
+	 * @param y y
 	 * @param maxError maxError
 	 */
 	public boolean approxEquals(R1Interval y, double maxError) {

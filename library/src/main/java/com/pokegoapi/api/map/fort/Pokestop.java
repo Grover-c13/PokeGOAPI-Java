@@ -57,7 +57,7 @@ public class Pokestop {
 	/**
 	 * Instantiates a new Pokestop.
 	 *
-	 * @param api      the api
+	 * @param api the api
 	 * @param fortData the fort data
 	 */
 	public Pokestop(PokemonGo api, FortDataOuterClass.FortData fortData) {
@@ -173,10 +173,10 @@ public class Pokestop {
 	 * Loots a pokestop for pokeballs and other items.
 	 *
 	 * @return PokestopLootResult
-	 * @throws LoginFailedException   if login failed
-	 * @throws RemoteServerException  if the server failed to respond
+	 * @throws LoginFailedException if login failed
+	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException          if an exception occurred while requesting hash
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public PokestopLootResult loot() throws LoginFailedException, CaptchaActiveException, RemoteServerException,
 			HashException {
@@ -217,11 +217,11 @@ public class Pokestop {
 	 * Adds a modifier to this pokestop. (i.e. add a lure module)
 	 *
 	 * @param item the modifier to add to this pokestop
-	 * @throws LoginFailedException   if login failed
-	 * @throws RemoteServerException  if the server failed to respond or the modifier could not be added to this
+	 * @throws LoginFailedException if login failed
+	 * @throws RemoteServerException if the server failed to respond or the modifier could not be added to this
 	 * pokestop
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException          if an exception occurred while requesting hash
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public void addModifier(ItemIdOuterClass.ItemId item)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
@@ -242,19 +242,19 @@ public class Pokestop {
 
 		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS,
 				reqMsg);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, FortDetails>
-				() {
-			@Override
-			public FortDetails call(ByteString result) {
-				FortDetailsResponseOuterClass.FortDetailsResponse response = null;
-				try {
-					response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(result);
-				} catch (InvalidProtocolBufferException e) {
-					throw new AsyncRemoteServerException(e);
-				}
-				return new FortDetails(response);
-			}
-		});
+		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
+				new Func1<ByteString, FortDetails>() {
+					@Override
+					public FortDetails call(ByteString result) {
+						FortDetailsResponseOuterClass.FortDetailsResponse response = null;
+						try {
+							response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(result);
+						} catch (InvalidProtocolBufferException e) {
+							throw new AsyncRemoteServerException(e);
+						}
+						return new FortDetails(response);
+					}
+				});
 	}
 
 
@@ -262,10 +262,10 @@ public class Pokestop {
 	 * Get more detailed information about a pokestop.
 	 *
 	 * @return FortDetails
-	 * @throws LoginFailedException   if login failed
-	 * @throws RemoteServerException  if the server failed to respond
+	 * @throws LoginFailedException if login failed
+	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException          if an exception occurred while requesting hash
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public FortDetails getDetails() throws LoginFailedException, CaptchaActiveException, RemoteServerException,
 			HashException {
@@ -302,10 +302,10 @@ public class Pokestop {
 	 *
 	 * @param updateFortDetails to make a new request and get updated lured status
 	 * @return lure status
-	 * @throws LoginFailedException   If login failed.
-	 * @throws RemoteServerException  If server communications failed.
+	 * @throws LoginFailedException If login failed.
+	 * @throws RemoteServerException If server communications failed.
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException          if an exception occurred while requesting hash
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public boolean hasLure(boolean updateFortDetails)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {

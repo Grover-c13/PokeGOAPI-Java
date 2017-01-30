@@ -88,10 +88,10 @@ public class Settings {
 	/**
 	 * Updates settings latest data.
 	 *
-	 * @throws LoginFailedException   the login failed exception
-	 * @throws RemoteServerException  the remote server exception
+	 * @throws LoginFailedException the login failed exception
+	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException          if an exception occurred while requesting hash
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public void updateSettings() throws RemoteServerException, CaptchaActiveException, LoginFailedException,
 			HashException {

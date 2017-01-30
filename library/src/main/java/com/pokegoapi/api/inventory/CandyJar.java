@@ -46,7 +46,7 @@ public class CandyJar {
 	/**
 	 * Sets the number of candies in the jar.
 	 *
-	 * @param family  Pokemon family id
+	 * @param family Pokemon family id
 	 * @param candies Amount to set it to
 	 */
 	public void setCandy(PokemonFamilyId family, int candies) {

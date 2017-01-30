@@ -257,7 +257,7 @@ public strictfp class S2EdgeUtil {
 		 * Accumulate a bounding rectangle from provided edges.
 		 *
 		 * @param from start of edge
-		 * @param to   end of edge.
+		 * @param to end of edge.
 		 */
 		public void addEdgeToBounds(S2Point from, S2Point to) {
 			if (!boundSet) {

@@ -91,19 +91,19 @@ public class PokeHashProvider implements HashProvider {
 	}
 
 	/**
-	 * @param timestamp   timestamp to hash
-	 * @param latitude    latitude to hash
-	 * @param longitude   longitude to hash
-	 * @param altitude    altitude to hash
-	 * @param authTicket  auth ticket to hash
+	 * @param timestamp timestamp to hash
+	 * @param latitude latitude to hash
+	 * @param longitude longitude to hash
+	 * @param altitude altitude to hash
+	 * @param authTicket auth ticket to hash
 	 * @param sessionData session data to hash
-	 * @param requests    request data to hash
-	 * @return
-	 * @throws HashException
+	 * @param requests request data to hash
+	 * @return the hash provider
+	 * @throws HashException - if can not login to the hash service
 	 */
 	@Override
 	public Hash provide(long timestamp, double latitude, double longitude, double altitude, byte[] authTicket,
-						byte[] sessionData, byte[][] requests) throws HashException {
+			byte[] sessionData, byte[][] requests) throws HashException {
 		Request request = new Request(latitude, longitude, altitude, timestamp, authTicket, sessionData, requests);
 		try {
 			HttpsURLConnection connection = (HttpsURLConnection) new URL(HASH_ENDPOINT).openConnection();
@@ -228,7 +228,7 @@ public class PokeHashProvider implements HashProvider {
 		private String[] requests;
 
 		private Request(double latitude, double longitude, double altitude, long timestamp, byte[] authTicket,
-						byte[] sessionData, byte[][] requests) {
+				byte[] sessionData, byte[][] requests) {
 			this.latitude = latitude;
 			this.longitude = longitude;
 			this.altitude = altitude;

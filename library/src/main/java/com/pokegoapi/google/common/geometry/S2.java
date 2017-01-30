@@ -74,7 +74,7 @@ public final strictfp class S2 {
 	 * the child cell.
 	 *
 	 * @param position the position of the subcell in the Hilbert traversal, in
-	 *                 the range [0,3].
+	 * the range [0,3].
 	 * @return a bit mask containing some combination of {@link #SWAP_MASK} and
 	 * {@link #INVERT_MASK}.
 	 * @throws IllegalArgumentException if position is out of bounds.
@@ -102,8 +102,8 @@ public final strictfp class S2 {
 	 * {@link #ijToPos}.
 	 *
 	 * @param orientation the subcell orientation, in the range [0,3].
-	 * @param position    the position of the subcell in the Hilbert traversal, in
-	 *                    the range [0,3].
+	 * @param position the position of the subcell in the Hilbert traversal, in
+	 * the range [0,3].
 	 * @return the IJ-index where {@code 0-&gt;(0,0), 1-&gt;(0,1), 2-&gt;(1,0), 3-&gt;(1,1)}.
 	 * @throws IllegalArgumentException if either parameter is out of bounds.
 	 */
@@ -131,8 +131,8 @@ public final strictfp class S2 {
 	 * curve. This is the inverse of {@link #posToIJ}.
 	 *
 	 * @param orientation the subcell orientation, in the range [0,3].
-	 * @param ijIndex     the subcell index where
-	 *                    {@code 0-&gt;(0,0), 1-&gt;(0,1), 2-&gt;(1,0), 3-&gt;(1,1)}.
+	 * @param ijIndex the subcell index where
+	 * {@code 0-&gt;(0,0), 1-&gt;(0,1), 2-&gt;(1,0), 3-&gt;(1,1)}.
 	 * @return the position of the subcell in the Hilbert traversal, in the range
 	 * [0,3].
 	 * @throws IllegalArgumentException if either parameter is out of bounds.
@@ -156,7 +156,7 @@ public final strictfp class S2 {
 		/**
 		 * Defines a cell metric of the given dimension (1 == length, 2 == area).
 		 *
-		 * @param dim   dim
+		 * @param dim dim
 		 * @param deriv deriv
 		 */
 		public Metric(int dim, double deriv) {
@@ -818,8 +818,8 @@ public final strictfp class S2 {
 	 * Return true if two points are within the given distance of each other
 	 * (mainly useful for testing).
 	 *
-	 * @param a        a
-	 * @param b        b
+	 * @param a a
+	 * @param b b
 	 * @param maxError maxError
 	 * @return true if angle of AB is &lt;= maxError.
 	 */
@@ -837,8 +837,8 @@ public final strictfp class S2 {
 	}
 
 	/**
-	 * @param a        a
-	 * @param b        b
+	 * @param a a
+	 * @param b b
 	 * @param maxError maxError
 	 * @return true if the difference of AB &lt;= maxError
 	 */

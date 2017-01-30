@@ -16,8 +16,7 @@
 package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
-import POGOProtos.Networking.Responses.DownloadItemTemplatesResponseOuterClass.DownloadItemTemplatesResponse
-		.ItemTemplate;
+import POGOProtos.Networking.Responses.DownloadItemTemplatesResponseOuterClass.DownloadItemTemplatesResponse.ItemTemplate;
 import POGOProtos.Settings.Master.PokemonSettingsOuterClass.PokemonSettings;
 import com.pokegoapi.main.PokemonMeta;
 

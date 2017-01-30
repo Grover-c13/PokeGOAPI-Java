@@ -55,7 +55,7 @@ public class MapUtil<K extends MapPoint> {
 	 * Dist between coordinates
 	 *
 	 * @param start the start coordinate
-	 * @param end   the end coordinate
+	 * @param end the end coordinate
 	 * @return the double
 	 */
 	public static double distFrom(Point start, Point end) {
@@ -87,7 +87,7 @@ public class MapUtil<K extends MapPoint> {
 	 * Sort items map by distance
 	 *
 	 * @param items the items
-	 * @param api   the api
+	 * @param api the api
 	 * @return the map
 	 */
 	public Map<Double, K> sortItems(List<K> items, PokemonGo api) {

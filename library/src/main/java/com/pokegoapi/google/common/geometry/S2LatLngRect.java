@@ -678,7 +678,7 @@ public strictfp class S2LatLngRect implements S2Region {
 	 * Return true if the edge AB intersects the given edge of constant longitude.
 	 */
 	private static boolean intersectsLngEdge(S2Point a, S2Point b,
-											 R1Interval lat, double lng) {
+			R1Interval lat, double lng) {
 		// Return true if the segment AB intersects the given edge of constant
 		// longitude. The nice thing about edges of constant longitude is that
 		// they are straight lines on the sphere (geodesics).
@@ -691,7 +691,7 @@ public strictfp class S2LatLngRect implements S2Region {
 	 * Return true if the edge AB intersects the given edge of constant latitude.
 	 */
 	private static boolean intersectsLatEdge(S2Point a, S2Point b, double lat,
-											 S1Interval lng) {
+			S1Interval lng) {
 		// Return true if the segment AB intersects the given edge of constant
 		// latitude. Unfortunately, lines of constant latitude are curves on
 		// the sphere. They can intersect a straight edge in 0, 1, or 2 points.

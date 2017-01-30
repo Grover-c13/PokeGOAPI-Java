@@ -35,9 +35,9 @@ public class Path {
 	/**
 	 * Creates a Path with the given positions
 	 *
-	 * @param source      the source of this path
+	 * @param source the source of this path
 	 * @param destination the destination for this path
-	 * @param speed       the speed to move at in kmph
+	 * @param speed the speed to move at in kmph
 	 */
 	public Path(Point source, Point destination, double speed) {
 		this.source = source;
@@ -97,7 +97,7 @@ public class Path {
 	/**
 	 * Changes the speed of this path
 	 *
-	 * @param api   the current API
+	 * @param api the current API
 	 * @param speed the new speed to travel at
 	 */
 	public void setSpeed(PokemonGo api, double speed) {

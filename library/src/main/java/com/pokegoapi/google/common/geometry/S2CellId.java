@@ -753,7 +753,7 @@ public final strictfp class S2CellId implements Comparable<S2CellId> {
 	 * the Hilbert curve orientation for the current cell.
 	 */
 	public int toFaceIJOrientation(MutableInteger pi, MutableInteger pj,
-								   MutableInteger orientation) {
+			MutableInteger orientation) {
 		// System.out.println("Entering toFaceIjorientation");
 		int face = this.face();
 		int bits = (face & SWAP_MASK);
@@ -803,7 +803,7 @@ public final strictfp class S2CellId implements Comparable<S2CellId> {
 		bits = LOOKUP_IJ[bits];
 		i.setValue(i.intValue()
 				+ ((bits >> (LOOKUP_BITS + 2)) << (k * LOOKUP_BITS)));
-    /*
+	/*
      * System.out.println("left is " + ((bits >> 2) & ((1 << kLookupBits) -
      * 1))); System.out.println("right is " + (k * kLookupBits));
      * System.out.println("j is: " + j.intValue()); System.out.println("addition
@@ -890,7 +890,7 @@ public final strictfp class S2CellId implements Comparable<S2CellId> {
 	 * FromFaceIJWrap if sameFace is false.
 	 */
 	public static S2CellId fromFaceIJSame(int face, int i, int j,
-										  boolean sameFace) {
+			boolean sameFace) {
 		if (sameFace) {
 			return S2CellId.fromFaceIJ(face, i, j);
 		} else {
@@ -950,7 +950,7 @@ public final strictfp class S2CellId implements Comparable<S2CellId> {
 	}
 
 	private static void initLookupCell(int level, int i, int j,
-									   int origOrientation, int pos, int orientation) {
+			int origOrientation, int pos, int orientation) {
 		if (level == LOOKUP_BITS) {
 			int ij = (i << LOOKUP_BITS) + j;
 			LOOKUP_POS[(ij << 2) + origOrientation] = (pos << 2) + orientation;

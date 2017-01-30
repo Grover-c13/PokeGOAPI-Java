@@ -34,18 +34,18 @@ public class PlayerAvatar {
 	/**
 	 * Constructs an avatar with individual parameters
 	 *
-	 * @param gender   the gender of this avatar
-	 * @param skin     the skin index of this avatar
-	 * @param hair     the hair index of this avatar
-	 * @param shirt    the shirt index of this avatar
-	 * @param pants    the pants index of this avatar
-	 * @param hat      the hat index of this avatar
-	 * @param shoes    the shoe index of this avatar
-	 * @param eyes     the eye index of this avatar
+	 * @param gender the gender of this avatar
+	 * @param skin the skin index of this avatar
+	 * @param hair the hair index of this avatar
+	 * @param shirt the shirt index of this avatar
+	 * @param pants the pants index of this avatar
+	 * @param hat the hat index of this avatar
+	 * @param shoes the shoe index of this avatar
+	 * @param eyes the eye index of this avatar
 	 * @param backpack the backpack index of this avatar
 	 */
 	public PlayerAvatar(Gender gender, int skin, int hair, int shirt, int pants,
-						int hat, int shoes, int eyes, int backpack) {
+			int hat, int shoes, int eyes, int backpack) {
 		avatar = PlayerAvatarOuterClass.PlayerAvatar.newBuilder()
 				.setGender(gender)
 				.setSkin(skin)

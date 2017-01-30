@@ -128,7 +128,7 @@ public class AsyncCatchOptions {
 	/**
 	 * Selects a pokeball to use
 	 *
-	 * @param pokeballs          the pokeballs contained in your inventory
+	 * @param pokeballs the pokeballs contained in your inventory
 	 * @param captureProbability the probability of this capture
 	 * @return the pokeball to use
 	 * @throws NoSuchItemException if there are no pokeballs to use

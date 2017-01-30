@@ -56,7 +56,7 @@ public class Gym implements MapPoint {
 	/**
 	 * Gym object.
 	 *
-	 * @param api   The api object to use for requests.
+	 * @param api The api object to use for requests.
 	 * @param proto The FortData to populate the Gym with.
 	 */
 	public Gym(PokemonGo api, FortData proto) {
@@ -191,10 +191,10 @@ public class Gym implements MapPoint {
 	 * Get a list of pokemon defending this gym.
 	 *
 	 * @return List of pokemon
-	 * @throws LoginFailedException   if the login failed
-	 * @throws RemoteServerException  When a buffer exception is thrown
+	 * @throws LoginFailedException if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException          if there is a problem with the Hash key / Service
+	 * @throws HashException if there is a problem with the Hash key / Service
 	 */
 	public List<PokemonData> getDefendingPokemon()
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
@@ -212,10 +212,10 @@ public class Gym implements MapPoint {
 	 *
 	 * @param pokemon The pokemon to deploy
 	 * @return Result of attempt to deploy pokemon
-	 * @throws LoginFailedException   if the login failed
-	 * @throws RemoteServerException  When a buffer exception is thrown
+	 * @throws LoginFailedException if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException          if there is a problem with the Hash key / Service
+	 * @throws HashException if there is a problem with the Hash key / Service
 	 */
 	public FortDeployPokemonResponse.Result deployPokemon(Pokemon pokemon)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
@@ -242,8 +242,8 @@ public class Gym implements MapPoint {
 	 *
 	 * @param pokemon The pokemon to deploy
 	 * @return Result of attempt to deploy pokemon
-	 * @throws LoginFailedException   if the login failed
-	 * @throws RemoteServerException  When a buffer exception is thrown
+	 * @throws LoginFailedException if the login failed
+	 * @throws RemoteServerException When a buffer exception is thrown
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public Observable<FortDeployPokemonResponse.Result> deployPokemonAsync(Pokemon pokemon)

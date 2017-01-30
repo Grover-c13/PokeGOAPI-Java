@@ -20,10 +20,8 @@ import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Responses.DownloadItemTemplatesResponseOuterClass.DownloadItemTemplatesResponse;
-import POGOProtos.Networking.Responses.DownloadItemTemplatesResponseOuterClass.DownloadItemTemplatesResponse
-		.ItemTemplate;
-import POGOProtos.Networking.Responses.DownloadRemoteConfigVersionResponseOuterClass
-		.DownloadRemoteConfigVersionResponse;
+import POGOProtos.Networking.Responses.DownloadItemTemplatesResponseOuterClass.DownloadItemTemplatesResponse.ItemTemplate;
+import POGOProtos.Networking.Responses.DownloadRemoteConfigVersionResponseOuterClass.DownloadRemoteConfigVersionResponse;
 import POGOProtos.Settings.Master.BadgeSettingsOuterClass.BadgeSettings;
 import POGOProtos.Settings.Master.GymBattleSettingsOuterClass.GymBattleSettings;
 import POGOProtos.Settings.Master.ItemSettingsOuterClass.ItemSettings;
@@ -107,7 +105,7 @@ public class PokemonMeta {
 	/**
 	 * Updates the PokemonMeta from the response to DownloadItemTemplatesResponse and caches it
 	 *
-	 * @param data  the data from the response
+	 * @param data the data from the response
 	 * @param write if this should write the data to the cache
 	 * @throws IOException if writing fails
 	 */

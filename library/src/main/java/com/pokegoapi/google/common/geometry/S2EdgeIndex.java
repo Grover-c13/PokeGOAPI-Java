@@ -485,7 +485,7 @@ public abstract strictfp class S2EdgeIndex {
 	 * intersect with edge.
 	 */
 	private void getEdgesInChildrenCells(S2Point a, S2Point b, List<S2CellId> cover,
-										 Set<Integer> candidateCrossings) {
+			Set<Integer> candidateCrossings) {
 		// Put all edge references of (covering cells + descendant cells) into
 		// result.
 		// This relies on the natural ordering of S2CellIds.

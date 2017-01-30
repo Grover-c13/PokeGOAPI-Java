@@ -31,7 +31,7 @@ public class Utils {
 	 * Converts input streams to byte arrays.
 	 *
 	 * @param input the input
-	 * @param size  the size
+	 * @param size the size
 	 * @return the byte [ ]
 	 * @throws IOException the io exception
 	 */
@@ -49,7 +49,7 @@ public class Utils {
 	 * Appends the given requests to the given array
 	 *
 	 * @param requests the base array
-	 * @param append   the requests to append
+	 * @param append the requests to append
 	 * @return a new array with the appended requests
 	 */
 	public static ServerRequest[] appendRequests(ServerRequest[] requests, ServerRequest... append) {

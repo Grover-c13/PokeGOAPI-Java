@@ -22,18 +22,18 @@ public interface HashProvider {
 	/**
 	 * Provides a hash for the given input
 	 *
-	 * @param timestamp   timestamp to hash
-	 * @param latitude    latitude to hash
-	 * @param longitude   longitude to hash
-	 * @param altitude    altitude to hash
-	 * @param authTicket  auth ticket to hash
+	 * @param timestamp timestamp to hash
+	 * @param latitude latitude to hash
+	 * @param longitude longitude to hash
+	 * @param altitude altitude to hash
+	 * @param authTicket auth ticket to hash
 	 * @param sessionData session data to hash
-	 * @param requests    request data to hash
+	 * @param requests request data to hash
 	 * @return the hash for the given input
 	 * @throws HashException if an exception occurs while hashing the given inputs
 	 */
 	Hash provide(long timestamp, double latitude, double longitude, double altitude,
-				 byte[] authTicket, byte[] sessionData, byte[][] requests)
+			byte[] authTicket, byte[] sessionData, byte[][] requests)
 			throws HashException;
 
 	/**

@@ -243,7 +243,7 @@ public final strictfp class S2RegionCoverer {
 	 * Computes a list of cell ids that covers the given region and satisfies the
 	 * various restrictions specified above.
 	 *
-	 * @param region   The region to cover
+	 * @param region The region to cover
 	 * @param covering The list filled in by this method
 	 */
 	public void getCovering(S2Region region, ArrayList<S2CellId> covering) {
@@ -263,7 +263,7 @@ public final strictfp class S2RegionCoverer {
 	 * Computes a list of cell ids that is contained within the given region and
 	 * satisfies the various restrictions specified above.
 	 *
-	 * @param region   The region to fill
+	 * @param region The region to fill
 	 * @param interior The list filled in by this method
 	 */
 	public void getInteriorCovering(S2Region region, ArrayList<S2CellId> interior) {

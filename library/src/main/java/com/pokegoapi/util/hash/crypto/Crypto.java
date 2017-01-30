@@ -52,7 +52,7 @@ public class Crypto {
 	/**
 	 * Shuffles bytes.
 	 *
-	 * @param input        input data
+	 * @param input input data
 	 * @param msSinceStart time since start
 	 * @return shuffled bytes
 	 */
@@ -108,8 +108,8 @@ public class Crypto {
 		 * Create new CipherText with contents and IV.
 		 *
 		 * @param crypto the crypto instance to use
-		 * @param input  the contents
-		 * @param ms     the time
+		 * @param input the contents
+		 * @param ms the time
 		 */
 		public CipherText(Crypto crypto, byte[] input, long ms, Rand rand) {
 			this.crypto = crypto;

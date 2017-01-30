@@ -16,7 +16,7 @@ public interface LoginListener extends Listener {
 	/**
 	 * Called when a challenge is requested.
 	 *
-	 * @param api          the current api
+	 * @param api the current api
 	 * @param challengeURL the challenge url
 	 */
 	void onChallenge(PokemonGo api, String challengeURL);

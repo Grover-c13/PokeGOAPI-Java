@@ -25,7 +25,7 @@ public interface HeartbeatListener extends Listener {
 	/**
 	 * Called when the map is updated
 	 *
-	 * @param api        the current API
+	 * @param api the current API
 	 * @param mapObjects the updated map objects
 	 */
 	void onMapUpdate(PokemonGo api, MapObjects mapObjects);
@@ -33,7 +33,7 @@ public interface HeartbeatListener extends Listener {
 	/**
 	 * Called when an exception occurs while the map is being updated.
 	 *
-	 * @param api       the current API
+	 * @param api the current API
 	 * @param exception the exception that occurred while updating the map
 	 */
 	void onMapUpdateException(PokemonGo api, Exception exception);

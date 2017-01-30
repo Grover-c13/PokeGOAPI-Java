@@ -11,7 +11,7 @@ public interface TutorialListener extends Listener {
 	/**
 	 * Called during the tutorial when you are asked to enter a name.
 	 *
-	 * @param api         the current api
+	 * @param api the current api
 	 * @param lastFailure the last name used that was already taken; null for first try.
 	 * @return a name for the current player, null to pick random
 	 */

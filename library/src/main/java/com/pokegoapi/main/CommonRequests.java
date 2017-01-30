@@ -19,8 +19,7 @@ import POGOProtos.Enums.PlatformOuterClass.Platform;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
 import POGOProtos.Networking.Requests.Messages.CheckChallenge.CheckChallengeMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadItemTemplatesMessageOuterClass.DownloadItemTemplatesMessage;
-import POGOProtos.Networking.Requests.Messages.DownloadRemoteConfigVersionMessageOuterClass
-		.DownloadRemoteConfigVersionMessage;
+import POGOProtos.Networking.Requests.Messages.DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass.DownloadSettingsMessage;
 import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.GetAssetDigestMessage;
 import POGOProtos.Networking.Requests.Messages.GetBuddyWalked.GetBuddyWalkedMessage;
@@ -221,7 +220,7 @@ public class CommonRequests {
 	 * together with the others.
 	 *
 	 * @param request The main request we want to fire
-	 * @param api     The current instance of PokemonGO
+	 * @param api The current instance of PokemonGO
 	 * @return an array of ServerRequest
 	 * @deprecated Use ServerRequest#withCommons
 	 */
@@ -251,9 +250,9 @@ public class CommonRequests {
 	 * @param type the request type
 	 * @param data the response data
 	 * @throws InvalidProtocolBufferException if the server returns an invalid response
-	 * @throws CaptchaActiveException         if a captcha is active
-	 * @throws RemoteServerException          if the server throws an error
-	 * @throws LoginFailedException           if login fails
+	 * @throws CaptchaActiveException if a captcha is active
+	 * @throws RemoteServerException if the server throws an error
+	 * @throws LoginFailedException if login fails
 	 */
 	public static void queue(RequestType type, ByteString data)
 			throws InvalidProtocolBufferException, CaptchaActiveException, RemoteServerException,
@@ -266,9 +265,9 @@ public class CommonRequests {
 	 *
 	 * @param api the current api
 	 * @throws InvalidProtocolBufferException if the server returns an invalid response
-	 * @throws CaptchaActiveException         if a captcha is active
-	 * @throws RemoteServerException          if the server throws an error
-	 * @throws LoginFailedException           if login fails
+	 * @throws CaptchaActiveException if a captcha is active
+	 * @throws RemoteServerException if the server throws an error
+	 * @throws LoginFailedException if login fails
 	 */
 	public static void handleQueue(PokemonGo api)
 			throws InvalidProtocolBufferException, RemoteServerException, CaptchaActiveException,

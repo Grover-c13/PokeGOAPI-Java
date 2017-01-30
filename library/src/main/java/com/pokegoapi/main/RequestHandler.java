@@ -71,7 +71,7 @@ public class RequestHandler implements Runnable {
 	/**
 	 * Instantiates a new Request handler.
 	 *
-	 * @param api    the api
+	 * @param api the api
 	 * @param client the client
 	 */
 	public RequestHandler(PokemonGo api, OkHttpClient client) {
@@ -151,10 +151,10 @@ public class RequestHandler implements Runnable {
 	 * Sends multiple ServerRequests in a thread safe manner.
 	 *
 	 * @param serverRequests list of ServerRequests to be sent
-	 * @throws RemoteServerException  the remote server exception
-	 * @throws LoginFailedException   the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException          if an exception occurred while requesting hash
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public void sendServerRequests(ServerRequest... serverRequests)
 			throws RemoteServerException, LoginFailedException, CaptchaActiveException, HashException {
@@ -176,10 +176,10 @@ public class RequestHandler implements Runnable {
 	 * Sends multiple ServerRequests in a thread safe manner.
 	 *
 	 * @param serverRequests list of ServerRequests to be sent
-	 * @throws RemoteServerException  the remote server exception
-	 * @throws LoginFailedException   the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException          if hashing fails
+	 * @throws HashException if hashing fails
 	 */
 	private AuthTicket internalSendServerRequests(AuthTicket authTicket, ServerRequest... serverRequests)
 			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
