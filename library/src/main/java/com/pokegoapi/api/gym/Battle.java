@@ -37,6 +37,7 @@ import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
@@ -78,11 +79,11 @@ public class Battle {
 
 	private Queue<ServerAction> serverActionQueue
 			= new PriorityBlockingQueue<>(11, new Comparator<ServerAction>() {
-				@Override
-				public int compare(ServerAction o1, ServerAction o2) {
-					return Long.compare(o1.getStart(), o2.getStart());
-				}
-			});
+		@Override
+		public int compare(ServerAction o1, ServerAction o2) {
+			return Long.compare(o1.getStart(), o2.getStart());
+		}
+	});
 	private Set<ServerAction> activeActions = new HashSet<>();
 	private Set<ServerAction> damagingActions = new HashSet<>();
 
@@ -129,9 +130,10 @@ public class Battle {
 	 * @throws CaptchaActiveException if a captcha is active
 	 * @throws LoginFailedException if the login failed
 	 * @throws RemoteServerException if the server errors
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public void start(final BattleHandler handler)
-			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
+			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
 		participantIndices.clear();
 		participants.clear();
 		activePokemon.clear();
@@ -478,9 +480,10 @@ public class Battle {
 	 * @throws CaptchaActiveException if a captcha is active
 	 * @throws LoginFailedException if login fails
 	 * @throws RemoteServerException if the server errors
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	private void sendActions(BattleHandler handler)
-			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
+			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
 		AttackGymMessage.Builder builder = AttackGymMessage.newBuilder()
 				.setGymId(gym.getId())
 				.setBattleId(battleId)
@@ -683,7 +686,8 @@ public class Battle {
 	 */
 	public int swap(Pokemon pokemon) {
 		int duration = PokemonMeta.battleSettings.getSwapDurationMs();
-		ClientAction action = new ClientAction(BattleActionType.ACTION_SWAP_POKEMON, api.currentTimeMillis(), duration);
+		ClientAction action = new ClientAction(BattleActionType.ACTION_SWAP_POKEMON, api.currentTimeMillis(),
+				duration);
 		action.setPokemon(pokemon);
 		queuedActions.add(action);
 		return duration;
@@ -913,7 +917,7 @@ public class Battle {
 		 * @param action the attack action
 		 */
 		void onAttacked(PokemonGo api, Battle battle, BattlePokemon attacked, BattlePokemon attacker, int duration,
-						long damageWindowStart, long damageWindowEnd, ServerAction action);
+				long damageWindowStart, long damageWindowEnd, ServerAction action);
 
 		/**
 		 * Called when a Pokemon is attacked with the special move in this battle
@@ -928,7 +932,7 @@ public class Battle {
 		 * @param action the attack action
 		 */
 		void onAttackedSpecial(PokemonGo api, Battle battle, BattlePokemon attacked, BattlePokemon attacker,
-								int duration, long damageWindowStart, long damageWindowEnd, ServerAction action);
+				int duration, long damageWindowStart, long damageWindowEnd, ServerAction action);
 
 		/**
 		 * Called when an exception occurs during this battle

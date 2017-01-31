@@ -26,6 +26,7 @@ import com.pokegoapi.api.pokemon.HatchedEgg;
 import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 
@@ -61,6 +62,7 @@ public class Hatchery {
 
 	/**
 	 * Adds the given egg to this hatchery
+	 *
 	 * @param egg the egg to add
 	 */
 	public void addEgg(EggPokemon egg) {
@@ -105,7 +107,6 @@ public class Hatchery {
 	 *
 	 * @param response the GetHatchedEggs response
 	 * @return the hatched eggs contained in the response
-	 *
 	 * @throws RemoteServerException if a bad request was sent
 	 * @throws LoginFailedException if login failed
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
@@ -131,11 +132,12 @@ public class Hatchery {
 	 * @throws RemoteServerException e
 	 * @throws LoginFailedException e
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
 	 * @deprecated Use getHatchedEggs()
 	 */
 	@Deprecated
 	public List<HatchedEgg> queryHatchedEggs()
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
 		GetHatchedEggsMessage msg = GetHatchedEggsMessage.newBuilder().build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.GET_HATCHED_EGGS, msg);
 		api.getRequestHandler().sendServerRequests(serverRequest);

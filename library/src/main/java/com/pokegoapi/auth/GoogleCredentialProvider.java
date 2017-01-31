@@ -56,9 +56,9 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	/**
 	 * Used for logging in when one has a persisted refreshToken.
 	 *
-	 * @param client       OkHttp client
+	 * @param client OkHttp client
 	 * @param refreshToken Refresh Token Persisted by user
-	 * @throws LoginFailedException  When login fails
+	 * @throws LoginFailedException When login fails
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
@@ -74,13 +74,13 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	/**
 	 * Used for logging in when you dont have a persisted refresh token.
 	 *
-	 * @param client                             OkHttp client
+	 * @param client OkHttp client
 	 * @param onGoogleLoginOAuthCompleteListener Callback to know verification url and also persist refresh token
 	 * @throws LoginFailedException When login fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public GoogleCredentialProvider(OkHttpClient client,
-									OnGoogleLoginOAuthCompleteListener onGoogleLoginOAuthCompleteListener)
+			OnGoogleLoginOAuthCompleteListener onGoogleLoginOAuthCompleteListener)
 			throws LoginFailedException, CaptchaActiveException {
 		this.client = client;
 		if (onGoogleLoginOAuthCompleteListener != null) {
@@ -96,7 +96,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	 * Given the refresh token fetches a new access token and returns AuthInfo.
 	 *
 	 * @param refreshToken Refresh token persisted by the user after initial login
-	 * @throws LoginFailedException  If we fail to get tokenId
+	 * @throws LoginFailedException If we fail to get tokenId
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
@@ -206,11 +206,12 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	 *
 	 * @param json google auth json
 	 * @return google auth token json
-	 * @throws URISyntaxException   syntax exception
-	 * @throws IOException          io exception
+	 * @throws URISyntaxException syntax exception
+	 * @throws IOException io exception
 	 * @throws LoginFailedException If we fail to get tokenId
 	 */
-	private GoogleAuthTokenJson poll(GoogleAuthJson json) throws URISyntaxException, IOException, LoginFailedException {
+	private GoogleAuthTokenJson poll(GoogleAuthJson json) throws URISyntaxException, IOException,
+			LoginFailedException {
 		HttpUrl url = HttpUrl.parse(OAUTH_TOKEN_ENDPOINT).newBuilder()
 				.addQueryParameter("client_id", CLIENT_ID)
 				.addQueryParameter("client_secret", SECRET)
@@ -250,7 +251,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	 * Refreshes tokenId if it has expired
 	 *
 	 * @return AuthInfo object
-	 * @throws LoginFailedException  When login fails
+	 * @throws LoginFailedException When login fails
 	 * @throws RemoteServerException if the server failed to respond
 	 */
 	@Override

@@ -45,6 +45,7 @@ import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.CommonRequests;
 import com.pokegoapi.main.Heartbeat;
@@ -56,8 +57,8 @@ import com.pokegoapi.util.ClientInterceptor;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import com.pokegoapi.util.hash.HashProvider;
-import lombok.Getter;
 import lombok.Setter;
+import lombok.Getter;
 import okhttp3.OkHttpClient;
 
 import java.io.IOException;
@@ -196,7 +197,7 @@ public class PokemonGo {
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public void login(CredentialProvider credentialProvider, HashProvider hashProvider)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		this.loggingIn = true;
 		if (credentialProvider == null) {
 			throw new NullPointerException("Credential Provider can not be null!");
@@ -214,7 +215,8 @@ public class PokemonGo {
 		initialize();
 	}
 
-	private void initialize() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+	private void initialize() throws RemoteServerException, CaptchaActiveException, LoginFailedException,
+			HashException {
 		playerProfile.updateProfile();
 
 		ServerRequest downloadConfigRequest = new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
@@ -301,7 +303,7 @@ public class PokemonGo {
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	private void fireRequestBlock(ServerRequest request, RequestType... exclude)
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
 		getRequestHandler().sendServerRequests(request.withCommons().exclude(exclude));
 		try {
 			awaitChallenge();
@@ -317,7 +319,8 @@ public class PokemonGo {
 	 * @throws RemoteServerException When server fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public void getAssetDigest() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+	public void getAssetDigest() throws RemoteServerException, CaptchaActiveException, LoginFailedException,
+			HashException {
 		fireRequestBlock(new ServerRequest(RequestType.GET_ASSET_DIGEST,
 				CommonRequests.getGetAssetDigestMessageRequest(this)).exclude(RequestType.GET_BUDDY_WALKED));
 	}
@@ -564,9 +567,11 @@ public class PokemonGo {
 	 * @throws RemoteServerException when server fails
 	 * @throws InvalidProtocolBufferException when the client receives an invalid message from the server
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if there is a problem with the Hash key / Service
 	 */
 	public boolean verifyChallenge(String token)
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException, InvalidProtocolBufferException {
+			throws RemoteServerException, CaptchaActiveException, LoginFailedException,
+			InvalidProtocolBufferException, HashException {
 		hasChallenge = false;
 		VerifyChallengeMessage message = VerifyChallengeMessage.newBuilder().setToken(token).build();
 		AsyncServerRequest request = new AsyncServerRequest(RequestType.VERIFY_CHALLENGE, message);
@@ -590,9 +595,11 @@ public class PokemonGo {
 	 * @throws RemoteServerException when server fails
 	 * @throws InvalidProtocolBufferException when the client receives an invalid message from the server
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if there is a problem with the Hash key / Service
 	 */
 	public String checkChallenge()
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException, InvalidProtocolBufferException {
+			throws RemoteServerException, CaptchaActiveException, LoginFailedException,
+			InvalidProtocolBufferException, HashException {
 		CheckChallengeMessage message = CheckChallengeMessage.newBuilder().build();
 		AsyncServerRequest request = new AsyncServerRequest(RequestType.CHECK_CHALLENGE, message);
 		ByteString responseData =

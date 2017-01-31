@@ -28,6 +28,7 @@ import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.main.ServerRequest;
 
@@ -38,7 +39,7 @@ public class EggIncubator {
 	/**
 	 * Create new EggIncubator with given proto.
 	 *
-	 * @param api   the api
+	 * @param api the api
 	 * @param proto the proto
 	 */
 	public EggIncubator(PokemonGo api, EggIncubatorOuterClass.EggIncubator proto) {
@@ -72,18 +73,20 @@ public class EggIncubator {
 	 * @param egg the egg
 	 * @return status of putting egg in incubator
 	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
+	 * @throws LoginFailedException the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public UseItemEggIncubatorResponse.Result hatchEgg(EggPokemon egg)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 
 		UseItemEggIncubatorMessage reqMsg = UseItemEggIncubatorMessage.newBuilder()
 				.setItemId(proto.getId())
 				.setPokemonId(egg.getId())
 				.build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR, reqMsg);
+		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR,
+				reqMsg);
 		api.getRequestHandler().sendServerRequests(serverRequest);
 
 		UseItemEggIncubatorResponse response;

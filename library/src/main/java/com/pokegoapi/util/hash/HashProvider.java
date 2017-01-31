@@ -33,7 +33,7 @@ public interface HashProvider {
 	 * @throws HashException if an exception occurs while hashing the given inputs
 	 */
 	Hash provide(long timestamp, double latitude, double longitude, double altitude,
-					byte[] authTicket, byte[] sessionData, byte[][] requests)
+			byte[] authTicket, byte[] sessionData, byte[][] requests)
 			throws HashException;
 
 	/**
@@ -50,4 +50,5 @@ public interface HashProvider {
 	 * @return the unknown 25 value used with this hash
 	 */
 	long getUNK25();
+
 }

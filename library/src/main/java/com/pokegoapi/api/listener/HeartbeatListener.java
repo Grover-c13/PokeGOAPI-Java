@@ -24,6 +24,7 @@ import com.pokegoapi.api.map.MapObjects;
 public interface HeartbeatListener extends Listener {
 	/**
 	 * Called when the map is updated
+	 *
 	 * @param api the current API
 	 * @param mapObjects the updated map objects
 	 */

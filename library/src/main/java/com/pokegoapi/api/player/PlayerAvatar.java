@@ -33,6 +33,7 @@ public class PlayerAvatar {
 
 	/**
 	 * Constructs an avatar with individual parameters
+	 *
 	 * @param gender the gender of this avatar
 	 * @param skin the skin index of this avatar
 	 * @param hair the hair index of this avatar
@@ -44,7 +45,7 @@ public class PlayerAvatar {
 	 * @param backpack the backpack index of this avatar
 	 */
 	public PlayerAvatar(Gender gender, int skin, int hair, int shirt, int pants,
-						int hat, int shoes, int eyes, int backpack) {
+			int hat, int shoes, int eyes, int backpack) {
 		avatar = PlayerAvatarOuterClass.PlayerAvatar.newBuilder()
 				.setGender(gender)
 				.setSkin(skin)
@@ -132,6 +133,7 @@ public class PlayerAvatar {
 
 	/**
 	 * Creates a random avatar based on the given gender
+	 *
 	 * @param gender the gender to generate based on
 	 * @return a randomly generated avatar
 	 */

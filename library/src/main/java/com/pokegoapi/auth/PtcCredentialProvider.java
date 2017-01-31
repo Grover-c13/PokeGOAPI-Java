@@ -42,7 +42,8 @@ public class PtcCredentialProvider extends CredentialProvider {
 	public static final String REDIRECT_URI = "https://www.nianticlabs.com/pokemongo/error";
 	public static final String CLIENT_ID = "mobile-app_pokemon-go";
 	public static final String API_URL = "https://pgorelease.nianticlabs.com/plfe/rpc";
-	public static final String LOGIN_URL = "https://sso.pokemon.com/sso/login?service=https%3A%2F%2Fsso.pokemon.com%2Fsso%2Foauth2.0%2FcallbackAuthorize";
+	public static final String LOGIN_URL = "https://sso.pokemon.com/sso/login?service=https%3A%2F%2Fsso.pokemon"
+			+ ".com%2Fsso%2Foauth2.0%2FcallbackAuthorize";
 	public static final String LOGIN_OAUTH = "https://sso.pokemon.com/sso/oauth2.0/accessToken";
 	public static final String USER_AGENT = "niantic";
 	private static final String TAG = PtcCredentialProvider.class.getSimpleName();
@@ -60,11 +61,11 @@ public class PtcCredentialProvider extends CredentialProvider {
 	/**
 	 * Instantiates a new Ptc login.
 	 *
-	 * @param client   the client
+	 * @param client the client
 	 * @param username Username
 	 * @param password password
-	 * @param time     a Time implementation
-	 * @throws LoginFailedException  When login fails
+	 * @param time a Time implementation
+	 * @throws LoginFailedException When login fails
 	 * @throws RemoteServerException When server fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
@@ -114,10 +115,10 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 * Instantiates a new Ptc login.
 	 * Deprecated: specify a Time implementation
 	 *
-	 * @param client   the client
+	 * @param client the client
 	 * @param username Username
 	 * @param password password
-	 * @throws LoginFailedException  if failed to login
+	 * @throws LoginFailedException if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
@@ -132,7 +133,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 *
 	 * @param username PTC username
 	 * @param password PTC password
-	 * @throws LoginFailedException  if failed to login
+	 * @throws LoginFailedException if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
@@ -268,7 +269,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 * Valid auth info object	 *
 	 *
 	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
-	 * @throws LoginFailedException  if failed to login
+	 * @throws LoginFailedException if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
