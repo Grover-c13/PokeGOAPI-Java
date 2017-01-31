@@ -10,6 +10,7 @@ import com.pokegoapi.api.pokemon.StarterPokemon;
 public interface TutorialListener extends Listener {
 	/**
 	 * Called during the tutorial when you are asked to enter a name.
+	 *
 	 * @param api the current api
 	 * @param lastFailure the last name used that was already taken; null for first try.
 	 * @return a name for the current player, null to pick random
@@ -18,6 +19,7 @@ public interface TutorialListener extends Listener {
 
 	/**
 	 * Called when the user is required to select a starter pokemon.
+	 *
 	 * @param api the current api
 	 * @return the desired starter pokemon; null to pick random
 	 */
@@ -25,6 +27,7 @@ public interface TutorialListener extends Listener {
 
 	/**
 	 * Called when the user is required to setup an avatar.
+	 *
 	 * @param api the current api
 	 * @return the selected avatar; null to pick random
 	 */

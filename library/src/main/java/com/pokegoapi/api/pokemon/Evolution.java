@@ -31,6 +31,7 @@ public class Evolution {
 
 	/**
 	 * Constructor for this evolution class
+	 *
 	 * @param parents the parents of this evolution
 	 * @param pokemon the pokmon being evolved
 	 */
@@ -41,6 +42,7 @@ public class Evolution {
 
 	/**
 	 * Adds the given pokemon as an evolution
+	 *
 	 * @param pokemon the pokemon to add
 	 */
 	public void addEvolution(PokemonId pokemon) {

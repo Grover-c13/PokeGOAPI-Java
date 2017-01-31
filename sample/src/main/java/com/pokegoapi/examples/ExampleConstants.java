@@ -23,6 +23,7 @@ import com.pokegoapi.util.hash.pokehash.PokeHashProvider;
  * Created by court on 19/07/2016.
  */
 public class ExampleConstants {
+
 	public static final String LOGIN = "";
 	public static final String PASSWORD = "";
 	public static final double LATITUDE = -32.058087;

@@ -127,6 +127,7 @@ public class Item {
 
 	/**
 	 * Sets this item to applied with the given AppliedItem proto
+	 *
 	 * @param item the proto to import from
 	 */
 	public void setApplied(AppliedItem item) {
@@ -137,6 +138,7 @@ public class Item {
 
 	/**
 	 * Checks if this item is applied
+	 *
 	 * @return if this item is applied / active
 	 */
 	public boolean isApplied() {

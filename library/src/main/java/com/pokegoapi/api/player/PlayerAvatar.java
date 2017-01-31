@@ -32,6 +32,7 @@ public class PlayerAvatar {
 
 	/**
 	 * Constructs an avatar with individual parameters
+	 *
 	 * @param gender the gender of this avatar
 	 * @param skin the skin index of this avatar
 	 * @param hair the hair index of this avatar
@@ -131,6 +132,7 @@ public class PlayerAvatar {
 
 	/**
 	 * Creates a random avatar based on the given gender
+	 *
 	 * @param gender the gender to generate based on
 	 * @return a randomly generated avatar
 	 */

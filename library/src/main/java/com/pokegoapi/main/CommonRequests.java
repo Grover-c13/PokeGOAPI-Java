@@ -255,12 +255,14 @@ public class CommonRequests {
 	 * @throws LoginFailedException if login fails
 	 */
 	public static void queue(RequestType type, ByteString data)
-			throws InvalidProtocolBufferException, CaptchaActiveException, RemoteServerException, LoginFailedException {
+			throws InvalidProtocolBufferException, CaptchaActiveException, RemoteServerException,
+			LoginFailedException {
 		RECEIVED_COMMONS.put(type, data);
 	}
 
 	/**
 	 * Handles the queued common requests and clears the map
+	 *
 	 * @param api the current api
 	 * @throws InvalidProtocolBufferException if the server returns an invalid response
 	 * @throws CaptchaActiveException if a captcha is active
@@ -268,7 +270,8 @@ public class CommonRequests {
 	 * @throws LoginFailedException if login fails
 	 */
 	public static void handleQueue(PokemonGo api)
-			throws InvalidProtocolBufferException, RemoteServerException, CaptchaActiveException, LoginFailedException {
+			throws InvalidProtocolBufferException, RemoteServerException, CaptchaActiveException,
+			LoginFailedException {
 		for (RequestType type : PARSE_REQUESTS) {
 			ByteString data = RECEIVED_COMMONS.get(type);
 			if (data != null) {

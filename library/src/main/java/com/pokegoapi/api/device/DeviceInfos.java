@@ -42,71 +42,71 @@ public interface DeviceInfos {
 	String getDeviceBrand();
 
 	/**
-	 *  adb.exe shell settings get secure android_id
-	 *  UUID.randomUUID().toString();
+	 * adb.exe shell settings get secure android_id
+	 * UUID.randomUUID().toString();
 	 *
 	 * @return device id, for example: "****************"
 	 */
 	String getDeviceId();
 
 	/**
-	 *  adb.exe shell getprop ro.product.model
+	 * adb.exe shell getprop ro.product.model
 	 *
 	 * @return device model, for example: "Nexus 6P"
 	 */
 	String getDeviceModel();
 
 	/**
-	 *  adb.exe shell getprop ro.product.name
+	 * adb.exe shell getprop ro.product.name
 	 *
 	 * @return device model identifier, for example: "angler"
 	 */
 	String getDeviceModelIdentifier();
 
 	/**
-	 *  Always qcom
+	 * Always qcom
 	 *
 	 * @return device boot model, for example: "qcom"
 	 */
 	String getDeviceModelBoot();
 
 	/**
-	 *  adb.exe shell getprop ro.product.manufacturer
+	 * adb.exe shell getprop ro.product.manufacturer
 	 *
 	 * @return hardware manufacturer, for example: "Huawei"
 	 */
 	String getHardwareManufacturer();
 
 	/**
-	 *  adb.exe shell getprop ro.product.model
+	 * adb.exe shell getprop ro.product.model
 	 *
 	 * @return hardware model, for example: "Nexus 6P"
 	 */
 	String getHardwareModel();
 
 	/**
-	 *  adb.exe shell getprop ro.product.name
+	 * adb.exe shell getprop ro.product.name
 	 *
 	 * @return firmware brand, for example: "angler"
 	 */
 	String getFirmwareBrand();
 
 	/**
-	 *  adb.exe shell getprop ro.build.tags
+	 * adb.exe shell getprop ro.build.tags
 	 *
 	 * @return firmware tags, for example: "release-keys"
 	 */
 	String getFirmwareTags();
 
 	/**
-	 *  adb.exe shell getprop ro.build.type
+	 * adb.exe shell getprop ro.build.type
 	 *
 	 * @return firmware type, for example: "user"
 	 */
 	String getFirmwareType();
 
 	/**
-	 *  adb.exe shell getprop ro.build.fingerprint
+	 * adb.exe shell getprop ro.build.fingerprint
 	 *
 	 * @return firmware fingerprint, for example: "google/angler/angler:7.0/NPD90G/3051502:user/release-keys"
 	 */

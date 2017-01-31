@@ -51,7 +51,37 @@ public class PokeHashProvider implements HashProvider {
 	private final String key;
 
 	/**
+	 * Hold the total amounts of requests per minute.
+	 */
+	@Getter
+	public static int totalRequests;
+	/**
+	 * Hold how many requests left per minute.
+	 */
+	@Getter
+	public static int requestsLeft;
+	/**
+	 * Hold the total time for the service (Always 60).
+	 */
+	@Getter
+	public static long rateLimitSeconds;
+	/**
+	 * When that api hash service key will end.
+	 * Unix Milliseconds time.
+	 */
+	@Getter
+	public static long expirationTimeStamp;
+	/**
+	 * When the current minute will end.
+	 * Unix Milliseconds time.
+	 */
+	@Getter
+	public static long endOfMinute;
+
+
+	/**
 	 * Creates a PokeHashProvider with the given key
+	 *
 	 * @param key the key for the PokeHash API
 	 */
 	public PokeHashProvider(String key) {
@@ -69,9 +99,21 @@ public class PokeHashProvider implements HashProvider {
 		this.endpoint = endpoint;
 	}
 
+  /**
+   * Provides a hash for the given arguments
+	 * @param timestamp timestamp to hash
+	 * @param latitude latitude to hash
+	 * @param longitude longitude to hash
+	 * @param altitude altitude to hash
+	 * @param authTicket auth ticket to hash
+	 * @param sessionData session data to hash
+	 * @param requests request data to hash
+	 * @return the hash provider
+	 * @throws HashException - if can not login to the hash service
+	 */
 	@Override
 	public Hash provide(long timestamp, double latitude, double longitude, double altitude, byte[] authTicket,
-						byte[] sessionData, byte[][] requests) throws HashException {
+			byte[] sessionData, byte[][] requests) throws HashException {
 		Request request = new Request(latitude, longitude, altitude, timestamp, authTicket, sessionData, requests);
 		try {
 			HttpURLConnection connection = (HttpURLConnection) new URL(endpoint).openConnection();
@@ -93,6 +135,16 @@ public class PokeHashProvider implements HashProvider {
 
 			switch (responseCode) {
 				case HttpURLConnection.HTTP_OK:
+					// Get the total number of requests per minute
+					totalRequests = Integer.parseInt(connection.getHeaderField("X-MaxRequestCount"));
+					// End of the cycle of the current minute
+					endOfMinute = Integer.parseInt(connection.getHeaderField("X-RatePeriodEnd"));
+					// How many requests left for the current minute
+					requestsLeft = Integer.parseInt(connection.getHeaderField("X-RateRequestsRemaining"));
+					// 60 always, in seconds, the calculus cycle.
+					rateLimitSeconds = Integer.parseInt(connection.getHeaderField("X-RateLimitSeconds"));
+					// when the Hash key is expired - Unix timestamp
+					expirationTimeStamp = Long.parseLong(connection.getHeaderField("X-AuthTokenExpiration"));
 					BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 					StringBuilder builder = new StringBuilder();
 					String line;
@@ -187,7 +239,7 @@ public class PokeHashProvider implements HashProvider {
 		private String[] requests;
 
 		private Request(double latitude, double longitude, double altitude, long timestamp, byte[] authTicket,
-						byte[] sessionData, byte[][] requests) {
+				byte[] sessionData, byte[][] requests) {
 			this.latitude = latitude;
 			this.longitude = longitude;
 			this.altitude = altitude;

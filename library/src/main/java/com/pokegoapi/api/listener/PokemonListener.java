@@ -13,6 +13,7 @@ import com.pokegoapi.api.pokemon.HatchedEgg;
 public interface PokemonListener extends Listener {
 	/**
 	 * Called when an egg is hatched.
+	 *
 	 * @param api the current api
 	 * @param hatchedEgg the hatched egg
 	 * @return true if this egg should be removed, if not required for later access via Hatchery#getHatchedEggs
@@ -21,6 +22,7 @@ public interface PokemonListener extends Listener {
 
 	/**
 	 * Called when a pokemon is encountered
+	 *
 	 * @param api the current api
 	 * @param encounterId the current encounter id
 	 * @param pokemon the pokemon encountered
@@ -30,6 +32,7 @@ public interface PokemonListener extends Listener {
 
 	/**
 	 * Called after a miss or pokeball escape when capturing a pokemon.
+	 *
 	 * @param api the current api
 	 * @param pokemon the pokemon being caught
 	 * @param pokeball the pokeball being used
@@ -40,6 +43,7 @@ public interface PokemonListener extends Listener {
 
 	/**
 	 * Called when your buddy pokemon finds candies
+	 *
 	 * @param api the current api
 	 * @param family the candy family type
 	 * @param candyCount the amount of candies found

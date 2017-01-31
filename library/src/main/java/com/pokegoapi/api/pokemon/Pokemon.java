@@ -44,6 +44,7 @@ import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
@@ -65,7 +66,7 @@ public class Pokemon extends PokemonDetails {
 	/**
 	 * Creates a Pokemon object with helper functions around the proto.
 	 *
-	 * @param api   the api to use
+	 * @param api the api to use
 	 * @param proto the proto from the server
 	 */
 	public Pokemon(PokemonGo api, PokemonData proto) {
@@ -77,11 +78,15 @@ public class Pokemon extends PokemonDetails {
 	 * Transfers the pokemon.
 	 *
 	 * @return the result
-	 * @throws LoginFailedException  the login failed exception
+	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
-	public Result transferPokemon() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	public Result transferPokemon() throws LoginFailedException, CaptchaActiveException, RemoteServerException,
+			HashException {
+		if (this.isFavorite())
+			return Result.FAILED;
 		ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.RELEASE_POKEMON, reqMsg);
@@ -110,12 +115,13 @@ public class Pokemon extends PokemonDetails {
 	 *
 	 * @param nickname the nickname
 	 * @return the nickname pokemon response . result
-	 * @throws LoginFailedException  the login failed exception
+	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public NicknamePokemonResponse.Result renamePokemon(String nickname)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		NicknamePokemonMessage reqMsg = NicknamePokemonMessage.newBuilder()
 				.setPokemonId(getId())
 				.setNickname(nickname)
@@ -142,12 +148,13 @@ public class Pokemon extends PokemonDetails {
 	 *
 	 * @param markFavorite Mark Pokemon as Favorite?
 	 * @return the SetFavoritePokemonResponse.Result
-	 * @throws LoginFailedException  the login failed exception
+	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public SetFavoritePokemonResponse.Result setFavoritePokemon(boolean markFavorite)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		SetFavoritePokemonMessage reqMsg = SetFavoritePokemonMessage.newBuilder()
 				.setPokemonId(getId())
 				.setIsFavorite(markFavorite)
@@ -185,7 +192,8 @@ public class Pokemon extends PokemonDetails {
 	 *
 	 * @param considerMaxCPLimitForPlayerLevel Consider max cp limit for actual player level
 	 * @return the boolean
-	 * @throws NoSuchItemException   If the PokemonId value cannot be found in the {@link com.pokegoapi.main.PokemonMeta}.
+	 * @throws NoSuchItemException If the PokemonId value cannot be found in the
+	 * {@link com.pokegoapi.main.PokemonMeta}.
 	 */
 	public boolean canPowerUp(boolean considerMaxCPLimitForPlayerLevel)
 			throws NoSuchItemException {
@@ -208,12 +216,13 @@ public class Pokemon extends PokemonDetails {
 	 * After powering up this pokemon object will reflect the new changes.
 	 *
 	 * @return The result
-	 * @throws LoginFailedException  the login failed exception
+	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public UpgradePokemonResponse.Result powerUp()
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		return AsyncHelper.toBlocking(powerUpAsync());
 	}
 
@@ -249,11 +258,13 @@ public class Pokemon extends PokemonDetails {
 	 * Evolve evolution result.
 	 *
 	 * @return the evolution result
-	 * @throws LoginFailedException  the login failed exception
+	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
-	public EvolutionResult evolve() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	public EvolutionResult evolve() throws LoginFailedException, CaptchaActiveException, RemoteServerException,
+			HashException {
 		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.EVOLVE_POKEMON, reqMsg);
@@ -297,12 +308,13 @@ public class Pokemon extends PokemonDetails {
 	 * Heal a pokemon, using various fallbacks for potions
 	 *
 	 * @return Result, ERROR_CANNOT_USE if the requirements arent met
-	 * @throws LoginFailedException  If login failed.
+	 * @throws LoginFailedException If login failed.
 	 * @throws RemoteServerException If server communication issues occurred.
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public UseItemPotionResponse.Result heal()
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 
 		if (!isInjured() || isFainted())
 			return UseItemPotionResponse.Result.ERROR_CANNOT_USE;
@@ -328,19 +340,21 @@ public class Pokemon extends PokemonDetails {
 	 *
 	 * @param itemId {@link ItemId} of the potion to use.
 	 * @return Result, ERROR_CANNOT_USE if the requirements aren't met
-	 * @throws LoginFailedException  If login failed.
+	 * @throws LoginFailedException If login failed.
 	 * @throws RemoteServerException If server communications failed.
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public UseItemPotionResponse.Result usePotion(ItemId itemId)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 
 		Item potion = api.getInventories().getItemBag().getItem(itemId);
 		//some sanity check, to prevent wrong use of this call
 		if (!potion.isPotion() || potion.getCount() < 1 || !isInjured())
 			return UseItemPotionResponse.Result.ERROR_CANNOT_USE;
 
-		UseItemPotionMessageOuterClass.UseItemPotionMessage reqMsg = UseItemPotionMessageOuterClass.UseItemPotionMessage
+		UseItemPotionMessageOuterClass.UseItemPotionMessage reqMsg = UseItemPotionMessageOuterClass
+				.UseItemPotionMessage
 				.newBuilder()
 				.setItemId(itemId)
 				.setPokemonId(getId())
@@ -366,12 +380,13 @@ public class Pokemon extends PokemonDetails {
 	 * Revive a pokemon, using various fallbacks for revive items
 	 *
 	 * @return Result, ERROR_CANNOT_USE if the requirements aren't met
-	 * @throws LoginFailedException  If login failed.
+	 * @throws LoginFailedException If login failed.
 	 * @throws RemoteServerException If server communications failed.
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public UseItemReviveResponse.Result revive()
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 
 		if (!isFainted())
 			return UseItemReviveResponse.Result.ERROR_CANNOT_USE;
@@ -391,18 +406,20 @@ public class Pokemon extends PokemonDetails {
 	 *
 	 * @param itemId {@link ItemId} of the Revive to use.
 	 * @return Result, ERROR_CANNOT_USE if the requirements aren't met
-	 * @throws LoginFailedException  If login failed.
+	 * @throws LoginFailedException If login failed.
 	 * @throws RemoteServerException If server communications failed.
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public UseItemReviveResponse.Result useRevive(ItemId itemId)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 
 		Item item = api.getInventories().getItemBag().getItem(itemId);
 		if (!item.isRevive() || item.getCount() < 1 || !isFainted())
 			return UseItemReviveResponse.Result.ERROR_CANNOT_USE;
 
-		UseItemReviveMessageOuterClass.UseItemReviveMessage reqMsg = UseItemReviveMessageOuterClass.UseItemReviveMessage
+		UseItemReviveMessageOuterClass.UseItemReviveMessage reqMsg = UseItemReviveMessageOuterClass
+				.UseItemReviveMessage
 				.newBuilder()
 				.setItemId(itemId)
 				.setPokemonId(getId())
@@ -440,7 +457,7 @@ public class Pokemon extends PokemonDetails {
 	 * at the actual player level (useful in ProgressBars)
 	 *
 	 * @return Actual cp in percentage
-	 * @throws NoSuchItemException   if threw from {@link #getMaxCpForPlayer()}
+	 * @throws NoSuchItemException if threw from {@link #getMaxCpForPlayer()}
 	 */
 	public int getCPInPercentageActualPlayerLevel()
 			throws NoSuchItemException {
@@ -473,5 +490,11 @@ public class Pokemon extends PokemonDetails {
 	@Override
 	public boolean equals(Object obj) {
 		return obj instanceof Pokemon && ((Pokemon) obj).getId() == getId();
+	}
+
+	public boolean isBuddy() {
+		if (!api.getPlayerProfile().hasBuddy())
+			return false;
+		return api.getPlayerProfile().getBuddy().getPokemon().getId() == this.getId();
 	}
 }

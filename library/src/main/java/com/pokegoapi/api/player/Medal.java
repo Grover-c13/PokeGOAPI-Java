@@ -38,6 +38,7 @@ public class Medal {
 
 	/**
 	 * Creates a Medal with a PlayerBadge proto
+	 *
 	 * @param badge the proto to inititialize with
 	 */
 	public Medal(PlayerBadge badge) {
@@ -50,6 +51,7 @@ public class Medal {
 
 	/**
 	 * Gets settings for this badge type
+	 *
 	 * @return the settings
 	 */
 	public BadgeSettings getSettings() {

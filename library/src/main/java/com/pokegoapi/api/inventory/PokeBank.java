@@ -35,6 +35,7 @@ import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 
@@ -146,12 +147,13 @@ public class PokeBank {
 	 * @throws CaptchaActiveException if a captcha is active and a message cannot be sent
 	 * @throws LoginFailedException the login fails
 	 * @throws RemoteServerException if the server errors
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public Map<PokemonFamilyId, Integer> releasePokemon(Pokemon... releasePokemon)
-			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
+			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
 		ReleasePokemonMessage.Builder releaseBuilder = ReleasePokemonMessage.newBuilder();
 		for (Pokemon pokemon : releasePokemon) {
-			if (!pokemon.isDeployed()) {
+			if (!pokemon.isDeployed() && !pokemon.isFavorite()) {
 				releaseBuilder.addPokemonIds(pokemon.getId());
 			}
 		}
