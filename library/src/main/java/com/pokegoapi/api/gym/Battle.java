@@ -146,7 +146,7 @@ public class Battle {
 	 */
 	public void start(final BattleHandler handler)
 			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
-    battleId = null;
+		battleId = null;
 		participantIndices.clear();
 		participants.clear();
 		activePokemon.clear();
@@ -190,9 +190,10 @@ public class Battle {
 	 * @throws CaptchaActiveException if a captcha is active
 	 * @throws LoginFailedException if the login failed
 	 * @throws RemoteServerException if the server errors
+	 * @throws HashException if a hashing related exception occurs
 	 */
 	private void attackDefender(final BattleHandler handler)
-			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
+			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
 		lastRetrievedAction = null;
 		queuedActions.clear();
 		battleState = BattleState.STATE_UNSET;
@@ -345,7 +346,8 @@ public class Battle {
 			gymPointsDelta += results.getGymPointsDelta();
 		}
 		BattleState state = log.getState();
-		active = defenderIndex < defenderCount && !(state == BattleState.TIMED_OUT || state == BattleState.STATE_UNSET);
+		active = defenderIndex < defenderCount && !(state == BattleState.TIMED_OUT || state == BattleState
+				.STATE_UNSET);
 		if (state != battleState) {
 			switch (state) {
 				case TIMED_OUT:

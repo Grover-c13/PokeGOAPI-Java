@@ -232,9 +232,14 @@ public class RequestHandler implements Runnable {
 			}
 
 			if (responseEnvelop.getStatusCode() == ResponseEnvelope.StatusCode.INVALID_AUTH_TOKEN) {
-				String msg = String.format("Invalid Auth status code received, token not refreshed? %s %s",
-						responseEnvelop.getApiUrl(), responseEnvelop.getError());
-				throw new LoginFailedException(msg);
+				try {
+					this.api.getAuthInfo(true);
+					return this.internalSendServerRequests(authTicket, serverRequests);
+				} catch (LoginFailedException e) {
+					throw new RemoteServerException("Failed to refresh auth token!", e);
+				} catch (RemoteServerException e) {
+					throw new RemoteServerException("Failed to send request with refreshed auth token!", e);
+				}
 			} else if (responseEnvelop.getStatusCode() == ResponseEnvelope.StatusCode.REDIRECT) {
 				// API_ENDPOINT was not correctly set, should be at this point, though, so redo the request
 				return internalSendServerRequests(newAuthTicket, serverRequests);
@@ -282,7 +287,7 @@ public class RequestHandler implements Runnable {
 			builder.setAuthTicket(authTicket);
 		} else {
 			Log.d(TAG, "Authenticated with static token");
-			builder.setAuthInfo(api.getAuthInfo());
+			builder.setAuthInfo(api.getAuthInfo(false));
 		}
 		builder.setMsSinceLastLocationfix(random.nextInt(1651) + 149);
 		builder.setLatitude(api.getLatitude());

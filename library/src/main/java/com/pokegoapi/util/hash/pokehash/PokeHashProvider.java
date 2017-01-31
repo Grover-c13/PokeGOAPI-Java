@@ -93,14 +93,16 @@ public class PokeHashProvider implements HashProvider {
 
 	/**
 	 * Sets the endpoint for this hash provider
+	 *
 	 * @param endpoint the endpoint to use
 	 */
 	public void setEndpoint(String endpoint) {
 		this.endpoint = endpoint;
 	}
 
-  /**
-   * Provides a hash for the given arguments
+	/**
+	 * Provides a hash for the given arguments
+	 *
 	 * @param timestamp timestamp to hash
 	 * @param latitude latitude to hash
 	 * @param longitude longitude to hash

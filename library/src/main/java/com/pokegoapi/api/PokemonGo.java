@@ -350,14 +350,15 @@ public class PokemonGo {
 	/**
 	 * Fetches valid AuthInfo
 	 *
+	 * @param refresh if the AuthInfo object should be refreshed
 	 * @return AuthInfo object
 	 * @throws LoginFailedException when login fails
 	 * @throws RemoteServerException When server fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public AuthInfo getAuthInfo()
+	public AuthInfo getAuthInfo(boolean refresh)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
-		return credentialProvider.getAuthInfo();
+		return credentialProvider.getAuthInfo(refresh);
 	}
 
 	/**

@@ -20,7 +20,6 @@ import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import POGOProtos.Data.PlayerBadgeOuterClass.PlayerBadge;
 import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
 import POGOProtos.Enums.BadgeTypeOuterClass.BadgeType;
-import POGOProtos.Enums.GenderOuterClass.Gender;
 import POGOProtos.Enums.TutorialStateOuterClass;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
 import POGOProtos.Networking.Requests.Messages.ClaimCodenameMessageOuterClass.ClaimCodenameMessage;
@@ -447,8 +446,9 @@ public class PlayerProfile {
 	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public boolean setBuddy(Pokemon pokemon) throws CaptchaActiveException, LoginFailedException,
-    RemoteServerException, HashException {
-		SetBuddyPokemonMessageOuterClass.SetBuddyPokemonMessage message = SetBuddyPokemonMessageOuterClass.SetBuddyPokemonMessage.newBuilder()
+			RemoteServerException, HashException {
+		SetBuddyPokemonMessageOuterClass.SetBuddyPokemonMessage message = SetBuddyPokemonMessageOuterClass
+				.SetBuddyPokemonMessage.newBuilder()
 				.setPokemonId(pokemon.getId())
 				.build();
 		ServerRequest request = new ServerRequest(RequestType.SET_BUDDY_POKEMON, message);
