@@ -57,7 +57,7 @@ public class PokeDictionary {
 	 * Fallback to the default locale if names do not exist for the given {@link Locale}.
 	 *
 	 * @param pokedexId Pokemon index number
-	 * @param locale    target name locale
+	 * @param locale target name locale
 	 * @return the Pokemon name in locale
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
@@ -71,7 +71,7 @@ public class PokeDictionary {
 	 * Fallback to the default locale if names do not exist for the given {@link Locale}.
 	 *
 	 * @param pokedexId Pokemon index number
-	 * @param locale    target name locale
+	 * @param locale target name locale
 	 * @return the Pokemon description in locale
 	 * @throws MissingResourceException if can not find a matched Pokemon description for the given pokedex
 	 */
@@ -85,7 +85,7 @@ public class PokeDictionary {
 	 * Fallback to the default locale if names do not exist for the given {@link Locale}.
 	 *
 	 * @param itemId Item id
-	 * @param locale    target name locale
+	 * @param locale target name locale
 	 * @return the item name in locale
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */
@@ -98,7 +98,7 @@ public class PokeDictionary {
 	 * Returns translated Pokemon name from ENGLISH locale.
 	 * Fallback to the default locale if names do not exist for the given {@link Locale}.
 	 *
-	 * @param engName   pokemon ENGLISH name
+	 * @param engName pokemon ENGLISH name
 	 * @param newLocale the locale you want translate to
 	 * @return translated pokemon name
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
@@ -112,7 +112,7 @@ public class PokeDictionary {
 	 * Returns the Pokemon index from the Pokemon name list.
 	 *
 	 * @param pokeName pokemon name in locale
-	 * @param locale   the locale on this name
+	 * @param locale the locale on this name
 	 * @return pokedex Pokedex Id if a Pokemon with the given pokedex id exists, else -1.
 	 * @throws MissingResourceException if can not find a matched Pokemon name for the given pokedex
 	 */

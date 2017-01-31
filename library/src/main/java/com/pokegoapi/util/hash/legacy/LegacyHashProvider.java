@@ -33,7 +33,7 @@ public class LegacyHashProvider implements HashProvider {
 
 	@Override
 	public Hash provide(long timestamp, double latitude, double longitude, double altitude, byte[] authTicket,
-						byte[] sessionData, byte[][] requests) {
+			byte[] sessionData, byte[][] requests) {
 		int locationHash = getLocationHash(latitude, longitude, altitude);
 		int locationAuthHash = getLocationAuthHash(latitude, longitude, altitude, authTicket);
 		List<Long> requestHashes = new ArrayList<>();

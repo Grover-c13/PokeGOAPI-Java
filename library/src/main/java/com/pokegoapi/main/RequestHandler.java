@@ -154,9 +154,10 @@ public class RequestHandler implements Runnable {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public void sendServerRequests(ServerRequest... serverRequests)
-			throws RemoteServerException, LoginFailedException, CaptchaActiveException {
+			throws RemoteServerException, LoginFailedException, CaptchaActiveException, HashException {
 		if (api.hasChallenge()) {
 			throw new CaptchaActiveException(new AsyncCaptchaActiveException("Captcha active! Cannot send requests!"));
 		}
@@ -263,7 +264,8 @@ public class RequestHandler implements Runnable {
 		} catch (IOException e) {
 			throw new RemoteServerException(e);
 		} catch (RemoteServerException | LoginFailedException e) {
-			// catch it, so the auto-close of resources triggers, but don't wrap it in yet another RemoteServer Exception
+			// catch it, so the auto-close of resources triggers, but don't wrap it in yet another RemoteServer
+			// Exception
 			throw e;
 		}
 		return newAuthTicket;
@@ -332,7 +334,8 @@ public class RequestHandler implements Runnable {
 							serverRequests.add(serverRequest);
 							requestMap.put(serverRequest, request);
 						} else {
-							AsyncCaptchaActiveException exception = new AsyncCaptchaActiveException(api.getChallengeURL());
+							AsyncCaptchaActiveException exception = new AsyncCaptchaActiveException(api
+									.getChallengeURL());
 							ResultOrException error = ResultOrException.getError(exception);
 							resultMap.put(request.getId(), error);
 						}

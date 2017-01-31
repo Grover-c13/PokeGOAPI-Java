@@ -23,6 +23,7 @@ import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.device.LocationFixes;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.UnavailableHashException;
 import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.util.hash.Hash;
 import com.pokegoapi.util.hash.HashProvider;
@@ -48,13 +49,11 @@ public class Signature {
 			return;
 		}
 
-
 		byte[] authTicket = builder.getAuthTicket().toByteArray();
 
 		if (authTicket.length == 0) {
 			return;
 		}
-
 
 		byte[][] requestData = new byte[builder.getRequestsCount()][];
 		for (int i = 0; i < builder.getRequestsCount(); i++) {
@@ -98,11 +97,14 @@ public class Signature {
 			signatureBuilder.addSensorInfo(sensorInfo);
 		}
 
-		List<Long> requestHashes = hash.getRequestHashes();
-		for (int i = 0; i < builder.getRequestsCount(); i++) {
-			signatureBuilder.addRequestHash(requestHashes.get(i));
+		try {
+			List<Long> requestHashes = hash.getRequestHashes();
+			for (int i = 0; i < builder.getRequestsCount(); i++) {
+				signatureBuilder.addRequestHash(requestHashes.get(i));
+			}
+		} catch (Exception e) {
+			throw new UnavailableHashException("Could not reach hash");
 		}
-
 		SignatureOuterClass.Signature signature = signatureBuilder.build();
 		byte[] signatureByteArray = signature.toByteArray();
 		byte[] encrypted = crypto.encrypt(signatureByteArray, timeSinceStart).toByteBuffer().array();

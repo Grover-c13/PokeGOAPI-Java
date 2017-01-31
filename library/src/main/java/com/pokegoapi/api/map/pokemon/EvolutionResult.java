@@ -28,7 +28,7 @@ public class EvolutionResult {
 	/**
 	 * The evolution result.
 	 *
-	 * @param api   PokemonGo api
+	 * @param api PokemonGo api
 	 * @param proto Pokemon proto
 	 */
 	public EvolutionResult(PokemonGo api, EvolvePokemonResponseOuterClass.EvolvePokemonResponse proto) {

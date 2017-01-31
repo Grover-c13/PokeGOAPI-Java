@@ -15,7 +15,11 @@
 
 package com.pokegoapi.exceptions.hash;
 
+/**
+ * Hash Limit Exceeded Exception
+ */
 public class HashLimitExceededException extends HashException {
+
 	public HashLimitExceededException() {
 		super();
 	}
@@ -27,4 +31,5 @@ public class HashLimitExceededException extends HashException {
 	public HashLimitExceededException(Throwable exception) {
 		super(exception);
 	}
+
 }

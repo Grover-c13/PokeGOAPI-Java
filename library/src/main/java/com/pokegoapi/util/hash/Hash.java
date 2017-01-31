@@ -29,6 +29,7 @@ public class Hash {
 
 	/**
 	 * Creates a hash object
+	 *
 	 * @param locationAuthHash the hash of the location & auth ticket
 	 * @param locationHash the hash of the location
 	 * @param requestHashes the hash of each request

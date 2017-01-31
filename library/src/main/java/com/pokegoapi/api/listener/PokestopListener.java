@@ -9,6 +9,7 @@ import com.pokegoapi.api.map.fort.Pokestop;
 public interface PokestopListener extends Listener {
 	/**
 	 * Called when a Pokestop is looted
+	 *
 	 * @param result the loot result from this pokestop
 	 */
 	void onLoot(PokestopLootResult result, Pokestop pokestop);
