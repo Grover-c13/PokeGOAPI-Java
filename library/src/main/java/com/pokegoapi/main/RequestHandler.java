@@ -68,6 +68,8 @@ public class RequestHandler implements Runnable {
 	private AtomicLong requestId = new AtomicLong(System.currentTimeMillis());
 	private Random random;
 
+	private boolean active = true;
+
 	/**
 	 * Instantiates a new Request handler.
 	 *
@@ -303,7 +305,7 @@ public class RequestHandler implements Runnable {
 	public void run() {
 		List<AsyncServerRequest> requests = new LinkedList<>();
 		AuthTicket authTicket = null;
-		while (true) {
+		while (active) {
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -405,5 +407,10 @@ public class RequestHandler implements Runnable {
 		}
 	}
 
-
+	/**
+	 * Stops this RequestHandler
+	 */
+	public void exit() {
+		active = false;
+	}
 }

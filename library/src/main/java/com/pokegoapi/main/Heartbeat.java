@@ -61,7 +61,7 @@ public class Heartbeat {
 		Thread heartbeatThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				while (true) {
+				while (active) {
 					try {
 						Thread.sleep(10);
 					} catch (InterruptedException e) {
@@ -133,5 +133,12 @@ public class Heartbeat {
 	 */
 	public void enqueueTask(Runnable task) {
 		tasks.add(task);
+	}
+
+	/**
+	 * Exits this heartbeat
+	 */
+	public void exit() {
+		active = false;
 	}
 }

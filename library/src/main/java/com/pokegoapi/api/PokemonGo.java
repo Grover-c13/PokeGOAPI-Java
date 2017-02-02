@@ -658,4 +658,12 @@ public class PokemonGo {
 	public int getVersion() {
 		return hashProvider.getHashVersion();
 	}
+
+	/**
+	 * Exits this API
+	 */
+	public void exit() {
+		heartbeat.exit();
+		requestHandler.exit();
+	}
 }
