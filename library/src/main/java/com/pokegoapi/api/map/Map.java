@@ -58,11 +58,11 @@ public class Map {
 	/**
 	 * Updates the map. Only API should be calling this.
 	 *
+	 * @return if the map was updated
 	 * @throws CaptchaActiveException if a captcha is active and the map cannot be updates
 	 * @throws RemoteServerException if the server gives an error while updating this map
 	 * @throws LoginFailedException if login fails
 	 * @throws HashException if an exception occurred while requesting hash
-	 * @return if the map was updated
 	 */
 	public boolean update() throws CaptchaActiveException, RemoteServerException, LoginFailedException, HashException {
 		boolean updated = false;
@@ -177,6 +177,7 @@ public class Map {
 
 	/**
 	 * Blocks this thread until MapObjects are updates
+	 * @throws InterruptedException if this thread is interrupted while awaiting map update
 	 */
 	public void awaitUpdate() throws InterruptedException {
 		synchronized (this.updateLock) {

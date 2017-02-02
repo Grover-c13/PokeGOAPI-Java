@@ -247,7 +247,8 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	@Override
-	public AuthInfo getAuthInfo(boolean refresh) throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	public AuthInfo getAuthInfo(boolean refresh)
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		if (refresh || isTokenIdExpired()) {
 			refreshToken(refreshToken);
 		}

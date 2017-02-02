@@ -110,6 +110,7 @@ public class Crypto {
 		 * @param crypto the crypto instance to use
 		 * @param input the contents
 		 * @param ms the time
+		 * @param rand the rand object to use
 		 */
 		public CipherText(Crypto crypto, byte[] input, long ms, Rand rand) {
 			this.crypto = crypto;

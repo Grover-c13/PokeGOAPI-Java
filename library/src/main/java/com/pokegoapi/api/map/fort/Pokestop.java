@@ -218,8 +218,7 @@ public class Pokestop {
 	 *
 	 * @param item the modifier to add to this pokestop
 	 * @throws LoginFailedException if login failed
-	 * @throws RemoteServerException if the server failed to respond or the modifier could not be added to this
-	 * pokestop
+	 * @throws RemoteServerException if the server failed to respond or the modifier could not be added to this pokestop
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 * @throws HashException if an exception occurred while requesting hash
 	 */

@@ -81,11 +81,11 @@ public class Battle {
 
 	private Queue<ServerAction> serverActionQueue
 			= new PriorityBlockingQueue<>(11, new Comparator<ServerAction>() {
-		@Override
-		public int compare(ServerAction o1, ServerAction o2) {
-			return Long.compare(o1.getStart(), o2.getStart());
-		}
-	});
+				@Override
+				public int compare(ServerAction o1, ServerAction o2) {
+					return Long.compare(o1.getStart(), o2.getStart());
+				}
+			});
 
 	private Set<ServerAction> activeActions = new HashSet<>();
 	private Set<ServerAction> damagingActions = new HashSet<>();

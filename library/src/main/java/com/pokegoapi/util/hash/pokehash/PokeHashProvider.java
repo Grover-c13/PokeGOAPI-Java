@@ -61,7 +61,7 @@ public class PokeHashProvider implements HashProvider {
 	 *
 	 * @param key the key for the PokeHash API
 	 * @param awaitRequest true if the API should, when the rate limit has been exceeded, wait until the current
-	 * period ends, or false to throw a HashLimitExceededException
+	 *     period ends, or false to throw a HashLimitExceededException
 	 */
 	public PokeHashProvider(PokeHashKey key, boolean awaitRequest) {
 		this.key = key;

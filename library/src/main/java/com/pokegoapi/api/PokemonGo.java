@@ -148,6 +148,9 @@ public class PokemonGo {
 		client = client.newBuilder()
 				.addNetworkInterceptor(new ClientInterceptor())
 				.build();
+		inventories = new Inventories(this);
+		settings = new Settings(this);
+		playerProfile = new PlayerProfile(this);
 		requestHandler = new RequestHandler(this, client);
 		map = new Map(this);
 		longitude = Double.NaN;
@@ -195,6 +198,7 @@ public class PokemonGo {
 	 * @throws LoginFailedException When login fails
 	 * @throws RemoteServerException When server fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurs while performing a hash request
 	 */
 	public void login(CredentialProvider credentialProvider, HashProvider hashProvider)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
@@ -208,10 +212,6 @@ public class PokemonGo {
 		this.hashProvider = hashProvider;
 
 		startTime = currentTimeMillis();
-		inventories = new Inventories(this);
-		settings = new Settings(this);
-		playerProfile = new PlayerProfile(this);
-
 		initialize();
 	}
 
@@ -305,6 +305,7 @@ public class PokemonGo {
 	 * @throws LoginFailedException When login fails
 	 * @throws RemoteServerException When server fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurs while performing a hash request
 	 */
 	private void fireRequestBlock(ServerRequest request, RequestType... exclude)
 			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
@@ -322,6 +323,7 @@ public class PokemonGo {
 	 * @throws LoginFailedException When login fails
 	 * @throws RemoteServerException When server fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurs while performing a hash request
 	 */
 	public void getAssetDigest() throws RemoteServerException, CaptchaActiveException, LoginFailedException,
 			HashException {
@@ -403,7 +405,7 @@ public class PokemonGo {
 		}
 		latitude = value;
 
-		if (!Double.isNaN(latitude) && !Double.isNaN(longitude)) {
+		if (heartbeat.active() && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
 			heartbeat.beat();
 		}
 	}
@@ -420,7 +422,7 @@ public class PokemonGo {
 		}
 		longitude = value;
 
-		if (!Double.isNaN(latitude) && !Double.isNaN(longitude)) {
+		if (heartbeat.active() && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
 			heartbeat.beat();
 		}
 	}
@@ -520,6 +522,7 @@ public class PokemonGo {
 	 * Returns all listeners for the given type.
 	 *
 	 * @param listenerType the type of listeners to return
+	 * @param <T> the listener type
 	 * @return all listeners for the given type
 	 */
 	public <T extends Listener> List<T> getListeners(Class<T> listenerType) {
