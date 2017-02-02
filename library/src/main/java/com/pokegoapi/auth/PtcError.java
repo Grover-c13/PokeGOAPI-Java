@@ -16,11 +16,14 @@
 package com.pokegoapi.auth;
 
 import lombok.Getter;
-import lombok.Setter;
 
 public class PtcError {
-
 	@Getter
-	@Setter
+	private String lt;
+	@Getter
 	private String error;
+	@Getter
+	private String execution;
+	@Getter
+	private String[] errors = new String[0];
 }

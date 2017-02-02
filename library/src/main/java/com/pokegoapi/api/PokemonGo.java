@@ -402,6 +402,10 @@ public class PokemonGo {
 			throw new IllegalArgumentException("latittude can not exceed +/- 90");
 		}
 		latitude = value;
+
+		if (!Double.isNaN(latitude) && !Double.isNaN(longitude)) {
+			heartbeat.beat();
+		}
 	}
 
 	/**
@@ -415,6 +419,10 @@ public class PokemonGo {
 			throw new IllegalArgumentException("longitude can not exceed +/- 180");
 		}
 		longitude = value;
+
+		if (!Double.isNaN(latitude) && !Double.isNaN(longitude)) {
+			heartbeat.beat();
+		}
 	}
 
 	/**

@@ -62,18 +62,22 @@ public class Map {
 	 * @throws RemoteServerException if the server gives an error while updating this map
 	 * @throws LoginFailedException if login fails
 	 * @throws HashException if an exception occurred while requesting hash
+	 * @return if the map was updated
 	 */
-	public void update() throws CaptchaActiveException, RemoteServerException, LoginFailedException, HashException {
+	public boolean update() throws CaptchaActiveException, RemoteServerException, LoginFailedException, HashException {
+		boolean updated = false;
 		if (!(Double.isNaN(api.getLatitude()) || Double.isNaN(api.getLongitude()))) {
 			MapObjects mapObjects = requestMapObjects();
 			if (api.getInventories().getItemBag().isIncenseActive()) {
 				mapObjects.addIncensePokemon(requestIncensePokemon());
 			}
 			this.mapObjects = mapObjects;
+			updated = true;
 		}
 		synchronized (this.updateLock) {
 			this.updateLock.notifyAll();
 		}
+		return updated;
 	}
 
 	/**

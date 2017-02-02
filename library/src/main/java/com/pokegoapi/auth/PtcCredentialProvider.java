@@ -206,6 +206,15 @@ public class PtcCredentialProvider extends CredentialProvider {
 			}
 			if (ptcError.getError() != null && ptcError.getError().length() > 0) {
 				throw new LoginFailedException(ptcError.getError());
+			} else if (ptcError.getErrors().length > 0) {
+				StringBuilder builder = new StringBuilder();
+				String[] errors = ptcError.getErrors();
+				for (int i = 0; i < errors.length - 1; i++) {
+					String error = errors[i];
+					builder.append("\"").append(error).append("\", ");
+				}
+				builder.append("\"").append(errors[errors.length - 1]).append("\"");
+				throw new LoginFailedException(builder.toString());
 			}
 		}
 
