@@ -30,17 +30,6 @@ public class GetInstance {
         }
     }
 
-    public static Provider.Service getService(String type)  throws NoSuchTypeException {
-        //TODO: implement default
-//        ProviderList list = Providers.getProviderList();
-//        Provider.Service s = list.getService(type);
-//        if (s == null) {
-//            throw new NoSuchTypeException
-//                    (type + " not available");
-//        }
-        return null;
-    }
-
 
     public static Provider.Service getService(String type, Provider provider) throws NoSuchTypeException {
         if (provider == null) {
@@ -67,55 +56,6 @@ public class GetInstance {
      *
      * There are overloaded methods for all the permutations.
      */
-
-    public static Instance getInstance(String type, Class clazz) throws NoSuchTypeException {
-        //TODO: implement default
-//        // in the almost all cases, the first service will work
-//        // avoid taking long path if so
-//        ProviderList list = Providers.getProviderList();
-//        Provider.Service firstService = list.getService(type, algorithm);
-//        if (firstService == null) {
-//            throw new NoSuchTypeException
-//                    (algorithm + " " + type + " not available");
-//        }
-//        NoSuchTypeException failure;
-//        try {
-//            return getInstance(firstService, clazz);
-//        } catch (NoSuchTypeException e) {
-//            failure = e;
-//        }
-//        // if we cannot get the service from the prefered provider,
-//        // fail over to the next
-//        for (Provider.Service s : list.getServices(type, algorithm)) {
-//            if (s == firstService) {
-//                // do not retry initial failed service
-//                continue;
-//            }
-//            try {
-//                return getInstance(s, clazz);
-//            } catch (NoSuchTypeException e) {
-//                failure = e;
-//            }
-//        }
-//        throw failure;
-        return null;
-    }
-
-    public static Instance getInstance(String type, Class clazz, Object param) throws NoSuchTypeException {
-        Provider.Service services = getService(type);
-        NoSuchTypeException failure = null;
-        try {
-            return getInstance(services, clazz, param);
-        } catch (NoSuchTypeException e) {
-            failure = e;
-        }
-
-        if (failure != null) {
-            throw failure;
-        } else {
-            throw new NoSuchTypeException(type + " not available");
-        }
-    }
 
     public static Instance getInstance(String type, Class clazz, Provider provider)
             throws NoSuchTypeException {
