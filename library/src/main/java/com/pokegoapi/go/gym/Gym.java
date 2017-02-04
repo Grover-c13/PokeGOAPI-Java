@@ -16,11 +16,14 @@ import com.pokegoapi.Provider;
 import com.pokegoapi.go.PokemonGoClient;
 import com.pokegoapi.go.gym.spec.Battle;
 import com.pokegoapi.go.map.spec.MapPoint;
+import com.pokegoapi.network.LoginFailedException;
+import com.pokegoapi.network.RemoteServerException;
 import com.pokegoapi.old.api.pokemon.Pokemon;
+import com.pokegoapi.old.exceptions.CaptchaActiveException;
 
 import java.util.List;
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings("unused")
 public class Gym implements MapPoint {
 
     private final GymSpi spi;
@@ -73,51 +76,51 @@ public class Gym implements MapPoint {
         return spi.getLongitude();
     }
 
-    protected boolean isEnabled() {
+    public boolean isEnabled() {
         return spi.engineIsEnabled();
     }
 
-    protected TeamColor ownedByTeam() {
+    public TeamColor getTeamOwner() {
         return spi.engineGetOwnedByTeam();
     }
 
-    protected PokemonId getGuardPokemonId() {
+    public PokemonId getGuardPokemonId() {
         return spi.engineGetGuardPokemonId();
     }
 
-    protected int getGuardPokemonCp() {
+    public int getGuardPokemonCp() {
         return spi.engineGetGuardPokemonCp();
     }
 
-    protected long getPoints() {
+    public long getPoints() {
         return spi.engineGetPoints();
     }
 
-    protected boolean getIsInBattle() {
+    public boolean isInBattle() {
         return spi.engineIsInBattle();
     }
 
-    protected boolean isAttackable() {
+    public boolean isAttackable() {
         return spi.engineIsAttackable();
     }
 
-    protected String getName() {
+    public String getName() {
         return spi.engineGetName();
     }
 
-    protected ProtocolStringList getUrlsList() {
+    public ProtocolStringList getUrlsList() {
         return spi.engineGetUrlsList();
     }
 
-    protected boolean isInRange() {
+    public boolean isInRange() {
         return spi.engineInRange();
     }
 
-    protected String getDescription() {
+    public String getDescription() {
         return spi.engineGetDescription();
     }
 
-    protected List<GymMembership> getGymMembers() {
+    public List<GymMembership> getGymMembers() {
         return spi.engineGetGymMembers();
     }
 
@@ -126,24 +129,32 @@ public class Gym implements MapPoint {
      *
      * @return List of pokemon
      */
-    protected List<PokemonData> getDefendingPokemon() {
+    public List<PokemonData> getDefendingPokemon() {
         return spi.engineGetDefendingPokemon();
     }
 
-    protected GymState getGymState() {
+    public GymState getGymState() {
         return spi.engineGetGymState();
     }
 
-    public GetGymDetailsResponse getGymDetails() {
+    public boolean hasGymDetails() {
+        return spi.engineHasGymDetails();
+    }
+
+    public boolean hasGymState() {
+        return spi.engineHasGymState();
+    }
+
+    public GetGymDetailsResponse getGymDetails() throws CaptchaActiveException, RemoteServerException, LoginFailedException {
         return spi.engineGetGymDetails();
     }
 
-    public Result deployPokemon(Pokemon pokemon) {
+    public Result deployPokemon(Pokemon pokemon) throws CaptchaActiveException, RemoteServerException, LoginFailedException {
         return spi.engineDeployPokemon(pokemon);
     }
 
-    public Battle battleGym() {
-        return spi.engineBattleGym();
+    public Battle battle() {
+        return spi.engineBattleGym(this);
     }
 
     public Provider getProvider() {
