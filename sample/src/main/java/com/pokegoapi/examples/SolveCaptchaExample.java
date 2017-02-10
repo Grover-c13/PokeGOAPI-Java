@@ -90,7 +90,6 @@ public class SolveCaptchaExample {
 
 			HashProvider hasher = ExampleConstants.getHashProvider();
 			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD), hasher);
-			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 
 			while (!api.hasChallenge()) {
 			}

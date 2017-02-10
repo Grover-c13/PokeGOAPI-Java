@@ -229,8 +229,9 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 	}
 
 	@Override
-	public String getTokenId() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
-		if (isTokenIdExpired()) {
+	public String getTokenId(boolean refresh) throws LoginFailedException, CaptchaActiveException,
+			RemoteServerException {
+		if (refresh || isTokenIdExpired()) {
 			refreshToken(refreshToken);
 		}
 		return tokenId;
@@ -239,14 +240,16 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 	/**
 	 * Refreshes tokenId if it has expired
 	 *
+	 * @param refresh if this AuthInfo should be refreshed
 	 * @return AuthInfo object
 	 * @throws LoginFailedException When login fails
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	@Override
-	public AuthInfo getAuthInfo() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
-		if (isTokenIdExpired()) {
+	public AuthInfo getAuthInfo(boolean refresh)
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+		if (refresh || isTokenIdExpired()) {
 			refreshToken(refreshToken);
 		}
 		authbuilder.setProvider("google");

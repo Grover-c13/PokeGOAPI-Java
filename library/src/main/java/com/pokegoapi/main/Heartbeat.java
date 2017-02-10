@@ -32,8 +32,11 @@ public class Heartbeat {
 	private long nextMapUpdate = Long.MIN_VALUE;
 	private long minMapRefresh;
 	private long maxMapRefresh;
+	private boolean updatingMap;
 
 	private boolean active;
+
+	private final Object lock = new Object();
 
 	private Queue<Runnable> tasks = new LinkedBlockingDeque<>();
 
@@ -58,7 +61,7 @@ public class Heartbeat {
 		Thread heartbeatThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				while (true) {
+				while (active) {
 					try {
 						Thread.sleep(10);
 					} catch (InterruptedException e) {
@@ -80,11 +83,19 @@ public class Heartbeat {
 		if (!api.hasChallenge()) {
 			List<HeartbeatListener> listeners = api.getListeners(HeartbeatListener.class);
 			long time = api.currentTimeMillis();
-			if (time >= nextMapUpdate) {
-				nextMapUpdate = time + minMapRefresh;
+			boolean updatingMap;
+			synchronized (lock) {
+				updatingMap = this.updatingMap;
+			}
+			if (time >= nextMapUpdate && !updatingMap) {
+				synchronized (lock) {
+					this.updatingMap = true;
+				}
 				Map map = api.getMap();
 				try {
-					map.update();
+					if (map.update()) {
+						nextMapUpdate = time + minMapRefresh;
+					}
 					for (HeartbeatListener listener : listeners) {
 						listener.onMapUpdate(api, map.getMapObjects());
 					}
@@ -92,6 +103,9 @@ public class Heartbeat {
 					for (HeartbeatListener listener : listeners) {
 						listener.onMapUpdateException(api, exception);
 					}
+				}
+				synchronized (lock) {
+					this.updatingMap = false;
 				}
 			}
 		}
@@ -119,5 +133,12 @@ public class Heartbeat {
 	 */
 	public void enqueueTask(Runnable task) {
 		tasks.add(task);
+	}
+
+	/**
+	 * Exits this heartbeat
+	 */
+	public void exit() {
+		active = false;
 	}
 }

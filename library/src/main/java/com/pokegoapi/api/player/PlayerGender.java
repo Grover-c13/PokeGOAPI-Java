@@ -13,23 +13,21 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.auth;
+package com.pokegoapi.api.player;
 
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
+public enum PlayerGender {
+	MALE,
+	FEMALE;
 
-/**
- * Any Credential Provider can extend this.
- */
-public abstract class CredentialProvider {
-
-	public abstract String getTokenId(boolean refresh) throws LoginFailedException, CaptchaActiveException,
-			RemoteServerException;
-
-	public abstract AuthInfo getAuthInfo(boolean refresh) throws LoginFailedException, CaptchaActiveException,
-			RemoteServerException;
-
-	public abstract boolean isTokenIdExpired();
+	/**
+	 * Gets a gender from the given proto value
+	 * @param value the proto value
+	 * @return the gender for the proto value
+	 */
+	public static PlayerGender get(int value) {
+		if (value == 0) {
+			return MALE;
+		}
+		return FEMALE;
+	}
 }

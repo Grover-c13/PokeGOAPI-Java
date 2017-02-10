@@ -104,29 +104,33 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 
 	/**
 	 * @return token id
+	 * @param refresh if this AuthInfo should be refreshed
 	 * @throws RemoteServerException login failed possibly due to invalid credentials
 	 * @throws LoginFailedException some server/network failure
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	@Override
-	public String getTokenId() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
-		if (isTokenIdExpired()) {
+	public String getTokenId(boolean refresh) throws RemoteServerException, CaptchaActiveException,
+			LoginFailedException {
+		if (refresh || isTokenIdExpired()) {
 			this.tokenInfo = refreshToken(username, tokenInfo.refreshToken);
 		}
 		return tokenInfo.authToken.getToken();
 	}
 
 	/**
+	 * @param refresh if this AuthInfo should be refreshed
 	 * @return auth info
 	 * @throws RemoteServerException login failed possibly due to invalid credentials
 	 * @throws LoginFailedException some server/network failure
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	@Override
-	public AuthInfo getAuthInfo() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+	public AuthInfo getAuthInfo(boolean refresh) throws RemoteServerException, CaptchaActiveException,
+			LoginFailedException {
 		AuthInfo.Builder builder = AuthInfo.newBuilder();
 		builder.setProvider("google");
-		builder.setToken(AuthInfo.JWT.newBuilder().setContents(getTokenId()).setUnknown2(59).build());
+		builder.setToken(AuthInfo.JWT.newBuilder().setContents(getTokenId(refresh)).setUnknown2(59).build());
 		return builder.build();
 	}
 

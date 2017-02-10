@@ -48,7 +48,7 @@ public class EggIncubator {
 	}
 
 	/**
-	 * @returns the attributes of this incubator, null if there are none
+	 * @return the attributes of this incubator, null if there are none
 	 */
 	public EggIncubatorAttributes getAttributes() {
 		ItemSettings settings = PokemonMeta.getItemSettings(proto.getItemId());

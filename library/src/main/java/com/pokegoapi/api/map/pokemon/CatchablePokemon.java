@@ -484,7 +484,7 @@ public class CatchablePokemon implements MapPoint {
 	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws NoSuchItemException the no such item exception
-	 * @throws CaptchaActiveException the encounter failed exception
+	 * @throws EncounterFailedException the encounter failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	public Observable<CatchResult> catchPokemon(EncounterResult encounter,

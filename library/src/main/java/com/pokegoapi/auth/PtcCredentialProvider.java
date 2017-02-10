@@ -206,6 +206,15 @@ public class PtcCredentialProvider extends CredentialProvider {
 			}
 			if (ptcError.getError() != null && ptcError.getError().length() > 0) {
 				throw new LoginFailedException(ptcError.getError());
+			} else if (ptcError.getErrors().length > 0) {
+				StringBuilder builder = new StringBuilder();
+				String[] errors = ptcError.getErrors();
+				for (int i = 0; i < errors.length - 1; i++) {
+					String error = errors[i];
+					builder.append("\"").append(error).append("\", ");
+				}
+				builder.append("\"").append(errors[errors.length - 1]).append("\"");
+				throw new LoginFailedException(builder.toString());
 			}
 		}
 
@@ -258,8 +267,9 @@ public class PtcCredentialProvider extends CredentialProvider {
 	}
 
 	@Override
-	public String getTokenId() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
-		if (isTokenIdExpired()) {
+	public String getTokenId(boolean refresh) throws LoginFailedException, CaptchaActiveException,
+			RemoteServerException {
+		if (refresh || isTokenIdExpired()) {
 			login(username, password);
 		}
 		return tokenId;
@@ -268,14 +278,16 @@ public class PtcCredentialProvider extends CredentialProvider {
 	/**
 	 * Valid auth info object	 *
 	 *
+	 * @param refresh if this AuthInfo should be refreshed
 	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
 	 * @throws LoginFailedException if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	@Override
-	public AuthInfo getAuthInfo() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
-		if (isTokenIdExpired()) {
+	public AuthInfo getAuthInfo(boolean refresh) throws LoginFailedException, CaptchaActiveException,
+			RemoteServerException {
+		if (refresh || isTokenIdExpired()) {
 			login(username, password);
 		}
 

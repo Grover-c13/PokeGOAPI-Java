@@ -492,9 +492,12 @@ public class Pokemon extends PokemonDetails {
 		return obj instanceof Pokemon && ((Pokemon) obj).getId() == getId();
 	}
 
+	/**
+	 * Returns true if this pokemon is your current buddy
+	 * @return true if this pokemon is your current buddy
+	 */
 	public boolean isBuddy() {
-		if (!api.getPlayerProfile().hasBuddy())
-			return false;
-		return api.getPlayerProfile().getBuddy().getPokemon().getId() == this.getId();
+		PlayerProfile profile = api.getPlayerProfile();
+		return profile.hasBuddy() && profile.getBuddy().getPokemon().getId() == this.getId();
 	}
 }

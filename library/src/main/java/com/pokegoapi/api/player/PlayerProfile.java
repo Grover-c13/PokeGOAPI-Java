@@ -20,7 +20,6 @@ import POGOProtos.Data.Player.PlayerStatsOuterClass;
 import POGOProtos.Data.PlayerBadgeOuterClass.PlayerBadge;
 import POGOProtos.Data.PlayerDataOuterClass.PlayerData;
 import POGOProtos.Enums.BadgeTypeOuterClass.BadgeType;
-import POGOProtos.Enums.GenderOuterClass.Gender;
 import POGOProtos.Enums.TutorialStateOuterClass;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
 import POGOProtos.Networking.Requests.Messages.ClaimCodenameMessageOuterClass.ClaimCodenameMessage;
@@ -30,7 +29,7 @@ import POGOProtos.Networking.Requests.Messages.GetPlayerProfileMessageOuterClass
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
 import POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessageOuterClass.MarkTutorialCompleteMessage;
 import POGOProtos.Networking.Requests.Messages.SetAvatarMessageOuterClass.SetAvatarMessage;
-import POGOProtos.Networking.Requests.Messages.SetBuddyPokemon;
+import POGOProtos.Networking.Requests.Messages.SetBuddyPokemonMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
 import POGOProtos.Networking.Responses.ClaimCodenameResponseOuterClass.ClaimCodenameResponse;
@@ -100,11 +99,8 @@ public class PlayerProfile {
 
 	/**
 	 * @param api the api
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
-	public PlayerProfile(PokemonGo api) throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	public PlayerProfile(PokemonGo api) {
 		this.api = api;
 		this.playerLocale = new PlayerLocale();
 	}
@@ -212,8 +208,7 @@ public class PlayerProfile {
 	 * The rewarded items are automatically inserted into the players item bag.
 	 *
 	 * @param level the trainer level that you want to accept the rewards for
-	 * @return a PlayerLevelUpRewards object containing information about the items rewarded and unlocked for this
-	 * level
+	 * @return a PlayerLevelUpRewards object containing information about the items rewarded and unlocked for this level
 	 * @throws LoginFailedException when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
@@ -448,7 +443,8 @@ public class PlayerProfile {
 	 */
 	public boolean setBuddy(Pokemon pokemon) throws CaptchaActiveException, LoginFailedException,
 			RemoteServerException, HashException {
-		SetBuddyPokemon.SetBuddyPokemonMessage message = SetBuddyPokemon.SetBuddyPokemonMessage.newBuilder()
+		SetBuddyPokemonMessageOuterClass.SetBuddyPokemonMessage message = SetBuddyPokemonMessageOuterClass
+				.SetBuddyPokemonMessage.newBuilder()
 				.setPokemonId(pokemon.getId())
 				.build();
 		ServerRequest request = new ServerRequest(RequestType.SET_BUDDY_POKEMON, message);
@@ -487,7 +483,7 @@ public class PlayerProfile {
 			HashException {
 		SecureRandom random = new SecureRandom();
 
-		Gender gender = random.nextInt(100) % 2 == 0 ? Gender.FEMALE : Gender.MALE;
+		PlayerGender gender = random.nextInt(100) % 2 == 0 ? PlayerGender.FEMALE : PlayerGender.MALE;
 		PlayerAvatar avatar = new PlayerAvatar(gender,
 				random.nextInt(PlayerAvatar.getAvailableSkins()),
 				random.nextInt(PlayerAvatar.getAvailableHair()),
@@ -575,6 +571,7 @@ public class PlayerProfile {
 	/**
 	 * Setup an user name for our account
 	 *
+	 * @return the claimed codename
 	 * @throws LoginFailedException when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
@@ -589,6 +586,7 @@ public class PlayerProfile {
 	 * Setup an user name for our account
 	 *
 	 * @param lastFailure the last name used that was already taken; null for first try.
+	 * @return the claimed codename
 	 * @throws LoginFailedException when the auth is invalid
 	 * @throws RemoteServerException when the server is down/having issues
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
@@ -619,7 +617,7 @@ public class PlayerProfile {
 
 		api.getRequestHandler().sendServerRequests(request.withCommons());
 
-		String updatedCodename = null;
+		String updatedCodename;
 		try {
 			ClaimCodenameResponse claimCodenameResponse = ClaimCodenameResponse.parseFrom(request.getData());
 			if (claimCodenameResponse.getStatus() != ClaimCodenameResponse.Status.SUCCESS) {
