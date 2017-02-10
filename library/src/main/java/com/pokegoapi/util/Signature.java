@@ -19,11 +19,13 @@ import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Platform.PlatformRequestTypeOuterClass.PlatformRequestType;
 import POGOProtos.Networking.Platform.Requests.SendEncryptedSignatureRequestOuterClass.SendEncryptedSignatureRequest;
+import POGOProtos.Networking.Platform.Requests.UnknownPtr8RequestOuterClass.UnknownPtr8Request;
+import POGOProtos.Networking.Requests.RequestOuterClass.Request;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.device.LocationFixes;
 import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.UnavailableHashException;
 import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.util.hash.Hash;
 import com.pokegoapi.util.hash.HashProvider;
@@ -97,14 +99,11 @@ public class Signature {
 			signatureBuilder.addSensorInfo(sensorInfo);
 		}
 
-		try {
-			List<Long> requestHashes = hash.getRequestHashes();
-			for (int i = 0; i < builder.getRequestsCount(); i++) {
-				signatureBuilder.addRequestHash(requestHashes.get(i));
-			}
-		} catch (Exception e) {
-			throw new UnavailableHashException("Could not reach hash");
+		List<Long> requestHashes = hash.getRequestHashes();
+		for (int i = 0; i < builder.getRequestsCount(); i++) {
+			signatureBuilder.addRequestHash(requestHashes.get(i));
 		}
+
 		SignatureOuterClass.Signature signature = signatureBuilder.build();
 		byte[] signatureByteArray = signature.toByteArray();
 		byte[] encrypted = crypto.encrypt(signatureByteArray, timeSinceStart).toByteBuffer().array();
@@ -113,10 +112,24 @@ public class Signature {
 				.setEncryptedSignature(ByteString.copyFrom(encrypted)).build()
 				.toByteString();
 
-		RequestEnvelope.PlatformRequest platformRequest = RequestEnvelope.PlatformRequest.newBuilder()
+		RequestEnvelope.PlatformRequest signatureRequest = RequestEnvelope.PlatformRequest.newBuilder()
 				.setType(PlatformRequestType.SEND_ENCRYPTED_SIGNATURE)
 				.setRequestMessage(signatureBytes)
 				.build();
-		builder.addPlatformRequests(platformRequest);
+		builder.addPlatformRequests(signatureRequest);
+
+		for (Request request : builder.getRequestsList()) {
+			RequestType requestType = request.getRequestType();
+			if (requestType == RequestType.GET_MAP_OBJECTS || requestType == RequestType.GET_PLAYER) {
+				ByteString ptr8 = UnknownPtr8Request.newBuilder()
+						.setMessage("7bb2d74dec0d8c5e132ad6c5491f72c9f19b306c")
+						.build()
+						.toByteString();
+				builder.addPlatformRequests(RequestEnvelope.PlatformRequest.newBuilder()
+						.setType(PlatformRequestType.UNKNOWN_PTR_8)
+						.setRequestMessage(ptr8).build());
+				break;
+			}
+		}
 	}
 }

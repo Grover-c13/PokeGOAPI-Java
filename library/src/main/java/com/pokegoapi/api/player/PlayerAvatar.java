@@ -16,7 +16,6 @@
 package com.pokegoapi.api.player;
 
 import POGOProtos.Data.Player.PlayerAvatarOuterClass;
-import POGOProtos.Enums.GenderOuterClass.Gender;
 import lombok.Data;
 import lombok.Getter;
 
@@ -44,10 +43,10 @@ public class PlayerAvatar {
 	 * @param eyes the eye index of this avatar
 	 * @param backpack the backpack index of this avatar
 	 */
-	public PlayerAvatar(Gender gender, int skin, int hair, int shirt, int pants,
-			int hat, int shoes, int eyes, int backpack) {
+	public PlayerAvatar(PlayerGender gender, int skin, int hair, int shirt, int pants,
+						int hat, int shoes, int eyes, int backpack) {
 		avatar = PlayerAvatarOuterClass.PlayerAvatar.newBuilder()
-				.setGender(gender)
+				.setAvatar(gender.ordinal())
 				.setSkin(skin)
 				.setHair(hair)
 				.setShirt(shirt)
@@ -84,11 +83,11 @@ public class PlayerAvatar {
 	}
 
 	public int getGenderValue() {
-		return avatar.getGenderValue();
+		return avatar.getAvatar();
 	}
 
-	public Gender getGender() {
-		return avatar.getGender();
+	public PlayerGender getGender() {
+		return PlayerGender.get(avatar.getAvatar());
 	}
 
 	public int getEyes() {
@@ -115,20 +114,20 @@ public class PlayerAvatar {
 		return 5;
 	}
 
-	public static int getAvailableShirts(Gender gender) {
-		return gender.getNumber() == Gender.MALE_VALUE ? 4 : 9;
+	public static int getAvailableShirts(PlayerGender gender) {
+		return gender == PlayerGender.MALE ? 4 : 9;
 	}
 
-	public static int getAvailablePants(Gender gender) {
-		return gender.getNumber() == Gender.MALE_VALUE ? 3 : 6;
+	public static int getAvailablePants(PlayerGender gender) {
+		return gender == PlayerGender.MALE ? 3 : 6;
 	}
 
 	public static int getAvailableShoes() {
 		return 7;
 	}
 
-	public static int getAvailableBags(Gender gender) {
-		return gender.getNumber() == Gender.MALE_VALUE ? 6 : 3;
+	public static int getAvailableBags(PlayerGender gender) {
+		return gender == PlayerGender.MALE ? 6 : 3;
 	}
 
 	/**
@@ -137,7 +136,7 @@ public class PlayerAvatar {
 	 * @param gender the gender to generate based on
 	 * @return a randomly generated avatar
 	 */
-	public static PlayerAvatar random(Gender gender) {
+	public static PlayerAvatar random(PlayerGender gender) {
 		SecureRandom random = new SecureRandom();
 		return new PlayerAvatar(gender,
 				random.nextInt(PlayerAvatar.getAvailableSkins()),

@@ -30,11 +30,11 @@
 
 package com.pokegoapi.examples;
 
-import POGOProtos.Enums.GenderOuterClass.Gender;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.listener.TutorialListener;
 import com.pokegoapi.api.player.Avatar;
 import com.pokegoapi.api.player.PlayerAvatar;
+import com.pokegoapi.api.player.PlayerGender;
 import com.pokegoapi.api.pokemon.StarterPokemon;
 import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.exceptions.CaptchaActiveException;
@@ -82,7 +82,7 @@ public class TutorialHandleExample {
 				public PlayerAvatar selectAvatar(PokemonGo api) {
 					System.out.println("Selecting player avatar");
 					return new PlayerAvatar(
-							Gender.FEMALE,
+							PlayerGender.FEMALE,
 							Avatar.Skin.YELLOW.id(),
 							Avatar.Hair.BLACK.id(),
 							Avatar.FemaleShirt.BLUE.id(),

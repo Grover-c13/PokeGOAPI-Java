@@ -37,7 +37,7 @@ public interface HashProvider {
 			throws HashException;
 
 	/**
-	 * @return the version this hash supports, for example 4500 = 0.45.0 and 5100 = 0.51.0
+	 * @return the version this hash supports, for example 4500 = 0.45.0 and 5300 = 0.53.0
 	 */
 	int getHashVersion();
 

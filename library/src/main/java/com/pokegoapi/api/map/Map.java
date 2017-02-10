@@ -58,22 +58,26 @@ public class Map {
 	/**
 	 * Updates the map. Only API should be calling this.
 	 *
+	 * @return if the map was updated
 	 * @throws CaptchaActiveException if a captcha is active and the map cannot be updates
 	 * @throws RemoteServerException if the server gives an error while updating this map
 	 * @throws LoginFailedException if login fails
 	 * @throws HashException if an exception occurred while requesting hash
 	 */
-	public void update() throws CaptchaActiveException, RemoteServerException, LoginFailedException, HashException {
+	public boolean update() throws CaptchaActiveException, RemoteServerException, LoginFailedException, HashException {
+		boolean updated = false;
 		if (!(Double.isNaN(api.getLatitude()) || Double.isNaN(api.getLongitude()))) {
 			MapObjects mapObjects = requestMapObjects();
 			if (api.getInventories().getItemBag().isIncenseActive()) {
 				mapObjects.addIncensePokemon(requestIncensePokemon());
 			}
 			this.mapObjects = mapObjects;
+			updated = true;
 		}
 		synchronized (this.updateLock) {
 			this.updateLock.notifyAll();
 		}
+		return updated;
 	}
 
 	/**
@@ -173,6 +177,7 @@ public class Map {
 
 	/**
 	 * Blocks this thread until MapObjects are updates
+	 * @throws InterruptedException if this thread is interrupted while awaiting map update
 	 */
 	public void awaitUpdate() throws InterruptedException {
 		synchronized (this.updateLock) {
