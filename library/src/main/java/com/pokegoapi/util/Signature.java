@@ -115,7 +115,7 @@ public class Signature {
 				RequestType requestType = request.getRequestType();
 				if (requestType == RequestType.GET_MAP_OBJECTS || requestType == RequestType.GET_PLAYER) {
 					ByteString ptr8 = UnknownPtr8Request.newBuilder()
-							.setMessage("7bb2d74dec0d8c5e132ad6c5491f72c9f19b306c")
+							.setMessage("90f6a704505bccac73cec99b07794993e6fd5a12")
 							.build()
 							.toByteString();
 					builder.addPlatformRequests(RequestEnvelope.PlatformRequest.newBuilder()
