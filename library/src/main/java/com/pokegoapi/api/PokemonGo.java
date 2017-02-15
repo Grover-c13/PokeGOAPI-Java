@@ -36,6 +36,7 @@ import com.pokegoapi.api.device.LocationFixes;
 import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.listener.Listener;
+import com.pokegoapi.api.listener.LocationListener;
 import com.pokegoapi.api.listener.LoginListener;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.map.Point;
@@ -408,6 +409,10 @@ public class PokemonGo {
 		if (heartbeat.active() && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
 			heartbeat.beat();
 		}
+
+		for (LocationListener listener : this.getListeners(LocationListener.class)) {
+			listener.onLocationUpdate(this, getPoint());
+		}
 	}
 
 	/**
@@ -424,6 +429,10 @@ public class PokemonGo {
 
 		if (heartbeat.active() && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
 			heartbeat.beat();
+		}
+
+		for (LocationListener listener : this.getListeners(LocationListener.class)) {
+			listener.onLocationUpdate(this, getPoint());
 		}
 	}
 
