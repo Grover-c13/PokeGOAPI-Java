@@ -47,14 +47,11 @@ public class Signature {
 	 */
 	public static void setSignature(PokemonGo api, RequestEnvelope.Builder builder)
 			throws RemoteServerException, HashException {
-		if (builder.getAuthTicket() == null) {
-			return;
-		}
-
-		byte[] authTicket = builder.getAuthTicket().toByteArray();
-
-		if (authTicket.length == 0) {
-			return;
+		byte[] authTicket;
+		if (builder.hasAuthTicket()) {
+			authTicket = builder.getAuthTicket().toByteArray();
+		} else {
+			authTicket = builder.getAuthInfo().getToken().getContentsBytes().toByteArray();
 		}
 
 		byte[][] requestData = new byte[builder.getRequestsCount()][];
