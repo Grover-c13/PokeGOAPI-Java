@@ -23,7 +23,8 @@ import POGOProtos.Enums.BadgeTypeOuterClass.BadgeType;
 import POGOProtos.Enums.TutorialStateOuterClass;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
 import POGOProtos.Networking.Requests.Messages.ClaimCodenameMessageOuterClass.ClaimCodenameMessage;
-import POGOProtos.Networking.Requests.Messages.EncounterTutorialCompleteMessageOuterClass.EncounterTutorialCompleteMessage;
+import POGOProtos.Networking.Requests.Messages.EncounterTutorialCompleteMessageOuterClass
+		.EncounterTutorialCompleteMessage;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
 import POGOProtos.Networking.Requests.Messages.GetPlayerProfileMessageOuterClass.GetPlayerProfileMessage;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
@@ -185,7 +186,7 @@ public class PlayerProfile {
 				.build();
 
 		ServerRequest profileRequest = new ServerRequest(RequestType.GET_PLAYER_PROFILE, profileMessage);
-		api.getRequestHandler().sendServerRequests(profileRequest.withCommons());
+		api.getRequestHandler().sendServerRequests(profileRequest, true);
 
 		try {
 			GetPlayerProfileResponse response = GetPlayerProfileResponse.parseFrom(profileRequest.getData());
@@ -509,7 +510,7 @@ public class PlayerProfile {
 
 		ServerRequest request = new ServerRequest(RequestType.SET_AVATAR, setAvatarMessage);
 
-		api.getRequestHandler().sendServerRequests(request.withCommons());
+		api.getRequestHandler().sendServerRequests(request, true);
 
 		try {
 			SetAvatarResponse setAvatarResponse = SetAvatarResponse.parseFrom(request.getData());
@@ -552,14 +553,14 @@ public class PlayerProfile {
 
 		ServerRequest request = new ServerRequest(RequestType.ENCOUNTER_TUTORIAL_COMPLETE, builder.build());
 
-		api.getRequestHandler().sendServerRequests(request.withCommons());
+		api.getRequestHandler().sendServerRequests(request, true);
 
 		final GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
 				.setPlayerLocale(playerLocale.getPlayerLocale())
 				.build();
 		request = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
 
-		api.getRequestHandler().sendServerRequests(request.withCommons());
+		api.getRequestHandler().sendServerRequests(request, true);
 
 		try {
 			updateProfile(GetPlayerResponse.parseFrom(request.getData()));
@@ -615,7 +616,7 @@ public class PlayerProfile {
 
 		ServerRequest request = new ServerRequest(RequestType.CLAIM_CODENAME, claimCodenameMessage);
 
-		api.getRequestHandler().sendServerRequests(request.withCommons());
+		api.getRequestHandler().sendServerRequests(request, true);
 
 		String updatedCodename;
 		try {
@@ -637,7 +638,7 @@ public class PlayerProfile {
 						.build();
 				request = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
 
-				api.getRequestHandler().sendServerRequests(request.withCommons());
+				api.getRequestHandler().sendServerRequests(request, true);
 
 				updateProfile(GetPlayerResponse.parseFrom(request.getData()));
 			}

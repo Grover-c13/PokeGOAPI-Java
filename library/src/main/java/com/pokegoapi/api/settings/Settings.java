@@ -98,7 +98,7 @@ public class Settings {
 		DownloadSettingsMessageOuterClass.DownloadSettingsMessage msg =
 				DownloadSettingsMessageOuterClass.DownloadSettingsMessage.newBuilder().build();
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.DOWNLOAD_SETTINGS, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest); //here you marked everything as read
+		api.getRequestHandler().sendServerRequests(serverRequest, false); //here you marked everything as read
 		DownloadSettingsResponseOuterClass.DownloadSettingsResponse response;
 		try {
 			response = DownloadSettingsResponseOuterClass.DownloadSettingsResponse.parseFrom(serverRequest.getData());

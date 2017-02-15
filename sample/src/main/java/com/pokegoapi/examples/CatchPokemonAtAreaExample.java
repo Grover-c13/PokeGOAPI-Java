@@ -180,21 +180,23 @@ public class CatchPokemonAtAreaExample {
 							if (result.getStatus() == CatchStatus.CATCH_SUCCESS) {
 								//Print pokemon stats
 								Pokemon pokemon = pokebank.getPokemonById(result.getCapturedPokemonId());
-								double iv = pokemon.getIvInPercentage();
-								int number = pokemon.getPokemonId().getNumber();
-								String name = PokeDictionary.getDisplayName(number, Locale.ENGLISH);
-								System.out.println("====" + name + "====");
-								System.out.println("CP: " + pokemon.getCp());
-								System.out.println("IV: " + iv + "%");
-								System.out.println("Height: " + pokemon.getHeightM() + "m");
-								System.out.println("Weight: " + pokemon.getWeightKg() + "kg");
-								System.out.println("Move 1: " + pokemon.getMove1());
-								System.out.println("Move 2: " + pokemon.getMove2());
-								//Rename the pokemon to <Name> IV%
-								pokemon.renamePokemon(name + " " + iv + "%");
-								//Set pokemon with IV above 90% as favorite
-								if (iv > 90) {
-									pokemon.setFavoritePokemon(true);
+								if (pokemon != null) {
+									double iv = pokemon.getIvInPercentage();
+									int number = pokemon.getPokemonId().getNumber();
+									String name = PokeDictionary.getDisplayName(number, Locale.ENGLISH);
+									System.out.println("====" + name + "====");
+									System.out.println("CP: " + pokemon.getCp());
+									System.out.println("IV: " + iv + "%");
+									System.out.println("Height: " + pokemon.getHeightM() + "m");
+									System.out.println("Weight: " + pokemon.getWeightKg() + "kg");
+									System.out.println("Move 1: " + pokemon.getMove1());
+									System.out.println("Move 2: " + pokemon.getMove2());
+									//Rename the pokemon to <Name> IV%
+									pokemon.renamePokemon(name + " " + iv + "%");
+									//Set pokemon with IV above 90% as favorite
+									if (iv > 90) {
+										pokemon.setFavoritePokemon(true);
+									}
 								}
 							}
 						}

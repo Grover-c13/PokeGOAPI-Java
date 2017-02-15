@@ -23,7 +23,7 @@ import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.R
 import POGOProtos.Networking.Requests.Messages.SetFavoritePokemonMessageOuterClass.SetFavoritePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.UpgradePokemonMessageOuterClass.UpgradePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.UseItemPotionMessageOuterClass;
-import POGOProtos.Networking.Requests.Messages.UseItemReviveMessageOuterClass;
+import POGOProtos.Networking.Requests.Messages.UseItemReviveMessageOuterClass.UseItemReviveMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass.EvolvePokemonResponse;
 import POGOProtos.Networking.Responses.NicknamePokemonResponseOuterClass.NicknamePokemonResponse;
@@ -45,7 +45,6 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.exceptions.hash.HashException;
-import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
 import lombok.Getter;
@@ -234,7 +233,7 @@ public class Pokemon extends PokemonDetails {
 	 */
 	public Observable<UpgradePokemonResponse.Result> powerUpAsync() {
 		UpgradePokemonMessage reqMsg = UpgradePokemonMessage.newBuilder().setPokemonId(getId()).build();
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.UPGRADE_POKEMON, reqMsg);
+		ServerRequest serverRequest = new ServerRequest(RequestType.UPGRADE_POKEMON, reqMsg);
 
 		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
 				new Func1<ByteString, UpgradePokemonResponse.Result>() {
@@ -268,7 +267,7 @@ public class Pokemon extends PokemonDetails {
 		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.EVOLVE_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest, true);
 
 		EvolvePokemonResponse response;
 		try {
@@ -361,7 +360,7 @@ public class Pokemon extends PokemonDetails {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_POTION, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest.withCommons());
+		api.getRequestHandler().sendServerRequests(serverRequest, true);
 
 		UseItemPotionResponse response;
 		try {
@@ -418,15 +417,14 @@ public class Pokemon extends PokemonDetails {
 		if (!item.isRevive() || item.getCount() < 1 || !isFainted())
 			return UseItemReviveResponse.Result.ERROR_CANNOT_USE;
 
-		UseItemReviveMessageOuterClass.UseItemReviveMessage reqMsg = UseItemReviveMessageOuterClass
-				.UseItemReviveMessage
+		UseItemReviveMessage reqMsg = UseItemReviveMessage
 				.newBuilder()
 				.setItemId(itemId)
 				.setPokemonId(getId())
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_REVIVE, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest.withCommons());
+		api.getRequestHandler().sendServerRequests(serverRequest, true);
 
 		UseItemReviveResponse response;
 		try {

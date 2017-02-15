@@ -99,8 +99,8 @@ public class Map {
 			builder.addCellId(cell);
 			builder.addSinceTimestampMs(0);
 		}
-		ServerRequest request = new ServerRequest(RequestType.GET_MAP_OBJECTS, builder.build()).withCommons();
-		api.getRequestHandler().sendServerRequests(request);
+		ServerRequest request = new ServerRequest(RequestType.GET_MAP_OBJECTS, builder.build());
+		api.getRequestHandler().sendServerRequests(request, true);
 		try {
 			GetMapObjectsResponse response = GetMapObjectsResponse.parseFrom(request.getData());
 			MapObjects mapObjects = new MapObjects(api);

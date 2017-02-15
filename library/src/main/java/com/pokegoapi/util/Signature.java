@@ -47,85 +47,82 @@ public class Signature {
 	 */
 	public static void setSignature(PokemonGo api, RequestEnvelope.Builder builder)
 			throws RemoteServerException, HashException {
-		byte[] authTicket;
 		if (builder.hasAuthTicket()) {
-			authTicket = builder.getAuthTicket().toByteArray();
-		} else {
-			authTicket = builder.getAuthInfo().getToken().getContentsBytes().toByteArray();
-		}
+			byte[] authTicket = builder.getAuthTicket().toByteArray();
 
-		byte[][] requestData = new byte[builder.getRequestsCount()][];
-		for (int i = 0; i < builder.getRequestsCount(); i++) {
-			requestData[i] = builder.getRequests(i).toByteArray();
-		}
+			byte[][] requestData = new byte[builder.getRequestsCount()][];
+			for (int i = 0; i < builder.getRequestsCount(); i++) {
+				requestData[i] = builder.getRequests(i).toByteArray();
+			}
 
-		double latitude = api.getLatitude();
-		double longitude = api.getLongitude();
-		double accuracy = api.getAccuracy();
+			double latitude = api.getLatitude();
+			double longitude = api.getLongitude();
+			double accuracy = api.getAccuracy();
 
-		if (Double.isNaN(latitude)) {
-			latitude = 0.0;
-		}
-		if (Double.isNaN(longitude)) {
-			longitude = 0.0;
-		}
-		if (Double.isNaN(accuracy)) {
-			accuracy = 0.0;
-		}
+			if (Double.isNaN(latitude)) {
+				latitude = 0.0;
+			}
+			if (Double.isNaN(longitude)) {
+				longitude = 0.0;
+			}
+			if (Double.isNaN(accuracy)) {
+				accuracy = 0.0;
+			}
 
-		long currentTime = api.currentTimeMillis();
-		byte[] sessionHash = api.getSessionHash();
-		HashProvider provider = api.getHashProvider();
-		Hash hash = provider.provide(currentTime, latitude, longitude, accuracy, authTicket, sessionHash, requestData);
-		Crypto crypto = provider.getCrypto();
+			long currentTime = api.currentTimeMillis();
+			byte[] sessionHash = api.getSessionHash();
+			HashProvider provider = api.getHashProvider();
+			Hash hash = provider.provide(currentTime, latitude, longitude, accuracy, authTicket, sessionHash, requestData);
+			Crypto crypto = provider.getCrypto();
 
-		long timeSinceStart = currentTime - api.getStartTime();
-		SignatureOuterClass.Signature.Builder signatureBuilder = SignatureOuterClass.Signature.newBuilder()
-				.setLocationHash1(hash.getLocationAuthHash())
-				.setLocationHash2(hash.getLocationHash())
-				.setTimestamp(currentTime)
-				.setTimestampSinceStart(timeSinceStart)
-				.setDeviceInfo(api.getDeviceInfo())
-				.setActivityStatus(api.getActivitySignature(RANDOM))
-				.addAllLocationFix(LocationFixes.getDefault(api, builder, currentTime, RANDOM))
-				.setSessionHash(ByteString.copyFrom(sessionHash))
-				.setUnknown25(provider.getUNK25());
+			long timeSinceStart = currentTime - api.getStartTime();
+			SignatureOuterClass.Signature.Builder signatureBuilder = SignatureOuterClass.Signature.newBuilder()
+					.setLocationHash1(hash.getLocationAuthHash())
+					.setLocationHash2(hash.getLocationHash())
+					.setTimestamp(currentTime)
+					.setTimestampSinceStart(timeSinceStart)
+					.setDeviceInfo(api.getDeviceInfo())
+					.setActivityStatus(api.getActivitySignature(RANDOM))
+					.addAllLocationFix(LocationFixes.getDefault(api, builder, currentTime, RANDOM))
+					.setSessionHash(ByteString.copyFrom(sessionHash))
+					.setUnknown25(provider.getUNK25());
 
-		SignatureOuterClass.Signature.SensorInfo sensorInfo = api.getSensorSignature(currentTime, RANDOM);
-		if (sensorInfo != null) {
-			signatureBuilder.addSensorInfo(sensorInfo);
-		}
+			SignatureOuterClass.Signature.SensorInfo sensorInfo = api.getSensorSignature(currentTime, RANDOM);
+			if (sensorInfo != null) {
+				signatureBuilder.addSensorInfo(sensorInfo);
+			}
 
-		List<Long> requestHashes = hash.getRequestHashes();
-		for (int i = 0; i < builder.getRequestsCount(); i++) {
-			signatureBuilder.addRequestHash(requestHashes.get(i));
-		}
+			List<Long> requestHashes = hash.getRequestHashes();
+			for (int i = 0; i < builder.getRequestsCount(); i++) {
+				signatureBuilder.addRequestHash(requestHashes.get(i));
+			}
 
-		SignatureOuterClass.Signature signature = signatureBuilder.build();
-		byte[] signatureByteArray = signature.toByteArray();
-		byte[] encrypted = crypto.encrypt(signatureByteArray, timeSinceStart).toByteBuffer().array();
+			SignatureOuterClass.Signature signature = signatureBuilder.build();
+			byte[] signatureByteArray = signature.toByteArray();
+			byte[] encrypted = crypto.encrypt(signatureByteArray, timeSinceStart).toByteBuffer().array();
 
-		ByteString signatureBytes = SendEncryptedSignatureRequest.newBuilder()
-				.setEncryptedSignature(ByteString.copyFrom(encrypted)).build()
-				.toByteString();
+			ByteString signatureBytes = SendEncryptedSignatureRequest.newBuilder()
+					.setEncryptedSignature(ByteString.copyFrom(encrypted)).build()
+					.toByteString();
 
-		RequestEnvelope.PlatformRequest signatureRequest = RequestEnvelope.PlatformRequest.newBuilder()
-				.setType(PlatformRequestType.SEND_ENCRYPTED_SIGNATURE)
-				.setRequestMessage(signatureBytes)
-				.build();
-		builder.addPlatformRequests(signatureRequest);
+			RequestEnvelope.PlatformRequest signatureRequest = RequestEnvelope.PlatformRequest.newBuilder()
+					.setType(PlatformRequestType.SEND_ENCRYPTED_SIGNATURE)
+					.setRequestMessage(signatureBytes)
+					.build();
+			builder.addPlatformRequests(signatureRequest);
 
-		for (Request request : builder.getRequestsList()) {
-			RequestType requestType = request.getRequestType();
-			if (requestType == RequestType.GET_MAP_OBJECTS || requestType == RequestType.GET_PLAYER) {
-				ByteString ptr8 = UnknownPtr8Request.newBuilder()
-						.setMessage("7bb2d74dec0d8c5e132ad6c5491f72c9f19b306c")
-						.build()
-						.toByteString();
-				builder.addPlatformRequests(RequestEnvelope.PlatformRequest.newBuilder()
-						.setType(PlatformRequestType.UNKNOWN_PTR_8)
-						.setRequestMessage(ptr8).build());
-				break;
+			for (Request request : builder.getRequestsList()) {
+				RequestType requestType = request.getRequestType();
+				if (requestType == RequestType.GET_MAP_OBJECTS || requestType == RequestType.GET_PLAYER) {
+					ByteString ptr8 = UnknownPtr8Request.newBuilder()
+							.setMessage("7bb2d74dec0d8c5e132ad6c5491f72c9f19b306c")
+							.build()
+							.toByteString();
+					builder.addPlatformRequests(RequestEnvelope.PlatformRequest.newBuilder()
+							.setType(PlatformRequestType.UNKNOWN_PTR_8)
+							.setRequestMessage(ptr8).build());
+					break;
+				}
 			}
 		}
 	}

@@ -53,27 +53,26 @@ public class Heartbeat {
 	 * Begins this heartbeat
 	 */
 	public void start() {
-		active = true;
-		MapSettings mapSettings = api.getSettings().getMapSettings();
-		minMapRefresh = (long) mapSettings.getMinRefresh();
-		maxMapRefresh = (long) mapSettings.getMaxRefresh();
-		beat();
-		Thread heartbeatThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				while (active) {
-					try {
-						Thread.sleep(10);
-					} catch (InterruptedException e) {
-						break;
+		if (!active) {
+			active = true;
+			beat();
+			Thread heartbeatThread = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					while (active) {
+						try {
+							Thread.sleep(10);
+						} catch (InterruptedException e) {
+							break;
+						}
+						beat();
 					}
-					beat();
 				}
-			}
-		});
-		heartbeatThread.setDaemon(true);
-		heartbeatThread.setName("Pokemon GO Heartbeat");
-		heartbeatThread.start();
+			});
+			heartbeatThread.setDaemon(true);
+			heartbeatThread.setName("Pokemon GO Heartbeat");
+			heartbeatThread.start();
+		}
 	}
 
 	/**
@@ -81,6 +80,10 @@ public class Heartbeat {
 	 */
 	public void beat() {
 		if (!api.hasChallenge()) {
+			MapSettings mapSettings = api.getSettings().getMapSettings();
+			minMapRefresh = (long) mapSettings.getMinRefresh();
+			maxMapRefresh = (long) mapSettings.getMaxRefresh();
+
 			List<HeartbeatListener> listeners = api.getListeners(HeartbeatListener.class);
 			long time = api.currentTimeMillis();
 			boolean updatingMap;

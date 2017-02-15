@@ -15,100 +15,109 @@
 
 package com.pokegoapi.main;
 
-import POGOProtos.Networking.Requests.RequestOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
-
+import com.google.protobuf.Message;
 import lombok.Getter;
+import rx.Observable;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-/**
- * The type Server request.
- */
 public class ServerRequest {
+	@Getter
+	private final RequestType type;
+	@Getter
+	private final Message request;
 
-	@Getter
-	RequestOuterClass.Request request;
-	@Getter
-	private RequestTypeOuterClass.RequestType type;
-	private ByteString data;
-	@Getter
-	private boolean requireCommon;
-	@Getter
-	private Set<RequestType> exclude = new HashSet<>();
+	private Observable<ByteString> observable;
 
-	/**
-	 * Instantiates a new Server request.
-	 *
-	 * @param type the type
-	 * @param req the req
-	 */
-	public ServerRequest(RequestTypeOuterClass.RequestType type, GeneratedMessage req) {
-		RequestOuterClass.Request.Builder reqBuilder = RequestOuterClass.Request.newBuilder();
-		reqBuilder.setRequestMessage(req.toByteString());
-		reqBuilder.setRequestType(type);
-		this.request = reqBuilder.build();
+	private final Object responseLock = new Object();
+
+	private ByteString response;
+	private boolean received;
+
+	public ServerRequest(RequestType type, Message request) {
 		this.type = type;
-	}
-
-	/**
-	 * Instantiates a new Server request.
-	 *
-	 * @param type the type
-	 * @param request the req
-	 */
-	ServerRequest(RequestTypeOuterClass.RequestType type, RequestOuterClass.Request request) {
 		this.request = request;
-		this.type = type;
+		this.observable = Observable.from(new Future<ByteString>() {
+			@Override
+			public boolean cancel(boolean mayInterruptIfRunning) {
+				synchronized (responseLock) {
+					responseLock.notifyAll();
+				}
+				return true;
+			}
+
+			@Override
+			public boolean isCancelled() {
+				return false;
+			}
+
+			@Override
+			public boolean isDone() {
+				synchronized (responseLock) {
+					return received;
+				}
+			}
+
+			@Override
+			public ByteString get() throws InterruptedException, ExecutionException {
+				return get(TimeUnit.MINUTES.toMillis(1));
+			}
+
+			@Override
+			public ByteString get(long timeout, TimeUnit unit)
+					throws InterruptedException, ExecutionException, TimeoutException {
+				return get(unit.toMillis(timeout));
+			}
+
+			private ByteString get(long timeout) throws ExecutionException, InterruptedException {
+				if (!isDone()) {
+					responseLock.wait(timeout);
+				}
+				return response;
+			}
+		});
 	}
 
 	/**
-	 * Handle data.
+	 * Handles the response for this request
 	 *
-	 * @param bytes the bytes
+	 * @param response the response to handle
 	 */
-	public void handleData(ByteString bytes) {
-		this.data = bytes;
+	public void handleResponse(ByteString response) {
+		synchronized (responseLock) {
+			this.response = response;
+			this.responseLock.notifyAll();
+			this.received = true;
+		}
 	}
 
 	/**
-	 * Gets data.
+	 * Gets the observable for this request
 	 *
-	 * @return the data
-	 * @throws InvalidProtocolBufferException the invalid protocol buffer exception
+	 * @return the observable for this request
+	 */
+	public Observable<ByteString> observable() {
+		return observable;
+	}
+
+	/**
+	 * Gets the response data for this request, if received
+	 *
+	 * @return the response data for this request, if received
+	 * @throws InvalidProtocolBufferException if the response data is null
 	 */
 	public ByteString getData() throws InvalidProtocolBufferException {
-		if (data == null) {
-			throw new InvalidProtocolBufferException("Contents of buffer are null");
+		synchronized (responseLock) {
+			if (response != null) {
+				return response;
+			}
+			throw new InvalidProtocolBufferException("Response data cannot be null");
 		}
-		return data;
-	}
-
-	/**
-	 * Adds a common request to this request
-	 *
-	 * @return this object
-	 */
-	public ServerRequest withCommons() {
-		this.requireCommon = true;
-		return this;
-	}
-
-	/**
-	 * Excludes the given requests from the next packet
-	 *
-	 * @param types the types to exclude
-	 * @return this object
-	 */
-	public ServerRequest exclude(RequestType... types) {
-		Collections.addAll(exclude, types);
-		return this;
 	}
 }

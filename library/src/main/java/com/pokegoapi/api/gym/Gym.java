@@ -37,7 +37,6 @@ import com.pokegoapi.exceptions.InsufficientLevelException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.exceptions.hash.HashException;
-import com.pokegoapi.main.AsyncServerRequest;
 import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.MapPoint;
@@ -255,7 +254,7 @@ public class Gym implements MapPoint {
 				.setPokemonId(pokemon.getId())
 				.build();
 
-		AsyncServerRequest asyncServerRequest = new AsyncServerRequest(RequestType.FORT_DEPLOY_POKEMON, reqMsg);
+		ServerRequest asyncServerRequest = new ServerRequest(RequestType.FORT_DEPLOY_POKEMON, reqMsg);
 		return api.getRequestHandler()
 				.sendAsyncServerRequests(asyncServerRequest)
 				.map(new Func1<ByteString, FortDeployPokemonResponse.Result>() {

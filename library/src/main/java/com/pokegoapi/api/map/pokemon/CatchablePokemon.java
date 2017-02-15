@@ -58,7 +58,7 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.exceptions.hash.HashException;
-import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.MapPoint;
@@ -222,10 +222,10 @@ public class CatchablePokemon implements MapPoint {
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
 				.setSpawnPointId(getSpawnPointId()).build();
-		AsyncServerRequest serverRequest = new AsyncServerRequest(
+		ServerRequest serverRequest = new ServerRequest(
 				RequestType.ENCOUNTER, reqMsg);
 		return api.getRequestHandler()
-				.sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, EncounterResult>() {
+				.sendAsyncServerRequests(serverRequest, false).map(new Func1<ByteString, EncounterResult>() {
 					@Override
 					public EncounterResult call(ByteString result) {
 						EncounterResponse response;
@@ -275,9 +275,9 @@ public class CatchablePokemon implements MapPoint {
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
 				.setFortId(getSpawnPointId()).build();
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.DISK_ENCOUNTER, reqMsg);
+		ServerRequest serverRequest = new ServerRequest(RequestType.DISK_ENCOUNTER, reqMsg);
 		return api.getRequestHandler()
-				.sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, EncounterResult>() {
+				.sendAsyncServerRequests(serverRequest, false).map(new Func1<ByteString, EncounterResult>() {
 					@Override
 					public EncounterResult call(ByteString result) {
 						DiskEncounterResponse response;
@@ -310,9 +310,9 @@ public class CatchablePokemon implements MapPoint {
 		IncenseEncounterMessage reqMsg = IncenseEncounterMessage.newBuilder()
 				.setEncounterId(getEncounterId())
 				.setEncounterLocation(getSpawnPointId()).build();
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestType.INCENSE_ENCOUNTER, reqMsg);
+		ServerRequest serverRequest = new ServerRequest(RequestType.INCENSE_ENCOUNTER, reqMsg);
 		return api.getRequestHandler()
-				.sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, EncounterResult>() {
+				.sendAsyncServerRequests(serverRequest, false).map(new Func1<ByteString, EncounterResult>() {
 					@Override
 					public EncounterResult call(ByteString result) {
 						IncenseEncounterResponse response;
@@ -639,13 +639,13 @@ public class CatchablePokemon implements MapPoint {
 				.setSpawnPointId(getSpawnPointId())
 				.setSpinModifier(spinModifier)
 				.setPokeball(type.getBallType()).build();
-		AsyncServerRequest serverRequest = new AsyncServerRequest(
+		ServerRequest serverRequest = new ServerRequest(
 				RequestType.CATCH_POKEMON, reqMsg);
 		return catchPokemonAsync(serverRequest);
 	}
 
-	private Observable<CatchResult> catchPokemonAsync(AsyncServerRequest serverRequest) {
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
+	private Observable<CatchResult> catchPokemonAsync(ServerRequest serverRequest) {
+		return api.getRequestHandler().sendAsyncServerRequests(serverRequest, true).map(
 				new Func1<ByteString, CatchResult>() {
 					@Override
 					public CatchResult call(ByteString result) {
@@ -695,10 +695,10 @@ public class CatchablePokemon implements MapPoint {
 				.setItemId(item)
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(
+		ServerRequest serverRequest = new ServerRequest(
 				RequestType.USE_ITEM_CAPTURE, reqMsg);
 		return api.getRequestHandler()
-				.sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, CatchItemResult>() {
+				.sendAsyncServerRequests(serverRequest, false).map(new Func1<ByteString, CatchItemResult>() {
 					@Override
 					public CatchItemResult call(ByteString result) {
 						UseItemCaptureResponse response;

@@ -47,19 +47,18 @@ import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.exceptions.hash.HashException;
-import com.pokegoapi.main.AsyncServerRequest;
-import com.pokegoapi.main.CommonRequests;
 import com.pokegoapi.main.Heartbeat;
 import com.pokegoapi.main.PokemonMeta;
+import com.pokegoapi.main.CommonRequests;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.AsyncHelper;
+import com.pokegoapi.main.ServerRequestEnvelope;
 import com.pokegoapi.util.ClientInterceptor;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import com.pokegoapi.util.hash.HashProvider;
-import lombok.Setter;
 import lombok.Getter;
+import lombok.Setter;
 import okhttp3.OkHttpClient;
 
 import java.io.IOException;
@@ -218,21 +217,21 @@ public class PokemonGo {
 
 	private void initialize() throws RemoteServerException, CaptchaActiveException, LoginFailedException,
 			HashException {
+		getRequestHandler().sendServerRequests(ServerRequestEnvelope.create());
+
 		playerProfile.updateProfile();
 
 		ServerRequest downloadConfigRequest = new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
 				CommonRequests.getDownloadRemoteConfigVersionMessageRequest(this));
-		fireRequestBlock(downloadConfigRequest, RequestType.GET_BUDDY_WALKED);
+		getRequestHandler().sendServerRequests(downloadConfigRequest, true, RequestType.GET_BUDDY_WALKED);
 		getAssetDigest();
 
 		try {
 			ByteString configVersionData = downloadConfigRequest.getData();
 			if (PokemonMeta.checkVersion(DownloadRemoteConfigVersionResponse.parseFrom(configVersionData))) {
 				DownloadItemTemplatesMessage message = CommonRequests.getDownloadItemTemplatesRequest();
-				ServerRequest templatesRequest = new ServerRequest(RequestType.DOWNLOAD_ITEM_TEMPLATES, message)
-						.withCommons();
-				fireRequestBlock(templatesRequest);
-				PokemonMeta.update(templatesRequest.getData(), true);
+				ServerRequest request = new ServerRequest(RequestType.DOWNLOAD_ITEM_TEMPLATES, message);
+				PokemonMeta.update(getRequestHandler().sendServerRequests(request, true), true);
 			}
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
@@ -246,10 +245,10 @@ public class PokemonGo {
 			LevelUpRewardsMessage rewardsMessage = LevelUpRewardsMessage.newBuilder()
 					.setLevel(playerProfile.getLevel())
 					.build();
-			ServerRequest levelUpRewards = new ServerRequest(RequestType.LEVEL_UP_REWARDS, rewardsMessage);
-			fireRequestBlock(levelUpRewards);
-			ByteString levelUpData = levelUpRewards.getData();
-			LevelUpRewardsResponse levelUpRewardsResponse = LevelUpRewardsResponse.parseFrom(levelUpData);
+			ServerRequestEnvelope envelope = ServerRequestEnvelope.createCommons();
+			ServerRequest request = envelope.add(RequestType.LEVEL_UP_REWARDS, rewardsMessage);
+			getRequestHandler().sendServerRequests(envelope);
+			LevelUpRewardsResponse levelUpRewardsResponse = LevelUpRewardsResponse.parseFrom(request.getData());
 			if (levelUpRewardsResponse.getResult() == Result.SUCCESS) {
 				inventories.getItemBag().addAwardedItems(levelUpRewardsResponse);
 			}
@@ -280,9 +279,7 @@ public class PokemonGo {
 			playerProfile.setupAvatar();
 		}
 
-		if (!heartbeat.active()) {
-			heartbeat.start();
-		}
+		heartbeat.start();
 
 		if (!tutorialStates.contains(TutorialState.POKEMON_CAPTURE)) {
 			playerProfile.encounterTutorialComplete();
@@ -299,26 +296,6 @@ public class PokemonGo {
 	}
 
 	/**
-	 * Fire requests block.
-	 *
-	 * @param request server request
-	 * @param exclude the commmon requests to exclude
-	 * @throws LoginFailedException When login fails
-	 * @throws RemoteServerException When server fails
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurs while performing a hash request
-	 */
-	private void fireRequestBlock(ServerRequest request, RequestType... exclude)
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
-		getRequestHandler().sendServerRequests(request.withCommons().exclude(exclude));
-		try {
-			awaitChallenge();
-		} catch (InterruptedException e) {
-			throw new LoginFailedException(e);
-		}
-	}
-
-	/**
 	 * Second requests block. Public since it could be re-fired at any time
 	 *
 	 * @throws LoginFailedException When login fails
@@ -328,8 +305,9 @@ public class PokemonGo {
 	 */
 	public void getAssetDigest() throws RemoteServerException, CaptchaActiveException, LoginFailedException,
 			HashException {
-		fireRequestBlock(new ServerRequest(RequestType.GET_ASSET_DIGEST,
-				CommonRequests.getGetAssetDigestMessageRequest(this)).exclude(RequestType.GET_BUDDY_WALKED));
+		ServerRequestEnvelope envelope = ServerRequestEnvelope.createCommons(RequestType.GET_BUDDY_WALKED);
+		envelope.add(RequestType.GET_ASSET_DIGEST, CommonRequests.getGetAssetDigestMessageRequest(this));
+		getRequestHandler().sendServerRequests(envelope);
 	}
 
 	/**
@@ -406,8 +384,8 @@ public class PokemonGo {
 		}
 		latitude = value;
 
-		if (heartbeat.active() && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
-			heartbeat.beat();
+		if (!loggingIn && heartbeat.active() && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
+			heartbeat.start();
 		}
 
 		for (LocationListener listener : this.getListeners(LocationListener.class)) {
@@ -427,8 +405,8 @@ public class PokemonGo {
 		}
 		longitude = value;
 
-		if (heartbeat.active() && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
-			heartbeat.beat();
+		if (!loggingIn && heartbeat.active() && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
+			heartbeat.start();
 		}
 
 		for (LocationListener listener : this.getListeners(LocationListener.class)) {
@@ -596,8 +574,8 @@ public class PokemonGo {
 			InvalidProtocolBufferException, HashException {
 		hasChallenge = false;
 		VerifyChallengeMessage message = VerifyChallengeMessage.newBuilder().setToken(token).build();
-		AsyncServerRequest request = new AsyncServerRequest(RequestType.VERIFY_CHALLENGE, message);
-		ByteString responseData = AsyncHelper.toBlocking(getRequestHandler().sendAsyncServerRequests(request));
+		ByteString responseData = getRequestHandler().sendServerRequests(new ServerRequest(RequestType.VERIFY_CHALLENGE, message),
+				false);
 		VerifyChallengeResponse response = VerifyChallengeResponse.parseFrom(responseData);
 		hasChallenge = !response.getSuccess();
 		if (!hasChallenge) {
@@ -623,9 +601,8 @@ public class PokemonGo {
 			throws RemoteServerException, CaptchaActiveException, LoginFailedException,
 			InvalidProtocolBufferException, HashException {
 		CheckChallengeMessage message = CheckChallengeMessage.newBuilder().build();
-		AsyncServerRequest request = new AsyncServerRequest(RequestType.CHECK_CHALLENGE, message);
-		ByteString responseData =
-				AsyncHelper.toBlocking(getRequestHandler().sendAsyncServerRequests(request));
+		ByteString responseData = getRequestHandler().sendServerRequests(new ServerRequest(RequestType.CHECK_CHALLENGE, message),
+				false);
 		CheckChallengeResponse response = CheckChallengeResponse.parseFrom(responseData);
 		String newChallenge = response.getChallengeUrl();
 		if (response.getShowChallenge() && newChallenge != null && newChallenge.length() > 0) {

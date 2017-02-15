@@ -35,7 +35,7 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.google.common.geometry.S2LatLng;
-import com.pokegoapi.main.AsyncServerRequest;
+import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
 import lombok.Getter;
 import rx.Observable;
@@ -144,7 +144,7 @@ public class Pokestop {
 				.setPlayerLongitude(api.getLongitude())
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH,
+		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH,
 				searchMessage);
 		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
 				new Func1<ByteString, PokestopLootResult>() {
@@ -196,7 +196,7 @@ public class Pokestop {
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
 				.build();
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.ADD_FORT_MODIFIER,
+		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.ADD_FORT_MODIFIER,
 				msg);
 		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, Boolean>() {
 			@Override
@@ -239,7 +239,7 @@ public class Pokestop {
 				.setLongitude(getLongitude())
 				.build();
 
-		AsyncServerRequest serverRequest = new AsyncServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS,
+		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS,
 				reqMsg);
 		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
 				new Func1<ByteString, FortDetails>() {

@@ -37,6 +37,7 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.main.ServerRequestEnvelope;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -160,10 +161,11 @@ public class PokeBank {
 		GetInventoryMessage inventoryMessage = GetInventoryMessage.newBuilder()
 				.setLastTimestampMs(api.getInventories().getLastInventoryUpdate())
 				.build();
-		ServerRequest inventoryRequest = new ServerRequest(RequestType.GET_INVENTORY, inventoryMessage);
-		ServerRequest releaseRequest = new ServerRequest(RequestType.RELEASE_POKEMON, releaseBuilder.build());
+		ServerRequestEnvelope envelope = ServerRequestEnvelope.create();
+		ServerRequest inventoryRequest = envelope.add(RequestType.GET_INVENTORY, inventoryMessage);
+		ServerRequest releaseRequest = envelope.add(RequestType.RELEASE_POKEMON, releaseBuilder.build());
 		Map<PokemonFamilyId, Integer> lastCandies = new HashMap<>(api.getInventories().getCandyjar().getCandies());
-		api.getRequestHandler().sendServerRequests(releaseRequest, inventoryRequest);
+		api.getRequestHandler().sendServerRequests(envelope);
 		try {
 			GetInventoryResponse inventoryResponse = GetInventoryResponse.parseFrom(inventoryRequest.getData());
 			ReleasePokemonResponse releaseResponse = ReleasePokemonResponse.parseFrom(releaseRequest.getData());
