@@ -40,14 +40,14 @@ import java.util.List;
  * This requires a key and is not free like the legacy provider.
  */
 public class PokeHashProvider implements HashProvider {
-	private static final String DEFAULT_ENDPOINT = "https://pokehash.buddyauth.com/api/v125/hash";
+	private static final String DEFAULT_ENDPOINT = "https://pokehash.buddyauth.com/api/v127_2/hash";
 
 	@Getter
 	@Setter
 	private String endpoint = DEFAULT_ENDPOINT;
 
-	private static final int VERSION = 5500;
-	private static final long UNK25 = -9156899491064153954L;
+	private static final int VERSION = 5702;
+	private static final long UNK25 = -816976800928766045L;
 
 	private static final Moshi MOSHI = new Builder().build();
 

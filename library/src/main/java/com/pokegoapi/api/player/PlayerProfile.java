@@ -23,8 +23,7 @@ import POGOProtos.Enums.BadgeTypeOuterClass.BadgeType;
 import POGOProtos.Enums.TutorialStateOuterClass;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
 import POGOProtos.Networking.Requests.Messages.ClaimCodenameMessageOuterClass.ClaimCodenameMessage;
-import POGOProtos.Networking.Requests.Messages.EncounterTutorialCompleteMessageOuterClass
-		.EncounterTutorialCompleteMessage;
+import POGOProtos.Networking.Requests.Messages.EncounterTutorialCompleteMessageOuterClass.EncounterTutorialCompleteMessage;
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass.GetPlayerMessage;
 import POGOProtos.Networking.Requests.Messages.GetPlayerProfileMessageOuterClass.GetPlayerProfileMessage;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;

@@ -40,6 +40,11 @@ public class ServerRequest {
 	private ByteString response;
 	private boolean received;
 
+	/**
+	 * Creates a ServerRequest
+	 * @param type the type of request
+	 * @param request the request data
+	 */
 	public ServerRequest(RequestType type, Message request) {
 		this.type = type;
 		this.request = request;

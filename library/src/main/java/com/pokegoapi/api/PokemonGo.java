@@ -384,8 +384,12 @@ public class PokemonGo {
 		}
 		latitude = value;
 
-		if (!loggingIn && heartbeat.active() && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
-			heartbeat.start();
+		if (!loggingIn && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
+			if (!heartbeat.active()) {
+				heartbeat.start();
+			} else {
+				heartbeat.beat();
+			}
 		}
 
 		for (LocationListener listener : this.getListeners(LocationListener.class)) {
@@ -405,8 +409,12 @@ public class PokemonGo {
 		}
 		longitude = value;
 
-		if (!loggingIn && heartbeat.active() && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
-			heartbeat.start();
+		if (!loggingIn && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
+			if (!heartbeat.active()) {
+				heartbeat.start();
+			} else {
+				heartbeat.beat();
+			}
 		}
 
 		for (LocationListener listener : this.getListeners(LocationListener.class)) {
@@ -574,8 +582,8 @@ public class PokemonGo {
 			InvalidProtocolBufferException, HashException {
 		hasChallenge = false;
 		VerifyChallengeMessage message = VerifyChallengeMessage.newBuilder().setToken(token).build();
-		ByteString responseData = getRequestHandler().sendServerRequests(new ServerRequest(RequestType.VERIFY_CHALLENGE, message),
-				false);
+		ServerRequest request = new ServerRequest(RequestType.VERIFY_CHALLENGE, message);
+		ByteString responseData = getRequestHandler().sendServerRequests(request, false);
 		VerifyChallengeResponse response = VerifyChallengeResponse.parseFrom(responseData);
 		hasChallenge = !response.getSuccess();
 		if (!hasChallenge) {
@@ -601,8 +609,8 @@ public class PokemonGo {
 			throws RemoteServerException, CaptchaActiveException, LoginFailedException,
 			InvalidProtocolBufferException, HashException {
 		CheckChallengeMessage message = CheckChallengeMessage.newBuilder().build();
-		ByteString responseData = getRequestHandler().sendServerRequests(new ServerRequest(RequestType.CHECK_CHALLENGE, message),
-				false);
+		ServerRequest request = new ServerRequest(RequestType.CHECK_CHALLENGE, message);
+		ByteString responseData = getRequestHandler().sendServerRequests(request, false);
 		CheckChallengeResponse response = CheckChallengeResponse.parseFrom(responseData);
 		String newChallenge = response.getChallengeUrl();
 		if (response.getShowChallenge() && newChallenge != null && newChallenge.length() > 0) {

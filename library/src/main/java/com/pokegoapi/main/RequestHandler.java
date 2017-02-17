@@ -131,10 +131,10 @@ public class RequestHandler implements Runnable {
 	 *
 	 * @param envelope list of ServerRequests to be sent
 	 * @return the server response
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException the login failed exception
+	 * @throws RemoteServerException if this message fails to send
+	 * @throws LoginFailedException if login fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws HashException if an exception occurs while hashing this request
 	 */
 	public ServerResponse sendServerRequests(ServerRequestEnvelope envelope)
 			throws RemoteServerException, LoginFailedException, CaptchaActiveException, HashException {
@@ -145,6 +145,10 @@ public class RequestHandler implements Runnable {
 	 * Sends a single ServerRequest without commons
 	 *
 	 * @param request the request to send
+	 * @throws RemoteServerException if this message fails to send
+	 * @throws LoginFailedException if login fails
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurs while hashing this request
 	 * @return the result from this request
 	 */
 	public ByteString sendServerRequests(ServerRequest request)
@@ -160,6 +164,10 @@ public class RequestHandler implements Runnable {
 	 * @param commons whether this request should include commons
 	 * @param commonExclusions the common requests to exclude from this request
 	 * @return the result from this request
+	 * @throws RemoteServerException if this message fails to send
+	 * @throws LoginFailedException if login fails
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurs while hashing this request
 	 */
 	public ByteString sendServerRequests(ServerRequest request, boolean commons, RequestType... commonExclusions)
 			throws RemoteServerException, LoginFailedException, CaptchaActiveException, HashException {
@@ -180,10 +188,10 @@ public class RequestHandler implements Runnable {
 	 *
 	 * @param serverResponse the response to append to
 	 * @param requests list of ServerRequests to be sent
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException the login failed exception
+	 * @throws RemoteServerException if this message fails to send
+	 * @throws LoginFailedException if login fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if hashing fails
+	 * @throws HashException if an exception occurs while hashing this request
 	 */
 	private ServerResponse sendInternal(ServerResponse serverResponse, ServerRequest[] requests)
 			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
@@ -261,10 +269,20 @@ public class RequestHandler implements Runnable {
 				}
 			}
 
+			boolean empty = false;
+
 			for (int i = 0; i < responseEnvelop.getReturnsCount(); i++) {
 				ByteString returned = responseEnvelop.getReturns(i);
 				ServerRequest serverRequest = requests[i];
-				serverResponse.addResponse(serverRequest.getType(), returned);
+				if (returned != null) {
+					serverResponse.addResponse(serverRequest.getType(), returned);
+				} else {
+					empty = true;
+				}
+			}
+
+			if (empty) {
+				throw new RemoteServerException("Received empty response. A bad request was sent!");
 			}
 		} catch (IOException e) {
 			throw new RemoteServerException(e);
@@ -367,8 +385,8 @@ public class RequestHandler implements Runnable {
 					}
 
 					CommonRequests.handleQueue(api);
-				} catch (InvalidProtocolBufferException |
-						RemoteServerException | LoginFailedException | CaptchaActiveException e) {
+				} catch (InvalidProtocolBufferException | RemoteServerException
+						| LoginFailedException | CaptchaActiveException e) {
 					continue;
 				}
 			}
