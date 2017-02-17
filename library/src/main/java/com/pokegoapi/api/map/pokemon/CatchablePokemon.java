@@ -645,7 +645,7 @@ public class CatchablePokemon implements MapPoint {
 	}
 
 	private Observable<CatchResult> catchPokemonAsync(ServerRequest serverRequest) {
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest, true).map(
+		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
 				new Func1<ByteString, CatchResult>() {
 					@Override
 					public CatchResult call(ByteString result) {
