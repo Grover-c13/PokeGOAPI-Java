@@ -20,12 +20,6 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import lombok.Getter;
-import rx.Observable;
-
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class ServerRequest {
 	@Getter
@@ -33,12 +27,9 @@ public class ServerRequest {
 	@Getter
 	private final Message request;
 
-	private Observable<ByteString> observable;
-
 	private final Object responseLock = new Object();
 
 	private ByteString response;
-	private boolean received;
 
 	/**
 	 * Creates a ServerRequest
@@ -48,45 +39,6 @@ public class ServerRequest {
 	public ServerRequest(RequestType type, Message request) {
 		this.type = type;
 		this.request = request;
-		this.observable = Observable.from(new Future<ByteString>() {
-			@Override
-			public boolean cancel(boolean mayInterruptIfRunning) {
-				synchronized (responseLock) {
-					responseLock.notifyAll();
-				}
-				return true;
-			}
-
-			@Override
-			public boolean isCancelled() {
-				return false;
-			}
-
-			@Override
-			public boolean isDone() {
-				synchronized (responseLock) {
-					return received;
-				}
-			}
-
-			@Override
-			public ByteString get() throws InterruptedException, ExecutionException {
-				return get(TimeUnit.MINUTES.toMillis(1));
-			}
-
-			@Override
-			public ByteString get(long timeout, TimeUnit unit)
-					throws InterruptedException, ExecutionException, TimeoutException {
-				return get(unit.toMillis(timeout));
-			}
-
-			private ByteString get(long timeout) throws ExecutionException, InterruptedException {
-				if (!isDone()) {
-					responseLock.wait(timeout);
-				}
-				return response;
-			}
-		});
 	}
 
 	/**
@@ -98,17 +50,7 @@ public class ServerRequest {
 		synchronized (responseLock) {
 			this.response = response;
 			this.responseLock.notifyAll();
-			this.received = true;
 		}
-	}
-
-	/**
-	 * Gets the observable for this request
-	 *
-	 * @return the observable for this request
-	 */
-	public Observable<ByteString> observable() {
-		return observable;
 	}
 
 	/**

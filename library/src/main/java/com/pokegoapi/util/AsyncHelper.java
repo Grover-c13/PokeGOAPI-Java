@@ -15,7 +15,11 @@
 
 package com.pokegoapi.util;
 
+import com.pokegoapi.exceptions.AsyncCaptchaActiveException;
+import com.pokegoapi.exceptions.AsyncHashException;
+import com.pokegoapi.exceptions.AsyncLoginFailedException;
 import com.pokegoapi.exceptions.AsyncPokemonGoException;
+import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
@@ -39,6 +43,15 @@ public class AsyncHelper {
 		try {
 			return observable.toBlocking().first();
 		} catch (RuntimeException e) {
+			if (e.getCause() instanceof AsyncLoginFailedException) {
+				throw new LoginFailedException(e.getMessage(), e.getCause());
+			} else if (e.getCause() instanceof AsyncRemoteServerException) {
+				throw new RemoteServerException(e.getMessage(), e.getCause());
+			} else if (e.getCause() instanceof AsyncCaptchaActiveException) {
+				throw new CaptchaActiveException((AsyncCaptchaActiveException) e.getCause());
+			} else if (e.getCause() instanceof AsyncHashException) {
+				throw new HashException(e.getMessage(), e.getCause());
+			}
 			throw new AsyncPokemonGoException("Unknown exception occurred. ", e);
 		}
 	}

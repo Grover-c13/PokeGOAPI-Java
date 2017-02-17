@@ -1,8 +1,9 @@
 package com.pokegoapi.api.device;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
-import POGOProtos.Networking.Envelopes.SignatureOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Envelopes.SignatureOuterClass.Signature.LocationFix;
+import POGOProtos.Networking.Requests.RequestOuterClass.Request;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import com.pokegoapi.api.PokemonGo;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +15,7 @@ import java.util.Random;
  * Created by fabianterhorst on 23.08.16.
  */
 
-public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.LocationFix> {
+public class LocationFixes extends ArrayList<LocationFix> {
 
 	@Setter
 	@Getter
@@ -34,6 +35,16 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 	 */
 	public static LocationFixes getDefault(PokemonGo api, RequestEnvelopeOuterClass.RequestEnvelope.Builder builder,
 			long currentTime, Random random) {
+		boolean hasMapUpdate = false;
+		boolean empty = builder.getRequestsCount() == 0 || builder.getRequests(0) == null;
+
+		for (Request request : builder.getRequestsList()) {
+			if (request.getRequestType() == RequestType.GET_MAP_OBJECTS) {
+				hasMapUpdate = true;
+				break;
+			}
+		}
+
 		int pn = random.nextInt(100);
 		int providerCount;
 		int[] negativeSnapshotProviders = new int[0];
@@ -60,12 +71,11 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 			locationFixes = api.getLocationFixes();
 			locationFixes.clear();
 
-			if (builder.getRequestsCount() == 0 || builder.getRequests(0) == null
-					|| (builder.getRequests(0).getRequestType() != RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS
-					&& (currentTime - locationFixes.getTimestampCreate() < (random.nextInt(10 * 1000) + 5000)))) {
+			boolean expired = currentTime - locationFixes.getTimestampCreate() < (random.nextInt(10 * 1000) + 5000);
+			if (empty || (!hasMapUpdate && expired)) {
 				locationFixes.setTimestampCreate(currentTime);
 				return locationFixes;
-			} else if (builder.getRequests(0).getRequestType() == RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS) {
+			} else if (hasMapUpdate) {
 				providerCount = chance >= 90 ? 2 : 1;
 			} else {
 				providerCount = pn < 60 ? 1 : pn < 90 ? 2 : 3;
@@ -81,7 +91,7 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 			float verticalAccuracy = (float) (15 + (23 - 15) * random.nextDouble());
 
 			// Fake errors
-			if (builder.getRequests(0).getRequestType() != RequestTypeOuterClass.RequestType.GET_MAP_OBJECTS) {
+			if (!hasMapUpdate) {
 				if (random.nextInt(100) > 90) {
 					latitude = 360;
 					longitude = -360;
@@ -91,18 +101,17 @@ public class LocationFixes extends ArrayList<SignatureOuterClass.Signature.Locat
 				}
 			}
 
-			SignatureOuterClass.Signature.LocationFix.Builder locationFixBuilder =
-					SignatureOuterClass.Signature.LocationFix.newBuilder();
+			LocationFix.Builder locationFixBuilder = LocationFix.newBuilder();
 
 			locationFixBuilder.setProvider("fused")
 					.setTimestampSnapshot(
 							contains(negativeSnapshotProviders, i)
 									? random.nextInt(1000) - 3000
 									: api.currentTimeMillis() - api.getStartTime()
-									+ (150 * (i + 1) + random.nextInt(250 * (i + 1) - (150 * (i + 1)))))
+											+ (150 * (i + 1) + random.nextInt(250 * (i + 1) - (150 * (i + 1)))))
 					.setLatitude(latitude)
 					.setLongitude(longitude)
-					.setHorizontalAccuracy(-1)
+					.setHorizontalAccuracy((float) api.getAccuracy())
 					.setAltitude(altitude)
 					.setVerticalAccuracy(verticalAccuracy)
 					.setProviderStatus(3)

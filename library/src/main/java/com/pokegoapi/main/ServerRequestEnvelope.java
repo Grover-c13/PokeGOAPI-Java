@@ -82,6 +82,9 @@ public class ServerRequestEnvelope {
 						responseLock.wait(timeout);
 					}
 				}
+				if (response != null && response.getException() != null) {
+					throw new ExecutionException(response.getException());
+				}
 				return response;
 			}
 		});

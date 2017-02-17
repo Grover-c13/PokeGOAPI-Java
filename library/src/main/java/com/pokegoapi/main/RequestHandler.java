@@ -145,11 +145,11 @@ public class RequestHandler implements Runnable {
 	 * Sends a single ServerRequest without commons
 	 *
 	 * @param request the request to send
+	 * @return the result from this request
 	 * @throws RemoteServerException if this message fails to send
 	 * @throws LoginFailedException if login fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 * @throws HashException if an exception occurs while hashing this request
-	 * @return the result from this request
 	 */
 	public ByteString sendServerRequests(ServerRequest request)
 			throws RemoteServerException, LoginFailedException, CaptchaActiveException, HashException {
@@ -196,7 +196,7 @@ public class RequestHandler implements Runnable {
 	private ServerResponse sendInternal(ServerResponse serverResponse, ServerRequest[] requests)
 			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
 		RequestEnvelope.Builder builder = RequestEnvelope.newBuilder();
-		resetBuilder(builder, authTicket);
+		resetBuilder(builder);
 
 		for (ServerRequest serverRequest : requests) {
 			ByteString data = serverRequest.getRequest().toByteString();
@@ -293,18 +293,17 @@ public class RequestHandler implements Runnable {
 		return serverResponse;
 	}
 
-	private void resetBuilder(RequestEnvelope.Builder builder, AuthTicket authTicket)
+	private void resetBuilder(RequestEnvelope.Builder builder)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		builder.setStatusCode(2);
 		builder.setRequestId(getRequestId());
 		//builder.setAuthInfo(api.getAuthInfo());
-		if (authTicket != null
-				&& authTicket.getExpireTimestampMs() > 0
-				&& authTicket.getExpireTimestampMs() > api.currentTimeMillis()) {
+		boolean expired = authTicket != null && api.currentTimeMillis() >= authTicket.getExpireTimestampMs();
+		if (authTicket != null && !expired) {
 			builder.setAuthTicket(authTicket);
 		} else {
 			Log.d(TAG, "Authenticated with static token");
-			builder.setAuthInfo(api.getAuthInfo(false));
+			builder.setAuthInfo(api.getAuthInfo(expired));
 		}
 		builder.setMsSinceLastLocationfix(random.nextInt(1651) + 149);
 		builder.setLatitude(api.getLatitude());
