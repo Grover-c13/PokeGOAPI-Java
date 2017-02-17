@@ -126,12 +126,16 @@ public class PokemonGo {
 
 	@Getter
 	private boolean loggingIn;
+	@Getter
+	private boolean active;
 
 	@Getter
 	private Heartbeat heartbeat = new Heartbeat(this);
 
 	@Getter
 	private HashProvider hashProvider;
+
+	private OkHttpClient client;
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -145,17 +149,16 @@ public class PokemonGo {
 		this.seed = seed;
 		sessionHash = new byte[32];
 		new Random().nextBytes(sessionHash);
-		client = client.newBuilder()
-				.addNetworkInterceptor(new ClientInterceptor())
-				.build();
 		inventories = new Inventories(this);
 		settings = new Settings(this);
 		playerProfile = new PlayerProfile(this);
-		requestHandler = new RequestHandler(this, client);
 		map = new Map(this);
 		longitude = Double.NaN;
 		latitude = Double.NaN;
 		altitude = Double.NaN;
+		this.client = client.newBuilder()
+				.addNetworkInterceptor(new ClientInterceptor())
+				.build();
 	}
 
 	/**
@@ -217,6 +220,12 @@ public class PokemonGo {
 
 	private void initialize() throws RemoteServerException, CaptchaActiveException, LoginFailedException,
 			HashException {
+		if (getRequestHandler() != null) {
+			getRequestHandler().exit();
+		}
+
+		requestHandler = new RequestHandler(this, client);
+
 		getRequestHandler().sendServerRequests(ServerRequestEnvelope.create());
 
 		playerProfile.updateProfile();
@@ -262,7 +271,8 @@ public class PokemonGo {
 			listener.onLogin(this);
 		}
 
-		this.loggingIn = false;
+		loggingIn = false;
+		active = true;
 
 		// From now one we will start to check our accounts is ready to fire requests.
 		// Actually, we can receive valid responses even with this first check,
@@ -384,7 +394,7 @@ public class PokemonGo {
 		}
 		latitude = value;
 
-		if (!loggingIn && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
+		if (active && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
 			if (!heartbeat.active()) {
 				heartbeat.start();
 			} else {
@@ -409,7 +419,7 @@ public class PokemonGo {
 		}
 		longitude = value;
 
-		if (!loggingIn && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
+		if (active && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
 			if (!heartbeat.active()) {
 				heartbeat.start();
 			} else {
@@ -660,7 +670,10 @@ public class PokemonGo {
 	 * Exits this API
 	 */
 	public void exit() {
-		heartbeat.exit();
-		requestHandler.exit();
+		if (active) {
+			heartbeat.exit();
+			requestHandler.exit();
+			active = false;
+		}
 	}
 }
