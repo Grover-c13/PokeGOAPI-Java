@@ -30,12 +30,12 @@
 
 package com.pokegoapi.examples;
 
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.listener.LoginListener;
-import com.pokegoapi.auth.PtcCredentialProvider;
-import com.pokegoapi.util.CaptchaSolveHelper;
-import com.pokegoapi.util.Log;
-import com.pokegoapi.util.hash.HashProvider;
+import com.pokegoapi.old.api.PokemonGo;
+import com.pokegoapi.old.api.listener.LoginListener;
+import com.pokegoapi.old.auth.PtcCredentialProvider;
+import com.pokegoapi.old.util.CaptchaSolveHelper;
+import com.pokegoapi.old.util.Log;
+import com.pokegoapi.old.util.hash.HashProvider;
 import com.sun.javafx.application.PlatformImpl;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;

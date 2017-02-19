@@ -17,15 +17,15 @@ package com.pokegoapi.examples;
 
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.inventory.PokeBank;
-import com.pokegoapi.api.pokemon.Pokemon;
-import com.pokegoapi.auth.PtcCredentialProvider;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.util.Log;
-import com.pokegoapi.util.hash.HashProvider;
+import com.pokegoapi.old.api.PokemonGo;
+import com.pokegoapi.old.api.inventory.PokeBank;
+import com.pokegoapi.old.api.pokemon.Pokemon;
+import com.pokegoapi.old.auth.PtcCredentialProvider;
+import com.pokegoapi.old.exceptions.CaptchaActiveException;
+import com.pokegoapi.network.LoginFailedException;
+import com.pokegoapi.network.RemoteServerException;
+import com.pokegoapi.old.util.Log;
+import com.pokegoapi.old.util.hash.HashProvider;
 import okhttp3.OkHttpClient;
 
 import java.util.ArrayList;

@@ -15,8 +15,8 @@
 
 package com.pokegoapi.examples;
 
-import com.pokegoapi.util.Log;
-import com.pokegoapi.util.PokeDictionary;
+import com.pokegoapi.old.util.Log;
+import com.pokegoapi.old.util.PokeDictionary;
 
 import java.util.Locale;
 import java.util.MissingResourceException;

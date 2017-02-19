@@ -13,7 +13,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.network;
 
 public class LoginFailedException extends Exception {
 	public LoginFailedException() {

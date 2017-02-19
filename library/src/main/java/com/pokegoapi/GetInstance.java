@@ -1,7 +1,5 @@
 package com.pokegoapi;
 
-import java.util.List;
-
 /**
  * Collection of utility methods to facilitate implementing getInstance()
  * methods in the framework.
@@ -22,11 +20,6 @@ public class GetInstance {
         private Instance(Provider provider, Object impl) {
             this.provider = provider;
             this.impl = impl;
-        }
-        // Return Provider and implementation as an array as used in the
-        // old Security.getImpl() methods.
-        public Object[] toArray() {
-            return new Object[] {impl, provider};
         }
     }
 

@@ -15,9 +15,7 @@
 
 package com.pokegoapi.google.common.geometry;
 
-
-
-import com.pokegoapi.util.Log;
+import com.pokegoapi.old.util.Log;
 
 import java.util.Arrays;
 import java.util.List;

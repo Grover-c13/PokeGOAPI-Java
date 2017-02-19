@@ -24,7 +24,7 @@ import com.pokegoapi.old.exceptions.CaptchaActiveException;
 import java.util.List;
 
 @SuppressWarnings("unused")
-public class Gym implements MapPoint {
+public final class Gym implements MapPoint {
 
     private final GymSpi spi;
     private final Provider provider;

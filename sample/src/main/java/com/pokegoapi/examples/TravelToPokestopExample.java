@@ -31,17 +31,17 @@
 package com.pokegoapi.examples;
 
 
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.map.Point;
-import com.pokegoapi.api.map.fort.Pokestop;
-import com.pokegoapi.api.map.fort.PokestopLootResult;
-import com.pokegoapi.auth.PtcCredentialProvider;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.util.Log;
-import com.pokegoapi.util.hash.HashProvider;
-import com.pokegoapi.util.path.Path;
+import com.pokegoapi.old.api.PokemonGo;
+import com.pokegoapi.old.api.map.Point;
+import com.pokegoapi.old.api.map.fort.Pokestop;
+import com.pokegoapi.old.api.map.fort.PokestopLootResult;
+import com.pokegoapi.old.auth.PtcCredentialProvider;
+import com.pokegoapi.old.exceptions.CaptchaActiveException;
+import com.pokegoapi.network.LoginFailedException;
+import com.pokegoapi.network.RemoteServerException;
+import com.pokegoapi.old.util.Log;
+import com.pokegoapi.old.util.hash.HashProvider;
+import com.pokegoapi.old.util.path.Path;
 import okhttp3.OkHttpClient;
 
 import java.util.Set;

@@ -16,7 +16,7 @@
 package com.pokegoapi.examples;
 
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
-import com.pokegoapi.api.pokemon.Evolutions;
+import com.pokegoapi.old.api.pokemon.Evolutions;
 
 import java.util.List;
 

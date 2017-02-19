@@ -15,9 +15,9 @@
 
 package com.pokegoapi.examples;
 
-import com.pokegoapi.util.hash.HashProvider;
-import com.pokegoapi.util.hash.legacy.LegacyHashProvider;
-import com.pokegoapi.util.hash.pokehash.PokeHashProvider;
+import com.pokegoapi.old.util.hash.HashProvider;
+import com.pokegoapi.old.util.hash.legacy.LegacyHashProvider;
+import com.pokegoapi.old.util.hash.pokehash.PokeHashProvider;
 
 /**
  * Created by court on 19/07/2016.

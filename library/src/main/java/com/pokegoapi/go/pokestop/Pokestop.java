@@ -21,7 +21,7 @@ import java.util.List;
  * An object that represents a Pokestop on the map in Pokemon Go
  */
 @SuppressWarnings("unused")
-public class Pokestop implements MapPoint{
+public final class Pokestop implements MapPoint{
 
     private final PokestopSpi spi;
     private final Provider provider;

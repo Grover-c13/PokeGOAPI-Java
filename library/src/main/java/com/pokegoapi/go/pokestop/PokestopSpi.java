@@ -13,7 +13,6 @@ import com.pokegoapi.network.RemoteServerException;
 
 import java.util.List;
 
-
 @SuppressWarnings("WeakerAccess")
 public abstract class PokestopSpi implements MapPoint {
 

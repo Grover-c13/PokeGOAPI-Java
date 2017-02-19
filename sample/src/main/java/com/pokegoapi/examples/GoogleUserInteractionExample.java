@@ -16,10 +16,10 @@
 package com.pokegoapi.examples;
 
 
-import com.pokegoapi.auth.GoogleUserCredentialProvider;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.old.auth.GoogleUserCredentialProvider;
+import com.pokegoapi.old.exceptions.CaptchaActiveException;
+import com.pokegoapi.network.LoginFailedException;
+import com.pokegoapi.network.RemoteServerException;
 import okhttp3.OkHttpClient;
 
 import java.util.Scanner;
