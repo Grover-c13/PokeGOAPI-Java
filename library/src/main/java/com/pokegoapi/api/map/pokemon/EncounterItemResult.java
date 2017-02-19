@@ -15,40 +15,26 @@
 
 package com.pokegoapi.api.map.pokemon;
 
-import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass.UseItemCaptureResponse;
+import POGOProtos.Data.Capture.CaptureProbabilityOuterClass.CaptureProbability;
+import POGOProtos.Networking.Responses.UseItemEncounterResponseOuterClass.UseItemEncounterResponse;
+import POGOProtos.Networking.Responses.UseItemEncounterResponseOuterClass.UseItemEncounterResponse.Status;
 
-public class CatchItemResult {
-	private UseItemCaptureResponse proto;
+public class EncounterItemResult {
+	private UseItemEncounterResponse proto;
 
-	public CatchItemResult(UseItemCaptureResponse proto) {
+	public EncounterItemResult(UseItemEncounterResponse proto) {
 		this.proto = proto;
 	}
 
 	public boolean getSuccess() {
-		return proto.getSuccess();
+		return proto.getStatus() == Status.SUCCESS;
 	}
 
-	public double getItemCaptureMult() {
-		return proto.getItemCaptureMult();
+	public UseItemEncounterResponse.Status getStatus() {
+		return proto.getStatus();
 	}
 
-	public double getItemFleeMult() {
-		return proto.getItemFleeMult();
-	}
-
-	public boolean getStopMovement() {
-		return proto.getStopMovement();
-	}
-
-	public boolean getStopAttack() {
-		return proto.getStopAttack();
-	}
-
-	public boolean getTargetMax() {
-		return proto.getTargetMax();
-	}
-
-	public boolean getTargetSlow() {
-		return proto.getTargetSlow();
+	public CaptureProbability getCaptureProbability() {
+		return proto.getCaptureProbability();
 	}
 }

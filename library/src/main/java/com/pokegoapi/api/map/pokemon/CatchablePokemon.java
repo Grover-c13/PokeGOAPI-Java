@@ -26,7 +26,7 @@ import POGOProtos.Networking.Requests.Messages.CatchPokemonMessageOuterClass.Cat
 import POGOProtos.Networking.Requests.Messages.DiskEncounterMessageOuterClass.DiskEncounterMessage;
 import POGOProtos.Networking.Requests.Messages.EncounterMessageOuterClass.EncounterMessage;
 import POGOProtos.Networking.Requests.Messages.IncenseEncounterMessageOuterClass.IncenseEncounterMessage;
-import POGOProtos.Networking.Requests.Messages.UseItemCaptureMessageOuterClass.UseItemCaptureMessage;
+import POGOProtos.Networking.Requests.Messages.UseItemEncounterMessageOuterClass.UseItemEncounterMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus;
@@ -35,7 +35,7 @@ import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResp
 import POGOProtos.Networking.Responses.GetIncensePokemonResponseOuterClass.GetIncensePokemonResponse;
 import POGOProtos.Networking.Responses.IncenseEncounterResponseOuterClass.IncenseEncounterResponse;
 import POGOProtos.Networking.Responses.IncenseEncounterResponseOuterClass.IncenseEncounterResponse.Result;
-import POGOProtos.Networking.Responses.UseItemCaptureResponseOuterClass.UseItemCaptureResponse;
+import POGOProtos.Networking.Responses.UseItemEncounterResponseOuterClass.UseItemEncounterResponse;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -356,7 +356,7 @@ public class CatchablePokemon implements MapPoint {
 		return catchPokemon(options.getNormalizedHitPosition(),
 				options.getNormalizedReticleSize(),
 				options.getSpinModifier(),
-				options.selectPokeball(getUseablePokeballs(), captureProbability),
+				options.selectPokeball(getUsablePokeballs(), captureProbability),
 				options.getMaxPokeballs(),
 				options.getRazzberries());
 	}
@@ -390,7 +390,7 @@ public class CatchablePokemon implements MapPoint {
 		return catchPokemon(options.getNormalizedHitPosition(),
 				options.getNormalizedReticleSize(),
 				options.getSpinModifier(),
-				options.selectPokeball(getUseablePokeballs(), probability),
+				options.selectPokeball(getUsablePokeballs(), probability),
 				options.getMaxPokeballs(),
 				options.getRazzberries());
 	}
@@ -449,11 +449,11 @@ public class CatchablePokemon implements MapPoint {
 		if (options != null) {
 			if (options.getUseRazzBerry() != 0) {
 				final AsyncCatchOptions asyncOptions = options;
-				final Pokeball asyncPokeball = asyncOptions.selectPokeball(getUseablePokeballs(), captureProbability);
+				final Pokeball asyncPokeball = asyncOptions.selectPokeball(getUsablePokeballs(), captureProbability);
 				return useItemAsync(ItemId.ITEM_RAZZ_BERRY).flatMap(
-						new Func1<CatchItemResult, Observable<CatchResult>>() {
+						new Func1<EncounterItemResult, Observable<CatchResult>>() {
 							@Override
-							public Observable<CatchResult> call(CatchItemResult result) {
+							public Observable<CatchResult> call(EncounterItemResult result) {
 								if (!result.getSuccess()) {
 									return Observable.just(new CatchResult());
 								}
@@ -470,7 +470,7 @@ public class CatchablePokemon implements MapPoint {
 		return catchPokemonAsync(options.getNormalizedHitPosition(),
 				options.getNormalizedReticleSize(),
 				options.getSpinModifier(),
-				options.selectPokeball(getUseablePokeballs(), captureProbability));
+				options.selectPokeball(getUsablePokeballs(), captureProbability));
 	}
 
 	/**
@@ -497,11 +497,11 @@ public class CatchablePokemon implements MapPoint {
 		if (options != null) {
 			if (options.getUseRazzBerry() != 0) {
 				final AsyncCatchOptions asyncOptions = options;
-				final Pokeball asyncPokeball = asyncOptions.selectPokeball(getUseablePokeballs(), captureProbability);
+				final Pokeball asyncPokeball = asyncOptions.selectPokeball(getUsablePokeballs(), captureProbability);
 				return useItemAsync(ItemId.ITEM_RAZZ_BERRY).flatMap(
-						new Func1<CatchItemResult, Observable<CatchResult>>() {
+						new Func1<EncounterItemResult, Observable<CatchResult>>() {
 							@Override
-							public Observable<CatchResult> call(CatchItemResult result) {
+							public Observable<CatchResult> call(EncounterItemResult result) {
 								if (!result.getSuccess()) {
 									return Observable.just(new CatchResult());
 								}
@@ -518,7 +518,7 @@ public class CatchablePokemon implements MapPoint {
 		return catchPokemonAsync(options.getNormalizedHitPosition(),
 				options.getNormalizedReticleSize(),
 				options.getSpinModifier(),
-				options.selectPokeball(getUseablePokeballs(), captureProbability));
+				options.selectPokeball(getUsablePokeballs(), captureProbability));
 	}
 
 	/**
@@ -677,37 +677,37 @@ public class CatchablePokemon implements MapPoint {
 				});
 	}
 
-	private List<Pokeball> getUseablePokeballs() {
-		return api.getInventories().getItemBag().getUseablePokeballs();
+	private List<Pokeball> getUsablePokeballs() {
+		return api.getInventories().getItemBag().getUsablePokeballs();
 	}
 
 	/**
 	 * Tries to use an item on a catchable pokemon (ie razzberry).
 	 *
 	 * @param item the item ID
-	 * @return CatchItemResult info about the new modifiers about the pokemon (can move, item capture multi) eg
+	 * @return EncounterItemResult info about the new modifiers about the pokemon (can move, item capture multi) eg
 	 */
-	public Observable<CatchItemResult> useItemAsync(ItemId item) {
-		UseItemCaptureMessage reqMsg = UseItemCaptureMessage
+	public Observable<EncounterItemResult> useItemAsync(ItemId item) {
+		UseItemEncounterMessage reqMsg = UseItemEncounterMessage
 				.newBuilder()
 				.setEncounterId(this.getEncounterId())
-				.setSpawnPointId(this.getSpawnPointId())
-				.setItemId(item)
+				.setSpawnPointGuid(this.getSpawnPointId())
+				.setItem(item)
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(
-				RequestType.USE_ITEM_CAPTURE, reqMsg);
+				RequestType.USE_ITEM_ENCOUNTER, reqMsg);
 		return api.getRequestHandler()
-				.sendAsyncServerRequests(serverRequest, false).map(new Func1<ByteString, CatchItemResult>() {
+				.sendAsyncServerRequests(serverRequest, false).map(new Func1<ByteString, EncounterItemResult>() {
 					@Override
-					public CatchItemResult call(ByteString result) {
-						UseItemCaptureResponse response;
+					public EncounterItemResult call(ByteString result) {
+						UseItemEncounterResponse response;
 						try {
-							response = UseItemCaptureResponse.parseFrom(result);
+							response = UseItemEncounterResponse.parseFrom(result);
 						} catch (InvalidProtocolBufferException e) {
 							throw new AsyncRemoteServerException(e);
 						}
-						return new CatchItemResult(response);
+						return new EncounterItemResult(response);
 					}
 				});
 	}
@@ -716,13 +716,13 @@ public class CatchablePokemon implements MapPoint {
 	 * Tries to use an item on a catchable pokemon (ie razzberry).
 	 *
 	 * @param item the item ID
-	 * @return CatchItemResult info about the new modifiers about the pokemon (can move, item capture multi) eg
+	 * @return EncounterItemResult info about the new modifiers about the pokemon (can move, item capture multi) eg
 	 * @throws LoginFailedException if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 * @throws HashException if an exception occurred while requesting hash
 	 */
-	public CatchItemResult useItem(ItemId item)
+	public EncounterItemResult useItem(ItemId item)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		return AsyncHelper.toBlocking(useItemAsync(item));
 	}

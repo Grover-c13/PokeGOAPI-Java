@@ -164,11 +164,11 @@ public class CatchPokemonAtAreaExample {
 					CatchOptions options = new CatchOptions(api)
 							.useRazzberry(true)
 							.withPokeballSelector(PokeballSelector.SMART);
-					List<Pokeball> useablePokeballs = api.getInventories().getItemBag().getUseablePokeballs();
+					List<Pokeball> usablePokeballs = api.getInventories().getItemBag().getUsablePokeballs();
 					double probability = cp.getCaptureProbability();
-					if (useablePokeballs.size() > 0) {
+					if (usablePokeballs.size() > 0) {
 						//Select pokeball with smart selector to print what pokeball is used
-						Pokeball pokeball = PokeballSelector.SMART.select(useablePokeballs, probability);
+						Pokeball pokeball = PokeballSelector.SMART.select(usablePokeballs, probability);
 						System.out.println("Attempting to catch: " + cp.getPokemonId() + " with " + pokeball
 								+ " (" + probability + ")");
 						//Throw pokeballs until capture or flee

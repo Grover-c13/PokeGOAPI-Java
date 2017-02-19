@@ -275,9 +275,18 @@ public class ItemBag {
 	}
 
 	/**
-	 * @return a list of useable pokeballs that are in the inventory
+	 * @deprecated use getUsablePokeballs
+	 * @return a list of usable pokeballs that are in the inventory
 	 */
+	@Deprecated
 	public List<Pokeball> getUseablePokeballs() {
+		return getUsablePokeballs();
+	}
+
+	/**
+	 * @return a list of usable pokeballs that are in the inventory
+	 */
+	public List<Pokeball> getUsablePokeballs() {
 		List<Pokeball> pokeballs = new ArrayList<>();
 		for (Pokeball pokeball : Pokeball.values()) {
 			if (getItem(pokeball.getBallType()).getCount() > 0) {

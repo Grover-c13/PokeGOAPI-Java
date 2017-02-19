@@ -50,6 +50,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class RequestHandler implements Runnable {
+	private static final int THROTTLE = 350;
 	private static final String TAG = RequestHandler.class.getSimpleName();
 	private final PokemonGo api;
 	private final Thread asyncHttpThread;
@@ -317,6 +318,8 @@ public class RequestHandler implements Runnable {
 
 	@Override
 	public void run() {
+		long lastRequest = System.currentTimeMillis();
+
 		while (active) {
 			try {
 				Thread.sleep(10);
@@ -325,6 +328,17 @@ public class RequestHandler implements Runnable {
 			}
 
 			if (!workQueue.isEmpty()) {
+				long time = System.currentTimeMillis();
+				long timeSinceLastRequest = time - lastRequest;
+
+				if (timeSinceLastRequest < THROTTLE) {
+					try {
+						Thread.sleep(THROTTLE - timeSinceLastRequest);
+					} catch (InterruptedException e) {
+						throw new AsyncPokemonGoException("System shutdown", e);
+					}
+				}
+
 				ServerRequestEnvelope envelope = workQueue.poll();
 
 				List<ServerRequest> requests = new ArrayList<>();
@@ -388,6 +402,8 @@ public class RequestHandler implements Runnable {
 						| LoginFailedException | CaptchaActiveException e) {
 					continue;
 				}
+
+				lastRequest = System.currentTimeMillis();
 			}
 		}
 	}
