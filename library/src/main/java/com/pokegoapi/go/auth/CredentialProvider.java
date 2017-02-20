@@ -5,8 +5,7 @@ import com.pokegoapi.NoSuchTypeException;
 import com.pokegoapi.Provider;
 import com.pokegoapi.go.spec.Credentials;
 import com.pokegoapi.go.spec.LoginParameterSpec;
-import com.pokegoapi.network.LoginFailedException;
-import com.pokegoapi.network.RemoteServerException;
+import com.pokegoapi.network.exception.LoginFailedException;
 
 /**
  * Created by chris on 1/23/2017.
@@ -45,8 +44,7 @@ public final class CredentialProvider {
         return spi.engineCreateCredential(spec, this);
     }
 
-    public Credentials refreshCredential(Credentials credential)
-            throws LoginFailedException, RemoteServerException{
+    public Credentials refreshCredential(Credentials credential) throws LoginFailedException {
         return spi.engineRefreshCredential(credential, this);
     }
 }

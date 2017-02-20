@@ -7,9 +7,7 @@ import com.google.protobuf.ProtocolStringList;
 import com.pokegoapi.go.PokemonGoClient;
 import com.pokegoapi.go.map.spec.MapPoint;
 import com.pokegoapi.go.pokestop.spec.LootResult;
-import com.pokegoapi.network.CaptchaActiveException;
-import com.pokegoapi.network.LoginFailedException;
-import com.pokegoapi.network.RemoteServerException;
+import com.pokegoapi.network.exception.RequestFailedException;
 
 import java.util.List;
 
@@ -69,31 +67,24 @@ public abstract class PokestopSpi implements MapPoint {
      * Loots a pokestop for pokeballs and other items.
      *
      * @return PokestopLootResult
-     * @throws LoginFailedException if login failed
-     * @throws RemoteServerException if the server failed to respond
-     * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+     * @throws RequestFailedException if an exception occurs while sending the request
      */
-    protected abstract LootResult engineLoot(Pokestop pokestop) throws LoginFailedException, CaptchaActiveException, RemoteServerException;
+    protected abstract LootResult engineLoot(Pokestop pokestop) throws RequestFailedException;
 
     /**
      * Adds a modifier to this pokestop. (i.e. add a lure module)
      *
      * @param item the modifier to add to this pokestop
-     * @throws LoginFailedException if login failed
-     * @throws RemoteServerException if the server failed to respond or the modifier could not be added to this pokestop
-     * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+     * @throws RequestFailedException if a problem occurs while sending this request
      */
-    protected abstract boolean engineAddModifier(ItemId item) throws LoginFailedException, CaptchaActiveException,
-            RemoteServerException;
+    protected abstract boolean engineAddModifier(ItemId item) throws RequestFailedException;
 
     /**
      * Get more detailed information about a pokestop.
      *
      * @return FortDetails
-     * @throws LoginFailedException if login failed
-     * @throws RemoteServerException if the server failed to respond
-     * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+     * @throws RequestFailedException if an exception occurs while sending the request
      */
-    protected abstract boolean engineGetDetails() throws LoginFailedException, CaptchaActiveException, RemoteServerException;
+    protected abstract boolean engineGetDetails() throws RequestFailedException;
 
 }

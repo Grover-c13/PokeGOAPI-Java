@@ -16,10 +16,8 @@ import com.pokegoapi.Provider;
 import com.pokegoapi.go.PokemonGoClient;
 import com.pokegoapi.go.gym.spec.Battle;
 import com.pokegoapi.go.map.spec.MapPoint;
-import com.pokegoapi.network.LoginFailedException;
-import com.pokegoapi.network.RemoteServerException;
+import com.pokegoapi.network.exception.RequestFailedException;
 import com.pokegoapi.old.api.pokemon.Pokemon;
-import com.pokegoapi.old.exceptions.CaptchaActiveException;
 
 import java.util.List;
 
@@ -145,11 +143,11 @@ public final class Gym implements MapPoint {
         return spi.engineHasGymState();
     }
 
-    public GetGymDetailsResponse getGymDetails() throws CaptchaActiveException, RemoteServerException, LoginFailedException {
+    public GetGymDetailsResponse getGymDetails() throws RequestFailedException {
         return spi.engineGetGymDetails();
     }
 
-    public Result deployPokemon(Pokemon pokemon) throws CaptchaActiveException, RemoteServerException, LoginFailedException {
+    public Result deployPokemon(Pokemon pokemon) throws RequestFailedException {
         return spi.engineDeployPokemon(pokemon);
     }
 

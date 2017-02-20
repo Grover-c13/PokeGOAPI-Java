@@ -11,9 +11,7 @@ import com.pokegoapi.Provider;
 import com.pokegoapi.go.PokemonGoClient;
 import com.pokegoapi.go.map.spec.MapPoint;
 import com.pokegoapi.go.pokestop.spec.LootResult;
-import com.pokegoapi.network.CaptchaActiveException;
-import com.pokegoapi.network.LoginFailedException;
-import com.pokegoapi.network.RemoteServerException;
+import com.pokegoapi.network.exception.RequestFailedException;
 
 import java.util.List;
 
@@ -137,11 +135,9 @@ public final class Pokestop implements MapPoint{
      * Loots the pokestop for pokeballs and other items.
      *
      * @return the Pokestop's Loot Result
-     * @throws LoginFailedException   if login failed
-     * @throws RemoteServerException  if the server failed to respond
-     * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+     * @throws RequestFailedException if an exception occurs while sending the request
      */
-    public LootResult loot() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+    public LootResult loot() throws RequestFailedException {
         return spi.engineLoot(this);
     }
 
@@ -149,12 +145,9 @@ public final class Pokestop implements MapPoint{
      * Adds a modifier to the pokestop. (i.e. add a lure module)
      *
      * @param item the modifier to add to this pokestop
-     * @throws LoginFailedException if login failed
-     * @throws RemoteServerException if the server failed to respond or the modifier could not be added to this pokestop
-     * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+     * @throws RequestFailedException if an exception occurs while sending the request
      */
-    public boolean addModifier(ItemId item) throws LoginFailedException, CaptchaActiveException,
-            RemoteServerException{
+    public boolean addModifier(ItemId item) throws RequestFailedException {
         return spi.engineAddModifier(item);
     }
 
@@ -162,11 +155,9 @@ public final class Pokestop implements MapPoint{
      * Get more detailed information about the pokestop.
      *
      * @return FortDetails
-     * @throws LoginFailedException if login failed
-     * @throws RemoteServerException if the server failed to respond
-     * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+     * @throws RequestFailedException if an exception occurs while sending the request
      */
-    public boolean getDetails() throws LoginFailedException, CaptchaActiveException, RemoteServerException{
+    public boolean getDetails() throws RequestFailedException {
         return spi.engineGetDetails();
     }
 
