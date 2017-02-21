@@ -1,16 +1,17 @@
-package com.pokegoapi.old.api.settings;
+package com.pokegoapi.api.settings;
 
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.old.api.PokemonGo;
-import com.pokegoapi.old.exceptions.CaptchaActiveException;
-import com.pokegoapi.network.LoginFailedException;
-import com.pokegoapi.network.RemoteServerException;
-import com.pokegoapi.old.main.ServerRequest;
-
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.exceptions.CaptchaActiveException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.main.ServerRequest;
+import lombok.Getter;
 
 /**
  * Created by rama on 27/07/16.
@@ -20,7 +21,7 @@ public class Settings {
 	private final PokemonGo api;
 
 
-
+	@Getter
 	/**
 	 * Settings for various parameters on map
 	 *
@@ -28,7 +29,7 @@ public class Settings {
 	 */
 	private final MapSettings mapSettings;
 
-
+	@Getter
 	/**
 	 * Settings for various parameters during levelup
 	 *
@@ -36,7 +37,7 @@ public class Settings {
 	 */
 	private final LevelUpSettings levelUpSettings;
 
-
+	@Getter
 	/**
 	 * Settings for various parameters during levelup
 	 *
@@ -45,7 +46,7 @@ public class Settings {
 	private final FortSettings fortSettings;
 
 
-
+	@Getter
 	/**
 	 * Settings for various parameters during levelup
 	 *
@@ -53,19 +54,19 @@ public class Settings {
 	 */
 	private final InventorySettings inventorySettings;
 
-
+	@Getter
 	/**
 	 * Settings for showing speed warnings
 	 *
 	 * @return GpsSettings instance.
 	 */
 	private final GpsSettings gpsSettings;
-
+	@Getter
 	/**
-     * Settings for hash
-     *
-     * @return String hash.
-     */
+	 * Settings for hash
+	 *
+	 * @return String hash.
+	 */
 	private String hash;
 
 	/**
@@ -87,11 +88,13 @@ public class Settings {
 	/**
 	 * Updates settings latest data.
 	 *
-	 * @throws LoginFailedException  the login failed exception
+	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
-	public void updateSettings() throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+	public void updateSettings() throws RemoteServerException, CaptchaActiveException, LoginFailedException,
+			HashException {
 		DownloadSettingsMessageOuterClass.DownloadSettingsMessage msg =
 				DownloadSettingsMessageOuterClass.DownloadSettingsMessage.newBuilder().build();
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.DOWNLOAD_SETTINGS, msg);

@@ -34,6 +34,7 @@ public class Path {
 
 	/**
 	 * Creates a Path with the given positions
+	 *
 	 * @param source the source of this path
 	 * @param destination the destination for this path
 	 * @param speed the speed to move at in kmph
@@ -49,6 +50,7 @@ public class Path {
 
 	/**
 	 * Sets the start and end time for this Path, ready to begin moving
+	 *
 	 * @param api the current API
 	 * @return the total time it will take for this path to complete
 	 */
@@ -61,6 +63,7 @@ public class Path {
 
 	/**
 	 * Calculates the desired intermediate point for this path, based on the current time
+	 *
 	 * @param api the current API
 	 * @return the intermediate point for the given time
 	 */
@@ -83,6 +86,7 @@ public class Path {
 
 	/**
 	 * Gets the amount of millis left before this path is complete
+	 *
 	 * @param api the current API
 	 * @return the amount of millis left before this path completes
 	 */
@@ -92,6 +96,7 @@ public class Path {
 
 	/**
 	 * Changes the speed of this path
+	 *
 	 * @param api the current API
 	 * @param speed the new speed to travel at
 	 */

@@ -31,14 +31,15 @@
 package com.pokegoapi.examples;
 
 
-import com.pokegoapi.old.api.PokemonGo;
-import com.pokegoapi.old.auth.PtcCredentialProvider;
-import com.pokegoapi.old.exceptions.CaptchaActiveException;
-import com.pokegoapi.network.LoginFailedException;
-import com.pokegoapi.network.RemoteServerException;
-import com.pokegoapi.old.util.Log;
-import com.pokegoapi.old.util.SystemTimeImpl;
-import com.pokegoapi.old.util.hash.HashProvider;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.auth.PtcCredentialProvider;
+import com.pokegoapi.exceptions.CaptchaActiveException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.util.Log;
+import com.pokegoapi.util.SystemTimeImpl;
+import com.pokegoapi.util.hash.HashProvider;
 import okhttp3.OkHttpClient;
 
 public class UseIncenseExample {
@@ -58,6 +59,8 @@ public class UseIncenseExample {
 		} catch (LoginFailedException | RemoteServerException | CaptchaActiveException e) {
 			// failed to login, invalid credentials, auth issue or server issue.
 			Log.e("Main", "Failed to login, captcha or server issue: ", e);
+		} catch (HashException e) {
+			Log.e("Main ", "Failed to login to the Hash Service: ", e);
 		}
 	}
 }

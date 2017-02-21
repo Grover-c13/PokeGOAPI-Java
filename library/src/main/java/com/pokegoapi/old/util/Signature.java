@@ -19,6 +19,9 @@ import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Platform.PlatformRequestTypeOuterClass.PlatformRequestType;
 import POGOProtos.Networking.Platform.Requests.SendEncryptedSignatureRequestOuterClass.SendEncryptedSignatureRequest;
+import POGOProtos.Networking.Platform.Requests.UnknownPtr8RequestOuterClass.UnknownPtr8Request;
+import POGOProtos.Networking.Requests.RequestOuterClass.Request;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.old.api.PokemonGo;
 import com.pokegoapi.old.api.device.LocationFixes;
@@ -44,17 +47,12 @@ public class Signature {
 	 */
 	public static void setSignature(PokemonGo api, RequestEnvelope.Builder builder)
 			throws RemoteServerException, HashException {
-		if (builder.getAuthTicket() == null) {
-			return;
+		byte[] authTicket;
+		if (builder.hasAuthTicket()) {
+			authTicket = builder.getAuthTicket().toByteArray();
+		} else {
+			authTicket = builder.getAuthInfo().getToken().getContentsBytes().toByteArray();
 		}
-
-
-		byte[] authTicket = builder.getAuthTicket().toByteArray();
-
-		if (authTicket.length == 0) {
-			return;
-		}
-
 
 		byte[][] requestData = new byte[builder.getRequestsCount()][];
 		for (int i = 0; i < builder.getRequestsCount(); i++) {
@@ -111,10 +109,24 @@ public class Signature {
 				.setEncryptedSignature(ByteString.copyFrom(encrypted)).build()
 				.toByteString();
 
-		RequestEnvelope.PlatformRequest platformRequest = RequestEnvelope.PlatformRequest.newBuilder()
+		RequestEnvelope.PlatformRequest signatureRequest = RequestEnvelope.PlatformRequest.newBuilder()
 				.setType(PlatformRequestType.SEND_ENCRYPTED_SIGNATURE)
 				.setRequestMessage(signatureBytes)
 				.build();
-		builder.addPlatformRequests(platformRequest);
+		builder.addPlatformRequests(signatureRequest);
+
+		for (Request request : builder.getRequestsList()) {
+			RequestType requestType = request.getRequestType();
+			if (requestType == RequestType.GET_MAP_OBJECTS || requestType == RequestType.GET_PLAYER) {
+				ByteString ptr8 = UnknownPtr8Request.newBuilder()
+						.setMessage("7bb2d74dec0d8c5e132ad6c5491f72c9f19b306c")
+						.build()
+						.toByteString();
+				builder.addPlatformRequests(RequestEnvelope.PlatformRequest.newBuilder()
+						.setType(PlatformRequestType.UNKNOWN_PTR_8)
+						.setRequestMessage(ptr8).build());
+				break;
+			}
+		}
 	}
 }

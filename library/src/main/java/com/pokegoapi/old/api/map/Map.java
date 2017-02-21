@@ -13,7 +13,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.old.api.map;
+package com.pokegoapi.api.map;
 
 import POGOProtos.Map.MapCellOuterClass.MapCell;
 import POGOProtos.Networking.Requests.Messages.GetIncensePokemonMessageOuterClass.GetIncensePokemonMessage;
@@ -22,15 +22,16 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetIncensePokemonResponseOuterClass.GetIncensePokemonResponse;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.old.api.PokemonGo;
-import com.pokegoapi.old.exceptions.CaptchaActiveException;
-import com.pokegoapi.network.LoginFailedException;
-import com.pokegoapi.network.RemoteServerException;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.exceptions.CaptchaActiveException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.google.common.geometry.MutableInteger;
 import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
-import com.pokegoapi.old.main.ServerRequest;
-
+import com.pokegoapi.main.ServerRequest;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class Map {
 	private final PokemonGo api;
 	private int defaultCellWidth = 3;
 
-
+	@Getter
 	private MapObjects mapObjects;
 
 	private final Object updateLock = new Object();
@@ -57,21 +58,26 @@ public class Map {
 	/**
 	 * Updates the map. Only API should be calling this.
 	 *
+	 * @return if the map was updated
 	 * @throws CaptchaActiveException if a captcha is active and the map cannot be updates
 	 * @throws RemoteServerException if the server gives an error while updating this map
 	 * @throws LoginFailedException if login fails
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
-	public void update() throws CaptchaActiveException, RemoteServerException, LoginFailedException {
+	public boolean update() throws CaptchaActiveException, RemoteServerException, LoginFailedException, HashException {
+		boolean updated = false;
 		if (!(Double.isNaN(api.getLatitude()) || Double.isNaN(api.getLongitude()))) {
 			MapObjects mapObjects = requestMapObjects();
 			if (api.getInventories().getItemBag().isIncenseActive()) {
 				mapObjects.addIncensePokemon(requestIncensePokemon());
 			}
 			this.mapObjects = mapObjects;
+			updated = true;
 		}
 		synchronized (this.updateLock) {
 			this.updateLock.notifyAll();
 		}
+		return updated;
 	}
 
 	/**
@@ -81,9 +87,10 @@ public class Map {
 	 * @throws CaptchaActiveException if a captcha is active and the map cannot be updated
 	 * @throws RemoteServerException if the server gives an error while updating this map
 	 * @throws LoginFailedException if login fails
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	protected MapObjects requestMapObjects()
-			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
+			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
 		List<Long> cells = getDefaultCells();
 		GetMapObjectsMessage.Builder builder = GetMapObjectsMessage.newBuilder();
 		builder.setLatitude(api.getLatitude());
@@ -113,9 +120,10 @@ public class Map {
 	 * @throws CaptchaActiveException if a captcha is active and the incense pokemon cannot be requested
 	 * @throws RemoteServerException if the server gives an error while updating the current
 	 * @throws LoginFailedException if login fails
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	protected GetIncensePokemonResponse requestIncensePokemon()
-			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
+			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
 		GetIncensePokemonMessage message = GetIncensePokemonMessage.newBuilder()
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
@@ -160,7 +168,8 @@ public class Map {
 		int halfWidth = (int) Math.floor(width / 2);
 		for (int x = -halfWidth; x <= halfWidth; x++) {
 			for (int y = -halfWidth; y <= halfWidth; y++) {
-				cells.add(S2CellId.fromFaceIJ(face, index.intValue() + x * size, jindex.intValue() + y * size).parent(15).id());
+				cells.add(S2CellId.fromFaceIJ(face, index.intValue() + x * size,
+						jindex.intValue() + y * size).parent(15).id());
 			}
 		}
 		return cells;
@@ -168,6 +177,7 @@ public class Map {
 
 	/**
 	 * Blocks this thread until MapObjects are updates
+	 * @throws InterruptedException if this thread is interrupted while awaiting map update
 	 */
 	public void awaitUpdate() throws InterruptedException {
 		synchronized (this.updateLock) {

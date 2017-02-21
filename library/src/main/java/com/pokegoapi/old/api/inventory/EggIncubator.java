@@ -13,7 +13,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.old.api.inventory;
+package com.pokegoapi.api.inventory;
 
 import POGOProtos.Inventory.EggIncubatorOuterClass;
 import POGOProtos.Inventory.EggIncubatorTypeOuterClass.EggIncubatorType;
@@ -23,13 +23,14 @@ import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.Use
 import POGOProtos.Settings.Master.Item.EggIncubatorAttributesOuterClass.EggIncubatorAttributes;
 import POGOProtos.Settings.Master.ItemSettingsOuterClass.ItemSettings;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.old.api.PokemonGo;
-import com.pokegoapi.old.api.pokemon.EggPokemon;
-import com.pokegoapi.old.exceptions.CaptchaActiveException;
-import com.pokegoapi.network.LoginFailedException;
-import com.pokegoapi.network.RemoteServerException;
-import com.pokegoapi.old.main.PokemonMeta;
-import com.pokegoapi.old.main.ServerRequest;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.pokemon.EggPokemon;
+import com.pokegoapi.exceptions.CaptchaActiveException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.main.PokemonMeta;
+import com.pokegoapi.main.ServerRequest;
 
 public class EggIncubator {
 	private final EggIncubatorOuterClass.EggIncubator proto;
@@ -38,7 +39,7 @@ public class EggIncubator {
 	/**
 	 * Create new EggIncubator with given proto.
 	 *
-	 * @param api   the api
+	 * @param api the api
 	 * @param proto the proto
 	 */
 	public EggIncubator(PokemonGo api, EggIncubatorOuterClass.EggIncubator proto) {
@@ -47,7 +48,7 @@ public class EggIncubator {
 	}
 
 	/**
-	 * @returns the attributes of this incubator, null if there are none
+	 * @return the attributes of this incubator, null if there are none
 	 */
 	public EggIncubatorAttributes getAttributes() {
 		ItemSettings settings = PokemonMeta.getItemSettings(proto.getItemId());
@@ -72,18 +73,20 @@ public class EggIncubator {
 	 * @param egg the egg
 	 * @return status of putting egg in incubator
 	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException  the login failed exception
+	 * @throws LoginFailedException the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public UseItemEggIncubatorResponse.Result hatchEgg(EggPokemon egg)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 
 		UseItemEggIncubatorMessage reqMsg = UseItemEggIncubatorMessage.newBuilder()
 				.setItemId(proto.getId())
 				.setPokemonId(egg.getId())
 				.build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR, reqMsg);
+		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR,
+				reqMsg);
 		api.getRequestHandler().sendServerRequests(serverRequest);
 
 		UseItemEggIncubatorResponse response;

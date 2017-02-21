@@ -17,12 +17,12 @@ package com.pokegoapi.old.main;
 
 import POGOProtos.Enums.PlatformOuterClass.Platform;
 import POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessageOuterClass.CheckAwardedBadgesMessage;
-import POGOProtos.Networking.Requests.Messages.CheckChallenge.CheckChallengeMessage;
+import POGOProtos.Networking.Requests.Messages.CheckChallengeMessageOuterClass.CheckChallengeMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadItemTemplatesMessageOuterClass.DownloadItemTemplatesMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadRemoteConfigVersionMessageOuterClass.DownloadRemoteConfigVersionMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass.DownloadSettingsMessage;
 import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.GetAssetDigestMessage;
-import POGOProtos.Networking.Requests.Messages.GetBuddyWalked.GetBuddyWalkedMessage;
+import POGOProtos.Networking.Requests.Messages.GetBuddyWalkedMessageOuterClass.GetBuddyWalkedMessage;
 import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
@@ -255,12 +255,14 @@ public class CommonRequests {
 	 * @throws LoginFailedException if login fails
 	 */
 	public static void queue(RequestType type, ByteString data)
-			throws InvalidProtocolBufferException, CaptchaActiveException, RemoteServerException, LoginFailedException {
+			throws InvalidProtocolBufferException, CaptchaActiveException, RemoteServerException,
+			LoginFailedException {
 		RECEIVED_COMMONS.put(type, data);
 	}
 
 	/**
 	 * Handles the queued common requests and clears the map
+	 *
 	 * @param api the current api
 	 * @throws InvalidProtocolBufferException if the server returns an invalid response
 	 * @throws CaptchaActiveException if a captcha is active
@@ -268,7 +270,8 @@ public class CommonRequests {
 	 * @throws LoginFailedException if login fails
 	 */
 	public static void handleQueue(PokemonGo api)
-			throws InvalidProtocolBufferException, RemoteServerException, CaptchaActiveException, LoginFailedException {
+			throws InvalidProtocolBufferException, RemoteServerException, CaptchaActiveException,
+			LoginFailedException {
 		for (RequestType type : PARSE_REQUESTS) {
 			ByteString data = RECEIVED_COMMONS.get(type);
 			if (data != null) {

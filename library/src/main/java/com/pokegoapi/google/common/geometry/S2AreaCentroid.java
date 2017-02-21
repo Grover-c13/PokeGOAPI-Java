@@ -16,7 +16,6 @@
 package com.pokegoapi.google.common.geometry;
 
 
-
 /**
  * The area of an interior, i.e. the region on the left side of an odd
  * number of loops and optionally a centroid.
@@ -28,19 +27,19 @@ package com.pokegoapi.google.common.geometry;
  */
 public final class S2AreaCentroid {
 
-  private final double area;
-  private final S2Point centroid;
+	private final double area;
+	private final S2Point centroid;
 
-  public S2AreaCentroid(double area, S2Point centroid) {
-    this.area = area;
-    this.centroid = centroid;
-  }
+	public S2AreaCentroid(double area, S2Point centroid) {
+		this.area = area;
+		this.centroid = centroid;
+	}
 
-  public double getArea() {
-    return area;
-  }
+	public double getArea() {
+		return area;
+	}
 
-  public S2Point getCentroid() {
-    return centroid;
-  }
+	public S2Point getCentroid() {
+		return centroid;
+	}
 }

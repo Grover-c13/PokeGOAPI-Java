@@ -33,11 +33,11 @@ public interface HashProvider {
 	 * @throws HashException if an exception occurs while hashing the given inputs
 	 */
 	Hash provide(long timestamp, double latitude, double longitude, double altitude,
-					byte[] authTicket, byte[] sessionData, byte[][] requests)
+			byte[] authTicket, byte[] sessionData, byte[][] requests)
 			throws HashException;
 
 	/**
-	 * @return the version this hash supports, for example 4500 = 0.45.0 and 5100 = 0.51.0
+	 * @return the version this hash supports, for example 4500 = 0.45.0 and 5300 = 0.53.0
 	 */
 	int getHashVersion();
 
@@ -50,4 +50,5 @@ public interface HashProvider {
 	 * @return the unknown 25 value used with this hash
 	 */
 	long getUNK25();
+
 }

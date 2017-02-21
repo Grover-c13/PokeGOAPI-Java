@@ -47,7 +47,7 @@ public class ServerRequest {
 	 * Instantiates a new Server request.
 	 *
 	 * @param type the type
-	 * @param req  the req
+	 * @param req the req
 	 */
 	public ServerRequest(RequestTypeOuterClass.RequestType type, GeneratedMessage req) {
 		RequestOuterClass.Request.Builder reqBuilder = RequestOuterClass.Request.newBuilder();
@@ -60,7 +60,7 @@ public class ServerRequest {
 	/**
 	 * Instantiates a new Server request.
 	 *
-	 * @param type    the type
+	 * @param type the type
 	 * @param request the req
 	 */
 	ServerRequest(RequestTypeOuterClass.RequestType type, RequestOuterClass.Request request) {
@@ -92,6 +92,7 @@ public class ServerRequest {
 
 	/**
 	 * Adds a common request to this request
+	 *
 	 * @return this object
 	 */
 	public ServerRequest withCommons() {
@@ -101,6 +102,7 @@ public class ServerRequest {
 
 	/**
 	 * Excludes the given requests from the next packet
+	 *
 	 * @param types the types to exclude
 	 * @return this object
 	 */

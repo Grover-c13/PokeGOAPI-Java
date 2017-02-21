@@ -68,6 +68,8 @@ public class RequestHandler implements Runnable {
 	private AtomicLong requestId = new AtomicLong(System.currentTimeMillis());
 	private Random random;
 
+	private boolean active = true;
+
 	/**
 	 * Instantiates a new Request handler.
 	 *
@@ -154,9 +156,10 @@ public class RequestHandler implements Runnable {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException the login failed exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public void sendServerRequests(ServerRequest... serverRequests)
-			throws RemoteServerException, LoginFailedException, CaptchaActiveException {
+			throws RemoteServerException, LoginFailedException, CaptchaActiveException, HashException {
 		if (api.hasChallenge()) {
 			throw new CaptchaActiveException(new AsyncCaptchaActiveException("Captcha active! Cannot send requests!"));
 		}
@@ -231,9 +234,14 @@ public class RequestHandler implements Runnable {
 			}
 
 			if (responseEnvelop.getStatusCode() == ResponseEnvelope.StatusCode.INVALID_AUTH_TOKEN) {
-				String msg = String.format("Invalid Auth status code received, token not refreshed? %s %s",
-						responseEnvelop.getApiUrl(), responseEnvelop.getError());
-				throw new LoginFailedException(msg);
+				try {
+					this.api.getAuthInfo(true);
+					return this.internalSendServerRequests(authTicket, serverRequests);
+				} catch (LoginFailedException e) {
+					throw new RemoteServerException("Failed to refresh auth token!", e);
+				} catch (RemoteServerException e) {
+					throw new RemoteServerException("Failed to send request with refreshed auth token!", e);
+				}
 			} else if (responseEnvelop.getStatusCode() == ResponseEnvelope.StatusCode.REDIRECT) {
 				// API_ENDPOINT was not correctly set, should be at this point, though, so redo the request
 				return internalSendServerRequests(newAuthTicket, serverRequests);
@@ -263,7 +271,8 @@ public class RequestHandler implements Runnable {
 		} catch (IOException e) {
 			throw new RemoteServerException(e);
 		} catch (RemoteServerException | LoginFailedException e) {
-			// catch it, so the auto-close of resources triggers, but don't wrap it in yet another RemoteServer Exception
+			// catch it, so the auto-close of resources triggers, but don't wrap it in yet another RemoteServer
+			// Exception
 			throw e;
 		}
 		return newAuthTicket;
@@ -280,7 +289,7 @@ public class RequestHandler implements Runnable {
 			builder.setAuthTicket(authTicket);
 		} else {
 			Log.d(TAG, "Authenticated with static token");
-			builder.setAuthInfo(api.getAuthInfo());
+			builder.setAuthInfo(api.getAuthInfo(false));
 		}
 		builder.setMsSinceLastLocationfix(random.nextInt(1651) + 149);
 		builder.setLatitude(api.getLatitude());
@@ -296,7 +305,7 @@ public class RequestHandler implements Runnable {
 	public void run() {
 		List<AsyncServerRequest> requests = new LinkedList<>();
 		AuthTicket authTicket = null;
-		while (true) {
+		while (active) {
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -332,7 +341,8 @@ public class RequestHandler implements Runnable {
 							serverRequests.add(serverRequest);
 							requestMap.put(serverRequest, request);
 						} else {
-							AsyncCaptchaActiveException exception = new AsyncCaptchaActiveException(api.getChallengeURL());
+							AsyncCaptchaActiveException exception = new AsyncCaptchaActiveException(api
+									.getChallengeURL());
 							ResultOrException error = ResultOrException.getError(exception);
 							resultMap.put(request.getId(), error);
 						}
@@ -397,5 +407,10 @@ public class RequestHandler implements Runnable {
 		}
 	}
 
-
+	/**
+	 * Stops this RequestHandler
+	 */
+	public void exit() {
+		active = false;
+	}
 }

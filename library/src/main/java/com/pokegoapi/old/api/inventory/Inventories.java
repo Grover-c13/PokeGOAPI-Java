@@ -13,7 +13,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.old.api.inventory;
+package com.pokegoapi.api.inventory;
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass;
@@ -30,14 +30,15 @@ import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.Get
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.old.api.PokemonGo;
-import com.pokegoapi.old.api.pokemon.EggPokemon;
-import com.pokegoapi.old.api.pokemon.Pokemon;
-import com.pokegoapi.old.exceptions.CaptchaActiveException;
-import com.pokegoapi.network.LoginFailedException;
-import com.pokegoapi.network.RemoteServerException;
-import com.pokegoapi.old.main.ServerRequest;
-
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.pokemon.EggPokemon;
+import com.pokegoapi.api.pokemon.Pokemon;
+import com.pokegoapi.exceptions.CaptchaActiveException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.main.ServerRequest;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,24 +52,24 @@ import java.util.Set;
 public class Inventories {
 
 	private final PokemonGo api;
-
+	@Getter
 	private ItemBag itemBag;
-
+	@Getter
 	private PokeBank pokebank;
-
+	@Getter
 	private CandyJar candyjar;
-
+	@Getter
 	private Pokedex pokedex;
-
+	@Getter
 	private final List<EggIncubator> incubators = Collections.synchronizedList(new ArrayList<EggIncubator>());
-
+	@Getter
 	private Hatchery hatchery;
-
+	@Getter
 	private long lastInventoryUpdate = 0;
 
 	private Map<ItemId, AppliedItem> appliedItems = new HashMap<>();
 
-
+	@Getter
 	private final Object lock = new Object();
 
 	/**
@@ -92,8 +93,10 @@ public class Inventories {
 	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
-	public GetInventoryResponse updateInventories() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+	public GetInventoryResponse updateInventories() throws LoginFailedException, CaptchaActiveException,
+			RemoteServerException, HashException {
 		return updateInventories(false);
 	}
 
@@ -105,9 +108,10 @@ public class Inventories {
 	 * @throws LoginFailedException the login failed exception
 	 * @throws RemoteServerException the remote server exception
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public GetInventoryResponse updateInventories(boolean forceUpdate)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
 		if (forceUpdate) {
 			lastInventoryUpdate = 0;
 			itemBag.reset();

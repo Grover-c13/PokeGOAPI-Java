@@ -49,7 +49,7 @@ public class CatchOptions {
 	/**
 	 * Instantiates a new CatchOptions object.
 	 *
-	 * @param api   the api
+	 * @param api the api
 	 */
 	public CatchOptions(PokemonGo api) {
 		this.api = api;
@@ -77,7 +77,7 @@ public class CatchOptions {
 	 * Allows using a single razzberry to attempt capture
 	 *
 	 * @param useRazzBerry true or false
-	 * @return               the CatchOptions object
+	 * @return the CatchOptions object
 	 */
 	public CatchOptions useRazzberry(boolean useRazzBerry) {
 		this.useRazzBerry = useRazzBerry;
@@ -88,7 +88,7 @@ public class CatchOptions {
 	 * Set a maximum number of razzberries
 	 *
 	 * @param maxRazzBerries maximum allowed
-	 * @return               the CatchOptions object
+	 * @return the CatchOptions object
 	 */
 	public CatchOptions maxRazzberries(int maxRazzBerries) {
 		this.maxRazzBerries = maxRazzBerries;
@@ -108,7 +108,7 @@ public class CatchOptions {
 	 * Set a maximum number of pokeballs
 	 *
 	 * @param maxPokeballs maximum allowed
-	 * @return             the CatchOptions object
+	 * @return the CatchOptions object
 	 */
 	public CatchOptions maxPokeballs(int maxPokeballs) {
 		if (maxPokeballs <= 1)
@@ -119,10 +119,10 @@ public class CatchOptions {
 
 	/**
 	 * Set a capture probability before switching balls
-	 *		or the minimum probability for a specific ball
+	 * or the minimum probability for a specific ball
 	 *
-	 * @param probability    the probability
-	 * @return               the AsyncCatchOptions object
+	 * @param probability the probability
+	 * @return the AsyncCatchOptions object
 	 */
 	public CatchOptions withProbability(double probability) {
 		this.probability = probability;
@@ -133,7 +133,7 @@ public class CatchOptions {
 	 * Set the normalized hit position of a pokeball throw
 	 *
 	 * @param normalizedHitPosition the normalized position
-	 * @return                      the CatchOptions object
+	 * @return the CatchOptions object
 	 */
 	public CatchOptions setNormalizedHitPosition(double normalizedHitPosition) {
 		this.normalizedHitPosition = normalizedHitPosition;
@@ -144,7 +144,7 @@ public class CatchOptions {
 	 * Set the normalized reticle for a pokeball throw
 	 *
 	 * @param normalizedReticleSize the normalized size
-	 * @return                      the CatchOptions object
+	 * @return the CatchOptions object
 	 */
 	public CatchOptions setNormalizedReticleSize(double normalizedReticleSize) {
 		this.normalizedReticleSize = normalizedReticleSize;
@@ -155,7 +155,7 @@ public class CatchOptions {
 	 * Set the spin modifier of a pokeball throw
 	 *
 	 * @param spinModifier the spin modifier
-	 * @return             the CatchOptions object
+	 * @return the CatchOptions object
 	 */
 	public CatchOptions setSpinModifier(double spinModifier) {
 		this.spinModifier = spinModifier;

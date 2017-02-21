@@ -30,18 +30,19 @@
 
 package com.pokegoapi.examples;
 
-import POGOProtos.Enums.GenderOuterClass.Gender;
-import com.pokegoapi.old.api.PokemonGo;
-import com.pokegoapi.old.api.listener.TutorialListener;
-import com.pokegoapi.old.api.player.Avatar;
-import com.pokegoapi.old.api.player.PlayerAvatar;
-import com.pokegoapi.old.api.pokemon.StarterPokemon;
-import com.pokegoapi.old.auth.PtcCredentialProvider;
-import com.pokegoapi.old.exceptions.CaptchaActiveException;
-import com.pokegoapi.network.LoginFailedException;
-import com.pokegoapi.network.RemoteServerException;
-import com.pokegoapi.old.util.Log;
-import com.pokegoapi.old.util.hash.HashProvider;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.listener.TutorialListener;
+import com.pokegoapi.api.player.Avatar;
+import com.pokegoapi.api.player.PlayerAvatar;
+import com.pokegoapi.api.player.PlayerGender;
+import com.pokegoapi.api.pokemon.StarterPokemon;
+import com.pokegoapi.auth.PtcCredentialProvider;
+import com.pokegoapi.exceptions.CaptchaActiveException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.util.Log;
+import com.pokegoapi.util.hash.HashProvider;
 import okhttp3.OkHttpClient;
 
 public class TutorialHandleExample {
@@ -81,7 +82,7 @@ public class TutorialHandleExample {
 				public PlayerAvatar selectAvatar(PokemonGo api) {
 					System.out.println("Selecting player avatar");
 					return new PlayerAvatar(
-							Gender.FEMALE,
+							PlayerGender.FEMALE,
 							Avatar.Skin.YELLOW.id(),
 							Avatar.Hair.BLACK.id(),
 							Avatar.FemaleShirt.BLUE.id(),
@@ -97,6 +98,8 @@ public class TutorialHandleExample {
 			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 		} catch (LoginFailedException | RemoteServerException | CaptchaActiveException e) {
 			Log.e("Main", "Failed to login!", e);
+		} catch (HashException e) {
+			Log.e("Main ", "Failed to login to the Hash Service: ", e);
 		}
 	}
 }

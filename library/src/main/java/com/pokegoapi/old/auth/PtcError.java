@@ -13,14 +13,17 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.old.auth;
+package com.pokegoapi.auth;
 
-
-
+import lombok.Getter;
 
 public class PtcError {
-
-
-
+	@Getter
+	private String lt;
+	@Getter
 	private String error;
+	@Getter
+	private String execution;
+	@Getter
+	private String[] errors = new String[0];
 }

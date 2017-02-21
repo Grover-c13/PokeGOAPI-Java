@@ -25,9 +25,11 @@ import com.pokegoapi.network.RemoteServerException;
  */
 public abstract class CredentialProvider {
 
-	public abstract String getTokenId() throws LoginFailedException, CaptchaActiveException, RemoteServerException;
+	public abstract String getTokenId(boolean refresh) throws LoginFailedException, CaptchaActiveException,
+			RemoteServerException;
 
-	public abstract AuthInfo getAuthInfo() throws LoginFailedException, CaptchaActiveException, RemoteServerException;
+	public abstract AuthInfo getAuthInfo(boolean refresh) throws LoginFailedException, CaptchaActiveException,
+			RemoteServerException;
 
 	public abstract boolean isTokenIdExpired();
 }

@@ -13,21 +13,22 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.old.api.inventory;
+package com.pokegoapi.api.inventory;
 
 import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.old.api.PokemonGo;
-import com.pokegoapi.old.api.listener.PokemonListener;
-import com.pokegoapi.old.api.pokemon.EggPokemon;
-import com.pokegoapi.old.api.pokemon.HatchedEgg;
-import com.pokegoapi.old.exceptions.CaptchaActiveException;
-import com.pokegoapi.network.LoginFailedException;
-import com.pokegoapi.network.RemoteServerException;
-import com.pokegoapi.old.main.ServerRequest;
-
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.listener.PokemonListener;
+import com.pokegoapi.api.pokemon.EggPokemon;
+import com.pokegoapi.api.pokemon.HatchedEgg;
+import com.pokegoapi.exceptions.CaptchaActiveException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.main.ServerRequest;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,11 +37,11 @@ import java.util.List;
 import java.util.Set;
 
 public class Hatchery {
-
+	@Getter
 	private final Set<EggPokemon> eggs = Collections.synchronizedSet(new HashSet<EggPokemon>());
-
+	@Getter
 	private final Set<HatchedEgg> hatchedEggs = Collections.synchronizedSet(new HashSet<HatchedEgg>());
-
+	@Getter
 	private PokemonGo api;
 
 	private final Object lock = new Object();
@@ -61,6 +62,7 @@ public class Hatchery {
 
 	/**
 	 * Adds the given egg to this hatchery
+	 *
 	 * @param egg the egg to add
 	 */
 	public void addEgg(EggPokemon egg) {
@@ -105,7 +107,6 @@ public class Hatchery {
 	 *
 	 * @param response the GetHatchedEggs response
 	 * @return the hatched eggs contained in the response
-	 *
 	 * @throws RemoteServerException if a bad request was sent
 	 * @throws LoginFailedException if login failed
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
@@ -131,11 +132,12 @@ public class Hatchery {
 	 * @throws RemoteServerException e
 	 * @throws LoginFailedException e
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
 	 * @deprecated Use getHatchedEggs()
 	 */
 	@Deprecated
 	public List<HatchedEgg> queryHatchedEggs()
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException {
+			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
 		GetHatchedEggsMessage msg = GetHatchedEggsMessage.newBuilder().build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.GET_HATCHED_EGGS, msg);
 		api.getRequestHandler().sendServerRequests(serverRequest);

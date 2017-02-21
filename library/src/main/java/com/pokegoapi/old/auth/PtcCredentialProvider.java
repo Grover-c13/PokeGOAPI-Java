@@ -42,7 +42,8 @@ public class PtcCredentialProvider extends CredentialProvider {
 	public static final String REDIRECT_URI = "https://www.nianticlabs.com/pokemongo/error";
 	public static final String CLIENT_ID = "mobile-app_pokemon-go";
 	public static final String API_URL = "https://pgorelease.nianticlabs.com/plfe/rpc";
-	public static final String LOGIN_URL = "https://sso.pokemon.com/sso/login?service=https%3A%2F%2Fsso.pokemon.com%2Fsso%2Foauth2.0%2FcallbackAuthorize";
+	public static final String LOGIN_URL = "https://sso.pokemon.com/sso/login?service=https%3A%2F%2Fsso.pokemon"
+			+ ".com%2Fsso%2Foauth2.0%2FcallbackAuthorize";
 	public static final String LOGIN_OAUTH = "https://sso.pokemon.com/sso/oauth2.0/accessToken";
 	public static final String USER_AGENT = "niantic";
 	private static final String TAG = PtcCredentialProvider.class.getSimpleName();
@@ -60,11 +61,11 @@ public class PtcCredentialProvider extends CredentialProvider {
 	/**
 	 * Instantiates a new Ptc login.
 	 *
-	 * @param client   the client
+	 * @param client the client
 	 * @param username Username
 	 * @param password password
-	 * @param time     a Time implementation
-	 * @throws LoginFailedException  When login fails
+	 * @param time a Time implementation
+	 * @throws LoginFailedException When login fails
 	 * @throws RemoteServerException When server fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
@@ -114,10 +115,10 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 * Instantiates a new Ptc login.
 	 * Deprecated: specify a Time implementation
 	 *
-	 * @param client   the client
+	 * @param client the client
 	 * @param username Username
 	 * @param password password
-	 * @throws LoginFailedException  if failed to login
+	 * @throws LoginFailedException if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
@@ -132,7 +133,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 *
 	 * @param username PTC username
 	 * @param password PTC password
-	 * @throws LoginFailedException  if failed to login
+	 * @throws LoginFailedException if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
@@ -205,6 +206,15 @@ public class PtcCredentialProvider extends CredentialProvider {
 			}
 			if (ptcError.getError() != null && ptcError.getError().length() > 0) {
 				throw new LoginFailedException(ptcError.getError());
+			} else if (ptcError.getErrors().length > 0) {
+				StringBuilder builder = new StringBuilder();
+				String[] errors = ptcError.getErrors();
+				for (int i = 0; i < errors.length - 1; i++) {
+					String error = errors[i];
+					builder.append("\"").append(error).append("\", ");
+				}
+				builder.append("\"").append(errors[errors.length - 1]).append("\"");
+				throw new LoginFailedException(builder.toString());
 			}
 		}
 
@@ -257,8 +267,9 @@ public class PtcCredentialProvider extends CredentialProvider {
 	}
 
 	@Override
-	public String getTokenId() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
-		if (isTokenIdExpired()) {
+	public String getTokenId(boolean refresh) throws LoginFailedException, CaptchaActiveException,
+			RemoteServerException {
+		if (refresh || isTokenIdExpired()) {
 			login(username, password);
 		}
 		return tokenId;
@@ -267,14 +278,16 @@ public class PtcCredentialProvider extends CredentialProvider {
 	/**
 	 * Valid auth info object	 *
 	 *
+	 * @param refresh if this AuthInfo should be refreshed
 	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
-	 * @throws LoginFailedException  if failed to login
+	 * @throws LoginFailedException if failed to login
 	 * @throws RemoteServerException if the server failed to respond
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 */
 	@Override
-	public AuthInfo getAuthInfo() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
-		if (isTokenIdExpired()) {
+	public AuthInfo getAuthInfo(boolean refresh) throws LoginFailedException, CaptchaActiveException,
+			RemoteServerException {
+		if (refresh || isTokenIdExpired()) {
 			login(username, password);
 		}
 

@@ -13,14 +13,13 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.old.api.device;
+package com.pokegoapi.api.device;
 
-import com.pokegoapi.old.api.PokemonGo;
+import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import com.pokegoapi.api.PokemonGo;
 
 import java.util.Random;
 import java.util.UUID;
-
-import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 
 /**
  * Created by fabianterhorst on 08.08.16.
@@ -197,7 +196,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets AndroidBoardName
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setAndroidBoardName(Build.BOARD);}
 	 * </pre>
@@ -210,7 +208,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets AndroidBootloader
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setAndroidBootloader(Build.BOOTLOADER);}
 	 * </pre>
@@ -223,7 +220,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets DeviceBrand
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setDeviceBrand(Build.BRAND);}
 	 * </pre>
@@ -236,7 +232,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets DeviceId
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setDeviceId(UUID.randomUUID().toString());}
 	 * </pre>
@@ -249,7 +244,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets DeviceModel
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setDeviceModel(Build.MODEL);}
 	 * </pre>
@@ -262,7 +256,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets DeviceModelBoot
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setDeviceModelBoot("qcom");}
 	 * </pre>
@@ -275,7 +268,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets DeviceModelIdentifier
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setDeviceModelIdentifier(Build.PRODUCT);}
 	 * </pre>
@@ -288,7 +280,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets FirmwareBrand
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setFirmwareBrand(Build.PRODUCT);}
 	 * </pre>
@@ -301,13 +292,12 @@ public class DeviceInfo {
 
 	/**
 	 * Sets FirmwareFingerprint
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setFirmwareFingerprint(Build.FINGERPRINT);}
 	 * </pre>
 	 *
 	 * @param firmwareFingerprint FirmwareFingerprint,
-	 *                            for example: "google/angler/angler:7.0/NPD90G/3051502:user/release-keys"
+	 *     for example: "google/angler/angler:7.0/NPD90G/3051502:user/release-keys"
 	 */
 	public void setFirmwareFingerprint(String firmwareFingerprint) {
 		deviceInfoBuilder.setFirmwareFingerprint(firmwareFingerprint);
@@ -315,7 +305,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets FirmwareTags
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setFirmwareTags(Build.TAGS);}
 	 * </pre>
@@ -328,7 +317,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets FirmwareType
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setFirmwareType(Build.TYPE);}
 	 * </pre>
@@ -341,7 +329,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets HardwareManufacturer
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setHardwareManufacturer(Build.MANUFACTURER);}
 	 * </pre>
@@ -354,7 +341,6 @@ public class DeviceInfo {
 
 	/**
 	 * Sets HardwareModel
-	 *
 	 * <pre>
 	 * {@code deviceInfo.setHardwareModel(Build.HARDWARE);}
 	 * </pre>

@@ -13,7 +13,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.old.api.inventory;
+package com.pokegoapi.api.inventory;
 
 import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass;
@@ -30,13 +30,14 @@ import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.pokegoapi.old.api.PokemonGo;
-import com.pokegoapi.old.api.pokemon.Pokemon;
-import com.pokegoapi.old.exceptions.CaptchaActiveException;
-import com.pokegoapi.network.LoginFailedException;
-import com.pokegoapi.network.RemoteServerException;
-import com.pokegoapi.old.main.ServerRequest;
-
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.pokemon.Pokemon;
+import com.pokegoapi.exceptions.CaptchaActiveException;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.main.ServerRequest;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,11 +46,11 @@ import java.util.List;
 import java.util.Map;
 
 public class PokeBank {
-
+	@Getter
 	private final List<Pokemon> pokemons = Collections.synchronizedList(new ArrayList<Pokemon>());
-
+	@Getter
 	private final Object lock = new Object();
-
+	@Getter
 	private final PokemonGo api;
 
 	public PokeBank(PokemonGo api) {
@@ -146,9 +147,10 @@ public class PokeBank {
 	 * @throws CaptchaActiveException if a captcha is active and a message cannot be sent
 	 * @throws LoginFailedException the login fails
 	 * @throws RemoteServerException if the server errors
+	 * @throws HashException if an exception occurred while requesting hash
 	 */
 	public Map<PokemonFamilyId, Integer> releasePokemon(Pokemon... releasePokemon)
-			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
+			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
 		ReleasePokemonMessage.Builder releaseBuilder = ReleasePokemonMessage.newBuilder();
 		for (Pokemon pokemon : releasePokemon) {
 			if (!pokemon.isDeployed() && !pokemon.isFavorite()) {
