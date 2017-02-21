@@ -13,9 +13,9 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.network;
+package com.pokegoapi.network.exception;
 
-public class LoginFailedException extends Exception {
+public class LoginFailedException extends RequestFailedException {
 	public LoginFailedException() {
 		super();
 	}

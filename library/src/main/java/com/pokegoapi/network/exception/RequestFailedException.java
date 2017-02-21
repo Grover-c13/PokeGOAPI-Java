@@ -13,22 +13,22 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.network;
+package com.pokegoapi.network.exception;
 
-public class RemoteServerException extends Exception {
-	public RemoteServerException() {
+public class RequestFailedException extends Exception {
+	public RequestFailedException() {
 		super();
 	}
 
-	public RemoteServerException(String reason) {
+	public RequestFailedException(String reason) {
 		super(reason);
 	}
 
-	public RemoteServerException(Throwable exception) {
+	public RequestFailedException(Throwable exception) {
 		super(exception);
 	}
 
-	public RemoteServerException(String reason, Throwable exception) {
+	public RequestFailedException(String reason, Throwable exception) {
 		super(reason, exception);
 	}
 }

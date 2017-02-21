@@ -1,18 +1,15 @@
 package com.pokegoapi.go.gym.spec;
 
 import com.pokegoapi.go.gym.Gym;
-import com.pokegoapi.network.LoginFailedException;
-import com.pokegoapi.network.RemoteServerException;
+import com.pokegoapi.network.exception.RequestFailedException;
 import com.pokegoapi.old.api.pokemon.Pokemon;
-import com.pokegoapi.old.exceptions.CaptchaActiveException;
 
 /**
  * Created by chris on 1/23/2017.
  */
 public interface Battle {
 
-    void start(Pokemon[] attackingTeam, BattleListenerSpec spec) throws CaptchaActiveException, LoginFailedException,
-            RemoteServerException;
+    void start(Pokemon[] attackingTeam, BattleListenerSpec spec) throws RequestFailedException;
 
     /**
      * Performs an attack action

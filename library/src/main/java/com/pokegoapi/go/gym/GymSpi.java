@@ -12,10 +12,8 @@ import com.google.protobuf.ProtocolStringList;
 import com.pokegoapi.go.PokemonGoClient;
 import com.pokegoapi.go.gym.spec.Battle;
 import com.pokegoapi.go.map.spec.MapPoint;
-import com.pokegoapi.network.LoginFailedException;
-import com.pokegoapi.network.RemoteServerException;
+import com.pokegoapi.network.exception.RequestFailedException;
 import com.pokegoapi.old.api.pokemon.Pokemon;
-import com.pokegoapi.old.exceptions.CaptchaActiveException;
 
 import java.util.List;
 
@@ -84,14 +82,14 @@ public abstract class GymSpi implements MapPoint {
      * Gets this gym's details. The gym's details will be set in this method
      * @return the GymDetailsResponse from the request to the server
      */
-    protected abstract GetGymDetailsResponse engineGetGymDetails() throws LoginFailedException, CaptchaActiveException, RemoteServerException;
+    protected abstract GetGymDetailsResponse engineGetGymDetails() throws RequestFailedException;
 
     /**
      * Deploys the pokemon to the gym if there is enough room
      * @param pokemon the pokemon to be deployed
      * @return the result of deploying to the gym
      */
-    protected abstract Result engineDeployPokemon(Pokemon pokemon) throws LoginFailedException, CaptchaActiveException, RemoteServerException;
+    protected abstract Result engineDeployPokemon(Pokemon pokemon) throws RequestFailedException;
 
     /**
      * Starts a battle at the gym

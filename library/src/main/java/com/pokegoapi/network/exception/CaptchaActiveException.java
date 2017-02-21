@@ -1,9 +1,9 @@
-package com.pokegoapi.network;
+package com.pokegoapi.network.exception;
 
 /**
  * Created by chris on 2/3/2017.
  */
-public class CaptchaActiveException extends Exception {
+public class CaptchaActiveException extends RequestFailedException {
 
     public CaptchaActiveException() {
         super();
