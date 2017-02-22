@@ -1,21 +1,17 @@
 package com.pokegoapi.go.gym;
 
-import POGOProtos.Data.Gym.GymMembershipOuterClass.GymMembership;
-import POGOProtos.Data.Gym.GymStateOuterClass.GymState;
-import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
-import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
-import POGOProtos.Enums.TeamColorOuterClass.TeamColor;
-import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
-import POGOProtos.Networking.Responses.FortDeployPokemonResponseOuterClass.FortDeployPokemonResponse.Result;
-import POGOProtos.Networking.Responses.GetGymDetailsResponseOuterClass.GetGymDetailsResponse;
+import com.github.aeonlucid.pogoprotos.Data;
+import com.github.aeonlucid.pogoprotos.Enums;
+import com.github.aeonlucid.pogoprotos.data.Gym.GymMembership;
+import com.github.aeonlucid.pogoprotos.data.Gym.GymState;
+import com.github.aeonlucid.pogoprotos.map.Fort;
+import com.github.aeonlucid.pogoprotos.networking.Responses;
 import com.google.protobuf.ProtocolStringList;
 import com.pokegoapi.go.PokemonGoClient;
 import com.pokegoapi.go.gym.spec.Battle;
 import com.pokegoapi.go.map.spec.MapPoint;
 import com.pokegoapi.network.LoginFailedException;
 import com.pokegoapi.network.RemoteServerException;
-import com.pokegoapi.old.api.pokemon.Pokemon;
-import com.pokegoapi.old.exceptions.CaptchaActiveException;
 
 import java.util.List;
 
@@ -27,14 +23,14 @@ public abstract class GymSpi implements MapPoint {
      * this PokemonGoClient
      * @param client the client for handling the server calls
      */
-    protected abstract void engineInitialize(PokemonGoClient client, FortData fortData);
+    protected abstract void engineInitialize(PokemonGoClient client, Fort.FortData fortData);
 
     /**
      * Initializes the Gyms Provider with a PokemonGoClient. Any calls to the server should go through
      * this PokemonGoClient
      * @param client the client for handling the server calls
      */
-    protected abstract void engineInitialize(PokemonGoClient client, GetGymDetailsResponse gymDetails);
+    protected abstract void engineInitialize(PokemonGoClient client, Responses.GetGymDetailsResponse gymDetails);
 
     /**
      * Initializes the Gyms Provider with a PokemonGoClient. Any calls to the server should go through
@@ -45,9 +41,9 @@ public abstract class GymSpi implements MapPoint {
 
     protected abstract boolean engineIsEnabled();
 
-    protected abstract TeamColor engineGetOwnedByTeam();
+    protected abstract Enums.TeamColor engineGetOwnedByTeam();
 
-    protected abstract PokemonId engineGetGuardPokemonId();
+    protected abstract Enums.PokemonId engineGetGuardPokemonId();
 
     protected abstract int engineGetGuardPokemonCp();
 
@@ -72,7 +68,7 @@ public abstract class GymSpi implements MapPoint {
      *
      * @return List of pokemon
      */
-    protected abstract List<PokemonData> engineGetDefendingPokemon();
+    protected abstract List<Data.PokemonData> engineGetDefendingPokemon();
 
     protected abstract boolean engineHasGymDetails();
 
@@ -80,18 +76,18 @@ public abstract class GymSpi implements MapPoint {
 
     protected abstract GymState engineGetGymState();
 
-    /**
-     * Gets this gym's details. The gym's details will be set in this method
-     * @return the GymDetailsResponse from the request to the server
-     */
-    protected abstract GetGymDetailsResponse engineGetGymDetails() throws LoginFailedException, CaptchaActiveException, RemoteServerException;
-
-    /**
-     * Deploys the pokemon to the gym if there is enough room
-     * @param pokemon the pokemon to be deployed
-     * @return the result of deploying to the gym
-     */
-    protected abstract Result engineDeployPokemon(Pokemon pokemon) throws LoginFailedException, CaptchaActiveException, RemoteServerException;
+//    /**
+//     * Gets this gym's details. The gym's details will be set in this method
+//     * @return the GymDetailsResponse from the request to the server
+//     */
+//    protected abstract GetGymDetailsResponse engineGetGymDetails() throws LoginFailedException, CaptchaActiveException, RemoteServerException;
+//
+//    /**
+//     * Deploys the pokemon to the gym if there is enough room
+//     * @param pokemon the pokemon to be deployed
+//     * @return the result of deploying to the gym
+//     */
+//    protected abstract Result engineDeployPokemon(Pokemon pokemon) throws LoginFailedException, CaptchaActiveException, RemoteServerException;
 
     /**
      * Starts a battle at the gym

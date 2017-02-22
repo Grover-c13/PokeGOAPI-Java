@@ -1,7 +1,7 @@
 package com.pokegoapi.go.spec;
 
-import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
+import com.github.aeonlucid.pogoprotos.networking.Envelopes.AuthTicket;
+import com.github.aeonlucid.pogoprotos.networking.Envelopes.RequestEnvelope.AuthInfo;
 import com.pokegoapi.go.auth.CredentialProvider;
 
 public interface Credentials {

@@ -1,30 +1,23 @@
 package com.pokegoapi.go.gym;
 
-import POGOProtos.Data.Gym.GymMembershipOuterClass.GymMembership;
-import POGOProtos.Data.Gym.GymStateOuterClass.GymState;
-import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
-import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
-import POGOProtos.Enums.TeamColorOuterClass.TeamColor;
-import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
-import POGOProtos.Map.Fort.FortTypeOuterClass.FortType;
-import POGOProtos.Networking.Responses.FortDeployPokemonResponseOuterClass.FortDeployPokemonResponse.Result;
-import POGOProtos.Networking.Responses.GetGymDetailsResponseOuterClass.GetGymDetailsResponse;
+import com.github.aeonlucid.pogoprotos.Data;
+import com.github.aeonlucid.pogoprotos.Enums;
+import com.github.aeonlucid.pogoprotos.data.Gym.GymMembership;
+import com.github.aeonlucid.pogoprotos.data.Gym.GymState;
+import com.github.aeonlucid.pogoprotos.map.Fort;
+import com.github.aeonlucid.pogoprotos.networking.Responses;
 import com.google.protobuf.ProtocolStringList;
-import com.pokegoapi.GetInstance;
-import com.pokegoapi.NoSuchTypeException;
-import com.pokegoapi.Provider;
+import com.pokegoapi.provider.GetInstance;
+import com.pokegoapi.provider.NoSuchTypeException;
+import com.pokegoapi.provider.Provider;
 import com.pokegoapi.go.PokemonGoClient;
 import com.pokegoapi.go.gym.spec.Battle;
 import com.pokegoapi.go.map.spec.MapPoint;
-import com.pokegoapi.network.LoginFailedException;
-import com.pokegoapi.network.RemoteServerException;
-import com.pokegoapi.old.api.pokemon.Pokemon;
-import com.pokegoapi.old.exceptions.CaptchaActiveException;
 
 import java.util.List;
 
 @SuppressWarnings("unused")
-public final class Gym implements MapPoint {
+public class Gym implements MapPoint {
 
     private final GymSpi spi;
     private final Provider provider;
@@ -45,15 +38,15 @@ public final class Gym implements MapPoint {
         return new Gym((GymSpi) instance.impl, instance.provider);
     }
 
-    public void initialize(PokemonGoClient client, FortData fort) {
-        if(fort.getType() != FortType.GYM) {
+    public void initialize(PokemonGoClient client, Fort.FortData fort) {
+        if(fort.getType() != Fort.FortType.GYM) {
             throw new IllegalArgumentException("Fort " + fort.getId() + " is not a Gym. " +
                     "Unable to initialize Gym object");
         }
         spi.engineInitialize(client, fort);
     }
 
-    public void initialize(PokemonGoClient client, GetGymDetailsResponse details) {
+    public void initialize(PokemonGoClient client, Responses.GetGymDetailsResponse details) {
         spi.engineInitialize(client, details);
     }
 
@@ -80,11 +73,11 @@ public final class Gym implements MapPoint {
         return spi.engineIsEnabled();
     }
 
-    public TeamColor getTeamOwner() {
+    public Enums.TeamColor getTeamOwner() {
         return spi.engineGetOwnedByTeam();
     }
 
-    public PokemonId getGuardPokemonId() {
+    public Enums.PokemonId getGuardPokemonId() {
         return spi.engineGetGuardPokemonId();
     }
 
@@ -129,7 +122,7 @@ public final class Gym implements MapPoint {
      *
      * @return List of pokemon
      */
-    public List<PokemonData> getDefendingPokemon() {
+    public List<Data.PokemonData> getDefendingPokemon() {
         return spi.engineGetDefendingPokemon();
     }
 
@@ -145,13 +138,13 @@ public final class Gym implements MapPoint {
         return spi.engineHasGymState();
     }
 
-    public GetGymDetailsResponse getGymDetails() throws CaptchaActiveException, RemoteServerException, LoginFailedException {
-        return spi.engineGetGymDetails();
-    }
+//    public GetGymDetailsResponse getGymDetails() throws CaptchaActiveException, RemoteServerException, LoginFailedException {
+//        return spi.engineGetGymDetails();
+//    }
 
-    public Result deployPokemon(Pokemon pokemon) throws CaptchaActiveException, RemoteServerException, LoginFailedException {
-        return spi.engineDeployPokemon(pokemon);
-    }
+//    public Result deployPokemon(Pokemon pokemon) throws CaptchaActiveException, RemoteServerException, LoginFailedException {
+//        return spi.engineDeployPokemon(pokemon);
+//    }
 
     public Battle battle() {
         return spi.engineBattleGym(this);

@@ -1,13 +1,10 @@
 package com.pokegoapi.go.pokestop;
-
-import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
-import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
-import POGOProtos.Map.Fort.FortModifierOuterClass.FortModifier;
-import POGOProtos.Map.Fort.FortTypeOuterClass;
+import com.github.aeonlucid.pogoprotos.inventory.Item;
+import com.github.aeonlucid.pogoprotos.map.Fort;
 import com.google.protobuf.ProtocolStringList;
-import com.pokegoapi.GetInstance;
-import com.pokegoapi.NoSuchTypeException;
-import com.pokegoapi.Provider;
+import com.pokegoapi.provider.GetInstance;
+import com.pokegoapi.provider.NoSuchTypeException;
+import com.pokegoapi.provider.Provider;
 import com.pokegoapi.go.PokemonGoClient;
 import com.pokegoapi.go.map.spec.MapPoint;
 import com.pokegoapi.go.pokestop.spec.LootResult;
@@ -42,8 +39,8 @@ public final class Pokestop implements MapPoint{
         return new Pokestop((PokestopSpi) instance.impl, instance.provider);
     }
 
-    public void initialize(PokemonGoClient client, FortData fort) {
-        if(fort.getType() != FortTypeOuterClass.FortType.CHECKPOINT) {
+    public void initialize(PokemonGoClient client, Fort.FortData fort) {
+        if(fort.getType() != Fort.FortType.CHECKPOINT) {
             throw new IllegalArgumentException("Fort " + fort.getId() + " is not a Pokestop. " +
                     "Unable to initialize Pokestop object");
         }
@@ -129,7 +126,7 @@ public final class Pokestop implements MapPoint{
     /**
      * @return a list of all of the modifiers attached to the Pokestop
      */
-    public List<FortModifier> getModifiers(){
+    public List<Fort.FortModifier> getModifiers(){
         return spi.engineGetModifiers();
     }
 
@@ -153,7 +150,7 @@ public final class Pokestop implements MapPoint{
      * @throws RemoteServerException if the server failed to respond or the modifier could not be added to this pokestop
      * @throws CaptchaActiveException if a captcha is active and the message can't be sent
      */
-    public boolean addModifier(ItemId item) throws LoginFailedException, CaptchaActiveException,
+    public boolean addModifier(Item.ItemId item) throws LoginFailedException, CaptchaActiveException,
             RemoteServerException{
         return spi.engineAddModifier(item);
     }

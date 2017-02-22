@@ -1,8 +1,8 @@
 package com.pokegoapi.go.auth;
 
-import com.pokegoapi.GetInstance;
-import com.pokegoapi.NoSuchTypeException;
-import com.pokegoapi.Provider;
+import com.pokegoapi.provider.GetInstance;
+import com.pokegoapi.provider.NoSuchTypeException;
+import com.pokegoapi.provider.Provider;
 import com.pokegoapi.go.spec.Credentials;
 import com.pokegoapi.go.spec.LoginParameterSpec;
 import com.pokegoapi.network.LoginFailedException;

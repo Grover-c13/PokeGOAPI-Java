@@ -1,26 +1,26 @@
 package com.pokegoapi.go.gym.spec;
 
-import POGOProtos.Data.Battle.BattlePokemonInfoOuterClass.BattlePokemonInfo;
-import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
+import com.github.aeonlucid.pogoprotos.Data;
+import com.github.aeonlucid.pogoprotos.data.Battle;
 
 /**
  * Created by chris on 2/2/2017.
  */
 public class BattlePokemon {
 
-    private final PokemonData pokemon;
+    private final Data.PokemonData pokemon;
     private int health;
     private int maxHealth;
     private int energy;
 
-    BattlePokemon(BattlePokemonInfo activePokemon) {
+    BattlePokemon(Battle.BattlePokemonInfo activePokemon) {
         this.health = activePokemon.getCurrentHealth();
         this.energy = activePokemon.getCurrentEnergy();
         this.pokemon = activePokemon.getPokemonData();
         this.maxHealth = pokemon.getStaminaMax();
     }
 
-    public PokemonData getPokemon() {
+    public Data.PokemonData getPokemon() {
         return pokemon;
     }
 
