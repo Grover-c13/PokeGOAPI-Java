@@ -1,8 +1,8 @@
 package com.pokegoapi.go.pokestop.spec;
 
-import com.github.aeonlucid.pogoprotos.Data;
-import com.github.aeonlucid.pogoprotos.inventory.Item;
-import com.github.aeonlucid.pogoprotos.networking.Responses;
+import com.github.aeonlucid.pogoprotos.Data.PokemonData;
+import com.github.aeonlucid.pogoprotos.inventory.Item.ItemAward;
+import com.github.aeonlucid.pogoprotos.networking.Responses.FortSearchResponse;
 import com.pokegoapi.go.pokestop.Pokestop;
 
 import java.util.List;
@@ -25,12 +25,12 @@ public interface LootResult {
     /**
      * @return the result of looting the pokestop
      */
-    Responses.FortSearchResponse.Result getResult();
+    FortSearchResponse.Result getResult();
 
     /**
      * @return the items gained from looting the pokestop
      */
-    List<Item.ItemAward> getItemsAwarded();
+    List<ItemAward> getItemsAwarded();
 
     /**
      * @return the experience gained from looting the pokestop
@@ -45,5 +45,5 @@ public interface LootResult {
     /**
      * @return the egg that was looted from the pokestop
      */
-    Data.PokemonData getEgg();
+    PokemonData getEgg();
 }

@@ -5,13 +5,12 @@ import com.github.aeonlucid.pogoprotos.Enums;
 import com.github.aeonlucid.pogoprotos.data.Gym.GymMembership;
 import com.github.aeonlucid.pogoprotos.data.Gym.GymState;
 import com.github.aeonlucid.pogoprotos.map.Fort;
-import com.github.aeonlucid.pogoprotos.networking.Responses;
+import com.github.aeonlucid.pogoprotos.networking.Responses.GetGymDetailsResponse;
 import com.google.protobuf.ProtocolStringList;
 import com.pokegoapi.go.PokemonGoClient;
 import com.pokegoapi.go.gym.spec.Battle;
 import com.pokegoapi.go.map.spec.MapPoint;
 import com.pokegoapi.network.exception.RequestFailedException;
-import com.pokegoapi.old.api.pokemon.Pokemon;
 
 import java.util.List;
 
@@ -30,7 +29,7 @@ public abstract class GymSpi implements MapPoint {
      * this PokemonGoClient
      * @param client the client for handling the server calls
      */
-    protected abstract void engineInitialize(PokemonGoClient client, Responses.GetGymDetailsResponse gymDetails);
+    protected abstract void engineInitialize(PokemonGoClient client, GetGymDetailsResponse gymDetails);
 
     /**
      * Initializes the Gyms Provider with a PokemonGoClient. Any calls to the server should go through
@@ -76,12 +75,13 @@ public abstract class GymSpi implements MapPoint {
 
     protected abstract GymState engineGetGymState();
 
-//    /**
-//     * Gets this gym's details. The gym's details will be set in this method
-//     * @return the GymDetailsResponse from the request to the server
-//     */
-//    protected abstract GetGymDetailsResponse engineGetGymDetails() throws RequestFailedException;
-//
+    /**
+     * Gets this gym's details. The gym's details will be set in this method
+     * @return the GymDetailsResponse from the request to the server
+     */
+    protected abstract GetGymDetailsResponse engineGetGymDetails() throws RequestFailedException;
+
+    //TODO: Uncomment when the Pokemon Class has been created
 //    /**
 //     * Deploys the pokemon to the gym if there is enough room
 //     * @param pokemon the pokemon to be deployed

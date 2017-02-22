@@ -1,14 +1,10 @@
 package com.pokegoapi.go.gym.spec;
 
 import com.pokegoapi.go.gym.Gym;
-import com.pokegoapi.network.exception.RequestFailedException;
-import com.pokegoapi.old.api.pokemon.Pokemon;
 
-/**
- * Created by chris on 1/23/2017.
- */
 public interface Battle {
 
+    //TODO: Uncomment when the Pokemon Class has been created
 //    void start(Pokemon[] attackingTeam, BattleListenerSpec spec) throws RequestFailedException;
 
     /**
@@ -32,12 +28,13 @@ public interface Battle {
      */
     int dodge();
 
-    /**
-     * Swaps your current attacking Pokemon
-     *
-     * @param pokemon the pokemon to swap to
-     * @return the duration of this action
-     */
+    //TODO: Uncomment when the Pokemon Class has been created
+//    /**
+//     * Swaps your current attacking Pokemon
+//     *
+//     * @param pokemon the pokemon to swap to
+//     * @return the duration of this action
+//     */
 //    int swap(Pokemon pokemon);
 
     /**

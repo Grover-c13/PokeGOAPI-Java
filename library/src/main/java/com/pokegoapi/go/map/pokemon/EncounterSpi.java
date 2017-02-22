@@ -1,8 +1,7 @@
 package com.pokegoapi.go.map.pokemon;
 
-import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
-import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
-import POGOProtos.Networking.Responses.UseItemEncounterResponseOuterClass.UseItemEncounterResponse.Status;
+import com.github.aeonlucid.pogoprotos.inventory.Item.ItemId;
+import com.github.aeonlucid.pogoprotos.networking.Responses.EncounterResponse;
 import com.pokegoapi.go.PokemonGoClient;
 import com.pokegoapi.go.map.pokemon.spec.EncounterItemResult;
 import com.pokegoapi.go.map.pokemon.spec.UsePokeballResult;
@@ -15,7 +14,7 @@ public abstract class EncounterSpi {
 
 	protected abstract CatchablePokemon engineGetPokemon();
 
-	protected abstract Status engineGetEncounterStatus();
+	protected abstract EncounterResponse.Status engineGetEncounterStatus();
 
 	/**
 	 * @return the currently active item, or null if no items are active
@@ -42,6 +41,6 @@ public abstract class EncounterSpi {
 	 * @throws RequestFailedException if an exception occurs while sending the request
 	 */
 	protected abstract UsePokeballResult engineUsePokeball(ItemId item, double hitPosition, double reticleSize,
-			double spinModifier) throws RequestFailedException;
+														   double spinModifier) throws RequestFailedException;
 
 }

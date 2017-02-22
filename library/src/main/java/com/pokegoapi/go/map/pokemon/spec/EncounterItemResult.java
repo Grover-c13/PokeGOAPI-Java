@@ -1,8 +1,8 @@
 package com.pokegoapi.go.map.pokemon.spec;
 
-import POGOProtos.Data.Capture.CaptureProbabilityOuterClass.CaptureProbability;
-import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
-import POGOProtos.Networking.Responses.UseItemEncounterResponseOuterClass.UseItemEncounterResponse.Status;
+import com.github.aeonlucid.pogoprotos.data.Capture.CaptureProbability;
+import com.github.aeonlucid.pogoprotos.inventory.Item.ItemId;
+import com.github.aeonlucid.pogoprotos.networking.Responses.UseItemEncounterResponse;
 import com.pokegoapi.go.map.pokemon.Encounter;
 
 /**
@@ -18,7 +18,7 @@ public interface EncounterItemResult {
 	/**
 	 * @return the status of this request
 	 */
-	Status getStatus();
+	UseItemEncounterResponse.Status getStatus();
 
 	/**
 	 * @return the encounter this item was used on

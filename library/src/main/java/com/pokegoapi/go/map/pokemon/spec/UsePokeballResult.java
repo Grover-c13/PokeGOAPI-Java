@@ -1,8 +1,8 @@
 package com.pokegoapi.go.map.pokemon.spec;
 
-import POGOProtos.Data.Capture.CaptureAwardOuterClass.CaptureAward;
-import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse.CaptureReason;
-import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus;
+import com.github.aeonlucid.pogoprotos.data.Capture.CaptureAward;
+import com.github.aeonlucid.pogoprotos.networking.Responses.CatchPokemonResponse.CaptureReason;
+import com.github.aeonlucid.pogoprotos.networking.Responses.CatchPokemonResponse.CatchStatus;
 import com.pokegoapi.go.map.pokemon.Encounter;
 
 /**

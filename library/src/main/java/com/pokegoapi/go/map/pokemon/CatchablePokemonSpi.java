@@ -1,17 +1,15 @@
 package com.pokegoapi.go.map.pokemon;
 
-import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
-import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
-import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
-import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
-import POGOProtos.Networking.Responses.GetIncensePokemonResponseOuterClass.GetIncensePokemonResponse;
+import com.github.aeonlucid.pogoprotos.Enums.PokemonId;
+import com.github.aeonlucid.pogoprotos.map.Fort.FortData;
+import com.github.aeonlucid.pogoprotos.map.Pokemon.MapPokemon;
+import com.github.aeonlucid.pogoprotos.map.Pokemon.WildPokemon;
+import com.github.aeonlucid.pogoprotos.networking.Responses.GetIncensePokemonResponse;
 import com.pokegoapi.go.PokemonGoClient;
 import com.pokegoapi.go.map.spec.MapPoint;
 import com.pokegoapi.network.exception.RequestFailedException;
 
-/**
- * Created by chris on 2/2/2017.
- */
+@SuppressWarnings("WeakerAccess")
 public abstract class CatchablePokemonSpi implements MapPoint {
 
 	protected abstract void engineInitialize(PokemonGoClient client, MapPokemon mapPokemon);

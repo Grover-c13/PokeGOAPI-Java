@@ -1,16 +1,15 @@
 package com.pokegoapi.go.map.pokemon;
 
-import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
-import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
-import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
-import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
-import POGOProtos.Networking.Responses.GetIncensePokemonResponseOuterClass.GetIncensePokemonResponse;
-import com.pokegoapi.GetInstance;
-import com.pokegoapi.NoSuchTypeException;
-import com.pokegoapi.Provider;
+import com.github.aeonlucid.pogoprotos.Enums;
+import com.github.aeonlucid.pogoprotos.map.Fort;
+import com.github.aeonlucid.pogoprotos.map.Pokemon;
+import com.github.aeonlucid.pogoprotos.networking.Responses;
 import com.pokegoapi.go.PokemonGoClient;
 import com.pokegoapi.go.map.spec.MapPoint;
 import com.pokegoapi.network.exception.RequestFailedException;
+import com.pokegoapi.provider.GetInstance;
+import com.pokegoapi.provider.NoSuchTypeException;
+import com.pokegoapi.provider.Provider;
 
 /**
  * An object that represents a catchable pokemon on the map in Pokemon GO
@@ -35,19 +34,19 @@ public final class CatchablePokemon implements MapPoint {
 		return new CatchablePokemon((CatchablePokemonSpi) instance.impl, instance.provider);
 	}
 
-	public void initialize(PokemonGoClient client, WildPokemon pokemon) {
+	public void initialize(PokemonGoClient client, Pokemon.WildPokemon pokemon) {
 		spi.engineInitialize(client, pokemon);
 	}
 
-	public void initialize(PokemonGoClient client, MapPokemon pokemon) {
+	public void initialize(PokemonGoClient client, Pokemon.MapPokemon pokemon) {
 		spi.engineInitialize(client, pokemon);
 	}
 
-	public void initialize(PokemonGoClient client, FortData luredFort) {
+	public void initialize(PokemonGoClient client, Fort.FortData luredFort) {
 		spi.engineInitialize(client, luredFort);
 	}
 
-	public void initialize(PokemonGoClient client, GetIncensePokemonResponse pokemon) {
+	public void initialize(PokemonGoClient client, Responses.GetIncensePokemonResponse pokemon) {
 		spi.engineInitialize(client, pokemon);
 	}
 
@@ -66,7 +65,7 @@ public final class CatchablePokemon implements MapPoint {
 		return spi.getLongitude();
 	}
 
-	public PokemonId getPokemonId() {
+	public Enums.PokemonId getPokemonId() {
 		return spi.engineGetPokemonId();
 	}
 

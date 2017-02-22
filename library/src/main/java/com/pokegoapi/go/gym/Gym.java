@@ -5,16 +5,15 @@ import com.github.aeonlucid.pogoprotos.Enums;
 import com.github.aeonlucid.pogoprotos.data.Gym.GymMembership;
 import com.github.aeonlucid.pogoprotos.data.Gym.GymState;
 import com.github.aeonlucid.pogoprotos.map.Fort;
-import com.github.aeonlucid.pogoprotos.networking.Responses;
+import com.github.aeonlucid.pogoprotos.networking.Responses.GetGymDetailsResponse;
 import com.google.protobuf.ProtocolStringList;
-import com.pokegoapi.provider.GetInstance;
-import com.pokegoapi.provider.NoSuchTypeException;
-import com.pokegoapi.provider.Provider;
 import com.pokegoapi.go.PokemonGoClient;
 import com.pokegoapi.go.gym.spec.Battle;
 import com.pokegoapi.go.map.spec.MapPoint;
 import com.pokegoapi.network.exception.RequestFailedException;
-import com.pokegoapi.old.api.pokemon.Pokemon;
+import com.pokegoapi.provider.GetInstance;
+import com.pokegoapi.provider.NoSuchTypeException;
+import com.pokegoapi.provider.Provider;
 
 import java.util.List;
 
@@ -48,7 +47,7 @@ public final class Gym implements MapPoint {
         spi.engineInitialize(client, fort);
     }
 
-    public void initialize(PokemonGoClient client, Responses.GetGymDetailsResponse details) {
+    public void initialize(PokemonGoClient client, GetGymDetailsResponse details) {
         spi.engineInitialize(client, details);
     }
 
@@ -140,10 +139,10 @@ public final class Gym implements MapPoint {
         return spi.engineHasGymState();
     }
 
-//    public GetGymDetailsResponse getGymDetails() throws RequestFailedException {
-//        return spi.engineGetGymDetails();
-//    }
-//
+    public GetGymDetailsResponse getGymDetails() throws RequestFailedException {
+        return spi.engineGetGymDetails();
+    }
+//    //TODO: Uncomment when the Pokemon Class has been created
 //    public Result deployPokemon(Pokemon pokemon) throws RequestFailedException {
 //        return spi.engineDeployPokemon(pokemon);
 //    }
