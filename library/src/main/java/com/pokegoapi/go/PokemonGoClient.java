@@ -1,9 +1,9 @@
 package com.pokegoapi.go;
 
-import com.pokegoapi.GetInstance;
-import com.pokegoapi.GetInstance.Instance;
-import com.pokegoapi.NoSuchTypeException;
-import com.pokegoapi.Provider;
+import com.pokegoapi.provider.GetInstance;
+import com.pokegoapi.provider.GetInstance.Instance;
+import com.pokegoapi.provider.NoSuchTypeException;
+import com.pokegoapi.provider.Provider;
 import com.pokegoapi.go.spec.Credentials;
 
 /**

@@ -1,7 +1,6 @@
 package com.pokegoapi.go.gym.spec;
 
-import POGOProtos.Data.Battle.BattleParticipantOuterClass.BattleParticipant;
-import com.pokegoapi.old.api.gym.Battle;
+import com.github.aeonlucid.pogoprotos.data.Battle.BattleParticipant;
 
 public interface BattleListenerSpec {
 

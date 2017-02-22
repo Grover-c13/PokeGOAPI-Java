@@ -1,0 +1,11 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+
+    compile 'com.google.protobuf:protobuf-java:3.2.0'
+}

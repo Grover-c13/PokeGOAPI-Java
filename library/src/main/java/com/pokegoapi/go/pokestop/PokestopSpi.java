@@ -1,8 +1,7 @@
 package com.pokegoapi.go.pokestop;
 
-import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
-import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
-import POGOProtos.Map.Fort.FortModifierOuterClass.FortModifier;
+import com.github.aeonlucid.pogoprotos.inventory.Item;
+import com.github.aeonlucid.pogoprotos.map.Fort;
 import com.google.protobuf.ProtocolStringList;
 import com.pokegoapi.go.PokemonGoClient;
 import com.pokegoapi.go.map.spec.MapPoint;
@@ -14,7 +13,7 @@ import java.util.List;
 @SuppressWarnings("WeakerAccess")
 public abstract class PokestopSpi implements MapPoint {
 
-    protected abstract void engineInitialize(PokemonGoClient client, FortData fort);
+    protected abstract void engineInitialize(PokemonGoClient client, Fort.FortData fort);
 
     /**
      * Returns the distance to a pokestop.
@@ -52,7 +51,7 @@ public abstract class PokestopSpi implements MapPoint {
 
     protected abstract String engineGetDescription();
 
-    protected abstract List<FortModifier> engineGetModifiers();
+    protected abstract List<Fort.FortModifier> engineGetModifiers();
 
     public abstract boolean engineHasDetails();
 

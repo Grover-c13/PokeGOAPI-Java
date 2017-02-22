@@ -9,7 +9,7 @@ import com.pokegoapi.old.api.pokemon.Pokemon;
  */
 public interface Battle {
 
-    void start(Pokemon[] attackingTeam, BattleListenerSpec spec) throws RequestFailedException;
+//    void start(Pokemon[] attackingTeam, BattleListenerSpec spec) throws RequestFailedException;
 
     /**
      * Performs an attack action
@@ -38,7 +38,7 @@ public interface Battle {
      * @param pokemon the pokemon to swap to
      * @return the duration of this action
      */
-    int swap(Pokemon pokemon);
+//    int swap(Pokemon pokemon);
 
     /**
      * @return the time left for this battle before it times out

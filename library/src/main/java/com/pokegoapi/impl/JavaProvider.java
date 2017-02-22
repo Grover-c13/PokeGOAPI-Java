@@ -1,6 +1,6 @@
 package com.pokegoapi.impl;
 
-import com.pokegoapi.Provider;
+import com.pokegoapi.provider.Provider;
 
 /**
  * Created by chris on 2/3/2017.
