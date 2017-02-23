@@ -162,8 +162,8 @@ public class PokeBank {
 				.setLastTimestampMs(api.getInventories().getLastInventoryUpdate())
 				.build();
 		ServerRequestEnvelope envelope = ServerRequestEnvelope.create();
-		ServerRequest inventoryRequest = envelope.add(RequestType.GET_INVENTORY, inventoryMessage);
 		ServerRequest releaseRequest = envelope.add(RequestType.RELEASE_POKEMON, releaseBuilder.build());
+		ServerRequest inventoryRequest = envelope.add(RequestType.GET_INVENTORY, inventoryMessage);
 		Map<PokemonFamilyId, Integer> lastCandies = new HashMap<>(api.getInventories().getCandyjar().getCandies());
 		api.getRequestHandler().sendServerRequests(envelope);
 		try {
