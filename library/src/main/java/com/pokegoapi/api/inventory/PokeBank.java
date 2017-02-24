@@ -20,7 +20,6 @@ import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Inventory.CandyOuterClass.Candy;
 import POGOProtos.Inventory.InventoryItemDataOuterClass.InventoryItemData;
 import POGOProtos.Inventory.InventoryItemOuterClass.InventoryItem;
-import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
 import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
@@ -38,6 +37,7 @@ import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.exceptions.hash.HashException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.main.ServerRequestEnvelope;
+import com.pokegoapi.main.ServerResponse;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -158,16 +158,12 @@ public class PokeBank {
 				releaseBuilder.addPokemonIds(pokemon.getId());
 			}
 		}
-		GetInventoryMessage inventoryMessage = GetInventoryMessage.newBuilder()
-				.setLastTimestampMs(api.getInventories().getLastInventoryUpdate())
-				.build();
-		ServerRequestEnvelope envelope = ServerRequestEnvelope.create();
+		ServerRequestEnvelope envelope = ServerRequestEnvelope.createCommons();
 		ServerRequest releaseRequest = envelope.add(RequestType.RELEASE_POKEMON, releaseBuilder.build());
-		ServerRequest inventoryRequest = envelope.add(RequestType.GET_INVENTORY, inventoryMessage);
 		Map<PokemonFamilyId, Integer> lastCandies = new HashMap<>(api.getInventories().getCandyjar().getCandies());
-		api.getRequestHandler().sendServerRequests(envelope);
+		ServerResponse response = api.getRequestHandler().sendServerRequests(envelope);
 		try {
-			GetInventoryResponse inventoryResponse = GetInventoryResponse.parseFrom(inventoryRequest.getData());
+			GetInventoryResponse inventoryResponse = GetInventoryResponse.parseFrom(response.get(RequestType.GET_INVENTORY));
 			ReleasePokemonResponse releaseResponse = ReleasePokemonResponse.parseFrom(releaseRequest.getData());
 			Map<PokemonFamilyId, Integer> candyCount = new HashMap<>();
 			if (releaseResponse.getResult() == Result.SUCCESS && inventoryResponse.getSuccess()) {

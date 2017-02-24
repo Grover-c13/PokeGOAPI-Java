@@ -84,12 +84,14 @@ public class Pokemon extends PokemonDetails {
 	 */
 	public Result transferPokemon() throws LoginFailedException, CaptchaActiveException, RemoteServerException,
 			HashException {
-		if (this.isFavorite())
+		if (this.isFavorite() || this.isDeployed()) {
 			return Result.FAILED;
+		}
+
 		ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.RELEASE_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest, true);
 
 		ReleasePokemonResponse response;
 		try {
@@ -101,10 +103,6 @@ public class Pokemon extends PokemonDetails {
 		if (response.getResult() == Result.SUCCESS) {
 			api.getInventories().getPokebank().removePokemon(this);
 		}
-
-		api.getInventories().getPokebank().removePokemon(this);
-
-		api.getInventories().updateInventories();
 
 		return response.getResult();
 	}
