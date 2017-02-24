@@ -67,7 +67,11 @@ public class ServerRequestEnvelope {
 
 			@Override
 			public ServerResponse get() throws InterruptedException, ExecutionException {
-				return get(TimeUnit.MINUTES.toMillis(1));
+				try {
+					return get(TimeUnit.MINUTES.toMillis(1));
+				} catch (TimeoutException e) {
+					throw new ExecutionException(e);
+				}
 			}
 
 			@Override
@@ -76,10 +80,16 @@ public class ServerRequestEnvelope {
 				return get(unit.toMillis(timeout));
 			}
 
-			private ServerResponse get(long timeout) throws ExecutionException, InterruptedException {
+			private ServerResponse get(long timeout) throws ExecutionException, InterruptedException,
+					TimeoutException {
 				if (!isDone()) {
+					long start = System.nanoTime();
 					synchronized (responseLock) {
 						responseLock.wait(timeout);
+						long delta = System.nanoTime() - start;
+						if (delta >= TimeUnit.MILLISECONDS.toNanos(timeout)) {
+							throw new TimeoutException();
+						}
 					}
 				}
 				if (response != null && response.getException() != null) {
@@ -92,6 +102,7 @@ public class ServerRequestEnvelope {
 
 	/**
 	 * Creates a request envelope without commons
+	 *
 	 * @return the envelope created
 	 */
 	public static ServerRequestEnvelope create() {
@@ -100,6 +111,7 @@ public class ServerRequestEnvelope {
 
 	/**
 	 * Creates a request envelope with commons
+	 *
 	 * @param commonExclusions the common requests to exclude
 	 * @return the envelope created
 	 */
@@ -111,6 +123,7 @@ public class ServerRequestEnvelope {
 
 	/**
 	 * Excludes the given commons from this request
+	 *
 	 * @param requestTypes the requests to exclude
 	 */
 	public void excludeCommons(RequestType... requestTypes) {
@@ -119,6 +132,7 @@ public class ServerRequestEnvelope {
 
 	/**
 	 * Adds a request to this envelope
+	 *
 	 * @param request the request to add
 	 * @return the added request
 	 */
@@ -129,6 +143,7 @@ public class ServerRequestEnvelope {
 
 	/**
 	 * Adds a request to this envelope
+	 *
 	 * @param requestType the type of request being added
 	 * @param request the request to be added
 	 * @return the added request
@@ -139,6 +154,7 @@ public class ServerRequestEnvelope {
 
 	/**
 	 * Handles the response for this request
+	 *
 	 * @param response the response
 	 */
 	public void handleResponse(ServerResponse response) {
@@ -153,6 +169,7 @@ public class ServerRequestEnvelope {
 
 	/**
 	 * Gets the observable for this envelope response
+	 *
 	 * @return the observable
 	 */
 	public Observable<ServerResponse> observable() {
