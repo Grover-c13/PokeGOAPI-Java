@@ -145,6 +145,8 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 */
 	private void login(String username, String password, int attempt)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+		boolean hasPTCError = false;
+
 		try {
 			//TODO: stop creating an okhttp client per request
 			Request get = new Request.Builder()
@@ -208,6 +210,9 @@ public class PtcCredentialProvider extends CredentialProvider {
 				PtcError ptcError;
 				try {
 					ptcError = moshi.adapter(PtcError.class).fromJson(body);
+					if (ptcError != null) {
+						hasPTCError = true;
+					}
 				} catch (IOException e) {
 					throw new RemoteServerException("Unmarshalling failure", e);
 				}
@@ -272,7 +277,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 				throw new LoginFailedException("Failed to fetch token, body:" + body);
 			}
 		} catch (Exception e) {
-			if (shouldRetry && attempt < MAXIMUM_RETRIES) {
+			if (!hasPTCError && shouldRetry && attempt < MAXIMUM_RETRIES) {
 				login(username, password, ++attempt);
 			} else {
 				throw e;
