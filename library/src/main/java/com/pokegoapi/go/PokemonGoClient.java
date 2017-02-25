@@ -1,10 +1,13 @@
 package com.pokegoapi.go;
 
+import com.github.aeonlucid.pogoprotos.networking.Requests.RequestType;
+import com.google.protobuf.Message;
+import com.pokegoapi.go.spec.Credentials;
+import com.pokegoapi.network.spec.ServerRequest;
 import com.pokegoapi.provider.GetInstance;
 import com.pokegoapi.provider.GetInstance.Instance;
 import com.pokegoapi.provider.NoSuchTypeException;
 import com.pokegoapi.provider.Provider;
-import com.pokegoapi.go.spec.Credentials;
 
 /**
  * Created by chris on 1/22/2017.
@@ -41,5 +44,9 @@ public final class PokemonGoClient {
 
     public void login(Credentials credentials){
         spi.engineLogin(credentials);
+    }
+
+    public ServerRequest createRequest(Message request, RequestType type) {
+        return spi.engineCreateRequest(request, type);
     }
 }
