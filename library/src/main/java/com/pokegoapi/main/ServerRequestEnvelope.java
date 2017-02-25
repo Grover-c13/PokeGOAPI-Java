@@ -67,35 +67,21 @@ public class ServerRequestEnvelope {
 
 			@Override
 			public ServerResponse get() throws InterruptedException, ExecutionException {
-				try {
-					return get(TimeUnit.MINUTES.toMillis(1));
-				} catch (TimeoutException e) {
-					throw new ExecutionException(e);
-				}
-			}
-
-			@Override
-			public ServerResponse get(long timeout, TimeUnit unit)
-					throws InterruptedException, ExecutionException, TimeoutException {
-				return get(unit.toMillis(timeout));
-			}
-
-			private ServerResponse get(long timeout) throws ExecutionException, InterruptedException,
-					TimeoutException {
 				if (!isDone()) {
-					long start = System.nanoTime();
 					synchronized (responseLock) {
-						responseLock.wait(timeout);
-						long delta = System.nanoTime() - start;
-						if (delta >= TimeUnit.MILLISECONDS.toNanos(timeout)) {
-							throw new TimeoutException();
-						}
+						responseLock.wait();
 					}
 				}
 				if (response != null && response.getException() != null) {
 					throw new ExecutionException(response.getException());
 				}
 				return response;
+			}
+
+			@Override
+			public ServerResponse get(long timeout, TimeUnit unit)
+					throws InterruptedException, ExecutionException, TimeoutException {
+				return get();
 			}
 		});
 	}
