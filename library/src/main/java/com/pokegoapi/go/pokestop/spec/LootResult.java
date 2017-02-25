@@ -3,7 +3,6 @@ package com.pokegoapi.go.pokestop.spec;
 import com.github.aeonlucid.pogoprotos.Data.PokemonData;
 import com.github.aeonlucid.pogoprotos.inventory.Item.ItemAward;
 import com.github.aeonlucid.pogoprotos.networking.Responses.FortSearchResponse;
-import com.pokegoapi.go.pokestop.Pokestop;
 
 import java.util.List;
 
