@@ -1,43 +1,18 @@
 package com.pokegoapi.go.gym.spec;
 
-import com.github.aeonlucid.pogoprotos.Data.PokemonData;
-import com.github.aeonlucid.pogoprotos.data.Battle.BattlePokemonInfo;
+import com.pokegoapi.go.pokemon.spec.Pokemon;
 
-public class BattlePokemon {
+public interface BattlePokemon {
 
-    private final PokemonData pokemon;
-    private int health;
-    private int maxHealth;
-    private int energy;
+    Pokemon getPokemon();
 
-    BattlePokemon(BattlePokemonInfo activePokemon) {
-        this.health = activePokemon.getCurrentHealth();
-        this.energy = activePokemon.getCurrentEnergy();
-        this.pokemon = activePokemon.getPokemonData();
-        this.maxHealth = pokemon.getStaminaMax();
-    }
+    int getHealth();
 
-    public PokemonData getPokemon() {
-        return pokemon;
-    }
+    int getMaxHealth();
 
-    public int getHealth() {
-        return health;
-    }
+    int getEnergy();
 
-    public int getMaxHealth() {
-        return maxHealth;
-    }
+    void setHealth(int health);
 
-    public int getEnergy() {
-        return energy;
-    }
-
-    public void setHealth(int health) {
-        this.health = health;
-    }
-
-    public void setEnergy(int energy) {
-        this.energy = energy;
-    }
+    void setEnergy(int energy);
 }

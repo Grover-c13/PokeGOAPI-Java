@@ -2,7 +2,7 @@ package com.pokegoapi.go.gym.spec;
 
 import com.github.aeonlucid.pogoprotos.data.Battle.BattleParticipant;
 
-public interface BattleListenerSpec {
+public interface BattleListener {
 
     /**
      * Called when this battle end, and you won

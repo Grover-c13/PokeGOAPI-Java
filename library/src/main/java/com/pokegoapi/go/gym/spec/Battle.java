@@ -1,11 +1,9 @@
 package com.pokegoapi.go.gym.spec;
 
-import com.pokegoapi.go.gym.Gym;
+import com.pokegoapi.go.gym.Gyms;
+import com.pokegoapi.go.pokemon.spec.Pokemon;
 
 public interface Battle {
-
-    //TODO: Uncomment when the Pokemon Class has been created
-//    void start(Pokemon[] attackingTeam, BattleListenerSpec spec) throws RequestFailedException;
 
     /**
      * Performs an attack action
@@ -28,14 +26,13 @@ public interface Battle {
      */
     int dodge();
 
-    //TODO: Uncomment when the Pokemon Class has been created
-//    /**
-//     * Swaps your current attacking Pokemon
-//     *
-//     * @param pokemon the pokemon to swap to
-//     * @return the duration of this action
-//     */
-//    int swap(Pokemon pokemon);
+    /**
+     * Swaps your current attacking Pokemon
+     *
+     * @param pokemon the pokemon to swap to
+     * @return the duration of this action
+     */
+    int swap(Pokemon pokemon);
 
     /**
      * @return the time left for this battle before it times out
@@ -45,5 +42,5 @@ public interface Battle {
     /**
      * @return the gym that this battle is taking place at
      */
-    Gym getGym();
+    Gyms getGym();
 }
