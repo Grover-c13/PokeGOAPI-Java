@@ -6,8 +6,12 @@ import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
+import POGOProtos.Settings.Master.Pokemon.EvolutionBranchOuterClass.EvolutionBranch;
 import POGOProtos.Settings.Master.Pokemon.StatsAttributesOuterClass;
 import POGOProtos.Settings.Master.PokemonSettingsOuterClass;
+
+import java.util.List;
+
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.main.PokemonMeta;
@@ -235,9 +239,9 @@ public class PokemonDetails {
 	}
 
 	/**
-	 * Checks whether the Pokémon is set as favorite.
+	 * Checks whether the Pokemon is set as favorite.
 	 *
-	 * @return true if the Pokémon is set as favorite
+	 * @return true if the Pokemon is set as favorite
 	 */
 	public boolean isFavorite() {
 		return favorite > 0;
@@ -268,8 +272,21 @@ public class PokemonDetails {
 		return getSettings().getEncounter().getBaseCaptureRate();
 	}
 
+	/**
+	 * Return the amount of candies necessary to evolve this pokemon
+	 * @return candy needed to evolve
+	 */
 	public int getCandiesToEvolve() {
-		return getSettings().getCandyToEvolve();
+		Evolution evolution = Evolutions.getEvolution(pokemonId);
+		if (evolution.getEvolutionBranch() != null && evolution.getEvolutionBranch().size() > 0) {
+			return evolution.getEvolutionBranch().get(0).getCandyCost();
+		}
+		return 0;
+	}
+	
+	public List<EvolutionBranch> getEvolutionBranch() {
+		Evolution evolution = Evolutions.getEvolution(pokemonId);
+		return evolution.getEvolutionBranch();
 	}
 
 	public double getBaseFleeRate() {

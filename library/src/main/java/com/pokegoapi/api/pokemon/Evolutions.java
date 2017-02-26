@@ -15,15 +15,14 @@
 
 package com.pokegoapi.api.pokemon;
 
-import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
-import POGOProtos.Networking.Responses.DownloadItemTemplatesResponseOuterClass.DownloadItemTemplatesResponse.ItemTemplate;
-import POGOProtos.Settings.Master.PokemonSettingsOuterClass.PokemonSettings;
-import com.pokegoapi.main.PokemonMeta;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
+import POGOProtos.Networking.Responses.DownloadItemTemplatesResponseOuterClass.DownloadItemTemplatesResponse.ItemTemplate;
+import POGOProtos.Settings.Master.PokemonSettingsOuterClass.PokemonSettings;
 
 public class Evolutions {
 	private static final Map<PokemonId, Evolution> EVOLUTIONS = new HashMap<>();
@@ -38,25 +37,25 @@ public class Evolutions {
 		for (ItemTemplate template : templates) {
 			if (template.hasPokemonSettings()) {
 				PokemonSettings settings = template.getPokemonSettings();
-				PokemonId[] parents = {};
 				PokemonId pokemon = settings.getPokemonId();
-				if (settings.getParentPokemonId() != null) {
-					PokemonSettings parentSettings = PokemonMeta.getPokemonSettings(settings.getParentPokemonId());
-					List<PokemonId> parentEvolutions = parentSettings != null ? parentSettings.getEvolutionIdsList()
-							: null;
-					if (parentEvolutions != null && parentEvolutions.contains(pokemon)) {
-						parents = new PokemonId[]{settings.getParentPokemonId()};
-					}
-				}
-				Evolution evolution = new Evolution(parents, pokemon);
-				EVOLUTIONS.put(pokemon, evolution);
-				for (PokemonId parent : parents) {
-					Evolution parentEvolution = EVOLUTIONS.get(parent);
-					if (parentEvolution != null) {
-						parentEvolution.addEvolution(pokemon);
-					}
+				if (!EVOLUTIONS.containsKey(pokemon)) {
+					addEvolution(null, pokemon);
 				}
 			}
+		}
+	}
+	
+	/**
+	 * Auxiliar method to add the evolution by recursion in the EVOLUTIONS Map
+	 *
+	 * @param parent the parent of this pokemon
+	 * @param pokemon the pokemon that evolution will be added
+	 */
+	private static void addEvolution(PokemonId parent, PokemonId pokemon) {
+		Evolution evolution = new Evolution(parent, pokemon);
+		EVOLUTIONS.put(pokemon, evolution);
+		for (PokemonId poke : evolution.getEvolutions()) {
+			addEvolution(pokemon, poke);
 		}
 	}
 
@@ -94,10 +93,8 @@ public class Evolutions {
 		List<PokemonId> basic = new ArrayList<>();
 		Evolution evolution = getEvolution(pokemon);
 		if (evolution != null) {
-			if (evolution.getParents() != null) {
-				for (PokemonId parent : evolution.getParents()) {
-					basic.addAll(getBasic(parent));
-				}
+			if (evolution.getParent() != null) {
+				basic.add(evolution.getParent());
 			} else {
 				basic.add(pokemon);
 			}
