@@ -49,8 +49,6 @@ import com.pokegoapi.api.map.pokemon.encounter.IncenseEncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.NormalEncounterResult;
 import com.pokegoapi.api.settings.AsyncCatchOptions;
 import com.pokegoapi.api.settings.CatchOptions;
-import com.pokegoapi.exceptions.AsyncCaptchaActiveException;
-import com.pokegoapi.exceptions.AsyncLoginFailedException;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.EncounterFailedException;
@@ -222,10 +220,9 @@ public class CatchablePokemon implements MapPoint {
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
 				.setSpawnPointId(getSpawnPointId()).build();
-		ServerRequest serverRequest = new ServerRequest(
-				RequestType.ENCOUNTER, reqMsg);
+		ServerRequest serverRequest = new ServerRequest(RequestType.ENCOUNTER, reqMsg);
 		return api.getRequestHandler()
-				.sendAsyncServerRequests(serverRequest, false).map(new Func1<ByteString, EncounterResult>() {
+				.sendAsyncServerRequests(serverRequest, true).map(new Func1<ByteString, EncounterResult>() {
 					@Override
 					public EncounterResult call(ByteString result) {
 						EncounterResponse response;
@@ -277,7 +274,7 @@ public class CatchablePokemon implements MapPoint {
 				.setFortId(getSpawnPointId()).build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.DISK_ENCOUNTER, reqMsg);
 		return api.getRequestHandler()
-				.sendAsyncServerRequests(serverRequest, false).map(new Func1<ByteString, EncounterResult>() {
+				.sendAsyncServerRequests(serverRequest, true).map(new Func1<ByteString, EncounterResult>() {
 					@Override
 					public EncounterResult call(ByteString result) {
 						DiskEncounterResponse response;
@@ -312,7 +309,7 @@ public class CatchablePokemon implements MapPoint {
 				.setEncounterLocation(getSpawnPointId()).build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.INCENSE_ENCOUNTER, reqMsg);
 		return api.getRequestHandler()
-				.sendAsyncServerRequests(serverRequest, false).map(new Func1<ByteString, EncounterResult>() {
+				.sendAsyncServerRequests(serverRequest, true).map(new Func1<ByteString, EncounterResult>() {
 					@Override
 					public EncounterResult call(ByteString result) {
 						IncenseEncounterResponse response;
@@ -639,13 +636,12 @@ public class CatchablePokemon implements MapPoint {
 				.setSpawnPointId(getSpawnPointId())
 				.setSpinModifier(spinModifier)
 				.setPokeball(type.getBallType()).build();
-		ServerRequest serverRequest = new ServerRequest(
-				RequestType.CATCH_POKEMON, reqMsg);
+		ServerRequest serverRequest = new ServerRequest(RequestType.CATCH_POKEMON, reqMsg);
 		return catchPokemonAsync(serverRequest);
 	}
 
 	private Observable<CatchResult> catchPokemonAsync(ServerRequest serverRequest) {
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
+		return api.getRequestHandler().sendAsyncServerRequests(serverRequest, true).map(
 				new Func1<ByteString, CatchResult>() {
 					@Override
 					public CatchResult call(ByteString result) {
@@ -656,23 +652,13 @@ public class CatchablePokemon implements MapPoint {
 						} catch (InvalidProtocolBufferException e) {
 							throw new AsyncRemoteServerException(e);
 						}
-						try {
-
-							// pokemon is caught or flee, and no longer on the map
-							if (response.getStatus() == CatchStatus.CATCH_FLEE
-									|| response.getStatus() == CatchStatus.CATCH_SUCCESS) {
-								despawned = true;
-							}
-
-							api.getInventories().updateInventories();
-							return new CatchResult(response);
-						} catch (RemoteServerException e) {
-							throw new AsyncRemoteServerException(e);
-						} catch (LoginFailedException | HashException e) {
-							throw new AsyncLoginFailedException(e);
-						} catch (CaptchaActiveException e) {
-							throw new AsyncCaptchaActiveException(e, e.getCaptcha());
+						// pokemon is caught or flee, and no longer on the map
+						if (response.getStatus() == CatchStatus.CATCH_FLEE
+								|| response.getStatus() == CatchStatus.CATCH_SUCCESS) {
+							despawned = true;
 						}
+
+						return new CatchResult(response);
 					}
 				});
 	}

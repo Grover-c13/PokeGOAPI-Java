@@ -226,7 +226,7 @@ public class PlayerProfile {
 				.setLevel(level)
 				.build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.LEVEL_UP_REWARDS, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest, true);
 		LevelUpRewardsResponse response;
 		try {
 			response = LevelUpRewardsResponse.parseFrom(serverRequest.getData());

@@ -125,17 +125,19 @@ public class Pokemon extends PokemonDetails {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.NICKNAME_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest, true);
 
 		NicknamePokemonResponse response;
 		try {
 			response = NicknamePokemonResponse.parseFrom(serverRequest.getData());
+			if (response.getResult() == NicknamePokemonResponse.Result.SUCCESS) {
+				this.nickname = nickname;
+			}
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
 
 		api.getInventories().getPokebank().removePokemon(this);
-		api.getInventories().updateInventories();
 
 		return response.getResult();
 	}
@@ -158,17 +160,19 @@ public class Pokemon extends PokemonDetails {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.SET_FAVORITE_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest, true);
 
 		SetFavoritePokemonResponse response;
 		try {
 			response = SetFavoritePokemonResponse.parseFrom(serverRequest.getData());
+			if (response.getResult() == SetFavoritePokemonResponse.Result.SUCCESS) {
+				favorite = markFavorite ? 1 : 0;
+			}
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
 
 		api.getInventories().getPokebank().removePokemon(this);
-		api.getInventories().updateInventories();
 
 		return response.getResult();
 	}
@@ -262,9 +266,29 @@ public class Pokemon extends PokemonDetails {
 	 */
 	public EvolutionResult evolve() throws LoginFailedException, CaptchaActiveException, RemoteServerException,
 			HashException {
-		EvolvePokemonMessage reqMsg = EvolvePokemonMessage.newBuilder().setPokemonId(getId()).build();
+		return evolve(null);
+	}
 
-		ServerRequest serverRequest = new ServerRequest(RequestType.EVOLVE_POKEMON, reqMsg);
+	/**
+	 * Evolves pokemon with evolution item
+	 *
+	 * @param evolutionItem the evolution item to evolve with
+	 * @return the evolution result
+	 * @throws LoginFailedException the login failed exception
+	 * @throws RemoteServerException the remote server exception
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurred while requesting hash
+	 */
+	public EvolutionResult evolve(ItemId evolutionItem) throws LoginFailedException, CaptchaActiveException,
+			RemoteServerException,
+			HashException {
+		EvolvePokemonMessage.Builder messageBuilder = EvolvePokemonMessage.newBuilder().setPokemonId(getId());
+
+		if (evolutionItem != null) {
+			messageBuilder.setEvolutionItemRequirement(evolutionItem);
+		}
+
+		ServerRequest serverRequest = new ServerRequest(RequestType.EVOLVE_POKEMON, messageBuilder.build());
 		api.getRequestHandler().sendServerRequests(serverRequest, true);
 
 		EvolvePokemonResponse response;
@@ -277,8 +301,6 @@ public class Pokemon extends PokemonDetails {
 		EvolutionResult result = new EvolutionResult(api, response);
 
 		api.getInventories().getPokebank().removePokemon(this);
-
-		api.getInventories().updateInventories();
 
 		return result;
 	}

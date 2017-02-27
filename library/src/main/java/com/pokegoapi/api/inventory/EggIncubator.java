@@ -18,7 +18,7 @@ package com.pokegoapi.api.inventory;
 import POGOProtos.Inventory.EggIncubatorOuterClass;
 import POGOProtos.Inventory.EggIncubatorTypeOuterClass.EggIncubatorType;
 import POGOProtos.Networking.Requests.Messages.UseItemEggIncubatorMessageOuterClass.UseItemEggIncubatorMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
 import POGOProtos.Settings.Master.Item.EggIncubatorAttributesOuterClass.EggIncubatorAttributes;
 import POGOProtos.Settings.Master.ItemSettingsOuterClass.ItemSettings;
@@ -85,9 +85,8 @@ public class EggIncubator {
 				.setPokemonId(egg.getId())
 				.build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR,
-				reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_EGG_INCUBATOR, reqMsg);
+		api.getRequestHandler().sendServerRequests(serverRequest, true);
 
 		UseItemEggIncubatorResponse response;
 		try {

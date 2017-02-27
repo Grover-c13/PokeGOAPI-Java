@@ -26,23 +26,28 @@ public class Crypto {
 	public static final Crypto LEGACY = new Crypto();
 
 	protected static class Rand {
-		public long state;
+		private long state;
+
+		private Rand(long state) {
+			this.state = state;
+		}
+
+		public byte next() {
+			state = (state * 0x41C64E6D) + 0x3039;
+			return (byte) ((state >> 16) & 0xFF);
+		}
 	}
 
 	protected byte[] makeIv(Rand rand) {
 		byte[] iv = new byte[256];
 		for (int i = 0; i < 256; i++) {
-			rand.state = (0x41C64E6D * rand.state) + 0x3039;
-			long shiftedRand = rand.state >> 16;
-			iv[i] = Long.valueOf(shiftedRand).byteValue();
+			iv[i] = rand.next();
 		}
 		return iv;
 	}
 
 	protected byte makeIntegrityByte(Rand rand) {
-		rand.state = (0x41C64E6D * rand.state) + 0x3039;
-		long shiftedRand = rand.state >> 16;
-		byte lastbyte = Long.valueOf(shiftedRand).byteValue();
+		byte lastbyte = rand.next();
 
 		byte v74 = (byte) ((lastbyte ^ 0x0C) & lastbyte);
 		byte v75 = (byte) (((~v74 & 0x67) | (v74 & 0x98)) ^ 0x6F | (v74 & 8));
@@ -57,12 +62,10 @@ public class Crypto {
 	 * @return shuffled bytes
 	 */
 	public CipherText encrypt(byte[] input, long msSinceStart) {
-		Rand rand = new Rand();
+		Rand rand = new Rand(msSinceStart);
 
 		byte[] arr3;
 		CipherText output;
-
-		rand.state = msSinceStart;
 
 		byte[] iv = makeIv(rand);
 		output = new CipherText(this, input, msSinceStart, rand);
