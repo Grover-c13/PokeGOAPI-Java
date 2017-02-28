@@ -49,6 +49,7 @@ import com.pokegoapi.api.map.pokemon.encounter.IncenseEncounterResult;
 import com.pokegoapi.api.map.pokemon.encounter.NormalEncounterResult;
 import com.pokegoapi.api.settings.AsyncCatchOptions;
 import com.pokegoapi.api.settings.CatchOptions;
+import com.pokegoapi.exceptions.AsyncPokemonGoException;
 import com.pokegoapi.exceptions.AsyncRemoteServerException;
 import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.EncounterFailedException;
@@ -656,6 +657,12 @@ public class CatchablePokemon implements MapPoint {
 						if (response.getStatus() == CatchStatus.CATCH_FLEE
 								|| response.getStatus() == CatchStatus.CATCH_SUCCESS) {
 							despawned = true;
+						}
+
+						try {
+							api.getPlayerProfile().updateProfile();
+						} catch (Exception e) {
+							throw new AsyncPokemonGoException(e);
 						}
 
 						return new CatchResult(response);

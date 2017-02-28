@@ -18,7 +18,6 @@ package com.pokegoapi.api;
 import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
-import POGOProtos.Networking.Platform.PlatformRequestTypeOuterClass.PlatformRequestType;
 import POGOProtos.Networking.Requests.Messages.CheckChallengeMessageOuterClass.CheckChallengeMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadItemTemplatesMessageOuterClass.DownloadItemTemplatesMessage;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
@@ -250,7 +249,8 @@ public class PokemonGo {
 
 		ServerRequest downloadConfigRequest = new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
 				CommonRequests.getDownloadRemoteConfigVersionMessageRequest(this));
-		getRequestHandler().sendServerRequests(downloadConfigRequest, true, RequestType.GET_BUDDY_WALKED);
+		getRequestHandler().sendServerRequests(downloadConfigRequest, true, RequestType.GET_BUDDY_WALKED,
+				RequestType.GET_INCENSE_POKEMON);
 		getAssetDigest();
 
 		try {
@@ -282,10 +282,6 @@ public class PokemonGo {
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
-
-		ServerRequestEnvelope envelope = ServerRequestEnvelope.create();
-		envelope.add(PlatformRequestType.GET_STORE_ITEMS, ByteString.EMPTY);
-		getRequestHandler().sendServerRequests(envelope);
 
 		List<LoginListener> loginListeners = getListeners(LoginListener.class);
 
@@ -337,7 +333,8 @@ public class PokemonGo {
 	 */
 	public void getAssetDigest() throws RemoteServerException, CaptchaActiveException, LoginFailedException,
 			HashException {
-		ServerRequestEnvelope envelope = ServerRequestEnvelope.createCommons(RequestType.GET_BUDDY_WALKED);
+		ServerRequestEnvelope envelope = ServerRequestEnvelope.createCommons(RequestType.GET_BUDDY_WALKED,
+				RequestType.GET_INCENSE_POKEMON);
 		envelope.add(RequestType.GET_ASSET_DIGEST, CommonRequests.getGetAssetDigestMessageRequest(this));
 		getRequestHandler().sendServerRequests(envelope);
 	}

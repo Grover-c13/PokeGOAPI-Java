@@ -50,7 +50,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class RequestHandler implements Runnable {
 	private static final int THROTTLE = 350;
@@ -60,12 +59,12 @@ public class RequestHandler implements Runnable {
 	private final BlockingQueue<ServerRequestEnvelope> workQueue = new LinkedBlockingQueue<>();
 	private String apiEndpoint;
 	private OkHttpClient client;
-	private AtomicLong requestId = new AtomicLong(System.currentTimeMillis());
 	private Random random;
-
 	private AuthTicket authTicket;
 
 	private boolean active = true;
+
+	private RequestIdGenerator requestIdGenerator = new RequestIdGenerator(16807);
 
 	/**
 	 * Instantiates a new Request handler.
@@ -188,7 +187,7 @@ public class RequestHandler implements Runnable {
 	}
 
 	/**
-	 * Sends multiple ServerRequests in a thread safe manner.
+	 * Builds and sends a request envelope
 	 *
 	 * @param serverResponse the response to append to
 	 * @param requests list of ServerRequests to be sent
@@ -201,28 +200,24 @@ public class RequestHandler implements Runnable {
 	private ServerResponse sendInternal(ServerResponse serverResponse, ServerRequest[] requests,
 			ServerPlatformRequest[] platformRequests)
 			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
-		RequestEnvelope.Builder builder = RequestEnvelope.newBuilder();
-		resetBuilder(builder);
+		RequestEnvelope.Builder builder = buildRequest(requests, platformRequests);
 
-		for (ServerRequest serverRequest : requests) {
-			ByteString data = serverRequest.getRequest().toByteString();
-			Request request = Request.newBuilder()
-					.setRequestMessage(data)
-					.setRequestType(serverRequest.getType())
-					.build();
-			builder.addRequests(request);
-		}
+		return sendInternal(serverResponse, requests, builder);
+	}
 
-		Signature.setSignature(api, builder);
-
-		for (ServerPlatformRequest platformRequest : platformRequests) {
-			ByteString data = platformRequest.getRequest();
-			Builder request = PlatformRequest.newBuilder()
-					.setType(platformRequest.getType())
-					.setRequestMessage(data);
-			builder.addPlatformRequests(request);
-		}
-
+	/**
+	 * Sends an already built request envelope
+	 *
+	 * @param serverResponse the response to append to
+	 * @param requests list of ServerRequests to be sent
+	 * @param builder the request envelope builder
+	 * @throws RemoteServerException if this message fails to send
+	 * @throws LoginFailedException if login fails
+	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws HashException if an exception occurs while hashing this request
+	 */
+	private ServerResponse sendInternal(ServerResponse serverResponse, ServerRequest[] requests,
+			RequestEnvelope.Builder builder) throws RemoteServerException, CaptchaActiveException, HashException, LoginFailedException {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		RequestEnvelope request = builder.build();
 		try {
@@ -260,19 +255,19 @@ public class RequestHandler implements Runnable {
 
 			StatusCode statusCode = responseEnvelop.getStatusCode();
 			if (statusCode != StatusCode.OK && statusCode != StatusCode.OK_RPC_URL_IN_RESPONSE) {
-				if (statusCode == ResponseEnvelope.StatusCode.INVALID_AUTH_TOKEN) {
+				if (statusCode == StatusCode.INVALID_AUTH_TOKEN) {
 					try {
 						api.getAuthInfo(true);
-						return sendInternal(serverResponse, requests, platformRequests);
+						return sendInternal(serverResponse, requests, builder);
 					} catch (LoginFailedException e) {
 						throw new RemoteServerException("Failed to refresh auth token!", e);
 					} catch (RemoteServerException e) {
 						throw new RemoteServerException("Failed to send request with refreshed auth token!", e);
 					}
-				} else if (statusCode == ResponseEnvelope.StatusCode.REDIRECT) {
+				} else if (statusCode == StatusCode.REDIRECT) {
 					// API_ENDPOINT was not correctly set, should be at this point, though, so redo the request
-					return sendInternal(serverResponse, requests, platformRequests);
-				} else if (statusCode == ResponseEnvelope.StatusCode.BAD_REQUEST) {
+					return sendInternal(serverResponse, requests, builder);
+				} else if (statusCode == StatusCode.BAD_REQUEST) {
 					if (api.getPlayerProfile().isBanned()) {
 						throw new LoginFailedException("Cannot send request, your account has been banned!");
 					} else {
@@ -315,10 +310,36 @@ public class RequestHandler implements Runnable {
 		return serverResponse;
 	}
 
+	private RequestEnvelope.Builder buildRequest(ServerRequest[] requests, ServerPlatformRequest[] platformRequests)
+			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
+		RequestEnvelope.Builder builder = RequestEnvelope.newBuilder();
+		resetBuilder(builder);
+
+		for (ServerRequest serverRequest : requests) {
+			ByteString data = serverRequest.getRequest().toByteString();
+			Request request = Request.newBuilder()
+					.setRequestMessage(data)
+					.setRequestType(serverRequest.getType())
+					.build();
+			builder.addRequests(request);
+		}
+
+		Signature.setSignature(api, builder);
+
+		for (ServerPlatformRequest platformRequest : platformRequests) {
+			ByteString data = platformRequest.getRequest();
+			Builder request = PlatformRequest.newBuilder()
+					.setType(platformRequest.getType())
+					.setRequestMessage(data);
+			builder.addPlatformRequests(request);
+		}
+		return builder;
+	}
+
 	private void resetBuilder(RequestEnvelope.Builder builder)
 			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
 		builder.setStatusCode(2);
-		builder.setRequestId(getRequestId());
+		builder.setRequestId(requestIdGenerator.next());
 		//builder.setAuthInfo(api.getAuthInfo());
 		boolean expired = authTicket != null && api.currentTimeMillis() >= authTicket.getExpireTimestampMs();
 		if (authTicket != null && !expired) {
@@ -331,10 +352,6 @@ public class RequestHandler implements Runnable {
 		builder.setLatitude(api.getLatitude());
 		builder.setLongitude(api.getLongitude());
 		builder.setAccuracy(api.getAccuracy());
-	}
-
-	private Long getRequestId() {
-		return requestId.get();
 	}
 
 	@Override
@@ -408,7 +425,6 @@ public class RequestHandler implements Runnable {
 					response.setException(e);
 				}
 
-				requestId.incrementAndGet();
 				envelope.handleResponse(response);
 
 				try {

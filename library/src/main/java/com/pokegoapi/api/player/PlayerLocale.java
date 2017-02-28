@@ -15,9 +15,10 @@
 
 package com.pokegoapi.api.player;
 
-import java.util.Locale;
-
 import POGOProtos.Networking.Requests.Messages.GetPlayerMessageOuterClass;
+
+import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Created by iGio90 on 25/08/16.
@@ -27,13 +28,14 @@ public class PlayerLocale {
 	private GetPlayerMessageOuterClass.GetPlayerMessage.PlayerLocale playerLocale;
 
 	/**
-	 * Contructor to use the default Locale
+	 * Constructor to use the default Locale
 	 */
 	public PlayerLocale() {
 		GetPlayerMessageOuterClass.GetPlayerMessage.PlayerLocale.Builder builder =
 				GetPlayerMessageOuterClass.GetPlayerMessage.PlayerLocale.newBuilder();
 		builder.setCountry(Locale.getDefault().getCountry())
-				.setLanguage(Locale.getDefault().getLanguage());
+				.setLanguage(Locale.getDefault().getLanguage())
+				.setTimezone(Calendar.getInstance().getTimeZone().getID());
 
 		playerLocale = builder.build();
 	}

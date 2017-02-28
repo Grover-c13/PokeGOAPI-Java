@@ -165,7 +165,7 @@ public class CommonRequests {
 		COMMON_REQUESTS.put(RequestType.GET_INCENSE_POKEMON, new CommonRequest() {
 			@Override
 			public boolean shouldAdd(PokemonGo api, RequestType type, Set<RequestType> requestTypes) {
-				return requestTypes.contains(RequestType.GET_PLAYER_PROFILE) && api.isLoggingIn();
+				return api.getInventories().getItemBag().isIncenseActive();
 			}
 
 			@Override

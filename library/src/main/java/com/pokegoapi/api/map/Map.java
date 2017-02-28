@@ -67,11 +67,7 @@ public class Map {
 	public boolean update() throws CaptchaActiveException, RemoteServerException, LoginFailedException, HashException {
 		boolean updated = false;
 		if (!(Double.isNaN(api.getLatitude()) || Double.isNaN(api.getLongitude()))) {
-			MapObjects mapObjects = requestMapObjects();
-			if (api.getInventories().getItemBag().isIncenseActive()) {
-				mapObjects.addIncensePokemon(requestIncensePokemon());
-			}
-			this.mapObjects = mapObjects;
+			this.mapObjects = requestMapObjects();
 			updated = true;
 		}
 		synchronized (this.updateLock) {
