@@ -21,6 +21,11 @@ public class LocationFixes extends ArrayList<LocationFix> {
 	@Getter
 	private long timestampCreate;
 
+	public LocationFixes generate(final PokemonGo api, final RequestEnvelopeOuterClass.RequestEnvelope.Builder builder,
+	                              final long currentTime, final Random rand) {
+		return getDefault(api, builder, currentTime, rand);
+	}
+	
 	public LocationFixes() {
 	}
 
@@ -71,7 +76,7 @@ public class LocationFixes extends ArrayList<LocationFix> {
 			locationFixes = api.getLocationFixes();
 			locationFixes.clear();
 
-			boolean expired = currentTime - locationFixes.getTimestampCreate() < (random.nextInt(10 * 1000) + 5000);
+			boolean expired = currentTime - locationFixes.getTimestampCreate() < (random.nextInt(10000) + 5000);
 			if (empty || (!hasMapUpdate && expired)) {
 				locationFixes.setTimestampCreate(currentTime);
 				return locationFixes;
@@ -97,7 +102,7 @@ public class LocationFixes extends ArrayList<LocationFix> {
 					longitude = -360;
 				}
 				if (random.nextInt(100) > 90) {
-					altitude = (float) (66 + (160 - 66) * random.nextDouble());
+					altitude = (float) (66 + 94 * random.nextDouble());
 				}
 			}
 
@@ -114,8 +119,11 @@ public class LocationFixes extends ArrayList<LocationFix> {
 					.setHorizontalAccuracy((float) api.getAccuracy())
 					.setAltitude(altitude)
 					.setVerticalAccuracy(verticalAccuracy)
-					.setProviderStatus(3)
-					.setLocationType(1);
+					.setProviderStatus(3L)
+					.setLocationType(1L)
+					// When emulating IOS (which is now mendatory) we must set those values too
+					.setSpeed(-1.0f)
+					.setCourse(-1.0f);
 			locationFixes.add(locationFixBuilder.build());
 		}
 		return locationFixes;
