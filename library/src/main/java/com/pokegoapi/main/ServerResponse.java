@@ -15,6 +15,7 @@
 
 package com.pokegoapi.main;
 
+import POGOProtos.Networking.Platform.PlatformRequestTypeOuterClass.PlatformRequestType;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import com.google.protobuf.ByteString;
 import lombok.Getter;
@@ -24,6 +25,7 @@ import java.util.EnumMap;
 
 public class ServerResponse {
 	private final EnumMap<RequestType, ByteString> responses = new EnumMap<>(RequestType.class);
+	private final EnumMap<PlatformRequestType, ByteString> platformResponses = new EnumMap<>(PlatformRequestType.class);
 	@Getter
 	@Setter
 	private Exception exception;
@@ -39,6 +41,16 @@ public class ServerResponse {
 	}
 
 	/**
+	 * Adds a response to this envelope
+	 *
+	 * @param type the type of request
+	 * @param data the response data for this request
+	 */
+	public void addResponse(PlatformRequestType type, ByteString data) {
+		platformResponses.put(type, data);
+	}
+
+	/**
 	 * Gets the response data for this request type
 	 *
 	 * @param type the type to check
@@ -46,5 +58,15 @@ public class ServerResponse {
 	 */
 	public ByteString get(RequestType type) {
 		return responses.get(type);
+	}
+
+	/**
+	 * Gets the response data for this request type
+	 *
+	 * @param type the type to check
+	 * @return response data for the given type, null if none available
+	 */
+	public ByteString get(PlatformRequestType type) {
+		return platformResponses.get(type);
 	}
 }

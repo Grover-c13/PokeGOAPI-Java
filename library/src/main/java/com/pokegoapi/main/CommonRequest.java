@@ -23,7 +23,11 @@ import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 
+import java.util.Set;
+
 public interface CommonRequest {
+	boolean shouldAdd(PokemonGo api, RequestType type, Set<RequestType> requestTypes);
+
 	ServerRequest create(PokemonGo api, RequestType requestType);
 
 	void parse(PokemonGo api, ByteString data, RequestType requestType)

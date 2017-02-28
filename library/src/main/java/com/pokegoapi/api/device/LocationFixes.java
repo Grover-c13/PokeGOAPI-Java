@@ -1,6 +1,7 @@
 package com.pokegoapi.api.device;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass.Signature.LocationFix;
 import POGOProtos.Networking.Requests.RequestOuterClass.Request;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
@@ -21,8 +22,7 @@ public class LocationFixes extends ArrayList<LocationFix> {
 	@Getter
 	private long timestampCreate;
 
-	public LocationFixes generate(final PokemonGo api, final RequestEnvelopeOuterClass.RequestEnvelope.Builder builder,
-	                              final long currentTime, final Random rand) {
+	public LocationFixes generate(PokemonGo api, RequestEnvelope.Builder builder, long currentTime, Random rand) {
 		return getDefault(api, builder, currentTime, rand);
 	}
 	

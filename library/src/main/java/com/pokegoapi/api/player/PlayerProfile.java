@@ -180,9 +180,7 @@ public class PlayerProfile {
 	 */
 	public void getProfile() throws RemoteServerException, CaptchaActiveException, LoginFailedException,
 			HashException {
-		GetPlayerProfileMessage profileMessage = GetPlayerProfileMessage.newBuilder()
-				.setPlayerName(playerData.getUsername())
-				.build();
+		GetPlayerProfileMessage profileMessage = GetPlayerProfileMessage.newBuilder().setPlayerName("").build();
 
 		ServerRequest profileRequest = new ServerRequest(RequestType.GET_PLAYER_PROFILE, profileMessage);
 		api.getRequestHandler().sendServerRequests(profileRequest, true);

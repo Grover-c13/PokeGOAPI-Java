@@ -24,6 +24,7 @@ import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass
 import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.GetAssetDigestMessage;
 import POGOProtos.Networking.Requests.Messages.GetBuddyWalkedMessageOuterClass.GetBuddyWalkedMessage;
 import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
+import POGOProtos.Networking.Requests.Messages.GetIncensePokemonMessageOuterClass.GetIncensePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
@@ -31,6 +32,7 @@ import POGOProtos.Networking.Responses.CheckChallengeResponseOuterClass.CheckCha
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import POGOProtos.Networking.Responses.GetBuddyWalkedResponseOuterClass.GetBuddyWalkedResponse;
 import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
+import POGOProtos.Networking.Responses.GetIncensePokemonResponseOuterClass.GetIncensePokemonResponse;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -41,9 +43,11 @@ import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by iGio90 on 27/08/16.
@@ -52,6 +56,7 @@ import java.util.Map;
 public class CommonRequests {
 	private static final RequestType[] PARSE_REQUESTS = new RequestType[]{
 			RequestType.DOWNLOAD_SETTINGS,
+			RequestType.GET_INCENSE_POKEMON,
 			RequestType.CHECK_CHALLENGE,
 			RequestType.GET_INVENTORY,
 			RequestType.GET_HATCHED_EGGS,
@@ -63,6 +68,11 @@ public class CommonRequests {
 
 	static {
 		COMMON_REQUESTS.put(RequestType.CHECK_CHALLENGE, new CommonRequest() {
+			@Override
+			public boolean shouldAdd(PokemonGo api, RequestType type, Set<RequestType> requestTypes) {
+				return !(api.isLoggingIn() && api.hasChallenge());
+			}
+
 			@Override
 			public ServerRequest create(PokemonGo api, RequestType requestType) {
 				return new ServerRequest(requestType, CheckChallengeMessage.getDefaultInstance());
@@ -78,6 +88,11 @@ public class CommonRequests {
 		});
 		COMMON_REQUESTS.put(RequestType.GET_HATCHED_EGGS, new CommonRequest() {
 			@Override
+			public boolean shouldAdd(PokemonGo api, RequestType type, Set<RequestType> requestTypes) {
+				return true;
+			}
+
+			@Override
 			public ServerRequest create(PokemonGo api, RequestType requestType) {
 				return new ServerRequest(requestType, GetHatchedEggsMessage.getDefaultInstance());
 			}
@@ -91,6 +106,11 @@ public class CommonRequests {
 			}
 		});
 		COMMON_REQUESTS.put(RequestType.GET_INVENTORY, new CommonRequest() {
+			@Override
+			public boolean shouldAdd(PokemonGo api, RequestType type, Set<RequestType> requestTypes) {
+				return true;
+			}
+
 			@Override
 			public ServerRequest create(PokemonGo api, RequestType requestType) {
 				return new ServerRequest(requestType, CommonRequests.getDefaultGetInventoryMessage(api));
@@ -106,6 +126,11 @@ public class CommonRequests {
 		});
 		COMMON_REQUESTS.put(RequestType.CHECK_AWARDED_BADGES, new CommonRequest() {
 			@Override
+			public boolean shouldAdd(PokemonGo api, RequestType type, Set<RequestType> requestTypes) {
+				return true;
+			}
+
+			@Override
 			public ServerRequest create(PokemonGo api, RequestType requestType) {
 				return new ServerRequest(requestType, CheckAwardedBadgesMessage.getDefaultInstance());
 			}
@@ -120,6 +145,11 @@ public class CommonRequests {
 		});
 		COMMON_REQUESTS.put(RequestType.DOWNLOAD_SETTINGS, new CommonRequest() {
 			@Override
+			public boolean shouldAdd(PokemonGo api, RequestType type, Set<RequestType> requestTypes) {
+				return true;
+			}
+
+			@Override
 			public ServerRequest create(PokemonGo api, RequestType requestType) {
 				return new ServerRequest(requestType, CommonRequests.getDownloadSettingsMessageRequest(api));
 			}
@@ -132,7 +162,34 @@ public class CommonRequests {
 				api.getSettings().updateSettings(response);
 			}
 		});
+		COMMON_REQUESTS.put(RequestType.GET_INCENSE_POKEMON, new CommonRequest() {
+			@Override
+			public boolean shouldAdd(PokemonGo api, RequestType type, Set<RequestType> requestTypes) {
+				return requestTypes.contains(RequestType.GET_PLAYER_PROFILE) && api.isLoggingIn();
+			}
+
+			@Override
+			public ServerRequest create(PokemonGo api, RequestType requestType) {
+				GetIncensePokemonMessage message = GetIncensePokemonMessage.newBuilder()
+						.setPlayerLatitude(api.getLatitude())
+						.setPlayerLongitude(api.getLongitude())
+						.build();
+				return new ServerRequest(requestType, message);
+			}
+
+			@Override
+			public void parse(PokemonGo api, ByteString data, RequestType requestType)
+					throws InvalidProtocolBufferException,
+					CaptchaActiveException, RemoteServerException, LoginFailedException {
+				api.getMap().getMapObjects().addIncensePokemon(GetIncensePokemonResponse.parseFrom(data));
+			}
+		});
 		COMMON_REQUESTS.put(RequestType.GET_BUDDY_WALKED, new CommonRequest() {
+			@Override
+			public boolean shouldAdd(PokemonGo api, RequestType type, Set<RequestType> requestTypes) {
+				return true;
+			}
+
 			@Override
 			public ServerRequest create(PokemonGo api, RequestType requestType) {
 				return new ServerRequest(requestType, GetBuddyWalkedMessage.getDefaultInstance());
@@ -282,5 +339,21 @@ public class CommonRequests {
 			}
 		}
 		RECEIVED_COMMONS.clear();
+	}
+
+	/**
+	 * Returns if the given common request should be added or not
+	 *
+	 * @param api the current api
+	 * @param type the current request
+	 * @param requests the other requests with this envelope
+	 * @return true if this common request should be included
+	 */
+	public static boolean shouldAdd(PokemonGo api, RequestType type, List<ServerRequest> requests) {
+		Set<RequestType> requestTypes = new HashSet<>();
+		for (ServerRequest request : requests) {
+			requestTypes.add(request.getType());
+		}
+		return COMMON_REQUESTS.get(type).shouldAdd(api, type, requestTypes);
 	}
 }

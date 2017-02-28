@@ -17,7 +17,10 @@ package com.pokegoapi.main;
 
 import POGOProtos.Networking.Envelopes.AuthTicketOuterClass.AuthTicket;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.PlatformRequest;
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.PlatformRequest.Builder;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope;
+import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope.PlatformResponse;
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope.StatusCode;
 import POGOProtos.Networking.Requests.RequestOuterClass.Request;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
@@ -189,12 +192,14 @@ public class RequestHandler implements Runnable {
 	 *
 	 * @param serverResponse the response to append to
 	 * @param requests list of ServerRequests to be sent
+	 * @param platformRequests list of ServerPlatformRequests to be sent
 	 * @throws RemoteServerException if this message fails to send
 	 * @throws LoginFailedException if login fails
 	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
 	 * @throws HashException if an exception occurs while hashing this request
 	 */
-	private ServerResponse sendInternal(ServerResponse serverResponse, ServerRequest[] requests)
+	private ServerResponse sendInternal(ServerResponse serverResponse, ServerRequest[] requests,
+			ServerPlatformRequest[] platformRequests)
 			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
 		RequestEnvelope.Builder builder = RequestEnvelope.newBuilder();
 		resetBuilder(builder);
@@ -209,6 +214,14 @@ public class RequestHandler implements Runnable {
 		}
 
 		Signature.setSignature(api, builder);
+
+		for (ServerPlatformRequest platformRequest : platformRequests) {
+			ByteString data = platformRequest.getRequest();
+			Builder request = PlatformRequest.newBuilder()
+					.setType(platformRequest.getType())
+					.setRequestMessage(data);
+			builder.addPlatformRequests(request);
+		}
 
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		RequestEnvelope request = builder.build();
@@ -250,7 +263,7 @@ public class RequestHandler implements Runnable {
 				if (statusCode == ResponseEnvelope.StatusCode.INVALID_AUTH_TOKEN) {
 					try {
 						api.getAuthInfo(true);
-						return sendInternal(serverResponse, requests);
+						return sendInternal(serverResponse, requests, platformRequests);
 					} catch (LoginFailedException e) {
 						throw new RemoteServerException("Failed to refresh auth token!", e);
 					} catch (RemoteServerException e) {
@@ -258,7 +271,7 @@ public class RequestHandler implements Runnable {
 					}
 				} else if (statusCode == ResponseEnvelope.StatusCode.REDIRECT) {
 					// API_ENDPOINT was not correctly set, should be at this point, though, so redo the request
-					return sendInternal(serverResponse, requests);
+					return sendInternal(serverResponse, requests, platformRequests);
 				} else if (statusCode == ResponseEnvelope.StatusCode.BAD_REQUEST) {
 					if (api.getPlayerProfile().isBanned()) {
 						throw new LoginFailedException("Cannot send request, your account has been banned!");
@@ -279,6 +292,14 @@ public class RequestHandler implements Runnable {
 					serverResponse.addResponse(serverRequest.getType(), returned);
 				} else {
 					empty = true;
+				}
+			}
+
+			for (int i = 0; i < responseEnvelop.getPlatformReturnsCount(); i++) {
+				PlatformResponse platformResponse = responseEnvelop.getPlatformReturns(i);
+				ByteString returned = platformResponse.getResponse();
+				if (returned != null) {
+					serverResponse.addResponse(platformResponse.getType(), returned);
 				}
 			}
 
@@ -313,7 +334,7 @@ public class RequestHandler implements Runnable {
 	}
 
 	private Long getRequestId() {
-		return requestId.getAndIncrement();
+		return requestId.get();
 	}
 
 	@Override
@@ -342,11 +363,8 @@ public class RequestHandler implements Runnable {
 				ServerRequestEnvelope envelope = workQueue.poll();
 
 				List<ServerRequest> requests = new ArrayList<>();
-				Set<RequestType> exclusions = envelope.getCommonExclusions();
 
-				if (api.isLoggingIn() && api.hasChallenge()) {
-					exclusions.add(RequestType.CHECK_CHALLENGE);
-				}
+				Set<RequestType> exclusions = envelope.getCommonExclusions();
 
 				ServerResponse response = new ServerResponse();
 
@@ -371,7 +389,8 @@ public class RequestHandler implements Runnable {
 				if (envelope.isCommons()) {
 					ServerRequest[] commonRequests = CommonRequests.getCommonRequests(api);
 					for (ServerRequest request : commonRequests) {
-						if (!exclusions.contains(request.getType())) {
+						RequestType type = request.getType();
+						if (CommonRequests.shouldAdd(api, type, envelope.getRequests()) && !exclusions.contains(type)) {
 							requests.add(request);
 							envelope.add(request);
 						}
@@ -379,12 +398,17 @@ public class RequestHandler implements Runnable {
 				}
 
 				ServerRequest[] arrayRequests = requests.toArray(new ServerRequest[requests.size()]);
+				List<ServerPlatformRequest> platformRequests = envelope.getPlatformRequests();
+				ServerPlatformRequest[] arrayPlatformRequests
+						= platformRequests.toArray(new ServerPlatformRequest[platformRequests.size()]);
 
 				try {
-					response = sendInternal(response, arrayRequests);
+					response = sendInternal(response, arrayRequests, arrayPlatformRequests);
 				} catch (RemoteServerException | LoginFailedException | CaptchaActiveException | HashException e) {
 					response.setException(e);
 				}
+
+				requestId.incrementAndGet();
 				envelope.handleResponse(response);
 
 				try {

@@ -18,6 +18,7 @@ package com.pokegoapi.api;
 import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
+import POGOProtos.Networking.Platform.PlatformRequestTypeOuterClass.PlatformRequestType;
 import POGOProtos.Networking.Requests.Messages.CheckChallengeMessageOuterClass.CheckChallengeMessage;
 import POGOProtos.Networking.Requests.Messages.DownloadItemTemplatesMessageOuterClass.DownloadItemTemplatesMessage;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
@@ -47,9 +48,9 @@ import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.main.CommonRequests;
 import com.pokegoapi.main.Heartbeat;
 import com.pokegoapi.main.PokemonMeta;
-import com.pokegoapi.main.CommonRequests;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.main.ServerRequestEnvelope;
@@ -281,6 +282,10 @@ public class PokemonGo {
 		} catch (InvalidProtocolBufferException e) {
 			throw new RemoteServerException(e);
 		}
+
+		ServerRequestEnvelope envelope = ServerRequestEnvelope.create();
+		envelope.add(PlatformRequestType.GET_STORE_ITEMS, ByteString.EMPTY);
+		getRequestHandler().sendServerRequests(envelope);
 
 		List<LoginListener> loginListeners = getListeners(LoginListener.class);
 

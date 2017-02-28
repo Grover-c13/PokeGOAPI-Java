@@ -15,7 +15,9 @@
 
 package com.pokegoapi.main;
 
+import POGOProtos.Networking.Platform.PlatformRequestTypeOuterClass.PlatformRequestType;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,6 +36,8 @@ import java.util.concurrent.TimeoutException;
 public class ServerRequestEnvelope {
 	@Getter
 	private List<ServerRequest> requests = new ArrayList<>();
+	@Getter
+	private List<ServerPlatformRequest> platformRequests = new ArrayList<>();
 	@Getter
 	private Set<RequestType> commonExclusions = new HashSet<>();
 	@Setter
@@ -139,12 +143,37 @@ public class ServerRequestEnvelope {
 	}
 
 	/**
+	 * Adds a platform request to this envelope
+	 *
+	 * @param request the request to add
+	 * @return the added request
+	 */
+	public ServerPlatformRequest add(ServerPlatformRequest request) {
+		this.platformRequests.add(request);
+		return request;
+	}
+
+	/**
+	 * Adds a platform request to this envelope
+	 *
+	 * @param requestType the type of request being added
+	 * @param request the request to be added
+	 * @return the added request
+	 */
+	public ServerPlatformRequest add(PlatformRequestType requestType, ByteString request) {
+		return this.add(new ServerPlatformRequest(requestType, request));
+	}
+
+	/**
 	 * Handles the response for this request
 	 *
 	 * @param response the response
 	 */
 	public void handleResponse(ServerResponse response) {
 		for (ServerRequest request : requests) {
+			request.handleResponse(response.get(request.getType()));
+		}
+		for (ServerPlatformRequest request : platformRequests) {
 			request.handleResponse(response.get(request.getType()));
 		}
 		synchronized (responseLock) {

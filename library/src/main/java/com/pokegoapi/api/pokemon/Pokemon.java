@@ -298,11 +298,7 @@ public class Pokemon extends PokemonDetails {
 			return null;
 		}
 
-		EvolutionResult result = new EvolutionResult(api, response);
-
-		api.getInventories().getPokebank().removePokemon(this);
-
-		return result;
+		return new EvolutionResult(api, response);
 	}
 
 	/**
