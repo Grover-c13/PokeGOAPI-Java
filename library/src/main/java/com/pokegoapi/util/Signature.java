@@ -36,43 +36,29 @@ import java.util.Random;
 
 public class Signature {
 	private static final Random RANDOM = new Random();
-	/**
-	* Ptr8 is only sent with the first Get Map Object, 
-	* we need a flag to tell us if it has already been sent.
-	* After that, GET_MAP_OBJECTS is sent with common requests.
-	*/
-	private static boolean firstGMO = true;
-	/**
-	* Ptr8 is only sent with the first Get Player request, 
-	* we need a flag to tell us if it has already been sent.
-	* after that, GET_PLAYER  is sent with common requests.
-	*/
-	private static boolean firstGP = true;
 
 	/**
 	 * Given a fully built request, set the signature correctly.
 	 *
-	 * @param api     the api
+	 * @param api the api
 	 * @param builder the RequestEnvelope builder
 	 * @throws RemoteServerException if an invalid request is sent
-	 * @throws HashException         if hashing fails
+	 * @throws HashException if hashing fails
 	 */
 	public static void setSignature(PokemonGo api, RequestEnvelope.Builder builder)
 			throws RemoteServerException, HashException {
-		boolean usePtr8 = builder.getRequestsCount() > 0;
+		boolean usePtr8 = false;
 		byte[][] requestData = new byte[builder.getRequestsCount()][];
 		for (int i = 0; i < builder.getRequestsCount(); i++) {
 			requestData[i] = builder.getRequests(i).toByteArray();
 			RequestType requestType = builder.getRequests(i).getRequestType();
 			if (requestType == RequestType.GET_PLAYER) {
-				usePtr8 = !firstGP;
-				if (firstGP)
-					firstGP = false;
-			} else if (firstGMO && requestType == RequestType.GET_MAP_OBJECTS) {
-				usePtr8 = false;
-				firstGMO = false;
-			} else
-				usePtr8 = false;
+				usePtr8 |= api.isFirstGP();
+				api.setFirstGP(false);
+			} else if (requestType == RequestType.GET_MAP_OBJECTS) {
+				usePtr8 |= !api.isFirstGMO();
+				api.setFirstGMO(false);
+			}
 		}
 		double latitude = api.getLatitude();
 		double longitude = api.getLongitude();

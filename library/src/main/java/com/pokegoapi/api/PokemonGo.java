@@ -138,6 +138,23 @@ public class PokemonGo {
 	private OkHttpClient client;
 
 	/**
+	 * Ptr8 is only sent with the first Get Map Object,
+	 * we need a flag to tell us if it has already been sent.
+	 * After that, GET_MAP_OBJECTS is sent with common requests.
+	 */
+	@Getter
+	@Setter
+	private boolean firstGMO = true;
+	/**
+	 * Ptr8 is only sent with the first Get Player request,
+	 * we need a flag to tell us if it has already been sent.
+	 * after that, GET_PLAYER  is sent with common requests.
+	 */
+	@Getter
+	@Setter
+	private boolean firstGP = true;
+
+	/**
 	 * Instantiates a new Pokemon go.
 	 *
 	 * @param client the http client
