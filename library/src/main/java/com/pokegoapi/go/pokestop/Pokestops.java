@@ -5,15 +5,13 @@ import com.pokegoapi.go.PokemonGoClient;
 import com.pokegoapi.go.pokestop.spec.LootResult;
 import com.pokegoapi.go.pokestop.spec.Pokestop;
 import com.pokegoapi.network.exception.RequestFailedException;
-import com.pokegoapi.provider.GetInstance;
-import com.pokegoapi.provider.NoSuchTypeException;
-import com.pokegoapi.provider.Provider;
+import com.pokegoapi.provider.*;
 
 /**
  * An object that handles interactions of Pokestops on the map
  */
 @SuppressWarnings("unused")
-public final class Pokestops{
+public final class Pokestops extends ProviderInterface {
 
     private final PokestopsSpi spi;
     private final Provider provider;
@@ -36,6 +34,7 @@ public final class Pokestops{
 
     public void initialize(PokemonGoClient client) {
         spi.engineInitialize(client);
+        called = true;
     }
 
     /**
@@ -45,6 +44,7 @@ public final class Pokestops{
      * @throws RequestFailedException if an exception occurs while sending the request
      */
     public LootResult loot(Pokestop pokestop) throws RequestFailedException {
+        ProviderInterfaces.requireInitializedAndNonNull(this, pokestop, Pokestop.class);
         return spi.engineLoot(pokestop);
     }
 
@@ -55,6 +55,7 @@ public final class Pokestops{
      * @throws RequestFailedException if an exception occurs while sending the request
      */
     public boolean addModifier(Pokestop pokestop, ItemId item) throws RequestFailedException {
+        ProviderInterfaces.requireInitializedAndNonNull(this, pokestop, Pokestop.class);
         return spi.engineAddModifier(pokestop, item);
     }
 
@@ -65,6 +66,7 @@ public final class Pokestops{
      * @throws RequestFailedException if an exception occurs while sending the request
      */
     public boolean getDetails(Pokestop pokestop) throws RequestFailedException {
+        ProviderInterfaces.requireInitializedAndNonNull(this, pokestop, Pokestop.class);
         return spi.engineGetDetails(pokestop);
     }
 

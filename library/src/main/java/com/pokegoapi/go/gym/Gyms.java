@@ -7,14 +7,12 @@ import com.pokegoapi.go.gym.spec.BattleListener;
 import com.pokegoapi.go.gym.spec.Gym;
 import com.pokegoapi.go.pokemon.spec.Pokemon;
 import com.pokegoapi.network.exception.RequestFailedException;
-import com.pokegoapi.provider.GetInstance;
-import com.pokegoapi.provider.NoSuchTypeException;
-import com.pokegoapi.provider.Provider;
+import com.pokegoapi.provider.*;
 
 import java.util.Objects;
 
 @SuppressWarnings("unused")
-public final class Gyms {
+public final class Gyms  extends ProviderInterface {
 
     private final GymsSpi spi;
     private final Provider provider;
@@ -37,6 +35,7 @@ public final class Gyms {
 
     public void initialize(PokemonGoClient client) {
         spi.engineInitialize(client);
+        called = true;
     }
 
     /**
@@ -44,7 +43,7 @@ public final class Gyms {
      * @return the updated Gym
      */
     public Gym getGymDetails(Gym gym) throws RequestFailedException {
-        gymNullCheck(gym);
+        ProviderInterfaces.requireInitializedAndNonNull(this, gym, Gym.class);
         return spi.engineGetGymDetails(gym);
     }
 
@@ -55,7 +54,7 @@ public final class Gyms {
      * @return the result of deploying to the gym
      */
     public FortDeployPokemonResponse.Result deployPokemon(Gym gym, Pokemon pokemon) throws RequestFailedException {
-        gymNullCheck(gym);
+        ProviderInterfaces.requireInitializedAndNonNull(this, gym, Gym.class);
         Objects.requireNonNull(pokemon, "Pokemon is null");
         return spi.engineDeployPokemon(gym, pokemon);
     }
@@ -68,7 +67,7 @@ public final class Gyms {
      * @return the battle to be fought
      */
     public Battle battle(Gym gym, Pokemon[] attackingTeam, BattleListener listener) throws RequestFailedException {
-        gymNullCheck(gym);
+        ProviderInterfaces.requireInitializedAndNonNull(this, gym, Gym.class);
         Objects.requireNonNull(attackingTeam,"Attacking Team is null");
         Objects.requireNonNull(listener, "Battle Listener is null");
 
@@ -77,10 +76,6 @@ public final class Gyms {
         }
 
         return spi.engineBattleGym(gym, attackingTeam, listener);
-    }
-
-    private void gymNullCheck(Gym gym){
-        Objects.requireNonNull(gym, "Gym is null");
     }
 
     public Provider getProvider() {
