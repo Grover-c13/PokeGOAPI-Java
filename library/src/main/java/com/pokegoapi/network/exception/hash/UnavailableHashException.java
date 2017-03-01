@@ -1,4 +1,4 @@
-package com.pokegoapi.exceptions.hash;
+package com.pokegoapi.network.exception.hash;
 
 /**
  * Created by RebliNk17 on 1/25/2017.

@@ -13,18 +13,24 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.network.exception.hash;
 
-public class AsyncLoginFailedException extends AsyncPokemonGoException {
-	public AsyncLoginFailedException(String reason) {
+public class HashException extends Exception {
+
+	public HashException() {
+		super();
+	}
+
+	public HashException(String reason) {
 		super(reason);
 	}
 
-	public AsyncLoginFailedException(Exception exception) {
+	public HashException(Throwable exception) {
 		super(exception);
 	}
 
-	public AsyncLoginFailedException(String reason, Exception exception) {
+	public HashException(String reason, Throwable exception) {
 		super(reason, exception);
 	}
+
 }
