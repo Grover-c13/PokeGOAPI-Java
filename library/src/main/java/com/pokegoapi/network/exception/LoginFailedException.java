@@ -15,20 +15,23 @@
 
 package com.pokegoapi.network.exception;
 
+/**
+ * Thrown when the API fails to log in due to an exception
+ */
 public class LoginFailedException extends RequestFailedException {
-	public LoginFailedException() {
-		super();
-	}
+    public LoginFailedException() {
+        super();
+    }
 
-	public LoginFailedException(String reason) {
-		super(reason);
-	}
+    public LoginFailedException(String reason) {
+        super(reason);
+    }
 
-	public LoginFailedException(Throwable exception) {
-		super(exception);
-	}
+    public LoginFailedException(Throwable exception) {
+        super(exception);
+    }
 
-	public LoginFailedException(String reason, Throwable exception) {
-		super(reason, exception);
-	}
+    public LoginFailedException(String reason, Throwable exception) {
+        super(reason, exception);
+    }
 }

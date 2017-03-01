@@ -1,7 +1,7 @@
 package com.pokegoapi.network.exception;
 
 /**
- * Created by chris on 2/3/2017.
+ * Exception thrown when this API fails to send a request because this current account is banned
  */
 public class AccountBannedException extends RequestFailedException {
 

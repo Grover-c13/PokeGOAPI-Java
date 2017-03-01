@@ -1,5 +1,6 @@
 package com.pokegoapi.go.auth;
 
+import com.pokegoapi.network.exception.InvalidCredentialsException;
 import com.pokegoapi.provider.GetInstance;
 import com.pokegoapi.provider.NoSuchTypeException;
 import com.pokegoapi.provider.Provider;
@@ -44,7 +45,7 @@ public final class CredentialProvider {
         return spi.engineCreateCredential(spec, this);
     }
 
-    public Credentials refreshCredential(Credentials credential) throws LoginFailedException {
+    public Credentials refreshCredential(Credentials credential) throws LoginFailedException, InvalidCredentialsException {
         return spi.engineRefreshCredential(credential, this);
     }
 }

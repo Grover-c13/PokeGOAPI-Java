@@ -1,7 +1,7 @@
 package com.pokegoapi.network.exception;
 
 /**
- * Created by chris on 2/3/2017.
+ * Thrown when the API fails to send a request because a captcha is currently active
  */
 public class CaptchaActiveException extends RequestFailedException {
 
