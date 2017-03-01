@@ -4,18 +4,18 @@ import com.github.aeonlucid.pogoprotos.networking.Requests.RequestType;
 import com.google.protobuf.Message;
 import com.pokegoapi.go.spec.Credentials;
 import com.pokegoapi.network.spec.ServerRequest;
-import com.pokegoapi.provider.GetInstance;
+import com.pokegoapi.provider.*;
 import com.pokegoapi.provider.GetInstance.Instance;
-import com.pokegoapi.provider.NoSuchTypeException;
-import com.pokegoapi.provider.Provider;
 
 /**
  * Created by chris on 1/22/2017.
  */
-public final class PokemonGoClient {
+public final class PokemonGoClient extends ProviderInterface {
 
     private Provider provider;
     private PokemonGoClientSpi spi;
+
+    private boolean called;
 
     private PokemonGoClient(PokemonGoClientSpi spi, Provider provider){
         this.spi = spi;
@@ -43,10 +43,12 @@ public final class PokemonGoClient {
     }
 
     public void login(Credentials credentials){
+        ProviderInterfaces.requireInitialized(this);
         spi.engineLogin(credentials);
     }
 
     public ServerRequest createRequest(Message request, RequestType type) {
+        ProviderInterfaces.requireInitialized(this);
         return spi.engineCreateRequest(request, type);
     }
 }
