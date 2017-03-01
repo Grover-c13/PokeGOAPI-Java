@@ -69,6 +69,7 @@ checkstyleMain.doLast {
 
 dependencies {
     compile project(':library')
+    compile project(':protos')
     compile 'svarzee.gps:gpsoauth:0.3'
     compile 'com.squareup.okio:okio:1.9.0'
     compile 'com.squareup.moshi:moshi:1.2.0'
