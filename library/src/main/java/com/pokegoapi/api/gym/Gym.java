@@ -142,7 +142,7 @@ public class Gym implements MapPoint {
 
 
 			ServerRequest serverRequest = new ServerRequest(RequestType.GET_GYM_DETAILS, reqMsg);
-			api.getRequestHandler().sendServerRequests(serverRequest);
+			api.getRequestHandler().sendServerRequests(serverRequest, true);
 
 			try {
 				details = GetGymDetailsResponse.parseFrom(serverRequest.getData());
@@ -226,7 +226,7 @@ public class Gym implements MapPoint {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.FORT_DEPLOY_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest, true);
 
 		try {
 			return FortDeployPokemonResponse.parseFrom(serverRequest.getData()).getResult();

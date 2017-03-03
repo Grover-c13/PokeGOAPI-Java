@@ -24,6 +24,7 @@ import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelo
 import POGOProtos.Networking.Envelopes.ResponseEnvelopeOuterClass.ResponseEnvelope.StatusCode;
 import POGOProtos.Networking.Requests.RequestOuterClass.Request;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResponse;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -253,7 +254,35 @@ public class RequestHandler implements Runnable {
 				this.authTicket = responseEnvelop.getAuthTicket();
 			}
 
+			boolean empty = false;
+
 			StatusCode statusCode = responseEnvelop.getStatusCode();
+
+			if (statusCode != StatusCode.REDIRECT && statusCode != StatusCode.INVALID_AUTH_TOKEN) {
+				for (int i = 0; i < responseEnvelop.getReturnsCount(); i++) {
+					ByteString returned = responseEnvelop.getReturns(i);
+					ServerRequest serverRequest = requests[i];
+					if (returned != null) {
+						serverResponse.addResponse(serverRequest.getType(), returned);
+						if (serverRequest.getType() == RequestType.GET_PLAYER) {
+							if (GetPlayerResponse.parseFrom(returned).getBanned()) {
+								throw new RemoteServerException("Failed to send request, your account is banned!");
+							}
+						}
+					} else {
+						empty = true;
+					}
+				}
+			}
+
+			for (int i = 0; i < responseEnvelop.getPlatformReturnsCount(); i++) {
+				PlatformResponse platformResponse = responseEnvelop.getPlatformReturns(i);
+				ByteString returned = platformResponse.getResponse();
+				if (returned != null) {
+					serverResponse.addResponse(platformResponse.getType(), returned);
+				}
+			}
+
 			if (statusCode != StatusCode.OK && statusCode != StatusCode.OK_RPC_URL_IN_RESPONSE) {
 				if (statusCode == StatusCode.INVALID_AUTH_TOKEN) {
 					try {
@@ -275,26 +304,6 @@ public class RequestHandler implements Runnable {
 					}
 				} else {
 					throw new RemoteServerException("Failed to send request: " + statusCode);
-				}
-			}
-
-			boolean empty = false;
-
-			for (int i = 0; i < responseEnvelop.getReturnsCount(); i++) {
-				ByteString returned = responseEnvelop.getReturns(i);
-				ServerRequest serverRequest = requests[i];
-				if (returned != null) {
-					serverResponse.addResponse(serverRequest.getType(), returned);
-				} else {
-					empty = true;
-				}
-			}
-
-			for (int i = 0; i < responseEnvelop.getPlatformReturnsCount(); i++) {
-				PlatformResponse platformResponse = responseEnvelop.getPlatformReturns(i);
-				ByteString returned = platformResponse.getResponse();
-				if (returned != null) {
-					serverResponse.addResponse(platformResponse.getType(), returned);
 				}
 			}
 

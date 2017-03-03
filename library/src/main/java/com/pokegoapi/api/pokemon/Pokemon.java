@@ -237,7 +237,7 @@ public class Pokemon extends PokemonDetails {
 		UpgradePokemonMessage reqMsg = UpgradePokemonMessage.newBuilder().setPokemonId(getId()).build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.UPGRADE_POKEMON, reqMsg);
 
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
+		return api.getRequestHandler().sendAsyncServerRequests(serverRequest, true).map(
 				new Func1<ByteString, UpgradePokemonResponse.Result>() {
 					@Override
 					public UpgradePokemonResponse.Result call(ByteString result) {

@@ -146,7 +146,7 @@ public class Pokestop {
 
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH,
 				searchMessage);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
+		return api.getRequestHandler().sendAsyncServerRequests(serverRequest, true).map(
 				new Func1<ByteString, PokestopLootResult>() {
 					@Override
 					public PokestopLootResult call(ByteString result) {
@@ -241,7 +241,7 @@ public class Pokestop {
 
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS,
 				reqMsg);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(
+		return api.getRequestHandler().sendAsyncServerRequests(serverRequest, true).map(
 				new Func1<ByteString, FortDetails>() {
 					@Override
 					public FortDetails call(ByteString result) {
