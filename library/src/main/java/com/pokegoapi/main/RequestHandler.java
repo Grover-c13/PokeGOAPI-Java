@@ -203,7 +203,7 @@ public class RequestHandler implements Runnable {
 			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
 		RequestEnvelope.Builder builder = buildRequest(requests, platformRequests);
 
-		return sendInternal(serverResponse, requests, builder);
+		return sendInternal(serverResponse, requests, platformRequests, builder);
 	}
 
 	/**
@@ -211,6 +211,7 @@ public class RequestHandler implements Runnable {
 	 *
 	 * @param serverResponse the response to append to
 	 * @param requests list of ServerRequests to be sent
+	 * @param platformRequests list of ServerPlatformRequests to be sent
 	 * @param builder the request envelope builder
 	 * @throws RemoteServerException if this message fails to send
 	 * @throws LoginFailedException if login fails
@@ -218,7 +219,8 @@ public class RequestHandler implements Runnable {
 	 * @throws HashException if an exception occurs while hashing this request
 	 */
 	private ServerResponse sendInternal(ServerResponse serverResponse, ServerRequest[] requests,
-			RequestEnvelope.Builder builder) throws RemoteServerException, CaptchaActiveException, HashException, LoginFailedException {
+			ServerPlatformRequest[] platformRequests, RequestEnvelope.Builder builder)
+			throws RemoteServerException, CaptchaActiveException, HashException, LoginFailedException {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		RequestEnvelope request = builder.build();
 		try {
@@ -286,8 +288,9 @@ public class RequestHandler implements Runnable {
 			if (statusCode != StatusCode.OK && statusCode != StatusCode.OK_RPC_URL_IN_RESPONSE) {
 				if (statusCode == StatusCode.INVALID_AUTH_TOKEN) {
 					try {
+						authTicket = null;
 						api.getAuthInfo(true);
-						return sendInternal(serverResponse, requests, builder);
+						return sendInternal(serverResponse, requests, platformRequests);
 					} catch (LoginFailedException e) {
 						throw new RemoteServerException("Failed to refresh auth token!", e);
 					} catch (RemoteServerException e) {
@@ -295,7 +298,7 @@ public class RequestHandler implements Runnable {
 					}
 				} else if (statusCode == StatusCode.REDIRECT) {
 					// API_ENDPOINT was not correctly set, should be at this point, though, so redo the request
-					return sendInternal(serverResponse, requests, builder);
+					return sendInternal(serverResponse, requests, platformRequests, builder);
 				} else if (statusCode == StatusCode.BAD_REQUEST) {
 					if (api.getPlayerProfile().isBanned()) {
 						throw new LoginFailedException("Cannot send request, your account has been banned!");
@@ -350,12 +353,12 @@ public class RequestHandler implements Runnable {
 		builder.setStatusCode(2);
 		builder.setRequestId(requestIdGenerator.next());
 		//builder.setAuthInfo(api.getAuthInfo());
-		boolean expired = authTicket != null && api.currentTimeMillis() >= authTicket.getExpireTimestampMs();
-		if (authTicket != null && !expired) {
+		boolean refresh = authTicket != null && api.currentTimeMillis() >= authTicket.getExpireTimestampMs();
+		if (authTicket != null && !refresh) {
 			builder.setAuthTicket(authTicket);
 		} else {
 			Log.d(TAG, "Authenticated with static token");
-			builder.setAuthInfo(api.getAuthInfo(expired));
+			builder.setAuthInfo(api.getAuthInfo(refresh));
 		}
 		builder.setMsSinceLastLocationfix(random.nextInt(1651) + 149);
 		builder.setLatitude(api.getLatitude());
