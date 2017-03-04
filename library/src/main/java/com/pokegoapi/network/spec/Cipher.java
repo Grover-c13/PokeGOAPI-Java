@@ -6,7 +6,16 @@ package com.pokegoapi.network.spec;
 public interface Cipher {
 
     class Rand {
-        public long state;
+        private long state;
+
+        private Rand(long state) {
+            this.state = state;
+        }
+
+        private byte next() {
+            state = (state * 0x41C64E6D) + 0x3039;
+            return (byte) ((state >> 16) & 0xFF);
+        }
     }
 
     byte[] makeIv(Rand rand);
@@ -21,5 +30,4 @@ public interface Cipher {
      * @return shuffled bytes
      */
     CipherText encrypt(byte[] input, long msSinceStart);
-
 }

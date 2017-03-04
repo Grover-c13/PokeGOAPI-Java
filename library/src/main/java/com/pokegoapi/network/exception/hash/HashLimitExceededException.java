@@ -13,16 +13,23 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.network.exception.hash;
 
+/**
+ * Hash Limit Exceeded Exception
+ */
+public class HashLimitExceededException extends HashException {
 
-
-public class CaptchaActiveException extends Exception {
-
-	private String captcha;
-
-	public CaptchaActiveException(AsyncCaptchaActiveException exception) {
-		super(exception.getMessage(), exception);
-		this.captcha = exception.getCaptcha();
+	public HashLimitExceededException() {
+		super();
 	}
+
+	public HashLimitExceededException(String reason) {
+		super(reason);
+	}
+
+	public HashLimitExceededException(Throwable exception) {
+		super(exception);
+	}
+
 }

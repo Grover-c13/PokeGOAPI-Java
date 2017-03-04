@@ -15,20 +15,23 @@
 
 package com.pokegoapi.network.exception;
 
+/**
+ * Base class for all request related exceptions
+ */
 public class RequestFailedException extends Exception {
-	public RequestFailedException() {
-		super();
-	}
+    public RequestFailedException() {
+        super();
+    }
 
-	public RequestFailedException(String reason) {
-		super(reason);
-	}
+    public RequestFailedException(String reason) {
+        super(reason);
+    }
 
-	public RequestFailedException(Throwable exception) {
-		super(exception);
-	}
+    public RequestFailedException(Throwable exception) {
+        super(exception);
+    }
 
-	public RequestFailedException(String reason, Throwable exception) {
-		super(reason, exception);
-	}
+    public RequestFailedException(String reason, Throwable exception) {
+        super(reason, exception);
+    }
 }

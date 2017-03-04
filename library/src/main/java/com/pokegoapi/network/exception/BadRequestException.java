@@ -1,7 +1,7 @@
 package com.pokegoapi.network.exception;
 
 /**
- * Created by chris on 2/3/2017.
+ * Thrown when the server responds to a request with the BAD_REQUEST status code
  */
 public class BadRequestException extends RequestFailedException {
 
