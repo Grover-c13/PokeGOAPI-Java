@@ -16,8 +16,6 @@
 package com.pokegoapi.google.common.geometry;
 
 
-import com.pokegoapi.util.Log;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -65,7 +63,6 @@ public final strictfp class S2Polyline implements S2Region {
 		int n = vertices.size();
 		for (int i = 0; i < n; ++i) {
 			if (!S2.isUnitLength(vertices.get(i))) {
-				Log.i(TAG, "Vertex " + i + " is not unit length");
 				return false;
 			}
 		}
@@ -74,7 +71,6 @@ public final strictfp class S2Polyline implements S2Region {
 		for (int i = 1; i < n; ++i) {
 			if (vertices.get(i - 1).equals(vertices.get(i))
 					|| vertices.get(i - 1).equals(S2Point.neg(vertices.get(i)))) {
-				Log.i(TAG, "Vertices " + (i - 1) + " and " + i + " are identical or antipodal");
 				return false;
 			}
 		}
