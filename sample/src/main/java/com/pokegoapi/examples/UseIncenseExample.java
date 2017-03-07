@@ -33,10 +33,7 @@ package com.pokegoapi.examples;
 
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.auth.PtcCredentialProvider;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.hash.HashProvider;
@@ -56,11 +53,9 @@ public class UseIncenseExample {
 			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD), hasher);
 			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 			api.getInventories().getItemBag().useIncense();
-		} catch (LoginFailedException | RemoteServerException | CaptchaActiveException e) {
+		} catch (RequestFailedException e) {
 			// failed to login, invalid credentials, auth issue or server issue.
 			Log.e("Main", "Failed to login, captcha or server issue: ", e);
-		} catch (HashException e) {
-			Log.e("Main ", "Failed to login to the Hash Service: ", e);
 		}
 	}
 }

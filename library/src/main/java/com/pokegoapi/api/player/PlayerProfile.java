@@ -48,12 +48,9 @@ import com.pokegoapi.api.listener.TutorialListener;
 import com.pokegoapi.api.pokemon.Buddy;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.api.pokemon.StarterPokemon;
-import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.InsufficientLevelException;
 import com.pokegoapi.exceptions.InvalidCurrencyException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 import lombok.Getter;
@@ -108,13 +105,9 @@ public class PlayerProfile {
 	/**
 	 * Updates the player profile with the latest data.
 	 *
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public void updateProfile() throws RemoteServerException, CaptchaActiveException, LoginFailedException,
-			HashException {
+	public void updateProfile() throws RequestFailedException {
 		GetPlayerMessage message = GetPlayerMessage.newBuilder()
 				.setPlayerLocale(playerLocale.getPlayerLocale())
 				.build();
@@ -125,7 +118,7 @@ public class PlayerProfile {
 		try {
 			updateProfile(GetPlayerResponse.parseFrom(request.getData()));
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 	}
 
@@ -173,13 +166,9 @@ public class PlayerProfile {
 	/**
 	 * Performs a GET_PLAYER_PROFILE request.
 	 *
-	 * @throws RemoteServerException if the server has an issue or an invalid request is sent
-	 * @throws CaptchaActiveException if a captcha is active, and the message cannot be sent
-	 * @throws LoginFailedException if login fails
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public void getProfile() throws RemoteServerException, CaptchaActiveException, LoginFailedException,
-			HashException {
+	public void getProfile() throws RequestFailedException {
 		GetPlayerProfileMessage profileMessage = GetPlayerProfileMessage.newBuilder().setPlayerName("").build();
 
 		ServerRequest profileRequest = new ServerRequest(RequestType.GET_PLAYER_PROFILE, profileMessage);
@@ -196,7 +185,7 @@ public class PlayerProfile {
 				this.startTime = response.getStartTime();
 			}
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 	}
 
@@ -207,15 +196,12 @@ public class PlayerProfile {
 	 *
 	 * @param level the trainer level that you want to accept the rewards for
 	 * @return a PlayerLevelUpRewards object containing information about the items rewarded and unlocked for this level
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 * @throws InsufficientLevelException if you have not yet reached the desired level
-	 * @throws HashException if an exception occurred while requesting hash
 	 * @see PlayerLevelUpRewards
 	 */
 	public PlayerLevelUpRewards acceptLevelUpRewards(int level)
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
+			throws RequestFailedException {
 		// Check if we even have achieved this level yet
 		if (level > stats.getLevel()) {
 			throw new InsufficientLevelException();
@@ -229,7 +215,7 @@ public class PlayerProfile {
 		try {
 			response = LevelUpRewardsResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 		// Add the awarded items to our bag
 		ItemBag bag = api.getInventories().getItemBag();
@@ -258,15 +244,11 @@ public class PlayerProfile {
 	/**
 	 * Check and equip badges.
 	 *
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException When a buffer exception is thrown
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 * @deprecated use getMedals, which uses common requests to check for badges
 	 */
 	@Deprecated
-	public void checkAndEquipBadges() throws LoginFailedException, CaptchaActiveException, RemoteServerException,
-			HashException {
+	public void checkAndEquipBadges() throws RequestFailedException {
 		CheckAwardedBadgesMessage msg = CheckAwardedBadgesMessage.newBuilder().build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.CHECK_AWARDED_BADGES, msg);
 		api.getRequestHandler().sendServerRequests(serverRequest);
@@ -274,7 +256,7 @@ public class PlayerProfile {
 		try {
 			response = CheckAwardedBadgesResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 		this.updateAwardedMedals(response);
 	}
@@ -298,12 +280,10 @@ public class PlayerProfile {
 	 * Equips the badges contained in the given response
 	 *
 	 * @param response the response to get badges from
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws LoginFailedException if login fails
-	 * @throws RemoteServerException if the server has an issue
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
 	public void updateAwardedMedals(CheckAwardedBadgesResponse response)
-			throws CaptchaActiveException, LoginFailedException, RemoteServerException {
+			throws RequestFailedException {
 		if (response.getSuccess()) {
 			List<PlayerListener> listeners = api.getListeners(PlayerListener.class);
 			for (int i = 0; i < response.getAwardedBadgesCount(); i++) {
@@ -321,7 +301,7 @@ public class PlayerProfile {
 	}
 
 	public enum Currency {
-		STARDUST, POKECOIN;
+		STARDUST, POKECOIN
 	}
 
 	/**
@@ -434,13 +414,10 @@ public class PlayerProfile {
 	 *
 	 * @param pokemon the pokemon to set as your buddy
 	 * @return if this task was successfull
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public boolean setBuddy(Pokemon pokemon) throws CaptchaActiveException, LoginFailedException,
-			RemoteServerException, HashException {
+	public boolean setBuddy(Pokemon pokemon) throws
+			RequestFailedException {
 		SetBuddyPokemonMessageOuterClass.SetBuddyPokemonMessage message = SetBuddyPokemonMessageOuterClass
 				.SetBuddyPokemonMessage.newBuilder()
 				.setPokemonId(pokemon.getId())
@@ -452,33 +429,25 @@ public class PlayerProfile {
 			buddy = new Buddy(api, response.getUpdatedBuddy());
 			return response.hasUpdatedBuddy();
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 	}
 
 	/**
 	 * Set the account to legal screen in order to receive valid response
 	 *
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public void activateAccount() throws LoginFailedException, CaptchaActiveException, RemoteServerException,
-			HashException {
+	public void activateAccount() throws RequestFailedException {
 		markTutorial(TutorialStateOuterClass.TutorialState.LEGAL_SCREEN);
 	}
 
 	/**
 	 * Setup an avatar for the current account
 	 *
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public void setupAvatar() throws LoginFailedException, CaptchaActiveException, RemoteServerException,
-			HashException {
+	public void setupAvatar() throws RequestFailedException {
 		SecureRandom random = new SecureRandom();
 
 		PlayerGender gender = random.nextInt(100) % 2 == 0 ? PlayerGender.FEMALE : PlayerGender.MALE;
@@ -515,7 +484,7 @@ public class PlayerProfile {
 
 			updateProfile(playerData);
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 
 		markTutorial(TutorialStateOuterClass.TutorialState.AVATAR_SELECTION);
@@ -526,13 +495,10 @@ public class PlayerProfile {
 	/**
 	 * Encounter tutorial complete. In other words, catch the first Pokémon
 	 *
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public void encounterTutorialComplete() throws LoginFailedException, CaptchaActiveException,
-			RemoteServerException, HashException {
+	public void encounterTutorialComplete() throws
+			RequestFailedException {
 		StarterPokemon starter = StarterPokemon.random();
 
 		List<TutorialListener> listeners = api.getListeners(TutorialListener.class);
@@ -562,7 +528,7 @@ public class PlayerProfile {
 		try {
 			updateProfile(GetPlayerResponse.parseFrom(request.getData()));
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 	}
 
@@ -570,13 +536,9 @@ public class PlayerProfile {
 	 * Setup an user name for our account
 	 *
 	 * @return the claimed codename
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public String claimCodeName() throws LoginFailedException, CaptchaActiveException, RemoteServerException,
-			HashException {
+	public String claimCodeName() throws RequestFailedException {
 		return claimCodeName(null);
 	}
 
@@ -585,13 +547,10 @@ public class PlayerProfile {
 	 *
 	 * @param lastFailure the last name used that was already taken; null for first try.
 	 * @return the claimed codename
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
 	public String claimCodeName(String lastFailure)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
+			throws RequestFailedException {
 		if (getPlayerData().getRemainingCodenameClaims() <= 0) {
 			throw new RuntimeException("You have no remaining codename claims!");
 		}
@@ -640,7 +599,7 @@ public class PlayerProfile {
 				updateProfile(GetPlayerResponse.parseFrom(request.getData()));
 			}
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 		return updatedCodename;
 	}
@@ -648,18 +607,15 @@ public class PlayerProfile {
 	/**
 	 * The last step, mark the last tutorial state as completed
 	 *
-	 * @throws LoginFailedException when the auth is invalid
-	 * @throws RemoteServerException when the server is down/having issues
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
 	public void firstTimeExperienceComplete()
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
+			throws RequestFailedException {
 		markTutorial(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE);
 	}
 
 	private void markTutorial(TutorialStateOuterClass.TutorialState state)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
+			throws RequestFailedException {
 		final MarkTutorialCompleteMessage tutorialMessage = MarkTutorialCompleteMessage.newBuilder()
 				.addTutorialsCompleted(state)
 				.setSendMarketingEmails(false)
@@ -674,7 +630,7 @@ public class PlayerProfile {
 
 			updateProfile(playerData);
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 	}
 

@@ -17,9 +17,7 @@ package com.pokegoapi.examples;
 
 
 import com.pokegoapi.auth.GoogleUserCredentialProvider;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import okhttp3.OkHttpClient;
 
 import java.util.Scanner;
@@ -48,7 +46,7 @@ public class GoogleUserInteractionExample {
 			provider.login(access);
 			System.out.println("Refresh token:" + provider.getRefreshToken());
 			
-		} catch (LoginFailedException | RemoteServerException | CaptchaActiveException e) {
+		} catch (RequestFailedException e) {
 			e.printStackTrace();
 		}
 

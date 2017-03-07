@@ -23,10 +23,7 @@ import POGOProtos.Networking.Responses.GetIncensePokemonResponseOuterClass.GetIn
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.google.common.geometry.MutableInteger;
 import com.pokegoapi.google.common.geometry.S2CellId;
 import com.pokegoapi.google.common.geometry.S2LatLng;
@@ -59,12 +56,9 @@ public class Map {
 	 * Updates the map. Only API should be calling this.
 	 *
 	 * @return if the map was updated
-	 * @throws CaptchaActiveException if a captcha is active and the map cannot be updates
-	 * @throws RemoteServerException if the server gives an error while updating this map
-	 * @throws LoginFailedException if login fails
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public boolean update() throws CaptchaActiveException, RemoteServerException, LoginFailedException, HashException {
+	public boolean update() throws RequestFailedException {
 		boolean updated = false;
 		if (!(Double.isNaN(api.getLatitude()) || Double.isNaN(api.getLongitude()))) {
 			this.mapObjects = requestMapObjects();
@@ -80,13 +74,10 @@ public class Map {
 	 * Requests and returns MapObjects from the server.
 	 *
 	 * @return the returned MapObjects
-	 * @throws CaptchaActiveException if a captcha is active and the map cannot be updated
-	 * @throws RemoteServerException if the server gives an error while updating this map
-	 * @throws LoginFailedException if login fails
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
 	protected MapObjects requestMapObjects()
-			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
+			throws RequestFailedException {
 		List<Long> cells = getDefaultCells();
 		GetMapObjectsMessage.Builder builder = GetMapObjectsMessage.newBuilder();
 		builder.setLatitude(api.getLatitude());
@@ -105,7 +96,7 @@ public class Map {
 			}
 			return mapObjects;
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 	}
 
@@ -113,13 +104,10 @@ public class Map {
 	 * Requests and returns incense pokemon from the server.
 	 *
 	 * @return the returned incense pokemon response
-	 * @throws CaptchaActiveException if a captcha is active and the incense pokemon cannot be requested
-	 * @throws RemoteServerException if the server gives an error while updating the current
-	 * @throws LoginFailedException if login fails
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
 	protected GetIncensePokemonResponse requestIncensePokemon()
-			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
+			throws RequestFailedException {
 		GetIncensePokemonMessage message = GetIncensePokemonMessage.newBuilder()
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
@@ -129,7 +117,7 @@ public class Map {
 		try {
 			return GetIncensePokemonResponse.parseFrom(request.getData());
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 	}
 

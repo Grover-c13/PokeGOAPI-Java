@@ -77,7 +77,7 @@ public class ServerRequestEnvelope {
 					}
 				}
 				if (response != null && response.getException() != null) {
-					throw new ExecutionException(response.getException());
+					throw new RuntimeException(response.getException());
 				}
 				return response;
 			}

@@ -13,22 +13,24 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.exceptions.request;
 
-public class RemoteServerException extends Exception {
-	public RemoteServerException() {
+public class HashException extends RequestFailedException {
+
+	public HashException() {
 		super();
 	}
 
-	public RemoteServerException(String reason) {
+	public HashException(String reason) {
 		super(reason);
 	}
 
-	public RemoteServerException(Throwable exception) {
+	public HashException(Throwable exception) {
 		super(exception);
 	}
 
-	public RemoteServerException(String reason, Throwable exception) {
+	public HashException(String reason, Throwable exception) {
 		super(reason, exception);
 	}
+
 }

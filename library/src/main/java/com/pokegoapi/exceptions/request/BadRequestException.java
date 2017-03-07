@@ -13,24 +13,22 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.exceptions.request;
 
-import lombok.Getter;
-
-/**
- * Exception thrown when a message is requested to send, but a captcha is currently active
- */
-public class AsyncCaptchaActiveException extends AsyncPokemonGoException {
-	@Getter
-	private String captcha;
-
-	public AsyncCaptchaActiveException(String captcha) {
-		super("Captcha must be solved before sending messages!");
-		this.captcha = captcha;
+public class BadRequestException extends RequestFailedException {
+	public BadRequestException() {
+		super();
 	}
 
-	public AsyncCaptchaActiveException(Exception exception, String captcha) {
-		super("Captcha must be solved before sending messages!", exception);
-		this.captcha = captcha;
+	public BadRequestException(String reason) {
+		super(reason);
+	}
+
+	public BadRequestException(Throwable exception) {
+		super(exception);
+	}
+
+	public BadRequestException(String reason, Throwable exception) {
+		super(reason, exception);
 	}
 }

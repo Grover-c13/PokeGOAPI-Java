@@ -43,10 +43,7 @@ import com.pokegoapi.api.map.Point;
 import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.auth.CredentialProvider;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.main.CommonRequests;
 import com.pokegoapi.main.Heartbeat;
 import com.pokegoapi.main.PokemonMeta;
@@ -215,13 +212,10 @@ public class PokemonGo {
 	 *
 	 * @param credentialProvider the credential provider
 	 * @param hashProvider to provide hashes
-	 * @throws LoginFailedException When login fails
-	 * @throws RemoteServerException When server fails
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurs while performing a hash request
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
 	public void login(CredentialProvider credentialProvider, HashProvider hashProvider)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
+			throws RequestFailedException {
 		this.loggingIn = true;
 		if (credentialProvider == null) {
 			throw new NullPointerException("Credential Provider can not be null!");
@@ -235,8 +229,7 @@ public class PokemonGo {
 		initialize();
 	}
 
-	private void initialize() throws RemoteServerException, CaptchaActiveException, LoginFailedException,
-			HashException {
+	private void initialize() throws RequestFailedException {
 		if (getRequestHandler() != null) {
 			getRequestHandler().exit();
 		}
@@ -261,7 +254,7 @@ public class PokemonGo {
 				PokemonMeta.update(getRequestHandler().sendServerRequests(request, true), true);
 			}
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -280,7 +273,7 @@ public class PokemonGo {
 				inventories.getItemBag().addAwardedItems(levelUpRewardsResponse);
 			}
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 
 		List<LoginListener> loginListeners = getListeners(LoginListener.class);
@@ -326,13 +319,9 @@ public class PokemonGo {
 	/**
 	 * Second requests block. Public since it could be re-fired at any time
 	 *
-	 * @throws LoginFailedException When login fails
-	 * @throws RemoteServerException When server fails
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurs while performing a hash request
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public void getAssetDigest() throws RemoteServerException, CaptchaActiveException, LoginFailedException,
-			HashException {
+	public void getAssetDigest() throws RequestFailedException {
 		ServerRequestEnvelope envelope = ServerRequestEnvelope.createCommons(RequestType.GET_BUDDY_WALKED,
 				RequestType.GET_INCENSE_POKEMON);
 		envelope.add(RequestType.GET_ASSET_DIGEST, CommonRequests.getGetAssetDigestMessageRequest(this));
@@ -362,12 +351,10 @@ public class PokemonGo {
 	 *
 	 * @param refresh if the AuthInfo object should be refreshed
 	 * @return AuthInfo object
-	 * @throws LoginFailedException when login fails
-	 * @throws RemoteServerException When server fails
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
 	public AuthInfo getAuthInfo(boolean refresh)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws RequestFailedException {
 		return credentialProvider.getAuthInfo(refresh);
 	}
 
@@ -600,51 +587,47 @@ public class PokemonGo {
 	 *
 	 * @param token the challenge response token
 	 * @return if the token was valid or not
-	 * @throws LoginFailedException when login fails
-	 * @throws RemoteServerException when server fails
-	 * @throws InvalidProtocolBufferException when the client receives an invalid message from the server
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if there is a problem with the Hash key / Service
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public boolean verifyChallenge(String token)
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException,
-			InvalidProtocolBufferException, HashException {
+	public boolean verifyChallenge(String token) throws RequestFailedException {
 		hasChallenge = false;
 		VerifyChallengeMessage message = VerifyChallengeMessage.newBuilder().setToken(token).build();
 		ServerRequest request = new ServerRequest(RequestType.VERIFY_CHALLENGE, message);
 		ByteString responseData = getRequestHandler().sendServerRequests(request, false);
-		VerifyChallengeResponse response = VerifyChallengeResponse.parseFrom(responseData);
-		hasChallenge = !response.getSuccess();
-		if (!hasChallenge) {
-			challengeURL = null;
-			synchronized (challengeLock) {
-				challengeLock.notifyAll();
+		try {
+			VerifyChallengeResponse response = VerifyChallengeResponse.parseFrom(responseData);
+			hasChallenge = !response.getSuccess();
+			if (!hasChallenge) {
+				challengeURL = null;
+				synchronized (challengeLock) {
+					challengeLock.notifyAll();
+				}
 			}
+			return response.getSuccess();
+		} catch (InvalidProtocolBufferException e) {
+			throw new RequestFailedException(e);
 		}
-		return response.getSuccess();
 	}
 
 	/**
 	 * Checks for a challenge / captcha
 	 *
 	 * @return the new challenge URL, if any
-	 * @throws LoginFailedException when login fails
-	 * @throws RemoteServerException when server fails
-	 * @throws InvalidProtocolBufferException when the client receives an invalid message from the server
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if there is a problem with the Hash key / Service
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public String checkChallenge()
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException,
-			InvalidProtocolBufferException, HashException {
+	public String checkChallenge() throws RequestFailedException {
 		CheckChallengeMessage message = CheckChallengeMessage.newBuilder().build();
-		ServerRequest request = new ServerRequest(RequestType.CHECK_CHALLENGE, message);
-		ByteString responseData = getRequestHandler().sendServerRequests(request, false);
-		CheckChallengeResponse response = CheckChallengeResponse.parseFrom(responseData);
-		String newChallenge = response.getChallengeUrl();
-		if (response.getShowChallenge() && newChallenge != null && newChallenge.length() > 0) {
-			updateChallenge(newChallenge, true);
-			return newChallenge;
+		try {
+			ServerRequest request = new ServerRequest(RequestType.CHECK_CHALLENGE, message);
+			ByteString responseData = getRequestHandler().sendServerRequests(request, false);
+			CheckChallengeResponse response = CheckChallengeResponse.parseFrom(responseData);
+			String newChallenge = response.getChallengeUrl();
+			if (response.getShowChallenge() && newChallenge != null && newChallenge.length() > 0) {
+				updateChallenge(newChallenge, true);
+				return newChallenge;
+			}
+		} catch (InvalidProtocolBufferException e) {
+			throw new RequestFailedException(e);
 		}
 		return null;
 	}

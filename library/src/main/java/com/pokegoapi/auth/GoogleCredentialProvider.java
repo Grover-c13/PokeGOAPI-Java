@@ -16,9 +16,8 @@
 package com.pokegoapi.auth;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.request.InvalidCredentialsException;
+import com.pokegoapi.exceptions.request.LoginFailedException;
 import com.pokegoapi.util.Log;
 import com.squareup.moshi.Moshi;
 import lombok.Getter;
@@ -58,12 +57,11 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	 *
 	 * @param client OkHttp client
 	 * @param refreshToken Refresh Token Persisted by user
-	 * @throws LoginFailedException When login fails
-	 * @throws RemoteServerException if the server failed to respond
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
 	public GoogleCredentialProvider(OkHttpClient client, String refreshToken)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, InvalidCredentialsException {
 		this.client = client;
 		this.refreshToken = refreshToken;
 		onGoogleLoginOAuthCompleteListener = null;
@@ -76,12 +74,12 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	 *
 	 * @param client OkHttp client
 	 * @param onGoogleLoginOAuthCompleteListener Callback to know verification url and also persist refresh token
-	 * @throws LoginFailedException When login fails
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
 	public GoogleCredentialProvider(OkHttpClient client,
 			OnGoogleLoginOAuthCompleteListener onGoogleLoginOAuthCompleteListener)
-			throws LoginFailedException, CaptchaActiveException {
+			throws LoginFailedException, InvalidCredentialsException {
 		this.client = client;
 		if (onGoogleLoginOAuthCompleteListener != null) {
 			this.onGoogleLoginOAuthCompleteListener = onGoogleLoginOAuthCompleteListener;
@@ -96,12 +94,11 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	 * Given the refresh token fetches a new access token and returns AuthInfo.
 	 *
 	 * @param refreshToken Refresh token persisted by the user after initial login
-	 * @throws LoginFailedException If we fail to get tokenId
-	 * @throws RemoteServerException if the server failed to respond
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
 	public void refreshToken(String refreshToken)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, InvalidCredentialsException {
 		HttpUrl url = HttpUrl.parse(OAUTH_TOKEN_ENDPOINT).newBuilder()
 				.addQueryParameter("client_id", CLIENT_ID)
 				.addQueryParameter("client_secret", SECRET)
@@ -119,7 +116,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 		try {
 			response = client.newCall(request).execute();
 		} catch (IOException e) {
-			throw new RemoteServerException("Network Request failed to fetch refreshed tokenId", e);
+			throw new LoginFailedException("Network Request failed to fetch refreshed tokenId", e);
 		}
 		Moshi moshi = new Moshi.Builder().build();
 		GoogleAuthTokenJson googleAuthTokenJson = null;
@@ -127,10 +124,10 @@ public class GoogleCredentialProvider extends CredentialProvider {
 			googleAuthTokenJson = moshi.adapter(GoogleAuthTokenJson.class).fromJson(response.body().string());
 			Log.d(TAG, "" + googleAuthTokenJson.getExpiresIn());
 		} catch (IOException e) {
-			throw new RemoteServerException("Failed to unmarshal the Json response to fetch refreshed tokenId", e);
+			throw new LoginFailedException("Failed to unmarshal the Json response to fetch refreshed tokenId", e);
 		}
 		if (googleAuthTokenJson.getError() != null) {
-			throw new LoginFailedException(googleAuthTokenJson.getError());
+			throw new InvalidCredentialsException(googleAuthTokenJson.getError());
 		} else {
 			Log.d(TAG, "Refreshed Token " + googleAuthTokenJson.getIdToken());
 			expiresTimestamp = System.currentTimeMillis()
@@ -142,11 +139,10 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	/**
 	 * Starts a login flow for google using googles device oauth endpoint.
 	 *
-	 * @throws LoginFailedException If we fail to get tokenId
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
-	public void login() throws LoginFailedException, CaptchaActiveException {
-
+	public void login() throws LoginFailedException, InvalidCredentialsException {
 		HttpUrl url = HttpUrl.parse(OAUTH_ENDPOINT).newBuilder()
 				.addQueryParameter("client_id", CLIENT_ID)
 				.addQueryParameter("scope", "openid email https://www.googleapis.com/auth/userinfo.email")
@@ -240,8 +236,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	}
 
 	@Override
-	public String getTokenId(boolean refresh) throws LoginFailedException, CaptchaActiveException,
-			RemoteServerException {
+	public String getTokenId(boolean refresh) throws LoginFailedException, InvalidCredentialsException {
 		if (refresh || isTokenIdExpired()) {
 			refreshToken(refreshToken);
 		}
@@ -253,12 +248,11 @@ public class GoogleCredentialProvider extends CredentialProvider {
 	 *
 	 * @param refresh if this AuthInfo should be refreshed
 	 * @return AuthInfo object
-	 * @throws LoginFailedException When login fails
-	 * @throws RemoteServerException if the server failed to respond
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
 	@Override
-	public AuthInfo getAuthInfo(boolean refresh) throws LoginFailedException, CaptchaActiveException,
-			RemoteServerException {
+	public AuthInfo getAuthInfo(boolean refresh) throws LoginFailedException, InvalidCredentialsException {
 		if (refresh || isTokenIdExpired()) {
 			refreshToken(refreshToken);
 		}

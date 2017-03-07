@@ -29,10 +29,7 @@ import POGOProtos.Networking.Responses.UseIncenseResponseOuterClass.UseIncenseRe
 import POGOProtos.Networking.Responses.UseItemXpBoostResponseOuterClass.UseItemXpBoostResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 
@@ -82,13 +79,9 @@ public class ItemBag {
 	 * @param id the id
 	 * @param quantity the quantity
 	 * @return the result
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException the login failed exception
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public Result removeItem(ItemId id, int quantity)
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
+	public Result removeItem(ItemId id, int quantity) throws RequestFailedException {
 		Item item = getItem(id);
 		if (item.getCount() < quantity) {
 			throw new IllegalArgumentException("You cannot remove more quantity than you have");
@@ -105,7 +98,7 @@ public class ItemBag {
 			response = RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse
 					.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 
 		if (response
@@ -179,13 +172,9 @@ public class ItemBag {
 	 * use an item with itemID
 	 *
 	 * @param type type of item
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException the login failed exception
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public void useItem(ItemId type) throws RemoteServerException, CaptchaActiveException, LoginFailedException,
-			HashException {
+	public void useItem(ItemId type) throws RequestFailedException {
 		if (type == ItemId.UNRECOGNIZED) {
 			throw new IllegalArgumentException("You cannot use item for UNRECOGNIZED");
 		}
@@ -206,28 +195,23 @@ public class ItemBag {
 	 * use an incense
 	 *
 	 * @param type type of item
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException the login failed exception
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public void useIncense(ItemId type) throws RemoteServerException, CaptchaActiveException, LoginFailedException,
-			HashException {
+	public void useIncense(ItemId type) throws RequestFailedException {
 		UseIncenseMessage useIncenseMessage =
 				UseIncenseMessage.newBuilder()
 						.setIncenseType(type)
 						.setIncenseTypeValue(type.getNumber())
 						.build();
 
-		ServerRequest useIncenseRequest = new ServerRequest(RequestType.USE_INCENSE,
-				useIncenseMessage);
-		api.getRequestHandler().sendServerRequests(useIncenseRequest);
+		ServerRequest useIncenseRequest = new ServerRequest(RequestType.USE_INCENSE, useIncenseMessage);
+		api.getRequestHandler().sendServerRequests(useIncenseRequest, true);
 
 		try {
 			UseIncenseResponse response = UseIncenseResponse.parseFrom(useIncenseRequest.getData());
 			Log.i("Main", "Use incense result: " + response.getResult());
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 	}
 
@@ -235,13 +219,9 @@ public class ItemBag {
 	/**
 	 * use an item with itemID
 	 *
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException the login failed exception
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public void useIncense() throws RemoteServerException, CaptchaActiveException, LoginFailedException,
-			HashException {
+	public void useIncense() throws RequestFailedException {
 		useIncense(ItemId.ITEM_INCENSE_ORDINARY);
 	}
 
@@ -249,28 +229,24 @@ public class ItemBag {
 	 * use a lucky egg
 	 *
 	 * @return the xp boost response
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException the login failed exception
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
 	public UseItemXpBoostResponse useLuckyEgg()
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
+			throws RequestFailedException {
 		UseItemXpBoostMessage xpMsg = UseItemXpBoostMessage
 				.newBuilder()
 				.setItemId(ItemId.ITEM_LUCKY_EGG)
 				.build();
 
-		ServerRequest req = new ServerRequest(RequestType.USE_ITEM_XP_BOOST,
-				xpMsg);
-		api.getRequestHandler().sendServerRequests(req);
+		ServerRequest req = new ServerRequest(RequestType.USE_ITEM_XP_BOOST, xpMsg);
+		api.getRequestHandler().sendServerRequests(req, true);
 
 		try {
 			UseItemXpBoostResponse response = UseItemXpBoostResponse.parseFrom(req.getData());
 			Log.i("Main", "Use incense result: " + response.getResult());
 			return response;
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 	}
 

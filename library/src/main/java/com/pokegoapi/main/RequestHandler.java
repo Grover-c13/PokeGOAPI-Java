@@ -29,10 +29,11 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.AsyncPokemonGoException;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.BadRequestException;
+import com.pokegoapi.exceptions.request.BannedException;
+import com.pokegoapi.exceptions.request.InvalidCredentialsException;
+import com.pokegoapi.exceptions.request.LoginFailedException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.Signature;
@@ -135,13 +136,10 @@ public class RequestHandler implements Runnable {
 	 *
 	 * @param envelope list of ServerRequests to be sent
 	 * @return the server response
-	 * @throws RemoteServerException if this message fails to send
-	 * @throws LoginFailedException if login fails
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurs while hashing this request
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
 	public ServerResponse sendServerRequests(ServerRequestEnvelope envelope)
-			throws RemoteServerException, LoginFailedException, CaptchaActiveException, HashException {
+			throws RequestFailedException {
 		return AsyncHelper.toBlocking(sendAsyncServerRequests(envelope));
 	}
 
@@ -150,13 +148,10 @@ public class RequestHandler implements Runnable {
 	 *
 	 * @param request the request to send
 	 * @return the result from this request
-	 * @throws RemoteServerException if this message fails to send
-	 * @throws LoginFailedException if login fails
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurs while hashing this request
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
 	public ByteString sendServerRequests(ServerRequest request)
-			throws RemoteServerException, LoginFailedException, CaptchaActiveException, HashException {
+			throws RequestFailedException {
 		return sendServerRequests(request, false);
 	}
 
@@ -168,13 +163,10 @@ public class RequestHandler implements Runnable {
 	 * @param commons whether this request should include commons
 	 * @param commonExclusions the common requests to exclude from this request
 	 * @return the result from this request
-	 * @throws RemoteServerException if this message fails to send
-	 * @throws LoginFailedException if login fails
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurs while hashing this request
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
 	public ByteString sendServerRequests(ServerRequest request, boolean commons, RequestType... commonExclusions)
-			throws RemoteServerException, LoginFailedException, CaptchaActiveException, HashException {
+			throws RequestFailedException {
 		ServerRequestEnvelope envelope = ServerRequestEnvelope.create();
 		envelope.add(request);
 		envelope.setCommons(commons);
@@ -183,7 +175,7 @@ public class RequestHandler implements Runnable {
 		try {
 			return request.getData();
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 	}
 
@@ -193,14 +185,11 @@ public class RequestHandler implements Runnable {
 	 * @param serverResponse the response to append to
 	 * @param requests list of ServerRequests to be sent
 	 * @param platformRequests list of ServerPlatformRequests to be sent
-	 * @throws RemoteServerException if this message fails to send
-	 * @throws LoginFailedException if login fails
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurs while hashing this request
+	 * @throws RequestFailedException if this request fails to send
 	 */
 	private ServerResponse sendInternal(ServerResponse serverResponse, ServerRequest[] requests,
 			ServerPlatformRequest[] platformRequests)
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
+			throws RequestFailedException {
 		RequestEnvelope.Builder builder = buildRequest(requests, platformRequests);
 
 		return sendInternal(serverResponse, requests, platformRequests, builder);
@@ -213,14 +202,11 @@ public class RequestHandler implements Runnable {
 	 * @param requests list of ServerRequests to be sent
 	 * @param platformRequests list of ServerPlatformRequests to be sent
 	 * @param builder the request envelope builder
-	 * @throws RemoteServerException if this message fails to send
-	 * @throws LoginFailedException if login fails
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurs while hashing this request
+	 * @throws RequestFailedException if this message fails to send
 	 */
 	private ServerResponse sendInternal(ServerResponse serverResponse, ServerRequest[] requests,
 			ServerPlatformRequest[] platformRequests, RequestEnvelope.Builder builder)
-			throws RemoteServerException, CaptchaActiveException, HashException, LoginFailedException {
+			throws RequestFailedException {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		RequestEnvelope request = builder.build();
 		try {
@@ -237,7 +223,7 @@ public class RequestHandler implements Runnable {
 
 		try (Response response = client.newCall(httpRequest).execute()) {
 			if (response.code() != 200) {
-				throw new RemoteServerException("Got a unexpected http code : " + response.code());
+				throw new RequestFailedException("Got a unexpected http code : " + response.code());
 			}
 
 			ResponseEnvelope responseEnvelop;
@@ -245,7 +231,7 @@ public class RequestHandler implements Runnable {
 				responseEnvelop = ResponseEnvelope.parseFrom(content);
 			} catch (IOException e) {
 				// retrieved garbage from the server
-				throw new RemoteServerException("Received malformed response : " + e);
+				throw new RequestFailedException("Received malformed response : " + e);
 			}
 
 			if (responseEnvelop.getApiUrl() != null && responseEnvelop.getApiUrl().length() > 0) {
@@ -268,7 +254,7 @@ public class RequestHandler implements Runnable {
 						serverResponse.addResponse(serverRequest.getType(), returned);
 						if (serverRequest.getType() == RequestType.GET_PLAYER) {
 							if (GetPlayerResponse.parseFrom(returned).getBanned()) {
-								throw new RemoteServerException("Failed to send request, your account is banned!");
+								throw new BannedException("Cannot send request, your account has been banned!");
 							}
 						}
 					} else {
@@ -291,31 +277,31 @@ public class RequestHandler implements Runnable {
 						authTicket = null;
 						api.getAuthInfo(true);
 						return sendInternal(serverResponse, requests, platformRequests);
-					} catch (LoginFailedException e) {
-						throw new RemoteServerException("Failed to refresh auth token!", e);
-					} catch (RemoteServerException e) {
-						throw new RemoteServerException("Failed to send request with refreshed auth token!", e);
+					} catch (LoginFailedException | InvalidCredentialsException e) {
+						throw new RequestFailedException("Failed to refresh auth token!", e);
+					} catch (RequestFailedException e) {
+						throw new RequestFailedException("Failed to send request with refreshed auth token!", e);
 					}
 				} else if (statusCode == StatusCode.REDIRECT) {
 					// API_ENDPOINT was not correctly set, should be at this point, though, so redo the request
 					return sendInternal(serverResponse, requests, platformRequests, builder);
 				} else if (statusCode == StatusCode.BAD_REQUEST) {
 					if (api.getPlayerProfile().isBanned()) {
-						throw new LoginFailedException("Cannot send request, your account has been banned!");
+						throw new BannedException("Cannot send request, your account has been banned!");
 					} else {
-						throw new RemoteServerException("A bad request was sent!");
+						throw new BadRequestException("A bad request was sent!");
 					}
 				} else {
-					throw new RemoteServerException("Failed to send request: " + statusCode);
+					throw new RequestFailedException("Failed to send request: " + statusCode);
 				}
 			}
 
 			if (empty) {
-				throw new RemoteServerException("Received empty response. A bad request was sent!");
+				throw new RequestFailedException("Received empty response from server!");
 			}
 		} catch (IOException e) {
-			throw new RemoteServerException(e);
-		} catch (RemoteServerException | LoginFailedException | CaptchaActiveException | HashException e) {
+			throw new RequestFailedException(e);
+		} catch (RequestFailedException e) {
 			throw e;
 		}
 
@@ -323,7 +309,7 @@ public class RequestHandler implements Runnable {
 	}
 
 	private RequestEnvelope.Builder buildRequest(ServerRequest[] requests, ServerPlatformRequest[] platformRequests)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
+			throws RequestFailedException {
 		RequestEnvelope.Builder builder = RequestEnvelope.newBuilder();
 		resetBuilder(builder);
 
@@ -349,7 +335,7 @@ public class RequestHandler implements Runnable {
 	}
 
 	private void resetBuilder(RequestEnvelope.Builder builder)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws RequestFailedException {
 		builder.setStatusCode(2);
 		builder.setRequestId(requestIdGenerator.next());
 		//builder.setAuthInfo(api.getAuthInfo());
@@ -433,7 +419,7 @@ public class RequestHandler implements Runnable {
 
 				try {
 					response = sendInternal(response, arrayRequests, arrayPlatformRequests);
-				} catch (RemoteServerException | LoginFailedException | CaptchaActiveException | HashException e) {
+				} catch (RequestFailedException e) {
 					response.setException(e);
 				}
 
@@ -450,8 +436,7 @@ public class RequestHandler implements Runnable {
 					}
 
 					CommonRequests.handleQueue(api);
-				} catch (InvalidProtocolBufferException | RemoteServerException
-						| LoginFailedException | CaptchaActiveException e) {
+				} catch (InvalidProtocolBufferException | RequestFailedException e) {
 					continue;
 				}
 

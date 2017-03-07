@@ -25,8 +25,8 @@ import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.device.LocationFixes;
 import com.pokegoapi.api.device.SensorInfo;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
+import com.pokegoapi.exceptions.request.HashException;
 import com.pokegoapi.util.hash.Hash;
 import com.pokegoapi.util.hash.HashProvider;
 import com.pokegoapi.util.hash.crypto.Crypto;
@@ -42,11 +42,11 @@ public class Signature {
 	 *
 	 * @param api the api
 	 * @param builder the RequestEnvelope builder
-	 * @throws RemoteServerException if an invalid request is sent
+	 * @throws RequestFailedException if an invalid request is sent
 	 * @throws HashException if hashing fails
 	 */
 	public static void setSignature(PokemonGo api, RequestEnvelope.Builder builder)
-			throws RemoteServerException, HashException {
+			throws RequestFailedException, HashException {
 		boolean usePtr8 = false;
 		byte[][] requestData = new byte[builder.getRequestsCount()][];
 		for (int i = 0; i < builder.getRequestsCount(); i++) {

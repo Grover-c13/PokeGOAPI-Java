@@ -13,16 +13,22 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.exceptions.request;
 
-import lombok.Getter;
+public class BannedException extends RequestFailedException {
+	public BannedException() {
+		super();
+	}
 
-public class CaptchaActiveException extends Exception {
-	@Getter
-	private String captcha;
+	public BannedException(String reason) {
+		super(reason);
+	}
 
-	public CaptchaActiveException(AsyncCaptchaActiveException exception) {
-		super(exception.getMessage(), exception);
-		this.captcha = exception.getCaptcha();
+	public BannedException(Throwable exception) {
+		super(exception);
+	}
+
+	public BannedException(String reason, Throwable exception) {
+		super(reason, exception);
 	}
 }

@@ -15,15 +15,8 @@
 
 package com.pokegoapi.util;
 
-import com.pokegoapi.exceptions.AsyncCaptchaActiveException;
-import com.pokegoapi.exceptions.AsyncHashException;
-import com.pokegoapi.exceptions.AsyncLoginFailedException;
 import com.pokegoapi.exceptions.AsyncPokemonGoException;
-import com.pokegoapi.exceptions.AsyncRemoteServerException;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import rx.Observable;
 
 public class AsyncHelper {
@@ -33,24 +26,14 @@ public class AsyncHelper {
 	 * @param observable Observable to handle
 	 * @param <T> Result type
 	 * @return Result of the observable
-	 * @throws LoginFailedException If an AsyncLoginFailedException was thrown
-	 * @throws RemoteServerException If an AsyncRemoteServerException was thrown
-	 * @throws CaptchaActiveException if an AsyncCaptchaActiveException was thrown
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public static <T> T toBlocking(Observable<T> observable)
-			throws LoginFailedException, RemoteServerException, CaptchaActiveException, HashException {
+	public static <T> T toBlocking(Observable<T> observable) throws RequestFailedException {
 		try {
 			return observable.toBlocking().first();
 		} catch (RuntimeException e) {
-			if (e.getCause() instanceof AsyncLoginFailedException) {
-				throw new LoginFailedException(e.getMessage(), e.getCause());
-			} else if (e.getCause() instanceof AsyncRemoteServerException) {
-				throw new RemoteServerException(e.getMessage(), e.getCause());
-			} else if (e.getCause() instanceof AsyncCaptchaActiveException) {
-				throw new CaptchaActiveException((AsyncCaptchaActiveException) e.getCause());
-			} else if (e.getCause() instanceof AsyncHashException) {
-				throw new HashException(e.getMessage(), e.getCause());
+			if (e.getCause() instanceof RequestFailedException) {
+				throw new RequestFailedException(e.getMessage(), e.getCause());
 			}
 			throw new AsyncPokemonGoException("Unknown exception occurred. ", e);
 		}

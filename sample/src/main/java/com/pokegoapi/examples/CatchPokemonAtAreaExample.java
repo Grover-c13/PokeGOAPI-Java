@@ -46,11 +46,9 @@ import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.api.settings.CatchOptions;
 import com.pokegoapi.api.settings.PokeballSelector;
 import com.pokegoapi.auth.PtcCredentialProvider;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.HashException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.MapUtil;
 import com.pokegoapi.util.PokeDictionary;
@@ -135,16 +133,12 @@ public class CatchPokemonAtAreaExample {
 				System.out.println("Finished traveling to pokestop, catching pokemon.");
 				catchArea(api);
 			}
-		} catch (LoginFailedException | NoSuchItemException | RemoteServerException | CaptchaActiveException e) {
-			// failed to login, invalid credentials, auth issue or server issue.
-			Log.e("Main", "Failed to login, captcha or server issue: ", e);
-		} catch (HashException e) {
-			Log.e("Main ", "Failed to login to the Hash Service: ", e);
+		} catch (NoSuchItemException | RequestFailedException e) {
+			Log.e("Main", "An exception occurred while running example: ", e);
 		}
 	}
 
-	private static void catchArea(PokemonGo api)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException, NoSuchItemException {
+	private static void catchArea(PokemonGo api) throws RequestFailedException, NoSuchItemException {
 		try {
 			//Wait until map is updated for the current location
 			api.getMap().awaitUpdate();
