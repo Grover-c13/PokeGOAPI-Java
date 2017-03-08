@@ -130,7 +130,7 @@ public class FightGymExample {
 				//Check if gym is attackable, and check if it is not owned by your team
 				if (gym.isAttackable() && gym.getOwnedByTeam() != api.getPlayerProfile().getPlayerData().getTeam()) {
 					//Walk to gym; Documented pathing in TravelToPokestopExample
-					Point destination = new Point(gym.getLatitude(), gym.getLongitude());
+					Point destination = new Point(gym);
 					Path path = new Path(api.getPoint(), destination, 50.0);
 					System.out.println("Traveling to " + destination + " at 50KMPH!");
 					path.start(api);

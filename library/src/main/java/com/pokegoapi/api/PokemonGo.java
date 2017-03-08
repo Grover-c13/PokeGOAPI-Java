@@ -51,6 +51,7 @@ import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.main.ServerRequestEnvelope;
 import com.pokegoapi.util.ClientInterceptor;
+import com.pokegoapi.util.MapPoint;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import com.pokegoapi.util.hash.HashProvider;
@@ -378,8 +379,10 @@ public class PokemonGo {
 	 * @param accuracy the accuracy of this location
 	 */
 	public void setLocation(double latitude, double longitude, double altitude, double accuracy) {
-		setLatitude(latitude);
-		setLongitude(longitude);
+		checkLatitude(latitude);
+		checkLongitude(longitude);
+		this.latitude = latitude;
+		this.longitude = longitude;
 		setAltitude(altitude);
 		setAccuracy(accuracy);
 	}
@@ -395,21 +398,15 @@ public class PokemonGo {
 	 * @throws IllegalArgumentException if value exceeds +-90
 	 */
 	public void setLatitude(double value) {
-		if (value > 90 || value < -90) {
-			throw new IllegalArgumentException("latittude can not exceed +/- 90");
-		}
+		checkLatitude(value);
 		latitude = value;
 
-		if (active && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
-			if (!heartbeat.active()) {
-				heartbeat.start();
-			} else {
-				heartbeat.beat();
-			}
+		updateLocation();
 		}
 
-		for (LocationListener listener : this.getListeners(LocationListener.class)) {
-			listener.onLocationUpdate(this, getPoint());
+	private void checkLatitude(double value) {
+		if (value > 90 || value < -90) {
+			throw new IllegalArgumentException("latitude can not exceed +/- 90");
 		}
 	}
 
@@ -420,11 +417,33 @@ public class PokemonGo {
 	 * @throws IllegalArgumentException if value exceeds +-180
 	 */
 	public void setLongitude(double value) {
+		checkLongitude(value);
+		longitude = value;
+
+		updateLocation();
+	}
+
+	private void checkLongitude(double value) {
 		if (value > 180 || value < -180) {
 			throw new IllegalArgumentException("longitude can not exceed +/- 180");
 		}
-		longitude = value;
+	}
 
+	/**
+	 * Validates and sets a given point value
+	 *
+	 * @param point map point
+	 * @throws IllegalArgumentException if value exceeds +-180
+	 */
+	public void setPoint(Point point) {
+		checkLatitude(point.getLatitude());
+		checkLongitude(point.getLongitude());
+		latitude = point.getLatitude();
+		longitude = point.getLongitude();
+		updateLocation();
+	}
+
+	private void updateLocation() {
 		if (active && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
 			if (!heartbeat.active()) {
 				heartbeat.start();

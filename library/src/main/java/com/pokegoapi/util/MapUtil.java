@@ -58,7 +58,7 @@ public class MapUtil<K extends MapPoint> {
 	 * @param end the end coordinate
 	 * @return the double
 	 */
-	public static double distFrom(Point start, Point end) {
+	public static double distFrom(MapPoint start, MapPoint end) {
 		return distFrom(start.getLatitude(), start.getLongitude(), end.getLatitude(), end.getLongitude());
 	}
 

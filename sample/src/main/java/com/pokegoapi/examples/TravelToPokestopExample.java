@@ -72,7 +72,7 @@ public class TravelToPokestopExample {
 			}
 
 			if (destinationPokestop != null) {
-				Point destination = new Point(destinationPokestop.getLatitude(), destinationPokestop.getLongitude());
+				Point destination = new Point(destinationPokestop);
 				//Use the current player position as the source and the pokestop position as the destination
 				//Travel to Pokestop at 20KMPH
 				Path path = new Path(api.getPoint(), destination, 20.0);

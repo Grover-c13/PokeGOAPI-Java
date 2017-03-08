@@ -111,7 +111,7 @@ public class CatchPokemonAtAreaExample {
 			});
 
 			for (Pokestop pokestop : travelPokestops) {
-				Point destination = new Point(pokestop.getLatitude(), pokestop.getLongitude());
+				Point destination = new Point(pokestop);
 				//Use the current player position as the source and the pokestop position as the destination
 				//Travel to Pokestop at 20KMPH
 				Path path = new Path(api.getPoint(), destination, 20.0);
@@ -122,8 +122,7 @@ public class CatchPokemonAtAreaExample {
 						//Calculate the desired intermediate point for the current time
 						Point point = path.calculateIntermediate(api);
 						//Set the API location to that point
-						api.setLatitude(point.getLatitude());
-						api.setLongitude(point.getLongitude());
+						api.setPoint(point);
 						//Sleep for 2 seconds before setting the location again
 						Thread.sleep(2000);
 					}

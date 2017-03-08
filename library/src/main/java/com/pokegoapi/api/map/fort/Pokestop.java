@@ -34,6 +34,7 @@ import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
+import com.pokegoapi.util.MapPoint;
 import lombok.Getter;
 import rx.Observable;
 import rx.exceptions.Exceptions;
@@ -44,7 +45,7 @@ import java.util.List;
 /**
  * Created by mjmfighter on 7/20/2016.
  */
-public class Pokestop {
+public class Pokestop implements MapPoint {
 
 	private final PokemonGo api;
 	@Getter
