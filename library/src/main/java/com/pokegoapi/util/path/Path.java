@@ -17,12 +17,13 @@ package com.pokegoapi.util.path;
 
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.Point;
+import com.pokegoapi.util.MapPoint;
 import com.pokegoapi.util.MapUtil;
 import lombok.Getter;
 
 public class Path {
-	private Point source;
-	private Point destination;
+	private MapPoint source;
+	private MapPoint destination;
 	private Point intermediate;
 	private double speed;
 	private long startTime;
@@ -39,12 +40,12 @@ public class Path {
 	 * @param destination the destination for this path
 	 * @param speed the speed to move at in kmph
 	 */
-	public Path(Point source, Point destination, double speed) {
+	public Path(MapPoint source, MapPoint destination, double speed) {
 		this.source = source;
 		this.destination = destination;
 		double metersPerHour = speed * 1000;
 		this.speed = metersPerHour / 60 / 60 / 1000;
-		this.intermediate = new Point(source.getLatitude(), source.getLongitude());
+		this.intermediate = new Point(source);
 		this.totalTime = (long) (MapUtil.distFrom(source, destination) / this.speed);
 	}
 
@@ -70,7 +71,7 @@ public class Path {
 	public Point calculateIntermediate(PokemonGo api) {
 		if (totalTime <= 0) {
 			this.complete = true;
-			return this.destination;
+			return new Point(destination);
 		}
 		long time = Math.min(api.currentTimeMillis(), endTime) - startTime;
 		if (time >= totalTime) {

@@ -20,7 +20,6 @@ import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Inventory.CandyOuterClass.Candy;
 import POGOProtos.Inventory.InventoryItemDataOuterClass.InventoryItemData;
 import POGOProtos.Inventory.InventoryItemOuterClass.InventoryItem;
-import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
 import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
@@ -32,11 +31,10 @@ import com.annimon.stream.function.Predicate;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.main.ServerRequest;
+import com.pokegoapi.main.ServerRequestEnvelope;
+import com.pokegoapi.main.ServerResponse;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -144,28 +142,21 @@ public class PokeBank {
 	 *
 	 * @param releasePokemon the pokemon to release
 	 * @return the amount of candies for each pokemon family
-	 * @throws CaptchaActiveException if a captcha is active and a message cannot be sent
-	 * @throws LoginFailedException the login fails
-	 * @throws RemoteServerException if the server errors
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public Map<PokemonFamilyId, Integer> releasePokemon(Pokemon... releasePokemon)
-			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
+	public Map<PokemonFamilyId, Integer> releasePokemon(Pokemon... releasePokemon) throws RequestFailedException {
 		ReleasePokemonMessage.Builder releaseBuilder = ReleasePokemonMessage.newBuilder();
 		for (Pokemon pokemon : releasePokemon) {
 			if (!pokemon.isDeployed() && !pokemon.isFavorite()) {
 				releaseBuilder.addPokemonIds(pokemon.getId());
 			}
 		}
-		GetInventoryMessage inventoryMessage = GetInventoryMessage.newBuilder()
-				.setLastTimestampMs(api.getInventories().getLastInventoryUpdate())
-				.build();
-		ServerRequest inventoryRequest = new ServerRequest(RequestType.GET_INVENTORY, inventoryMessage);
-		ServerRequest releaseRequest = new ServerRequest(RequestType.RELEASE_POKEMON, releaseBuilder.build());
+		ServerRequestEnvelope envelope = ServerRequestEnvelope.createCommons();
+		ServerRequest releaseRequest = envelope.add(RequestType.RELEASE_POKEMON, releaseBuilder.build());
 		Map<PokemonFamilyId, Integer> lastCandies = new HashMap<>(api.getInventories().getCandyjar().getCandies());
-		api.getRequestHandler().sendServerRequests(releaseRequest, inventoryRequest);
+		ServerResponse response = api.getRequestHandler().sendServerRequests(envelope);
 		try {
-			GetInventoryResponse inventoryResponse = GetInventoryResponse.parseFrom(inventoryRequest.getData());
+			GetInventoryResponse inventoryResponse = GetInventoryResponse.parseFrom(response.get(RequestType.GET_INVENTORY));
 			ReleasePokemonResponse releaseResponse = ReleasePokemonResponse.parseFrom(releaseRequest.getData());
 			Map<PokemonFamilyId, Integer> candyCount = new HashMap<>();
 			if (releaseResponse.getResult() == Result.SUCCESS && inventoryResponse.getSuccess()) {
@@ -194,7 +185,7 @@ public class PokeBank {
 			}
 			return candyCount;
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 	}
 

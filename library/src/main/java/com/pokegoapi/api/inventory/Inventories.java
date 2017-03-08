@@ -33,10 +33,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.api.pokemon.Pokemon;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 
@@ -90,13 +87,9 @@ public class Inventories {
 	 * Updates the inventories with latest data.
 	 *
 	 * @return the response to the update message
-	 * @throws LoginFailedException the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public GetInventoryResponse updateInventories() throws LoginFailedException, CaptchaActiveException,
-			RemoteServerException, HashException {
+	public GetInventoryResponse updateInventories() throws RequestFailedException {
 		return updateInventories(false);
 	}
 
@@ -105,13 +98,10 @@ public class Inventories {
 	 *
 	 * @param forceUpdate For a full update if true
 	 * @return the response to the update message
-	 * @throws LoginFailedException the login failed exception
-	 * @throws RemoteServerException the remote server exception
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
 	public GetInventoryResponse updateInventories(boolean forceUpdate)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
+			throws RequestFailedException {
 		if (forceUpdate) {
 			lastInventoryUpdate = 0;
 			itemBag.reset();
@@ -133,7 +123,7 @@ public class Inventories {
 		try {
 			response = GetInventoryResponse.parseFrom(inventoryRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 
 		return response;

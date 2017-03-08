@@ -35,6 +35,11 @@ public class Point implements MapPoint {
 		this.longitude = longitude;
 	}
 
+	public Point(MapPoint point) {
+		this.latitude = point.getLatitude();
+		this.longitude = point.getLongitude();
+	}
+
 	public Point(SpawnPointOuterClass.SpawnPoint spawnpoint) {
 		this.latitude = spawnpoint.getLatitude();
 		this.longitude = spawnpoint.getLongitude();

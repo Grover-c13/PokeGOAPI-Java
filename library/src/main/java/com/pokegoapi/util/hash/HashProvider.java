@@ -15,7 +15,7 @@
 
 package com.pokegoapi.util.hash;
 
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.HashException;
 import com.pokegoapi.util.hash.crypto.Crypto;
 
 public interface HashProvider {

@@ -13,23 +13,22 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions.hash;
+package com.pokegoapi.exceptions.request;
 
-/**
- * Hash Limit Exceeded Exception
- */
-public class HashLimitExceededException extends HashException {
-
-	public HashLimitExceededException() {
+public class BannedException extends RequestFailedException {
+	public BannedException() {
 		super();
 	}
 
-	public HashLimitExceededException(String reason) {
+	public BannedException(String reason) {
 		super(reason);
 	}
 
-	public HashLimitExceededException(Throwable exception) {
+	public BannedException(Throwable exception) {
 		super(exception);
 	}
 
+	public BannedException(String reason, Throwable exception) {
+		super(reason, exception);
+	}
 }

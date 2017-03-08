@@ -16,12 +16,12 @@
 package com.pokegoapi.auth;
 
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.request.InvalidCredentialsException;
+import com.pokegoapi.exceptions.request.LoginFailedException;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import com.squareup.moshi.Moshi;
+import lombok.Setter;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
@@ -49,6 +49,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 	private static final String TAG = PtcCredentialProvider.class.getSimpleName();
 	//We try and refresh token 5 minutes before it actually expires
 	protected static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
+	protected static final int MAXIMUM_RETRIES = 5;
 
 	protected final OkHttpClient client;
 	protected final String username;
@@ -58,6 +59,9 @@ public class PtcCredentialProvider extends CredentialProvider {
 	protected long expiresTimestamp;
 	protected AuthInfo.Builder authbuilder;
 
+	@Setter
+	protected boolean shouldRetry = true;
+
 	/**
 	 * Instantiates a new Ptc login.
 	 *
@@ -65,12 +69,11 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 * @param username Username
 	 * @param password password
 	 * @param time a Time implementation
-	 * @throws LoginFailedException When login fails
-	 * @throws RemoteServerException When server fails
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
 	public PtcCredentialProvider(OkHttpClient client, String username, String password, Time time)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, InvalidCredentialsException {
 		this.time = time;
 		this.username = username;
 		this.password = password;
@@ -108,7 +111,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 				.build();
 
 		authbuilder = AuthInfo.newBuilder();
-		login(username, password);
+		login(username, password, 0);
 	}
 
 	/**
@@ -118,12 +121,11 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 * @param client the client
 	 * @param username Username
 	 * @param password password
-	 * @throws LoginFailedException if failed to login
-	 * @throws RemoteServerException if the server failed to respond
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
 	public PtcCredentialProvider(OkHttpClient client, String username, String password)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+			throws LoginFailedException, InvalidCredentialsException {
 		this(client, username, password, new SystemTimeImpl());
 	}
 
@@ -133,144 +135,150 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 *
 	 * @param username PTC username
 	 * @param password PTC password
-	 * @throws LoginFailedException if failed to login
-	 * @throws RemoteServerException if the server failed to respond
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @param attempt the current attempt index
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
-	private void login(String username, String password)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException {
-		//TODO: stop creating an okhttp client per request
-		Request get = new Request.Builder()
-				.url(LOGIN_URL)
-				.get()
-				.build();
+	private void login(String username, String password, int attempt)
+			throws LoginFailedException, InvalidCredentialsException {
 
-		Response getResponse;
 		try {
-			getResponse = client.newCall(get).execute();
-		} catch (IOException e) {
-			throw new RemoteServerException("Failed to receive contents from server", e);
-		}
+			//TODO: stop creating an okhttp client per request
+			Request get = new Request.Builder()
+					.url(LOGIN_URL)
+					.get()
+					.build();
 
-		Moshi moshi = new Moshi.Builder().build();
-
-		PtcAuthJson ptcAuth;
-		try {
-			String response = getResponse.body().string();
-			ptcAuth = moshi.adapter(PtcAuthJson.class).fromJson(response);
-		} catch (IOException e) {
-			throw new RemoteServerException("Looks like the servers are down", e);
-		}
-
-		HttpUrl url = HttpUrl.parse(LOGIN_URL).newBuilder()
-				.addQueryParameter("lt", ptcAuth.getLt())
-				.addQueryParameter("execution", ptcAuth.getExecution())
-				.addQueryParameter("_eventId", "submit")
-				.addQueryParameter("username", username)
-				.addQueryParameter("password", password)
-				.build();
-
-		RequestBody reqBody = RequestBody.create(null, new byte[0]);
-
-		Request postRequest = new Request.Builder()
-				.url(url)
-				.method("POST", reqBody)
-				.build();
-
-		// Need a new client for this to not follow redirects
-		Response response;
-		try {
-			response = client.newBuilder()
-					.followRedirects(false)
-					.followSslRedirects(false)
-					.build()
-					.newCall(postRequest)
-					.execute();
-		} catch (IOException e) {
-			throw new RemoteServerException("Network failure", e);
-		}
-
-		String body;
-		try {
-			body = response.body().string();
-		} catch (IOException e) {
-			throw new RemoteServerException("Response body fetching failed", e);
-		}
-
-		if (body.length() > 0) {
-			PtcError ptcError;
+			Response getResponse;
 			try {
-				ptcError = moshi.adapter(PtcError.class).fromJson(body);
+				getResponse = client.newCall(get).execute();
 			} catch (IOException e) {
-				throw new RemoteServerException("Unmarshalling failure", e);
+				throw new LoginFailedException("Failed to receive contents from server", e);
 			}
-			if (ptcError.getError() != null && ptcError.getError().length() > 0) {
-				throw new LoginFailedException(ptcError.getError());
-			} else if (ptcError.getErrors().length > 0) {
-				StringBuilder builder = new StringBuilder();
-				String[] errors = ptcError.getErrors();
-				for (int i = 0; i < errors.length - 1; i++) {
-					String error = errors[i];
-					builder.append("\"").append(error).append("\", ");
+
+			Moshi moshi = new Moshi.Builder().build();
+
+			PtcAuthJson ptcAuth;
+			try {
+				String response = getResponse.body().string();
+				ptcAuth = moshi.adapter(PtcAuthJson.class).fromJson(response);
+			} catch (IOException e) {
+				throw new LoginFailedException("Looks like the servers are down", e);
+			}
+
+			HttpUrl url = HttpUrl.parse(LOGIN_URL).newBuilder()
+					.addQueryParameter("lt", ptcAuth.getLt())
+					.addQueryParameter("execution", ptcAuth.getExecution())
+					.addQueryParameter("_eventId", "submit")
+					.addQueryParameter("username", username)
+					.addQueryParameter("password", password)
+					.build();
+
+			RequestBody reqBody = RequestBody.create(null, new byte[0]);
+
+			Request postRequest = new Request.Builder()
+					.url(url)
+					.method("POST", reqBody)
+					.build();
+
+			// Need a new client for this to not follow redirects
+			Response response;
+			try {
+				response = client.newBuilder()
+						.followRedirects(false)
+						.followSslRedirects(false)
+						.build()
+						.newCall(postRequest)
+						.execute();
+			} catch (IOException e) {
+				throw new LoginFailedException("Network failure", e);
+			}
+
+			String body;
+			try {
+				body = response.body().string();
+			} catch (IOException e) {
+				throw new LoginFailedException("Response body fetching failed", e);
+			}
+
+			if (body.length() > 0) {
+				PtcError ptcError;
+				try {
+					ptcError = moshi.adapter(PtcError.class).fromJson(body);
+				} catch (IOException e) {
+					throw new LoginFailedException("Unmarshalling failure", e);
 				}
-				builder.append("\"").append(errors[errors.length - 1]).append("\"");
-				throw new LoginFailedException(builder.toString());
+				if (ptcError.getError() != null && ptcError.getError().length() > 0) {
+					throw new InvalidCredentialsException(ptcError.getError());
+				} else if (ptcError.getErrors().length > 0) {
+					StringBuilder builder = new StringBuilder();
+					String[] errors = ptcError.getErrors();
+					for (int i = 0; i < errors.length - 1; i++) {
+						String error = errors[i];
+						builder.append("\"").append(error).append("\", ");
+					}
+					builder.append("\"").append(errors[errors.length - 1]).append("\"");
+					throw new InvalidCredentialsException(builder.toString());
+				}
 			}
-		}
 
-		String ticket = null;
-		for (String location : response.headers("location")) {
-			String[] ticketArray = location.split("ticket=");
-			if (ticketArray.length > 1) {
-				ticket = ticketArray[1];
+			String ticket = null;
+			for (String location : response.headers("location")) {
+				String[] ticketArray = location.split("ticket=");
+				if (ticketArray.length > 1) {
+					ticket = ticketArray[1];
+				}
 			}
-		}
 
-		if (ticket == null) {
-			throw new LoginFailedException("Failed to fetch token, body:" + body);
-		}
+			if (ticket == null) {
+				throw new LoginFailedException("Failed to fetch token, body:" + body);
+			}
 
-		url = HttpUrl.parse(LOGIN_OAUTH).newBuilder()
-				.addQueryParameter("client_id", CLIENT_ID)
-				.addQueryParameter("redirect_uri", REDIRECT_URI)
-				.addQueryParameter("client_secret", CLIENT_SECRET)
-				.addQueryParameter("grant_type", "refreshToken")
-				.addQueryParameter("code", ticket)
-				.build();
+			url = HttpUrl.parse(LOGIN_OAUTH).newBuilder()
+					.addQueryParameter("client_id", CLIENT_ID)
+					.addQueryParameter("redirect_uri", REDIRECT_URI)
+					.addQueryParameter("client_secret", CLIENT_SECRET)
+					.addQueryParameter("grant_type", "refreshToken")
+					.addQueryParameter("code", ticket)
+					.build();
 
-		postRequest = new Request.Builder()
-				.url(url)
-				.method("POST", reqBody)
-				.build();
+			postRequest = new Request.Builder()
+					.url(url)
+					.method("POST", reqBody)
+					.build();
 
-		try {
-			response = client.newCall(postRequest).execute();
-		} catch (IOException e) {
-			throw new RemoteServerException("Network Failure ", e);
-		}
+			try {
+				response = client.newCall(postRequest).execute();
+			} catch (IOException e) {
+				throw new LoginFailedException("Network Failure ", e);
+			}
 
-		try {
-			body = response.body().string();
-		} catch (IOException e) {
-			throw new RemoteServerException("Network failure", e);
-		}
+			try {
+				body = response.body().string();
+			} catch (IOException e) {
+				throw new LoginFailedException("Network failure", e);
+			}
 
-		String[] params;
-		try {
-			params = body.split("&");
-			this.tokenId = params[0].split("=")[1];
-			this.expiresTimestamp = time.currentTimeMillis()
-					+ (Integer.valueOf(params[1].split("=")[1]) * 1000 - REFRESH_TOKEN_BUFFER_TIME);
-		} catch (Exception e) {
-			throw new LoginFailedException("Failed to fetch token, body:" + body);
+			String[] params;
+			try {
+				params = body.split("&");
+				this.tokenId = params[0].split("=")[1];
+				this.expiresTimestamp = time.currentTimeMillis()
+						+ (Integer.valueOf(params[1].split("=")[1]) * 1000 - REFRESH_TOKEN_BUFFER_TIME);
+			} catch (Exception e) {
+				throw new LoginFailedException("Failed to fetch token, body:" + body);
+			}
+		} catch (LoginFailedException e) {
+			if (shouldRetry && attempt < MAXIMUM_RETRIES) {
+				login(username, password, ++attempt);
+			}
 		}
 	}
 
 	@Override
-	public String getTokenId(boolean refresh) throws LoginFailedException, CaptchaActiveException,
-			RemoteServerException {
+	public String getTokenId(boolean refresh) throws LoginFailedException, InvalidCredentialsException {
 		if (refresh || isTokenIdExpired()) {
-			login(username, password);
+			login(username, password, 0);
 		}
 		return tokenId;
 	}
@@ -280,15 +288,13 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 *
 	 * @param refresh if this AuthInfo should be refreshed
 	 * @return AuthInfo a AuthInfo proto structure to be encapsulated in server requests
-	 * @throws LoginFailedException if failed to login
-	 * @throws RemoteServerException if the server failed to respond
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws LoginFailedException if an exception occurs while attempting to log in
+	 * @throws InvalidCredentialsException if invalid credentials are used
 	 */
 	@Override
-	public AuthInfo getAuthInfo(boolean refresh) throws LoginFailedException, CaptchaActiveException,
-			RemoteServerException {
+	public AuthInfo getAuthInfo(boolean refresh) throws LoginFailedException, InvalidCredentialsException {
 		if (refresh || isTokenIdExpired()) {
-			login(username, password);
+			login(username, password, 0);
 		}
 
 		authbuilder.setProvider("ptc");
