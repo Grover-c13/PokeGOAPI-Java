@@ -13,9 +13,11 @@ import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokem
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus;
 import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
 import POGOProtos.Networking.Responses.UseItemEncounterResponseOuterClass.UseItemEncounterResponse;
+import POGOProtos.Networking.Responses.UseItemEncounterResponseOuterClass.UseItemEncounterResponse.Status;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.settings.PokeballSelector;
@@ -130,7 +132,8 @@ public class Encounter {
 			throws RequestFailedException, NoSuchItemException {
 		if (isActive()) {
 			ItemBag bag = api.getInventories().getItemBag();
-			if (bag.getItem(pokeball).getCount() > 0) {
+			Item item = bag.getItem(pokeball);
+			if (item.getCount() > 0) {
 				CatchPokemonMessage message = CatchPokemonMessage.newBuilder()
 						.setEncounterId(pokemon.getEncounterId())
 						.setSpawnPointId(pokemon.getSpawnPointId())
@@ -155,6 +158,9 @@ public class Encounter {
 					if (status == CatchStatus.CATCH_SUCCESS || status == CatchStatus.CATCH_FLEE) {
 						pokemon.setDespawned(true);
 					}
+					if (status != CatchStatus.CATCH_ERROR) {
+						item.setCount(item.getCount() - 1);
+					}
 				} catch (InvalidProtocolBufferException e) {
 					throw new RequestFailedException(e);
 				}
@@ -168,19 +174,20 @@ public class Encounter {
 	/**
 	 * Uses an item in this encounter
 	 *
-	 * @param item the item to use
+	 * @param itemId the item to use
 	 * @return the result from this action
 	 * @throws RequestFailedException if the use request fails
 	 */
-	public UseItemEncounterResponse.Status useItem(ItemId item) throws RequestFailedException {
+	public UseItemEncounterResponse.Status useItem(ItemId itemId) throws RequestFailedException {
 		if (isActive()) {
 			ItemBag bag = api.getInventories().getItemBag();
-			if (bag.getItem(item).getCount() > 0) {
+			Item item = bag.getItem(itemId);
+			if (item.getCount() > 0) {
 				if (activeItem == null) {
 					UseItemEncounterMessage message = UseItemEncounterMessage.newBuilder()
 							.setEncounterId(pokemon.getEncounterId())
 							.setSpawnPointGuid(pokemon.getSpawnPointId())
-							.setItem(item)
+							.setItem(itemId)
 							.build();
 
 					ServerRequest request = new ServerRequest(RequestType.USE_ITEM_ENCOUNTER, message);
@@ -190,6 +197,9 @@ public class Encounter {
 						UseItemEncounterResponse response = UseItemEncounterResponse.parseFrom(responseData);
 						activeItem = response.getActiveItem();
 						captureProbabilities = response.getCaptureProbability();
+						if (response.getStatus() == Status.SUCCESS) {
+							item.setCount(item.getCount() - 1);
+						}
 						return response.getStatus();
 					} catch (InvalidProtocolBufferException e) {
 						throw new RequestFailedException(e);
