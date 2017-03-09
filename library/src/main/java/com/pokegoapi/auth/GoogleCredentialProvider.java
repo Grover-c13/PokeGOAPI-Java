@@ -257,7 +257,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 			refreshToken(refreshToken);
 		}
 		authbuilder.setProvider("google");
-		authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(tokenId).setUnknown2(59).build());
+		authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(tokenId).setUnknown2(0).build());
 		return authbuilder.build();
 	}
 

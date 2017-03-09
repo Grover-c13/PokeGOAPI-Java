@@ -40,6 +40,10 @@ public class LocationFixes extends ArrayList<LocationFix> {
 	 */
 	public static LocationFixes getDefault(PokemonGo api, RequestEnvelopeOuterClass.RequestEnvelope.Builder builder,
 			long currentTime, Random random) {
+		if (Double.isNaN(api.getLatitude()) || Double.isNaN(api.getLongitude())) {
+			return new LocationFixes();
+		}
+
 		boolean hasMapUpdate = false;
 		boolean empty = builder.getRequestsCount() == 0 || builder.getRequests(0) == null;
 

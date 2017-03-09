@@ -26,7 +26,6 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.device.LocationFixes;
 import com.pokegoapi.api.device.SensorInfo;
 import com.pokegoapi.exceptions.request.RequestFailedException;
-import com.pokegoapi.exceptions.request.HashException;
 import com.pokegoapi.util.hash.Hash;
 import com.pokegoapi.util.hash.HashProvider;
 import com.pokegoapi.util.hash.crypto.Crypto;
@@ -43,10 +42,8 @@ public class Signature {
 	 * @param api the api
 	 * @param builder the RequestEnvelope builder
 	 * @throws RequestFailedException if an invalid request is sent
-	 * @throws HashException if hashing fails
 	 */
-	public static void setSignature(PokemonGo api, RequestEnvelope.Builder builder)
-			throws RequestFailedException, HashException {
+	public static void setSignature(PokemonGo api, RequestEnvelope.Builder builder) throws RequestFailedException {
 		boolean usePtr8 = false;
 		byte[][] requestData = new byte[builder.getRequestsCount()][];
 		for (int i = 0; i < builder.getRequestsCount(); i++) {
@@ -76,7 +73,7 @@ public class Signature {
 		if (builder.hasAuthTicket()) {
 			authTicket = builder.getAuthTicket().toByteArray();
 		} else {
-			authTicket = builder.getAuthInfo().getToken().toByteArray();
+			authTicket = builder.getAuthInfo().toByteArray();
 		}
 
 		long currentTimeMillis = api.currentTimeMillis();
@@ -116,6 +113,12 @@ public class Signature {
 				.setEncryptedSignature(ByteString.copyFrom(encrypted)).build()
 				.toByteString();
 
+		RequestEnvelope.PlatformRequest signatureRequest = RequestEnvelope.PlatformRequest.newBuilder()
+				.setType(PlatformRequestType.SEND_ENCRYPTED_SIGNATURE)
+				.setRequestMessage(signatureBytes)
+				.build();
+		builder.addPlatformRequests(signatureRequest);
+
 		if (usePtr8) {
 			ByteString ptr8 = UnknownPtr8RequestOuterClass.UnknownPtr8Request.newBuilder()
 					.setMessage("90f6a704505bccac73cec99b07794993e6fd5a12")
@@ -125,10 +128,5 @@ public class Signature {
 					.setType(PlatformRequestType.UNKNOWN_PTR_8)
 					.setRequestMessage(ptr8).build());
 		}
-		RequestEnvelope.PlatformRequest signatureRequest = RequestEnvelope.PlatformRequest.newBuilder()
-				.setType(PlatformRequestType.SEND_ENCRYPTED_SIGNATURE)
-				.setRequestMessage(signatureBytes)
-				.build();
-		builder.addPlatformRequests(signatureRequest);
 	}
 }

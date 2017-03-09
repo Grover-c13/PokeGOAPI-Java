@@ -90,7 +90,7 @@ public class PokemonGo {
 	private double altitude;
 	@Getter
 	@Setter
-	private double accuracy = 1;
+	private double accuracy = 65;
 	private CredentialProvider credentialProvider;
 	@Getter
 	private Settings settings;
@@ -169,7 +169,6 @@ public class PokemonGo {
 		map = new Map(this);
 		longitude = Double.NaN;
 		latitude = Double.NaN;
-		altitude = Double.NaN;
 		this.client = client.newBuilder()
 				.addNetworkInterceptor(new ClientInterceptor())
 				.build();

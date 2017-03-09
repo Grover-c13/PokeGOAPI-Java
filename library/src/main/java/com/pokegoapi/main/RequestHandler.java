@@ -347,9 +347,21 @@ public class RequestHandler implements Runnable {
 			builder.setAuthInfo(api.getAuthInfo(refresh));
 		}
 		builder.setMsSinceLastLocationfix(random.nextInt(1651) + 149);
-		builder.setLatitude(api.getLatitude());
-		builder.setLongitude(api.getLongitude());
-		builder.setAccuracy(api.getAccuracy());
+		double latitude = api.getLatitude();
+		double longitude = api.getLongitude();
+		double accuracy = api.getAccuracy();
+		if (Double.isNaN(latitude)) {
+			latitude = 0.0;
+		}
+		if (Double.isNaN(longitude)) {
+			longitude = 0.0;
+		}
+		if (Double.isNaN(accuracy)) {
+			accuracy = 0.0;
+		}
+		builder.setLatitude(latitude);
+		builder.setLongitude(longitude);
+		builder.setAccuracy(accuracy);
 	}
 
 	@Override

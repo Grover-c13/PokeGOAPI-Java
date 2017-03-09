@@ -32,6 +32,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,14 +44,16 @@ public class PtcCredentialProvider extends CredentialProvider {
 	public static final String REDIRECT_URI = "https://www.nianticlabs.com/pokemongo/error";
 	public static final String CLIENT_ID = "mobile-app_pokemon-go";
 	public static final String API_URL = "https://pgorelease.nianticlabs.com/plfe/rpc";
-	public static final String LOGIN_URL = "https://sso.pokemon.com/sso/login?service=https%3A%2F%2Fsso.pokemon"
-			+ ".com%2Fsso%2Foauth2.0%2FcallbackAuthorize";
+	public static final String SERVICE_URL = "https://sso.pokemon.com/sso/oauth2.0/callbackAuthorize";
+	public static final String LOGIN_URL = "https://sso.pokemon.com/sso/login?locale=en&service="
+			+ URLEncoder.encode(SERVICE_URL) + "";
 	public static final String LOGIN_OAUTH = "https://sso.pokemon.com/sso/oauth2.0/accessToken";
 	public static final String USER_AGENT = "niantic";
 	private static final String TAG = PtcCredentialProvider.class.getSimpleName();
 	//We try and refresh token 5 minutes before it actually expires
 	protected static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
 	protected static final int MAXIMUM_RETRIES = 5;
+	protected static final int[] UK2_VALUES = new int[]{2, 8, 21, 24, 28, 37, 56, 58, 59};
 
 	protected final OkHttpClient client;
 	protected final String username;
@@ -57,7 +61,12 @@ public class PtcCredentialProvider extends CredentialProvider {
 	protected final Time time;
 	protected String tokenId;
 	protected long expiresTimestamp;
+
 	protected AuthInfo.Builder authbuilder;
+
+	private int unknown2;
+
+	protected SecureRandom random = new SecureRandom();
 
 	@Setter
 	protected boolean shouldRetry = true;
@@ -262,9 +271,13 @@ public class PtcCredentialProvider extends CredentialProvider {
 			String[] params;
 			try {
 				params = body.split("&");
-				this.tokenId = params[0].split("=")[1];
-				this.expiresTimestamp = time.currentTimeMillis()
-						+ (Integer.valueOf(params[1].split("=")[1]) * 1000 - REFRESH_TOKEN_BUFFER_TIME);
+				int expire = Integer.valueOf(params[1].split("=")[1]);
+				tokenId = params[0].split("=")[1];
+				expiresTimestamp = time.currentTimeMillis() + (expire * 1000 - REFRESH_TOKEN_BUFFER_TIME);
+				unknown2 = expire;
+				if (random.nextDouble() > 0.1) {
+					unknown2 = UK2_VALUES[random.nextInt(UK2_VALUES.length)];
+				}
 			} catch (Exception e) {
 				throw new LoginFailedException("Failed to fetch token, body:" + body);
 			}
@@ -298,7 +311,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 		}
 
 		authbuilder.setProvider("ptc");
-		authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(tokenId).setUnknown2(59).build());
+		authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(tokenId).setUnknown2(unknown2).build());
 
 		return authbuilder.build();
 	}
