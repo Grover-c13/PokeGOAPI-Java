@@ -151,10 +151,19 @@ public class PokeHashProvider implements HashProvider {
 					}
 					throw new HashException("Unauthorized hash request!");
 				case 429:
-					if (error.length() > 0) {
-						throw new HashLimitExceededException(error);
+					if (awaitRequests) {
+						try {
+							key.await();
+							return provide(timestamp, latitude, longitude, altitude, authTicket, sessionData, requests);
+						} catch (InterruptedException e) {
+							throw new HashException(e);
+						}
+					} else {
+						if (error.length() > 0) {
+							throw new HashLimitExceededException(error);
+						}
+						throw new HashLimitExceededException("Exceeded hash limit!");
 					}
-					throw new HashLimitExceededException("Exceeded hash limit!");
 				case 404:
 					throw new HashException("Unknown hashing endpoint! \"" + this.endpoint + "\"");
 				default:

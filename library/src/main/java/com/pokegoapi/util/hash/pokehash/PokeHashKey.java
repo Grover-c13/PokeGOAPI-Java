@@ -100,7 +100,7 @@ public class PokeHashKey {
 		if (this.requestsRemaining <= 0) {
 			long timeToPeriodEnd = System.currentTimeMillis() - this.getRatePeriodEnd();
 			if (this.tested && timeToPeriodEnd > 0) {
-				Thread.sleep(timeToPeriodEnd);
+				Thread.sleep(Math.min(timeToPeriodEnd, 3600000));
 				this.checkPeriod();
 			}
 		}

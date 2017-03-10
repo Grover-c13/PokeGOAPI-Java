@@ -592,7 +592,7 @@ public class PokemonGo {
 		hasChallenge = false;
 		VerifyChallengeMessage message = VerifyChallengeMessage.newBuilder().setToken(token).build();
 		ServerRequest request = new ServerRequest(RequestType.VERIFY_CHALLENGE, message);
-		ByteString responseData = getRequestHandler().sendServerRequests(request, false);
+		ByteString responseData = getRequestHandler().sendServerRequests(request, true);
 		try {
 			VerifyChallengeResponse response = VerifyChallengeResponse.parseFrom(responseData);
 			hasChallenge = !response.getSuccess();
@@ -613,7 +613,9 @@ public class PokemonGo {
 	 *
 	 * @return the new challenge URL, if any
 	 * @throws RequestFailedException if an exception occurred while sending requests
+	 * @deprecated CHECK_CHALLENGE is sent as a common request, should not be needed
 	 */
+	@Deprecated
 	public String checkChallenge() throws RequestFailedException {
 		CheckChallengeMessage message = CheckChallengeMessage.newBuilder().build();
 		try {
