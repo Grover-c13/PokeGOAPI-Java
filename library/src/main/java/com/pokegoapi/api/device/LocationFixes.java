@@ -94,8 +94,13 @@ public class LocationFixes extends ArrayList<LocationFix> {
 		locationFixes.setTimestampCreate(api.currentTimeMillis());
 
 		for (int i = 0; i < providerCount; i++) {
-			float latitude = offsetOnLatLong(api.getLatitude(), random.nextInt(100) + 10);
-			float longitude = offsetOnLatLong(api.getLongitude(), random.nextInt(100) + 10);
+			float latitude = (float) api.getLatitude();
+			float longitude = (float) api.getLongitude();
+			if (i < providerCount - 1) {
+				latitude = offsetOnLatLong(api.getLatitude(), random.nextInt(100) + 10);
+				longitude = offsetOnLatLong(api.getLongitude(), random.nextInt(100) + 10);
+			}
+
 			float altitude = (float) api.getAltitude();
 			float verticalAccuracy = (float) (15 + (23 - 15) * random.nextDouble());
 
