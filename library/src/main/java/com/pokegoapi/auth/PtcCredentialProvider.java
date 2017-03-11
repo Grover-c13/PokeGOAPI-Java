@@ -48,7 +48,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 	public static final String LOGIN_URL = "https://sso.pokemon.com/sso/login?locale=en&service="
 			+ URLEncoder.encode(SERVICE_URL) + "";
 	public static final String LOGIN_OAUTH = "https://sso.pokemon.com/sso/oauth2.0/accessToken";
-	public static final String USER_AGENT = "niantic";
+	public static final String USER_AGENT = "pokemongo/1 CFNetwork/808.2.16 Darwin/16.3.0";
 	private static final String TAG = PtcCredentialProvider.class.getSimpleName();
 	//We try and refresh token 5 minutes before it actually expires
 	protected static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
