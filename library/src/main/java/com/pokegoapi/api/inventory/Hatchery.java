@@ -108,11 +108,14 @@ public class Hatchery {
 	 */
 	public List<HatchedEgg> updateHatchedEggs(GetHatchedEggsResponse response) throws RequestFailedException {
 		List<HatchedEgg> eggs = new ArrayList<>();
-		for (int i = 0; i < response.getPokemonIdCount(); i++) {
-			HatchedEgg egg = new HatchedEgg(response.getPokemonId(i),
+		for (int i = 0; i < response.getHatchedPokemonCount(); i++) {
+			HatchedEgg egg = new HatchedEgg(
+					response.getPokemonId(i),
 					response.getExperienceAwarded(i),
 					response.getCandyAwarded(i),
-					response.getStardustAwarded(i));
+					response.getStardustAwarded(i),
+					response.getHatchedPokemon(i),
+					api);
 			eggs.add(egg);
 			addHatchedEgg(egg);
 		}

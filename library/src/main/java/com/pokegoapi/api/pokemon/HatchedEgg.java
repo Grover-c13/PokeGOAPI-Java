@@ -15,17 +15,36 @@
 
 package com.pokegoapi.api.pokemon;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
+import com.pokegoapi.api.PokemonGo;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@AllArgsConstructor
 public class HatchedEgg {
-
+	@Setter
+	@Getter
+	private Pokemon pokemon;
+	@Setter
+	@Getter
 	private Long id;
+	@Setter
+	@Getter
 	private int experience;
+	@Setter
+	@Getter
 	private int candy;
+	@Setter
+	@Getter
 	private int stardust;
+	
+	public HatchedEgg(long pokemonId, int experienceAwarded, int candyAwarded, int stardustAwarded,
+	                  PokemonData hatchedPokemon, PokemonGo api) {
+		this.pokemon = new Pokemon(api, hatchedPokemon);
+		this.id=pokemonId;
+		this.experience = experienceAwarded;
+		this.candy = candyAwarded;
+		this.stardust = stardustAwarded;
+	}
 
 	@Override
 	public int hashCode() {

@@ -155,12 +155,15 @@ public class Encounter {
 						capturedPokemon = response.getCapturedPokemonId();
 						captureReason = response.getCaptureReason();
 					}
-					if (status == CatchStatus.CATCH_SUCCESS || status == CatchStatus.CATCH_FLEE) {
+					if(status == CatchStatus.CATCH_SUCCESS || status == CatchStatus.CATCH_FLEE)
 						pokemon.setDespawned(true);
-					}
-					if (status != CatchStatus.CATCH_ERROR) {
+					
+					if (status == CatchStatus.CATCH_SUCCESS)
+						api.getPlayerProfile().updateProfile();
+
+					if (status != CatchStatus.CATCH_ERROR)
 						item.setCount(item.getCount() - 1);
-					}
+
 				} catch (InvalidProtocolBufferException e) {
 					throw new RequestFailedException(e);
 				}
