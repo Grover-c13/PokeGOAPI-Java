@@ -94,6 +94,9 @@ public class PlayerProfile {
 	@Getter
 	private boolean banned;
 
+	@Getter
+	private boolean warned = false;
+
 	/**
 	 * @param api the api
 	 */
@@ -129,6 +132,13 @@ public class PlayerProfile {
 	 */
 	public void updateProfile(GetPlayerResponse playerResponse) {
 		banned = playerResponse.getBanned();
+		if(playerResponse.getWarn() && !warned) {
+			warned = true;
+			List<PlayerListener> listeners = api.getListeners(PlayerListener.class);
+			for (PlayerListener listener : listeners) {
+				listener.onWarningReceived(api);
+			}
+		}
 		updateProfile(playerResponse.getPlayerData());
 	}
 

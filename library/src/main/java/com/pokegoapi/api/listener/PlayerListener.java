@@ -26,4 +26,10 @@ public interface PlayerListener extends Listener {
 	 * @param medal the medal awarded
 	 */
 	void onMedalAwarded(PokemonGo api, PlayerProfile profile, Medal medal);
+	
+	/**
+	 * Called when a warning received
+	 * @param api the current api
+	 */
+	void onWarningReceived(PokemonGo api);
 }
