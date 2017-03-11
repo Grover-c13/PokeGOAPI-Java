@@ -36,9 +36,18 @@ public class HatchedEgg {
 	@Setter
 	@Getter
 	private int stardust;
-	
+
+	/**
+	 * Creates a hatched egg
+	 * @param pokemonId the hatched pokemon id
+	 * @param experienceAwarded the experience awarded from this hatch
+	 * @param candyAwarded the candy awarded from this hatch
+	 * @param stardustAwarded the stardust awarded from this hatch
+	 * @param hatchedPokemon the pokemon hatched
+	 * @param api the current API
+	 */
 	public HatchedEgg(long pokemonId, int experienceAwarded, int candyAwarded, int stardustAwarded,
-	                  PokemonData hatchedPokemon, PokemonGo api) {
+			PokemonData hatchedPokemon, PokemonGo api) {
 		this.pokemon = new Pokemon(api, hatchedPokemon);
 		this.id=pokemonId;
 		this.experience = experienceAwarded;
