@@ -13,20 +13,22 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.api.map.pokemon.encounter;
+package com.pokegoapi.exceptions.request;
 
-import POGOProtos.Data.Capture.CaptureProbabilityOuterClass;
-import POGOProtos.Data.PokemonDataOuterClass;
-import POGOProtos.Networking.Responses.EncounterResponseOuterClass.EncounterResponse;
+public class LoginFailedException extends RequestFailedException {
+	public LoginFailedException() {
+		super();
+	}
 
+	public LoginFailedException(String reason) {
+		super(reason);
+	}
 
-public interface EncounterResult {
+	public LoginFailedException(Throwable exception) {
+		super(exception);
+	}
 
-	boolean wasSuccessful();
-
-	EncounterResponse.Status getStatus();
-
-	PokemonDataOuterClass.PokemonData getPokemonData();
-
-	CaptureProbabilityOuterClass.CaptureProbability getCaptureProbability();
+	public LoginFailedException(String reason, Throwable exception) {
+		super(reason, exception);
+	}
 }

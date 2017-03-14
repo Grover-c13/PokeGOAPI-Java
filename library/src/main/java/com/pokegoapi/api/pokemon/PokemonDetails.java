@@ -6,8 +6,12 @@ import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
+import POGOProtos.Settings.Master.Pokemon.EvolutionBranchOuterClass.EvolutionBranch;
 import POGOProtos.Settings.Master.Pokemon.StatsAttributesOuterClass;
 import POGOProtos.Settings.Master.PokemonSettingsOuterClass;
+
+import java.util.List;
+
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.main.PokemonMeta;
@@ -16,41 +20,41 @@ import com.pokegoapi.util.Log;
 public class PokemonDetails {
 	private static final String TAG = Pokemon.class.getSimpleName();
 	protected final PokemonGo api;
-	private PokemonSettingsOuterClass.PokemonSettings settings;
-	private long id;
-	private PokemonIdOuterClass.PokemonId pokemonId;
-	private int cp;
-	private int maxStamina;
-	private int stamina;
-	private PokemonMove move1;
-	private PokemonMove move2;
-	private String deployedFortId;
-	private String ownerName;
-	private boolean isEgg;
-	private double eggKmWalkedTarget;
-	private double eggKmWalkedStart;
-	private int origin;
-	private float height;
-	private float weight;
-	private int individualAttack;
-	private int individualDefense;
-	private int individualStamina;
-	private float cpMultiplier;
-	private float additionalCpMultiplier;
-	private ItemId pokeball;
-	private long capturedCellId;
-	private int battlesAttacked;
-	private int battlesDefended;
-	private String eggIncubatorId;
-	private long creationTimeMs;
-	private int favorite;
-	private String nickname;
-	private int fromFort;
-	private String protoData;
-	private int numUpgrades;
-	private PokemonDisplay pokemonDisplay;
-	private int buddyCandyAwarded;
-	private float buddyTotalKmWalked;
+	protected PokemonSettingsOuterClass.PokemonSettings settings;
+	protected long id;
+	protected PokemonIdOuterClass.PokemonId pokemonId;
+	protected int cp;
+	protected int maxStamina;
+	protected int stamina;
+	protected PokemonMove move1;
+	protected PokemonMove move2;
+	protected String deployedFortId;
+	protected String ownerName;
+	protected boolean isEgg;
+	protected double eggKmWalkedTarget;
+	protected double eggKmWalkedStart;
+	protected int origin;
+	protected float height;
+	protected float weight;
+	protected int individualAttack;
+	protected int individualDefense;
+	protected int individualStamina;
+	protected float cpMultiplier;
+	protected float additionalCpMultiplier;
+	protected ItemId pokeball;
+	protected long capturedCellId;
+	protected int battlesAttacked;
+	protected int battlesDefended;
+	protected String eggIncubatorId;
+	protected long creationTimeMs;
+	protected int favorite;
+	protected String nickname;
+	protected int fromFort;
+	protected String protoData;
+	protected int numUpgrades;
+	protected PokemonDisplay pokemonDisplay;
+	protected int buddyCandyAwarded;
+	protected float buddyTotalKmWalked;
 
 	public PokemonDetails(PokemonGo api, PokemonData proto) {
 		this.api = api;
@@ -235,9 +239,9 @@ public class PokemonDetails {
 	}
 
 	/**
-	 * Checks whether the Pokémon is set as favorite.
+	 * Checks whether the Pokemon is set as favorite.
 	 *
-	 * @return true if the Pokémon is set as favorite
+	 * @return true if the Pokemon is set as favorite
 	 */
 	public boolean isFavorite() {
 		return favorite > 0;
@@ -268,8 +272,21 @@ public class PokemonDetails {
 		return getSettings().getEncounter().getBaseCaptureRate();
 	}
 
+	/**
+	 * Return the amount of candies necessary to evolve this pokemon
+	 * @return candy needed to evolve
+	 */
 	public int getCandiesToEvolve() {
-		return getSettings().getCandyToEvolve();
+		Evolution evolution = Evolutions.getEvolution(pokemonId);
+		if (evolution.getEvolutionBranch() != null && evolution.getEvolutionBranch().size() > 0) {
+			return evolution.getEvolutionBranch().get(0).getCandyCost();
+		}
+		return 0;
+	}
+	
+	public List<EvolutionBranch> getEvolutionBranch() {
+		Evolution evolution = Evolutions.getEvolution(pokemonId);
+		return evolution.getEvolutionBranch();
 	}
 
 	public double getBaseFleeRate() {

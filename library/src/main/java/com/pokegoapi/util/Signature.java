@@ -19,14 +19,13 @@ import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Platform.PlatformRequestTypeOuterClass.PlatformRequestType;
 import POGOProtos.Networking.Platform.Requests.SendEncryptedSignatureRequestOuterClass.SendEncryptedSignatureRequest;
-import POGOProtos.Networking.Platform.Requests.UnknownPtr8RequestOuterClass.UnknownPtr8Request;
-import POGOProtos.Networking.Requests.RequestOuterClass.Request;
+import POGOProtos.Networking.Platform.Requests.UnknownPtr8RequestOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.device.LocationFixes;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.api.device.SensorInfo;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.util.hash.Hash;
 import com.pokegoapi.util.hash.HashProvider;
 import com.pokegoapi.util.hash.crypto.Crypto;
@@ -42,27 +41,25 @@ public class Signature {
 	 *
 	 * @param api the api
 	 * @param builder the RequestEnvelope builder
-	 * @throws RemoteServerException if an invalid request is sent
-	 * @throws HashException if hashing fails
+	 * @throws RequestFailedException if an invalid request is sent
 	 */
-	public static void setSignature(PokemonGo api, RequestEnvelope.Builder builder)
-			throws RemoteServerException, HashException {
-		byte[] authTicket;
-		if (builder.hasAuthTicket()) {
-			authTicket = builder.getAuthTicket().toByteArray();
-		} else {
-			authTicket = builder.getAuthInfo().getToken().getContentsBytes().toByteArray();
-		}
-
+	public static void setSignature(PokemonGo api, RequestEnvelope.Builder builder) throws RequestFailedException {
+		boolean usePtr8 = false;
 		byte[][] requestData = new byte[builder.getRequestsCount()][];
 		for (int i = 0; i < builder.getRequestsCount(); i++) {
 			requestData[i] = builder.getRequests(i).toByteArray();
+			RequestType requestType = builder.getRequests(i).getRequestType();
+			if (requestType == RequestType.GET_PLAYER) {
+				usePtr8 |= api.isFirstGP();
+				api.setFirstGP(false);
+			} else if (requestType == RequestType.GET_MAP_OBJECTS) {
+				usePtr8 |= !api.isFirstGMO();
+				api.setFirstGMO(false);
+			}
 		}
-
 		double latitude = api.getLatitude();
 		double longitude = api.getLongitude();
 		double accuracy = api.getAccuracy();
-
 		if (Double.isNaN(latitude)) {
 			latitude = 0.0;
 		}
@@ -72,35 +69,42 @@ public class Signature {
 		if (Double.isNaN(accuracy)) {
 			accuracy = 0.0;
 		}
+		byte[] authTicket;
+		if (builder.hasAuthTicket()) {
+			authTicket = builder.getAuthTicket().toByteArray();
+		} else {
+			authTicket = builder.getAuthInfo().toByteArray();
+		}
 
-		long currentTime = api.currentTimeMillis();
+		long currentTimeMillis = api.currentTimeMillis();
 		byte[] sessionHash = api.getSessionHash();
 		HashProvider provider = api.getHashProvider();
-		Hash hash = provider.provide(currentTime, latitude, longitude, accuracy, authTicket, sessionHash, requestData);
-		Crypto crypto = provider.getCrypto();
+		Hash hash = provider.provide(currentTimeMillis, latitude, longitude, accuracy, authTicket, sessionHash,
+				requestData);
 
-		long timeSinceStart = currentTime - api.getStartTime();
+		long timeSinceStart = currentTimeMillis - api.getStartTime();
 		SignatureOuterClass.Signature.Builder signatureBuilder = SignatureOuterClass.Signature.newBuilder()
 				.setLocationHash1(hash.getLocationAuthHash())
 				.setLocationHash2(hash.getLocationHash())
-				.setTimestamp(currentTime)
+				.setSessionHash(ByteString.copyFrom(sessionHash))
+				.setTimestamp(currentTimeMillis)
 				.setTimestampSinceStart(timeSinceStart)
 				.setDeviceInfo(api.getDeviceInfo())
+				.addAllLocationFix(LocationFixes.getDefault(api, builder, currentTimeMillis, RANDOM))
 				.setActivityStatus(api.getActivitySignature(RANDOM))
-				.addAllLocationFix(LocationFixes.getDefault(api, builder, currentTime, RANDOM))
-				.setSessionHash(ByteString.copyFrom(sessionHash))
 				.setUnknown25(provider.getUNK25());
 
-		SignatureOuterClass.Signature.SensorInfo sensorInfo = api.getSensorSignature(currentTime, RANDOM);
-		if (sensorInfo != null) {
+		final SignatureOuterClass.Signature.SensorInfo sensorInfo = SensorInfo.getDefault(api, currentTimeMillis,
+				RANDOM);
+
+		if (sensorInfo != null)
 			signatureBuilder.addSensorInfo(sensorInfo);
-		}
 
 		List<Long> requestHashes = hash.getRequestHashes();
-		for (int i = 0; i < builder.getRequestsCount(); i++) {
+		for (int i = 0; i < builder.getRequestsCount(); i++)
 			signatureBuilder.addRequestHash(requestHashes.get(i));
-		}
 
+		Crypto crypto = provider.getCrypto();
 		SignatureOuterClass.Signature signature = signatureBuilder.build();
 		byte[] signatureByteArray = signature.toByteArray();
 		byte[] encrypted = crypto.encrypt(signatureByteArray, timeSinceStart).toByteBuffer().array();
@@ -115,18 +119,14 @@ public class Signature {
 				.build();
 		builder.addPlatformRequests(signatureRequest);
 
-		for (Request request : builder.getRequestsList()) {
-			RequestType requestType = request.getRequestType();
-			if (requestType == RequestType.GET_MAP_OBJECTS || requestType == RequestType.GET_PLAYER) {
-				ByteString ptr8 = UnknownPtr8Request.newBuilder()
-						.setMessage("7bb2d74dec0d8c5e132ad6c5491f72c9f19b306c")
-						.build()
-						.toByteString();
-				builder.addPlatformRequests(RequestEnvelope.PlatformRequest.newBuilder()
-						.setType(PlatformRequestType.UNKNOWN_PTR_8)
-						.setRequestMessage(ptr8).build());
-				break;
-			}
+		if (usePtr8) {
+			ByteString ptr8 = UnknownPtr8RequestOuterClass.UnknownPtr8Request.newBuilder()
+					.setMessage("90f6a704505bccac73cec99b07794993e6fd5a12")
+					.build()
+					.toByteString();
+			builder.addPlatformRequests(RequestEnvelope.PlatformRequest.newBuilder()
+					.setType(PlatformRequestType.UNKNOWN_PTR_8)
+					.setRequestMessage(ptr8).build());
 		}
 	}
 }

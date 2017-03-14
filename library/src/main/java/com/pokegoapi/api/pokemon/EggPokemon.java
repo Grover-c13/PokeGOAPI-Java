@@ -21,10 +21,7 @@ import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.EggIncubator;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import lombok.Setter;
 
 /**
@@ -44,13 +41,9 @@ public class EggPokemon {
 	 *
 	 * @param incubator : the incubator
 	 * @return status of putting egg in incubator
-	 * @throws LoginFailedException if failed to login
-	 * @throws RemoteServerException if the server failed to respond
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public UseItemEggIncubatorResponse.Result incubate(EggIncubator incubator)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
+	public UseItemEggIncubatorResponse.Result incubate(EggIncubator incubator) throws RequestFailedException {
 		if (incubator.isInUse()) {
 			throw new IllegalArgumentException("Incubator already used");
 		}

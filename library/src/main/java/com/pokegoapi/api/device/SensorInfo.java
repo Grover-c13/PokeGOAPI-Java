@@ -75,38 +75,40 @@ public class SensorInfo {
 		SensorInfo sensorInfo;
 		if (api.getSensorInfo() == null) {
 			sensorInfo = new SensorInfo();
-			sensorInfo.getBuilder().setTimestampSnapshot(currentTime - api.getStartTime() + random.nextInt(500))
-					.setRotationRateX(0.1 + (0.7 - 0.1) * random.nextDouble())
-					.setRotationRateY(0.1 + (0.8 - 0.1) * random.nextDouble())
-					.setRotationRateZ(0.1 + (0.8 - 0.1) * random.nextDouble())
-					.setAttitudePitch(-1.0 + random.nextDouble() * 2.0)
-					.setAttitudeRoll(-1.0 + random.nextDouble() * 2.0)
-					.setAttitudeYaw(-1.0 + random.nextDouble() * 2.0)
-					.setGravityX(-1.0 + random.nextDouble() * 2.0)
-					.setGravityY(-1.0 + random.nextDouble() * 2.0)
-					.setGravityZ(-1.0 + random.nextDouble() * 2.0)
-					.setMagneticFieldAccuracy(-1)
-					.setStatus(3);
+			sensorInfo.getBuilder()
+				.setTimestampSnapshot(currentTime - api.getStartTime() + random.nextInt(500))
+				.setRotationRateX(0.1 + 0.6 * random.nextDouble())
+				.setRotationRateY(0.1 + 0.7000000000000001 * random.nextDouble())
+				.setRotationRateZ(0.1 + 0.7000000000000001 * random.nextDouble())
+				.setAttitudePitch(-1.0 + random.nextDouble() * 2.0)
+				.setAttitudeRoll(-1.0 + random.nextDouble() * 2.0)
+				.setAttitudeYaw(-1.0 + random.nextDouble() * 2.0)
+				.setGravityX(-1.0 + random.nextDouble() * 2.0)
+				.setGravityY(-1.0 + random.nextDouble() * 2.0)
+				.setGravityZ(-1.0 + random.nextDouble() * 2.0)
+				.setMagneticFieldAccuracy(-1)
+				.setStatus(3);
 			api.setSensorInfo(sensorInfo);
 		} else {
 			sensorInfo = api.getSensorInfo();
-			sensorInfo.getBuilder().setTimestampSnapshot(currentTime - api.getStartTime() + random.nextInt(500))
-					.setLinearAccelerationX(-0.7 + random.nextDouble() * 1.4)
-					.setLinearAccelerationY(-0.7 + random.nextDouble() * 1.4)
-					.setLinearAccelerationZ(-0.7 + random.nextDouble() * 1.4)
-					.setRotationRateX(0.1 + (0.7 - 0.1) * random.nextDouble())
-					.setRotationRateY(0.1 + (0.8 - 0.1) * random.nextDouble())
-					.setRotationRateZ(0.1 + (0.8 - 0.1) * random.nextDouble())
-					.setAttitudePitch(-1.0 + random.nextDouble() * 2.0)
-					.setAttitudeRoll(-1.0 + random.nextDouble() * 2.0)
-					.setAttitudeYaw(-1.0 + random.nextDouble() * 2.0)
-					.setGravityX(-1.0 + random.nextDouble() * 2.0)
-					.setGravityY(-1.0 + random.nextDouble() * 2.0)
-					.setGravityZ(-1.0 + random.nextDouble() * 2.0)
-					.setMagneticFieldAccuracy(-1)
-					.setStatus(3);
+			sensorInfo.getBuilder()
+				.setTimestampSnapshot(currentTime - api.getStartTime() + random.nextInt(500))
+				.setLinearAccelerationX(-0.7 + random.nextDouble() * 1.4)
+				.setLinearAccelerationY(-0.7 + random.nextDouble() * 1.4)
+				.setLinearAccelerationZ(-0.7 + random.nextDouble() * 1.4)
+				.setRotationRateX(0.1 + 0.6 * random.nextDouble())
+				.setRotationRateY(0.1 + 0.7000000000000001 * random.nextDouble())
+				.setRotationRateZ(0.1 + 0.7000000000000001 * random.nextDouble())
+				.setAttitudePitch(-1.0 + random.nextDouble() * 2.0)
+				.setAttitudeRoll(-1.0 + random.nextDouble() * 2.0)
+				.setAttitudeYaw(-1.0 + random.nextDouble() * 2.0)
+				.setGravityX(-1.0 + random.nextDouble() * 2.0)
+				.setGravityY(-1.0 + random.nextDouble() * 2.0)
+				.setGravityZ(-1.0 + random.nextDouble() * 2.0)
+				.setMagneticFieldAccuracy(-1)
+				.setStatus(3);
 		}
-		if (currentTime - sensorInfo.getTimestampCreate() > (random.nextInt(10 * 1000) + 5 * 1000)) {
+		if (currentTime - sensorInfo.getTimestampCreate() > (random.nextInt(10000) + 5000)) {
 			sensorInfo.setTimestampCreate(currentTime);
 			return sensorInfo.getSensorInfo();
 		}

@@ -31,26 +31,24 @@
 package com.pokegoapi.examples;
 
 
+import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Responses.CatchPokemonResponseOuterClass.CatchPokemonResponse.CatchStatus;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.ItemBag;
 import com.pokegoapi.api.inventory.PokeBank;
 import com.pokegoapi.api.inventory.Pokeball;
 import com.pokegoapi.api.map.MapObjects;
 import com.pokegoapi.api.map.Point;
 import com.pokegoapi.api.map.fort.Pokestop;
-import com.pokegoapi.api.map.pokemon.CatchResult;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
+import com.pokegoapi.api.map.pokemon.Encounter;
 import com.pokegoapi.api.map.pokemon.NearbyPokemon;
-import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
+import com.pokegoapi.api.map.pokemon.ThrowProperties;
 import com.pokegoapi.api.pokemon.Pokemon;
-import com.pokegoapi.api.settings.CatchOptions;
 import com.pokegoapi.api.settings.PokeballSelector;
 import com.pokegoapi.auth.PtcCredentialProvider;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.NoSuchItemException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.MapUtil;
 import com.pokegoapi.util.PokeDictionary;
@@ -135,16 +133,13 @@ public class CatchPokemonAtAreaExample {
 				System.out.println("Finished traveling to pokestop, catching pokemon.");
 				catchArea(api);
 			}
-		} catch (LoginFailedException | NoSuchItemException | RemoteServerException | CaptchaActiveException e) {
-			// failed to login, invalid credentials, auth issue or server issue.
-			Log.e("Main", "Failed to login, captcha or server issue: ", e);
-		} catch (HashException e) {
-			Log.e("Main ", "Failed to login to the Hash Service: ", e);
+		} catch (NoSuchItemException | RequestFailedException e) {
+			Log.e("Main", "An exception occurred while running example: ", e);
 		}
 	}
 
-	private static void catchArea(PokemonGo api)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException, NoSuchItemException {
+	private static void catchArea(PokemonGo api) throws RequestFailedException, NoSuchItemException {
+		ItemBag bag = api.getInventories().getItemBag();
 		try {
 			//Wait until map is updated for the current location
 			api.getMap().awaitUpdate();
@@ -156,61 +151,71 @@ public class CatchPokemonAtAreaExample {
 			PokeBank pokebank = api.getInventories().getPokebank();
 
 			for (CatchablePokemon cp : catchablePokemon) {
-				// You need to Encounter first.
-				EncounterResult encResult = cp.encounterPokemon();
-				// if encounter was successful, catch
-				if (encResult.wasSuccessful()) {
+				// Encounter this pokemon
+				Encounter encounter = cp.encounter();
+
+				// If the encounter was successful, attempt to catch this pokemon
+				if (encounter.isSuccessful()) {
 					System.out.println("Encountered: " + cp.getPokemonId());
-					CatchOptions options = new CatchOptions(api)
-							.useRazzberry(true)
-							.withPokeballSelector(PokeballSelector.SMART);
-					List<Pokeball> useablePokeballs = api.getInventories().getItemBag().getUseablePokeballs();
-					double probability = cp.getCaptureProbability();
-					if (useablePokeballs.size() > 0) {
+
+					List<Pokeball> usablePokeballs = bag.getUsablePokeballs();
+
+					if (usablePokeballs.size() > 0) {
 						//Select pokeball with smart selector to print what pokeball is used
-						Pokeball pokeball = PokeballSelector.SMART.select(useablePokeballs, probability);
+						double probability = encounter.getCaptureProbability();
+						Pokeball pokeball = PokeballSelector.SMART.select(usablePokeballs, probability);
 						System.out.println("Attempting to catch: " + cp.getPokemonId() + " with " + pokeball
 								+ " (" + probability + ")");
-						//Throw pokeballs until capture or flee
-						while (!cp.isDespawned()) {
-							//Wait between Pokeball throws
+
+						// Throw pokeballs until capture or flee
+						while (encounter.isActive()) {
+							// Wait between Pokeball throws
 							Thread.sleep(500 + random.nextInt(1000));
-							CatchResult result = cp.catchPokemon(options);
-							System.out.println("Threw ball: " + result.getStatus());
-							if (result.getStatus() == CatchStatus.CATCH_SUCCESS) {
-								//Print pokemon stats
-								Pokemon pokemon = pokebank.getPokemonById(result.getCapturedPokemonId());
-								double iv = pokemon.getIvInPercentage();
-								int number = pokemon.getPokemonId().getNumber();
-								String name = PokeDictionary.getDisplayName(number, Locale.ENGLISH);
-								System.out.println("====" + name + "====");
-								System.out.println("CP: " + pokemon.getCp());
-								System.out.println("IV: " + iv + "%");
-								System.out.println("Height: " + pokemon.getHeightM() + "m");
-								System.out.println("Weight: " + pokemon.getWeightKg() + "kg");
-								System.out.println("Move 1: " + pokemon.getMove1());
-								System.out.println("Move 2: " + pokemon.getMove2());
-								//Rename the pokemon to <Name> IV%
-								pokemon.renamePokemon(name + " " + iv + "%");
-								//Set pokemon with IV above 90% as favorite
-								if (iv > 90) {
-									pokemon.setFavoritePokemon(true);
+
+							// If no item is active, use a razzberry
+							int razzberryCount = bag.getItem(ItemId.ITEM_RAZZ_BERRY).getCount();
+							if (encounter.getActiveItem() == null && razzberryCount > 0) {
+								encounter.useItem(ItemId.ITEM_RAZZ_BERRY);
+							}
+
+							// Throw pokeball with random properties
+							encounter.throwPokeball(PokeballSelector.SMART, ThrowProperties.random());
+
+							if (encounter.getStatus() == CatchStatus.CATCH_SUCCESS) {
+								// Print pokemon stats
+								Pokemon pokemon = pokebank.getPokemonById(encounter.getCapturedPokemon());
+								if (pokemon != null) {
+									double iv = pokemon.getIvInPercentage();
+									int number = pokemon.getPokemonId().getNumber();
+									String name = PokeDictionary.getDisplayName(number, Locale.ENGLISH);
+									System.out.println("====" + name + "====");
+									System.out.println("CP: " + pokemon.getCp());
+									System.out.println("IV: " + iv + "%");
+									System.out.println("Height: " + pokemon.getHeightM() + "m");
+									System.out.println("Weight: " + pokemon.getWeightKg() + "kg");
+									System.out.println("Move 1: " + pokemon.getMove1());
+									System.out.println("Move 2: " + pokemon.getMove2());
+									//Rename the pokemon to <Name> IV%
+									pokemon.renamePokemon(name + " " + iv + "%");
+									//Set pokemon with IV above 90% as favorite
+									if (iv > 90) {
+										pokemon.setFavoritePokemon(true);
+									}
 								}
 							}
 						}
-						//Wait for animation before catching next pokemon
-						Thread.sleep(3000 + random.nextInt(1000));
 					} else {
 						System.out.println("Skipping Pokemon, we have no Pokeballs!");
 					}
+
+					// Wait for animation before catching next pokemon
+					Thread.sleep(3000 + random.nextInt(1000));
 				} else {
-					System.out.println("Encounter failed. " + encResult.getStatus());
+					System.out.println("Failed to encounter pokemon: " + encounter.getEncounterResult());
 				}
 			}
 		} catch (InterruptedException e) {
 			return;
-		} catch (HashException e) {
-			Log.e("Main ", "Failed to login to the Hash Service: ", e);
 		}
 	}
 }

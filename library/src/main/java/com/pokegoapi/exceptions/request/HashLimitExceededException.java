@@ -13,18 +13,23 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.exceptions.request;
 
-public class AsyncRemoteServerException extends AsyncPokemonGoException {
-	public AsyncRemoteServerException(String reason) {
+/**
+ * Hash Limit Exceeded Exception
+ */
+public class HashLimitExceededException extends HashException {
+
+	public HashLimitExceededException() {
+		super();
+	}
+
+	public HashLimitExceededException(String reason) {
 		super(reason);
 	}
 
-	public AsyncRemoteServerException(Exception exception) {
+	public HashLimitExceededException(Throwable exception) {
 		super(exception);
 	}
 
-	public AsyncRemoteServerException(String reason, Exception exception) {
-		super(reason, exception);
-	}
 }

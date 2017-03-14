@@ -18,17 +18,14 @@ package com.pokegoapi.api.inventory;
 import POGOProtos.Inventory.EggIncubatorOuterClass;
 import POGOProtos.Inventory.EggIncubatorTypeOuterClass.EggIncubatorType;
 import POGOProtos.Networking.Requests.Messages.UseItemEggIncubatorMessageOuterClass.UseItemEggIncubatorMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.UseItemEggIncubatorResponseOuterClass.UseItemEggIncubatorResponse;
 import POGOProtos.Settings.Master.Item.EggIncubatorAttributesOuterClass.EggIncubatorAttributes;
 import POGOProtos.Settings.Master.ItemSettingsOuterClass.ItemSettings;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.EggPokemon;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.main.ServerRequest;
 
@@ -72,28 +69,23 @@ public class EggIncubator {
 	 *
 	 * @param egg the egg
 	 * @return status of putting egg in incubator
-	 * @throws RemoteServerException the remote server exception
-	 * @throws LoginFailedException the login failed exception
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public UseItemEggIncubatorResponse.Result hatchEgg(EggPokemon egg)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
+	public UseItemEggIncubatorResponse.Result hatchEgg(EggPokemon egg) throws RequestFailedException {
 
 		UseItemEggIncubatorMessage reqMsg = UseItemEggIncubatorMessage.newBuilder()
 				.setItemId(proto.getId())
 				.setPokemonId(egg.getId())
 				.build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_EGG_INCUBATOR,
-				reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_EGG_INCUBATOR, reqMsg);
+		api.getRequestHandler().sendServerRequests(serverRequest, true);
 
 		UseItemEggIncubatorResponse response;
 		try {
 			response = UseItemEggIncubatorResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 
 		api.getInventories().updateInventories(true);

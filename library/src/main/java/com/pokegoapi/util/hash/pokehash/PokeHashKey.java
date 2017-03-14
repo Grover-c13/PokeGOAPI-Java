@@ -54,11 +54,41 @@ public class PokeHashKey {
 	synchronized void setProperties(HttpURLConnection connection) {
 		this.checkPeriod();
 
-		this.ratePeriodEnd = connection.getHeaderFieldLong("X-RatePeriodEnd", this.ratePeriodEnd);
-		this.maxRequests = connection.getHeaderFieldInt("X-MaxRequestCount", this.maxRequests);
-		this.requestsRemaining = connection.getHeaderFieldInt("X-RateRequestsRemaining", this.requestsRemaining);
-		this.keyExpiration = connection.getHeaderFieldLong("X-AuthTokenExpiration", this.keyExpiration);
+		this.ratePeriodEnd = this.getHeaderLong(connection, "X-RatePeriodEnd", this.ratePeriodEnd);
+		this.maxRequests = this.getHeaderInteger(connection, "X-MaxRequestCount", this.maxRequests);
+		this.requestsRemaining = this.getHeaderInteger(connection, "X-RateRequestsRemaining", this.requestsRemaining);
+		this.keyExpiration = this.getHeaderLong(connection, "X-AuthTokenExpiration", this.keyExpiration);
 		this.tested = true;
+	}
+
+	/**
+	 * Parses a long header
+	 * @param connection the connection to load the header from
+	 * @param name the header name
+	 * @param defaultValue the default value to use, if parsing fails
+	 * @return the parsed long
+	 */
+	private long getHeaderLong(HttpURLConnection connection, String name, long defaultValue) {
+		try {
+			return Long.parseLong(connection.getHeaderField(name));
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+
+	/**
+	 * Parses an integer header
+	 * @param connection the connection to load the header from
+	 * @param name the header name
+	 * @param defaultValue the default value to use, if parsing fails
+	 * @return the parsed integer
+	 */
+	private int getHeaderInteger(HttpURLConnection connection, String name, int defaultValue) {
+		try {
+			return Integer.parseInt(connection.getHeaderField(name));
+		} catch (Exception e) {
+			return defaultValue;
+		}
 	}
 
 	/**
@@ -70,7 +100,7 @@ public class PokeHashKey {
 		if (this.requestsRemaining <= 0) {
 			long timeToPeriodEnd = System.currentTimeMillis() - this.getRatePeriodEnd();
 			if (this.tested && timeToPeriodEnd > 0) {
-				Thread.sleep(timeToPeriodEnd);
+				Thread.sleep(Math.min(timeToPeriodEnd, 3600000));
 				this.checkPeriod();
 			}
 		}

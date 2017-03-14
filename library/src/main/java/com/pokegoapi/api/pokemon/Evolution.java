@@ -16,36 +16,38 @@
 package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
+import POGOProtos.Settings.Master.Pokemon.EvolutionBranchOuterClass.EvolutionBranch;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.pokegoapi.main.PokemonMeta;
 
 public class Evolution {
 	@Getter
-	private PokemonId[] parents;
+	private PokemonId parent;
 	@Getter
 	private PokemonId pokemon;
 	@Getter
 	private List<PokemonId> evolutions = new ArrayList<>();
+	@Getter
+	private List<EvolutionBranch> evolutionBranch;
 
 	/**
 	 * Constructor for this evolution class
 	 *
-	 * @param parents the parents of this evolution
-	 * @param pokemon the pokmon being evolved
+	 * @param parent the parent of this evolution
+	 * @param pokemon the pokemon being evolved
 	 */
-	public Evolution(PokemonId[] parents, PokemonId pokemon) {
-		this.parents = parents;
+	public Evolution(PokemonId parent, PokemonId pokemon) {
+		this.parent = parent;
 		this.pokemon = pokemon;
-	}
-
-	/**
-	 * Adds the given pokemon as an evolution
-	 *
-	 * @param pokemon the pokemon to add
-	 */
-	public void addEvolution(PokemonId pokemon) {
-		this.evolutions.add(pokemon);
+		this.evolutionBranch = PokemonMeta.getPokemonSettings(pokemon).getEvolutionBranchList();
+		for (EvolutionBranch evolutionBranch : this.evolutionBranch) {
+			this.evolutions.add(evolutionBranch.getEvolution());
+		}
+		
 	}
 }
