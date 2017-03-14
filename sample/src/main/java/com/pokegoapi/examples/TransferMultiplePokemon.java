@@ -21,10 +21,7 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.PokeBank;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.auth.PtcCredentialProvider;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.hash.HashProvider;
 import okhttp3.OkHttpClient;
@@ -84,11 +81,9 @@ public class TransferMultiplePokemon {
 			for (Map.Entry<PokemonFamilyId, Integer> entry : candies.entrySet()) {
 				System.out.println(entry.getKey() + ": " + entry.getValue() + " candies awarded");
 			}
-		} catch (LoginFailedException | RemoteServerException | CaptchaActiveException e) {
+		} catch (RequestFailedException e) {
 			// failed to login, invalid credentials, auth issue or server issue.
 			Log.e("Main", "Failed to login. Invalid credentials, captcha or server issue: ", e);
-		} catch (HashException e) {
-			Log.e("Main ", "Failed to login to the Hash Service: ", e);
 		}
 	}
 }

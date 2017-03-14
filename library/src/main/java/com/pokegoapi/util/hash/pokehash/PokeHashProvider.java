@@ -15,8 +15,8 @@
 
 package com.pokegoapi.util.hash.pokehash;
 
-import com.pokegoapi.exceptions.hash.HashException;
-import com.pokegoapi.exceptions.hash.HashLimitExceededException;
+import com.pokegoapi.exceptions.request.HashException;
+import com.pokegoapi.exceptions.request.HashLimitExceededException;
 import com.pokegoapi.util.hash.Hash;
 import com.pokegoapi.util.hash.HashProvider;
 import com.pokegoapi.util.hash.crypto.Crypto;
@@ -40,14 +40,14 @@ import java.util.List;
  * This requires a key and is not free like the legacy provider.
  */
 public class PokeHashProvider implements HashProvider {
-	private static final String DEFAULT_ENDPOINT = "https://pokehash.buddyauth.com/api/v125/hash";
+	private static final String DEFAULT_ENDPOINT = "https://pokehash.buddyauth.com/api/v127_4/hash";
 
 	@Getter
 	@Setter
 	private String endpoint = DEFAULT_ENDPOINT;
 
-	private static final int VERSION = 5500;
-	private static final long UNK25 = -9156899491064153954L;
+	private static final int VERSION = 5704;
+	private static final long UNK25 = -816976800928766045L;
 
 	private static final Moshi MOSHI = new Builder().build();
 
@@ -151,10 +151,19 @@ public class PokeHashProvider implements HashProvider {
 					}
 					throw new HashException("Unauthorized hash request!");
 				case 429:
-					if (error.length() > 0) {
-						throw new HashLimitExceededException(error);
+					if (awaitRequests) {
+						try {
+							key.await();
+							return provide(timestamp, latitude, longitude, altitude, authTicket, sessionData, requests);
+						} catch (InterruptedException e) {
+							throw new HashException(e);
+						}
+					} else {
+						if (error.length() > 0) {
+							throw new HashLimitExceededException(error);
+						}
+						throw new HashLimitExceededException("Exceeded hash limit!");
 					}
-					throw new HashLimitExceededException("Exceeded hash limit!");
 				case 404:
 					throw new HashException("Unknown hashing endpoint! \"" + this.endpoint + "\"");
 				default:

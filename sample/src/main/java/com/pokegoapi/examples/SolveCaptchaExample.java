@@ -130,12 +130,8 @@ public class SolveCaptchaExample {
 									if (api.verifyChallenge(token)) {
 										System.out.println("Captcha was correctly solved!");
 									} else {
+										//verifyChallenge will receive a new captcha url if this one is invalid
 										System.out.println("Captcha was incorrectly solved! Please try again.");
-										/*
-											Ask for a new challenge url, don't need to check the result,
-											because the LoginListener will be called when this completed.
-										*/
-										api.checkChallenge();
 									}
 								} catch (Exception e) {
 									Log.e("Main", "Error while solving captcha!", e);

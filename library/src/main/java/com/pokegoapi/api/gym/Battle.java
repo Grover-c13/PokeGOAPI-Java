@@ -34,10 +34,7 @@ import POGOProtos.Settings.Master.MoveSettingsOuterClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
@@ -139,13 +136,9 @@ public class Battle {
 	 * Starts this battle
 	 *
 	 * @param handler to handle this battle
-	 * @throws CaptchaActiveException if a captcha is active
-	 * @throws LoginFailedException if the login failed
-	 * @throws RemoteServerException if the server errors
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public void start(final BattleHandler handler)
-			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
+	public void start(final BattleHandler handler) throws RequestFailedException {
 		battleId = null;
 		participantIndices.clear();
 		participants.clear();
@@ -180,20 +173,17 @@ public class Battle {
 		updateThread.setName("Gym Battle Update Thread");
 		updateThread.start();
 
-		attackDefender(handler);
+		beginDefenderBattle(handler);
 	}
 
 	/**
-	 * Starts this battle with a single defender
+	 * Starts this battle with an individual defender
 	 *
 	 * @param handler to handle this battle
-	 * @throws CaptchaActiveException if a captcha is active
-	 * @throws LoginFailedException if the login failed
-	 * @throws RemoteServerException if the server errors
-	 * @throws HashException if a hashing related exception occurs
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	private void attackDefender(final BattleHandler handler)
-			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
+	private void beginDefenderBattle(final BattleHandler handler)
+			throws RequestFailedException {
 		lastRetrievedAction = null;
 		queuedActions.clear();
 		battleState = BattleState.STATE_UNSET;
@@ -249,7 +239,7 @@ public class Battle {
 				handler.onStart(api, this, response.getResult());
 			} catch (InvalidProtocolBufferException e) {
 				battleId = "";
-				throw new RemoteServerException(e);
+				throw new RequestFailedException(e);
 			}
 		} else {
 			active = false;
@@ -294,7 +284,7 @@ public class Battle {
 		}
 		activeActions.removeAll(completedActions);
 		boolean nextDefender = false;
-		if (time - lastSendTime > PokemonMeta.battleSettings.getAttackServerInterval() && active) {
+		if (active && !queuedActions.isEmpty()) {
 			try {
 				nextDefender = sendActions(handler);
 			} catch (Exception e) {
@@ -305,7 +295,7 @@ public class Battle {
 		if (nextDefender) {
 			defenderIndex++;
 			try {
-				attackDefender(handler);
+				beginDefenderBattle(handler);
 				Thread.sleep(1500);
 			} catch (Exception e) {
 				handler.onException(api, this, e);
@@ -548,13 +538,10 @@ public class Battle {
 	 *
 	 * @param handler to handle this battle
 	 * @return if this battle should switch to the next defender
-	 * @throws CaptchaActiveException if a captcha is active
-	 * @throws LoginFailedException if login fails
-	 * @throws RemoteServerException if the server errors
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
 	private boolean sendActions(BattleHandler handler)
-			throws CaptchaActiveException, LoginFailedException, RemoteServerException, HashException {
+			throws RequestFailedException {
 		AttackGymMessage.Builder builder = AttackGymMessage.newBuilder()
 				.setGymId(gym.getId())
 				.setBattleId(battleId)
@@ -589,18 +576,21 @@ public class Battle {
 		if (lastRetrievedAction != null && sentActions) {
 			builder.setLastRetrievedAction(lastRetrievedAction);
 		}
-		AttackGymMessage message = builder.build();
-		ServerRequest request = new ServerRequest(RequestType.ATTACK_GYM, message);
-		api.getRequestHandler().sendServerRequests(request);
-		boolean nextDefender;
-		try {
-			AttackGymResponse response = AttackGymResponse.parseFrom(request.getData());
-			nextDefender = handleAttackResponse(handler, response);
-		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+		if (builder.getAttackActionsCount() > 0) {
+			AttackGymMessage message = builder.build();
+			ServerRequest request = new ServerRequest(RequestType.ATTACK_GYM, message);
+			api.getRequestHandler().sendServerRequests(request, true);
+			boolean nextDefender;
+			try {
+				AttackGymResponse response = AttackGymResponse.parseFrom(request.getData());
+				nextDefender = handleAttackResponse(handler, response);
+			} catch (InvalidProtocolBufferException e) {
+				throw new RequestFailedException(e);
+			}
+			sentActions = true;
+			return nextDefender;
 		}
-		sentActions = true;
-		return nextDefender;
+		return false;
 	}
 
 	/**

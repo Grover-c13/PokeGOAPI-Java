@@ -15,28 +15,27 @@
 
 package com.pokegoapi.main;
 
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Platform.PlatformRequestTypeOuterClass.PlatformRequestType;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.protobuf.Message;
 import lombok.Getter;
 
-public class ServerRequest {
+public class ServerPlatformRequest {
 	@Getter
-	private final RequestType type;
+	private final PlatformRequestType type;
 	@Getter
-	private final Message request;
+	private final ByteString request;
 
 	private final Object responseLock = new Object();
 
 	private ByteString response;
 
 	/**
-	 * Creates a ServerRequest
+	 * Creates a ServerPlatformRequest
 	 * @param type the type of request
 	 * @param request the request data
 	 */
-	public ServerRequest(RequestType type, Message request) {
+	public ServerPlatformRequest(PlatformRequestType type, ByteString request) {
 		this.type = type;
 		this.request = request;
 	}

@@ -13,22 +13,24 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.exceptions.request;
 
-public class LoginFailedException extends Exception {
-	public LoginFailedException() {
+public class HashException extends RequestFailedException {
+
+	public HashException() {
 		super();
 	}
 
-	public LoginFailedException(String reason) {
+	public HashException(String reason) {
 		super(reason);
 	}
 
-	public LoginFailedException(Throwable exception) {
+	public HashException(Throwable exception) {
 		super(exception);
 	}
 
-	public LoginFailedException(String reason, Throwable exception) {
+	public HashException(String reason, Throwable exception) {
 		super(reason, exception);
 	}
+
 }

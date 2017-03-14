@@ -23,10 +23,7 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.listener.PokemonListener;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.api.pokemon.HatchedEgg;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 
@@ -107,18 +104,18 @@ public class Hatchery {
 	 *
 	 * @param response the GetHatchedEggs response
 	 * @return the hatched eggs contained in the response
-	 * @throws RemoteServerException if a bad request was sent
-	 * @throws LoginFailedException if login failed
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public List<HatchedEgg> updateHatchedEggs(GetHatchedEggsResponse response)
-			throws RemoteServerException, LoginFailedException, CaptchaActiveException {
+	public List<HatchedEgg> updateHatchedEggs(GetHatchedEggsResponse response) throws RequestFailedException {
 		List<HatchedEgg> eggs = new ArrayList<>();
-		for (int i = 0; i < response.getPokemonIdCount(); i++) {
-			HatchedEgg egg = new HatchedEgg(response.getPokemonId(i),
+		for (int i = 0; i < response.getHatchedPokemonCount(); i++) {
+			HatchedEgg egg = new HatchedEgg(
+					response.getPokemonId(i),
 					response.getExperienceAwarded(i),
 					response.getCandyAwarded(i),
-					response.getStardustAwarded(i));
+					response.getStardustAwarded(i),
+					response.getHatchedPokemon(i),
+					api);
 			eggs.add(egg);
 			addHatchedEgg(egg);
 		}
@@ -129,15 +126,12 @@ public class Hatchery {
 	 * Get if eggs has hatched.
 	 *
 	 * @return list of hatched eggs
-	 * @throws RemoteServerException e
-	 * @throws LoginFailedException e
-	 * @throws CaptchaActiveException if a captcha is active and the message can't be sent
-	 * @throws HashException if an exception occurred while requesting hash
+	 * @throws RequestFailedException if an exception occurred while sending requests
 	 * @deprecated Use getHatchedEggs()
 	 */
 	@Deprecated
 	public List<HatchedEgg> queryHatchedEggs()
-			throws RemoteServerException, CaptchaActiveException, LoginFailedException, HashException {
+			throws RequestFailedException {
 		GetHatchedEggsMessage msg = GetHatchedEggsMessage.newBuilder().build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.GET_HATCHED_EGGS, msg);
 		api.getRequestHandler().sendServerRequests(serverRequest);
@@ -146,7 +140,7 @@ public class Hatchery {
 		try {
 			response = GetHatchedEggsResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
-			throw new RemoteServerException(e);
+			throw new RequestFailedException(e);
 		}
 		api.getInventories().updateInventories();
 		return updateHatchedEggs(response);

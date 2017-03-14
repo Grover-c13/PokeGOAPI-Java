@@ -29,7 +29,7 @@ public class ExampleConstants {
 	public static final String PASSWORD = "";
 	public static final double LATITUDE = -32.058087;
 	public static final double LONGITUDE = 115.744325;
-	public static final double ALTITUDE = 0.0;
+	public static final double ALTITUDE = Math.random() * 15.0;
 	public static final String POKEHASH_KEY = "";
 
 	/**

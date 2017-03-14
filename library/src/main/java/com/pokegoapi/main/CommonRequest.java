@@ -19,13 +19,15 @@ import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
+
+import java.util.Set;
 
 public interface CommonRequest {
+	boolean shouldAdd(PokemonGo api, RequestType type, Set<RequestType> requestTypes);
+
 	ServerRequest create(PokemonGo api, RequestType requestType);
 
 	void parse(PokemonGo api, ByteString data, RequestType requestType)
-			throws InvalidProtocolBufferException, CaptchaActiveException, RemoteServerException, LoginFailedException;
+			throws InvalidProtocolBufferException, RequestFailedException;
 }

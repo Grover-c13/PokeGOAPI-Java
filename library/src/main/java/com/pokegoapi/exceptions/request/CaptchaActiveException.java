@@ -13,18 +13,16 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.exceptions.request;
 
-public class AsyncLoginFailedException extends AsyncPokemonGoException {
-	public AsyncLoginFailedException(String reason) {
-		super(reason);
-	}
+import lombok.Getter;
 
-	public AsyncLoginFailedException(Exception exception) {
-		super(exception);
-	}
+public class CaptchaActiveException extends RequestFailedException {
+	@Getter
+	private String captcha;
 
-	public AsyncLoginFailedException(String reason, Exception exception) {
-		super(reason, exception);
+	public CaptchaActiveException(CaptchaActiveException exception) {
+		super(exception.getMessage(), exception);
+		this.captcha = exception.getCaptcha();
 	}
 }

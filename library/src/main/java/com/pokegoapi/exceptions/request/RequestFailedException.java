@@ -13,16 +13,22 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.exceptions;
+package com.pokegoapi.exceptions.request;
 
-import lombok.Getter;
+public class RequestFailedException extends Exception {
+	public RequestFailedException() {
+		super();
+	}
 
-public class CaptchaActiveException extends Exception {
-	@Getter
-	private String captcha;
+	public RequestFailedException(String reason) {
+		super(reason);
+	}
 
-	public CaptchaActiveException(AsyncCaptchaActiveException exception) {
-		super(exception.getMessage(), exception);
-		this.captcha = exception.getCaptcha();
+	public RequestFailedException(Throwable exception) {
+		super(exception);
+	}
+
+	public RequestFailedException(String reason, Throwable exception) {
+		super(reason, exception);
 	}
 }

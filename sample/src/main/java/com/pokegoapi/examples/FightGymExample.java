@@ -46,10 +46,10 @@ import com.pokegoapi.api.map.MapObjects;
 import com.pokegoapi.api.map.Point;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.auth.PtcCredentialProvider;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.CaptchaActiveException;
+import com.pokegoapi.exceptions.request.LoginFailedException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
+import com.pokegoapi.exceptions.request.HashException;
 import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.MapUtil;
@@ -173,11 +173,9 @@ public class FightGymExample {
 					}
 				}
 			}
-		} catch (LoginFailedException | RemoteServerException | InterruptedException | CaptchaActiveException e) {
+		} catch (RequestFailedException | InterruptedException e) {
 			// failed to login, invalid credentials, auth issue or server issue.
 			Log.e("Main", "Failed to login, captcha or server issue: ", e);
-		} catch (HashException e) {
-			Log.e("Main ", "Failed to login to the Hash Service: ", e);
 		}
 	}
 
@@ -198,7 +196,7 @@ public class FightGymExample {
 	}
 
 	private static void healPokemonFull(PokemonGo api, Pokemon pokemon)
-			throws LoginFailedException, CaptchaActiveException, RemoteServerException, HashException {
+			throws LoginFailedException, CaptchaActiveException, RequestFailedException, HashException {
 		System.out.println("Healing " + pokemon.getPokemonId());
 		//Continue healing the pokemon until fully healed
 		while (pokemon.isInjured() || pokemon.isFainted()) {

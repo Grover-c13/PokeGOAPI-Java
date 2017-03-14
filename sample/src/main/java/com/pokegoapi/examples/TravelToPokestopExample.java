@@ -36,10 +36,7 @@ import com.pokegoapi.api.map.Point;
 import com.pokegoapi.api.map.fort.Pokestop;
 import com.pokegoapi.api.map.fort.PokestopLootResult;
 import com.pokegoapi.auth.PtcCredentialProvider;
-import com.pokegoapi.exceptions.CaptchaActiveException;
-import com.pokegoapi.exceptions.LoginFailedException;
-import com.pokegoapi.exceptions.RemoteServerException;
-import com.pokegoapi.exceptions.hash.HashException;
+import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.hash.HashProvider;
 import com.pokegoapi.util.path.Path;
@@ -106,10 +103,8 @@ public class TravelToPokestopExample {
 			} else {
 				System.out.println("Couldn't find out of range pokestop to travel to!");
 			}
-		} catch (LoginFailedException | RemoteServerException | CaptchaActiveException e) {
+		} catch (RequestFailedException e) {
 			Log.e("Main", "Failed to login, captcha or server issue: ", e);
-		} catch (HashException e) {
-			Log.e("Main ", "Failed to login to the Hash Service: ", e);
 		}
 	}
 }

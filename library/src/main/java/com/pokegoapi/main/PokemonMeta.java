@@ -56,12 +56,12 @@ public class PokemonMeta {
 	public static PokemonUpgradeSettings upgradeSettings;
 
 	private static long timestamp;
-	private static DownloadItemTemplatesResponse templatesResponse;
 
 	static {
 		try {
+			File templatesFile = Utils.getTempFile("templates");
 			File timestampFile = Utils.getTempFile("timestamp");
-			if (timestampFile.exists()) {
+			if (timestampFile.exists() && templatesFile.exists()) {
 				BufferedReader reader = new BufferedReader(new FileReader(timestampFile));
 				String line;
 				while ((line = reader.readLine()) != null) {
@@ -73,9 +73,6 @@ public class PokemonMeta {
 					}
 				}
 				reader.close();
-			}
-			File templatesFile = Utils.getTempFile("templates");
-			if (templatesFile.exists()) {
 				ByteString data = ByteString.readFrom(new FileInputStream(templatesFile));
 				update(data, false);
 			}
@@ -110,7 +107,7 @@ public class PokemonMeta {
 	 * @throws IOException if writing fails
 	 */
 	public static void update(ByteString data, boolean write) throws IOException {
-		templatesResponse = DownloadItemTemplatesResponse.parseFrom(data);
+		DownloadItemTemplatesResponse templatesResponse = DownloadItemTemplatesResponse.parseFrom(data);
 		if (write) {
 			data.writeTo(new FileOutputStream(Utils.createTempFile("templates")));
 		}
