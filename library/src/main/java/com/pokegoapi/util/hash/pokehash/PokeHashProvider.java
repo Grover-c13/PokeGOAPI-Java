@@ -217,11 +217,11 @@ public class PokeHashProvider implements HashProvider {
 
 	private static class Request {
 		@Getter
-		private double latitude;
+		private long latitude64;
 		@Getter
-		private double longitude;
+		private long longitude64;
 		@Getter
-		private double altitude;
+		private long accuracy64;
 		@Getter
 		private long timestamp;
 		@Getter
@@ -233,9 +233,9 @@ public class PokeHashProvider implements HashProvider {
 
 		private Request(double latitude, double longitude, double altitude, long timestamp, byte[] authTicket,
 				byte[] sessionData, byte[][] requests) {
-			this.latitude = latitude;
-			this.longitude = longitude;
-			this.altitude = altitude;
+			this.latitude64 = Double.doubleToLongBits(latitude);
+			this.longitude64 = Double.doubleToLongBits(longitude);
+			this.accuracy64 = Double.doubleToLongBits(altitude);
 			this.timestamp = timestamp;
 			this.authTicket = Base64.encodeBytes(authTicket);
 			this.sessionData = Base64.encodeBytes(sessionData);
