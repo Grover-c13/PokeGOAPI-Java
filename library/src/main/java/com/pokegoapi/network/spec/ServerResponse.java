@@ -7,12 +7,10 @@ public class ServerResponse {
 
     private ServerRequest request;
     private ByteString response;
-    private Requests.RequestType type;
 
-    public ServerResponse(ServerRequest request, ByteString response, Requests.RequestType type) {
+    public ServerResponse(ServerRequest request, ByteString response) {
         this.request = request;
         this.response = response;
-        this.type = type;
     }
 
     public ServerRequest getRequest() {
@@ -24,7 +22,7 @@ public class ServerResponse {
     }
 
     public Requests.RequestType getType() {
-        return type;
+        return request.getType();
     }
 
     public String getName(){
