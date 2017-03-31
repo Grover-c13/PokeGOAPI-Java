@@ -38,6 +38,7 @@ import java.util.List;
 /**
  * Hash provider on latest version, using the PokeHash hashing service.
  * This requires a key and is not free like the legacy provider.
+ * @see <a href="https://hashing.pogodev.org/">https://hashing.pogodev.org/</a>
  */
 public class PokeHashProvider implements HashProvider {
 	private static final String DEFAULT_ENDPOINT = "https://pokehash.buddyauth.com/api/v127_4/hash";

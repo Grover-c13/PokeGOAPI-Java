@@ -26,7 +26,10 @@ import java.util.List;
 
 /**
  * 0.45.0 local hash provider, no key required
+ * @deprecated Niantic have disabled use of invalid hashes,
+ * {@link com.pokegoapi.util.hash.pokehash.PokeHashProvider} must be used now
  */
+@Deprecated
 public class LegacyHashProvider implements HashProvider {
 	private static final int VERSION = 4500;
 	private static final long UNK25 = -816976800928766045L;
