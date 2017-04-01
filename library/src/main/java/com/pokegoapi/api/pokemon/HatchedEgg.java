@@ -39,6 +39,7 @@ public class HatchedEgg {
 
 	/**
 	 * Creates a hatched egg
+	 *
 	 * @param pokemonId the hatched pokemon id
 	 * @param experienceAwarded the experience awarded from this hatch
 	 * @param candyAwarded the candy awarded from this hatch
@@ -49,7 +50,7 @@ public class HatchedEgg {
 	public HatchedEgg(long pokemonId, int experienceAwarded, int candyAwarded, int stardustAwarded,
 			PokemonData hatchedPokemon, PokemonGo api) {
 		this.pokemon = new Pokemon(api, hatchedPokemon);
-		this.id=pokemonId;
+		this.id = pokemonId;
 		this.experience = experienceAwarded;
 		this.candy = candyAwarded;
 		this.stardust = stardustAwarded;

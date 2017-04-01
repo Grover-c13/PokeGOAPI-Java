@@ -16,7 +16,6 @@
 package com.pokegoapi.util.hash;
 
 import com.pokegoapi.exceptions.request.HashException;
-import com.pokegoapi.util.hash.crypto.Crypto;
 
 public interface HashProvider {
 	/**
@@ -40,11 +39,6 @@ public interface HashProvider {
 	 * @return the version this hash supports, for example 4500 = 0.45.0 and 5300 = 0.53.0
 	 */
 	int getHashVersion();
-
-	/**
-	 * @return the instance of crypto this hash should use
-	 */
-	Crypto getCrypto();
 
 	/**
 	 * @return the unknown 25 value used with this hash

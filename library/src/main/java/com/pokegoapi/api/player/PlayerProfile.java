@@ -132,7 +132,7 @@ public class PlayerProfile {
 	 */
 	public void updateProfile(GetPlayerResponse playerResponse) {
 		banned = playerResponse.getBanned();
-		if(playerResponse.getWarn() && !warned) {
+		if (playerResponse.getWarn() && !warned) {
 			warned = true;
 			List<PlayerListener> listeners = api.getListeners(PlayerListener.class);
 			for (PlayerListener listener : listeners) {
