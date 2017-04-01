@@ -19,8 +19,6 @@ import com.pokegoapi.exceptions.request.HashException;
 import com.pokegoapi.exceptions.request.HashLimitExceededException;
 import com.pokegoapi.util.hash.Hash;
 import com.pokegoapi.util.hash.HashProvider;
-import com.pokegoapi.util.hash.crypto.Crypto;
-import com.pokegoapi.util.hash.crypto.PokeHashCrypto;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Moshi.Builder;
 import lombok.Getter;
@@ -38,16 +36,17 @@ import java.util.List;
 /**
  * Hash provider on latest version, using the PokeHash hashing service.
  * This requires a key and is not free like the legacy provider.
+ * @see <a href="https://hashing.pogodev.org/">https://hashing.pogodev.org/</a>
  */
 public class PokeHashProvider implements HashProvider {
-	private static final String DEFAULT_ENDPOINT = "https://pokehash.buddyauth.com/api/v127_4/hash";
+	private static final String DEFAULT_ENDPOINT = "https://pokehash.buddyauth.com/api/v129_1/hash";
 
 	@Getter
 	@Setter
 	private String endpoint = DEFAULT_ENDPOINT;
 
-	private static final int VERSION = 5704;
-	private static final long UNK25 = -816976800928766045L;
+	private static final int VERSION = 5901;
+	private static final long UNK25 = -3226782243204485589L;
 
 	private static final Moshi MOSHI = new Builder().build();
 
@@ -194,11 +193,6 @@ public class PokeHashProvider implements HashProvider {
 	@Override
 	public int getHashVersion() {
 		return VERSION;
-	}
-
-	@Override
-	public Crypto getCrypto() {
-		return PokeHashCrypto.POKE_HASH;
 	}
 
 	@Override

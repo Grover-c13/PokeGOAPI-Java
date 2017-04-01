@@ -15,15 +15,15 @@
 
 package com.pokegoapi.util.hash.crypto;
 
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.security.InvalidKeyException;
 
 public class Crypto {
-	public static final Crypto LEGACY = new Crypto();
+	private static final byte[] KEY = new byte[]{
+			(byte) 0x4F, (byte) 0xEB, (byte) 0x1C, (byte) 0xA5, (byte) 0xF6, (byte) 0x1A, (byte) 0x67, (byte) 0xCE,
+			(byte) 0x43, (byte) 0xF3, (byte) 0xF0, (byte) 0x0C, (byte) 0xB1, (byte) 0x23, (byte) 0x88, (byte) 0x35,
+			(byte) 0xE9, (byte) 0x8B, (byte) 0xE8, (byte) 0x39, (byte) 0xD8, (byte) 0x89, (byte) 0x8F, (byte) 0x5A,
+			(byte) 0x3B, (byte) 0x51, (byte) 0x2E, (byte) 0xA9, (byte) 0x47, (byte) 0x38, (byte) 0xC4, (byte) 0x14
+	};
 
 	protected static class Rand {
 		private long state;
@@ -39,115 +39,56 @@ public class Crypto {
 	}
 
 	protected byte[] makeIv(Rand rand) {
-		byte[] iv = new byte[256];
-		for (int i = 0; i < 256; i++) {
+		byte[] iv = new byte[TwoFish.BLOCK_SIZE];
+		for (int i = 0; i < iv.length; i++) {
 			iv[i] = rand.next();
 		}
 		return iv;
 	}
 
 	protected byte makeIntegrityByte(Rand rand) {
-		byte lastbyte = rand.next();
-
-		byte v74 = (byte) ((lastbyte ^ 0x0C) & lastbyte);
-		byte v75 = (byte) (((~v74 & 0x67) | (v74 & 0x98)) ^ 0x6F | (v74 & 8));
-		return v75;
+		return 0x21;
 	}
 
 	/**
-	 * Shuffles bytes.
+	 * Encrypts the given signature
 	 *
 	 * @param input input data
 	 * @param msSinceStart time since start
-	 * @return shuffled bytes
+	 * @return encrypted signature
 	 */
-	public CipherText encrypt(byte[] input, long msSinceStart) {
-		Rand rand = new Rand(msSinceStart);
+	public byte[] encrypt(byte[] input, long msSinceStart) {
+		try {
+			Object key = TwoFish.makeKey(KEY);
 
-		byte[] arr3;
-		CipherText output;
+			Rand rand = new Rand(msSinceStart);
+			byte[] iv = this.makeIv(rand);
+			int blockCount = (input.length + 256) / 256;
+			int outputSize = (blockCount * 256) + 5;
+			byte[] output = new byte[outputSize];
 
-		byte[] iv = makeIv(rand);
-		output = new CipherText(this, input, msSinceStart, rand);
+			output[0] = (byte) (msSinceStart >> 24);
+			output[1] = (byte) (msSinceStart >> 16);
+			output[2] = (byte) (msSinceStart >> 8);
+			output[3] = (byte) msSinceStart;
 
-		for (int i = 0; i < output.content.size(); ++i) {
-			byte[] current = output.content.get(i);
+			System.arraycopy(input, 0, output, 4, input.length);
+			output[outputSize - 2] = (byte) (256 - input.length % 256);
 
-			for (int j = 0; j < 256; j++) {
-				current[j] ^= iv[j];
+			for (int offset = 0; offset < blockCount * 256; offset += TwoFish.BLOCK_SIZE) {
+				for (int i = 0; i < TwoFish.BLOCK_SIZE; i++) {
+					output[4 + offset + i] ^= iv[i];
+				}
+
+				byte[] block = TwoFish.blockEncrypt(output, offset + 4, key);
+				System.arraycopy(block, 0, output, offset + 4, block.length);
+				System.arraycopy(output, 4 + offset, iv, 0, TwoFish.BLOCK_SIZE);
 			}
 
-			int[] temp2 = new int[0x100 / 4];
-			// only use 256 bytes from input.
-			IntBuffer intBuf = ByteBuffer.wrap(Arrays.copyOf(current, 0x100))//
-					.order(ByteOrder.BIG_ENDIAN)//
-					.asIntBuffer();
-			intBuf.get(temp2);
-			arr3 = Shuffle.shuffle2(temp2);
-
-			System.arraycopy(arr3, 0, iv, 0, 256);
-			System.arraycopy(arr3, 0, current, 0, 256);
-		}
-
-		return output;
-	}
-
-	public static class CipherText {
-		Crypto crypto;
-		Rand rand;
-		byte[] prefix;
-		public ArrayList<byte[]> content;
-
-		int totalsize;
-		int inputLen;
-
-		byte[] intBytes(long value) {
-			ByteBuffer buffer = ByteBuffer.allocate(4);
-			buffer.putInt(new BigInteger(String.valueOf(value)).intValue());
-			return buffer.array();
-		}
-
-		/**
-		 * Create new CipherText with contents and IV.
-		 *
-		 * @param crypto the crypto instance to use
-		 * @param input the contents
-		 * @param ms the time
-		 * @param rand the rand object to use
-		 */
-		public CipherText(Crypto crypto, byte[] input, long ms, Rand rand) {
-			this.crypto = crypto;
-			this.inputLen = input.length;
-			this.rand = rand;
-			prefix = new byte[32];
-			content = new ArrayList<>();
-			int roundedsize = input.length + (256 - (input.length % 256));
-			for (int i = 0; i < roundedsize / 256; ++i) {
-				content.add(new byte[256]);
-			}
-			totalsize = roundedsize + 5;
-
-			prefix = intBytes(ms);
-
-			for (int i = 0; i < input.length; ++i)
-				content.get(i / 256)[i % 256] = input[i];
-			byte[] last = content.get(content.size() - 1);
-			last[last.length - 1] = (byte) (256 - (input.length % 256));
-
-		}
-
-		/**
-		 * Convert this Ciptext to a ByteBuffer
-		 *
-		 * @return contents as bytebuffer
-		 */
-		public ByteBuffer toByteBuffer() {
-			ByteBuffer buff = ByteBuffer.allocate(totalsize).put(prefix);
-			for (int i = 0; i < content.size(); ++i)
-				buff.put(content.get(i));
-
-			buff.put(totalsize - 1, crypto.makeIntegrityByte(rand));
-			return buff;
+			output[outputSize - 1] = this.makeIntegrityByte(rand);
+			return output;
+		} catch (InvalidKeyException e) {
+			return null;
 		}
 	}
 }

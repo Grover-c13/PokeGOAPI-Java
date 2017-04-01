@@ -104,10 +104,10 @@ public class Signature {
 		for (int i = 0; i < builder.getRequestsCount(); i++)
 			signatureBuilder.addRequestHash(requestHashes.get(i));
 
-		Crypto crypto = provider.getCrypto();
+		Crypto crypto = new Crypto();
 		SignatureOuterClass.Signature signature = signatureBuilder.build();
 		byte[] signatureByteArray = signature.toByteArray();
-		byte[] encrypted = crypto.encrypt(signatureByteArray, timeSinceStart).toByteBuffer().array();
+		byte[] encrypted = crypto.encrypt(signatureByteArray, timeSinceStart);
 
 		ByteString signatureBytes = SendEncryptedSignatureRequest.newBuilder()
 				.setEncryptedSignature(ByteString.copyFrom(encrypted)).build()
