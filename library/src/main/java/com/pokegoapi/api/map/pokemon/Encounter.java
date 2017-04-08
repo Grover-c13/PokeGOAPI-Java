@@ -190,7 +190,7 @@ public class Encounter {
 			ItemBag bag = api.getInventories().getItemBag();
 			Item item = bag.getItem(itemId);
 			if (item.getCount() > 0) {
-				if (activeItem == null) {
+				if (getActiveItem() == null) {
 					UseItemEncounterMessage message = UseItemEncounterMessage.newBuilder()
 							.setEncounterId(pokemon.getEncounterId())
 							.setSpawnPointGuid(pokemon.getSpawnPointId())

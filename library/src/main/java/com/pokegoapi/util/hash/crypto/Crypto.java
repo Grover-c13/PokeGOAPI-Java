@@ -32,16 +32,16 @@ public class Crypto {
 			this.state = state;
 		}
 
-		public byte next() {
+		public char next() {
 			state = (state * 0x41C64E6D) + 0x3039;
-			return (byte) ((state >> 16) & 0xFF);
+			return (char) ((state >> 16) & 0x7FFF);
 		}
 	}
 
 	protected byte[] makeIv(Rand rand) {
 		byte[] iv = new byte[TwoFish.BLOCK_SIZE];
 		for (int i = 0; i < iv.length; i++) {
-			iv[i] = rand.next();
+			iv[i] = (byte) rand.next();
 		}
 		return iv;
 	}
@@ -86,6 +86,7 @@ public class Crypto {
 			}
 
 			output[outputSize - 1] = this.makeIntegrityByte(rand);
+
 			return output;
 		} catch (InvalidKeyException e) {
 			return null;
