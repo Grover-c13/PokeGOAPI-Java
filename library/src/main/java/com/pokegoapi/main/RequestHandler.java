@@ -366,7 +366,7 @@ public class RequestHandler implements Runnable {
 
 	@Override
 	public void run() {
-		long lastRequest = System.currentTimeMillis();
+		long lastRequest = api.currentTimeMillis();
 
 		while (active) {
 			try {
@@ -376,7 +376,7 @@ public class RequestHandler implements Runnable {
 			}
 
 			if (!workQueue.isEmpty()) {
-				long time = System.currentTimeMillis();
+				long time = api.currentTimeMillis();
 				long timeSinceLastRequest = time - lastRequest;
 
 				if (timeSinceLastRequest < THROTTLE) {
@@ -452,7 +452,7 @@ public class RequestHandler implements Runnable {
 					continue;
 				}
 
-				lastRequest = System.currentTimeMillis();
+				lastRequest = api.currentTimeMillis();
 			}
 		}
 	}

@@ -101,11 +101,11 @@ public class PokeBank {
 	}
 
 	/**
-	 * Remove pokemon.
+	 * Remove pokemon by ID.
 	 *
-	 * @param pokemon the pokemon to remove.
+	 * @param pokemonID the pokemon id to remove.
 	 */
-	public void removePokemon(final Pokemon pokemon) {
+	public void removePokemon(final long pokemonID) {
 		synchronized (this.lock) {
 			List<Pokemon> previous = new ArrayList<>();
 			previous.addAll(pokemons);
@@ -113,11 +113,20 @@ public class PokeBank {
 			pokemons.clear();
 			pokemons.addAll(Stream.of(previous).filter(new Predicate<Pokemon>() {
 				@Override
-				public boolean test(Pokemon pokemn) {
-					return pokemn.getId() != pokemon.getId();
+				public boolean test(Pokemon pokemon) {
+					return pokemon.getId() != pokemonID;
 				}
 			}).collect(Collectors.<Pokemon>toList()));
 		}
+	}
+
+	/**
+	 * Remove pokemon.
+	 *
+	 * @param pokemon the pokemon to remove.
+	 */
+	public void removePokemon(final Pokemon pokemon) {
+		removePokemon(pokemon.getId());
 	}
 
 	/**
