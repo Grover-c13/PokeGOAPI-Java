@@ -91,7 +91,7 @@ public class LocationFixes extends ArrayList<LocationFix> {
 			}
 		}
 
-		locationFixes.setTimestampCreate(api.currentTimeMillis());
+		locationFixes.setTimestampCreate(currentTime);
 
 		for (int i = 0; i < providerCount; i++) {
 			float latitude = (float) api.getLatitude();
@@ -121,7 +121,7 @@ public class LocationFixes extends ArrayList<LocationFix> {
 					.setTimestampSnapshot(
 							contains(negativeSnapshotProviders, i)
 									? random.nextInt(1000) - 3000
-									: api.currentTimeMillis() - api.getStartTime()
+									: currentTime - api.getStartTime()
 											+ (150 * (i + 1) + random.nextInt(250 * (i + 1) - (150 * (i + 1)))))
 					.setLatitude(latitude)
 					.setLongitude(longitude)

@@ -139,6 +139,12 @@ public class Inventories {
 
 		for (InventoryItemOuterClass.InventoryItem inventoryItem
 				: response.getInventoryDelta().getInventoryItemsList()) {
+			
+			// Remove released Pokemon from bag.
+			if(inventoryItem.getDeletedItem().getPokemonId() != 0) {
+				pokebank.removePokemon(inventoryItem.getDeletedItem().getPokemonId());
+			}
+			
 			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
 
 			// hatchery
