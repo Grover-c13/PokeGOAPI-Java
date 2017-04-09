@@ -42,4 +42,9 @@ public class LegacyHashProvider implements HashProvider {
 	public long getUNK25() {
 		return -816976800928766045L;
 	}
+	
+	@Override
+	public int[] getCurrentAPIVersion() {
+		return new int[] {0,45,0};
+	}
 }
