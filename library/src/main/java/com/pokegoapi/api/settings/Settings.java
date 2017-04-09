@@ -6,9 +6,12 @@ import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.listener.SettingsListener;
 import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
+
+import java.util.List;
 
 /**
  * Created by rama on 27/07/16.
@@ -122,6 +125,30 @@ public class Settings {
 		}
 		if (response.getSettings().hasGpsSettings()) {
 			gpsSettings.update(response.getSettings().getGpsSettings());
+		}
+
+		// check if new api has been forced by Niantic
+		if(!response.getSettings().getMinimumClientVersion().isEmpty()) {
+			int[] currentVer = api.getHashProvider().getCurrentAPIVersion();
+			String[] minimumVer = response.getSettings().getMinimumClientVersion().split("\\.");
+			int[] splitMinimumVer = new int[currentVer.length];
+			for (int i = 0; i < currentVer.length; i++) {
+				try {
+					splitMinimumVer[i] = Integer.parseInt(minimumVer[i]);
+				} catch (NumberFormatException e) {
+					splitMinimumVer[i] = 0;
+				}
+			}
+			for (int i = 0; i < currentVer.length; i++) {
+				if (splitMinimumVer[i] > currentVer[i]) {
+					List<SettingsListener> listeners = api.getListeners(SettingsListener.class);
+					for (SettingsListener settings: listeners) {
+						settings.onNewVersionForced(api, currentVer[0] + "." + currentVer[1] + "." + currentVer[2],
+								response.getSettings().getMinimumClientVersion());
+					}
+					break;
+				}
+			}
 		}
 		this.hash = response.getHash();
 	}
