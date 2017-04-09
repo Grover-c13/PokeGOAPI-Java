@@ -129,10 +129,10 @@ public class Settings {
 			int[] currentVer = api.getHashProvider().getCurrentAPIVersion();
 			String[] curVer = response.getSettings().getMinimumClientVersion().split("\\.");
 			int[] minimumVer = new int[currentVer.length];
-			for (int x = 0; x < currentVer.length; x++)
-				minimumVer[x] = Integer.valueOf(curVer[x]);
-			for (int x = 0; x < currentVer.length; x++) {
-				if(minimumVer[x] > currentVer[x]) {
+			for (int i = 0; i < currentVer.length; i++)
+				minimumVer[i] = Integer.valueOf(curVer[i]);
+			for (int i = 0; i < currentVer.length; i++) {
+				if(minimumVer[i] > currentVer[i]) {
 					List<SettingsListener> listeners = api.getListeners(SettingsListener.class);
 					for(SettingsListener settings: listeners) {
 						settings.onNewVersionForced(api, currentVer[0] + "." + currentVer[1] + "." + currentVer[2], 
