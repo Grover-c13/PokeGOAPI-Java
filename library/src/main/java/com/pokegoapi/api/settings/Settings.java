@@ -123,6 +123,23 @@ public class Settings {
 		if (response.getSettings().hasGpsSettings()) {
 			gpsSettings.update(response.getSettings().getGpsSettings());
 		}
+		// check if new api has been forced by Niantic
+		if(!response.getSettings().getMinimumClientVersion().isEmpty()) {
+			int[] currentVer = api.getHashProvider().getCurrentAPIVersion();
+			String[] curVer = response.getSettings().getMinimumClientVersion().split("\\.");
+			int[] minimumVer = new int[currentVer.length];
+			for(int x = 0; x < currentVer.length; x++)
+				minimumVer[x] = Integer.valueOf(curVer[x]);
+			for(int x=0; x < currentVer.length; x++) {
+				if(minimumVer[x] > currentVer[x]) {
+					List<SettingsListener> listeners = api.getListeners(SettingsListener.class);
+					for(SettingsListener settings: listeners) {
+						settings.onNewVersionForced(api, currentVer[0]+"."+currentVer[1]+"."+currentVer[2], response.getSettings().getMinimumClientVersion());
+					}
+					break;
+				}
+			}
+		}
 		this.hash = response.getHash();
 	}
 }
