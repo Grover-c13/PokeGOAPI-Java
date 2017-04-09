@@ -10,6 +10,7 @@ import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 import com.pokegoapi.api.listener.SettingsListener;
+import java.util.List;
 
 /**
  * Created by rama on 27/07/16.
