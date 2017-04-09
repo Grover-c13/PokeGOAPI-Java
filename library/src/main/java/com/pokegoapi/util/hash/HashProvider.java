@@ -44,5 +44,10 @@ public interface HashProvider {
 	 * @return the unknown 25 value used with this hash
 	 */
 	long getUNK25();
-
+	
+	/**
+	 * Get the supported API version as a int array
+	 * @return the supported API version
+	 */
+	int[] getCurrentAPIVersion();
 }
