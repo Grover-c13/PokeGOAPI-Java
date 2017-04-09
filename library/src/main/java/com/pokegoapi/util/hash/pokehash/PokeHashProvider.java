@@ -21,6 +21,9 @@ import com.pokegoapi.util.hash.Hash;
 import com.pokegoapi.util.hash.HashProvider;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Moshi.Builder;
+import de.btobastian.javacord.listener.server.ServerLeaveListener;
+import dps.utils.bag.pokemon.Sleeper;
+import dps.utils.gui.logger.MyLogger;
 import lombok.Getter;
 import lombok.Setter;
 import net.iharder.Base64;
@@ -39,14 +42,16 @@ import java.util.List;
  * @see <a href="https://hashing.pogodev.org/">https://hashing.pogodev.org/</a>
  */
 public class PokeHashProvider implements HashProvider {
-	private static final String DEFAULT_ENDPOINT = "https://pokehash.buddyauth.com/api/v129_1/hash";
+	private static final String DEFAULT_ENDPOINT = "https://pokehash.buddyauth.com/api/v131_0/hash";
 
 	@Getter
 	@Setter
 	private String endpoint = DEFAULT_ENDPOINT;
 
-	private static final int VERSION = 5901;
-	private static final long UNK25 = -3226782243204485589L;
+	private static final int VERSION = 6100;
+	private static final long UNK25 = 1296456256998993698L;
+
+	private static final int[] currentAPIVersion = new int[] {0,61,0};
 
 	private static final Moshi MOSHI = new Builder().build();
 
@@ -238,5 +243,11 @@ public class PokeHashProvider implements HashProvider {
 				this.requests[i] = Base64.encodeBytes(requests[i]);
 			}
 		}
+	}
+	
+	
+	@Override
+	public int[] getCurrentAPIVersion() {
+		return currentAPIVersion;
 	}
 }
