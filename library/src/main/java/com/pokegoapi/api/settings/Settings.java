@@ -9,6 +9,7 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
+import com.pokegoapi.api.listener.SettingsListener;
 
 /**
  * Created by rama on 27/07/16.
@@ -124,17 +125,18 @@ public class Settings {
 			gpsSettings.update(response.getSettings().getGpsSettings());
 		}
 		// check if new api has been forced by Niantic
-		if(!response.getSettings().getMinimumClientVersion().isEmpty()) {
+		if (!response.getSettings().getMinimumClientVersion().isEmpty()) {
 			int[] currentVer = api.getHashProvider().getCurrentAPIVersion();
 			String[] curVer = response.getSettings().getMinimumClientVersion().split("\\.");
 			int[] minimumVer = new int[currentVer.length];
-			for(int x = 0; x < currentVer.length; x++)
+			for (int x = 0; x < currentVer.length; x++)
 				minimumVer[x] = Integer.valueOf(curVer[x]);
-			for(int x=0; x < currentVer.length; x++) {
+			for (int x = 0; x < currentVer.length; x++) {
 				if(minimumVer[x] > currentVer[x]) {
 					List<SettingsListener> listeners = api.getListeners(SettingsListener.class);
 					for(SettingsListener settings: listeners) {
-						settings.onNewVersionForced(api, currentVer[0]+"."+currentVer[1]+"."+currentVer[2], response.getSettings().getMinimumClientVersion());
+						settings.onNewVersionForced(api, currentVer[0] + "." + currentVer[1] + "." + currentVer[2], 
+									    response.getSettings().getMinimumClientVersion());
 					}
 					break;
 				}
