@@ -38,18 +38,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-
 public class PtcCredentialProvider extends CredentialProvider {
 	public static final String CLIENT_SECRET = "w8ScCUXJQc6kXKw8FiOhd8Fixzht18Dq3PEVkUCP5ZPxtgyWsbTvWHFLm2wNY0JR";
 	public static final String REDIRECT_URI = "https://www.nianticlabs.com/pokemongo/error";
 	public static final String CLIENT_ID = "mobile-app_pokemon-go";
-	public static final String API_URL = "https://pgorelease.nianticlabs.com/plfe/rpc";
 	public static final String SERVICE_URL = "https://sso.pokemon.com/sso/oauth2.0/callbackAuthorize";
 	public static final String LOGIN_URL = "https://sso.pokemon.com/sso/login?locale=en&service="
 			+ URLEncoder.encode(SERVICE_URL) + "";
 	public static final String LOGIN_OAUTH = "https://sso.pokemon.com/sso/oauth2.0/accessToken";
 	public static final String USER_AGENT = "pokemongo/1 CFNetwork/808.2.16 Darwin/16.3.0";
-	private static final String TAG = PtcCredentialProvider.class.getSimpleName();
 	//We try and refresh token 5 minutes before it actually expires
 	protected static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
 	protected static final int MAXIMUM_RETRIES = 5;
@@ -319,5 +316,11 @@ public class PtcCredentialProvider extends CredentialProvider {
 	@Override
 	public boolean isTokenIdExpired() {
 		return time.currentTimeMillis() > expiresTimestamp;
+	}
+
+	@Override
+	public void reset() {
+		tokenId = null;
+		expiresTimestamp = 0;
 	}
 }

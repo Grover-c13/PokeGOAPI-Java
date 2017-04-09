@@ -133,8 +133,9 @@ public class Inventories {
 	 * Updates the inventories with the latest data.
 	 *
 	 * @param response the get inventory response
+	 * @throws RequestFailedException if a request fails while sending a request
 	 */
-	public void updateInventories(GetInventoryResponse response) {
+	public void updateInventories(GetInventoryResponse response) throws RequestFailedException {
 		lastInventoryUpdate = api.currentTimeMillis();
 
 		for (InventoryItemOuterClass.InventoryItem inventoryItem

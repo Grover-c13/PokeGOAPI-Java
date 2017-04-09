@@ -18,14 +18,14 @@ package com.pokegoapi.api.inventory;
 import POGOProtos.Enums.ItemCategoryOuterClass.ItemCategory;
 import POGOProtos.Inventory.AppliedItemOuterClass.AppliedItem;
 import POGOProtos.Inventory.Item.ItemDataOuterClass;
+import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Settings.Master.ItemSettingsOuterClass.ItemSettings;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.main.PokemonMeta;
 import lombok.Getter;
 
 public class Item {
-	private ItemDataOuterClass.ItemData proto;
+	private ItemData proto;
 
 	private PokemonGo api;
 
@@ -57,7 +57,7 @@ public class Item {
 		this.proto = proto;
 		this.count = proto.getCount();
 		this.itemBag = itemBag;
-		this.settings = PokemonMeta.getItemSettings(getItemId());
+		this.settings = api.getItemTemplates().getItemSettings(getItemId());
 	}
 
 	public ItemId getItemId() {

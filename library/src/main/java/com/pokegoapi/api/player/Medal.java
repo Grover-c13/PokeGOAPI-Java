@@ -18,11 +18,13 @@ package com.pokegoapi.api.player;
 import POGOProtos.Data.PlayerBadgeOuterClass.PlayerBadge;
 import POGOProtos.Enums.BadgeTypeOuterClass.BadgeType;
 import POGOProtos.Settings.Master.BadgeSettingsOuterClass.BadgeSettings;
-import com.pokegoapi.main.PokemonMeta;
+import com.pokegoapi.api.PokemonGo;
 import lombok.Getter;
 import lombok.Setter;
 
 public class Medal {
+	private PokemonGo api;
+
 	@Getter
 	@Setter
 	private int rank;
@@ -39,9 +41,11 @@ public class Medal {
 	/**
 	 * Creates a Medal with a PlayerBadge proto
 	 *
+	 * @param api the current api
 	 * @param badge the proto to inititialize with
 	 */
-	public Medal(PlayerBadge badge) {
+	public Medal(PokemonGo api, PlayerBadge badge) {
+		this.api = api;
 		this.type = badge.getBadgeType();
 		this.rank = badge.getRank();
 		this.startValue = badge.getStartValue();
@@ -55,7 +59,7 @@ public class Medal {
 	 * @return the settings
 	 */
 	public BadgeSettings getSettings() {
-		return PokemonMeta.getBadgeSettings(type);
+		return api.getItemTemplates().getBadgeSettings(type);
 	}
 
 	@Override

@@ -31,6 +31,21 @@ public class ServerResponse {
 	private Exception exception;
 
 	/**
+	 * Creates a blank {@link ServerResponse}
+	 */
+	public ServerResponse() {
+	}
+
+	/**
+	 * Creates a {@link ServerResponse} with an exception
+	 *
+	 * @param exception the exception in this response
+	 */
+	public ServerResponse(Exception exception) {
+		this.exception = exception;
+	}
+
+	/**
 	 * Adds a response to this envelope
 	 *
 	 * @param type the type of request
@@ -68,5 +83,25 @@ public class ServerResponse {
 	 */
 	public ByteString get(PlatformRequestType type) {
 		return platformResponses.get(type);
+	}
+
+	/**
+	 * Checks if this response contains the given request type
+	 *
+	 * @param type the request type to check for
+	 * @return true if this response contains the given request type
+	 */
+	public boolean has(RequestType type) {
+		return responses.containsKey(type);
+	}
+
+	/**
+	 * Checks if this response contains the given platform request type
+	 *
+	 * @param type the platform request type to check for
+	 * @return true if this response contains the given platform request type
+	 */
+	public boolean has(PlatformRequestType type) {
+		return platformResponses.containsKey(type);
 	}
 }

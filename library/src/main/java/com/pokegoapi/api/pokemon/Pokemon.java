@@ -41,6 +41,7 @@ import com.pokegoapi.api.map.pokemon.EvolutionResult;
 import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.exceptions.NoSuchItemException;
 import com.pokegoapi.exceptions.request.RequestFailedException;
+import com.pokegoapi.api.settings.templates.ItemTemplates;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.AsyncHelper;
 import lombok.Getter;
@@ -181,7 +182,7 @@ public class Pokemon extends PokemonDetails {
 	 * @param considerMaxCPLimitForPlayerLevel Consider max cp limit for actual player level
 	 * @return the boolean
 	 * @throws NoSuchItemException If the PokemonId value cannot be found in the
-	 * {@link com.pokegoapi.main.PokemonMeta}.
+	 * {@link ItemTemplates}.
 	 */
 	public boolean canPowerUp(boolean considerMaxCPLimitForPlayerLevel)
 			throws NoSuchItemException {
@@ -196,7 +197,8 @@ public class Pokemon extends PokemonDetails {
 	 * @return the boolean
 	 */
 	public boolean canEvolve() {
-		return Evolutions.canEvolve(getPokemonId()) && (getCandy() >= getCandiesToEvolve());
+		Evolutions evolutions = api.getItemTemplates().getEvolutions();
+		return evolutions.canEvolve(getPokemonId()) && (getCandy() >= getCandiesToEvolve());
 	}
 
 	/**
@@ -206,8 +208,7 @@ public class Pokemon extends PokemonDetails {
 	 * @return The result
 	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public UpgradePokemonResponse.Result powerUp()
-			throws RequestFailedException {
+	public UpgradePokemonResponse.Result powerUp() throws RequestFailedException {
 		return AsyncHelper.toBlocking(powerUpAsync());
 	}
 
@@ -419,8 +420,11 @@ public class Pokemon extends PokemonDetails {
 		}
 	}
 
+	/**
+	 * @return the evolution metadata for this pokemon, or null if it doesn't exist
+	 */
 	public Evolution getEvolution() {
-		return Evolutions.getEvolution(this.getPokemonId());
+		return api.getItemTemplates().getEvolutions().getEvolution(this.getPokemonId());
 	}
 
 	/**

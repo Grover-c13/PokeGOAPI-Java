@@ -19,7 +19,7 @@ import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Requests.Messages.CheckChallengeMessageOuterClass.CheckChallengeMessage;
-import POGOProtos.Networking.Requests.Messages.DownloadItemTemplatesMessageOuterClass.DownloadItemTemplatesMessage;
+import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.GetAssetDigestMessage;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
 import POGOProtos.Networking.Requests.Messages.VerifyChallengeMessageOuterClass.VerifyChallengeMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
@@ -42,11 +42,13 @@ import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.map.Point;
 import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.api.settings.Settings;
+import com.pokegoapi.api.settings.templates.ItemTemplateProvider;
+import com.pokegoapi.api.settings.templates.ItemTemplates;
+import com.pokegoapi.api.settings.templates.TempFileTemplateProvider;
 import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.main.CommonRequests;
 import com.pokegoapi.main.Heartbeat;
-import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.main.RequestHandler;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.main.ServerRequestEnvelope;
@@ -74,7 +76,7 @@ public class PokemonGo {
 	@Getter
 	private long startTime;
 	@Getter
-	private final byte[] sessionHash;
+	private final byte[] sessionHash = new byte[32];
 	@Getter
 	RequestHandler requestHandler;
 	@Getter
@@ -90,7 +92,7 @@ public class PokemonGo {
 	private double altitude;
 	@Getter
 	@Setter
-	private double accuracy = 65;
+	private double accuracy = 5;
 	private CredentialProvider credentialProvider;
 	@Getter
 	private Settings settings;
@@ -151,6 +153,10 @@ public class PokemonGo {
 	@Setter
 	private boolean firstGP = true;
 
+	@Getter
+	@Setter
+	private ItemTemplates itemTemplates;
+
 	/**
 	 * Instantiates a new Pokemon go.
 	 *
@@ -161,14 +167,7 @@ public class PokemonGo {
 	public PokemonGo(OkHttpClient client, Time time, long seed) {
 		this.time = time;
 		this.seed = seed;
-		sessionHash = new byte[32];
-		new Random().nextBytes(sessionHash);
-		inventories = new Inventories(this);
-		settings = new Settings(this);
-		playerProfile = new PlayerProfile(this);
-		map = new Map(this);
-		longitude = Double.NaN;
-		latitude = Double.NaN;
+		reset();
 		this.client = client.newBuilder()
 				.addNetworkInterceptor(new ClientInterceptor())
 				.build();
@@ -215,6 +214,12 @@ public class PokemonGo {
 	 */
 	public void login(CredentialProvider credentialProvider, HashProvider hashProvider)
 			throws RequestFailedException {
+		try {
+			itemTemplates = new ItemTemplates(new TempFileTemplateProvider());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
 		this.loggingIn = true;
 		if (credentialProvider == null) {
 			throw new NullPointerException("Credential Provider can not be null!");
@@ -226,6 +231,19 @@ public class PokemonGo {
 
 		startTime = currentTimeMillis();
 		initialize();
+	}
+
+	private void reset() {
+		firstGMO = true;
+		firstGP = true;
+		active = false;
+		new Random().nextBytes(sessionHash);
+		inventories = new Inventories(this);
+		settings = new Settings(this);
+		playerProfile = new PlayerProfile(this);
+		map = new Map(this);
+		longitude = Double.NaN;
+		latitude = Double.NaN;
 	}
 
 	private void initialize() throws RequestFailedException {
@@ -241,21 +259,16 @@ public class PokemonGo {
 
 		ServerRequest downloadConfigRequest = new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
 				CommonRequests.getDownloadRemoteConfigVersionMessageRequest(this));
-		getRequestHandler().sendServerRequests(downloadConfigRequest, true, RequestType.GET_BUDDY_WALKED,
-				RequestType.GET_INCENSE_POKEMON);
+		getRequestHandler().sendServerRequests(downloadConfigRequest, true);
 		getAssetDigest();
 
 		try {
 			ByteString configVersionData = downloadConfigRequest.getData();
-			if (PokemonMeta.checkVersion(DownloadRemoteConfigVersionResponse.parseFrom(configVersionData))) {
-				DownloadItemTemplatesMessage message = CommonRequests.getDownloadItemTemplatesRequest();
-				ServerRequest request = new ServerRequest(RequestType.DOWNLOAD_ITEM_TEMPLATES, message);
-				PokemonMeta.update(getRequestHandler().sendServerRequests(request, true), true);
+			if (itemTemplates.requiresUpdate(DownloadRemoteConfigVersionResponse.parseFrom(configVersionData))) {
+				itemTemplates.update(this);
 			}
 		} catch (InvalidProtocolBufferException e) {
 			throw new RequestFailedException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
 		}
 
 		playerProfile.getProfile();
@@ -264,8 +277,8 @@ public class PokemonGo {
 			LevelUpRewardsMessage rewardsMessage = LevelUpRewardsMessage.newBuilder()
 					.setLevel(playerProfile.getLevel())
 					.build();
-			ServerRequestEnvelope envelope = ServerRequestEnvelope.createCommons();
-			ServerRequest request = envelope.add(RequestType.LEVEL_UP_REWARDS, rewardsMessage);
+			ServerRequest request = new ServerRequest(RequestType.LEVEL_UP_REWARDS, rewardsMessage);
+			ServerRequestEnvelope envelope = ServerRequestEnvelope.createCommons(request, this);
 			getRequestHandler().sendServerRequests(envelope);
 			LevelUpRewardsResponse levelUpRewardsResponse = LevelUpRewardsResponse.parseFrom(request.getData());
 			if (levelUpRewardsResponse.getResult() == Result.SUCCESS) {
@@ -284,13 +297,8 @@ public class PokemonGo {
 		loggingIn = false;
 		active = true;
 
-		// From now one we will start to check our accounts is ready to fire requests.
-		// Actually, we can receive valid responses even with this first check,
-		// that mark the tutorial state into LEGAL_SCREEN.
-		// Following, we are going to check if the account binded to this session
-		// have an avatar, a nickname, and all the other things that are usually filled
-		// on the official client BEFORE sending any requests such as the getMapObject etc.
 		ArrayList<TutorialState> tutorialStates = playerProfile.getTutorialState().getTutorialStates();
+
 		if (tutorialStates.isEmpty()) {
 			playerProfile.activateAccount();
 		}
@@ -321,10 +329,9 @@ public class PokemonGo {
 	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
 	public void getAssetDigest() throws RequestFailedException {
-		ServerRequestEnvelope envelope = ServerRequestEnvelope.createCommons(RequestType.GET_BUDDY_WALKED,
-				RequestType.GET_INCENSE_POKEMON);
-		envelope.add(RequestType.GET_ASSET_DIGEST, CommonRequests.getGetAssetDigestMessageRequest(this));
-		getRequestHandler().sendServerRequests(envelope);
+		GetAssetDigestMessage message = CommonRequests.getGetAssetDigestMessageRequest(this);
+		ServerRequest request = new ServerRequest(RequestType.GET_ASSET_DIGEST, message);
+		getRequestHandler().sendServerRequests(request, true);
 	}
 
 	/**
@@ -487,6 +494,18 @@ public class PokemonGo {
 			return ActivityStatus.getDefault(this, random);
 		}
 		return activityStatus.getActivityStatus();
+	}
+
+	/**
+	 * Sets the item template provider for this api instance
+	 *
+	 * @param provider the provider to use
+	 */
+	public void setItemTemplateProvider(ItemTemplateProvider provider) {
+		if (active || loggingIn) {
+			throw new IllegalStateException("Cannot set ItemTemplates while active!");
+		}
+		itemTemplates = new ItemTemplates(provider);
 	}
 
 	/**
@@ -654,15 +673,6 @@ public class PokemonGo {
 	}
 
 	/**
-	 * Enqueues the given task
-	 *
-	 * @param task the task to enqueue
-	 */
-	public void enqueueTask(Runnable task) {
-		heartbeat.enqueueTask(task);
-	}
-
-	/**
 	 * @return the version of the API being used
 	 */
 	public int getVersion() {
@@ -677,6 +687,14 @@ public class PokemonGo {
 			heartbeat.exit();
 			requestHandler.exit();
 			active = false;
+			reset();
 		}
+	}
+
+	/**
+	 * @return true if the item templates (game settings) have been loaded yet
+	 */
+	public boolean hasTemplates() {
+		return itemTemplates.hasLoaded();
 	}
 }

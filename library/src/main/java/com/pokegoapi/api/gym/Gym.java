@@ -33,7 +33,6 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.InsufficientLevelException;
 import com.pokegoapi.exceptions.request.RequestFailedException;
-import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.MapPoint;
 import rx.Observable;
@@ -109,7 +108,7 @@ public class Gym implements MapPoint {
 	 * @return the battle object
 	 */
 	public Battle battle() {
-		int minimumPlayerLevel = PokemonMeta.battleSettings.getMinimumPlayerLevel();
+		int minimumPlayerLevel = api.getItemTemplates().getBattleSettings().getMinimumPlayerLevel();
 		if (api.getPlayerProfile().getLevel() < minimumPlayerLevel) {
 			throw new InsufficientLevelException("You must be at least " + minimumPlayerLevel + " to battle a gym!");
 		}

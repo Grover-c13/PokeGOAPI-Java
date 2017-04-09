@@ -15,45 +15,48 @@
 
 package com.pokegoapi.api.pokemon;
 
+import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
+import POGOProtos.Networking.Responses.DownloadItemTemplatesResponseOuterClass.DownloadItemTemplatesResponse.ItemTemplate;
+import POGOProtos.Settings.Master.PokemonSettingsOuterClass.PokemonSettings;
+import com.pokegoapi.api.settings.templates.ItemTemplates;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
-import POGOProtos.Networking.Responses.DownloadItemTemplatesResponseOuterClass.DownloadItemTemplatesResponse.ItemTemplate;
-import POGOProtos.Settings.Master.PokemonSettingsOuterClass.PokemonSettings;
-
 public class Evolutions {
-	private static final Map<PokemonId, Evolution> EVOLUTIONS = new HashMap<>();
+	private final ItemTemplates itemTemplates;
+	private final Map<PokemonId, Evolution> evolutions = new HashMap<>();
 
 	/**
-	 * Initializes these evolutions from PokemonSettings
+	 * Initializes these evolutions from a list of ItemTemplates
 	 *
 	 * @param templates the templates to initialize from
 	 */
-	public static void initialize(List<ItemTemplate> templates) {
-		EVOLUTIONS.clear();
-		for (ItemTemplate template : templates) {
+	public Evolutions(ItemTemplates templates) {
+		itemTemplates = templates;
+		evolutions.clear();
+		for (ItemTemplate template : templates.getTemplates()) {
 			if (template.hasPokemonSettings()) {
 				PokemonSettings settings = template.getPokemonSettings();
 				PokemonId pokemon = settings.getPokemonId();
-				if (!EVOLUTIONS.containsKey(pokemon)) {
+				if (!evolutions.containsKey(pokemon)) {
 					addEvolution(null, pokemon);
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Auxiliar method to add the evolution by recursion in the EVOLUTIONS Map
 	 *
 	 * @param parent the parent of this pokemon
 	 * @param pokemon the pokemon that evolution will be added
 	 */
-	private static void addEvolution(PokemonId parent, PokemonId pokemon) {
-		Evolution evolution = new Evolution(parent, pokemon);
-		EVOLUTIONS.put(pokemon, evolution);
+	private void addEvolution(PokemonId parent, PokemonId pokemon) {
+		Evolution evolution = new Evolution(itemTemplates, parent, pokemon);
+		evolutions.put(pokemon, evolution);
 		for (PokemonId poke : evolution.getEvolutions()) {
 			addEvolution(pokemon, poke);
 		}
@@ -65,8 +68,8 @@ public class Evolutions {
 	 * @param pokemon the pokemon to get data for
 	 * @return the evolution data
 	 */
-	public static Evolution getEvolution(PokemonId pokemon) {
-		return EVOLUTIONS.get(pokemon);
+	public Evolution getEvolution(PokemonId pokemon) {
+		return evolutions.get(pokemon);
 	}
 
 	/**
@@ -75,7 +78,7 @@ public class Evolutions {
 	 * @param pokemon the pokemon to get data for
 	 * @return the evolutions from this pokemon
 	 */
-	public static List<PokemonId> getEvolutions(PokemonId pokemon) {
+	public List<PokemonId> getEvolutions(PokemonId pokemon) {
 		Evolution evolution = getEvolution(pokemon);
 		if (evolution != null) {
 			return evolution.getEvolutions();
@@ -89,7 +92,7 @@ public class Evolutions {
 	 * @param pokemon the pokemon to find the lowest evolution for
 	 * @return the lowest evolution for the given pokemon
 	 */
-	public static List<PokemonId> getBasic(PokemonId pokemon) {
+	public List<PokemonId> getBasic(PokemonId pokemon) {
 		List<PokemonId> basic = new ArrayList<>();
 		Evolution evolution = getEvolution(pokemon);
 		if (evolution != null) {
@@ -111,7 +114,7 @@ public class Evolutions {
 	 * @param pokemon the pokemon to find the highest evolution for
 	 * @return the highest evolution for the given pokemon
 	 */
-	public static List<PokemonId> getHighest(PokemonId pokemon) {
+	public List<PokemonId> getHighest(PokemonId pokemon) {
 		List<PokemonId> highest = new ArrayList<>();
 		Evolution evolution = getEvolution(pokemon);
 		if (evolution != null) {
@@ -135,7 +138,7 @@ public class Evolutions {
 	 * @param pokemon the pokemon
 	 * @return if this pokemon can be evolved
 	 */
-	public static boolean canEvolve(PokemonId pokemon) {
+	public boolean canEvolve(PokemonId pokemon) {
 		Evolution evolution = getEvolution(pokemon);
 		return evolution != null && evolution.getEvolutions() != null && evolution.getEvolutions().size() > 0;
 	}
