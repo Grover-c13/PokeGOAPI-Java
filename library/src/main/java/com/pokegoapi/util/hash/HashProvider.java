@@ -45,4 +45,10 @@ public interface HashProvider {
 	 */
 	long getUNK25();
 
+	/**
+	 * Get the supported API version as a int array
+	 * @return the supported API version
+	 */
+	int[] getCurrentAPIVersion();
+
 }
