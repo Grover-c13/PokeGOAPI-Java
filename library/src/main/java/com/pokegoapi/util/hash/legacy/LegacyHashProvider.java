@@ -45,6 +45,6 @@ public class LegacyHashProvider implements HashProvider {
 	
 	@Override
 	public int[] getCurrentAPIVersion() {
-		return new int[] {0,45,0};
+		return new int[] {0, 45, 0};
 	}
 }
