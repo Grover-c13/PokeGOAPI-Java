@@ -48,7 +48,7 @@ public class PokeHashProvider implements HashProvider {
 	private static final int VERSION = 6100;
 	private static final long UNK25 = 1296456256998993698L;
 
-	private static final int[] currentAPIVersion = new int[] {0,61,0};
+	private static final int[] currentAPIVersion = new int[] {0, 61, 0};
 
 	private static final Moshi MOSHI = new Builder().build();
 
