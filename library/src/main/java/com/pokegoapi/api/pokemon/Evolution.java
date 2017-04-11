@@ -36,6 +36,7 @@ public class Evolution {
 	/**
 	 * Constructor for this evolution class
 	 *
+	 * @param templates the item templates received from the server
 	 * @param parent the parent of this evolution
 	 * @param pokemon the pokemon being evolved
 	 */
@@ -43,8 +44,8 @@ public class Evolution {
 		this.parent = parent;
 		this.pokemon = pokemon;
 		this.evolutionBranch = templates.getPokemonSettings(pokemon).getEvolutionBranchList();
-		for (EvolutionBranch evolutionBranch : this.evolutionBranch) {
-			this.evolutions.add(evolutionBranch.getEvolution());
+		for (EvolutionBranch evolutionBranch : evolutionBranch) {
+			evolutions.add(evolutionBranch.getEvolution());
 		}
 	}
 }

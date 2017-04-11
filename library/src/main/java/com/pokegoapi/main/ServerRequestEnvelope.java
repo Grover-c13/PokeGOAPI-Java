@@ -107,17 +107,6 @@ public class ServerRequestEnvelope {
 	}
 
 	/**
-	 * Creates a request envelope with the default common requests
-	 *
-	 * @param request the request to add to this envelope
-	 * @param api the current api
-	 * @return the envelope created
-	 */
-	public static ServerRequestEnvelope createCommons(ServerRequest request, PokemonGo api) {
-		return new ServerRequestEnvelope(request, CommonRequests.getDefaultCommons(api, request.getType()));
-	}
-
-	/**
 	 * Creates a request envelope with optional default commons
 	 *
 	 * @param request the request to add to this envelope
@@ -131,6 +120,17 @@ public class ServerRequestEnvelope {
 			commonRequests.addAll(CommonRequests.getDefaultCommons(api, request.getType()));
 		}
 		return new ServerRequestEnvelope(request, commonRequests);
+	}
+
+	/**
+	 * Creates a request envelope with the default common requests
+	 *
+	 * @param request the request to add to this envelope
+	 * @param api the current api
+	 * @return the envelope created
+	 */
+	public static ServerRequestEnvelope createCommons(ServerRequest request, PokemonGo api) {
+		return new ServerRequestEnvelope(request, CommonRequests.getDefaultCommons(api, request.getType()));
 	}
 
 	/**

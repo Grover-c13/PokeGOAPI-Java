@@ -435,14 +435,15 @@ public class RequestHandler implements Runnable {
 	}
 
 	/**
-	 * Adds a request to an envelope, taking {@link RequestInterceptor}s into account
+	 * Adds a request to an envelope, taking {@link RequestInterceptor} into account
 	 *
 	 * @param envelope the current envelope
 	 * @param requests the requests list
 	 * @param request the request to add
 	 * @return the added request
 	 */
-	private ServerRequest addRequest(ServerRequestEnvelope envelope, List<ServerRequest> requests, ServerRequest request) {
+	private ServerRequest addRequest(ServerRequestEnvelope envelope, List<ServerRequest> requests,
+			ServerRequest request) {
 		List<RequestInterceptor> interceptors = api.getListeners(RequestInterceptor.class);
 		boolean remove = false;
 		for (RequestInterceptor interceptor : interceptors) {

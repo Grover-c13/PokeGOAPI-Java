@@ -3,11 +3,11 @@ package com.pokegoapi.util.hash.pokehash;
 import lombok.Getter;
 
 import java.net.HttpURLConnection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 public class PokeHashKey {
-	private static final Map<String, PokeHashKey> KEYS = new HashMap<>();
+	private static final Map<String, PokeHashKey> KEYS = new WeakHashMap<>();
 
 	@Getter
 	private final String key;

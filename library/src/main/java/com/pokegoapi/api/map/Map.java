@@ -16,10 +16,8 @@
 package com.pokegoapi.api.map;
 
 import POGOProtos.Map.MapCellOuterClass.MapCell;
-import POGOProtos.Networking.Requests.Messages.GetIncensePokemonMessageOuterClass.GetIncensePokemonMessage;
 import POGOProtos.Networking.Requests.Messages.GetMapObjectsMessageOuterClass.GetMapObjectsMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.GetIncensePokemonResponseOuterClass.GetIncensePokemonResponse;
 import POGOProtos.Networking.Responses.GetMapObjectsResponseOuterClass.GetMapObjectsResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -39,6 +37,9 @@ public class Map {
 
 	@Getter
 	private MapObjects mapObjects;
+
+	@Getter
+	private long mapUpdateTime;
 
 	private final Object updateLock = new Object();
 
@@ -89,33 +90,15 @@ public class Map {
 		ServerRequest request = new ServerRequest(RequestType.GET_MAP_OBJECTS, builder.build());
 		api.getRequestHandler().sendServerRequests(request, true);
 		try {
+			long updateTime = mapUpdateTime;
 			GetMapObjectsResponse response = GetMapObjectsResponse.parseFrom(request.getData());
 			MapObjects mapObjects = new MapObjects(api);
 			for (MapCell cell : response.getMapCellsList()) {
 				mapObjects.addCell(cell);
+				updateTime = Math.max(updateTime, cell.getCurrentTimestampMs());
 			}
+			mapUpdateTime = updateTime;
 			return mapObjects;
-		} catch (InvalidProtocolBufferException e) {
-			throw new RequestFailedException(e);
-		}
-	}
-
-	/**
-	 * Requests and returns incense pokemon from the server.
-	 *
-	 * @return the returned incense pokemon response
-	 * @throws RequestFailedException if an exception occurred while sending requests
-	 */
-	protected GetIncensePokemonResponse requestIncensePokemon()
-			throws RequestFailedException {
-		GetIncensePokemonMessage message = GetIncensePokemonMessage.newBuilder()
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
-				.build();
-		ServerRequest request = new ServerRequest(RequestType.GET_INCENSE_POKEMON, message);
-		api.getRequestHandler().sendServerRequests(request);
-		try {
-			return GetIncensePokemonResponse.parseFrom(request.getData());
 		} catch (InvalidProtocolBufferException e) {
 			throw new RequestFailedException(e);
 		}
