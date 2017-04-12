@@ -225,29 +225,27 @@ public class RequestHandler implements Runnable {
 				throw new RequestFailedException("Got a unexpected http code : " + response.code());
 			}
 
-			ResponseEnvelope responseEnvelop;
+			ResponseEnvelope responseEnvelope;
 			try (InputStream content = response.body().byteStream()) {
-				responseEnvelop = ResponseEnvelope.parseFrom(content);
+				responseEnvelope = ResponseEnvelope.parseFrom(content);
 			} catch (IOException e) {
 				// retrieved garbage from the server
 				throw new RequestFailedException("Received malformed response : " + e);
 			}
 
-			if (responseEnvelop.getApiUrl() != null && responseEnvelop.getApiUrl().length() > 0) {
-				apiEndpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
+			if (responseEnvelope.getApiUrl() != null && responseEnvelope.getApiUrl().length() > 0) {
+				apiEndpoint = "https://" + responseEnvelope.getApiUrl() + "/rpc";
 			}
 
-			if (responseEnvelop.hasAuthTicket()) {
-				this.authTicket = responseEnvelop.getAuthTicket();
+			if (responseEnvelope.hasAuthTicket()) {
+				authTicket = responseEnvelope.getAuthTicket();
 			}
 
-			boolean empty = false;
+			StatusCode statusCode = responseEnvelope.getStatusCode();
 
-			StatusCode statusCode = responseEnvelop.getStatusCode();
-
-			if (statusCode != StatusCode.REDIRECT && statusCode != StatusCode.INVALID_AUTH_TOKEN) {
-				for (int i = 0; i < responseEnvelop.getReturnsCount(); i++) {
-					ByteString returned = responseEnvelop.getReturns(i);
+			if (requests.length > 0) {
+				for (int i = 0; i < responseEnvelope.getReturnsCount(); i++) {
+					ByteString returned = responseEnvelope.getReturns(i);
 					ServerRequest serverRequest = requests[i];
 					if (returned != null) {
 						serverResponse.addResponse(serverRequest.getType(), returned);
@@ -257,13 +255,13 @@ public class RequestHandler implements Runnable {
 							}
 						}
 					} else {
-						empty = true;
+						throw new RequestFailedException("Received empty response from server");
 					}
 				}
 			}
 
-			for (int i = 0; i < responseEnvelop.getPlatformReturnsCount(); i++) {
-				PlatformResponse platformResponse = responseEnvelop.getPlatformReturns(i);
+			for (int i = 0; i < responseEnvelope.getPlatformReturnsCount(); i++) {
+				PlatformResponse platformResponse = responseEnvelope.getPlatformReturns(i);
 				ByteString returned = platformResponse.getResponse();
 				if (returned != null) {
 					serverResponse.addResponse(platformResponse.getType(), returned);
@@ -293,10 +291,6 @@ public class RequestHandler implements Runnable {
 				} else {
 					throw new RequestFailedException("Failed to send request: " + statusCode);
 				}
-			}
-
-			if (empty) {
-				throw new RequestFailedException("Received empty response from server!");
 			}
 		} catch (IOException e) {
 			throw new RequestFailedException(e);

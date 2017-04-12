@@ -281,6 +281,8 @@ public class PtcCredentialProvider extends CredentialProvider {
 		} catch (LoginFailedException e) {
 			if (shouldRetry && attempt < MAXIMUM_RETRIES) {
 				login(username, password, ++attempt);
+			} else {
+				throw new LoginFailedException("Exceeded maximum login retries", e);
 			}
 		}
 	}
