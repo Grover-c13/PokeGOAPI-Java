@@ -16,14 +16,15 @@
 package com.pokegoapi.api.inventory;
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
-import POGOProtos.Enums.PokemonFamilyIdOuterClass;
+import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Inventory.AppliedItemOuterClass.AppliedItem;
 import POGOProtos.Inventory.AppliedItemsOuterClass.AppliedItems;
+import POGOProtos.Inventory.CandyOuterClass.Candy;
 import POGOProtos.Inventory.EggIncubatorOuterClass;
 import POGOProtos.Inventory.EggIncubatorsOuterClass.EggIncubators;
-import POGOProtos.Inventory.InventoryItemDataOuterClass;
-import POGOProtos.Inventory.InventoryItemOuterClass;
+import POGOProtos.Inventory.InventoryItemDataOuterClass.InventoryItemData;
+import POGOProtos.Inventory.InventoryItemOuterClass.InventoryItem;
 import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
@@ -133,48 +134,46 @@ public class Inventories {
 	 * Updates the inventories with the latest data.
 	 *
 	 * @param response the get inventory response
+	 * @throws RequestFailedException if a request fails while sending a request
 	 */
-	public void updateInventories(GetInventoryResponse response) {
+	public void updateInventories(GetInventoryResponse response) throws RequestFailedException {
 		lastInventoryUpdate = api.currentTimeMillis();
 
-		for (InventoryItemOuterClass.InventoryItem inventoryItem
-				: response.getInventoryDelta().getInventoryItemsList()) {
+		for (InventoryItem inventoryItem : response.getInventoryDelta().getInventoryItemsList()) {
 			
 			// Remove released Pokemon from bag.
-			if(inventoryItem.getDeletedItem().getPokemonId() != 0) {
+			if (inventoryItem.getDeletedItem().getPokemonId() != 0) {
 				pokebank.removePokemon(inventoryItem.getDeletedItem().getPokemonId());
 			}
 			
-			InventoryItemDataOuterClass.InventoryItemData itemData = inventoryItem.getInventoryItemData();
+			InventoryItemData itemData = inventoryItem.getInventoryItemData();
 
-			// hatchery
-			PokemonData pokemonData = itemData.getPokemonData();
-			if (pokemonData.getPokemonId() == PokemonId.MISSINGNO && pokemonData.getIsEgg()) {
-				hatchery.addEgg(new EggPokemon(pokemonData));
+			if (itemData.hasPokemonData()) {
+				PokemonData pokemonData = itemData.getPokemonData();
+				if (pokemonData.getPokemonId() == PokemonId.MISSINGNO && pokemonData.getIsEgg()) {
+					hatchery.addEgg(new EggPokemon(pokemonData));
+				}
+
+				if (pokemonData.getPokemonId() != PokemonId.MISSINGNO) {
+					pokebank.addPokemon(new Pokemon(api, pokemonData));
+				}
 			}
 
-			// pokebank
-			if (pokemonData.getPokemonId() != PokemonId.MISSINGNO) {
-				pokebank.addPokemon(new Pokemon(api, inventoryItem.getInventoryItemData().getPokemonData()));
-			}
-
-			// items
-			if (itemData.getItem().getItemId() != ItemId.UNRECOGNIZED
-					&& itemData.getItem().getItemId() != ItemId.ITEM_UNKNOWN) {
+			if (itemData.hasItem()) {
 				ItemData item = itemData.getItem();
 				if (item.getCount() > 0) {
 					itemBag.addItem(new Item(api, item, itemBag));
 				}
 			}
 
-			// candyjar
-			if (itemData.getCandy().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED
-					&& itemData.getCandy().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_UNSET) {
-				candyjar.setCandy(
-						itemData.getCandy().getFamilyId(),
-						itemData.getCandy().getCandy()
-				);
+			if (itemData.hasCandy()) {
+				Candy candy = itemData.getCandy();
+				if (candy.getFamilyId() != PokemonFamilyId.UNRECOGNIZED
+						&& candy.getFamilyId() != PokemonFamilyId.FAMILY_UNSET) {
+					candyjar.setCandy(candy.getFamilyId(), candy.getCandy());
+				}
 			}
+
 			// player stats
 			if (itemData.hasPlayerStats()) {
 				api.getPlayerProfile().setStats(new Stats(itemData.getPlayerStats()));

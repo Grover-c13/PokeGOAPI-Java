@@ -17,7 +17,6 @@ package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Data.BuddyPokemonOuterClass.BuddyPokemon;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.main.PokemonMeta;
 
 public class Buddy {
 	private final PokemonGo api;
@@ -46,7 +45,7 @@ public class Buddy {
 	public Pokemon getPokemon() {
 		if (pokemon == null) {
 			pokemon = api.getInventories().getPokebank().getPokemonById(this.id);
-			buddyDistance = PokemonMeta.getPokemonSettings(pokemon.getPokemonId()).getKmBuddyDistance();
+			buddyDistance = api.getItemTemplates().getPokemonSettings(pokemon.getPokemonId()).getKmBuddyDistance();
 		}
 		return pokemon;
 	}

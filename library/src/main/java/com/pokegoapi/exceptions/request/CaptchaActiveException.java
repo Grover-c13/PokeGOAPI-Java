@@ -19,10 +19,10 @@ import lombok.Getter;
 
 public class CaptchaActiveException extends RequestFailedException {
 	@Getter
-	private String captcha;
+	private String challengeUrl;
 
-	public CaptchaActiveException(CaptchaActiveException exception) {
-		super(exception.getMessage(), exception);
-		this.captcha = exception.getCaptcha();
+	public CaptchaActiveException(String message, String challengeUrl) {
+		super(message);
+		this.challengeUrl = challengeUrl;
 	}
 }

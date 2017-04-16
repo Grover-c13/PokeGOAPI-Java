@@ -31,6 +31,10 @@ import okhttp3.Response;
 
 import java.io.IOException;
 
+/**
+ * @deprecated Use {@link GoogleAutoCredentialProvider}
+ */
+@Deprecated
 public class GoogleUserCredentialProvider extends CredentialProvider {
 
 	public static final String SECRET = "NCjF1TLi2CcY6t5mt0ZveuL7";
@@ -251,5 +255,11 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 	@Override
 	public boolean isTokenIdExpired() {
 		return time.currentTimeMillis() > expiresTimestamp;
+	}
+
+	@Override
+	public void reset() {
+		tokenId = null;
+		refreshToken = null;
 	}
 }

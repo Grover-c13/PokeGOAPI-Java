@@ -40,168 +40,13 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.listener.PokemonListener;
 import com.pokegoapi.exceptions.request.RequestFailedException;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
- * Created by iGio90 on 27/08/16.
+ * Handles all the common requests, handled by the API
  */
-
 public class CommonRequests {
-	private static final RequestType[] PARSE_REQUESTS = new RequestType[]{
-			RequestType.DOWNLOAD_SETTINGS,
-			RequestType.GET_INCENSE_POKEMON,
-			RequestType.CHECK_CHALLENGE,
-			RequestType.GET_INVENTORY,
-			RequestType.GET_HATCHED_EGGS,
-			RequestType.CHECK_AWARDED_BADGES,
-			RequestType.GET_BUDDY_WALKED
-	};
-	private static Map<RequestType, CommonRequest> COMMON_REQUESTS = new LinkedHashMap<>();
-	private static Map<RequestType, ByteString> RECEIVED_COMMONS = new HashMap<>();
-
-	static {
-		COMMON_REQUESTS.put(RequestType.CHECK_CHALLENGE, new CommonRequest() {
-			@Override
-			public boolean shouldAdd(PokemonGo api, RequestType type, Set<RequestType> requestTypes) {
-				return !(api.isLoggingIn() && api.hasChallenge());
-			}
-
-			@Override
-			public ServerRequest create(PokemonGo api, RequestType requestType) {
-				return new ServerRequest(requestType, CheckChallengeMessage.getDefaultInstance());
-			}
-
-			@Override
-			public void parse(PokemonGo api, ByteString data, RequestType requestType)
-					throws InvalidProtocolBufferException, RequestFailedException {
-				CheckChallengeResponse response = CheckChallengeResponse.parseFrom(data);
-				api.updateChallenge(response.getChallengeUrl(), response.getShowChallenge());
-			}
-		});
-		COMMON_REQUESTS.put(RequestType.GET_HATCHED_EGGS, new CommonRequest() {
-			@Override
-			public boolean shouldAdd(PokemonGo api, RequestType type, Set<RequestType> requestTypes) {
-				return true;
-			}
-
-			@Override
-			public ServerRequest create(PokemonGo api, RequestType requestType) {
-				return new ServerRequest(requestType, GetHatchedEggsMessage.getDefaultInstance());
-			}
-
-			@Override
-			public void parse(PokemonGo api, ByteString data, RequestType requestType)
-					throws InvalidProtocolBufferException, RequestFailedException {
-				GetHatchedEggsResponse response = GetHatchedEggsResponse.parseFrom(data);
-				api.getInventories().getHatchery().updateHatchedEggs(response);
-			}
-		});
-		COMMON_REQUESTS.put(RequestType.GET_INVENTORY, new CommonRequest() {
-			@Override
-			public boolean shouldAdd(PokemonGo api, RequestType type, Set<RequestType> requestTypes) {
-				return true;
-			}
-
-			@Override
-			public ServerRequest create(PokemonGo api, RequestType requestType) {
-				return new ServerRequest(requestType, CommonRequests.getDefaultGetInventoryMessage(api));
-			}
-
-			@Override
-			public void parse(PokemonGo api, ByteString data, RequestType requestType)
-					throws InvalidProtocolBufferException, RequestFailedException {
-				GetInventoryResponse response = GetInventoryResponse.parseFrom(data);
-				api.getInventories().updateInventories(response);
-			}
-		});
-		COMMON_REQUESTS.put(RequestType.CHECK_AWARDED_BADGES, new CommonRequest() {
-			@Override
-			public boolean shouldAdd(PokemonGo api, RequestType type, Set<RequestType> requestTypes) {
-				return true;
-			}
-
-			@Override
-			public ServerRequest create(PokemonGo api, RequestType requestType) {
-				return new ServerRequest(requestType, CheckAwardedBadgesMessage.getDefaultInstance());
-			}
-
-			@Override
-			public void parse(PokemonGo api, ByteString data, RequestType requestType)
-					throws InvalidProtocolBufferException, RequestFailedException {
-				CheckAwardedBadgesResponse response = CheckAwardedBadgesResponse.parseFrom(data);
-				api.getPlayerProfile().updateAwardedMedals(response);
-			}
-		});
-		COMMON_REQUESTS.put(RequestType.DOWNLOAD_SETTINGS, new CommonRequest() {
-			@Override
-			public boolean shouldAdd(PokemonGo api, RequestType type, Set<RequestType> requestTypes) {
-				return true;
-			}
-
-			@Override
-			public ServerRequest create(PokemonGo api, RequestType requestType) {
-				return new ServerRequest(requestType, CommonRequests.getDownloadSettingsMessageRequest(api));
-			}
-
-			@Override
-			public void parse(PokemonGo api, ByteString data, RequestType requestType)
-					throws InvalidProtocolBufferException, RequestFailedException {
-				DownloadSettingsResponse response = DownloadSettingsResponse.parseFrom(data);
-				api.getSettings().updateSettings(response);
-			}
-		});
-		COMMON_REQUESTS.put(RequestType.GET_INCENSE_POKEMON, new CommonRequest() {
-			@Override
-			public boolean shouldAdd(PokemonGo api, RequestType type, Set<RequestType> requestTypes) {
-				return api.getInventories().getItemBag().isIncenseActive();
-			}
-
-			@Override
-			public ServerRequest create(PokemonGo api, RequestType requestType) {
-				GetIncensePokemonMessage message = GetIncensePokemonMessage.newBuilder()
-						.setPlayerLatitude(api.getLatitude())
-						.setPlayerLongitude(api.getLongitude())
-						.build();
-				return new ServerRequest(requestType, message);
-			}
-
-			@Override
-			public void parse(PokemonGo api, ByteString data, RequestType requestType)
-					throws InvalidProtocolBufferException, RequestFailedException {
-				api.getMap().getMapObjects().addIncensePokemon(GetIncensePokemonResponse.parseFrom(data));
-			}
-		});
-		COMMON_REQUESTS.put(RequestType.GET_BUDDY_WALKED, new CommonRequest() {
-			@Override
-			public boolean shouldAdd(PokemonGo api, RequestType type, Set<RequestType> requestTypes) {
-				return true;
-			}
-
-			@Override
-			public ServerRequest create(PokemonGo api, RequestType requestType) {
-				return new ServerRequest(requestType, GetBuddyWalkedMessage.getDefaultInstance());
-			}
-
-			@Override
-			public void parse(PokemonGo api, ByteString data, RequestType requestType)
-					throws InvalidProtocolBufferException, RequestFailedException {
-				GetBuddyWalkedResponse response = GetBuddyWalkedResponse.parseFrom(data);
-				int candies = response.getCandyEarnedCount();
-				if (response.getSuccess() && candies > 0) {
-					List<PokemonListener> listeners = api.getListeners(PokemonListener.class);
-					for (PokemonListener listener : listeners) {
-						listener.onBuddyFindCandy(api, response.getFamilyCandyId(), candies);
-					}
-				}
-			}
-		});
-	}
-
 	/**
 	 * Constant for repetitive usage of DownloadRemoteConfigVersionMessage request
 	 *
@@ -230,18 +75,6 @@ public class CommonRequests {
 	}
 
 	/**
-	 * Constant for repetitive usage of DownloadSettingsMessage request
-	 *
-	 * @param api The current instance of PokemonGO
-	 * @return DownloadSettingsMessage
-	 */
-	public static DownloadSettingsMessage getDownloadSettingsMessageRequest(PokemonGo api) {
-		return DownloadSettingsMessage.newBuilder()
-				.setHash(api.getSettings().getHash())
-				.build();
-	}
-
-	/**
 	 * Constant for repetitive usage of DownloadItemTemplatesMessage request
 	 *
 	 * @return the DownloadItemTemplatesMessage
@@ -251,94 +84,155 @@ public class CommonRequests {
 	}
 
 	/**
-	 * Constant for repetitive usage of GetInventoryMessage request
-	 *
-	 * @param api The current instance of PokemonGO
-	 * @return GetInventoryMessage
-	 */
-	public static GetInventoryMessage getDefaultGetInventoryMessage(PokemonGo api) {
-		return GetInventoryMessage.newBuilder()
-				.setLastTimestampMs(api.getInventories().getLastInventoryUpdate())
-				.build();
-	}
-
-	/**
-	 * Most of the requests from the official client are fired together with the following
-	 * requests. We will append our request on top of the array and we will send it
-	 * together with the others.
-	 *
-	 * @param request The main request we want to fire
-	 * @param api The current instance of PokemonGO
-	 * @return an array of ServerRequest
-	 * @deprecated Use ServerRequest#withCommons
-	 */
-	@Deprecated
-	public static ServerRequest[] fillRequest(ServerRequest request, PokemonGo api) {
-		return Utils.appendRequests(new ServerRequest[]{request}, getCommonRequests(api));
-	}
-
-	/**
-	 * Construct an array of common requests
-	 *
-	 * @param api The current instance of PokemonGO
-	 * @return an array of ServerRequests for each CommonRequest
-	 */
-	public static ServerRequest[] getCommonRequests(PokemonGo api) {
-		ServerRequest[] requests = new ServerRequest[COMMON_REQUESTS.size()];
-		int index = 0;
-		for (Map.Entry<RequestType, CommonRequest> entry : COMMON_REQUESTS.entrySet()) {
-			requests[index++] = entry.getValue().create(api, entry.getKey());
-		}
-		return requests;
-	}
-
-	/**
-	 * Queues the given common request to be parsed
-	 *
-	 * @param type the request type
-	 * @param data the response data
-	 * @throws InvalidProtocolBufferException if the server returns an invalid response
-	 * @throws RequestFailedException if an exception occurred while sending requests
-	 */
-	public static void queue(RequestType type, ByteString data)
-			throws InvalidProtocolBufferException, RequestFailedException {
-		RECEIVED_COMMONS.put(type, data);
-	}
-
-	/**
-	 * Handles the queued common requests and clears the map
+	 * Returns a list of all default commons to be included in an envelope
 	 *
 	 * @param api the current api
-	 * @throws InvalidProtocolBufferException if the server returns an invalid response
-	 * @throws RequestFailedException if an exception occurred while sending requests
+	 * @param request the request in this envelope
+	 * @return a list of all default commons to be included
 	 */
-	public static void handleQueue(PokemonGo api)
+	public static List<ServerRequest> getDefaultCommons(PokemonGo api, RequestType request) {
+		List<ServerRequest> defaultCommons = new ArrayList<>();
+		if (!api.hasChallenge()) {
+			defaultCommons.add(CommonRequests.checkChallenge());
+		}
+		defaultCommons.add(CommonRequests.getHatchedEggs());
+		defaultCommons.add(CommonRequests.getInventory(api));
+		defaultCommons.add(CommonRequests.checkAwardedBadges());
+		if (request != RequestType.SET_BUDDY_POKEMON) {
+			defaultCommons.add(CommonRequests.downloadSettings(api));
+		}
+		if (api.getInventories().getItemBag().isIncenseActive()) {
+			defaultCommons.add(CommonRequests.getIncensePokemon(api));
+		}
+		if (api.hasTemplates()) {
+			defaultCommons.add(CommonRequests.getBuddyWalked());
+		}
+		return defaultCommons;
+	}
+
+	/**
+	 * Handles all commons in a ServerResponse
+	 * @param api the current api
+	 * @param response the response to handle
+	 * @throws InvalidProtocolBufferException if an invalid response is parsed
+	 * @throws RequestFailedException if a request fails while sending a request
+	 */
+	public static void handleCommons(PokemonGo api, ServerResponse response)
 			throws InvalidProtocolBufferException, RequestFailedException {
-		for (RequestType type : PARSE_REQUESTS) {
-			ByteString data = RECEIVED_COMMONS.get(type);
-			if (data != null) {
-				CommonRequest commonRequest = COMMON_REQUESTS.get(type);
-				if (commonRequest != null) {
-					commonRequest.parse(api, data, type);
+		if (response.has(RequestType.DOWNLOAD_SETTINGS)) {
+			ByteString data = response.get(RequestType.DOWNLOAD_SETTINGS);
+			DownloadSettingsResponse settings = DownloadSettingsResponse.parseFrom(data);
+			api.getSettings().updateSettings(settings);
+		}
+		if (response.has(RequestType.CHECK_CHALLENGE)) {
+			ByteString data = response.get(RequestType.CHECK_CHALLENGE);
+			CheckChallengeResponse checkChallenge = CheckChallengeResponse.parseFrom(data);
+			api.updateChallenge(checkChallenge.getChallengeUrl(), checkChallenge.getShowChallenge());
+		}
+		if (response.has(RequestType.GET_INVENTORY)) {
+			ByteString data = response.get(RequestType.GET_INVENTORY);
+			GetInventoryResponse inventory = GetInventoryResponse.parseFrom(data);
+			api.getInventories().updateInventories(inventory);
+		}
+		if (response.has(RequestType.CHECK_AWARDED_BADGES)) {
+			ByteString data = response.get(RequestType.CHECK_AWARDED_BADGES);
+			CheckAwardedBadgesResponse awardedBadges = CheckAwardedBadgesResponse.parseFrom(data);
+			api.getPlayerProfile().updateAwardedMedals(awardedBadges);
+		}
+		if (response.has(RequestType.GET_HATCHED_EGGS)) {
+			ByteString data = response.get(RequestType.GET_HATCHED_EGGS);
+			GetHatchedEggsResponse hatchedEggs = GetHatchedEggsResponse.parseFrom(data);
+			api.getInventories().getHatchery().updateHatchedEggs(hatchedEggs);
+		}
+		if (response.has(RequestType.GET_BUDDY_WALKED)) {
+			ByteString data = response.get(RequestType.GET_BUDDY_WALKED);
+			GetBuddyWalkedResponse buddyWalked = GetBuddyWalkedResponse.parseFrom(data);
+			int candies = buddyWalked.getCandyEarnedCount();
+			if (buddyWalked.getSuccess() && candies > 0) {
+				List<PokemonListener> listeners = api.getListeners(PokemonListener.class);
+				for (PokemonListener listener : listeners) {
+					listener.onBuddyFindCandy(api, buddyWalked.getFamilyCandyId(), candies);
 				}
 			}
 		}
-		RECEIVED_COMMONS.clear();
+		if (response.has(RequestType.GET_INCENSE_POKEMON)) {
+			ByteString data = response.get(RequestType.GET_INCENSE_POKEMON);
+			GetIncensePokemonResponse incense = GetIncensePokemonResponse.parseFrom(data);
+			api.getMap().getMapObjects().addIncensePokemon(incense);
+		}
 	}
 
 	/**
-	 * Returns if the given common request should be added or not
+	 * Creates a default CHECK_CHALLENGE request
+	 *
+	 * @return the constructed request
+	 */
+	public static ServerRequest checkChallenge() {
+		return new ServerRequest(RequestType.CHECK_CHALLENGE, CheckChallengeMessage.getDefaultInstance());
+	}
+
+	/**
+	 * Creates a default GET_HATCHED_EGGS request
+	 *
+	 * @return the constructed request
+	 */
+	public static ServerRequest getHatchedEggs() {
+		return new ServerRequest(RequestType.GET_HATCHED_EGGS, GetHatchedEggsMessage.getDefaultInstance());
+	}
+
+	/**
+	 * Creates a default GET_INVENTORY request
 	 *
 	 * @param api the current api
-	 * @param type the current request
-	 * @param requests the other requests with this envelope
-	 * @return true if this common request should be included
+	 * @return the constructed request
 	 */
-	public static boolean shouldAdd(PokemonGo api, RequestType type, List<ServerRequest> requests) {
-		Set<RequestType> requestTypes = new HashSet<>();
-		for (ServerRequest request : requests) {
-			requestTypes.add(request.getType());
-		}
-		return COMMON_REQUESTS.get(type).shouldAdd(api, type, requestTypes);
+	public static ServerRequest getInventory(PokemonGo api) {
+		long lastUpdate = api.getInventories().getLastInventoryUpdate();
+		GetInventoryMessage message = GetInventoryMessage.newBuilder().setLastTimestampMs(lastUpdate).build();
+		return new ServerRequest(RequestType.GET_INVENTORY, message);
+	}
+
+	/**
+	 * Creates a default CHECK_AWARDED_BADGES request
+	 *
+	 * @return the constructed request
+	 */
+	public static ServerRequest checkAwardedBadges() {
+		return new ServerRequest(RequestType.CHECK_AWARDED_BADGES, CheckAwardedBadgesMessage.getDefaultInstance());
+	}
+
+	/**
+	 * Creates a default DOWNLOAD_SETTINGS request
+	 *
+	 * @param api the current api
+	 * @return the constructed request
+	 */
+	public static ServerRequest downloadSettings(PokemonGo api) {
+		String hash = api.getSettings().getHash();
+		DownloadSettingsMessage message = DownloadSettingsMessage.newBuilder().setHash(hash).build();
+		return new ServerRequest(RequestType.DOWNLOAD_SETTINGS, message);
+	}
+
+	/**
+	 * Creates a default GET_INCENSE_POKEMON request
+	 *
+	 * @param api the current api
+	 * @return the constructed request
+	 */
+	public static ServerRequest getIncensePokemon(PokemonGo api) {
+		GetIncensePokemonMessage message = GetIncensePokemonMessage.newBuilder()
+				.setPlayerLatitude(api.getLatitude())
+				.setPlayerLongitude(api.getLongitude())
+				.build();
+		return new ServerRequest(RequestType.GET_INCENSE_POKEMON, message);
+	}
+
+	/**
+	 * Creates a default GET_BUDDY_WALKED request
+	 *
+	 * @return the constructed request
+	 */
+	public static ServerRequest getBuddyWalked() {
+		return new ServerRequest(RequestType.GET_BUDDY_WALKED, GetBuddyWalkedMessage.getDefaultInstance());
 	}
 }
