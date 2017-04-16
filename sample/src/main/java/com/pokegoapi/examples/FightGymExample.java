@@ -37,7 +37,7 @@ import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
 import POGOProtos.Networking.Responses.StartGymBattleResponseOuterClass.StartGymBattleResponse.Result;
 import POGOProtos.Networking.Responses.UseItemPotionResponseOuterClass.UseItemPotionResponse;
 import POGOProtos.Networking.Responses.UseItemReviveResponseOuterClass.UseItemReviveResponse;
-import POGOProtos.Settings.Master.MoveSettingsOuterClass;
+import POGOProtos.Settings.Master.MoveSettingsOuterClass.MoveSettings;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.gym.Battle;
 import com.pokegoapi.api.gym.Battle.ServerAction;
@@ -46,11 +46,7 @@ import com.pokegoapi.api.map.MapObjects;
 import com.pokegoapi.api.map.Point;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.auth.PtcCredentialProvider;
-import com.pokegoapi.exceptions.request.CaptchaActiveException;
-import com.pokegoapi.exceptions.request.LoginFailedException;
 import com.pokegoapi.exceptions.request.RequestFailedException;
-import com.pokegoapi.exceptions.request.HashException;
-import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.MapUtil;
 import com.pokegoapi.util.hash.HashProvider;
@@ -84,7 +80,7 @@ public class FightGymExample {
 				//Check if pokemon has full health and is not deployed in a gym
 				if (pokemon.getDeployedFortId().length() == 0) {
 					if (pokemon.getStamina() < pokemon.getMaxStamina()) {
-						healPokemonFull(api, pokemon);
+						healPokemonFull(pokemon);
 						if (!(pokemon.isInjured() || pokemon.isFainted())) {
 							possiblePokemon.add(pokemon);
 						}
@@ -154,13 +150,13 @@ public class FightGymExample {
 					//Start battle
 					battle.start(new FightHandler(attackers));
 					while (battle.isActive()) {
-						handleAttack(battle);
+						handleAttack(api, battle);
 					}
 
 					//Heal all pokemon after battle
 					for (Pokemon pokemon : possiblePokemon) {
 						if (pokemon.getStamina() < pokemon.getMaxStamina()) {
-							healPokemonFull(api, pokemon);
+							healPokemonFull(pokemon);
 							Thread.sleep(1000);
 						}
 					}
@@ -179,10 +175,10 @@ public class FightGymExample {
 		}
 	}
 
-	private static void handleAttack(Battle battle) throws InterruptedException {
+	private static void handleAttack(PokemonGo api, Battle battle) throws InterruptedException {
 		int duration;
 		PokemonMove specialMove = battle.getActiveAttacker().getPokemon().getMove2();
-		MoveSettingsOuterClass.MoveSettings moveSettings = PokemonMeta.getMoveSettings(specialMove);
+		MoveSettings moveSettings = api.getItemTemplates().getMoveSettings(specialMove);
 		//Check if we have sufficient energy to perform a special attack
 		int energy = battle.getActiveAttacker().getEnergy();
 		int desiredEnergy = -moveSettings.getEnergyDelta();
@@ -195,8 +191,7 @@ public class FightGymExample {
 		Thread.sleep(duration + (long) (Math.random() * 10));
 	}
 
-	private static void healPokemonFull(PokemonGo api, Pokemon pokemon)
-			throws LoginFailedException, CaptchaActiveException, RequestFailedException, HashException {
+	private static void healPokemonFull(Pokemon pokemon) throws RequestFailedException {
 		System.out.println("Healing " + pokemon.getPokemonId());
 		//Continue healing the pokemon until fully healed
 		while (pokemon.isInjured() || pokemon.isFainted()) {

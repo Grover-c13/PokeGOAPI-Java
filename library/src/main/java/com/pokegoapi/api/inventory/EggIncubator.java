@@ -26,7 +26,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.exceptions.request.RequestFailedException;
-import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.main.ServerRequest;
 
 public class EggIncubator {
@@ -48,7 +47,7 @@ public class EggIncubator {
 	 * @return the attributes of this incubator, null if there are none
 	 */
 	public EggIncubatorAttributes getAttributes() {
-		ItemSettings settings = PokemonMeta.getItemSettings(proto.getItemId());
+		ItemSettings settings = api.getItemTemplates().getItemSettings(proto.getItemId());
 		if (settings != null) {
 			return settings.getEggIncubator();
 		}

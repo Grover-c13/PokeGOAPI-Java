@@ -35,7 +35,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.request.RequestFailedException;
-import com.pokegoapi.main.PokemonMeta;
 import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 import lombok.Setter;
@@ -707,7 +706,7 @@ public class Battle {
 	public int attack() {
 		PokemonData pokemon = activeAttacker.getPokemon();
 		PokemonMove move = pokemon.getMove1();
-		MoveSettingsOuterClass.MoveSettings moveSettings = PokemonMeta.getMoveSettings(move);
+		MoveSettingsOuterClass.MoveSettings moveSettings = api.getItemTemplates().getMoveSettings(move);
 		int duration = moveSettings.getDurationMs();
 		long time = api.currentTimeMillis();
 		ClientAction action = new ClientAction(BattleActionType.ACTION_ATTACK, time, duration);
@@ -724,7 +723,7 @@ public class Battle {
 	public int attackSpecial() {
 		PokemonData pokemon = activeAttacker.getPokemon();
 		PokemonMove move = pokemon.getMove2();
-		MoveSettingsOuterClass.MoveSettings moveSettings = PokemonMeta.getMoveSettings(move);
+		MoveSettingsOuterClass.MoveSettings moveSettings = api.getItemTemplates().getMoveSettings(move);
 		int duration = moveSettings.getDurationMs();
 		if (activeAttacker.getEnergy() >= -moveSettings.getEnergyDelta()) {
 			long time = api.currentTimeMillis();
@@ -743,7 +742,7 @@ public class Battle {
 	 * @return the duration of this action
 	 */
 	public int dodge() {
-		int duration = PokemonMeta.battleSettings.getDodgeDurationMs();
+		int duration = api.getItemTemplates().getBattleSettings().getDodgeDurationMs();
 		performAction(BattleActionType.ACTION_DODGE, duration);
 		return duration;
 	}
@@ -755,7 +754,7 @@ public class Battle {
 	 * @return the duration of this action
 	 */
 	public int swap(Pokemon pokemon) {
-		int duration = PokemonMeta.battleSettings.getSwapDurationMs();
+		int duration = api.getItemTemplates().getBattleSettings().getSwapDurationMs();
 		ClientAction action = new ClientAction(BattleActionType.ACTION_SWAP_POKEMON, api.currentTimeMillis(),
 				duration);
 		action.setPokemon(pokemon);

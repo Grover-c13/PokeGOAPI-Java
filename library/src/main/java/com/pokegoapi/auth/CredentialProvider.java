@@ -29,4 +29,6 @@ public abstract class CredentialProvider {
 	public abstract AuthInfo getAuthInfo(boolean refresh) throws LoginFailedException, InvalidCredentialsException;
 
 	public abstract boolean isTokenIdExpired();
+
+	public abstract void reset();
 }

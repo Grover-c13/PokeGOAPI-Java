@@ -19,15 +19,14 @@ import POGOProtos.Networking.Platform.PlatformRequestTypeOuterClass.PlatformRequ
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
+import com.pokegoapi.api.PokemonGo;
 import lombok.Getter;
 import lombok.Setter;
 import rx.Observable;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -35,22 +34,20 @@ import java.util.concurrent.TimeoutException;
 
 public class ServerRequestEnvelope {
 	@Getter
-	private List<ServerRequest> requests = new ArrayList<>();
+	@Setter
+	private ServerRequest request;
 	@Getter
 	private List<ServerPlatformRequest> platformRequests = new ArrayList<>();
 	@Getter
-	private Set<RequestType> commonExclusions = new HashSet<>();
-	@Setter
-	@Getter
-	private boolean commons;
+	private List<ServerRequest> commons;
 
 	private Observable<ServerResponse> observable;
 	private ServerResponse response;
 	private final Object responseLock = new Object();
 
-	private ServerRequestEnvelope(boolean commons, Set<RequestType> commonExclusions) {
+	private ServerRequestEnvelope(ServerRequest request, List<ServerRequest> commons) {
+		this.request = request;
 		this.commons = commons;
-		this.commonExclusions = commonExclusions;
 		this.observable = Observable.from(new Future<ServerResponse>() {
 			@Override
 			public boolean cancel(boolean mayInterruptIfRunning) {
@@ -91,55 +88,79 @@ public class ServerRequestEnvelope {
 	}
 
 	/**
-	 * Creates a request envelope without commons
+	 * Creates an empty request envelope without commons
 	 *
 	 * @return the envelope created
 	 */
 	public static ServerRequestEnvelope create() {
-		return new ServerRequestEnvelope(false, new HashSet<RequestType>());
+		return new ServerRequestEnvelope(null, new ArrayList<ServerRequest>());
 	}
 
 	/**
-	 * Creates a request envelope with commons
+	 * Creates a request envelope without commons
 	 *
-	 * @param commonExclusions the common requests to exclude
+	 * @param request the request to add to this envelope
 	 * @return the envelope created
 	 */
-	public static ServerRequestEnvelope createCommons(RequestType... commonExclusions) {
-		Set<RequestType> exclusions = new HashSet<>();
-		Collections.addAll(exclusions, commonExclusions);
-		return new ServerRequestEnvelope(true, exclusions);
+	public static ServerRequestEnvelope create(ServerRequest request) {
+		return new ServerRequestEnvelope(request, new ArrayList<ServerRequest>());
 	}
 
 	/**
-	 * Excludes the given commons from this request
+	 * Creates a request envelope with optional default commons
 	 *
-	 * @param requestTypes the requests to exclude
+	 * @param request the request to add to this envelope
+	 * @param api the current api
+	 * @param commons true if the default common requests should be added to this envelope
+	 * @return the envelope created
 	 */
-	public void excludeCommons(RequestType... requestTypes) {
-		Collections.addAll(this.commonExclusions, requestTypes);
+	public static ServerRequestEnvelope create(ServerRequest request, PokemonGo api, boolean commons) {
+		List<ServerRequest> commonRequests = new ArrayList<>();
+		if (commons) {
+			commonRequests.addAll(CommonRequests.getDefaultCommons(api, request.getType()));
+		}
+		return new ServerRequestEnvelope(request, commonRequests);
 	}
 
 	/**
-	 * Adds a request to this envelope
+	 * Creates a request envelope with the default common requests
 	 *
-	 * @param request the request to add
-	 * @return the added request
+	 * @param request the request to add to this envelope
+	 * @param api the current api
+	 * @return the envelope created
 	 */
-	public ServerRequest add(ServerRequest request) {
-		this.requests.add(request);
-		return request;
+	public static ServerRequestEnvelope createCommons(ServerRequest request, PokemonGo api) {
+		return new ServerRequestEnvelope(request, CommonRequests.getDefaultCommons(api, request.getType()));
 	}
 
 	/**
-	 * Adds a request to this envelope
+	 * Includes the given commons from this request
+	 *
+	 * @param commons the requests to include
+	 */
+	public void includeCommons(ServerRequest... commons) {
+		Collections.addAll(this.commons, commons);
+	}
+
+	/**
+	 * Removes the given commons from this request
+	 *
+	 * @param commons the commons to remove
+	 */
+	public void removeCommons(ServerRequest... commons) {
+		for (ServerRequest common : commons) {
+			this.commons.remove(common);
+		}
+	}
+
+	/**
+	 * Sets the main request of this envelope
 	 *
 	 * @param requestType the type of request being added
 	 * @param request the request to be added
-	 * @return the added request
 	 */
-	public ServerRequest add(RequestType requestType, Message request) {
-		return this.add(new ServerRequest(requestType, request));
+	public void setRequest(RequestType requestType, Message request) {
+		this.setRequest(new ServerRequest(requestType, request));
 	}
 
 	/**
@@ -148,7 +169,7 @@ public class ServerRequestEnvelope {
 	 * @param request the request to add
 	 * @return the added request
 	 */
-	public ServerPlatformRequest add(ServerPlatformRequest request) {
+	public ServerPlatformRequest addPlatform(ServerPlatformRequest request) {
 		this.platformRequests.add(request);
 		return request;
 	}
@@ -160,8 +181,8 @@ public class ServerRequestEnvelope {
 	 * @param request the request to be added
 	 * @return the added request
 	 */
-	public ServerPlatformRequest add(PlatformRequestType requestType, ByteString request) {
-		return this.add(new ServerPlatformRequest(requestType, request));
+	public ServerPlatformRequest addPlatform(PlatformRequestType requestType, ByteString request) {
+		return this.addPlatform(new ServerPlatformRequest(requestType, request));
 	}
 
 	/**
@@ -170,12 +191,29 @@ public class ServerRequestEnvelope {
 	 * @param response the response
 	 */
 	public void handleResponse(ServerResponse response) {
-		for (ServerRequest request : requests) {
+		if (request != null && response.has(request.getType())) {
 			request.handleResponse(response.get(request.getType()));
+		}
+		for (ServerRequest request : commons) {
+			RequestType type = request.getType();
+			if (response.has(type)) {
+				request.handleResponse(response.get(type));
+			}
 		}
 		for (ServerPlatformRequest request : platformRequests) {
-			request.handleResponse(response.get(request.getType()));
+			PlatformRequestType type = request.getType();
+			if (response.has(type)) {
+				request.handleResponse(response.get(type));
+			}
 		}
+	}
+
+	/**
+	 * Notifies all listeners of this envelope that the response has been received
+	 *
+	 * @param response the response that has been received
+	 */
+	public void notifyResponse(ServerResponse response) {
 		synchronized (responseLock) {
 			this.response = response;
 			this.responseLock.notifyAll();

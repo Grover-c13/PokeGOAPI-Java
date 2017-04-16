@@ -17,13 +17,11 @@ package com.pokegoapi.api.pokemon;
 
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Settings.Master.Pokemon.EvolutionBranchOuterClass.EvolutionBranch;
+import com.pokegoapi.api.settings.templates.ItemTemplates;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import com.pokegoapi.main.PokemonMeta;
 
 public class Evolution {
 	@Getter
@@ -38,16 +36,16 @@ public class Evolution {
 	/**
 	 * Constructor for this evolution class
 	 *
+	 * @param templates the item templates received from the server
 	 * @param parent the parent of this evolution
 	 * @param pokemon the pokemon being evolved
 	 */
-	public Evolution(PokemonId parent, PokemonId pokemon) {
+	public Evolution(ItemTemplates templates, PokemonId parent, PokemonId pokemon) {
 		this.parent = parent;
 		this.pokemon = pokemon;
-		this.evolutionBranch = PokemonMeta.getPokemonSettings(pokemon).getEvolutionBranchList();
-		for (EvolutionBranch evolutionBranch : this.evolutionBranch) {
-			this.evolutions.add(evolutionBranch.getEvolution());
+		this.evolutionBranch = templates.getPokemonSettings(pokemon).getEvolutionBranchList();
+		for (EvolutionBranch evolutionBranch : evolutionBranch) {
+			evolutions.add(evolutionBranch.getEvolution());
 		}
-		
 	}
 }

@@ -190,7 +190,7 @@ public class PlayerProfile {
 				medals.clear();
 				List<PlayerBadge> badges = response.getBadgesList();
 				for (PlayerBadge badge : badges) {
-					medals.put(badge.getBadgeType(), new Medal(badge));
+					medals.put(badge.getBadgeType(), new Medal(api, badge));
 				}
 				this.startTime = response.getStartTime();
 			}
@@ -290,10 +290,8 @@ public class PlayerProfile {
 	 * Equips the badges contained in the given response
 	 *
 	 * @param response the response to get badges from
-	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public void updateAwardedMedals(CheckAwardedBadgesResponse response)
-			throws RequestFailedException {
+	public void updateAwardedMedals(CheckAwardedBadgesResponse response) {
 		if (response.getSuccess()) {
 			List<PlayerListener> listeners = api.getListeners(PlayerListener.class);
 			for (int i = 0; i < response.getAwardedBadgesCount(); i++) {
@@ -375,28 +373,17 @@ public class PlayerProfile {
 	 * Sets the player statistics
 	 *
 	 * @param stats the statistics to apply
+	 * @throws RequestFailedException if a request fails while sending a request
 	 */
-	public void setStats(Stats stats) {
+	public void setStats(Stats stats) throws RequestFailedException {
 		final int newLevel = stats.getLevel();
 		if (this.stats != null) {
 			if (newLevel > this.level) {
-				boolean acceptRewards = false;
 				List<PlayerListener> listeners = api.getListeners(PlayerListener.class);
 				for (PlayerListener listener : listeners) {
-					acceptRewards |= listener.onLevelUp(api, level, newLevel);
+					listener.onLevelUp(api, level, newLevel);
 				}
-				if (acceptRewards) {
-					api.enqueueTask(new Runnable() {
-						@Override
-						public void run() {
-							try {
-								acceptLevelUpRewards(newLevel);
-							} catch (Exception e) {
-								//Ignore
-							}
-						}
-					});
-				}
+				acceptLevelUpRewards(newLevel);
 			}
 		}
 		this.stats = stats;
@@ -433,7 +420,7 @@ public class PlayerProfile {
 				.setPokemonId(pokemon.getId())
 				.build();
 		ServerRequest request = new ServerRequest(RequestType.SET_BUDDY_POKEMON, message);
-		api.getRequestHandler().sendServerRequests(request);
+		api.getRequestHandler().sendServerRequests(request, true);
 		try {
 			SetBuddyPokemonResponse response = SetBuddyPokemonResponse.parseFrom(request.getData());
 			buddy = new Buddy(api, response.getUpdatedBuddy());

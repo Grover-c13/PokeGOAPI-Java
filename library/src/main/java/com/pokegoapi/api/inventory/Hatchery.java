@@ -104,9 +104,8 @@ public class Hatchery {
 	 *
 	 * @param response the GetHatchedEggs response
 	 * @return the hatched eggs contained in the response
-	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public List<HatchedEgg> updateHatchedEggs(GetHatchedEggsResponse response) throws RequestFailedException {
+	public List<HatchedEgg> updateHatchedEggs(GetHatchedEggsResponse response) {
 		List<HatchedEgg> eggs = new ArrayList<>();
 		for (int i = 0; i < response.getHatchedPokemonCount(); i++) {
 			HatchedEgg egg = new HatchedEgg(

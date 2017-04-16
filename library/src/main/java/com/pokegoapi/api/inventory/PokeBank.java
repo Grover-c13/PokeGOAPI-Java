@@ -28,6 +28,7 @@ import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleaseP
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Predicate;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
@@ -160,12 +161,13 @@ public class PokeBank {
 				releaseBuilder.addPokemonIds(pokemon.getId());
 			}
 		}
-		ServerRequestEnvelope envelope = ServerRequestEnvelope.createCommons();
-		ServerRequest releaseRequest = envelope.add(RequestType.RELEASE_POKEMON, releaseBuilder.build());
+		ServerRequest releaseRequest = new ServerRequest(RequestType.RELEASE_POKEMON, releaseBuilder.build());
+		ServerRequestEnvelope envelope = ServerRequestEnvelope.createCommons(releaseRequest, api);
 		Map<PokemonFamilyId, Integer> lastCandies = new HashMap<>(api.getInventories().getCandyjar().getCandies());
 		ServerResponse response = api.getRequestHandler().sendServerRequests(envelope);
 		try {
-			GetInventoryResponse inventoryResponse = GetInventoryResponse.parseFrom(response.get(RequestType.GET_INVENTORY));
+			ByteString inventoryData = response.get(RequestType.GET_INVENTORY);
+			GetInventoryResponse inventoryResponse = GetInventoryResponse.parseFrom(inventoryData);
 			ReleasePokemonResponse releaseResponse = ReleasePokemonResponse.parseFrom(releaseRequest.getData());
 			Map<PokemonFamilyId, Integer> candyCount = new HashMap<>();
 			if (releaseResponse.getResult() == Result.SUCCESS && inventoryResponse.getSuccess()) {
@@ -196,6 +198,15 @@ public class PokeBank {
 		} catch (InvalidProtocolBufferException e) {
 			throw new RequestFailedException(e);
 		}
+	}
+
+	/**
+	 * Gets the amount of pokemon in the PokeBank, including the egg count
+	 *
+	 * @return the amount of pokemon in the PokeBank
+	 */
+	public int size() {
+		return pokemons.size() + api.getInventories().getHatchery().getEggs().size();
 	}
 
 	/**

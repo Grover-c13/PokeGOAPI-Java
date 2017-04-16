@@ -159,10 +159,11 @@ public class Encounter {
 
 					if (status == CatchStatus.CATCH_SUCCESS || status == CatchStatus.CATCH_FLEE) {
 						pokemon.setDespawned(true);
+						api.getPlayerProfile().updateProfile();
 					}
 
-					if (status == CatchStatus.CATCH_SUCCESS) {
-						api.getPlayerProfile().updateProfile();
+					if (status == CatchStatus.CATCH_ESCAPE) {
+						activeItem = ItemId.UNRECOGNIZED;
 					}
 
 					if (status != CatchStatus.CATCH_ERROR) {

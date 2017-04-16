@@ -16,7 +16,13 @@
 package com.pokegoapi.examples;
 
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
+import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Evolutions;
+import com.pokegoapi.auth.PtcCredentialProvider;
+import com.pokegoapi.exceptions.request.RequestFailedException;
+import com.pokegoapi.util.Log;
+import com.pokegoapi.util.hash.HashProvider;
+import okhttp3.OkHttpClient;
 
 import java.util.List;
 
@@ -28,34 +34,49 @@ public class CheckEvolutionExample {
 	 * @param args Not used
 	 */
 	public static void main(String[] args) {
-		System.out.println("Evolutions: ");
-		for (PokemonId pokemon : PokemonId.values()) {
-			List<PokemonId> evolutions = Evolutions.getEvolutions(pokemon);
-			if (evolutions.size() > 0) {
-				System.out.println(pokemon + " -> " + evolutions);
-			}
-		}
-		System.out.println();
-		System.out.println("Most basic: ");
-		for (PokemonId pokemon : PokemonId.values()) {
-			List<PokemonId> basic = Evolutions.getBasic(pokemon);
-			if (basic.size() > 0) {
-				//Check this is not the most basic pokemon
-				if (!(basic.size() == 1 && basic.contains(pokemon))) {
-					System.out.println(pokemon + " -> " + basic);
+		OkHttpClient http = new OkHttpClient();
+		final PokemonGo api = new PokemonGo(http);
+		try {
+			//Login and set location
+			HashProvider hasher = ExampleConstants.getHashProvider();
+			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
+			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD), hasher);
+
+			//Get the evolution meta from the item templates received from the game server
+			Evolutions evolutionMeta = api.getItemTemplates().getEvolutions();
+
+			System.out.println("Evolutions: ");
+			for (PokemonId pokemon : PokemonId.values()) {
+				List<PokemonId> evolutions = evolutionMeta.getEvolutions(pokemon);
+				if (evolutions.size() > 0) {
+					System.out.println(pokemon + " -> " + evolutions);
 				}
 			}
-		}
-		System.out.println();
-		System.out.println("Highest: ");
-		for (PokemonId pokemon : PokemonId.values()) {
-			List<PokemonId> highest = Evolutions.getHighest(pokemon);
-			if (highest.size() > 0) {
-				//Check this is not the highest pokemon
-				if (!(highest.size() == 1 && highest.contains(pokemon))) {
-					System.out.println(pokemon + " -> " + highest);
+			System.out.println();
+			System.out.println("Most basic: ");
+			for (PokemonId pokemon : PokemonId.values()) {
+				List<PokemonId> basic = evolutionMeta.getBasic(pokemon);
+				if (basic.size() > 0) {
+					//Check this is not the most basic pokemon
+					if (!(basic.size() == 1 && basic.contains(pokemon))) {
+						System.out.println(pokemon + " -> " + basic);
+					}
 				}
 			}
+			System.out.println();
+			System.out.println("Highest: ");
+			for (PokemonId pokemon : PokemonId.values()) {
+				List<PokemonId> highest = evolutionMeta.getHighest(pokemon);
+				if (highest.size() > 0) {
+					//Check this is not the highest pokemon
+					if (!(highest.size() == 1 && highest.contains(pokemon))) {
+						System.out.println(pokemon + " -> " + highest);
+					}
+				}
+			}
+		} catch (RequestFailedException e) {
+			// failed to login, invalid credentials, auth issue or server issue.
+			Log.e("Main", "Failed to login, captcha or server issue: ", e);
 		}
 	}
 }

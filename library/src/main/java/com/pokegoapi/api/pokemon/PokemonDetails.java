@@ -4,18 +4,19 @@ import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Data.PokemonDisplayOuterClass.PokemonDisplay;
 import POGOProtos.Enums.PokemonFamilyIdOuterClass;
 import POGOProtos.Enums.PokemonIdOuterClass;
+import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Enums.PokemonMoveOuterClass.PokemonMove;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Settings.Master.Pokemon.EvolutionBranchOuterClass.EvolutionBranch;
-import POGOProtos.Settings.Master.Pokemon.StatsAttributesOuterClass;
+import POGOProtos.Settings.Master.Pokemon.StatsAttributesOuterClass.StatsAttributes;
 import POGOProtos.Settings.Master.PokemonSettingsOuterClass;
+import POGOProtos.Settings.Master.PokemonSettingsOuterClass.PokemonSettings;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.settings.templates.ItemTemplates;
+import com.pokegoapi.exceptions.NoSuchItemException;
+import com.pokegoapi.util.Log;
 
 import java.util.List;
-
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.NoSuchItemException;
-import com.pokegoapi.main.PokemonMeta;
-import com.pokegoapi.util.Log;
 
 public class PokemonDetails {
 	private static final String TAG = Pokemon.class.getSimpleName();
@@ -277,7 +278,7 @@ public class PokemonDetails {
 	 * @return candy needed to evolve
 	 */
 	public int getCandiesToEvolve() {
-		Evolution evolution = Evolutions.getEvolution(pokemonId);
+		Evolution evolution = api.getItemTemplates().getEvolutions().getEvolution(pokemonId);
 		if (evolution.getEvolutionBranch() != null && evolution.getEvolutionBranch().size() > 0) {
 			return evolution.getEvolutionBranch().get(0).getCandyCost();
 		}
@@ -285,7 +286,7 @@ public class PokemonDetails {
 	}
 	
 	public List<EvolutionBranch> getEvolutionBranch() {
-		Evolution evolution = Evolutions.getEvolution(pokemonId);
+		Evolution evolution = api.getItemTemplates().getEvolutions().getEvolution(pokemonId);
 		return evolution.getEvolutionBranch();
 	}
 
@@ -304,7 +305,7 @@ public class PokemonDetails {
 	 */
 	public PokemonSettingsOuterClass.PokemonSettings getSettings() {
 		if (settings == null) {
-			settings = PokemonMeta.getPokemonSettings(pokemonId);
+			settings = api.getItemTemplates().getPokemonSettings(pokemonId);
 		}
 
 		return settings;
@@ -314,7 +315,7 @@ public class PokemonDetails {
 	 * Calculate the maximum CP for this individual pokemon when the player is at level 40
 	 *
 	 * @return The maximum CP for this pokemon
-	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMeta}.
+	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link ItemTemplates}.
 	 */
 	public int getMaxCp() throws NoSuchItemException {
 		if (settings == null) {
@@ -323,14 +324,14 @@ public class PokemonDetails {
 		int attack = getIndividualAttack() + settings.getStats().getBaseAttack();
 		int defense = getIndividualDefense() + settings.getStats().getBaseDefense();
 		int stamina = getIndividualStamina() + settings.getStats().getBaseStamina();
-		return PokemonCpUtils.getMaxCp(attack, defense, stamina);
+		return PokemonCpUtils.getMaxCp(api, attack, defense, stamina);
 	}
 
 	/**
 	 * Calculate the maximum CP for this individual pokemon and this player's level
 	 *
 	 * @return The maximum CP for this pokemon
-	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMeta}.
+	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link ItemTemplates}.
 	 */
 	public int getMaxCpForPlayer() throws NoSuchItemException {
 		if (settings == null) {
@@ -340,17 +341,17 @@ public class PokemonDetails {
 		int defense = getIndividualDefense() + settings.getStats().getBaseDefense();
 		int stamina = getIndividualStamina() + settings.getStats().getBaseStamina();
 		int playerLevel = api.getPlayerProfile().getStats().getLevel();
-		return PokemonCpUtils.getMaxCpForPlayer(attack, defense, stamina, playerLevel);
+		return PokemonCpUtils.getMaxCpForPlayer(api, attack, defense, stamina, playerLevel);
 	}
 
 	/**
 	 * Calculates the absolute maximum CP for all pokemons with this PokemonId
 	 *
 	 * @return The absolute maximum CP
-	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMeta}.
+	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link ItemTemplates}.
 	 */
 	public int getAbsoluteMaxCp() throws NoSuchItemException {
-		return PokemonCpUtils.getAbsoluteMaxCp(getPokemonId());
+		return PokemonCpUtils.getAbsoluteMaxCp(api, getPokemonId());
 	}
 
 	/**
@@ -369,7 +370,7 @@ public class PokemonDetails {
 	 * @param highestEvolution the full evolution path
 	 * @return Max cp of this pokemon
 	 */
-	public int getMaxCpFullEvolveAndPowerupForPlayer(PokemonIdOuterClass.PokemonId highestEvolution) {
+	public int getMaxCpFullEvolveAndPowerupForPlayer(PokemonId highestEvolution) {
 		return getMaxCpFullEvolveAndPowerup(api.getPlayerProfile().getStats().getLevel(), highestEvolution);
 	}
 
@@ -380,13 +381,13 @@ public class PokemonDetails {
 	 * @param highestEvolution the full evolution path
 	 * @return Max cp of this pokemon
 	 */
-	private int getMaxCpFullEvolveAndPowerup(int playerLevel, PokemonIdOuterClass.PokemonId highestEvolution) {
-		PokemonSettingsOuterClass.PokemonSettings settings = PokemonMeta.getPokemonSettings(highestEvolution);
-		StatsAttributesOuterClass.StatsAttributes stats = settings.getStats();
+	private int getMaxCpFullEvolveAndPowerup(int playerLevel, PokemonId highestEvolution) {
+		PokemonSettings settings = api.getItemTemplates().getPokemonSettings(highestEvolution);
+		StatsAttributes stats = settings.getStats();
 		int attack = getIndividualAttack() + stats.getBaseAttack();
 		int defense = getIndividualDefense() + stats.getBaseDefense();
 		int stamina = getIndividualStamina() + stats.getBaseStamina();
-		return PokemonCpUtils.getMaxCpForPlayer(attack, defense, stamina, playerLevel);
+		return PokemonCpUtils.getMaxCpForPlayer(api, attack, defense, stamina, playerLevel);
 	}
 
 	/**
@@ -395,9 +396,9 @@ public class PokemonDetails {
 	 * @param evolution the pokemon evolving into
 	 * @return New CP after evolve
 	 */
-	public int getCpAfterEvolve(PokemonIdOuterClass.PokemonId evolution) {
-		PokemonSettingsOuterClass.PokemonSettings settings = PokemonMeta.getPokemonSettings(evolution);
-		StatsAttributesOuterClass.StatsAttributes stats = settings.getStats();
+	public int getCpAfterEvolve(PokemonId evolution) {
+		PokemonSettings settings = api.getItemTemplates().getPokemonSettings(evolution);
+		StatsAttributes stats = settings.getStats();
 		int attack = getIndividualAttack() + stats.getBaseAttack();
 		int defense = getIndividualDefense() + stats.getBaseDefense();
 		int stamina = getIndividualStamina() + stats.getBaseStamina();
@@ -410,9 +411,9 @@ public class PokemonDetails {
 	 * @param highestEvolution the pokemon at the top of the evolution chain being evolved into
 	 * @return New CP after evolve
 	 */
-	public int getCpAfterFullEvolve(PokemonIdOuterClass.PokemonId highestEvolution) {
-		PokemonSettingsOuterClass.PokemonSettings settings = PokemonMeta.getPokemonSettings(highestEvolution);
-		StatsAttributesOuterClass.StatsAttributes stats = settings.getStats();
+	public int getCpAfterFullEvolve(PokemonId highestEvolution) {
+		PokemonSettings settings = api.getItemTemplates().getPokemonSettings(highestEvolution);
+		StatsAttributes stats = settings.getStats();
 		int attack = getIndividualAttack() + stats.getBaseAttack();
 		int defense = getIndividualDefense() + stats.getBaseDefense();
 		int stamina = getIndividualStamina() + stats.getBaseStamina();
@@ -437,14 +438,14 @@ public class PokemonDetails {
 	 * @return Cost of candy for a powerup
 	 */
 	public int getCandyCostsForPowerup() {
-		return PokemonCpUtils.getCandyCostsForPowerup(getCombinedCpMultiplier());
+		return PokemonCpUtils.getCandyCostsForPowerup(api, getCombinedCpMultiplier());
 	}
 
 	/**
 	 * @return Cost of stardust for a powerup
 	 */
 	public int getStardustCostsForPowerup() {
-		return PokemonCpUtils.getStartdustCostsForPowerup(getCombinedCpMultiplier());
+		return PokemonCpUtils.getStartdustCostsForPowerup(api, getCombinedCpMultiplier());
 	}
 
 	/**

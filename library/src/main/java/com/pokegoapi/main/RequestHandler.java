@@ -28,9 +28,11 @@ import POGOProtos.Networking.Responses.GetPlayerResponseOuterClass.GetPlayerResp
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.listener.RequestInterceptor;
 import com.pokegoapi.exceptions.AsyncPokemonGoException;
 import com.pokegoapi.exceptions.request.BadRequestException;
 import com.pokegoapi.exceptions.request.BannedException;
+import com.pokegoapi.exceptions.request.CaptchaActiveException;
 import com.pokegoapi.exceptions.request.InvalidCredentialsException;
 import com.pokegoapi.exceptions.request.LoginFailedException;
 import com.pokegoapi.exceptions.request.RequestFailedException;
@@ -49,11 +51,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class RequestHandler implements Runnable {
+	private static final String API_ENDPOINT = "https://pgorelease.nianticlabs.com/plfe/rpc";
 	private static final int THROTTLE = 350;
 	private static final String TAG = RequestHandler.class.getSimpleName();
 	private final PokemonGo api;
@@ -77,7 +79,7 @@ public class RequestHandler implements Runnable {
 	public RequestHandler(PokemonGo api, OkHttpClient client) {
 		this.api = api;
 		this.client = client;
-		apiEndpoint = ApiSettings.API_ENDPOINT;
+		apiEndpoint = API_ENDPOINT;
 		asyncHttpThread = new Thread(this, "Async HTTP Thread");
 		asyncHttpThread.setDaemon(true);
 		asyncHttpThread.start();
@@ -91,7 +93,14 @@ public class RequestHandler implements Runnable {
 	 * @return ServerResponse response to be processed in the future
 	 */
 	public Observable<ServerResponse> sendAsyncServerRequests(ServerRequestEnvelope envelope) {
-		workQueue.offer(envelope);
+		if (api.hasChallenge() && envelope.getRequest().getType() != RequestType.VERIFY_CHALLENGE) {
+			String challenge = api.getChallengeURL();
+			CaptchaActiveException exception
+					= new CaptchaActiveException("Could not send request, challenge is active", challenge);
+			envelope.handleResponse(new ServerResponse(exception));
+		} else {
+			workQueue.offer(envelope);
+		}
 		return envelope.observable();
 	}
 
@@ -110,15 +119,10 @@ public class RequestHandler implements Runnable {
 	 *
 	 * @param request the request to send
 	 * @param commons whether this request should include commons
-	 * @param commonExclusions the common requests to exclude from this request
 	 * @return the result from this request
 	 */
-	public Observable<ByteString> sendAsyncServerRequests(final ServerRequest request, boolean commons,
-			RequestType... commonExclusions) {
-		ServerRequestEnvelope envelope = ServerRequestEnvelope.create();
-		envelope.add(request);
-		envelope.setCommons(commons);
-		envelope.excludeCommons(commonExclusions);
+	public Observable<ByteString> sendAsyncServerRequests(final ServerRequest request, boolean commons) {
+		ServerRequestEnvelope envelope = ServerRequestEnvelope.create(request, api, commons);
 		return sendAsyncServerRequests(envelope).map(new Func1<ServerResponse, ByteString>() {
 			@Override
 			public ByteString call(ServerResponse serverResponse) {
@@ -155,22 +159,17 @@ public class RequestHandler implements Runnable {
 		return sendServerRequests(request, false);
 	}
 
-
 	/**
 	 * Sends a single ServerRequest
 	 *
 	 * @param request the request to send
 	 * @param commons whether this request should include commons
-	 * @param commonExclusions the common requests to exclude from this request
 	 * @return the result from this request
 	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public ByteString sendServerRequests(ServerRequest request, boolean commons, RequestType... commonExclusions)
+	public ByteString sendServerRequests(ServerRequest request, boolean commons)
 			throws RequestFailedException {
-		ServerRequestEnvelope envelope = ServerRequestEnvelope.create();
-		envelope.add(request);
-		envelope.setCommons(commons);
-		envelope.excludeCommons(commonExclusions);
+		ServerRequestEnvelope envelope = ServerRequestEnvelope.create(request, api, commons);
 		AsyncHelper.toBlocking(sendAsyncServerRequests(envelope));
 		try {
 			return request.getData();
@@ -226,29 +225,27 @@ public class RequestHandler implements Runnable {
 				throw new RequestFailedException("Got a unexpected http code : " + response.code());
 			}
 
-			ResponseEnvelope responseEnvelop;
+			ResponseEnvelope responseEnvelope;
 			try (InputStream content = response.body().byteStream()) {
-				responseEnvelop = ResponseEnvelope.parseFrom(content);
+				responseEnvelope = ResponseEnvelope.parseFrom(content);
 			} catch (IOException e) {
 				// retrieved garbage from the server
 				throw new RequestFailedException("Received malformed response : " + e);
 			}
 
-			if (responseEnvelop.getApiUrl() != null && responseEnvelop.getApiUrl().length() > 0) {
-				apiEndpoint = "https://" + responseEnvelop.getApiUrl() + "/rpc";
+			if (responseEnvelope.getApiUrl() != null && responseEnvelope.getApiUrl().length() > 0) {
+				apiEndpoint = "https://" + responseEnvelope.getApiUrl() + "/rpc";
 			}
 
-			if (responseEnvelop.hasAuthTicket()) {
-				this.authTicket = responseEnvelop.getAuthTicket();
+			if (responseEnvelope.hasAuthTicket()) {
+				authTicket = responseEnvelope.getAuthTicket();
 			}
 
-			boolean empty = false;
+			StatusCode statusCode = responseEnvelope.getStatusCode();
 
-			StatusCode statusCode = responseEnvelop.getStatusCode();
-
-			if (statusCode != StatusCode.REDIRECT && statusCode != StatusCode.INVALID_AUTH_TOKEN) {
-				for (int i = 0; i < responseEnvelop.getReturnsCount(); i++) {
-					ByteString returned = responseEnvelop.getReturns(i);
+			if (requests.length > 0) {
+				for (int i = 0; i < responseEnvelope.getReturnsCount(); i++) {
+					ByteString returned = responseEnvelope.getReturns(i);
 					ServerRequest serverRequest = requests[i];
 					if (returned != null) {
 						serverResponse.addResponse(serverRequest.getType(), returned);
@@ -258,13 +255,13 @@ public class RequestHandler implements Runnable {
 							}
 						}
 					} else {
-						empty = true;
+						throw new RequestFailedException("Received empty response from server");
 					}
 				}
 			}
 
-			for (int i = 0; i < responseEnvelop.getPlatformReturnsCount(); i++) {
-				PlatformResponse platformResponse = responseEnvelop.getPlatformReturns(i);
+			for (int i = 0; i < responseEnvelope.getPlatformReturnsCount(); i++) {
+				PlatformResponse platformResponse = responseEnvelope.getPlatformReturns(i);
 				ByteString returned = platformResponse.getResponse();
 				if (returned != null) {
 					serverResponse.addResponse(platformResponse.getType(), returned);
@@ -294,10 +291,6 @@ public class RequestHandler implements Runnable {
 				} else {
 					throw new RequestFailedException("Failed to send request: " + statusCode);
 				}
-			}
-
-			if (empty) {
-				throw new RequestFailedException("Received empty response from server!");
 			}
 		} catch (IOException e) {
 			throw new RequestFailedException(e);
@@ -338,7 +331,6 @@ public class RequestHandler implements Runnable {
 			throws RequestFailedException {
 		builder.setStatusCode(2);
 		builder.setRequestId(requestIdGenerator.next());
-		//builder.setAuthInfo(api.getAuthInfo());
 		boolean refresh = authTicket != null && api.currentTimeMillis() >= authTicket.getExpireTimestampMs();
 		if (authTicket != null && !refresh) {
 			builder.setAuthTicket(authTicket);
@@ -391,44 +383,25 @@ public class RequestHandler implements Runnable {
 
 				List<ServerRequest> requests = new ArrayList<>();
 
-				Set<RequestType> exclusions = envelope.getCommonExclusions();
-
-				ServerResponse response = new ServerResponse();
-
-				if (api.hasChallenge() && !api.isLoggingIn()) {
-					for (ServerRequest request : envelope.getRequests()) {
-						RequestType type = request.getType();
-						if (!exclusions.contains(type)) {
-							if (type == RequestType.VERIFY_CHALLENGE || type == RequestType.CHECK_CHALLENGE) {
-								requests.add(request);
-							}
-						}
-					}
-				} else {
-					for (ServerRequest request : envelope.getRequests()) {
-						RequestType type = request.getType();
-						if (!exclusions.contains(type)) {
-							requests.add(request);
-						}
-					}
+				if (envelope.getRequest() != null) {
+					envelope.setRequest(addRequest(envelope, requests, envelope.getRequest()));
 				}
 
-				if (envelope.isCommons()) {
-					ServerRequest[] commonRequests = CommonRequests.getCommonRequests(api);
-					for (ServerRequest request : commonRequests) {
-						RequestType type = request.getType();
-						if (CommonRequests.shouldAdd(api, type, envelope.getRequests()) && !exclusions.contains(type)) {
-							requests.add(request);
-							envelope.add(request);
-						}
+				List<ServerRequest> commons = new ArrayList<>(envelope.getCommons());
+				for (ServerRequest commonRequest : commons) {
+					ServerRequest adaptedRequest = addRequest(envelope, requests, commonRequest);
+					if (adaptedRequest != null) {
+						envelope.removeCommons(commonRequest);
+						envelope.includeCommons(adaptedRequest);
 					}
 				}
 
 				ServerRequest[] arrayRequests = requests.toArray(new ServerRequest[requests.size()]);
 				List<ServerPlatformRequest> platformRequests = envelope.getPlatformRequests();
-				ServerPlatformRequest[] arrayPlatformRequests
-						= platformRequests.toArray(new ServerPlatformRequest[platformRequests.size()]);
+				ServerPlatformRequest[] arrayPlatformRequests = platformRequests
+						.toArray(new ServerPlatformRequest[platformRequests.size()]);
 
+				ServerResponse response = new ServerResponse();
 				try {
 					response = sendInternal(response, arrayRequests, arrayPlatformRequests);
 				} catch (RequestFailedException e) {
@@ -437,24 +410,48 @@ public class RequestHandler implements Runnable {
 
 				envelope.handleResponse(response);
 
-				try {
-					for (ServerRequest request : requests) {
-						ByteString result = request.getData();
-						try {
-							CommonRequests.queue(request.getType(), result);
-						} catch (InvalidProtocolBufferException e) {
-							break;
-						}
-					}
-
-					CommonRequests.handleQueue(api);
-				} catch (InvalidProtocolBufferException | RequestFailedException e) {
-					continue;
+				List<RequestInterceptor> interceptors = api.getListeners(RequestInterceptor.class);
+				for (RequestInterceptor interceptor : interceptors) {
+					interceptor.handleResponse(api, response, envelope);
 				}
+
+				try {
+					CommonRequests.handleCommons(api, response);
+				} catch (RequestFailedException | InvalidProtocolBufferException e) {
+					response.setException(e);
+				}
+
+				envelope.notifyResponse(response);
 
 				lastRequest = api.currentTimeMillis();
 			}
 		}
+	}
+
+	/**
+	 * Adds a request to an envelope, taking {@link RequestInterceptor} into account
+	 *
+	 * @param envelope the current envelope
+	 * @param requests the requests list
+	 * @param request the request to add
+	 * @return the added request
+	 */
+	private ServerRequest addRequest(ServerRequestEnvelope envelope, List<ServerRequest> requests,
+			ServerRequest request) {
+		List<RequestInterceptor> interceptors = api.getListeners(RequestInterceptor.class);
+		boolean remove = false;
+		for (RequestInterceptor interceptor : interceptors) {
+			remove |= interceptor.shouldRemove(api, request, envelope);
+			ServerRequest adapt = interceptor.adaptRequest(api, request, envelope);
+			if (adapt != null) {
+				request = adapt;
+			}
+		}
+		if (!remove) {
+			requests.add(request);
+			return request;
+		}
+		return null;
 	}
 
 	/**

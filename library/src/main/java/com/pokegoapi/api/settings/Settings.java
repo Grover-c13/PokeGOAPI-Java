@@ -1,13 +1,7 @@
 package com.pokegoapi.api.settings;
 
-import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.request.RequestFailedException;
-import com.pokegoapi.main.ServerRequest;
 import lombok.Getter;
 
 /**
@@ -79,27 +73,7 @@ public class Settings {
 		this.fortSettings = new FortSettings();
 		this.inventorySettings = new InventorySettings();
 		this.gpsSettings = new GpsSettings();
-		this.hash = new String();
-	}
-
-	/**
-	 * Updates settings latest data.
-	 *
-	 * @throws RequestFailedException if an exception occurred while sending requests
-	 */
-	public void updateSettings() throws RequestFailedException {
-		DownloadSettingsMessageOuterClass.DownloadSettingsMessage msg =
-				DownloadSettingsMessageOuterClass.DownloadSettingsMessage.newBuilder().build();
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.DOWNLOAD_SETTINGS, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest, false); //here you marked everything as read
-		DownloadSettingsResponseOuterClass.DownloadSettingsResponse response;
-		try {
-			response = DownloadSettingsResponseOuterClass.DownloadSettingsResponse.parseFrom(serverRequest.getData());
-		} catch (InvalidProtocolBufferException e) {
-			throw new RequestFailedException(e);
-		}
-
-		updateSettings(response);
+		this.hash = "";
 	}
 
 	/**

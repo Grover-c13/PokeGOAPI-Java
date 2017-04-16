@@ -15,17 +15,13 @@
 
 package com.pokegoapi.api.pokemon;
 
-import POGOProtos.Enums.PokemonIdOuterClass;
-import POGOProtos.Networking.Responses.DownloadItemTemplatesResponseOuterClass.DownloadItemTemplatesResponse.ItemTemplate;
-import POGOProtos.Settings.Master.PlayerLevelSettingsOuterClass;
-import POGOProtos.Settings.Master.Pokemon.StatsAttributesOuterClass;
-import POGOProtos.Settings.Master.PokemonSettingsOuterClass;
+import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
+import POGOProtos.Settings.Master.Pokemon.StatsAttributesOuterClass.StatsAttributes;
+import POGOProtos.Settings.Master.PokemonSettingsOuterClass.PokemonSettings;
+import POGOProtos.Settings.Master.PokemonUpgradeSettingsOuterClass.PokemonUpgradeSettings;
+import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.settings.templates.ItemTemplates;
 import com.pokegoapi.exceptions.NoSuchItemException;
-import com.pokegoapi.main.PokemonMeta;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Information in this class is based on:
@@ -34,32 +30,6 @@ import java.util.Map;
  * http://pokemongo.gamepress.gg/pokemon-stats-advanced
  */
 public class PokemonCpUtils {
-	private static final Map<Float, Double> LEVEL_CP_MULTIPLIER = new HashMap<>();
-
-	/**
-	 * Initializes this with the given item templates
-	 *
-	 * @param templates the item templates
-	 */
-	public static void initialize(List<ItemTemplate> templates) {
-		for (ItemTemplate template : templates) {
-			if (template.hasPlayerLevel()) {
-				PlayerLevelSettingsOuterClass.PlayerLevelSettings settings = template.getPlayerLevel();
-				List<Float> multipliers = settings.getCpMultiplierList();
-				for (int i = 0; i < multipliers.size(); i++) {
-					double multiplier = multipliers.get(i);
-					LEVEL_CP_MULTIPLIER.put(i + 1.0F, multiplier);
-					double nextMultiplier = multipliers.get(Math.min(multipliers.size() - 1, i + 1));
-					double step = ((nextMultiplier * nextMultiplier) - (multiplier * multiplier)) / 2.0F;
-					if (i >= 30) {
-						step /= 2.0;
-					}
-					LEVEL_CP_MULTIPLIER.put(i + 1.5F, Math.sqrt((multiplier * multiplier) + step));
-				}
-			}
-		}
-	}
-
 	private static float getLevel(double combinedCpMultiplier) {
 		double level;
 		if (combinedCpMultiplier < 0.734f) {
@@ -85,52 +55,6 @@ public class PokemonCpUtils {
 	}
 
 	/**
-	 * Get the maximum CP from the values
-	 *
-	 * @param attack All attack values combined
-	 * @param defense All defense values combined
-	 * @param stamina All stamina values combined
-	 * @return Maximum CP for these levels
-	 */
-	public static int getMaxCp(int attack, int defense, int stamina) {
-		return getMaxCpForPlayer(attack, defense, stamina, 40);
-	}
-
-	/**
-	 * Get the absolute maximum CP for pokemons with their PokemonId.
-	 *
-	 * @param id The {@link PokemonIdOuterClass.PokemonId} of the Pokemon to get CP for.
-	 * @return The absolute maximum CP
-	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link PokemonMeta}.
-	 */
-	public static int getAbsoluteMaxCp(PokemonIdOuterClass.PokemonId id) throws NoSuchItemException {
-		PokemonSettingsOuterClass.PokemonSettings settings = PokemonMeta.getPokemonSettings(id);
-		if (settings == null) {
-			throw new NoSuchItemException("Cannot find meta data for " + id);
-		}
-		StatsAttributesOuterClass.StatsAttributes stats = settings.getStats();
-		int attack = 15 + stats.getBaseAttack();
-		int defense = 15 + stats.getBaseDefense();
-		int stamina = 15 + stats.getBaseStamina();
-		return getMaxCpForPlayer(attack, defense, stamina, 40);
-	}
-
-	/**
-	 * Get the maximum CP from the values
-	 *
-	 * @param attack All attack values combined
-	 * @param defense All defense values combined
-	 * @param stamina All stamina values combined
-	 * @param playerLevel The player level
-	 * @return Maximum CP for these levels
-	 */
-	public static int getMaxCpForPlayer(int attack, int defense, int stamina, int playerLevel) {
-		float maxLevel = Math.min(playerLevel + 1.5f, 40f);
-		double maxCpMultplier = LEVEL_CP_MULTIPLIER.get(maxLevel);
-		return getCp(attack, defense, stamina, maxCpMultplier);
-	}
-
-	/**
 	 * Calculate CP based on raw values
 	 *
 	 * @param attack All attack values combined
@@ -142,6 +66,55 @@ public class PokemonCpUtils {
 	public static int getCp(int attack, int defense, int stamina, double combinedCpMultiplier) {
 		return (int) Math.round(attack * Math.pow(defense, 0.5) * Math.pow(stamina, 0.5)
 				* Math.pow(combinedCpMultiplier, 2) / 10f);
+	}
+
+	/**
+	 * Get the maximum CP from the values
+	 *
+	 * @param api the current api
+	 * @param attack All attack values combined
+	 * @param defense All defense values combined
+	 * @param stamina All stamina values combined
+	 * @return Maximum CP for these levels
+	 */
+	public static int getMaxCp(PokemonGo api, int attack, int defense, int stamina) {
+		return getMaxCpForPlayer(api, attack, defense, stamina, 40);
+	}
+
+	/**
+	 * Get the absolute maximum CP for pokemons with their PokemonId.
+	 *
+	 * @param api the current api
+	 * @param id The {@link PokemonId} of the Pokemon to get CP for.
+	 * @return The absolute maximum CP
+	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link ItemTemplates}.
+	 */
+	public static int getAbsoluteMaxCp(PokemonGo api, PokemonId id) throws NoSuchItemException {
+		PokemonSettings settings = api.getItemTemplates().getPokemonSettings(id);
+		if (settings == null) {
+			throw new NoSuchItemException("Cannot find meta data for " + id);
+		}
+		StatsAttributes stats = settings.getStats();
+		int attack = 15 + stats.getBaseAttack();
+		int defense = 15 + stats.getBaseDefense();
+		int stamina = 15 + stats.getBaseStamina();
+		return getMaxCpForPlayer(api, attack, defense, stamina, 40);
+	}
+
+	/**
+	 * Get the maximum CP from the values
+	 *
+	 * @param api the current api
+	 * @param attack All attack values combined
+	 * @param defense All defense values combined
+	 * @param stamina All stamina values combined
+	 * @param playerLevel The player level
+	 * @return Maximum CP for these levels
+	 */
+	public static int getMaxCpForPlayer(PokemonGo api, int attack, int defense, int stamina, int playerLevel) {
+		float maxLevel = Math.min(playerLevel + 1.5F, 40.0F);
+		double maxCpMultplier = api.getItemTemplates().getLevelCpMultiplier(maxLevel);
+		return getCp(attack, defense, stamina, maxCpMultplier);
 	}
 
 	/**
@@ -169,25 +142,29 @@ public class PokemonCpUtils {
 	/**
 	 * Get the new additional multiplier after powerup
 	 *
+	 * @param api the current api
 	 * @param cpMultiplier Multiplier
 	 * @param additionalCpMultiplier Additional multiplier
 	 * @return Additional CP multiplier after upgrade
 	 */
-	public static double getAdditionalCpMultiplierAfterPowerup(double cpMultiplier, double additionalCpMultiplier) {
+	public static double getAdditionalCpMultiplierAfterPowerup(PokemonGo api,
+			double cpMultiplier, double additionalCpMultiplier) {
 		float nextLevel = getLevelFromCpMultiplier(cpMultiplier + additionalCpMultiplier) + .5f;
-		return LEVEL_CP_MULTIPLIER.get(nextLevel) - cpMultiplier;
+		return api.getItemTemplates().getLevelCpMultiplier(nextLevel) - cpMultiplier;
 	}
 
 	/**
 	 * Get the amount of stardust required to do a powerup
 	 *
+	 * @param api the current api
 	 * @param combinedCpMultiplier All CP multiplier values combined
 	 * @return Amount of stardust
 	 */
-	public static int getStartdustCostsForPowerup(double combinedCpMultiplier) {
+	public static int getStartdustCostsForPowerup(PokemonGo api, double combinedCpMultiplier) {
+		PokemonUpgradeSettings upgradeSettings = api.getItemTemplates().getUpgradeSettings();
 		int level = (int) getLevelFromCpMultiplier(combinedCpMultiplier);
-		if (level < PokemonMeta.upgradeSettings.getStardustCostCount()) {
-			return PokemonMeta.upgradeSettings.getStardustCost(level);
+		if (level < upgradeSettings.getStardustCostCount()) {
+			return upgradeSettings.getStardustCost(level);
 		}
 		return 0;
 	}
@@ -195,11 +172,12 @@ public class PokemonCpUtils {
 	/**
 	 * Get the amount of candy required to do a powerup
 	 *
+	 * @param api the current api
 	 * @param combinedCpMultiplier All CP multiplier values combined
 	 * @return Amount of candy
 	 */
-	public static int getCandyCostsForPowerup(double combinedCpMultiplier) {
+	public static int getCandyCostsForPowerup(PokemonGo api, double combinedCpMultiplier) {
 		int level = (int) getLevelFromCpMultiplier(combinedCpMultiplier);
-		return PokemonMeta.upgradeSettings.getCandyCost(level);
+		return api.getItemTemplates().getUpgradeSettings().getCandyCost(level);
 	}
 }

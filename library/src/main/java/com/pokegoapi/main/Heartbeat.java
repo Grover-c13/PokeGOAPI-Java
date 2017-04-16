@@ -22,8 +22,6 @@ import com.pokegoapi.api.settings.MapSettings;
 import lombok.Getter;
 
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingDeque;
 
 public class Heartbeat {
 	@Getter
@@ -37,8 +35,6 @@ public class Heartbeat {
 	private boolean active;
 
 	private final Object lock = new Object();
-
-	private Queue<Runnable> tasks = new LinkedBlockingDeque<>();
 
 	/**
 	 * Create a new Heartbeat object for the given API
@@ -70,7 +66,7 @@ public class Heartbeat {
 				}
 			});
 			heartbeatThread.setDaemon(true);
-			heartbeatThread.setName("Pokemon GO Heartbeat");
+			heartbeatThread.setName("Heartbeat thread");
 			heartbeatThread.start();
 		}
 	}
@@ -112,30 +108,13 @@ public class Heartbeat {
 				}
 			}
 		}
-		long startTime = api.currentTimeMillis();
-		while (!tasks.isEmpty()) {
-			Runnable task = tasks.poll();
-			task.run();
-			if (api.currentTimeMillis() - startTime > 1000) {
-				break;
-			}
-		}
 	}
 
 	/**
 	 * @return if the heartbeat is currently active
 	 */
 	public boolean active() {
-		return this.active;
-	}
-
-	/**
-	 * Enqueues the given task
-	 *
-	 * @param task the task to enqueue
-	 */
-	public void enqueueTask(Runnable task) {
-		tasks.add(task);
+		return active;
 	}
 
 	/**

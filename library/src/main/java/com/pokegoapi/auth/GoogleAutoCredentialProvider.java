@@ -127,6 +127,11 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 		return tokenInfo.authToken.getExpiry() < time.currentTimeMillis() / 1000;
 	}
 
+	@Override
+	public void reset() {
+		tokenInfo = null;
+	}
+
 	private static class TokenInfo {
 		final AuthToken authToken;
 		final String refreshToken;
