@@ -197,6 +197,32 @@ This library is meant to be a Java implementation of the API. Google Volley is s
 
 You can't. The Google Identity Platform uses the SHA1 fingerprint and package name to authenticate the caller of all sign in requests. This means that Niantic would need to add your app's SHA1 fingerprint and package name to their Google API Console. If you ever requested a Google Maps API key, you went through the same process. An alternative would be using a WebView to access the web based OAuth flow. This will work with the client ID and secret provided by this library.
 
+   - I want to add this to Android Studio! But I can't add it as a module. I get a "Specify location of the Gradle or Android Eclipse project."
+
+ 1. Pull this repo into a folder in your project directory and follow the instructions earlier in this guide for building the project. Make sure that it builds and it passes before proceeding any further. Your directory should look something like this:
+
+    ```gradle
+	-Project
+	|__build.gradle
+	|__settings.gradle
+	|__PokeGOAPI (this is the repo)
+	|__app
+    ```
+    
+ 2. Go to your settings.gradle (Module:PokeGoAPI) and add
+
+    ```gradle
+include ":PokeGOAPI"
+project(":PokeGOAPI").projectDir = file("./PokeGOAPI")
+    ```
+    
+ 3. Go to your build.gradle (Module: app) and add to your dependencies:
+
+    ```gradle
+compile project(":PokeGOAPI")
+    ```
+    
+ 4. Run the project. You will see that Android Studio will automatically include this as a submodule
 
 ## Contributing
   - Fork it!
