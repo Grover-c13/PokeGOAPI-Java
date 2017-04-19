@@ -212,7 +212,7 @@ public class PlayerProfile {
 	 */
 	public PlayerLevelUpRewards acceptLevelUpRewards(int level)
 			throws RequestFailedException {
-		this.acceptLevelUpRewards(level, true);
+		return this.acceptLevelUpRewards(level, true);
 	}
 
 	private PlayerLevelUpRewards acceptLevelUpRewards(int level, boolean checkLevel)
