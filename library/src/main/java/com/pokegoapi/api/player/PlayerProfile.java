@@ -212,8 +212,13 @@ public class PlayerProfile {
 	 */
 	public PlayerLevelUpRewards acceptLevelUpRewards(int level)
 			throws RequestFailedException {
+		return this.acceptLevelUpRewards(level, true);
+	}
+
+	private PlayerLevelUpRewards acceptLevelUpRewards(int level, boolean checkLevel)
+			throws RequestFailedException {
 		// Check if we even have achieved this level yet
-		if (level > stats.getLevel()) {
+		if (checkLevel && level > stats.getLevel()) {
 			throw new InsufficientLevelException();
 		}
 		LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder()
@@ -383,7 +388,7 @@ public class PlayerProfile {
 				for (PlayerListener listener : listeners) {
 					listener.onLevelUp(api, level, newLevel);
 				}
-				acceptLevelUpRewards(newLevel);
+				acceptLevelUpRewards(newLevel, false);
 			}
 		}
 		this.stats = stats;
