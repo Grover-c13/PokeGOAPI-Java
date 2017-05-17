@@ -18,9 +18,9 @@ ___
 
 This API may have issues when the PokemonGO servers are under high load or down, in this case please wait for the official to get back up. You can check the official servers status on [IsPokemonGoDownOrNot.com](http://ispokemongodownornot.com) or [MMOServerStatus.com](http://www.mmoserverstatus.com/pokemon_go).
 
-This API doesnt fake the official client perfectly, niantic may know that you aren't using the official app, we encourage you to use an alternate account to play with this API.
+This API doesn't fake the official client perfectly, Niantic may know that you aren't using the official app, we encourage you to use an alternate account to play with this API.
 
-If you are using this lib to catch pokemon and loot pokestop, take care that you aren't teleporting, the servers may issue a softban against your client (its temporary, between 10 and 30 minutes in general).
+If you are using this lib to catch Pokemon and loot PokeStop, take care that you aren't teleporting, the servers may issue a soft ban against your client (its temporary, between 10 and 30 minutes in general).
 
 :exclamation: :exclamation: :exclamation:
 ___
