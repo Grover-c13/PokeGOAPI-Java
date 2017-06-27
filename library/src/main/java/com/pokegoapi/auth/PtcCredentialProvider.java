@@ -235,7 +235,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 			for(Cookie cook : c){
 				if(cook.name().equals("CASTGC")){					
 					this.tokenId = cook.value();
-					expiresTimestamp = time.currentTimeMillis() + 7140000L;
+					expiresTimestamp = time.currentTimeMillis() + 7140000;
 				}
 			}
 			
@@ -254,7 +254,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 		if (refresh || isTokenIdExpired()) {
 			login(username, password, 0);
 		}
-		return tokenId;
+		return tokenId; 
 	}
 
 	/**
