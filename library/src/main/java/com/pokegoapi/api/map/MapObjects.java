@@ -26,6 +26,7 @@ import POGOProtos.Networking.Responses.GetIncensePokemonResponseOuterClass.GetIn
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.gym.Gym;
 import com.pokegoapi.api.map.fort.Pokestop;
+import com.pokegoapi.api.map.fort.Raid;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.NearbyPokemon;
 import lombok.Getter;
@@ -57,6 +58,8 @@ public class MapObjects {
 	private Set<Pokestop> pokestops = new HashSet<>();
 	@Getter
 	private Set<Gym> gyms = new HashSet<>();
+	@Getter
+	private Set<Raid> raid = new HashSet<>();
 
 	/**
 	 * Adds the given nearby pokemon to this object
@@ -120,6 +123,9 @@ public class MapObjects {
 	 */
 	public void addForts(List<FortData> forts) {
 		for (FortData fortData : forts) {
+			if(fortData.hasRaidInfo()){
+				this.raid.add(new Raid(api,fortData));
+			}
 			switch (fortData.getType()) {
 				case CHECKPOINT:
 					this.pokestops.add(new Pokestop(api, fortData));
