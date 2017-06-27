@@ -16,6 +16,7 @@
 package com.pokegoapi.api.map;
 
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
+import POGOProtos.Data.Raid.RaidInfoOuterClass.RaidInfo;
 import POGOProtos.Map.MapCellOuterClass.MapCell;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
@@ -57,6 +58,8 @@ public class MapObjects {
 	private Set<Pokestop> pokestops = new HashSet<>();
 	@Getter
 	private Set<Gym> gyms = new HashSet<>();
+	@Getter
+	private Set<RaidInfo> raid = new HashSet<>();
 
 	/**
 	 * Adds the given nearby pokemon to this object
@@ -120,6 +123,9 @@ public class MapObjects {
 	 */
 	public void addForts(List<FortData> forts) {
 		for (FortData fortData : forts) {
+			if(fortData.hasRaidInfo()){
+				this.raid.add(fortData.getRaidInfo());
+			}
 			switch (fortData.getType()) {
 				case CHECKPOINT:
 					this.pokestops.add(new Pokestop(api, fortData));
