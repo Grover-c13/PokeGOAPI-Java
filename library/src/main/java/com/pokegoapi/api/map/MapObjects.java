@@ -59,7 +59,7 @@ public class MapObjects {
 	@Getter
 	private Set<Gym> gyms = new HashSet<>();
 	@Getter
-	private Set<Raid> raid = new HashSet<>();
+	private Set<Raid> raids = new HashSet<>();
 
 	/**
 	 * Adds the given nearby pokemon to this object
@@ -122,16 +122,17 @@ public class MapObjects {
 	 * @param forts the fort protos
 	 */
 	public void addForts(List<FortData> forts) {
-		for (FortData fortData : forts) {
-			if(fortData.hasRaidInfo()){
-				this.raid.add(new Raid(api,fortData));
-			}
+		for (FortData fortData : forts) {			
 			switch (fortData.getType()) {
 				case CHECKPOINT:
 					this.pokestops.add(new Pokestop(api, fortData));
 					break;
 				case GYM:
-					this.gyms.add(new Gym(api, fortData));
+					if (fortData.hasRaidInfo()) {
+						this.raids.add(new Raid(api,fortData));
+					} else {
+						this.gyms.add(new Gym(api, fortData));
+					}					
 					break;
 				default:
 					break;

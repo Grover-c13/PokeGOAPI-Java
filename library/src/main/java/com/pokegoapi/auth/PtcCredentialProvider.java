@@ -22,7 +22,6 @@ import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import com.squareup.moshi.Moshi;
 
-import lombok.Getter;
 import lombok.Setter;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
@@ -32,7 +31,6 @@ import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.io.IOException;
@@ -63,9 +61,6 @@ public class PtcCredentialProvider extends CredentialProvider {
 	protected String tokenId;
 	protected long expiresTimestamp;
 	protected AuthInfo.Builder authbuilder;
-	String c;
-
-	private int unknown2;
 
 	protected SecureRandom random = new SecureRandom();
 
@@ -98,6 +93,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 			public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
 				cookieStore.put(url.host(), cookies);
 			}
+			
 			@Override
 			public List<Cookie> loadForRequest(HttpUrl url) {
 				List<Cookie> cookies = cookieStore.get(url.host());
@@ -109,10 +105,14 @@ public class PtcCredentialProvider extends CredentialProvider {
 				.cookieJar(tempJar)
 				.addInterceptor(new Interceptor() {
 					@Override
-					public Response intercept(Chain paramChain) throws IOException {
+					public Response intercept(Chain chain) throws IOException {
 						//Makes sure the User-Agent is always set
-						Request localRequest = paramChain.request().newBuilder().header("User-Agent", USER_AGENT).build();
-					    return paramChain.proceed(localRequest);					    
+						Request localRequest; 
+						localRequest = chain.request()
+								.newBuilder()
+								.header("User-Agent", USER_AGENT)
+								.build();
+					    return chain.proceed(localRequest);					    
 					}
 				})
 				.build();
@@ -211,7 +211,6 @@ public class PtcCredentialProvider extends CredentialProvider {
 			}
 
 			if (body.length() > 0) {
-				System.out.println("have error");
 				PtcError ptcError;
 				try {
 					ptcError = moshi.adapter(PtcError.class).fromJson(body);
@@ -231,11 +230,11 @@ public class PtcCredentialProvider extends CredentialProvider {
 					throw new InvalidCredentialsException(builder.toString());
 				}
 			}
-			List<Cookie>c = client.cookieJar().loadForRequest(localObject);
-			for(Cookie cook : c){
-				if(cook.name().equals("CASTGC")){					
-					this.tokenId = cook.value();
-					expiresTimestamp = time.currentTimeMillis() + 7140000;
+			List<Cookie> cookies = client.cookieJar().loadForRequest(localObject);
+			for (Cookie cookie : cookies) {
+				if (cookie.name().equals("CASTGC")) {					
+					this.tokenId = cookie.value();
+					expiresTimestamp = time.currentTimeMillis() + 7140000L;
 				}
 			}
 			
@@ -254,7 +253,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 		if (refresh || isTokenIdExpired()) {
 			login(username, password, 0);
 		}
-		return tokenId; 
+		return tokenId;
 	}
 
 	/**
