@@ -116,7 +116,7 @@ public class PlayerProfile {
 				.build();
 
 		ServerRequest request = new ServerRequest(RequestType.GET_PLAYER, message);
-		api.getRequestHandler().sendServerRequests(request);
+		api.getRequestHandler().sendServerRequests(request, false);
 
 		try {
 			updateProfile(GetPlayerResponse.parseFrom(request.getData()));
@@ -212,13 +212,8 @@ public class PlayerProfile {
 	 */
 	public PlayerLevelUpRewards acceptLevelUpRewards(int level)
 			throws RequestFailedException {
-		return this.acceptLevelUpRewards(level, true);
-	}
-
-	private PlayerLevelUpRewards acceptLevelUpRewards(int level, boolean checkLevel)
-			throws RequestFailedException {
 		// Check if we even have achieved this level yet
-		if (checkLevel && level > stats.getLevel()) {
+		if (level > stats.getLevel()) {
 			throw new InsufficientLevelException();
 		}
 		LevelUpRewardsMessage msg = LevelUpRewardsMessage.newBuilder()
@@ -266,7 +261,7 @@ public class PlayerProfile {
 	public void checkAndEquipBadges() throws RequestFailedException {
 		CheckAwardedBadgesMessage msg = CheckAwardedBadgesMessage.newBuilder().build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.CHECK_AWARDED_BADGES, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest, false);
 		CheckAwardedBadgesResponse response;
 		try {
 			response = CheckAwardedBadgesResponse.parseFrom(serverRequest.getData());
@@ -381,18 +376,18 @@ public class PlayerProfile {
 	 * @throws RequestFailedException if a request fails while sending a request
 	 */
 	public void setStats(Stats stats) throws RequestFailedException {
-		final int newLevel = stats.getLevel();
+		int oldLevel = level;
+		level = stats.getLevel();
 		if (this.stats != null) {
-			if (newLevel > this.level) {
+			if (level > oldLevel) {
 				List<PlayerListener> listeners = api.getListeners(PlayerListener.class);
 				for (PlayerListener listener : listeners) {
-					listener.onLevelUp(api, level, newLevel);
+					listener.onLevelUp(api, oldLevel, level);
 				}
-				acceptLevelUpRewards(newLevel, false);
+				acceptLevelUpRewards(level);
 			}
 		}
 		this.stats = stats;
-		this.level = newLevel;
 	}
 
 	/**
@@ -611,9 +606,24 @@ public class PlayerProfile {
 	 *
 	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public void firstTimeExperienceComplete()
-			throws RequestFailedException {
+	public void firstTimeExperienceComplete() throws RequestFailedException {
 		markTutorial(TutorialStateOuterClass.TutorialState.FIRST_TIME_EXPERIENCE_COMPLETE);
+	}
+
+	/**
+	 * Completes the visit gym tutorial
+	 * @throws RequestFailedException if an exception occurred while sending this request
+	 */
+	public void visitGymComplete() throws RequestFailedException {
+		markTutorial(TutorialStateOuterClass.TutorialState.GYM_TUTORIAL);
+	}
+
+	/**
+	 * Completes the visit pokestop tutorial
+	 * @throws RequestFailedException if an exception occurred while sending this request
+	 */
+	public void visitPokestopComplete() throws RequestFailedException {
+		markTutorial(TutorialStateOuterClass.TutorialState.POKESTOP_TUTORIAL);
 	}
 
 	private void markTutorial(TutorialStateOuterClass.TutorialState state)
@@ -625,7 +635,7 @@ public class PlayerProfile {
 
 		ServerRequest request = new ServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialMessage);
 
-		api.getRequestHandler().sendServerRequests(request);
+		api.getRequestHandler().sendServerRequests(request, true);
 
 		try {
 			playerData = MarkTutorialCompleteResponse.parseFrom(request.getData()).getPlayerData();

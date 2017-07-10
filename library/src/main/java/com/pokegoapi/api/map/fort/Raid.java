@@ -16,100 +16,34 @@
 package com.pokegoapi.api.map.fort;
 
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
-import POGOProtos.Data.PokemonDataOuterClass.PokemonDataOrBuilder;
 import POGOProtos.Data.Raid.RaidInfoOuterClass.RaidInfo;
 import POGOProtos.Enums.RaidLevelOuterClass.RaidLevel;
-import POGOProtos.Enums.TeamColorOuterClass;
-import POGOProtos.Map.Fort.FortDataOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
-import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
-
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
+import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.exceptions.request.RequestFailedException;
-import com.pokegoapi.google.common.geometry.S2LatLng;
-import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.AsyncHelper;
-
+import com.pokegoapi.api.gym.Gym;
 import lombok.Getter;
-import rx.Observable;
-import rx.exceptions.Exceptions;
-import rx.functions.Func1;
 
 public class Raid {
-
 	private final PokemonGo api;
 	@Getter
-	private final FortDataOuterClass.FortData fortData;
-	@Getter
-	private long cooldownCompleteTimestampMs;
+	private final FortData fortData;
 	@Getter
 	private final RaidInfo raidInfo;
-	
-	public Raid(PokemonGo api, FortDataOuterClass.FortData fortData) {
+
+	public Raid(PokemonGo api, FortData fortData) {
 		this.api = api;
 		this.fortData = fortData;
 		this.raidInfo = fortData.getRaidInfo();
 	}
-	
-	
-	public double getDistance() {
-		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
-		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
-		return pokestop.getEarthDistance(player);
-	}
-	
-	/**
-	 * Get more detailed information about a raid.
-	 *
-	 * @return FortDetails
-	 */
-	private Observable<FortDetails> getDetailsAsync() {
-		FortDetailsMessage reqMsg = FortDetailsMessage.newBuilder()
-				.setFortId(getId())
-				.setLatitude(getLatitude())
-				.setLongitude(getLongitude())
-				.build();
 
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS,
-				reqMsg);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest, true).map(
-				new Func1<ByteString, FortDetails>() {
-					@Override
-					public FortDetails call(ByteString result) {
-						FortDetailsResponseOuterClass.FortDetailsResponse response = null;
-						try {
-							response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(result);
-						} catch (InvalidProtocolBufferException e) {
-							throw Exceptions.propagate(e);
-						}
-						return new FortDetails(response);
-					}
-				});
+	public Gym getGym() {
+		return api.getMap().getMapObjects().getGym(fortData.getId());
 	}
-	
-	private FortDetails getDetails() throws RequestFailedException {
-		return AsyncHelper.toBlocking(getDetailsAsync());
-	}
-	
-	public String getName() throws RequestFailedException {
-		return getDetails().getName();
-	}
-	
-	public String getDescription() throws RequestFailedException {
-		return getDetails().getDescription();
-	}
-	
-	public TeamColorOuterClass.TeamColor getTeam() throws RequestFailedException {
-		return fortData.getOwnedByTeam();
-	}
-	
+
 	public long getRaidSeed() {
 		return raidInfo.getRaidSeed();
 	}
-	
+
 	public long getRaidSpawnMs() {
 		return raidInfo.getRaidSpawnMs();
 	}
@@ -128,10 +62,6 @@ public class Raid {
 
 	public PokemonData getRaidPokemon() {
 		return raidInfo.getRaidPokemon();
-	}
-
-	public PokemonDataOrBuilder getRaidPokemonOrBuilder() {
-		return raidInfo.getRaidPokemonOrBuilder();
 	}
 
 	public int getRaidLevelValue() {

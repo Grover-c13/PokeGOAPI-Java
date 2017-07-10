@@ -15,6 +15,7 @@
 
 package com.pokegoapi.api.map.fort;
 
+import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
 import POGOProtos.Inventory.Item.ItemIdOuterClass;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Map.Fort.FortDataOuterClass;
@@ -23,7 +24,9 @@ import POGOProtos.Networking.Requests.Messages.AddFortModifierMessageOuterClass.
 import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
 import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass.FortSearchMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Responses.AddFortModifierResponseOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
+import POGOProtos.Networking.Responses.AddFortModifierResponseOuterClass.AddFortModifierResponse;
+import POGOProtos.Networking.Responses.AddFortModifierResponseOuterClass.AddFortModifierResponse.Result;
 import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
 import POGOProtos.Networking.Responses.FortSearchResponseOuterClass;
 import com.google.protobuf.ByteString;
@@ -190,19 +193,16 @@ public class Pokestop {
 				.setPlayerLatitude(api.getLatitude())
 				.setPlayerLongitude(api.getLongitude())
 				.build();
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.ADD_FORT_MODIFIER,
-				msg);
+		ServerRequest serverRequest = new ServerRequest(RequestType.ADD_FORT_MODIFIER, msg);
 		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, Boolean>() {
 			@Override
 			public Boolean call(ByteString result) {
 				try {
-					//sadly the server response does not contain any information to verify if the request was
-					// successful
-					AddFortModifierResponseOuterClass.AddFortModifierResponse.parseFrom(result);
+					AddFortModifierResponse response = AddFortModifierResponse.parseFrom(result);
+					return response.getResult() == Result.SUCCESS;
 				} catch (InvalidProtocolBufferException e) {
 					throw Exceptions.propagate(e);
 				}
-				return Boolean.TRUE;
 			}
 		});
 	}
@@ -254,6 +254,11 @@ public class Pokestop {
 	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
 	public FortDetails getDetails() throws RequestFailedException {
+		List<TutorialState> tutorialStates = api.getPlayerProfile().getTutorialState().getTutorialStates();
+		if (!tutorialStates.contains(TutorialState.POKESTOP_TUTORIAL)) {
+			api.getPlayerProfile().visitPokestopComplete();
+		}
+
 		return AsyncHelper.toBlocking(getDetailsAsync());
 	}
 

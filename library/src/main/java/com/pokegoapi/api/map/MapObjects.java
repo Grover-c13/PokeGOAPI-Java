@@ -122,17 +122,17 @@ public class MapObjects {
 	 * @param forts the fort protos
 	 */
 	public void addForts(List<FortData> forts) {
-		for (FortData fortData : forts) {			
+		for (FortData fortData : forts) {
 			switch (fortData.getType()) {
 				case CHECKPOINT:
 					this.pokestops.add(new Pokestop(api, fortData));
 					break;
 				case GYM:
 					if (fortData.hasRaidInfo()) {
-						this.raids.add(new Raid(api,fortData));
+						this.raids.add(new Raid(api, fortData));
 					} else {
 						this.gyms.add(new Gym(api, fortData));
-					}					
+					}
 					break;
 				default:
 					break;

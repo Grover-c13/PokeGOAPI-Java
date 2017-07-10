@@ -32,7 +32,6 @@ import com.pokegoapi.api.listener.RequestInterceptor;
 import com.pokegoapi.exceptions.AsyncPokemonGoException;
 import com.pokegoapi.exceptions.request.BadRequestException;
 import com.pokegoapi.exceptions.request.BannedException;
-import com.pokegoapi.exceptions.request.CaptchaActiveException;
 import com.pokegoapi.exceptions.request.InvalidCredentialsException;
 import com.pokegoapi.exceptions.request.LoginFailedException;
 import com.pokegoapi.exceptions.request.RequestFailedException;
@@ -93,14 +92,7 @@ public class RequestHandler implements Runnable {
 	 * @return ServerResponse response to be processed in the future
 	 */
 	public Observable<ServerResponse> sendAsyncServerRequests(ServerRequestEnvelope envelope) {
-		if (api.hasChallenge() && envelope.getRequest().getType() != RequestType.VERIFY_CHALLENGE) {
-			String challenge = api.getChallengeURL();
-			CaptchaActiveException exception
-					= new CaptchaActiveException("Could not send request, challenge is active", challenge);
-			envelope.handleResponse(new ServerResponse(exception));
-		} else {
-			workQueue.offer(envelope);
-		}
+		workQueue.offer(envelope);
 		return envelope.observable();
 	}
 
@@ -111,7 +103,7 @@ public class RequestHandler implements Runnable {
 	 * @return the result from this request
 	 */
 	public Observable<ByteString> sendAsyncServerRequests(final ServerRequest request) {
-		return sendAsyncServerRequests(request, false);
+		return sendAsyncServerRequests(request, true);
 	}
 
 	/**
@@ -156,7 +148,7 @@ public class RequestHandler implements Runnable {
 	 */
 	public ByteString sendServerRequests(ServerRequest request)
 			throws RequestFailedException {
-		return sendServerRequests(request, false);
+		return sendServerRequests(request, true);
 	}
 
 	/**

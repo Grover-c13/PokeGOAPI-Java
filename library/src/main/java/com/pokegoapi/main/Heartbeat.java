@@ -75,37 +75,35 @@ public class Heartbeat {
 	 * Performs a single heartbeat
 	 */
 	public void beat() {
-		if (!api.hasChallenge()) {
-			MapSettings mapSettings = api.getSettings().getMapSettings();
-			minMapRefresh = (long) mapSettings.getMinRefresh();
-			maxMapRefresh = (long) mapSettings.getMaxRefresh();
+		MapSettings mapSettings = api.getSettings().getMapSettings();
+		minMapRefresh = (long) mapSettings.getMinRefresh();
+		maxMapRefresh = (long) mapSettings.getMaxRefresh();
 
-			List<HeartbeatListener> listeners = api.getListeners(HeartbeatListener.class);
-			long time = api.currentTimeMillis();
-			boolean updatingMap;
+		List<HeartbeatListener> listeners = api.getListeners(HeartbeatListener.class);
+		long time = api.currentTimeMillis();
+		boolean updatingMap;
+		synchronized (lock) {
+			updatingMap = this.updatingMap;
+		}
+		if (time >= nextMapUpdate && !updatingMap) {
 			synchronized (lock) {
-				updatingMap = this.updatingMap;
+				this.updatingMap = true;
 			}
-			if (time >= nextMapUpdate && !updatingMap) {
-				synchronized (lock) {
-					this.updatingMap = true;
+			Map map = api.getMap();
+			try {
+				if (map.update()) {
+					nextMapUpdate = time + minMapRefresh;
 				}
-				Map map = api.getMap();
-				try {
-					if (map.update()) {
-						nextMapUpdate = time + minMapRefresh;
-					}
-					for (HeartbeatListener listener : listeners) {
-						listener.onMapUpdate(api, map.getMapObjects());
-					}
-				} catch (Exception exception) {
-					for (HeartbeatListener listener : listeners) {
-						listener.onMapUpdateException(api, exception);
-					}
+				for (HeartbeatListener listener : listeners) {
+					listener.onMapUpdate(api, map.getMapObjects());
 				}
-				synchronized (lock) {
-					this.updatingMap = false;
+			} catch (Exception exception) {
+				for (HeartbeatListener listener : listeners) {
+					listener.onMapUpdateException(api, exception);
 				}
+			}
+			synchronized (lock) {
+				this.updatingMap = false;
 			}
 		}
 	}

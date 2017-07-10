@@ -92,13 +92,13 @@ public class CommonRequests {
 	 */
 	public static List<ServerRequest> getDefaultCommons(PokemonGo api, RequestType request) {
 		List<ServerRequest> defaultCommons = new ArrayList<>();
-		if (!api.hasChallenge()) {
+		if (!api.hasChallenge() || request == RequestType.VERIFY_CHALLENGE) {
 			defaultCommons.add(CommonRequests.checkChallenge());
 		}
 		defaultCommons.add(CommonRequests.getHatchedEggs());
 		defaultCommons.add(CommonRequests.getInventory(api));
 		defaultCommons.add(CommonRequests.checkAwardedBadges());
-		if (request != RequestType.SET_BUDDY_POKEMON) {
+		if (api.isLoggingIn()) {
 			defaultCommons.add(CommonRequests.downloadSettings(api));
 		}
 		if (api.getInventories().getItemBag().isIncenseActive()) {

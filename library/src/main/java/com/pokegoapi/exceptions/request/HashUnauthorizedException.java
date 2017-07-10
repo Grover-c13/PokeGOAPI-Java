@@ -13,17 +13,23 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.pokegoapi.auth;
+package com.pokegoapi.exceptions.request;
 
-import lombok.Getter;
+/**
+ * Exception thrown when the hashing service returns an unauthorized status code
+ */
+public class HashUnauthorizedException extends HashException {
 
-public class PtcError {
-	@Getter
-	private String lt;
-	@Getter
-	private String error;
-	@Getter
-	private String execution;
-	@Getter
-	private String[] errors = new String[0];
+	public HashUnauthorizedException() {
+		super();
+	}
+
+	public HashUnauthorizedException(String reason) {
+		super(reason);
+	}
+
+	public HashUnauthorizedException(Throwable exception) {
+		super(exception);
+	}
+
 }

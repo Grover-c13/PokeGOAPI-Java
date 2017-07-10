@@ -133,7 +133,7 @@ public class Hatchery {
 			throws RequestFailedException {
 		GetHatchedEggsMessage msg = GetHatchedEggsMessage.newBuilder().build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.GET_HATCHED_EGGS, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest, false);
 
 		GetHatchedEggsResponse response;
 		try {

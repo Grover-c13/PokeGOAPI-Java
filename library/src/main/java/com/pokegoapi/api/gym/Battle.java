@@ -219,7 +219,7 @@ public class Battle {
 				StartGymBattleMessage message = builder.build();
 				ServerRequest request = new ServerRequest(RequestType.START_GYM_BATTLE, message);
 
-				api.getRequestHandler().sendServerRequests(request);
+				api.getRequestHandler().sendServerRequests(request, true);
 				StartGymBattleResponse response = StartGymBattleResponse.parseFrom(request.getData());
 
 				if (response.getResult() == StartGymBattleResponse.Result.SUCCESS) {
