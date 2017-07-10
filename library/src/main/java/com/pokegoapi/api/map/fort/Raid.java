@@ -18,7 +18,6 @@ package com.pokegoapi.api.map.fort;
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Data.Raid.RaidInfoOuterClass.RaidInfo;
 import POGOProtos.Enums.RaidLevelOuterClass.RaidLevel;
-import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.gym.Gym;
 import lombok.Getter;
@@ -26,18 +25,14 @@ import lombok.Getter;
 public class Raid {
 	private final PokemonGo api;
 	@Getter
-	private final FortData fortData;
+	private final Gym gym;
 	@Getter
 	private final RaidInfo raidInfo;
 
-	public Raid(PokemonGo api, FortData fortData) {
+	public Raid(PokemonGo api, Gym gym, RaidInfo raidInfo) {
 		this.api = api;
-		this.fortData = fortData;
-		this.raidInfo = fortData.getRaidInfo();
-	}
-
-	public Gym getGym() {
-		return api.getMap().getMapObjects().getGym(fortData.getId());
+		this.gym = gym;
+		this.raidInfo = raidInfo;
 	}
 
 	public long getRaidSeed() {
@@ -64,10 +59,6 @@ public class Raid {
 		return raidInfo.getRaidPokemon();
 	}
 
-	public int getRaidLevelValue() {
-		return raidInfo.getRaidLevelValue();
-	}
-
 	public RaidLevel getRaidLevel() {
 		return raidInfo.getRaidLevel();
 	}
@@ -81,15 +72,15 @@ public class Raid {
 	}
 
 	public String getId() {
-		return fortData.getId();
+		return gym.getId();
 	}
 
 	public double getLatitude() {
-		return fortData.getLatitude();
+		return gym.getLatitude();
 	}
 
 	public double getLongitude() {
-		return fortData.getLongitude();
+		return gym.getLongitude();
 	}
 
 	@Override

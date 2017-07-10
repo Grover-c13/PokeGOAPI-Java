@@ -128,11 +128,11 @@ public class MapObjects {
 					this.pokestops.add(new Pokestop(api, fortData));
 					break;
 				case GYM:
+					Gym gym = new Gym(api, fortData);
 					if (fortData.hasRaidInfo()) {
-						this.raids.add(new Raid(api, fortData));
-					} else {
-						this.gyms.add(new Gym(api, fortData));
+						this.raids.add(new Raid(api, gym, fortData.getRaidInfo()));
 					}
+					this.gyms.add(gym);
 					break;
 				default:
 					break;
