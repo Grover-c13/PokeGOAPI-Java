@@ -157,6 +157,19 @@ public class Gym implements MapPoint {
 		return details().getName();
 	}	
 
+	public String getUrlsList() throws RequestFailedException {
+		return details().getUrl();
+	}
+
+	public GymGetInfoResponse.Result getResult() throws RequestFailedException {
+		return details().getResult();
+	}
+
+	public boolean inRange() throws RequestFailedException {
+		GymGetInfoResponse.Result result = getResult();
+		return (result != GymGetInfoResponse.Result.ERROR_NOT_IN_RANGE);
+	}
+	
 	public String getDescription() throws RequestFailedException {
 		return details().getDescription();
 	}
