@@ -15,21 +15,21 @@
 
 package com.pokegoapi.api.gym;
 
-import POGOProtos.Data.Gym.GymMembershipOuterClass.GymMembership;
+import POGOProtos.Data.Gym.GymDefenderOuterClass.GymDefender;
 import POGOProtos.Data.Gym.GymStateOuterClass.GymState;
-import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.TeamColorOuterClass;
 import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
+import POGOProtos.Map.Pokemon.MotivatedPokemonOuterClass.MotivatedPokemon;
 import POGOProtos.Networking.Requests.Messages.FortDeployPokemonMessageOuterClass.FortDeployPokemonMessage;
-import POGOProtos.Networking.Requests.Messages.GetGymDetailsMessageOuterClass.GetGymDetailsMessage;
+import POGOProtos.Networking.Requests.Messages.GymGetInfoMessageOuterClass.GymGetInfoMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.FortDeployPokemonResponseOuterClass.FortDeployPokemonResponse;
-import POGOProtos.Networking.Responses.GetGymDetailsResponseOuterClass.GetGymDetailsResponse;
+import POGOProtos.Networking.Responses.GymGetInfoResponseOuterClass.GymGetInfoResponse;
+
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.protobuf.ProtocolStringList;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.InsufficientLevelException;
@@ -45,7 +45,7 @@ import java.util.List;
 
 public class Gym implements MapPoint {
 	private FortData proto;
-	private GetGymDetailsResponse details;
+	private GymGetInfoResponse details;
 	private PokemonGo api;
 	private long points;
 
@@ -124,27 +124,27 @@ public class Gym implements MapPoint {
 		details = null;
 	}
 
-	private GetGymDetailsResponse details() throws RequestFailedException {
+	private GymGetInfoResponse details() throws RequestFailedException {
 		List<TutorialState> tutorialStates = api.getPlayerProfile().getTutorialState().getTutorialStates();
 		if (!tutorialStates.contains(TutorialState.GYM_TUTORIAL)) {
 			api.getPlayerProfile().visitGymComplete();
 		}
 
 		if (details == null) {
-			GetGymDetailsMessage reqMsg = GetGymDetailsMessage
+			GymGetInfoMessage reqMsg = GymGetInfoMessage
 					.newBuilder()
 					.setGymId(this.getId())
-					.setGymLatitude(this.getLatitude())
-					.setGymLongitude(this.getLongitude())
-					.setPlayerLatitude(api.getLatitude())
-					.setPlayerLongitude(api.getLongitude())
+					.setGymLatDegrees(this.getLatitude())
+					.setGymLngDegrees(this.getLongitude())
+					.setPlayerLatDegrees(api.getLatitude())
+					.setPlayerLngDegrees(api.getLongitude())
 					.build();
 
-			ServerRequest serverRequest = new ServerRequest(RequestType.GET_GYM_DETAILS, reqMsg);
+			ServerRequest serverRequest = new ServerRequest(RequestType.GYM_GET_INFO, reqMsg);
 			api.getRequestHandler().sendServerRequests(serverRequest, true);
 
 			try {
-				details = GetGymDetailsResponse.parseFrom(serverRequest.getData());
+				details = GymGetInfoResponse.parseFrom(serverRequest.getData());
 			} catch (InvalidProtocolBufferException e) {
 				throw new RequestFailedException();
 			}
@@ -155,29 +155,15 @@ public class Gym implements MapPoint {
 
 	public String getName() throws RequestFailedException {
 		return details().getName();
-	}
-
-	public ProtocolStringList getUrlsList() throws RequestFailedException {
-		return details().getUrlsList();
-	}
-
-	public GetGymDetailsResponse.Result getResult() throws RequestFailedException {
-		return details().getResult();
-	}
-
-	public boolean inRange() throws RequestFailedException {
-		GetGymDetailsResponse.Result result = getResult();
-		return (result != GetGymDetailsResponse.Result.ERROR_NOT_IN_RANGE);
-	}
+	}	
 
 	public String getDescription() throws RequestFailedException {
 		return details().getDescription();
 	}
 
-
-	public List<GymMembership> getGymMembers()
+	public List<GymDefender> getGymMembers()
 			throws RequestFailedException {
-		return details().getGymState().getMembershipsList();
+		return details().getGymStatusAndDefenders().getGymDefenderList();
 	}
 
 	/**
@@ -186,11 +172,11 @@ public class Gym implements MapPoint {
 	 * @return List of pokemon
 	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public List<PokemonData> getDefendingPokemon() throws RequestFailedException {
-		List<PokemonData> data = new ArrayList<PokemonData>();
+	public List<MotivatedPokemon> getDefendingPokemon() throws RequestFailedException {
+		List<MotivatedPokemon> data = new ArrayList<MotivatedPokemon>();
 
-		for (GymMembership gymMember : getGymMembers()) {
-			data.add(gymMember.getPokemonData());
+		for (GymDefender gymMember : getGymMembers()) {
+			data.add(gymMember.getMotivatedPokemon());
 		}
 
 		return data;

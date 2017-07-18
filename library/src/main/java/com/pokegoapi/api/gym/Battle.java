@@ -203,7 +203,7 @@ public class Battle {
 					.setPlayerLatitude(api.getLatitude())
 					.setPlayerLongitude(api.getLongitude())
 					.setGymId(gym.getId())
-					.setDefendingPokemonId(gym.getDefendingPokemon().get(defenderIndex).getId());
+					.setDefendingPokemonId(gym.getDefendingPokemon().get(defenderIndex).getPokemon().getId());
 			for (Pokemon pokemon : attackers) {
 				builder.addAttackingPokemonIds(pokemon.getId());
 				if (pokemon.getStamina() < pokemon.getMaxStamina()) {
