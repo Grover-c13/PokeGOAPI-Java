@@ -28,7 +28,7 @@ import POGOProtos.Inventory.InventoryItemOuterClass.InventoryItem;
 import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -100,7 +100,9 @@ public class Inventories {
 	 * @param forceUpdate For a full update if true
 	 * @return the response to the update message
 	 * @throws RequestFailedException if an exception occurred while sending requests
+	 * @deprecated Inventory is updated as a common request
 	 */
+	@Deprecated
 	public GetInventoryResponse updateInventories(boolean forceUpdate)
 			throws RequestFailedException {
 		if (forceUpdate) {
@@ -117,8 +119,8 @@ public class Inventories {
 		GetInventoryMessage invReqMsg = GetInventoryMessage.newBuilder()
 				.setLastTimestampMs(lastInventoryUpdate)
 				.build();
-		ServerRequest inventoryRequest = new ServerRequest(RequestTypeOuterClass.RequestType.GET_INVENTORY, invReqMsg);
-		api.getRequestHandler().sendServerRequests(inventoryRequest);
+		ServerRequest inventoryRequest = new ServerRequest(RequestType.GET_INVENTORY, invReqMsg);
+		api.getRequestHandler().sendServerRequests(inventoryRequest, false);
 
 		GetInventoryResponse response;
 		try {

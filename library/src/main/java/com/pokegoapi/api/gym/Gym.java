@@ -20,6 +20,7 @@ import POGOProtos.Data.Gym.GymStateOuterClass.GymState;
 import POGOProtos.Data.PokemonDataOuterClass.PokemonData;
 import POGOProtos.Enums.PokemonIdOuterClass;
 import POGOProtos.Enums.TeamColorOuterClass;
+import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Networking.Requests.Messages.FortDeployPokemonMessageOuterClass.FortDeployPokemonMessage;
 import POGOProtos.Networking.Requests.Messages.GetGymDetailsMessageOuterClass.GetGymDetailsMessage;
@@ -124,6 +125,11 @@ public class Gym implements MapPoint {
 	}
 
 	private GetGymDetailsResponse details() throws RequestFailedException {
+		List<TutorialState> tutorialStates = api.getPlayerProfile().getTutorialState().getTutorialStates();
+		if (!tutorialStates.contains(TutorialState.GYM_TUTORIAL)) {
+			api.getPlayerProfile().visitGymComplete();
+		}
+
 		if (details == null) {
 			GetGymDetailsMessage reqMsg = GetGymDetailsMessage
 					.newBuilder()
@@ -134,7 +140,6 @@ public class Gym implements MapPoint {
 					.setPlayerLongitude(api.getLongitude())
 					.build();
 
-
 			ServerRequest serverRequest = new ServerRequest(RequestType.GET_GYM_DETAILS, reqMsg);
 			api.getRequestHandler().sendServerRequests(serverRequest, true);
 
@@ -143,7 +148,6 @@ public class Gym implements MapPoint {
 			} catch (InvalidProtocolBufferException e) {
 				throw new RequestFailedException();
 			}
-
 		}
 
 		return details;

@@ -23,7 +23,7 @@ import POGOProtos.Networking.Requests.Messages.UseIncenseMessageOuterClass.UseIn
 import POGOProtos.Networking.Requests.Messages.UseItemXpBoostMessageOuterClass.UseItemXpBoostMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
-import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass;
+import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse;
 import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result;
 import POGOProtos.Networking.Responses.UseIncenseResponseOuterClass.UseIncenseResponse;
 import POGOProtos.Networking.Responses.UseItemXpBoostResponseOuterClass.UseItemXpBoostResponse;
@@ -91,18 +91,16 @@ public class ItemBag {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.RECYCLE_INVENTORY_ITEM, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest);
+		api.getRequestHandler().sendServerRequests(serverRequest, true);
 
-		RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse response;
+		RecycleInventoryItemResponse response;
 		try {
-			response = RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse
-					.parseFrom(serverRequest.getData());
+			response = RecycleInventoryItemResponse.parseFrom(serverRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
 			throw new RequestFailedException(e);
 		}
 
-		if (response
-				.getResult() == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
+		if (response.getResult() == RecycleInventoryItemResponse.Result.SUCCESS) {
 			item.setCount(response.getNewCount());
 			if (item.getCount() <= 0) {
 				removeItem(item.getItemId());

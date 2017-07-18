@@ -25,4 +25,8 @@ public class CaptchaActiveException extends RequestFailedException {
 		super(message);
 		this.challengeUrl = challengeUrl;
 	}
+
+	public CaptchaActiveException(String challengeUrl) {
+		this("Cannot send message while captcha is active", challengeUrl);
+	}
 }

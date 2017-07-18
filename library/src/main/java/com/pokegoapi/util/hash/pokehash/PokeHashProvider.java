@@ -17,6 +17,7 @@ package com.pokegoapi.util.hash.pokehash;
 
 import com.pokegoapi.exceptions.request.HashException;
 import com.pokegoapi.exceptions.request.HashLimitExceededException;
+import com.pokegoapi.exceptions.request.HashUnauthorizedException;
 import com.pokegoapi.util.hash.Hash;
 import com.pokegoapi.util.hash.HashProvider;
 import com.squareup.moshi.Moshi;
@@ -39,14 +40,14 @@ import java.util.List;
  * @see <a href="https://hashing.pogodev.org/">https://hashing.pogodev.org/</a>
  */
 public class PokeHashProvider implements HashProvider {
-	private static final String DEFAULT_ENDPOINT = "https://pokehash.buddyauth.com/api/v133_1/hash";
+	private static final String DEFAULT_ENDPOINT = "https://pokehash.buddyauth.com/api/v137_1/hash";
 
 	@Getter
 	@Setter
 	private String endpoint = DEFAULT_ENDPOINT;
 
-	private static final int VERSION = 6301;
-	private static final long UNK25 = 5348175887752539474L;
+	private static final int VERSION = 6702;
+	private static final long UNK25 = 5395925083854747393L;
 
 	private static final Moshi MOSHI = new Builder().build();
 
@@ -146,16 +147,16 @@ public class PokeHashProvider implements HashProvider {
 					throw new HashException("Bad hash request!");
 				case HttpURLConnection.HTTP_UNAUTHORIZED:
 					if (error.length() > 0) {
-						throw new HashException(error);
+						throw new HashUnauthorizedException(error);
 					}
-					throw new HashException("Unauthorized hash request!");
+					throw new HashUnauthorizedException("Unauthorized hash request!");
 				case 429:
 					if (awaitRequests) {
 						try {
 							key.await();
 							return provide(timestamp, latitude, longitude, altitude, authTicket, sessionData, requests);
 						} catch (InterruptedException e) {
-							throw new HashException(e);
+							throw new HashException("Interrupted while awaining request", e);
 						}
 					} else {
 						if (error.length() > 0) {

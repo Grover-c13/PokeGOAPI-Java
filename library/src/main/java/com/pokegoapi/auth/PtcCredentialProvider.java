@@ -24,11 +24,12 @@ import com.squareup.moshi.Moshi;
 import lombok.Setter;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
+import okhttp3.FormBody;
+import okhttp3.FormBody.Builder;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.io.IOException;
@@ -37,6 +38,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 public class PtcCredentialProvider extends CredentialProvider {
 	public static final String CLIENT_SECRET = "w8ScCUXJQc6kXKw8FiOhd8Fixzht18Dq3PEVkUCP5ZPxtgyWsbTvWHFLm2wNY0JR";
@@ -46,7 +48,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 	public static final String LOGIN_URL = "https://sso.pokemon.com/sso/login?locale=en&service="
 			+ URLEncoder.encode(SERVICE_URL) + "";
 	public static final String LOGIN_OAUTH = "https://sso.pokemon.com/sso/oauth2.0/accessToken";
-	public static final String USER_AGENT = "pokemongo/1 CFNetwork/808.2.16 Darwin/16.3.0";
+	public static final String USER_AGENT = "pokemongo/1 CFNetwork/811.4.18 Darwin/16.5.0";
 	//We try and refresh token 5 minutes before it actually expires
 	protected static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
 	protected static final int MAXIMUM_RETRIES = 5;
@@ -58,10 +60,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 	protected final Time time;
 	protected String tokenId;
 	protected long expiresTimestamp;
-
 	protected AuthInfo.Builder authbuilder;
-
-	private int unknown2;
 
 	protected SecureRandom random = new SecureRandom();
 
@@ -109,9 +108,11 @@ public class PtcCredentialProvider extends CredentialProvider {
 					@Override
 					public Response intercept(Chain chain) throws IOException {
 						//Makes sure the User-Agent is always set
-						Request req = chain.request();
-						req = req.newBuilder().header("User-Agent", USER_AGENT).build();
-						return chain.proceed(req);
+						return chain.proceed(chain.request()
+								.newBuilder()
+								.removeHeader("User-Agent")
+								.addHeader("User-Agent", USER_AGENT)
+								.build());
 					}
 				})
 				.build();
@@ -147,17 +148,20 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 */
 	private void login(String username, String password, int attempt)
 			throws LoginFailedException, InvalidCredentialsException {
-
 		try {
 			//TODO: stop creating an okhttp client per request
-			Request get = new Request.Builder()
-					.url(LOGIN_URL)
-					.get()
-					.build();
 
 			Response getResponse;
 			try {
-				getResponse = client.newCall(get).execute();
+				getResponse = client.newCall(new Request.Builder()
+						.url(HttpUrl.parse("https://sso.pokemon.com/sso/oauth2.0/authorize").newBuilder()
+								.addQueryParameter("client_id", CLIENT_ID)
+								.addQueryParameter("redirect_uri", REDIRECT_URI)
+								.addQueryParameter("locale", "en")
+								.build())
+						.get()
+						.build())
+						.execute();
 			} catch (IOException e) {
 				throw new LoginFailedException("Failed to receive contents from server", e);
 			}
@@ -166,31 +170,27 @@ public class PtcCredentialProvider extends CredentialProvider {
 
 			PtcAuthJson ptcAuth;
 			try {
-				String response = getResponse.body().string();
-				ptcAuth = moshi.adapter(PtcAuthJson.class).fromJson(response);
+				ptcAuth = moshi.adapter(PtcAuthJson.class).fromJson(getResponse.body().string());
 			} catch (IOException e) {
 				throw new LoginFailedException("Looks like the servers are down", e);
 			}
 
-			HttpUrl url = HttpUrl.parse(LOGIN_URL).newBuilder()
-					.addQueryParameter("lt", ptcAuth.getLt())
-					.addQueryParameter("execution", ptcAuth.getExecution())
-					.addQueryParameter("_eventId", "submit")
-					.addQueryParameter("username", username)
-					.addQueryParameter("password", password)
-					.build();
-
-			RequestBody reqBody = RequestBody.create(null, new byte[0]);
-
-			Request postRequest = new Request.Builder()
-					.url(url)
-					.method("POST", reqBody)
-					.build();
-
-			// Need a new client for this to not follow redirects
-			Response response;
+			Response postResponse;
 			try {
-				response = client.newBuilder()
+				FormBody postForm = new Builder()
+						.add("lt", ptcAuth.getLt())
+						.add("execution", ptcAuth.getExecution())
+						.add("_eventId", "submit")
+						.add("username", username)
+						.add("password", password)
+						.build();
+				Request postRequest = new Request.Builder()
+						.url(LOGIN_URL)
+						.post(postForm)
+						.build();
+
+				// Need a new client for this to not follow redirects
+				postResponse = client.newBuilder()
 						.followRedirects(false)
 						.followSslRedirects(false)
 						.build()
@@ -200,83 +200,27 @@ public class PtcCredentialProvider extends CredentialProvider {
 				throw new LoginFailedException("Network failure", e);
 			}
 
-			String body;
+			String postBody;
 			try {
-				body = response.body().string();
+				postBody = postResponse.body().string();
 			} catch (IOException e) {
 				throw new LoginFailedException("Response body fetching failed", e);
 			}
 
-			if (body.length() > 0) {
-				PtcError ptcError;
-				try {
-					ptcError = moshi.adapter(PtcError.class).fromJson(body);
-				} catch (IOException e) {
-					throw new LoginFailedException("Unmarshalling failure", e);
-				}
-				if (ptcError.getError() != null && ptcError.getError().length() > 0) {
-					throw new InvalidCredentialsException(ptcError.getError());
-				} else if (ptcError.getErrors().length > 0) {
-					StringBuilder builder = new StringBuilder();
-					String[] errors = ptcError.getErrors();
-					for (int i = 0; i < errors.length - 1; i++) {
-						String error = errors[i];
-						builder.append("\"").append(error).append("\", ");
-					}
-					builder.append("\"").append(errors[errors.length - 1]).append("\"");
-					throw new InvalidCredentialsException(builder.toString());
+			if (postBody.length() > 0) {
+				if (postBody.toLowerCase(Locale.ROOT).contains("password is incorrect")) {
+					throw new InvalidCredentialsException("Username or password is incorrect");
+				} else if (postBody.toLowerCase(Locale.ROOT).contains("failed to log in correctly")) {
+					throw new InvalidCredentialsException("Account temporarily disabled");
 				}
 			}
 
-			String ticket = null;
-			for (String location : response.headers("location")) {
-				String[] ticketArray = location.split("ticket=");
-				if (ticketArray.length > 1) {
-					ticket = ticketArray[1];
+			List<Cookie> cookies = client.cookieJar().loadForRequest(HttpUrl.parse(LOGIN_URL));
+			for (Cookie cookie : cookies) {
+				if (cookie.name().startsWith("CASTGC")) {
+					this.tokenId = cookie.value();
+					expiresTimestamp = time.currentTimeMillis() + 7140000L;
 				}
-			}
-
-			if (ticket == null) {
-				throw new LoginFailedException("Failed to fetch token, body:" + body);
-			}
-
-			url = HttpUrl.parse(LOGIN_OAUTH).newBuilder()
-					.addQueryParameter("client_id", CLIENT_ID)
-					.addQueryParameter("redirect_uri", REDIRECT_URI)
-					.addQueryParameter("client_secret", CLIENT_SECRET)
-					.addQueryParameter("grant_type", "refreshToken")
-					.addQueryParameter("code", ticket)
-					.build();
-
-			postRequest = new Request.Builder()
-					.url(url)
-					.method("POST", reqBody)
-					.build();
-
-			try {
-				response = client.newCall(postRequest).execute();
-			} catch (IOException e) {
-				throw new LoginFailedException("Network Failure ", e);
-			}
-
-			try {
-				body = response.body().string();
-			} catch (IOException e) {
-				throw new LoginFailedException("Network failure", e);
-			}
-
-			String[] params;
-			try {
-				params = body.split("&");
-				int expire = Integer.valueOf(params[1].split("=")[1]);
-				tokenId = params[0].split("=")[1];
-				expiresTimestamp = time.currentTimeMillis() + (expire * 1000 - REFRESH_TOKEN_BUFFER_TIME);
-				unknown2 = expire;
-				if (random.nextDouble() > 0.1) {
-					unknown2 = UK2_VALUES[random.nextInt(UK2_VALUES.length)];
-				}
-			} catch (Exception e) {
-				throw new LoginFailedException("Failed to fetch token, body:" + body);
 			}
 		} catch (LoginFailedException e) {
 			if (shouldRetry && attempt < MAXIMUM_RETRIES) {
@@ -310,7 +254,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 		}
 
 		authbuilder.setProvider("ptc");
-		authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(tokenId).setUnknown2(unknown2).build());
+		authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(tokenId).setUnknown2(59).build());
 
 		return authbuilder.build();
 	}
