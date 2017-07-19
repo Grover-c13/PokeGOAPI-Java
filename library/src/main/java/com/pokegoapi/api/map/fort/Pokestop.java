@@ -15,45 +15,18 @@
 
 package com.pokegoapi.api.map.fort;
 
-import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
 import POGOProtos.Inventory.Item.ItemIdOuterClass;
-import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
 import POGOProtos.Map.Fort.FortDataOuterClass;
 import POGOProtos.Map.Fort.FortModifierOuterClass;
-import POGOProtos.Networking.Requests.Messages.AddFortModifierMessageOuterClass.AddFortModifierMessage;
-import POGOProtos.Networking.Requests.Messages.FortDetailsMessageOuterClass.FortDetailsMessage;
-import POGOProtos.Networking.Requests.Messages.FortSearchMessageOuterClass.FortSearchMessage;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.AddFortModifierResponseOuterClass.AddFortModifierResponse;
-import POGOProtos.Networking.Responses.AddFortModifierResponseOuterClass.AddFortModifierResponse.Result;
-import POGOProtos.Networking.Responses.FortDetailsResponseOuterClass;
-import POGOProtos.Networking.Responses.FortSearchResponseOuterClass;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.listener.PokestopListener;
 import com.pokegoapi.exceptions.request.RequestFailedException;
-import com.pokegoapi.google.common.geometry.S2LatLng;
-import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.util.AsyncHelper;
-import lombok.Getter;
-import rx.Observable;
-import rx.exceptions.Exceptions;
-import rx.functions.Func1;
 
 import java.util.List;
 
 /**
  * Created by mjmfighter on 7/20/2016.
  */
-public class Pokestop {
-
-	private final PokemonGo api;
-	@Getter
-	private final FortDataOuterClass.FortData fortData;
-	@Getter
-	private long cooldownCompleteTimestampMs;
+public class Pokestop extends Fort{
 
 	/**
 	 * Instantiates a new Pokestop.
@@ -62,206 +35,9 @@ public class Pokestop {
 	 * @param fortData the fort data
 	 */
 	public Pokestop(PokemonGo api, FortDataOuterClass.FortData fortData) {
-		this.api = api;
-		this.fortData = fortData;
-		this.cooldownCompleteTimestampMs = fortData.getCooldownCompleteTimestampMs();
+		super(api, fortData);		
 	}
-
-	/**
-	 * Returns the distance to a pokestop.
-	 *
-	 * @return the calculated distance
-	 */
-	public double getDistance() {
-		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
-		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
-		return pokestop.getEarthDistance(player);
-	}
-
-	/**
-	 * Returns whether or not a pokestop is in range.
-	 *
-	 * @return true when in range of player
-	 */
-	public boolean inRange() {
-		return getDistance() <= api.getSettings().getFortSettings().getInteractionRangeInMeters();
-	}
-
-	/**
-	 * Returns whether or not the lured pokemon is in range.
-	 *
-	 * @return true when the lured pokemon is in range of player
-	 */
-	public boolean inRangeForLuredPokemon() {
-		return getDistance() <= api.getSettings().getMapSettings().getPokemonVisibilityRange();
-	}
-
-	/**
-	 * can user loot this from current position.
-	 *
-	 * @return true when lootable
-	 */
-	public boolean canLoot() {
-		return canLoot(false);
-	}
-
-	/**
-	 * Can loot boolean.
-	 *
-	 * @param ignoreDistance the ignore distance
-	 * @return the boolean
-	 */
-	public boolean canLoot(boolean ignoreDistance) {
-		boolean active = cooldownCompleteTimestampMs < api.currentTimeMillis();
-		if (!ignoreDistance) {
-			return active && inRange();
-		}
-		return active;
-	}
-
-	public String getId() {
-		return fortData.getId();
-	}
-
-	public double getLatitude() {
-		return fortData.getLatitude();
-	}
-
-	public double getLongitude() {
-		return fortData.getLongitude();
-	}
-
-	/**
-	 * Loots a pokestop for pokeballs and other items.
-	 *
-	 * @return PokestopLootResult
-	 */
-	public Observable<PokestopLootResult> lootAsync() {
-		FortSearchMessage searchMessage = FortSearchMessage.newBuilder()
-				.setFortId(getId())
-				.setFortLatitude(getLatitude())
-				.setFortLongitude(getLongitude())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
-				.build();
-
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH,
-				searchMessage);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest, true).map(
-				new Func1<ByteString, PokestopLootResult>() {
-					@Override
-					public PokestopLootResult call(ByteString result) {
-						FortSearchResponseOuterClass.FortSearchResponse response;
-						try {
-							response = FortSearchResponseOuterClass.FortSearchResponse.parseFrom(result);
-						} catch (InvalidProtocolBufferException e) {
-							throw Exceptions.propagate(e);
-						}
-						cooldownCompleteTimestampMs = response.getCooldownCompleteTimestampMs();
-						PokestopLootResult lootResult = new PokestopLootResult(response);
-						List<PokestopListener> listeners = api.getListeners(PokestopListener.class);
-						for (PokestopListener listener : listeners) {
-							// listener.onLoot(lootResult);
-							// return the pokestop, also change in listener
-							listener.onLoot(lootResult, Pokestop.this);
-						}
-						return lootResult;
-					}
-				});
-	}
-
-	/**
-	 * Loots a pokestop for pokeballs and other items.
-	 *
-	 * @return PokestopLootResult
-	 * @throws RequestFailedException if an exception occurred while sending requests
-	 */
-	public PokestopLootResult loot() throws RequestFailedException {
-		return AsyncHelper.toBlocking(lootAsync());
-	}
-
-	/**
-	 * Adds a modifier to this pokestop. (i.e. add a lure module)
-	 *
-	 * @param item the modifier to add to this pokestop
-	 * @return true if success
-	 */
-	public Observable<Boolean> addModifierAsync(ItemId item) {
-		AddFortModifierMessage msg = AddFortModifierMessage.newBuilder()
-				.setModifierType(item)
-				.setFortId(getId())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
-				.build();
-		ServerRequest serverRequest = new ServerRequest(RequestType.ADD_FORT_MODIFIER, msg);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, Boolean>() {
-			@Override
-			public Boolean call(ByteString result) {
-				try {
-					AddFortModifierResponse response = AddFortModifierResponse.parseFrom(result);
-					return response.getResult() == Result.SUCCESS;
-				} catch (InvalidProtocolBufferException e) {
-					throw Exceptions.propagate(e);
-				}
-			}
-		});
-	}
-
-	/**
-	 * Adds a modifier to this pokestop. (i.e. add a lure module)
-	 *
-	 * @param item the modifier to add to this pokestop
-	 * @throws RequestFailedException if an exception occurred while sending requests
-	 */
-	public void addModifier(ItemId item) throws RequestFailedException {
-		AsyncHelper.toBlocking(addModifierAsync(item));
-	}
-
-	/**
-	 * Get more detailed information about a pokestop.
-	 *
-	 * @return FortDetails
-	 */
-	public Observable<FortDetails> getDetailsAsync() {
-		FortDetailsMessage reqMsg = FortDetailsMessage.newBuilder()
-				.setFortId(getId())
-				.setLatitude(getLatitude())
-				.setLongitude(getLongitude())
-				.build();
-
-		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS,
-				reqMsg);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest, true).map(
-				new Func1<ByteString, FortDetails>() {
-					@Override
-					public FortDetails call(ByteString result) {
-						FortDetailsResponseOuterClass.FortDetailsResponse response = null;
-						try {
-							response = FortDetailsResponseOuterClass.FortDetailsResponse.parseFrom(result);
-						} catch (InvalidProtocolBufferException e) {
-							throw Exceptions.propagate(e);
-						}
-						return new FortDetails(response);
-					}
-				});
-	}
-
-
-	/**
-	 * Get more detailed information about a pokestop.
-	 *
-	 * @return FortDetails for this Pokestop
-	 * @throws RequestFailedException if an exception occurred while sending requests
-	 */
-	public FortDetails getDetails() throws RequestFailedException {
-		List<TutorialState> tutorialStates = api.getPlayerProfile().getTutorialState().getTutorialStates();
-		if (!tutorialStates.contains(TutorialState.POKESTOP_TUTORIAL)) {
-			api.getPlayerProfile().visitPokestopComplete();
-		}
-
-		return AsyncHelper.toBlocking(getDetailsAsync());
-	}
-
+	
 	/**
 	 * Returns whether this pokestop has an active lure.
 	 *
@@ -269,7 +45,7 @@ public class Pokestop {
 	 */
 	@Deprecated
 	public boolean hasLurePokemon() {
-		return fortData.hasLureInfo() && fortData.getLureInfo().getLureExpiresTimestampMs() > api.currentTimeMillis();
+		return getFortData().hasLureInfo() && getFortData().getLureInfo().getLureExpiresTimestampMs() > getApi().currentTimeMillis();
 	}
 
 	/**
@@ -285,6 +61,15 @@ public class Pokestop {
 		}
 	}
 
+	/**
+	 * Returns whether or not the lured pokemon is in range.
+	 *
+	 * @return true when the lured pokemon is in range of player
+	 */
+	public boolean inRangeForLuredPokemon() {
+		return getDistance() <= getApi().getSettings().getMapSettings().getPokemonVisibilityRange();
+	}
+	
 	/**
 	 * Returns whether this pokestop has an active lure.
 	 *
@@ -304,7 +89,7 @@ public class Pokestop {
 			return false;
 		}
 
-		return fortData.getActiveFortModifierList()
+		return getFortData().getActiveFortModifierList()
 				.contains(ItemIdOuterClass.ItemId.ITEM_TROY_DISK);
 	}
 
