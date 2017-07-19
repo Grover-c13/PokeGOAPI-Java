@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Created by mjmfighter on 7/20/2016.
  */
-public class Pokestop extends Fort{
+public class Pokestop extends Fort {
 
 	/**
 	 * Instantiates a new Pokestop.
