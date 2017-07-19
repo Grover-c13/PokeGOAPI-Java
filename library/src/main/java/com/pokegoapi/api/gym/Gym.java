@@ -31,6 +31,7 @@ import POGOProtos.Networking.Responses.GymGetInfoResponseOuterClass.GymGetInfoRe
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.map.fort.Fort;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.InsufficientLevelException;
 import com.pokegoapi.exceptions.request.RequestFailedException;
@@ -43,10 +44,8 @@ import rx.functions.Func1;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Gym implements MapPoint {
-	private FortData proto;
+public class Gym extends Fort implements MapPoint {
 	private GymGetInfoResponse details;
-	private PokemonGo api;
 	private long points;
 
 	/**
@@ -56,39 +55,23 @@ public class Gym implements MapPoint {
 	 * @param proto The FortData to populate the Gym with.
 	 */
 	public Gym(PokemonGo api, FortData proto) {
-		this.api = api;
-		this.proto = proto;
-		this.points = proto.getGymPoints();
-	}
-
-	public String getId() {
-		return proto.getId();
-	}
-
-	@Override
-	public double getLatitude() {
-		return proto.getLatitude();
-	}
-
-	@Override
-	public double getLongitude() {
-		return proto.getLongitude();
-	}
+		super (api, proto);
+	}	
 
 	public boolean getEnabled() {
-		return proto.getEnabled();
+		return getFortData().getEnabled();
 	}
 
 	public TeamColorOuterClass.TeamColor getOwnedByTeam() {
-		return proto.getOwnedByTeam();
+		return getFortData().getOwnedByTeam();
 	}
 
 	public PokemonIdOuterClass.PokemonId getGuardPokemonId() {
-		return proto.getGuardPokemonId();
+		return getFortData().getGuardPokemonId();
 	}
 
 	public int getGuardPokemonCp() {
-		return proto.getGuardPokemonCp();
+		return getFortData().getGuardPokemonCp();
 	}
 
 	public long getPoints() {
@@ -96,7 +79,7 @@ public class Gym implements MapPoint {
 	}
 
 	public boolean getIsInBattle() {
-		return proto.getIsInBattle();
+		return getFortData().getIsInBattle();
 	}
 
 	public boolean isAttackable() throws RequestFailedException {
@@ -109,11 +92,11 @@ public class Gym implements MapPoint {
 	 * @return the battle object
 	 */
 	public Battle battle() {
-		int minimumPlayerLevel = api.getItemTemplates().getBattleSettings().getMinimumPlayerLevel();
-		if (api.getPlayerProfile().getLevel() < minimumPlayerLevel) {
+		int minimumPlayerLevel = getApi().getItemTemplates().getBattleSettings().getMinimumPlayerLevel();
+		if (getApi().getPlayerProfile().getLevel() < minimumPlayerLevel) {
 			throw new InsufficientLevelException("You must be at least " + minimumPlayerLevel + " to battle a gym!");
 		}
-		return new Battle(api, this);
+		return new Battle(getApi(), this);
 	}
 
 	/**
@@ -125,9 +108,9 @@ public class Gym implements MapPoint {
 	}
 
 	private GymGetInfoResponse details() throws RequestFailedException {
-		List<TutorialState> tutorialStates = api.getPlayerProfile().getTutorialState().getTutorialStates();
+		List<TutorialState> tutorialStates = getApi().getPlayerProfile().getTutorialState().getTutorialStates();
 		if (!tutorialStates.contains(TutorialState.GYM_TUTORIAL)) {
-			api.getPlayerProfile().visitGymComplete();
+			getApi().getPlayerProfile().visitGymComplete();
 		}
 
 		if (details == null) {
@@ -136,12 +119,12 @@ public class Gym implements MapPoint {
 					.setGymId(this.getId())
 					.setGymLatDegrees(this.getLatitude())
 					.setGymLngDegrees(this.getLongitude())
-					.setPlayerLatDegrees(api.getLatitude())
-					.setPlayerLngDegrees(api.getLongitude())
+					.setPlayerLatDegrees(getApi().getLatitude())
+					.setPlayerLngDegrees(getApi().getLongitude())
 					.build();
 
 			ServerRequest serverRequest = new ServerRequest(RequestType.GYM_GET_INFO, reqMsg);
-			api.getRequestHandler().sendServerRequests(serverRequest, true);
+			getApi().getRequestHandler().sendServerRequests(serverRequest, true);
 
 			try {
 				details = GymGetInfoResponse.parseFrom(serverRequest.getData());
@@ -152,28 +135,11 @@ public class Gym implements MapPoint {
 
 		return details;
 	}
-
-	public String getName() throws RequestFailedException {
-		return details().getName();
-	}	
-
-	public String getUrlsList() throws RequestFailedException {
-		return details().getUrl();
-	}
-
+	
 	public GymGetInfoResponse.Result getResult() throws RequestFailedException {
 		return details().getResult();
 	}
-
-	public boolean inRange() throws RequestFailedException {
-		GymGetInfoResponse.Result result = getResult();
-		return (result != GymGetInfoResponse.Result.ERROR_NOT_IN_RANGE);
-	}
 	
-	public String getDescription() throws RequestFailedException {
-		return details().getDescription();
-	}
-
 	public List<GymDefender> getGymMembers()
 			throws RequestFailedException {
 		return details().getGymStatusAndDefenders().getGymDefenderList();
@@ -205,13 +171,13 @@ public class Gym implements MapPoint {
 	public FortDeployPokemonResponse.Result deployPokemon(Pokemon pokemon) throws RequestFailedException {
 		FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
 				.setFortId(getId())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
+				.setPlayerLatitude(getApi().getLatitude())
+				.setPlayerLongitude(getApi().getLongitude())
 				.setPokemonId(pokemon.getId())
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.FORT_DEPLOY_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest, true);
+		getApi().getRequestHandler().sendServerRequests(serverRequest, true);
 
 		try {
 			return FortDeployPokemonResponse.parseFrom(serverRequest.getData()).getResult();
@@ -232,13 +198,13 @@ public class Gym implements MapPoint {
 			throws RequestFailedException {
 		FortDeployPokemonMessage reqMsg = FortDeployPokemonMessage.newBuilder()
 				.setFortId(getId())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
+				.setPlayerLatitude(getApi().getLatitude())
+				.setPlayerLongitude(getApi().getLongitude())
 				.setPokemonId(pokemon.getId())
 				.build();
 
 		ServerRequest asyncServerRequest = new ServerRequest(RequestType.FORT_DEPLOY_POKEMON, reqMsg);
-		return api.getRequestHandler()
+		return getApi().getRequestHandler()
 				.sendAsyncServerRequests(asyncServerRequest)
 				.map(new Func1<ByteString, FortDeployPokemonResponse.Result>() {
 
@@ -257,10 +223,6 @@ public class Gym implements MapPoint {
 
 	}
 
-	protected PokemonGo getApi() {
-		return api;
-	}
-
 	/**
 	 * Updates this gym's point count by the given delta
 	 *
@@ -276,7 +238,7 @@ public class Gym implements MapPoint {
 	 * @param state the state to update from
 	 */
 	public void updateState(GymState state) {
-		proto = state.getFortData();
+		setFortData(state.getFortData());
 		clearDetails();
 	}
 
