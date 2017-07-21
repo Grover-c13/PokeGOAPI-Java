@@ -63,11 +63,11 @@ public class ScanRaidExample {
 				if (count > 60) {
 					throw new Exception("Get Map Timeout !");
 				}
-				if (api.getMap().getMapObjects().getRaids().size() != 0) {
-					count++;
-					Thread.sleep(1000);
+				if (api.getMap().getMapObjects().getRaids().size() != 0) {					
 					break;
 				}
+				count++;
+				Thread.sleep(1000);
 			} while (true);
 			
 			/*
