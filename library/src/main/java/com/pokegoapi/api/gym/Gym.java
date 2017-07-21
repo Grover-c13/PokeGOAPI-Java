@@ -23,14 +23,18 @@ import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
 import POGOProtos.Map.Pokemon.MotivatedPokemonOuterClass.MotivatedPokemon;
 import POGOProtos.Networking.Requests.Messages.FortDeployPokemonMessageOuterClass.FortDeployPokemonMessage;
+import POGOProtos.Networking.Requests.Messages.GymFeedPokemonMessageOuterClass.GymFeedPokemonMessage;
 import POGOProtos.Networking.Requests.Messages.GymGetInfoMessageOuterClass.GymGetInfoMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.FortDeployPokemonResponseOuterClass.FortDeployPokemonResponse;
+import POGOProtos.Networking.Responses.GymFeedPokemonResponseOuterClass.GymFeedPokemonResponse;
+import POGOProtos.Networking.Responses.GymFeedPokemonResponseOuterClass.GymFeedPokemonResponse.Result;
 import POGOProtos.Networking.Responses.GymGetInfoResponseOuterClass.GymGetInfoResponse;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
+import com.pokegoapi.api.inventory.Item;
 import com.pokegoapi.api.map.fort.Fort;
 import com.pokegoapi.api.pokemon.Pokemon;
 import com.pokegoapi.exceptions.InsufficientLevelException;
@@ -46,6 +50,7 @@ import java.util.List;
 
 public class Gym extends Fort implements MapPoint {
 	private GymGetInfoResponse details;
+	private GymFeedPokemonResponse feedPokemon;
 	private long points;
 
 	/**
@@ -55,7 +60,7 @@ public class Gym extends Fort implements MapPoint {
 	 * @param proto The FortData to populate the Gym with.
 	 */
 	public Gym(PokemonGo api, FortData proto) {
-		super (api, proto);
+		super(api, proto);
 	}	
 
 	public boolean getEnabled() {
@@ -161,6 +166,50 @@ public class Gym extends Fort implements MapPoint {
 		return data;
 	}
 
+	private int getStartQuantity(Item item) throws RequestFailedException {				
+		return getApi().getInventories().getItemBag().getItem(item.getItemId()).getCount();		
+	}
+	
+	private GymFeedPokemonResponse getFeedPokemon(Item item, MotivatedPokemon motivatedPokemon) 
+			throws RequestFailedException {
+		List<TutorialState> tutorialStates = getApi().getPlayerProfile().getTutorialState().getTutorialStates();
+		if (!tutorialStates.contains(TutorialState.GYM_TUTORIAL)) {
+			getApi().getPlayerProfile().visitGymComplete();
+		}
+		int startingQuantity = getStartQuantity(item);
+		if (startingQuantity > 0) {
+			GymFeedPokemonMessage reqMsg = GymFeedPokemonMessage
+					.newBuilder()
+					.setGymId(this.getId())
+					.setItem(item.getItemId())
+					.setPlayerLatDegrees(getApi().getLatitude())
+					.setPlayerLngDegrees(getApi().getLongitude())
+					.setPokemonId(motivatedPokemon.getPokemon().getId())
+					.setStartingQuantity(startingQuantity)				
+					.build();
+	
+			ServerRequest serverRequest = new ServerRequest(RequestType.GYM_FEED_POKEMON, reqMsg);
+			getApi().getRequestHandler().sendServerRequests(serverRequest, true);
+	
+			try {
+				feedPokemon = GymFeedPokemonResponse.parseFrom(serverRequest.getData());
+				if (feedPokemon.getResult().equals(Result.SUCCESS)) {
+					item.setCount(startingQuantity - 1);
+				}
+			} catch (InvalidProtocolBufferException e) {
+				throw new RequestFailedException();
+			}
+		} else {
+			throw new RequestFailedException("Not Enough Item");
+		}
+		return feedPokemon;
+	}
+	
+	public GymFeedPokemonResponse feed(Item item, MotivatedPokemon pokemonData) 
+			throws RequestFailedException {
+		return getFeedPokemon(item, pokemonData);
+	}
+	
 	/**
 	 * Deploy pokemon
 	 *
