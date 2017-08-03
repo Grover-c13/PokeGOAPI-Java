@@ -51,7 +51,7 @@ protobuf {
     // Configure the protoc executable
     protoc {
         // Download from repositories
-        artifact = 'com.google.protobuf:protoc:3.0.0-beta-3'
+        artifact = 'com.google.protobuf:protoc:3.3.0'
     }
 }
 
@@ -96,7 +96,7 @@ dependencies {
     compile 'com.squareup.moshi:moshi:1.2.0'
     compile 'com.annimon:stream:1.1.1'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
-    compile 'com.google.protobuf:protobuf-java:3.0.0-beta-3'
+    compile 'com.google.protobuf:protobuf-java:3.3.0'
     compile 'io.reactivex:rxjava:1.1.8'
     compile 'net.jpountz.lz4:lz4:1.3.0'
     compileOnly 'org.projectlombok:lombok:1.16.10'
