@@ -16,32 +16,18 @@
 package com.pokegoapi.main;
 
 public class RequestIdGenerator {
-	private static final int MULTIPLIER = 16807;
-	private static final int MODULUS = 0x7FFFFFFF;
-	private static final int MQ = (int) Math.floor(MODULUS / MULTIPLIER);
-	private static final int MR = MODULUS % MULTIPLIER;
-	private int seed;
-	private int count = 2;
+	private static final long MULTIPLIER = 16807;
+	private static final long MODULUS = 0x7FFFFFFF;
 
-	/**
-	 * Creates request id generator with an inital seed
-	 * @param seed the initial seed
-	 */
-	public RequestIdGenerator(int seed) {
-		this.seed = seed;
-	}
+	private long rpcIdHigh = 1;
+	private long rpcId = 2;
 
 	/**
 	 * Generates next request id and increments count
 	 * @return the next request id
 	 */
 	public long next() {
-		int temp = MULTIPLIER * (this.seed % MQ) - (MR * (int) Math.floor(this.seed / MQ));
-		if (temp > 0) {
-			this.seed = temp;
-		} else {
-			this.seed = temp + MODULUS;
-		}
-		return this.count++ | (long) this.seed << 32;
+		rpcIdHigh = MULTIPLIER * rpcIdHigh % MODULUS;
+		return rpcId++ | (rpcIdHigh << 32);
 	}
 }

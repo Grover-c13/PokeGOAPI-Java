@@ -67,7 +67,7 @@ public class RequestHandler implements Runnable {
 
 	private boolean active = true;
 
-	private RequestIdGenerator requestIdGenerator = new RequestIdGenerator(16807);
+	private RequestIdGenerator requestIdGenerator = new RequestIdGenerator();
 
 	/**
 	 * Instantiates a new Request handler.

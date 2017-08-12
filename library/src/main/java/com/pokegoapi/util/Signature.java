@@ -121,7 +121,7 @@ public class Signature {
 
 		if (usePtr8) {
 			ByteString ptr8 = UnknownPtr8RequestOuterClass.UnknownPtr8Request.newBuilder()
-					.setMessage("90f6a704505bccac73cec99b07794993e6fd5a12")
+					.setMessage("15c79df0558009a4242518d2ab65de2a59e09499")
 					.build()
 					.toByteString();
 			builder.addPlatformRequests(RequestEnvelope.PlatformRequest.newBuilder()
