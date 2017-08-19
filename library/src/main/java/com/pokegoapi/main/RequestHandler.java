@@ -38,6 +38,7 @@ import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.util.AsyncHelper;
 import com.pokegoapi.util.Log;
 import com.pokegoapi.util.Signature;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -56,6 +57,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class RequestHandler implements Runnable {
 	private static final String API_ENDPOINT = "https://pgorelease.nianticlabs.com/plfe/rpc";
 	private static final int THROTTLE = 350;
+	private static final MediaType BINARY_MEDIA = MediaType.parse("application/binary");
 	private static final String TAG = RequestHandler.class.getSimpleName();
 	private final PokemonGo api;
 	private final Thread asyncHttpThread;
@@ -206,7 +208,7 @@ public class RequestHandler implements Runnable {
 			Log.wtf(TAG, "Failed to write request to bytearray ouput stream. This should never happen", e);
 		}
 
-		RequestBody body = RequestBody.create(null, stream.toByteArray());
+		RequestBody body = RequestBody.create(BINARY_MEDIA, stream.toByteArray());
 		okhttp3.Request httpRequest = new okhttp3.Request.Builder()
 				.url(apiEndpoint)
 				.post(body)
