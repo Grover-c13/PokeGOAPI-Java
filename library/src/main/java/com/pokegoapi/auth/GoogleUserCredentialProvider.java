@@ -227,7 +227,7 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 
 	@Override
 	public String getTokenId(boolean refresh) throws LoginFailedException, InvalidCredentialsException {
-		if (refresh || isTokenIdExpired()) {
+		if (refresh || isTokenIdInvalid()) {
 			refreshToken(refreshToken);
 		}
 		return tokenId;
@@ -244,7 +244,7 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 	@Override
 	public AuthInfo getAuthInfo(boolean refresh)
 			throws LoginFailedException, InvalidCredentialsException {
-		if (refresh || isTokenIdExpired()) {
+		if (refresh || isTokenIdInvalid()) {
 			refreshToken(refreshToken);
 		}
 		authbuilder.setProvider("google");
@@ -254,7 +254,12 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 
 	@Override
 	public boolean isTokenIdExpired() {
-		return time.currentTimeMillis() > expiresTimestamp;
+		return isTokenIdInvalid();
+	}
+
+	@Override
+	public boolean isTokenIdInvalid() {
+		return tokenId == null || time.currentTimeMillis() > expiresTimestamp;
 	}
 
 	@Override

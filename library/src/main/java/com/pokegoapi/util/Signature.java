@@ -92,7 +92,8 @@ public class Signature {
 				.setDeviceInfo(api.getDeviceInfo())
 				.addAllLocationFix(LocationFixes.getDefault(api, builder, currentTimeMillis, RANDOM))
 				.setActivityStatus(api.getActivitySignature(RANDOM))
-				.setUnknown25(provider.getUNK25());
+				.setUnknown25(provider.getUNK25())
+				.setUnknown27(RANDOM.nextInt(59000) + 1000); // Currently random, generation is unknown
 
 		final SignatureOuterClass.Signature.SensorInfo sensorInfo = SensorInfo.getDefault(api, currentTimeMillis,
 				RANDOM);

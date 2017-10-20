@@ -27,9 +27,9 @@ import POGOProtos.Inventory.InventoryItemDataOuterClass.InventoryItemData;
 import POGOProtos.Inventory.InventoryItemOuterClass.InventoryItem;
 import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
-import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
+import POGOProtos.Networking.Requests.Messages.GetHoloInventoryMessageOuterClass.GetHoloInventoryMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
+import POGOProtos.Networking.Responses.GetHoloInventoryResponseOuterClass.GetHoloInventoryResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.EggPokemon;
@@ -90,7 +90,7 @@ public class Inventories {
 	 * @return the response to the update message
 	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
-	public GetInventoryResponse updateInventories() throws RequestFailedException {
+	public GetHoloInventoryResponse updateInventories() throws RequestFailedException {
 		return updateInventories(false);
 	}
 
@@ -103,7 +103,7 @@ public class Inventories {
 	 * @deprecated Inventory is updated as a common request
 	 */
 	@Deprecated
-	public GetInventoryResponse updateInventories(boolean forceUpdate)
+	public GetHoloInventoryResponse updateInventories(boolean forceUpdate)
 			throws RequestFailedException {
 		if (forceUpdate) {
 			lastInventoryUpdate = 0;
@@ -116,15 +116,15 @@ public class Inventories {
 			}
 			hatchery.reset();
 		}
-		GetInventoryMessage invReqMsg = GetInventoryMessage.newBuilder()
+		GetHoloInventoryMessage invReqMsg = GetHoloInventoryMessage.newBuilder()
 				.setLastTimestampMs(lastInventoryUpdate)
 				.build();
-		ServerRequest inventoryRequest = new ServerRequest(RequestType.GET_INVENTORY, invReqMsg);
+		ServerRequest inventoryRequest = new ServerRequest(RequestType.GET_HOLO_INVENTORY, invReqMsg);
 		api.getRequestHandler().sendServerRequests(inventoryRequest, false);
 
-		GetInventoryResponse response;
+		GetHoloInventoryResponse response;
 		try {
-			response = GetInventoryResponse.parseFrom(inventoryRequest.getData());
+			response = GetHoloInventoryResponse.parseFrom(inventoryRequest.getData());
 		} catch (InvalidProtocolBufferException e) {
 			throw new RequestFailedException(e);
 		}
@@ -138,7 +138,7 @@ public class Inventories {
 	 * @param response the get inventory response
 	 * @throws RequestFailedException if a request fails while sending a request
 	 */
-	public void updateInventories(GetInventoryResponse response) throws RequestFailedException {
+	public void updateInventories(GetHoloInventoryResponse response) throws RequestFailedException {
 		lastInventoryUpdate = api.currentTimeMillis();
 
 		for (InventoryItem inventoryItem : response.getInventoryDelta().getInventoryItemsList()) {

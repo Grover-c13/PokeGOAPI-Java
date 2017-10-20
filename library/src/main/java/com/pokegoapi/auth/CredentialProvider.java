@@ -28,7 +28,13 @@ public abstract class CredentialProvider {
 
 	public abstract AuthInfo getAuthInfo(boolean refresh) throws LoginFailedException, InvalidCredentialsException;
 
+	/**
+	 * @deprecated Use {@link CredentialProvider#isTokenIdInvalid()}
+	 */
+	@Deprecated
 	public abstract boolean isTokenIdExpired();
+
+	public abstract boolean isTokenIdInvalid();
 
 	public abstract void reset();
 }

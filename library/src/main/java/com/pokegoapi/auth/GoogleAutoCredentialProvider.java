@@ -102,7 +102,7 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	 */
 	@Override
 	public String getTokenId(boolean refresh) throws LoginFailedException, InvalidCredentialsException {
-		if (refresh || isTokenIdExpired()) {
+		if (refresh || isTokenIdInvalid()) {
 			this.tokenInfo = refreshToken(username, tokenInfo.refreshToken);
 		}
 		return tokenInfo.authToken.getToken();
@@ -124,7 +124,12 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 
 	@Override
 	public boolean isTokenIdExpired() {
-		return tokenInfo.authToken.getExpiry() < time.currentTimeMillis() / 1000;
+		return isTokenIdInvalid();
+	}
+
+	@Override
+	public boolean isTokenIdInvalid() {
+		return tokenInfo == null || tokenInfo.authToken.getExpiry() < time.currentTimeMillis() / 1000;
 	}
 
 	@Override
