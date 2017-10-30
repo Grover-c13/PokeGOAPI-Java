@@ -22,7 +22,7 @@ import POGOProtos.Inventory.InventoryItemDataOuterClass.InventoryItemData;
 import POGOProtos.Inventory.InventoryItemOuterClass.InventoryItem;
 import POGOProtos.Networking.Requests.Messages.ReleasePokemonMessageOuterClass.ReleasePokemonMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
+import POGOProtos.Networking.Responses.GetHoloInventoryResponseOuterClass.GetHoloInventoryResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
 import com.annimon.stream.Collectors;
@@ -39,6 +39,7 @@ import com.pokegoapi.main.ServerResponse;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -166,15 +167,13 @@ public class PokeBank {
 		Map<PokemonFamilyId, Integer> lastCandies = new HashMap<>(api.getInventories().getCandyjar().getCandies());
 		ServerResponse response = api.getRequestHandler().sendServerRequests(envelope);
 		try {
-			ByteString inventoryData = response.get(RequestType.GET_INVENTORY);
-			GetInventoryResponse inventoryResponse = GetInventoryResponse.parseFrom(inventoryData);
+			ByteString inventoryData = response.get(RequestType.GET_HOLO_INVENTORY);
+			GetHoloInventoryResponse inventoryResponse = GetHoloInventoryResponse.parseFrom(inventoryData);
 			ReleasePokemonResponse releaseResponse = ReleasePokemonResponse.parseFrom(releaseRequest.getData());
 			Map<PokemonFamilyId, Integer> candyCount = new HashMap<>();
 			if (releaseResponse.getResult() == Result.SUCCESS && inventoryResponse.getSuccess()) {
 				synchronized (this.lock) {
-					for (Pokemon pokemon : releasePokemon) {
-						this.pokemons.remove(pokemon);
-					}
+					this.pokemons.removeAll(Arrays.asList(releasePokemon));
 				}
 				for (Pokemon pokemon : releasePokemon) {
 					api.getInventories().getPokebank().removePokemon(pokemon);

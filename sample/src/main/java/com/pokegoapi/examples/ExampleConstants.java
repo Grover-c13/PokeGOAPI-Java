@@ -16,7 +16,6 @@
 package com.pokegoapi.examples;
 
 import com.pokegoapi.util.hash.HashProvider;
-import com.pokegoapi.util.hash.legacy.LegacyHashProvider;
 import com.pokegoapi.util.hash.pokehash.PokeHashKey;
 import com.pokegoapi.util.hash.pokehash.PokeHashProvider;
 
@@ -37,11 +36,9 @@ public class ExampleConstants {
 	 * @return a hash provider
 	 */
 	public static HashProvider getHashProvider() {
-		boolean hasKey = POKEHASH_KEY != null && POKEHASH_KEY.length() > 0;
-		if (hasKey) {
+		if (POKEHASH_KEY != null && POKEHASH_KEY.length() > 0) {
 			return new PokeHashProvider(PokeHashKey.from(POKEHASH_KEY), true);
-		} else {
-			return new LegacyHashProvider();
 		}
+		throw new IllegalStateException("Cannot start example without hash key");
 	}
 }

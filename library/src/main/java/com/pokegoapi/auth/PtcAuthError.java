@@ -12,29 +12,15 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package com.pokegoapi.auth;
 
-package com.pokegoapi.util;
+import lombok.Getter;
 
-import okhttp3.Interceptor;
-import okhttp3.Request;
-import okhttp3.Response;
-
-import java.io.IOException;
-
-/**
- * Created by iGio90 on 29/08/16.
- */
-
-public class ClientInterceptor implements Interceptor {
-
-	@Override
-	public Response intercept(Interceptor.Chain chain) throws IOException {
-		Request originalRequest = chain.request();
-		Request requestWithUserAgent = originalRequest.newBuilder()
-				.header("User-Agent", "Niantic App")
-				.header("Accept-Encoding", "identity, gzip")
-				.build();
-
-		return chain.proceed(requestWithUserAgent);
-	}
+public class PtcAuthError {
+	@Getter
+	private String lt;
+	@Getter
+	private String execution;
+	@Getter
+	private String[] errors;
 }

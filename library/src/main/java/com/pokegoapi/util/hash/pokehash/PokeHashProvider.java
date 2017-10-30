@@ -40,14 +40,14 @@ import java.util.List;
  * @see <a href="https://hashing.pogodev.org/">https://hashing.pogodev.org/</a>
  */
 public class PokeHashProvider implements HashProvider {
-	private static final String DEFAULT_ENDPOINT = "https://pokehash.buddyauth.com/api/v137_1/hash";
+	private static final String DEFAULT_ENDPOINT = "https://pokehash.buddyauth.com/api/v147_1/hash";
 
 	@Getter
 	@Setter
 	private String endpoint = DEFAULT_ENDPOINT;
 
-	private static final int VERSION = 6901;
-	private static final long UNK25 = 5395925083854747393L;
+	private static final int VERSION = 7903;
+	private static final long UNK25 = -6553495230586135539L;
 
 	private static final Moshi MOSHI = new Builder().build();
 
@@ -164,7 +164,7 @@ public class PokeHashProvider implements HashProvider {
 						}
 						throw new HashLimitExceededException("Exceeded hash limit!");
 					}
-				case 404:
+				case HttpURLConnection.HTTP_NOT_FOUND:
 					throw new HashException("Unknown hashing endpoint! \"" + this.endpoint + "\"");
 				default:
 					if (error.length() > 0) {

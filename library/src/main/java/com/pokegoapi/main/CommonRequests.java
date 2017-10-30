@@ -24,16 +24,16 @@ import POGOProtos.Networking.Requests.Messages.DownloadSettingsMessageOuterClass
 import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.GetAssetDigestMessage;
 import POGOProtos.Networking.Requests.Messages.GetBuddyWalkedMessageOuterClass.GetBuddyWalkedMessage;
 import POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessageOuterClass.GetHatchedEggsMessage;
+import POGOProtos.Networking.Requests.Messages.GetHoloInventoryMessageOuterClass.GetHoloInventoryMessage;
 import POGOProtos.Networking.Requests.Messages.GetIncensePokemonMessageOuterClass.GetIncensePokemonMessage;
-import POGOProtos.Networking.Requests.Messages.GetInventoryMessageOuterClass.GetInventoryMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckAwardedBadgesResponseOuterClass.CheckAwardedBadgesResponse;
 import POGOProtos.Networking.Responses.CheckChallengeResponseOuterClass.CheckChallengeResponse;
 import POGOProtos.Networking.Responses.DownloadSettingsResponseOuterClass.DownloadSettingsResponse;
 import POGOProtos.Networking.Responses.GetBuddyWalkedResponseOuterClass.GetBuddyWalkedResponse;
 import POGOProtos.Networking.Responses.GetHatchedEggsResponseOuterClass.GetHatchedEggsResponse;
+import POGOProtos.Networking.Responses.GetHoloInventoryResponseOuterClass.GetHoloInventoryResponse;
 import POGOProtos.Networking.Responses.GetIncensePokemonResponseOuterClass.GetIncensePokemonResponse;
-import POGOProtos.Networking.Responses.GetInventoryResponseOuterClass.GetInventoryResponse;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
@@ -129,9 +129,9 @@ public class CommonRequests {
 			CheckChallengeResponse checkChallenge = CheckChallengeResponse.parseFrom(data);
 			api.updateChallenge(checkChallenge.getChallengeUrl(), checkChallenge.getShowChallenge());
 		}
-		if (response.has(RequestType.GET_INVENTORY)) {
-			ByteString data = response.get(RequestType.GET_INVENTORY);
-			GetInventoryResponse inventory = GetInventoryResponse.parseFrom(data);
+		if (response.has(RequestType.GET_HOLO_INVENTORY)) {
+			ByteString data = response.get(RequestType.GET_HOLO_INVENTORY);
+			GetHoloInventoryResponse inventory = GetHoloInventoryResponse.parseFrom(data);
 			api.getInventories().updateInventories(inventory);
 		}
 		if (response.has(RequestType.CHECK_AWARDED_BADGES)) {
@@ -188,8 +188,8 @@ public class CommonRequests {
 	 */
 	public static ServerRequest getInventory(PokemonGo api) {
 		long lastUpdate = api.getInventories().getLastInventoryUpdate();
-		GetInventoryMessage message = GetInventoryMessage.newBuilder().setLastTimestampMs(lastUpdate).build();
-		return new ServerRequest(RequestType.GET_INVENTORY, message);
+		GetHoloInventoryMessage message = GetHoloInventoryMessage.newBuilder().setLastTimestampMs(lastUpdate).build();
+		return new ServerRequest(RequestType.GET_HOLO_INVENTORY, message);
 	}
 
 	/**

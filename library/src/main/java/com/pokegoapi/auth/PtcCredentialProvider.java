@@ -33,20 +33,17 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 public class PtcCredentialProvider extends CredentialProvider {
 	public static final String CLIENT_SECRET = "w8ScCUXJQc6kXKw8FiOhd8Fixzht18Dq3PEVkUCP5ZPxtgyWsbTvWHFLm2wNY0JR";
 	public static final String REDIRECT_URI = "https://www.nianticlabs.com/pokemongo/error";
 	public static final String CLIENT_ID = "mobile-app_pokemon-go";
 	public static final String SERVICE_URL = "https://sso.pokemon.com/sso/oauth2.0/callbackAuthorize";
-	public static final String LOGIN_URL = "https://sso.pokemon.com/sso/login?locale=en&service="
-			+ URLEncoder.encode(SERVICE_URL) + "";
+	public static final String LOGIN_URL = "https://sso.pokemon.com/sso/login";
 	public static final String LOGIN_OAUTH = "https://sso.pokemon.com/sso/oauth2.0/accessToken";
 	public static final String USER_AGENT = "pokemongo/1 CFNetwork/811.4.18 Darwin/16.5.0";
 	//We try and refresh token 5 minutes before it actually expires
@@ -183,9 +180,13 @@ public class PtcCredentialProvider extends CredentialProvider {
 						.add("_eventId", "submit")
 						.add("username", username)
 						.add("password", password)
+						.add("locale", "en_US")
+						.build();
+				HttpUrl loginPostUrl = HttpUrl.parse(LOGIN_URL).newBuilder()
+						.addQueryParameter("service", SERVICE_URL)
 						.build();
 				Request postRequest = new Request.Builder()
-						.url(LOGIN_URL)
+						.url(loginPostUrl)
 						.post(postForm)
 						.build();
 
@@ -207,19 +208,23 @@ public class PtcCredentialProvider extends CredentialProvider {
 				throw new LoginFailedException("Response body fetching failed", e);
 			}
 
-			if (postBody.length() > 0) {
-				if (postBody.toLowerCase(Locale.ROOT).contains("password is incorrect")) {
-					throw new InvalidCredentialsException("Username or password is incorrect");
-				} else if (postBody.toLowerCase(Locale.ROOT).contains("failed to log in correctly")) {
-					throw new InvalidCredentialsException("Account temporarily disabled");
-				}
-			}
-
 			List<Cookie> cookies = client.cookieJar().loadForRequest(HttpUrl.parse(LOGIN_URL));
 			for (Cookie cookie : cookies) {
 				if (cookie.name().startsWith("CASTGC")) {
 					this.tokenId = cookie.value();
 					expiresTimestamp = time.currentTimeMillis() + 7140000L;
+					return;
+				}
+			}
+
+			if (postBody.length() > 0) {
+				try {
+					String[] errors = moshi.adapter(PtcAuthError.class).fromJson(postBody).getErrors();
+					if (errors != null && errors.length > 0) {
+						throw new InvalidCredentialsException(errors[0]);
+					}
+				} catch (IOException e) {
+					throw new LoginFailedException("Failed to parse ptc error json");
 				}
 			}
 		} catch (LoginFailedException e) {
@@ -233,7 +238,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 
 	@Override
 	public String getTokenId(boolean refresh) throws LoginFailedException, InvalidCredentialsException {
-		if (refresh || isTokenIdExpired()) {
+		if (refresh || isTokenIdInvalid()) {
 			login(username, password, 0);
 		}
 		return tokenId;
@@ -249,7 +254,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 	 */
 	@Override
 	public AuthInfo getAuthInfo(boolean refresh) throws LoginFailedException, InvalidCredentialsException {
-		if (refresh || isTokenIdExpired()) {
+		if (refresh || isTokenIdInvalid()) {
 			login(username, password, 0);
 		}
 
@@ -261,7 +266,12 @@ public class PtcCredentialProvider extends CredentialProvider {
 
 	@Override
 	public boolean isTokenIdExpired() {
-		return time.currentTimeMillis() > expiresTimestamp;
+		return isTokenIdInvalid();
+	}
+
+	@Override
+	public boolean isTokenIdInvalid() {
+		return tokenId == null || time.currentTimeMillis() > expiresTimestamp;
 	}
 
 	@Override
