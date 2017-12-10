@@ -40,7 +40,7 @@ import java.util.List;
  * @see <a href="https://hashing.pogodev.org/">https://hashing.pogodev.org/</a>
  */
 public class PokeHashProvider implements HashProvider {
-	private static final String DEFAULT_ENDPOINT = "https://pokehash.buddyauth.com/api/v147_1/hash";
+	private static final String DEFAULT_ENDPOINT = "https://pokehash.buddyauth.com/api/v153_2/hash";
 
 	@Getter
 	@Setter
