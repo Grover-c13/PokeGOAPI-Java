@@ -53,11 +53,6 @@ public class DeviceInfo {
 
 			{"iPad7,1", "iPad", "N102AP"},
 
-			{"iPhone5,1", "iPhone", "N41AP"},
-			{"iPhone5,2", "iPhone", "N42AP"},
-			{"iPhone5,3", "iPhone", "N48AP"},
-			{"iPhone5,4", "iPhone", "N49AP"},
-
 			{"iPhone6,1", "iPhone", "N51AP"},
 			{"iPhone6,2", "iPhone", "N53AP"},
 
@@ -74,13 +69,11 @@ public class DeviceInfo {
 			{"iPhone9,4", "iPhone", "D111AP"}
 	};
 
-	private static final String[] IPHONE_OS_VERSIONS = {
-			"8.1.1", "8.1.2", "8.1.3", "8.2", "8.3", "8.4", "8.4.1",
-			"9.0", "9.0.1", "9.0.2", "9.1", "9.2", "9.2.1", "9.3", "9.3.1", "9.3.2", "9.3.3", "9.3.4"
+	private static final String[] IPHONE_OS_VERSIONS = { "9.0", "9.0.1", "9.0.2", "9.1", "9.2", "9.2.1", "9.3", "9.3.1", "9.3.2", "9.3.3", "9.3.4"
 	};
 
 	private static final String[] IOS_VERSIONS = {
-			"10.2", "10.2.1"
+			"10.2", "10.2.1", "10.3.3", "11.0", "11.1", "11.2"
 	};
 
 	private SignatureOuterClass.Signature.DeviceInfo.Builder deviceInfoBuilder;
