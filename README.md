@@ -107,18 +107,20 @@ go.login(provider);
 * you will need to store the refresh_token that you can get the first time with provider.getRefreshToken()
 * ! The API does not store the refresh token for you !
 * log in using the refresh token like this :
+* - Needs hasher - example below
 */
 PokemonGo go = new PokemonGo(httpClient);
-go.login(new GoogleUserCredentialProvider(httpClient, refreshToken));
+go.login(new GoogleUserCredentialProvider(httpClient, refreshToken), hasher);
 
 /**
 * PTC is much simpler, but less secure.
 * You will need the username and password for each user log in
 * This account does not currently support a refresh_token. 
 * Example log in :
+* - Needs hasher - example below
 */
 PokemonGo go = new PokemonGo(httpClient);
-go.login(new PtcCredentialProvider(httpClient, username, password));
+go.login(new PtcCredentialProvider(httpClient, username, password), hasher);
 
 // After this you can access the api from the PokemonGo instance :
 go.getPlayerProfile(); // to get the user profile
@@ -143,6 +145,15 @@ try {
 	// its possible that the parsing fail when servers are in high load for example.
 	throw new RemoteServerException(e);
 }
+
+public static HashProvider getHashProvider(){
+    String POKEHASH_KEY = "****************";
+    if(POKEHASH_KEY != null && POKEHASH_KEY.length() > 0){
+        return new PokeHashProvider(PokeHashKey.from(POKEHASH_KEY), true);
+    }
+    throw new IllegalStateException("Cannot start example without hash key");
+}
+
 ```
 
 ## (Async)CatchOptions
