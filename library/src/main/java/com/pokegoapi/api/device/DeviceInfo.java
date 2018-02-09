@@ -26,39 +26,6 @@ import java.util.Random;
 
 public class DeviceInfo {
 	private static final String[][] DEVICES = new String[][]{
-			{"iPad3,1", "iPad", "J1AP"},
-			{"iPad3,2", "iPad", "J2AP"},
-			{"iPad3,3", "iPad", "J2AAP"},
-			{"iPad3,4", "iPad", "P101AP"},
-			{"iPad3,5", "iPad", "P102AP"},
-			{"iPad3,6", "iPad", "P103AP"},
-
-			{"iPad4,1", "iPad", "J71AP"},
-			{"iPad4,2", "iPad", "J72AP"},
-			{"iPad4,3", "iPad", "J73AP"},
-			{"iPad4,4", "iPad", "J85AP"},
-			{"iPad4,5", "iPad", "J86AP"},
-			{"iPad4,6", "iPad", "J87AP"},
-			{"iPad4,7", "iPad", "J85mAP"},
-			{"iPad4,8", "iPad", "J86mAP"},
-			{"iPad4,9", "iPad", "J87mAP"},
-
-			{"iPad5,1", "iPad", "J96AP"},
-			{"iPad5,2", "iPad", "J97AP"},
-			{"iPad5,3", "iPad", "J81AP"},
-			{"iPad5,4", "iPad", "J82AP"},
-
-			{"iPad6,7", "iPad", "J98aAP"},
-			{"iPad6,8", "iPad", "J99aAP"},
-
-			{"iPad7,1", "iPad", "N102AP"},
-
-			{"iPhone6,1", "iPhone", "N51AP"},
-			{"iPhone6,2", "iPhone", "N53AP"},
-
-			{"iPhone7,1", "iPhone", "N56AP"},
-			{"iPhone7,2", "iPhone", "N61AP"},
-
 			{"iPhone8,1", "iPhone", "N71AP"},
 			{"iPhone8,2", "iPhone", "N66AP"},
 			{"iPhone8,4", "iPhone", "N69AP"},
@@ -69,11 +36,11 @@ public class DeviceInfo {
 			{"iPhone9,4", "iPhone", "D111AP"}
 	};
 
-	private static final String[] IPHONE_OS_VERSIONS = { "9.0", "9.0.1", "9.0.2", "9.1", "9.2", "9.2.1", "9.3", "9.3.1", "9.3.2", "9.3.3", "9.3.4"
+	private static final String[] IPHONE_OS_VERSIONS = { "11.0", "11.1", "11.2", "11.2.5", "11.3.0"
 	};
 
 	private static final String[] IOS_VERSIONS = {
-			"10.2", "10.2.1", "10.3.3", "11.0", "11.1", "11.2"
+			"11.0", "11.1", "11.2", "11.2.5", "11.3.0"
 	};
 
 	private SignatureOuterClass.Signature.DeviceInfo.Builder deviceInfoBuilder;
