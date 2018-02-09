@@ -45,7 +45,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 	public static final String SERVICE_URL = "https://sso.pokemon.com/sso/oauth2.0/callbackAuthorize";
 	public static final String LOGIN_URL = "https://sso.pokemon.com/sso/login";
 	public static final String LOGIN_OAUTH = "https://sso.pokemon.com/sso/oauth2.0/accessToken";
-	public static final String USER_AGENT = "pokemongo/1 CFNetwork/811.4.18 Darwin/16.5.0";
+	public static final String USER_AGENT = "pokemongo/1 CFNetwork/897.1 Darwin/17.5.0"; //Lasted iOS 11.3.0
 	//We try and refresh token 5 minutes before it actually expires
 	protected static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
 	protected static final int MAXIMUM_RETRIES = 5;
