@@ -156,3 +156,6 @@ fabric.properties
 
 
 *.iml
+
+-# IntelliJ
+-/out/
