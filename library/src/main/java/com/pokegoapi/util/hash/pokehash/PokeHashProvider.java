@@ -40,14 +40,14 @@ import java.util.List;
  * @see <a href="https://hashing.pogodev.org/">https://hashing.pogodev.org/</a>
  */
 public class PokeHashProvider implements HashProvider {
-	private static final String DEFAULT_ENDPOINT = "https://pokehash.buddyauth.com/api/v147_1/hash";
+	private static final String DEFAULT_ENDPOINT = "https://pokehash.buddyauth.com/api/v159_1/hash";
 
 	@Getter
 	@Setter
 	private String endpoint = DEFAULT_ENDPOINT;
 
-	private static final int VERSION = 7904;
-	private static final long UNK25 = -6553495230586135539L;
+	private static final int VERSION = 9100;
+	private static final long UNK25 = -782790124105039914L;
 
 	private static final Moshi MOSHI = new Builder().build();
 
