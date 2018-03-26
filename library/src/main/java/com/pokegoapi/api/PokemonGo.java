@@ -21,12 +21,14 @@ import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Platform.PlatformRequestTypeOuterClass.PlatformRequestType;
 import POGOProtos.Networking.Platform.Requests.GetStoreItemsRequestOuterClass.GetStoreItemsRequest;
 import POGOProtos.Networking.Requests.Messages.CheckChallengeMessageOuterClass.CheckChallengeMessage;
+import POGOProtos.Networking.Requests.Messages.FetchAllNewsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.GetAssetDigestMessage;
 import POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessageOuterClass.LevelUpRewardsMessage;
 import POGOProtos.Networking.Requests.Messages.VerifyChallengeMessageOuterClass.VerifyChallengeMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.CheckChallengeResponseOuterClass.CheckChallengeResponse;
 import POGOProtos.Networking.Responses.DownloadRemoteConfigVersionResponseOuterClass.DownloadRemoteConfigVersionResponse;
+import POGOProtos.Networking.Responses.FetchAllNewsResponseOuterClass;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse;
 import POGOProtos.Networking.Responses.LevelUpRewardsResponseOuterClass.LevelUpRewardsResponse.Result;
 import POGOProtos.Networking.Responses.VerifyChallengeResponseOuterClass.VerifyChallengeResponse;
@@ -42,6 +44,7 @@ import com.pokegoapi.api.listener.LocationListener;
 import com.pokegoapi.api.listener.LoginListener;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.map.Point;
+import com.pokegoapi.api.news.News;
 import com.pokegoapi.api.player.PlayerProfile;
 import com.pokegoapi.api.settings.Settings;
 import com.pokegoapi.api.settings.templates.ItemTemplateProvider;
@@ -56,6 +59,7 @@ import com.pokegoapi.main.ServerPlatformRequest;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.main.ServerRequestEnvelope;
 import com.pokegoapi.util.ClientInterceptor;
+import com.pokegoapi.util.Log;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import com.pokegoapi.util.hash.HashProvider;
@@ -87,7 +91,9 @@ public class PokemonGo {
 	@Getter
 	private Inventories inventories;
 	@Getter
-	private double latitude;
+    private News news;
+    @Getter
+    private double latitude;
 	@Getter
 	private double longitude;
 	@Getter
@@ -242,7 +248,8 @@ public class PokemonGo {
 		active = false;
 		new Random().nextBytes(sessionHash);
 		inventories = new Inventories(this);
-		settings = new Settings(this);
+        news = new News(this);
+        settings = new Settings(this);
 		playerProfile = new PlayerProfile(this);
 		map = new Map(this);
 		longitude = Double.NaN;
@@ -297,7 +304,27 @@ public class PokemonGo {
 
 		getRequestHandler().sendServerRequests(envelope);
 
-		List<LoginListener> loginListeners = getListeners(LoginListener.class);
+        try {
+            FetchAllNewsMessageOuterClass.FetchAllNewsMessage msg = FetchAllNewsMessageOuterClass.FetchAllNewsMessage.newBuilder().build();
+            ServerRequest request = new ServerRequest(RequestType.FETCH_ALL_NEWS, msg);
+            envelope = ServerRequestEnvelope.create(request);
+            getRequestHandler().sendServerRequests(envelope);
+            FetchAllNewsResponseOuterClass.FetchAllNewsResponse response = FetchAllNewsResponseOuterClass.FetchAllNewsResponse.parseFrom(request.getData());
+            if (response.getResult() == FetchAllNewsResponseOuterClass.FetchAllNewsResponse.Result.SUCCESS) {
+                Log.i(TAG, "FetchAllNewsMessage Success: total News=" + response.getCurrentNews().getNewsArticlesCount());
+                this.news.setCurrentNews(response.getCurrentNews());
+
+                // mark all un-read new to read
+                this.news.markUnreadNews();
+            } else {
+                Log.d(TAG, "FetchAllNewsMessage Failed. Result=" + response.getResult());
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "Exceptions FetchAllNew");
+        }
+
+
+        List<LoginListener> loginListeners = getListeners(LoginListener.class);
 
 		for (LoginListener listener : loginListeners) {
 			listener.onLogin(this);
