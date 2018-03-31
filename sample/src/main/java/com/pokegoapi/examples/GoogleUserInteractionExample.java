@@ -38,7 +38,7 @@ public class GoogleUserInteractionExample {
 			System.out.println("Please go to " + provider.LOGIN_URL);
 			System.out.println("Enter authorisation code:");
 			
-			// Ask the user to enter it in the standart input
+			// Ask the user to enter it in the standard input
 			Scanner sc = new Scanner(System.in);
 			String access = sc.nextLine();
 			
