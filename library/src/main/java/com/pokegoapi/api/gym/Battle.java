@@ -217,7 +217,7 @@ public class Battle {
 			}
 			try {
 				StartGymBattleMessage message = builder.build();
-				ServerRequest request = new ServerRequest(RequestType.START_GYM_BATTLE, message);
+				ServerRequest request = new ServerRequest(RequestType.GYM_START_SESSION, message);
 
 				api.getRequestHandler().sendServerRequests(request, true);
 				StartGymBattleResponse response = StartGymBattleResponse.parseFrom(request.getData());
@@ -577,7 +577,7 @@ public class Battle {
 		}
 		if (builder.getAttackActionsCount() > 0) {
 			AttackGymMessage message = builder.build();
-			ServerRequest request = new ServerRequest(RequestType.ATTACK_GYM, message);
+			ServerRequest request = new ServerRequest(RequestType.GYM_BATTLE_ATTACK, message);
 			api.getRequestHandler().sendServerRequests(request, true);
 			boolean nextDefender;
 			try {
