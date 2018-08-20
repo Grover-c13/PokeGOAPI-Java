@@ -167,7 +167,7 @@ public class PokeBank {
 		Map<PokemonFamilyId, Integer> lastCandies = new HashMap<>(api.getInventories().getCandyjar().getCandies());
 		ServerResponse response = api.getRequestHandler().sendServerRequests(envelope);
 		try {
-			ByteString inventoryData = response.get(RequestType.GET_HOLO_INVENTORY);
+			ByteString inventoryData = response.get(RequestType.GET_HOLOHOLO_INVENTORY);
 			GetHoloInventoryResponse inventoryResponse = GetHoloInventoryResponse.parseFrom(inventoryData);
 			ReleasePokemonResponse releaseResponse = ReleasePokemonResponse.parseFrom(releaseRequest.getData());
 			Map<PokemonFamilyId, Integer> candyCount = new HashMap<>();
