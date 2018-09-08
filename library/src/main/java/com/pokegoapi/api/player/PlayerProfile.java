@@ -56,7 +56,12 @@ import com.pokegoapi.util.Log;
 import lombok.Getter;
 
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class PlayerProfile {
 	private static final String TAG = PlayerProfile.class.getSimpleName();

@@ -33,7 +33,12 @@ import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.util.Log;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**

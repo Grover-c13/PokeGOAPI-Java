@@ -21,7 +21,11 @@ import com.pokegoapi.exceptions.request.LoginFailedException;
 import com.pokegoapi.util.Log;
 import com.squareup.moshi.Moshi;
 import lombok.Getter;
-import okhttp3.*;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

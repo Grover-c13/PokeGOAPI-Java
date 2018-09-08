@@ -1,7 +1,7 @@
 package com.pokegoapi.api.listener;
 
-import com.pokegoapi.api.map.fort.Fort;
 import com.pokegoapi.api.map.fort.PokestopLootResult;
+import com.pokegoapi.api.map.fort.Fort;
 
 /**
  * Listener for all pokestop related events.

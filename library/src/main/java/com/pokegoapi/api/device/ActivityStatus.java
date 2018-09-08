@@ -15,11 +15,12 @@
 
 package com.pokegoapi.api.device;
 
-import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
 
 import java.util.Random;
+
+import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 
 /**
  * Created by fabianterhorst on 22.08.16.
