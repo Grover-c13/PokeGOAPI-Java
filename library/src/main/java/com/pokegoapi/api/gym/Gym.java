@@ -55,7 +55,7 @@ public class Gym extends Fort implements MapPoint {
 	 * @param proto The FortData to populate the Gym with.
 	 */
 	public Gym(PokemonGo api, FortData proto) {
-		super (api, proto);
+		super(api, proto);
 	}	
 
 	public boolean getEnabled() {

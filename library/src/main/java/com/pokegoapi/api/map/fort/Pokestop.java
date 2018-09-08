@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Created by mjmfighter on 7/20/2016.
  */
-public class Pokestop extends Fort{
+public class Pokestop extends Fort {
 
 	/**
 	 * Instantiates a new Pokestop.
@@ -45,7 +45,8 @@ public class Pokestop extends Fort{
 	 */
 	@Deprecated
 	public boolean hasLurePokemon() {
-		return getFortData().hasLureInfo() && getFortData().getLureInfo().getLureExpiresTimestampMs() > getApi().currentTimeMillis();
+		return getFortData().hasLureInfo() && getFortData().getLureInfo().getLureExpiresTimestampMs() > getApi()
+				.currentTimeMillis();
 	}
 
 	/**
@@ -85,12 +86,9 @@ public class Pokestop extends Fort{
 					return true;
 				}
 			}
-
 			return false;
 		}
-
-		return getFortData().getActiveFortModifierList()
-				.contains(ItemIdOuterClass.ItemId.ITEM_TROY_DISK);
+		return getFortData().getActiveFortModifierList().contains(ItemIdOuterClass.ItemId.ITEM_TROY_DISK);
 	}
 
 	@Override
