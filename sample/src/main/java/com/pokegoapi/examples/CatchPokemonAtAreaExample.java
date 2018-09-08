@@ -56,13 +56,7 @@ import com.pokegoapi.util.hash.HashProvider;
 import com.pokegoapi.util.path.Path;
 import okhttp3.OkHttpClient;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public class CatchPokemonAtAreaExample {
 

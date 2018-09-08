@@ -44,9 +44,7 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import okhttp3.OkHttpClient;
 
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 

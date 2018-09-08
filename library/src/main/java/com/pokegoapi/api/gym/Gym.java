@@ -27,7 +27,6 @@ import POGOProtos.Networking.Requests.Messages.GymGetInfoMessageOuterClass.GymGe
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import POGOProtos.Networking.Responses.FortDeployPokemonResponseOuterClass.FortDeployPokemonResponse;
 import POGOProtos.Networking.Responses.GymGetInfoResponseOuterClass.GymGetInfoResponse;
-
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;

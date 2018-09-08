@@ -16,7 +16,6 @@
 package com.pokegoapi.api.map.pokemon;
 
 import POGOProtos.Networking.Responses.EvolvePokemonResponseOuterClass;
-
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
 

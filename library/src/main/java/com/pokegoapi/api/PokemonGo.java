@@ -49,12 +49,7 @@ import com.pokegoapi.api.settings.templates.ItemTemplates;
 import com.pokegoapi.api.settings.templates.TempFileTemplateProvider;
 import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.exceptions.request.RequestFailedException;
-import com.pokegoapi.main.CommonRequests;
-import com.pokegoapi.main.Heartbeat;
-import com.pokegoapi.main.RequestHandler;
-import com.pokegoapi.main.ServerPlatformRequest;
-import com.pokegoapi.main.ServerRequest;
-import com.pokegoapi.main.ServerRequestEnvelope;
+import com.pokegoapi.main.*;
 import com.pokegoapi.util.ClientInterceptor;
 import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
@@ -65,11 +60,7 @@ import okhttp3.OkHttpClient;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 
 public class PokemonGo {
