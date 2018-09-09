@@ -66,9 +66,7 @@ public class RequestHandler implements Runnable {
 	private OkHttpClient client;
 	private Random random;
 	private AuthTicket authTicket;
-
 	private boolean active = true;
-
 	private RequestIdGenerator requestIdGenerator = new RequestIdGenerator();
 
 	/**
@@ -378,7 +376,7 @@ public class RequestHandler implements Runnable {
 				List<ServerRequest> requests = new ArrayList<>();
 
 				if (envelope.request != null) {
-					envelope.setRequest(addRequest(envelope, requests, envelope.request));
+					envelope.request = addRequest(envelope, requests, envelope.request);
 				}
 
 				List<ServerRequest> commons = new ArrayList<>(envelope.commons);
