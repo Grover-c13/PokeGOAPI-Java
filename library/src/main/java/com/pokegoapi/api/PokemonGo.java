@@ -62,7 +62,6 @@ import com.pokegoapi.util.hash.HashProvider;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
-
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -71,9 +70,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-
 public class PokemonGo {
-
 	private static final java.lang.String TAG = PokemonGo.class.getSimpleName();
 	private final Time time;
 	@Getter
@@ -114,29 +111,22 @@ public class PokemonGo {
 	@Getter
 	@Setter
 	public LocationFixes locationFixes;
-
 	@Setter
 	private boolean hasChallenge;
 	@Getter
 	private String challengeURL;
 	private final Object challengeLock = new Object();
-
 	@Getter
 	private List<Listener> listeners = Collections.synchronizedList(new ArrayList<Listener>());
-
 	private final Object lock = new Object();
-
 	@Getter
 	public boolean loggingIn;
 	@Getter
 	private boolean active;
-
 	@Getter
 	private Heartbeat heartbeat = new Heartbeat(this);
-
 	@Getter
 	public HashProvider hashProvider;
-
 	private OkHttpClient client;
 
 	/**
@@ -399,9 +389,9 @@ public class PokemonGo {
 		//setAccuracy(accuracy);
 	}
 
-    public long currentTimeMillis() {
-        return time.currentTimeMillis();
-    }
+	public long currentTimeMillis() {
+		return time.currentTimeMillis();
+	}
 
 	/**
 	 * Validates and sets a given latitude value

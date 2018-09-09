@@ -20,7 +20,6 @@ import POGOProtos.Map.Fort.FortDataOuterClass;
 import POGOProtos.Map.Fort.FortModifierOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.request.RequestFailedException;
-
 import java.util.List;
 
 /**
@@ -35,9 +34,9 @@ public class Pokestop extends Fort {
 	 * @param fortData the fort data
 	 */
 	public Pokestop(PokemonGo api, FortDataOuterClass.FortData fortData) {
-		super(api, fortData);		
+		super(api, fortData);
 	}
-	
+
 	/**
 	 * Returns whether this pokestop has an active lure.
 	 *
@@ -48,7 +47,7 @@ public class Pokestop extends Fort {
 		return fortData.hasLureInfo() && fortData.getLureInfo().getLureExpiresTimestampMs() > api.startTime;
 	}
 
-    /**
+	/**
 	 * Returns whether this pokestop has an active lure when detected on map.
 	 *
 	 * @return true if this pokestop currently has a lure active
@@ -69,7 +68,7 @@ public class Pokestop extends Fort {
 	public boolean inRangeForLuredPokemon() {
 		return getDistance() <= api.settings.mapSettings.pokemonVisibilityRange;
 	}
-	
+
 	/**
 	 * Returns whether this pokestop has an active lure.
 	 *

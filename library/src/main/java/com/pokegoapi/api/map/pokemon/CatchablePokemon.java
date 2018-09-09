@@ -48,7 +48,6 @@ public class CatchablePokemon implements MapPoint {
 	private final double longitude;
 	private final EncounterKind encounterKind;
 	private Encounter encounter = null;
-
 	@Getter
 	@Setter
 	public boolean despawned = false;
@@ -199,17 +198,17 @@ public class CatchablePokemon implements MapPoint {
 		return encounterKind == EncounterKind.INCENSE;
 	}
 
-    private enum EncounterKind {
+	private enum EncounterKind {
 		NORMAL,
 		DISK,
 		INCENSE
 	}
 
-    public double getLatitude() {
-        return this.latitude;
-    }
+	public double getLatitude() {
+		return this.latitude;
+	}
 
-    public double getLongitude() {
-        return this.longitude;
-    }
+	public double getLongitude() {
+		return this.longitude;
+	}
 }

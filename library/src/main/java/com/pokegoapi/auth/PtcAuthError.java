@@ -18,7 +18,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class PtcAuthError {
-
 	@Getter
 	@Setter
 	public String[] errors;

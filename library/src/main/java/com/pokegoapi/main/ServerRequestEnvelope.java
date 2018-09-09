@@ -23,7 +23,6 @@ import com.pokegoapi.api.PokemonGo;
 import lombok.Getter;
 import lombok.Setter;
 import rx.Observable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,14 +32,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class ServerRequestEnvelope {
-    @Getter
-    @Setter
-    public ServerRequest request;
+	@Getter
+	@Setter
+	public ServerRequest request;
 	@Getter
 	public List<ServerPlatformRequest> platformRequests = new ArrayList<>();
 	@Getter
 	public List<ServerRequest> commons;
-
 	private Observable<ServerResponse> observable;
 	private ServerResponse response;
 	private final Object responseLock = new Object();
@@ -153,7 +151,7 @@ public class ServerRequestEnvelope {
 		}
 	}
 
-    /**
+	/**
 	 * Adds a platform request to this envelope
 	 *
 	 * @param request the request to add
