@@ -175,8 +175,8 @@ public class PtcCredentialProvider extends CredentialProvider {
 			Response postResponse;
 			try {
 				FormBody postForm = new Builder()
-						.add("lt", ptcAuth.getLt())
-						.add("execution", ptcAuth.getExecution())
+						.add("lt", ptcAuth.lt)
+						.add("execution", ptcAuth.execution)
 						.add("_eventId", "submit")
 						.add("username", username)
 						.add("password", password)
@@ -219,7 +219,7 @@ public class PtcCredentialProvider extends CredentialProvider {
 
 			if (postBody.length() > 0) {
 				try {
-					String[] errors = moshi.adapter(PtcAuthError.class).fromJson(postBody).getErrors();
+					String[] errors = moshi.adapter(PtcAuthError.class).fromJson(postBody).errors;
 					if (errors != null && errors.length > 0) {
 						throw new InvalidCredentialsException(errors[0]);
 					}
@@ -262,11 +262,6 @@ public class PtcCredentialProvider extends CredentialProvider {
 		authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(tokenId).setUnknown2(59).build());
 
 		return authbuilder.build();
-	}
-
-	@Override
-	public boolean isTokenIdExpired() {
-		return isTokenIdInvalid();
 	}
 
 	@Override

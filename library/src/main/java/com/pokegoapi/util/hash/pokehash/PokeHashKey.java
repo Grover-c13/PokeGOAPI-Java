@@ -10,17 +10,17 @@ public class PokeHashKey {
 	private static final Map<String, PokeHashKey> KEYS = new WeakHashMap<>();
 
 	@Getter
-	private final String key;
+	public final String key;
 
 	private int rpm;
 	@Getter
 	private int maxRequests = 150;
 	@Getter
-	private int requestsRemaining = this.maxRequests;
+	public int requestsRemaining = this.maxRequests;
 	@Getter
 	private long keyExpiration;
 	@Getter
-	private long ratePeriodEnd;
+	public long ratePeriodEnd;
 
 	private boolean tested;
 
@@ -98,7 +98,7 @@ public class PokeHashKey {
 	 */
 	void await() throws InterruptedException {
 		if (this.requestsRemaining <= 0) {
-			long timeToPeriodEnd = System.currentTimeMillis() - this.getRatePeriodEnd();
+			long timeToPeriodEnd = System.currentTimeMillis() - this.ratePeriodEnd;
 			if (this.tested && timeToPeriodEnd > 0) {
 				Thread.sleep(Math.min(timeToPeriodEnd, 3600000));
 				this.checkPeriod();

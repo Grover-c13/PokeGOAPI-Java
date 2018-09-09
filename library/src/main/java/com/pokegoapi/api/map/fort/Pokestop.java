@@ -45,11 +45,10 @@ public class Pokestop extends Fort {
 	 */
 	@Deprecated
 	public boolean hasLurePokemon() {
-		return getFortData().hasLureInfo() && getFortData().getLureInfo().getLureExpiresTimestampMs() > getApi()
-				.currentTimeMillis();
+		return fortData.hasLureInfo() && fortData.getLureInfo().getLureExpiresTimestampMs() > api.startTime;
 	}
 
-	/**
+    /**
 	 * Returns whether this pokestop has an active lure when detected on map.
 	 *
 	 * @return true if this pokestop currently has a lure active
@@ -68,7 +67,7 @@ public class Pokestop extends Fort {
 	 * @return true when the lured pokemon is in range of player
 	 */
 	public boolean inRangeForLuredPokemon() {
-		return getDistance() <= getApi().getSettings().getMapSettings().getPokemonVisibilityRange();
+		return getDistance() <= api.settings.mapSettings.pokemonVisibilityRange;
 	}
 	
 	/**
@@ -88,7 +87,7 @@ public class Pokestop extends Fort {
 			}
 			return false;
 		}
-		return getFortData().getActiveFortModifierList().contains(ItemIdOuterClass.ItemId.ITEM_TROY_DISK);
+		return fortData.getActiveFortModifierList().contains(ItemIdOuterClass.ItemId.ITEM_TROY_DISK);
 	}
 
 	@Override

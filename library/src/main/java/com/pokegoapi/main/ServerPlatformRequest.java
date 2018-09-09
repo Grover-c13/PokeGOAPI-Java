@@ -22,9 +22,9 @@ import lombok.Getter;
 
 public class ServerPlatformRequest {
 	@Getter
-	private final PlatformRequestType type;
+	public final PlatformRequestType type;
 	@Getter
-	private final ByteString request;
+	public final ByteString request;
 
 	private final Object responseLock = new Object();
 

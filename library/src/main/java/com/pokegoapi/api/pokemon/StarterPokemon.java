@@ -11,7 +11,7 @@ public enum StarterPokemon {
 	CHARMANDER(PokemonIdOuterClass.PokemonId.CHARMANDER);
 
 	@Getter
-	private PokemonIdOuterClass.PokemonId pokemon;
+	public PokemonIdOuterClass.PokemonId pokemon;
 
 	StarterPokemon(PokemonIdOuterClass.PokemonId pokemon) {
 		this.pokemon = pokemon;

@@ -92,7 +92,7 @@ public class DeviceInfo {
 	 */
 	public static DeviceInfo getDefault(PokemonGo api) {
 		DeviceInfo deviceInfo = new DeviceInfo();
-		Random random = new Random(api.getSeed());
+		Random random = new Random(api.seed);
 		byte[] bytes = new byte[16];
 		random.nextBytes(bytes);
 		String[] device = DEVICES[random.nextInt(DEVICES.length)];

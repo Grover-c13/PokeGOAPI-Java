@@ -32,7 +32,7 @@ public class SensorInfo {
 
 	@Setter
 	@Getter
-	private long timestampCreate;
+	public long timestampCreate;
 
 	public SensorInfo() {
 		sensorInfoBuilder = SignatureOuterClass.Signature.SensorInfo.newBuilder();
@@ -73,10 +73,10 @@ public class SensorInfo {
 	 */
 	public static SignatureOuterClass.Signature.SensorInfo getDefault(PokemonGo api, long currentTime, Random random) {
 		SensorInfo sensorInfo;
-		if (api.getSensorInfo() == null) {
+		if (api.sensorInfo == null) {
 			sensorInfo = new SensorInfo();
 			sensorInfo.getBuilder()
-				.setTimestampSnapshot(currentTime - api.getStartTime() + random.nextInt(500))
+				.setTimestampSnapshot(currentTime - api.startTime + random.nextInt(500))
 				.setRotationRateX(0.1 + 0.6 * random.nextDouble())
 				.setRotationRateY(0.1 + 0.7000000000000001 * random.nextDouble())
 				.setRotationRateZ(0.1 + 0.7000000000000001 * random.nextDouble())
@@ -88,11 +88,11 @@ public class SensorInfo {
 				.setGravityZ(-1.0 + random.nextDouble() * 2.0)
 				.setMagneticFieldAccuracy(-1)
 				.setStatus(3);
-			api.setSensorInfo(sensorInfo);
+			api.sensorInfo = sensorInfo;
 		} else {
-			sensorInfo = api.getSensorInfo();
+			sensorInfo = api.sensorInfo;
 			sensorInfo.getBuilder()
-				.setTimestampSnapshot(currentTime - api.getStartTime() + random.nextInt(500))
+				.setTimestampSnapshot(currentTime - api.startTime + random.nextInt(500))
 				.setLinearAccelerationX(-0.7 + random.nextDouble() * 1.4)
 				.setLinearAccelerationY(-0.7 + random.nextDouble() * 1.4)
 				.setLinearAccelerationZ(-0.7 + random.nextDouble() * 1.4)
@@ -108,8 +108,8 @@ public class SensorInfo {
 				.setMagneticFieldAccuracy(-1)
 				.setStatus(3);
 		}
-		if (currentTime - sensorInfo.getTimestampCreate() > (random.nextInt(10000) + 5000)) {
-			sensorInfo.setTimestampCreate(currentTime);
+		if (currentTime - sensorInfo.timestampCreate > (random.nextInt(10000) + 5000)) {
+			sensorInfo.timestampCreate = currentTime;
 			return sensorInfo.getSensorInfo();
 		}
 		return null;

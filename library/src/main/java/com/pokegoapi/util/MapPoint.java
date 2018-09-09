@@ -25,7 +25,7 @@ public interface MapPoint {
 	 *
 	 * @return the latitude
 	 */
-	double getLatitude();
+     double getLatitude();
 
 	/**
 	 * Gets longitude.

@@ -56,12 +56,12 @@ public class ItemTemplates {
 	private Map<Float, Double> levelCpMultiplier = new HashMap<>();
 
 	@Getter
-	private GymBattleSettings battleSettings;
+	public GymBattleSettings battleSettings;
 	@Getter
-	private PokemonUpgradeSettings upgradeSettings;
+	public PokemonUpgradeSettings upgradeSettings;
 
 	@Getter
-	private Evolutions evolutions;
+	public Evolutions evolutions;
 
 	private boolean loaded;
 
@@ -112,7 +112,7 @@ public class ItemTemplates {
 				.setPageTimestamp(timestamp)
 				.build();
 		ServerRequest request = new ServerRequest(RequestType.DOWNLOAD_ITEM_TEMPLATES, message);
-		api.getRequestHandler().sendServerRequests(request, true);
+		api.requestHandler.sendServerRequests(request, true);
 		try {
 			DownloadItemTemplatesResponse response = DownloadItemTemplatesResponse.parseFrom(request.getData());
 			provider.updateTemplates(response, loadTime);

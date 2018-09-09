@@ -83,7 +83,7 @@ public class ItemBag {
 	 */
 	public Result removeItem(ItemId id, int quantity) throws RequestFailedException {
 		Item item = getItem(id);
-		if (item.getCount() < quantity) {
+		if (item.count < quantity) {
 			throw new IllegalArgumentException("You cannot remove more quantity than you have");
 		}
 
@@ -91,7 +91,7 @@ public class ItemBag {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.RECYCLE_INVENTORY_ITEM, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest, true);
+		api.requestHandler.sendServerRequests(serverRequest, true);
 
 		RecycleInventoryItemResponse response;
 		try {
@@ -102,7 +102,7 @@ public class ItemBag {
 
 		if (response.getResult() == RecycleInventoryItemResponse.Result.SUCCESS) {
 			item.setCount(response.getNewCount());
-			if (item.getCount() <= 0) {
+			if (item.count <= 0) {
 				removeItem(item.getItemId());
 			}
 		}
@@ -160,7 +160,7 @@ public class ItemBag {
 		synchronized (this.lock) {
 			int ct = 0;
 			for (Item item : items.values()) {
-				ct += item.getCount();
+				ct += item.count;
 			}
 			return ct;
 		}
@@ -203,7 +203,7 @@ public class ItemBag {
 						.build();
 
 		ServerRequest useIncenseRequest = new ServerRequest(RequestType.USE_INCENSE, useIncenseMessage);
-		api.getRequestHandler().sendServerRequests(useIncenseRequest, true);
+		api.requestHandler.sendServerRequests(useIncenseRequest, true);
 
 		try {
 			UseIncenseResponse response = UseIncenseResponse.parseFrom(useIncenseRequest.getData());
@@ -237,7 +237,7 @@ public class ItemBag {
 				.build();
 
 		ServerRequest req = new ServerRequest(RequestType.USE_ITEM_XP_BOOST, xpMsg);
-		api.getRequestHandler().sendServerRequests(req, true);
+		api.requestHandler.sendServerRequests(req, true);
 
 		try {
 			UseItemXpBoostResponse response = UseItemXpBoostResponse.parseFrom(req.getData());
@@ -263,7 +263,7 @@ public class ItemBag {
 	public List<Pokeball> getUsablePokeballs() {
 		List<Pokeball> pokeballs = new ArrayList<>();
 		for (Pokeball pokeball : Pokeball.values()) {
-			if (getItem(pokeball.getBallType()).getCount() > 0) {
+			if (getItem(pokeball.ballType).count > 0) {
 				pokeballs.add(pokeball);
 			}
 		}
@@ -308,7 +308,7 @@ public class ItemBag {
 	public void addAwardedItems(LevelUpRewardsResponse levelUpResponse) {
 		for (ItemAward itemAward : levelUpResponse.getItemsAwardedList()) {
 			Item item = getItem(itemAward.getItemId());
-			item.setCount(item.getCount() + itemAward.getItemCount());
+			item.setCount(item.count + itemAward.getItemCount());
 		}
 	}
 
@@ -316,6 +316,6 @@ public class ItemBag {
 	 * @return the maximum amount of items this item bag can store
 	 */
 	public int getMaxStorage() {
-		return api.getPlayerProfile().getPlayerData().getMaxItemStorage();
+		return api.playerProfile.getPlayerData().getMaxItemStorage();
 	}
 }

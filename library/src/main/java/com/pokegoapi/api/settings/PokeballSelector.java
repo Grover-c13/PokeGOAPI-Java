@@ -46,7 +46,7 @@ public interface PokeballSelector {
 		public Pokeball select(List<Pokeball> pokeballs, double captureProbability) {
 			Pokeball desired = pokeballs.get(0);
 			for (Pokeball pokeball : pokeballs) {
-				if (captureProbability <= pokeball.getCaptureProbability()) {
+				if (captureProbability <= pokeball.captureProbability) {
 					desired = pokeball;
 				}
 			}

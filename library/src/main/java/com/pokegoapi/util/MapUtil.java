@@ -35,8 +35,8 @@ public class MapUtil<K extends MapPoint> {
 	 * @return the coordinate
 	 */
 	public static Point randomStep(Point point) {
-		point.setLongitude(point.getLongitude() + randomStep());
-		point.setLatitude(point.getLatitude() + randomStep());
+		point.longitude = (point.getLongitude() + randomStep());
+		point.latitude = (point.getLatitude() + randomStep());
 
 		return point;
 	}
@@ -93,7 +93,7 @@ public class MapUtil<K extends MapPoint> {
 	public Map<Double, K> sortItems(List<K> items, PokemonGo api) {
 		Map<Double, K> result = new TreeMap<>();
 		for (K point : items) {
-			result.put(distFrom(api.getLatitude(), api.getLongitude(), point.getLatitude(), point.getLongitude()),
+			result.put(distFrom(api.latitude, api.longitude, point.getLatitude(), point.getLongitude()),
 					point);
 		}
 		return result;

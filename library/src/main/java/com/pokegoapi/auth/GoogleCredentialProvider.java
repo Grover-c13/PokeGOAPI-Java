@@ -126,17 +126,17 @@ public class GoogleCredentialProvider extends CredentialProvider {
 		GoogleAuthTokenJson googleAuthTokenJson = null;
 		try {
 			googleAuthTokenJson = moshi.adapter(GoogleAuthTokenJson.class).fromJson(response.body().string());
-			Log.d(TAG, "" + googleAuthTokenJson.getExpiresIn());
+			Log.d(TAG, "" + googleAuthTokenJson.expiresIn);
 		} catch (IOException e) {
 			throw new LoginFailedException("Failed to unmarshal the Json response to fetch refreshed tokenId", e);
 		}
-		if (googleAuthTokenJson.getError() != null) {
-			throw new InvalidCredentialsException(googleAuthTokenJson.getError());
+		if (googleAuthTokenJson.error != null) {
+			throw new InvalidCredentialsException(googleAuthTokenJson.error);
 		} else {
-			Log.d(TAG, "Refreshed Token " + googleAuthTokenJson.getIdToken());
+			Log.d(TAG, "Refreshed Token " + googleAuthTokenJson.idToken);
 			expiresTimestamp = System.currentTimeMillis()
-					+ (googleAuthTokenJson.getExpiresIn() * 1000 - REFRESH_TOKEN_BUFFER_TIME);
-			tokenId = googleAuthTokenJson.getIdToken();
+					+ (googleAuthTokenJson.expiresIn * 1000 - REFRESH_TOKEN_BUFFER_TIME);
+			tokenId = googleAuthTokenJson.idToken;
 		}
 	}
 
@@ -171,19 +171,19 @@ public class GoogleCredentialProvider extends CredentialProvider {
 		GoogleAuthJson googleAuth = null;
 		try {
 			googleAuth = moshi.adapter(GoogleAuthJson.class).fromJson(response.body().string());
-			Log.d(TAG, "" + googleAuth.getExpiresIn());
+			Log.d(TAG, "" + googleAuth.expiresIn);
 		} catch (IOException e) {
 			throw new LoginFailedException("Failed to unmarshell the Json response to fetch tokenId", e);
 		}
 		Log.d(TAG, "Get user to go to:"
-				+ googleAuth.getVerificationUrl()
-				+ " and enter code:" + googleAuth.getUserCode());
+				+ googleAuth.verificationUrl
+				+ " and enter code:" + googleAuth.userCode);
 		onGoogleLoginOAuthCompleteListener.onInitialOAuthComplete(googleAuth);
 
 		GoogleAuthTokenJson googleAuthTokenJson;
 		try {
 			while ((googleAuthTokenJson = poll(googleAuth)) == null) {
-				Thread.sleep(googleAuth.getInterval() * 1000);
+				Thread.sleep(googleAuth.interval * 1000);
 			}
 		} catch (InterruptedException e) {
 			throw new LoginFailedException("Sleeping was interrupted", e);
@@ -193,12 +193,12 @@ public class GoogleCredentialProvider extends CredentialProvider {
 			throw new LoginFailedException(e);
 		}
 
-		Log.d(TAG, "Got token: " + googleAuthTokenJson.getIdToken());
+		Log.d(TAG, "Got token: " + googleAuthTokenJson.idToken);
 		onGoogleLoginOAuthCompleteListener.onTokenIdReceived(googleAuthTokenJson);
 		expiresTimestamp = System.currentTimeMillis()
-				+ (googleAuthTokenJson.getExpiresIn() * 1000 - REFRESH_TOKEN_BUFFER_TIME);
-		tokenId = googleAuthTokenJson.getIdToken();
-		refreshToken = googleAuthTokenJson.getRefreshToken();
+				+ (googleAuthTokenJson.expiresIn * 1000 - REFRESH_TOKEN_BUFFER_TIME);
+		tokenId = googleAuthTokenJson.idToken;
+		refreshToken = googleAuthTokenJson.refreshToken;
 	}
 
 	/**
@@ -215,7 +215,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 		HttpUrl url = HttpUrl.parse(OAUTH_TOKEN_ENDPOINT).newBuilder()
 				.addQueryParameter("client_id", CLIENT_ID)
 				.addQueryParameter("client_secret", SECRET)
-				.addQueryParameter("code", json.getDeviceCode())
+				.addQueryParameter("code", json.deviceCode)
 				.addQueryParameter("grant_type", "http://oauth.net/grant_type/device/1.0")
 				.addQueryParameter("scope", "openid email https://www.googleapis.com/auth/userinfo.email")
 				.build();
@@ -232,7 +232,7 @@ public class GoogleCredentialProvider extends CredentialProvider {
 		Moshi moshi = new Moshi.Builder().build();
 		GoogleAuthTokenJson token = moshi.adapter(GoogleAuthTokenJson.class).fromJson(response.body().string());
 
-		if (token.getError() == null) {
+		if (token.error == null) {
 			return token;
 		} else {
 			return null;
@@ -263,11 +263,6 @@ public class GoogleCredentialProvider extends CredentialProvider {
 		authbuilder.setProvider("google");
 		authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(tokenId).setUnknown2(0).build());
 		return authbuilder.build();
-	}
-
-	@Override
-	public boolean isTokenIdExpired() {
-		return isTokenIdInvalid();
 	}
 
 	@Override

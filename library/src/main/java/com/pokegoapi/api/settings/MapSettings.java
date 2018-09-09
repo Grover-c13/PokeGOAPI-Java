@@ -30,7 +30,7 @@ public class MapSettings {
 	 *
 	 * @return value in milliseconds.
 	 */
-	private float maxRefresh;
+	public float maxRefresh;
 
 	@Getter
 	/**
@@ -38,7 +38,7 @@ public class MapSettings {
 	 *
 	 * @return value in milliseconds.
 	 */
-	private float minRefresh;
+	public float minRefresh;
 
 	@Getter
 	/**
@@ -54,7 +54,7 @@ public class MapSettings {
 	 *
 	 * @return distance in meters.
 	 */
-	private double pokemonVisibilityRange;
+	public double pokemonVisibilityRange;
 
 	@Getter
 	/**

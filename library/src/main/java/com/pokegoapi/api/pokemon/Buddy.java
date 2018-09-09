@@ -44,8 +44,8 @@ public class Buddy {
 	 */
 	public Pokemon getPokemon() {
 		if (pokemon == null) {
-			pokemon = api.getInventories().getPokebank().getPokemonById(this.id);
-			buddyDistance = api.getItemTemplates().getPokemonSettings(pokemon.getPokemonId()).getKmBuddyDistance();
+			pokemon = api.inventories.pokebank.getPokemonById(this.id);
+			buddyDistance = api.itemTemplates.getPokemonSettings(pokemon.getPokemonId()).getKmBuddyDistance();
 		}
 		return pokemon;
 	}
@@ -85,7 +85,7 @@ public class Buddy {
 	 * @return the current buddy walk progress, from 0-buddyDistance
 	 */
 	public double getProgressKM() {
-		double walked = api.getPlayerProfile().getStats().getKmWalked();
+		double walked = api.playerProfile.getStats().getKmWalked();
 		double startedKM = Math.max(getStartKM(), getLastReceiveKM());
 		return walked - startedKM;
 	}
