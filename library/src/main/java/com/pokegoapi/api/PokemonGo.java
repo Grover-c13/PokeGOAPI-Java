@@ -385,8 +385,8 @@ public class PokemonGo {
 	public void setLocation(double latitude, double longitude, double altitude, double accuracy) {
 		setLatitude(latitude);
 		setLongitude(longitude);
-		//setAltitude(altitude);
-		//setAccuracy(accuracy);
+		this.altitude = altitude;
+		this.accuracy = accuracy;
 	}
 
 	public long currentTimeMillis() {

@@ -27,11 +27,9 @@ import java.security.InvalidKeyException;
 public final class TwoFish {
 	public static final int BLOCK_SIZE = 16;
 	private static final int ROUNDS = 16;
-
 	private static final int INPUT_WHITEN = 0;
 	private static final int OUTPUT_WHITEN = INPUT_WHITEN + BLOCK_SIZE / 4;
 	private static final int ROUND_SUBKEYS = OUTPUT_WHITEN + BLOCK_SIZE / 4;
-
 	private static final int SK_STEP = 0x02020202;
 	private static final int SK_BUMP = 0x01010101;
 	private static final int SK_ROTL = 9;
@@ -184,19 +182,16 @@ public final class TwoFish {
 	private static final int P_02 = 0;
 	private static final int P_03 = P_01 ^ 1;
 	private static final int P_04 = 1;
-
 	private static final int P_10 = 0;
 	private static final int P_11 = 0;
 	private static final int P_12 = 1;
 	private static final int P_13 = P_11 ^ 1;
 	private static final int P_14 = 0;
-
 	private static final int P_20 = 1;
 	private static final int P_21 = 1;
 	private static final int P_22 = 0;
 	private static final int P_23 = P_21 ^ 1;
 	private static final int P_24 = 0;
-
 	private static final int P_30 = 0;
 	private static final int P_31 = 1;
 	private static final int P_32 = 1;
@@ -252,33 +247,33 @@ public final class TwoFish {
 		}
 	}
 
-	private static final int lfsr1(int x) {
-		return (x >> 1) ^ ((x & 0x01) != 0 ? GF256_FDBK_2 : 0);
+	private static final int lfsr1(int input) {
+		return (input >> 1) ^ ((input & 0x01) != 0 ? GF256_FDBK_2 : 0);
 	}
 
-	private static final int lfsr2(int x) {
-		return (x >> 2) ^ ((x & 0x02) != 0 ? GF256_FDBK_2 : 0) ^ ((x & 0x01) != 0 ? GF256_FDBK_4 : 0);
+	private static final int lfsr2(int input) {
+		return (input >> 2) ^ ((input & 0x02) != 0 ? GF256_FDBK_2 : 0) ^ ((input & 0x01) != 0 ? GF256_FDBK_4 : 0);
 	}
 
-	private static final int mxX(int x) {
-		return x ^ lfsr2(x);
+	private static final int mxX(int input) {
+		return input ^ lfsr2(input);
 	}
 
-	private static final int mxY(int x) {
-		return x ^ lfsr1(x) ^ lfsr2(x);
+	private static final int mxY(int input) {
+		return input ^ lfsr1(input) ^ lfsr2(input);
 	}
 
 	/**
 	 * Expand a user-supplied key material into a session key.
 	 *
-	 * @param k The 64/128/192/256-bit user-key to use.
+	 * @param bytes The 64/128/192/256-bit user-key to use.
 	 * @return This cipher's round keys.
 	 * @throws InvalidKeyException If the key is invalid.
 	 */
-	public static synchronized Object makeKey(byte[] k) throws InvalidKeyException {
-		if (k == null)
+	public static synchronized Object makeKey(byte[] bytes) throws InvalidKeyException {
+		if (bytes == null)
 			throw new InvalidKeyException("Empty key");
-		int length = k.length;
+		int length = bytes.length;
 		if (!(length == 8 || length == 16 || length == 24 || length == 32))
 			throw new InvalidKeyException("Incorrect key length");
 
@@ -286,121 +281,136 @@ public final class TwoFish {
 		int subkeyCnt = ROUND_SUBKEYS + 2 * ROUNDS;
 		int[] k32e = new int[4];
 		int[] k32o = new int[4];
-		int[] sBoxKey = new int[4];
-		int i, j, offset = 0;
-		for (i = 0, j = k64Cnt - 1; i < 4 && offset < length; i++, j--) {
-			k32e[i] = (k[offset++] & 0xFF)
-					| (k[offset++] & 0xFF) << 8
-					| (k[offset++] & 0xFF) << 16
-					| (k[offset++] & 0xFF) << 24;
-			k32o[i] = (k[offset++] & 0xFF)
-					| (k[offset++] & 0xFF) << 8
-					| (k[offset++] & 0xFF) << 16
-					| (k[offset++] & 0xFF) << 24;
-			sBoxKey[j] = rsMdsEncode(k32e[i], k32o[i]);
+		int[] sboxkey = new int[4];
+		int input = 0;
+		int input2 = 0;
+		int offset = 0;
+		for (input = 0, input2 = k64Cnt - 1; input < 4 && offset < length; input++, input2--) {
+			k32e[input] = (bytes[offset++] & 0xFF)
+					| (bytes[offset++] & 0xFF) << 8
+					| (bytes[offset++] & 0xFF) << 16
+					| (bytes[offset++] & 0xFF) << 24;
+			k32o[input] = (bytes[offset++] & 0xFF)
+					| (bytes[offset++] & 0xFF) << 8
+					| (bytes[offset++] & 0xFF) << 16
+					| (bytes[offset++] & 0xFF) << 24;
+			sboxkey[input2] = rsMdsEncode(k32e[input], k32o[input]);
 		}
-		int q, A, B;
-		int[] subKeys = new int[subkeyCnt];
-		for (i = q = 0; i < subkeyCnt / 2; i++, q += SK_STEP) {
-			A = f32(k64Cnt, q, k32e);
-			B = f32(k64Cnt, q + SK_BUMP, k32o);
-			B = B << 8 | B >>> 24;
-			A += B;
-			subKeys[2 * i] = A;
-			A += B;
-			subKeys[2 * i + 1] = A << SK_ROTL | A >>> (32 - SK_ROTL);
+		int input3;
+		int input4;
+		int input5;
+		int[] subkeys = new int[subkeyCnt];
+		for (input = input3 = 0; input < subkeyCnt / 2; input++, input3 += SK_STEP) {
+			input4 = f32(k64Cnt, input3, k32e);
+			input5 = f32(k64Cnt, input3 + SK_BUMP, k32o);
+			input5 = input5 << 8 | input5 >>> 24;
+			input4 += input5;
+			subkeys[2 * input] = input4;
+			input4 += input5;
+			subkeys[2 * input + 1] = input4 << SK_ROTL | input4 >>> (32 - SK_ROTL);
 		}
-		int k0 = sBoxKey[0];
-		int k1 = sBoxKey[1];
-		int k2 = sBoxKey[2];
-		int k3 = sBoxKey[3];
-		int b0, b1, b2, b3;
-		int[] sBox = new int[4 * 256];
-		for (i = 0; i < 256; i++) {
-			b0 = b1 = b2 = b3 = i;
+		int k0 = sboxkey[0];
+		int k1 = sboxkey[1];
+		int k2 = sboxkey[2];
+		int k3 = sboxkey[3];
+		int b0;
+		int b1;
+		int b2;
+		int b3;
+		int[] sbox = new int[4 * 256];
+		for (input = 0; input < 256; input++) {
+			b0 = b1 = b2 = b3 = input;
 			switch (k64Cnt & 3) {
 				case 1:
-					sBox[2 * i] = MDS[0][(P[P_01][b0] & 0xFF) ^ b0(k0)];
-					sBox[2 * i + 1] = MDS[1][(P[P_11][b1] & 0xFF) ^ b1(k0)];
-					sBox[0x200 + 2 * i] = MDS[2][(P[P_21][b2] & 0xFF) ^ b2(k0)];
-					sBox[0x200 + 2 * i + 1] = MDS[3][(P[P_31][b3] & 0xFF) ^ b3(k0)];
+					sbox[2 * input] = MDS[0][(P[P_01][b0] & 0xFF) ^ b0(k0)];
+					sbox[2 * input + 1] = MDS[1][(P[P_11][b1] & 0xFF) ^ b1(k0)];
+					sbox[0x200 + 2 * input] = MDS[2][(P[P_21][b2] & 0xFF) ^ b2(k0)];
+					sbox[0x200 + 2 * input + 1] = MDS[3][(P[P_31][b3] & 0xFF) ^ b3(k0)];
 					break;
 				case 0:
 					b0 = (P[P_04][b0] & 0xFF) ^ b0(k3);
 					b1 = (P[P_14][b1] & 0xFF) ^ b1(k3);
 					b2 = (P[P_24][b2] & 0xFF) ^ b2(k3);
 					b3 = (P[P_34][b3] & 0xFF) ^ b3(k3);
+					break;
 				case 3:
 					b0 = (P[P_03][b0] & 0xFF) ^ b0(k2);
 					b1 = (P[P_13][b1] & 0xFF) ^ b1(k2);
 					b2 = (P[P_23][b2] & 0xFF) ^ b2(k2);
 					b3 = (P[P_33][b3] & 0xFF) ^ b3(k2);
+					break;
 				case 2:
-					sBox[2 * i] = MDS[0][(P[P_01][(P[P_02][b0] & 0xFF) ^ b0(k1)] & 0xFF) ^ b0(k0)];
-					sBox[2 * i + 1] = MDS[1][(P[P_11][(P[P_12][b1] & 0xFF) ^ b1(k1)] & 0xFF) ^ b1(k0)];
-					sBox[0x200 + 2 * i] = MDS[2][(P[P_21][(P[P_22][b2] & 0xFF) ^ b2(k1)] & 0xFF) ^ b2(k0)];
-					sBox[0x200 + 2 * i + 1] = MDS[3][(P[P_31][(P[P_32][b3] & 0xFF) ^ b3(k1)] & 0xFF) ^ b3(k0)];
+					sbox[2 * input] = MDS[0][(P[P_01][(P[P_02][b0] & 0xFF) ^ b0(k1)] & 0xFF) ^ b0(k0)];
+					sbox[2 * input + 1] = MDS[1][(P[P_11][(P[P_12][b1] & 0xFF) ^ b1(k1)] & 0xFF) ^ b1(k0)];
+					sbox[0x200 + 2 * input] = MDS[2][(P[P_21][(P[P_22][b2] & 0xFF) ^ b2(k1)] & 0xFF) ^ b2(k0)];
+					sbox[0x200 + 2 * input + 1] = MDS[3][(P[P_31][(P[P_32][b3] & 0xFF) ^ b3(k1)] & 0xFF) ^ b3(k0)];
+					break;
+				default:
+					break;
 			}
 		}
-		return new Object[]{sBox, subKeys};
+		return new Object[]{sbox, subkeys};
 	}
 
 	/**
 	 * Encrypt exactly one block of plaintext.
 	 *
-	 * @param in The plaintext.
-	 * @param inOffset Index of in from which to start considering data.
+	 * @param in         The plaintext.
+	 * @param inOffset   Index of in from which to start considering data.
 	 * @param sessionKey The session key to use for encryption.
 	 * @return The ciphertext generated from a plaintext using the session key.
 	 */
 	public static byte[] blockEncrypt(byte[] in, int inOffset, Object sessionKey) {
+		int x0 = 0;
+		x0 = (in[inOffset++] & 0xFF)
+				| (in[inOffset++] & 0xFF) << 8
+				| (in[inOffset++] & 0xFF) << 16
+				| (in[inOffset++] & 0xFF) << 24;
+		int x1 = 0;
+		x1 = (in[inOffset++] & 0xFF)
+				| (in[inOffset++] & 0xFF) << 8
+				| (in[inOffset++] & 0xFF) << 16
+				| (in[inOffset++] & 0xFF) << 24;
+		int x2 = 0;
+		x2 = (in[inOffset++] & 0xFF)
+				| (in[inOffset++] & 0xFF) << 8
+				| (in[inOffset++] & 0xFF) << 16
+				| (in[inOffset++] & 0xFF) << 24;
+		int x3 = 0;
+		x3 = (in[inOffset++] & 0xFF)
+				| (in[inOffset++] & 0xFF) << 8
+				| (in[inOffset++] & 0xFF) << 16
+				| (in[inOffset++] & 0xFF) << 24;
+
 		Object[] sk = (Object[]) sessionKey;
-		int[] sBox = (int[]) sk[0];
-		int[] sKey = (int[]) sk[1];
-
-		int x0 = (in[inOffset++] & 0xFF)
-				| (in[inOffset++] & 0xFF) << 8
-				| (in[inOffset++] & 0xFF) << 16
-				| (in[inOffset++] & 0xFF) << 24;
-		int x1 = (in[inOffset++] & 0xFF)
-				| (in[inOffset++] & 0xFF) << 8
-				| (in[inOffset++] & 0xFF) << 16
-				| (in[inOffset++] & 0xFF) << 24;
-		int x2 = (in[inOffset++] & 0xFF)
-				| (in[inOffset++] & 0xFF) << 8
-				| (in[inOffset++] & 0xFF) << 16
-				| (in[inOffset++] & 0xFF) << 24;
-		int x3 = (in[inOffset++] & 0xFF)
-				| (in[inOffset++] & 0xFF) << 8
-				| (in[inOffset++] & 0xFF) << 16
-				| (in[inOffset++] & 0xFF) << 24;
-
-		x0 ^= sKey[INPUT_WHITEN];
-		x1 ^= sKey[INPUT_WHITEN + 1];
-		x2 ^= sKey[INPUT_WHITEN + 2];
-		x3 ^= sKey[INPUT_WHITEN + 3];
-
-		int t0, t1;
-		int k = ROUND_SUBKEYS;
-		for (int R = 0; R < ROUNDS; R += 2) {
-			t0 = fe32(sBox, x0, 0);
-			t1 = fe32(sBox, x1, 3);
-			x2 ^= t0 + t1 + sKey[k++];
+		int[] skey = (int[]) sk[1];
+		x0 ^= skey[INPUT_WHITEN];
+		x1 ^= skey[INPUT_WHITEN + 1];
+		x2 ^= skey[INPUT_WHITEN + 2];
+		x3 ^= skey[INPUT_WHITEN + 3];
+		int t0;
+		int t1;
+		int[] sbox = (int[]) sk[0];
+		int roundSubkeys = ROUND_SUBKEYS;
+		for (int rounds = 0; rounds < ROUNDS; rounds += 2) {
+			t0 = fe32(sbox, x0, 0);
+			t1 = fe32(sbox, x1, 3);
+			x2 ^= t0 + t1 + skey[roundSubkeys++];
 			x2 = x2 >>> 1 | x2 << 31;
 			x3 = x3 << 1 | x3 >>> 31;
-			x3 ^= t0 + 2 * t1 + sKey[k++];
+			x3 ^= t0 + 2 * t1 + skey[roundSubkeys++];
 
-			t0 = fe32(sBox, x2, 0);
-			t1 = fe32(sBox, x3, 3);
-			x0 ^= t0 + t1 + sKey[k++];
+			t0 = fe32(sbox, x2, 0);
+			t1 = fe32(sbox, x3, 3);
+			x0 ^= t0 + t1 + skey[roundSubkeys++];
 			x0 = x0 >>> 1 | x0 << 31;
 			x1 = x1 << 1 | x1 >>> 31;
-			x1 ^= t0 + 2 * t1 + sKey[k++];
+			x1 ^= t0 + 2 * t1 + skey[roundSubkeys++];
 		}
-		x2 ^= sKey[OUTPUT_WHITEN];
-		x3 ^= sKey[OUTPUT_WHITEN + 1];
-		x0 ^= sKey[OUTPUT_WHITEN + 2];
-		x1 ^= sKey[OUTPUT_WHITEN + 3];
+		x2 ^= skey[OUTPUT_WHITEN];
+		x3 ^= skey[OUTPUT_WHITEN + 1];
+		x0 ^= skey[OUTPUT_WHITEN + 2];
+		x1 ^= skey[OUTPUT_WHITEN + 3];
 
 		return new byte[]{
 				(byte) x2, (byte) (x2 >>> 8), (byte) (x2 >>> 16), (byte) (x2 >>> 24),
@@ -410,13 +420,21 @@ public final class TwoFish {
 		};
 	}
 
-	private static final int b0(int x) { return x & 0xFF; }
+	private static final int b0(int input) {
+		return input & 0xFF;
+	}
 
-	private static final int b1(int x) { return (x >>> 8) & 0xFF; }
+	private static final int b1(int input) {
+		return (input >>> 8) & 0xFF;
+	}
 
-	private static final int b2(int x) { return (x >>> 16) & 0xFF; }
+	private static final int b2(int input) {
+		return (input >>> 16) & 0xFF;
+	}
 
-	private static final int b3(int x) { return (x >>> 24) & 0xFF; }
+	private static final int b3(int input) {
+		return (input >>> 24) & 0xFF;
+	}
 
 	/**
 	 * Use (12, 8) Reed-Solomon code over GF(256) to produce a key S-box
@@ -427,30 +445,30 @@ public final class TwoFish {
 	 * @return Remainder polynomial generated using RS code
 	 */
 	private static final int rsMdsEncode(int k0, int k1) {
-		int r = k1;
+		int k11 = k1;
 		for (int i = 0; i < 4; i++) {
-			r = rsRem(r);
+			k11 = rsRem(k11);
 		}
-		r ^= k0;
+		k11 ^= k0;
 		for (int i = 0; i < 4; i++) {
-			r = rsRem(r);
+			k11 = rsRem(k11);
 		}
-		return r;
+		return k11;
 	}
 
-	private static final int rsRem(int x) {
-		int b = (x >>> 24) & 0xFF;
-		int g2 = ((b << 1) ^ ((b & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xFF;
-		int g3 = (b >>> 1) ^ ((b & 0x01) != 0 ? (RS_GF_FDBK >>> 1) : 0) ^ g2;
-		int result = (x << 8) ^ (g3 << 24) ^ (g2 << 16) ^ (g3 << 8) ^ b;
+	private static final int rsRem(int input) {
+		int in = (input >>> 24) & 0xFF;
+		int g2 = ((in << 1) ^ ((in & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xFF;
+		int g3 = (in >>> 1) ^ ((in & 0x01) != 0 ? (RS_GF_FDBK >>> 1) : 0) ^ g2;
+		int result = (input << 8) ^ (g3 << 24) ^ (g2 << 16) ^ (g3 << 8) ^ in;
 		return result;
 	}
 
-	private static final int f32(int k64Cnt, int x, int[] k32) {
-		int b0 = b0(x);
-		int b1 = b1(x);
-		int b2 = b2(x);
-		int b3 = b3(x);
+	private static final int f32(int k64Cnt, int input, int[] k32) {
+		int b0 = b0(input);
+		int b1 = b1(input);
+		int b2 = b2(input);
+		int b3 = b3(input);
 		int k0 = k32[0];
 		int k1 = k32[1];
 		int k2 = k32[2];
@@ -474,11 +492,13 @@ public final class TwoFish {
 				b1 = (P[P_14][b1] & 0xFF) ^ b1(k3);
 				b2 = (P[P_24][b2] & 0xFF) ^ b2(k3);
 				b3 = (P[P_34][b3] & 0xFF) ^ b3(k3);
+				break;
 			case 3:
 				b0 = (P[P_03][b0] & 0xFF) ^ b0(k2);
 				b1 = (P[P_13][b1] & 0xFF) ^ b1(k2);
 				b2 = (P[P_23][b2] & 0xFF) ^ b2(k2);
 				b3 = (P[P_33][b3] & 0xFF) ^ b3(k2);
+				break;
 			case 2:
 				result =
 						MDS[0][(P[P_01][(P[P_02][b0] & 0xFF)
@@ -493,31 +513,37 @@ public final class TwoFish {
 								^ b3(k1)] & 0xFF)
 								^ b3(k0)];
 				break;
+			default:
+				result = 0;
+				break;
 		}
 		return result;
 	}
 
-	private static final int fe32(int[] sBox, int x, int r) {
-		return sBox[2 * b(x, r)]
-				^ sBox[2 * b(x, r + 1) + 1]
-				^ sBox[0x200 + 2 * b(x, r + 2)]
-				^ sBox[0x200 + 2 * b(x, r + 3) + 1];
+	private static final int fe32(int[] sbox, int in1, int in2) {
+		return sbox[2 * base(in1, in2)]
+				^ sbox[2 * base(in1, in2 + 1) + 1]
+				^ sbox[0x200 + 2 * base(in1, in2 + 2)]
+				^ sbox[0x200 + 2 * base(in1, in2 + 3) + 1];
 	}
 
-	private static final int b(int x, int n) {
+	private static final int base(int in1, int in2) {
 		int result = 0;
-		switch (n % 4) {
+		switch (in2 % 4) {
 			case 0:
-				result = b0(x);
+				result = b0(in1);
 				break;
 			case 1:
-				result = b1(x);
+				result = b1(in1);
 				break;
 			case 2:
-				result = b2(x);
+				result = b2(in1);
 				break;
 			case 3:
-				result = b3(x);
+				result = b3(in1);
+				break;
+			default:
+				result = 0;
 				break;
 		}
 		return result;
