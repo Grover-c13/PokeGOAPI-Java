@@ -77,10 +77,11 @@ import java.util.UUID;
 public class PokemonGo {
 	private static final java.lang.String TAG = PokemonGo.class.getSimpleName();
 	private final Time time;
+	private News news;
 	@Getter
 	public long startTime;
 	@Getter
-	private final byte[] sessionHash = new byte[32];
+	public final byte[] sessionHash = new byte[32];
 	@Getter
 	public RequestHandler requestHandler;
 	@Getter
@@ -89,7 +90,6 @@ public class PokemonGo {
 	public Inventories inventories;
 	@Getter
 	public double latitude;
-    private News news;
 	@Getter
 	public double longitude;
 	@Getter
@@ -159,8 +159,8 @@ public class PokemonGo {
 	 * Instantiates a new Pokemon go.
 	 *
 	 * @param client the http client
-	 * @param time a time implementation
-	 * @param seed the seed to generate same device
+	 * @param time   a time implementation
+	 * @param seed   the seed to generate same device
 	 */
 	public PokemonGo(OkHttpClient client, Time time, long seed) {
 		this.time = time;
@@ -176,7 +176,7 @@ public class PokemonGo {
 	 * Deprecated: specify a time implementation
 	 *
 	 * @param client the http client
-	 * @param seed the seed to generate same device
+	 * @param seed   the seed to generate same device
 	 */
 	public PokemonGo(OkHttpClient client, long seed) {
 		this(client, new SystemTimeImpl(), seed);
@@ -187,7 +187,7 @@ public class PokemonGo {
 	 * Deprecated: specify a time implementation
 	 *
 	 * @param client the http client
-	 * @param time a time implementation
+	 * @param time   a time implementation
 	 */
 	public PokemonGo(OkHttpClient client, Time time) {
 		this(client, time, hash(UUID.randomUUID().toString()));
@@ -207,7 +207,7 @@ public class PokemonGo {
 	 * Login user with the provided provider
 	 *
 	 * @param credentialProvider the credential provider
-	 * @param hashProvider to provide hashes
+	 * @param hashProvider       to provide hashes
 	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
 	public void login(CredentialProvider credentialProvider, HashProvider hashProvider)
@@ -237,8 +237,8 @@ public class PokemonGo {
 		active = false;
 		new Random().nextBytes(sessionHash);
 		inventories = new Inventories(this);
-        news = new News(this);
-        settings = new Settings(this);
+		news = new News(this);
+		settings = new Settings(this);
 		playerProfile = new PlayerProfile(this);
 		map = new Map(this);
 		longitude = Double.NaN;
@@ -293,27 +293,29 @@ public class PokemonGo {
 
 		requestHandler.sendServerRequests(envelope);
 
-        try {
-            FetchAllNewsMessageOuterClass.FetchAllNewsMessage msg = FetchAllNewsMessageOuterClass.FetchAllNewsMessage.newBuilder().build();
-            ServerRequest request = new ServerRequest(RequestType.FETCH_ALL_NEWS, msg);
-            envelope = ServerRequestEnvelope.create(request);
-            getRequestHandler().sendServerRequests(envelope);
-            FetchAllNewsResponseOuterClass.FetchAllNewsResponse response = FetchAllNewsResponseOuterClass.FetchAllNewsResponse.parseFrom(request.getData());
-            if (response.getResult() == FetchAllNewsResponseOuterClass.FetchAllNewsResponse.Result.SUCCESS) {
-                Log.i(TAG, "FetchAllNewsMessage Success: total News=" + response.getCurrentNews().getNewsArticlesCount());
-                this.news.setCurrentNews(response.getCurrentNews());
+		try {
+			FetchAllNewsMessageOuterClass.FetchAllNewsMessage msg = FetchAllNewsMessageOuterClass.FetchAllNewsMessage
+					.newBuilder().build();
+			ServerRequest request = new ServerRequest(RequestType.FETCH_ALL_NEWS, msg);
+			envelope = ServerRequestEnvelope.create(request);
+			requestHandler.sendServerRequests(envelope);
+			FetchAllNewsResponseOuterClass.FetchAllNewsResponse response = FetchAllNewsResponseOuterClass
+					.FetchAllNewsResponse.parseFrom(request.getData());
+			if (response.getResult() == FetchAllNewsResponseOuterClass.FetchAllNewsResponse.Result.SUCCESS) {
+				Log.i(TAG, "FetchAllNewsMessage Success: total News=" + response.getCurrentNews()
+						.getNewsArticlesCount());
+				this.news.setCurrentNews(response.getCurrentNews());
 
-                // mark all un-read new to read
-                this.news.markUnreadNews();
-            } else {
-                Log.d(TAG, "FetchAllNewsMessage Failed. Result=" + response.getResult());
-            }
-        } catch (Exception e) {
-            Log.d(TAG, "Exceptions FetchAllNew");
-        }
+				// mark all un-read new to read
+				this.news.markUnreadNews();
+			} else {
+				Log.d(TAG, "FetchAllNewsMessage Failed. Result=" + response.getResult());
+			}
+		} catch (Exception e) {
+			Log.d(TAG, "Exceptions FetchAllNew");
+		}
 
-
-        List<LoginListener> loginListeners = getListeners(LoginListener.class);
+		List<LoginListener> loginListeners = getListeners(LoginListener.class);
 
 		for (LoginListener listener : loginListeners) {
 			listener.onLogin(this);
@@ -392,9 +394,9 @@ public class PokemonGo {
 	/**
 	 * Sets location.
 	 *
-	 * @param latitude the latitude
+	 * @param latitude  the latitude
 	 * @param longitude the longitude
-	 * @param altitude the altitude
+	 * @param altitude  the altitude
 	 */
 	public void setLocation(double latitude, double longitude, double altitude) {
 		setLocation(latitude, longitude, altitude, accuracy);
@@ -403,10 +405,10 @@ public class PokemonGo {
 	/**
 	 * Sets location with accuracy.
 	 *
-	 * @param latitude the latitude
+	 * @param latitude  the latitude
 	 * @param longitude the longitude
-	 * @param altitude the altitude
-	 * @param accuracy the accuracy of this location
+	 * @param altitude  the altitude
+	 * @param accuracy  the accuracy of this location
 	 */
 	public void setLocation(double latitude, double longitude, double altitude, double accuracy) {
 		setLatitude(latitude);
@@ -498,7 +500,7 @@ public class PokemonGo {
 	 * Gets the sensor info
 	 *
 	 * @param currentTime the current time
-	 * @param random the random object
+	 * @param random      the random object
 	 * @return the sensor info
 	 */
 	public SignatureOuterClass.Signature.SensorInfo getSensorSignature(long currentTime, Random random) {
@@ -536,7 +538,7 @@ public class PokemonGo {
 	/**
 	 * Updates the current challenge
 	 *
-	 * @param url the challenge url, if any
+	 * @param url          the challenge url, if any
 	 * @param hasChallenge whether the challenge solve is required
 	 */
 	public void updateChallenge(String url, boolean hasChallenge) {
@@ -576,7 +578,7 @@ public class PokemonGo {
 	 * Returns all listeners for the given type.
 	 *
 	 * @param listenerType the type of listeners to return
-	 * @param <T> the listener type
+	 * @param <T>          the listener type
 	 * @return all listeners for the given type
 	 */
 	public <T extends Listener> List<T> getListeners(Class<T> listenerType) {
@@ -595,9 +597,9 @@ public class PokemonGo {
 	 * Invokes a method in all listeners of the given type
 	 *
 	 * @param listenerType the listener to call to
-	 * @param name the method name to call
-	 * @param parameters the parameters to pass to the method
-	 * @param <T> the listener type
+	 * @param name         the method name to call
+	 * @param parameters   the parameters to pass to the method
+	 * @param <T>          the listener type
 	 * @throws ReflectiveOperationException if an exception occurred while invoking the listener
 	 */
 	public <T extends Listener> void callListener(Class<T> listenerType, String name, Object... parameters)

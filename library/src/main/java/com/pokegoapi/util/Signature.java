@@ -77,7 +77,7 @@ public class Signature {
 		}
 
 		long currentTimeMillis = api.currentTimeMillis();
-		byte[] sessionHash = api.settings.hash.getBytes();//.getSessionHash();
+		byte[] sessionHash = api.sessionHash;
 		HashProvider provider = api.hashProvider;
 		Hash hash = provider.provide(currentTimeMillis, latitude, longitude, accuracy, authTicket, sessionHash,
 				requestData);

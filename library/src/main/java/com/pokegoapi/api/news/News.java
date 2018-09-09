@@ -16,33 +16,20 @@
 package com.pokegoapi.api.news;
 
 import POGOProtos.Data.News.CurrentNewsOuterClass;
-import POGOProtos.Data.News.NewsArticleOuterClass;
 import POGOProtos.Data.News.NewsArticleOuterClass.NewsArticle;
-import POGOProtos.Networking.Requests.Messages.MarkReadNewsArticleMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.MarkReadNewsArticleMessageOuterClass.MarkReadNewsArticleMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
-import POGOProtos.Networking.Responses.MarkReadNewsArticleResponseOuterClass;
 import POGOProtos.Networking.Responses.MarkReadNewsArticleResponseOuterClass.MarkReadNewsArticleResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.request.RequestFailedException;
 import com.pokegoapi.main.ServerRequest;
 import com.pokegoapi.main.ServerRequestEnvelope;
-import com.pokegoapi.util.ClientInterceptor;
 import com.pokegoapi.util.Log;
 import lombok.Getter;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.*;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class News {
 	private static final java.lang.String TAG = News.class.getSimpleName();
@@ -52,10 +39,11 @@ public class News {
 	private CurrentNewsOuterClass.CurrentNews currentNews;
 	// the Key of the Language = Key
 
-    /**
-     * Constructor
-     * @param api Pokemon Go Core Api
-     */
+	/**
+	 * Constructor
+	 *
+	 * @param api Pokemon Go Core Api
+	 */
 	public News(PokemonGo api) {
 		this.api = api;
 	}
@@ -64,51 +52,47 @@ public class News {
 		this.currentNews = currentNews;
 	}
 
-    /**
-     * Mark Unread News to read
-     */
-	public void markUnreadNews(){
-        
-        if(currentNews == null || currentNews.getNewsArticlesCount() <= 0){
-            // do nothing
-            return;
-        }
+	/**
+	 * Mark Unread News to read
+	 */
+	public void markUnreadNews() {
 
-        // Stored enabled and un-read article
-        List<String> unReadNewsList = new ArrayList<>();
-        for(NewsArticle newsArticle:currentNews.getNewsArticlesList()){
-            if(newsArticle.getEnabled() && !newsArticle.getArticleRead())
-                unReadNewsList.add(newsArticle.getId());
-        }
+		if (currentNews == null || currentNews.getNewsArticlesCount() <= 0) {
+			// do nothing
+			return;
+		}
 
-        Log.i(TAG, "markUnreadNews total Article count:"+ unReadNewsList.size());
+		// Stored enabled and un-read article
+		List<String> unReadNewsList = new ArrayList<>();
+		for (NewsArticle newsArticle : currentNews.getNewsArticlesList()) {
+			if (newsArticle.getEnabled() && !newsArticle.getArticleRead())
+				unReadNewsList.add(newsArticle.getId());
+		}
 
-        if(unReadNewsList.size() > 0) {
-            MarkReadNewsArticleMessage msg = MarkReadNewsArticleMessage.newBuilder()
-                    .addAllNewsIds(unReadNewsList).build();
-            ServerRequest request = new ServerRequest(RequestTypeOuterClass.RequestType.MARK_READ_NEWS_ARTICLE, msg);
-            ServerRequestEnvelope envelope = ServerRequestEnvelope.create(request);
-            try {
-                api.getRequestHandler().sendServerRequests(envelope);
-                MarkReadNewsArticleResponse response = MarkReadNewsArticleResponse.parseFrom(request.getData());
-                if(response.getResult() == MarkReadNewsArticleResponse.Result.SUCCESS){
-                    Log.i(TAG, "Mark News Article -> success");
-                }else{
-                    Log.w(TAG, "Mark News Article -> !success");
-                }
-            } catch (RequestFailedException e) {
-                e.printStackTrace();
-                Log.e(TAG, "RequestFailedException: cause:" + e.getCause() + " message:" + e.getMessage());
-            } catch (InvalidProtocolBufferException e) {
-                e.printStackTrace();
-                Log.e(TAG, "InvalidProtocolBufferException: cause:" + e.getCause() + " message:" + e.getMessage());
-            }
-        }else {
-            Log.i(TAG, "no unmarked news found -> skipped");
-        }
-    }
+		Log.i(TAG, "markUnreadNews total Article count:" + unReadNewsList.size());
 
-
-
-
+		if (unReadNewsList.size() > 0) {
+			MarkReadNewsArticleMessage msg = MarkReadNewsArticleMessage.newBuilder()
+					.addAllNewsIds(unReadNewsList).build();
+			ServerRequest request = new ServerRequest(RequestTypeOuterClass.RequestType.MARK_READ_NEWS_ARTICLE, msg);
+			ServerRequestEnvelope envelope = ServerRequestEnvelope.create(request);
+			try {
+				api.requestHandler.sendServerRequests(envelope);
+				MarkReadNewsArticleResponse response = MarkReadNewsArticleResponse.parseFrom(request.getData());
+				if (response.getResult() == MarkReadNewsArticleResponse.Result.SUCCESS) {
+					Log.i(TAG, "Mark News Article -> success");
+				} else {
+					Log.w(TAG, "Mark News Article -> !success");
+				}
+			} catch (RequestFailedException e) {
+				e.printStackTrace();
+				Log.e(TAG, "RequestFailedException: cause:" + e.getCause() + " message:" + e.getMessage());
+			} catch (InvalidProtocolBufferException e) {
+				e.printStackTrace();
+				Log.e(TAG, "InvalidProtocolBufferException: cause:" + e.getCause() + " message:" + e.getMessage());
+			}
+		} else {
+			Log.i(TAG, "no unmarked news found -> skipped");
+		}
+	}
 }
