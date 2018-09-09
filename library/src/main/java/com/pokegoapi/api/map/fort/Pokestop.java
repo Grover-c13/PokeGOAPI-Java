@@ -48,6 +48,15 @@ public class Pokestop extends Fort {
 	}
 
 	/**
+	 * Returns whether or not the lured pokemon is in range.
+	 *
+	 * @return true when the lured pokemon is in range of player
+	 */
+	public boolean inRangeForLuredPokemon() {
+		return getDistance() <= api.settings.mapSettings.pokemonVisibilityRange;
+	}
+
+	/**
 	 * Returns whether this pokestop has an active lure when detected on map.
 	 *
 	 * @return true if this pokestop currently has a lure active
@@ -58,15 +67,6 @@ public class Pokestop extends Fort {
 		} catch (RequestFailedException e) {
 			return false;
 		}
-	}
-
-	/**
-	 * Returns whether or not the lured pokemon is in range.
-	 *
-	 * @return true when the lured pokemon is in range of player
-	 */
-	public boolean inRangeForLuredPokemon() {
-		return getDistance() <= api.settings.mapSettings.pokemonVisibilityRange;
 	}
 
 	/**
@@ -86,6 +86,7 @@ public class Pokestop extends Fort {
 			}
 			return false;
 		}
+
 		return fortData.getActiveFortModifierList().contains(ItemIdOuterClass.ItemId.ITEM_TROY_DISK);
 	}
 

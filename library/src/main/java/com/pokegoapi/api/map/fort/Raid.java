@@ -29,6 +29,13 @@ public class Raid {
 	@Getter
 	private final RaidInfo raidInfo;
 
+	/**
+	 * Raid Constructor.
+	 *
+	 * @param api set api
+	 * @param gym set gym
+	 * @param raidInfo set raidInfo
+	 */
 	public Raid(PokemonGo api, Gym gym, RaidInfo raidInfo) {
 		this.api = api;
 		this.gym = gym;
