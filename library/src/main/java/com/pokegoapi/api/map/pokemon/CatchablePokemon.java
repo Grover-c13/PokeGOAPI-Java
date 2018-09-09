@@ -43,17 +43,14 @@ public class CatchablePokemon implements MapPoint {
 	@Getter
 	private final int pokemonIdValue;
 	@Getter
-	private final long expirationTimestampMs;
-	@Getter
+	public final long expirationTimestampMs;
 	private final double latitude;
-	@Getter
 	private final double longitude;
 	private final EncounterKind encounterKind;
 	private Encounter encounter = null;
-
 	@Getter
 	@Setter
-	private boolean despawned = false;
+	public boolean despawned = false;
 
 	/**
 	 * Instantiates a new Catchable pokemon.
@@ -164,14 +161,14 @@ public class CatchablePokemon implements MapPoint {
 		if (obj == this) {
 			return true;
 		} else if (obj instanceof CatchablePokemon) {
-			return this.getEncounterId() == ((CatchablePokemon) obj).getEncounterId();
+			return this.encounterId == ((CatchablePokemon) obj).encounterId;
 		}
 		return false;
 	}
 
 	@Override
 	public int hashCode() {
-		return (int) this.getEncounterId();
+		return (int) this.encounterId;
 	}
 
 	/**
@@ -205,5 +202,13 @@ public class CatchablePokemon implements MapPoint {
 		NORMAL,
 		DISK,
 		INCENSE
+	}
+
+	public double getLatitude() {
+		return this.latitude;
+	}
+
+	public double getLongitude() {
+		return this.longitude;
 	}
 }

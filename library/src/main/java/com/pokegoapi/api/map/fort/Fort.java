@@ -49,10 +49,10 @@ import java.util.List;
  */
 public class Fort {
 	@Getter
-	private final PokemonGo api;
+	public final PokemonGo api;
 	@Getter
 	@Setter
-	private FortDataOuterClass.FortData fortData;
+	public FortDataOuterClass.FortData fortData;
 	@Getter
 	private long cooldownCompleteTimestampMs;
 
@@ -75,7 +75,7 @@ public class Fort {
 	 */
 	public double getDistance() {
 		S2LatLng pokestop = S2LatLng.fromDegrees(getLatitude(), getLongitude());
-		S2LatLng player = S2LatLng.fromDegrees(api.getLatitude(), api.getLongitude());
+		S2LatLng player = S2LatLng.fromDegrees(api.latitude, api.longitude);
 		return pokestop.getEarthDistance(player);
 	}
 
@@ -85,7 +85,7 @@ public class Fort {
 	 * @return true when in range of player
 	 */
 	public boolean inRange() {
-		return getDistance() <= api.getSettings().getFortSettings().getInteractionRangeInMeters();
+		return getDistance() <= api.settings.fortSettings.interactionRangeInMeters;
 	}
 
 	/**
@@ -133,13 +133,13 @@ public class Fort {
 				.setFortId(getId())
 				.setFortLatitude(getLatitude())
 				.setFortLongitude(getLongitude())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
+				.setPlayerLatitude(api.latitude)
+				.setPlayerLongitude(api.longitude)
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_SEARCH,
 				searchMessage);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest, true).map(
+		return api.requestHandler.sendAsyncServerRequests(serverRequest, true).map(
 				new Func1<ByteString, PokestopLootResult>() {
 					@Override
 					public PokestopLootResult call(ByteString result) {
@@ -182,11 +182,11 @@ public class Fort {
 		AddFortModifierMessage msg = AddFortModifierMessage.newBuilder()
 				.setModifierType(item)
 				.setFortId(getId())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
+				.setPlayerLatitude(api.latitude)
+				.setPlayerLongitude(api.longitude)
 				.build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.ADD_FORT_MODIFIER, msg);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, Boolean>() {
+		return api.requestHandler.sendAsyncServerRequests(serverRequest).map(new Func1<ByteString, Boolean>() {
 			@Override
 			public Boolean call(ByteString result) {
 				try {
@@ -223,7 +223,7 @@ public class Fort {
 
 		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.FORT_DETAILS,
 				reqMsg);
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest, true).map(
+		return api.requestHandler.sendAsyncServerRequests(serverRequest, true).map(
 				new Func1<ByteString, FortDetails>() {
 					@Override
 					public FortDetails call(ByteString result) {
@@ -246,9 +246,9 @@ public class Fort {
 	 * @throws RequestFailedException if an exception occurred while sending requests
 	 */
 	public FortDetails getDetails() throws RequestFailedException {
-		List<TutorialState> tutorialStates = api.getPlayerProfile().getTutorialState().getTutorialStates();
+		List<TutorialState> tutorialStates = api.playerProfile.getTutorialState().getTutorialStates();
 		if (!tutorialStates.contains(TutorialState.POKESTOP_TUTORIAL)) {
-			api.getPlayerProfile().visitPokestopComplete();
+			api.playerProfile.visitPokestopComplete();
 		}
 
 		return AsyncHelper.toBlocking(getDetailsAsync());

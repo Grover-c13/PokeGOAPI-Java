@@ -123,11 +123,6 @@ public class GoogleAutoCredentialProvider extends CredentialProvider {
 	}
 
 	@Override
-	public boolean isTokenIdExpired() {
-		return isTokenIdInvalid();
-	}
-
-	@Override
 	public boolean isTokenIdInvalid() {
 		return tokenInfo == null || tokenInfo.authToken.getExpiry() < time.currentTimeMillis() / 1000;
 	}

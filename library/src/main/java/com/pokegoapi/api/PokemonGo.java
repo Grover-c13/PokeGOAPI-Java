@@ -62,7 +62,6 @@ import com.pokegoapi.util.hash.HashProvider;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.OkHttpClient;
-
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -71,34 +70,32 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-
 public class PokemonGo {
-
 	private static final java.lang.String TAG = PokemonGo.class.getSimpleName();
 	private final Time time;
 	@Getter
-	private long startTime;
+	public long startTime;
 	@Getter
 	private final byte[] sessionHash = new byte[32];
 	@Getter
-	RequestHandler requestHandler;
+	public RequestHandler requestHandler;
 	@Getter
-	private PlayerProfile playerProfile;
+	public PlayerProfile playerProfile;
 	@Getter
-	private Inventories inventories;
+	public Inventories inventories;
 	@Getter
-	private double latitude;
+	public double latitude;
 	@Getter
-	private double longitude;
-	@Getter
-	@Setter
-	private double altitude;
+	public double longitude;
 	@Getter
 	@Setter
-	private double accuracy = 5;
+	public double altitude;
+	@Getter
+	@Setter
+	public double accuracy = 5;
 	private CredentialProvider credentialProvider;
 	@Getter
-	private Settings settings;
+	public Settings settings;
 	private Map map;
 	@Setter
 	private DeviceInfo deviceInfo;
@@ -110,33 +107,26 @@ public class PokemonGo {
 	public ActivityStatus activityStatus;
 	@Setter
 	@Getter
-	private long seed;
+	public long seed;
 	@Getter
 	@Setter
 	public LocationFixes locationFixes;
-
 	@Setter
 	private boolean hasChallenge;
 	@Getter
 	private String challengeURL;
 	private final Object challengeLock = new Object();
-
 	@Getter
 	private List<Listener> listeners = Collections.synchronizedList(new ArrayList<Listener>());
-
 	private final Object lock = new Object();
-
 	@Getter
-	private boolean loggingIn;
+	public boolean loggingIn;
 	@Getter
 	private boolean active;
-
 	@Getter
 	private Heartbeat heartbeat = new Heartbeat(this);
-
 	@Getter
-	private HashProvider hashProvider;
-
+	public HashProvider hashProvider;
 	private OkHttpClient client;
 
 	/**
@@ -146,7 +136,7 @@ public class PokemonGo {
 	 */
 	@Getter
 	@Setter
-	private boolean firstGMO = true;
+	public boolean firstGMO = true;
 	/**
 	 * Ptr8 is only sent with the first Get Player request,
 	 * we need a flag to tell us if it has already been sent.
@@ -154,11 +144,11 @@ public class PokemonGo {
 	 */
 	@Getter
 	@Setter
-	private boolean firstGP = true;
+	public boolean firstGP = true;
 
 	@Getter
 	@Setter
-	private ItemTemplates itemTemplates;
+	public ItemTemplates itemTemplates;
 
 	/**
 	 * Instantiates a new Pokemon go.
@@ -250,19 +240,19 @@ public class PokemonGo {
 	}
 
 	private void initialize() throws RequestFailedException {
-		if (getRequestHandler() != null) {
-			getRequestHandler().exit();
+		if (requestHandler != null) {
+			requestHandler.exit();
 		}
 
 		requestHandler = new RequestHandler(this, client);
 
-		getRequestHandler().sendServerRequests(ServerRequestEnvelope.create());
+		requestHandler.sendServerRequests(ServerRequestEnvelope.create());
 
 		playerProfile.updateProfile();
 
 		ServerRequest downloadConfigRequest = new ServerRequest(RequestType.DOWNLOAD_REMOTE_CONFIG_VERSION,
 				CommonRequests.getDownloadRemoteConfigVersionMessageRequest(this));
-		getRequestHandler().sendServerRequests(downloadConfigRequest, true);
+		requestHandler.sendServerRequests(downloadConfigRequest, true);
 		getAssetDigest();
 
 		try {
@@ -278,14 +268,14 @@ public class PokemonGo {
 
 		try {
 			LevelUpRewardsMessage rewardsMessage = LevelUpRewardsMessage.newBuilder()
-					.setLevel(playerProfile.getLevel())
+					.setLevel(playerProfile.getStats().getLevel())
 					.build();
 			ServerRequest request = new ServerRequest(RequestType.LEVEL_UP_REWARDS, rewardsMessage);
 			ServerRequestEnvelope envelope = ServerRequestEnvelope.createCommons(request, this);
-			getRequestHandler().sendServerRequests(envelope);
+			requestHandler.sendServerRequests(envelope);
 			LevelUpRewardsResponse levelUpRewardsResponse = LevelUpRewardsResponse.parseFrom(request.getData());
 			if (levelUpRewardsResponse.getResult() == Result.SUCCESS) {
-				inventories.getItemBag().addAwardedItems(levelUpRewardsResponse);
+				inventories.itemBag.addAwardedItems(levelUpRewardsResponse);
 			}
 		} catch (InvalidProtocolBufferException e) {
 			throw new RequestFailedException(e);
@@ -295,7 +285,7 @@ public class PokemonGo {
 		ServerRequestEnvelope envelope = ServerRequestEnvelope.create();
 		envelope.addPlatform(new ServerPlatformRequest(PlatformRequestType.GET_STORE_ITEMS, getStoreItems));
 
-		getRequestHandler().sendServerRequests(envelope);
+		requestHandler.sendServerRequests(envelope);
 
 		List<LoginListener> loginListeners = getListeners(LoginListener.class);
 
@@ -322,7 +312,7 @@ public class PokemonGo {
 			playerProfile.encounterTutorialComplete();
 		}
 
-		int remainingCodenameClaims = getPlayerProfile().getPlayerData().getRemainingCodenameClaims();
+		int remainingCodenameClaims = playerProfile.getPlayerData().getRemainingCodenameClaims();
 		if (!tutorialStates.contains(TutorialState.NAME_SELECTION) && remainingCodenameClaims > 0) {
 			playerProfile.claimCodeName();
 		}
@@ -340,7 +330,7 @@ public class PokemonGo {
 	public void getAssetDigest() throws RequestFailedException {
 		GetAssetDigestMessage message = CommonRequests.getGetAssetDigestMessageRequest(this);
 		ServerRequest request = new ServerRequest(RequestType.GET_ASSET_DIGEST, message);
-		getRequestHandler().sendServerRequests(request, true);
+		requestHandler.sendServerRequests(request, true);
 	}
 
 	/**
@@ -395,8 +385,8 @@ public class PokemonGo {
 	public void setLocation(double latitude, double longitude, double altitude, double accuracy) {
 		setLatitude(latitude);
 		setLongitude(longitude);
-		setAltitude(altitude);
-		setAccuracy(accuracy);
+		//setAltitude(altitude);
+		//setAccuracy(accuracy);
 	}
 
 	public long currentTimeMillis() {
@@ -486,7 +476,7 @@ public class PokemonGo {
 	 * @return the sensor info
 	 */
 	public SignatureOuterClass.Signature.SensorInfo getSensorSignature(long currentTime, Random random) {
-		if (this.sensorInfo == null || sensorInfo.getTimestampCreate() != 0L) {
+		if (this.sensorInfo == null || sensorInfo.timestampCreate != 0L) {
 			return SensorInfo.getDefault(this, currentTime, random);
 		}
 		return sensorInfo.getSensorInfo();
@@ -620,7 +610,7 @@ public class PokemonGo {
 		hasChallenge = false;
 		VerifyChallengeMessage message = VerifyChallengeMessage.newBuilder().setToken(token).build();
 		ServerRequest request = new ServerRequest(RequestType.VERIFY_CHALLENGE, message);
-		ByteString responseData = getRequestHandler().sendServerRequests(request, true);
+		ByteString responseData = requestHandler.sendServerRequests(request, true);
 		try {
 			VerifyChallengeResponse response = VerifyChallengeResponse.parseFrom(responseData);
 			hasChallenge = !response.getSuccess();
@@ -648,7 +638,7 @@ public class PokemonGo {
 		CheckChallengeMessage message = CheckChallengeMessage.newBuilder().build();
 		try {
 			ServerRequest request = new ServerRequest(RequestType.CHECK_CHALLENGE, message);
-			ByteString responseData = getRequestHandler().sendServerRequests(request, false);
+			ByteString responseData = requestHandler.sendServerRequests(request, false);
 			CheckChallengeResponse response = CheckChallengeResponse.parseFrom(responseData);
 			String newChallenge = response.getChallengeUrl();
 			if (response.getShowChallenge() && newChallenge != null && newChallenge.length() > 0) {
@@ -665,7 +655,7 @@ public class PokemonGo {
 	 * @return the current player position in Point form
 	 */
 	public Point getPoint() {
-		return new Point(this.getLatitude(), this.getLongitude());
+		return new Point(this.latitude, this.longitude);
 	}
 
 	/**

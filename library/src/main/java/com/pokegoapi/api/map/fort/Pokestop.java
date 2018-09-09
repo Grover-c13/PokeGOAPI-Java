@@ -20,7 +20,6 @@ import POGOProtos.Map.Fort.FortDataOuterClass;
 import POGOProtos.Map.Fort.FortModifierOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.request.RequestFailedException;
-
 import java.util.List;
 
 /**
@@ -35,9 +34,9 @@ public class Pokestop extends Fort {
 	 * @param fortData the fort data
 	 */
 	public Pokestop(PokemonGo api, FortDataOuterClass.FortData fortData) {
-		super(api, fortData);		
+		super(api, fortData);
 	}
-	
+
 	/**
 	 * Returns whether this pokestop has an active lure.
 	 *
@@ -45,8 +44,16 @@ public class Pokestop extends Fort {
 	 */
 	@Deprecated
 	public boolean hasLurePokemon() {
-		return getFortData().hasLureInfo() && getFortData().getLureInfo().getLureExpiresTimestampMs() > getApi()
-				.currentTimeMillis();
+		return fortData.hasLureInfo() && fortData.getLureInfo().getLureExpiresTimestampMs() > api.startTime;
+	}
+
+	/**
+	 * Returns whether or not the lured pokemon is in range.
+	 *
+	 * @return true when the lured pokemon is in range of player
+	 */
+	public boolean inRangeForLuredPokemon() {
+		return getDistance() <= api.settings.mapSettings.pokemonVisibilityRange;
 	}
 
 	/**
@@ -62,15 +69,6 @@ public class Pokestop extends Fort {
 		}
 	}
 
-	/**
-	 * Returns whether or not the lured pokemon is in range.
-	 *
-	 * @return true when the lured pokemon is in range of player
-	 */
-	public boolean inRangeForLuredPokemon() {
-		return getDistance() <= getApi().getSettings().getMapSettings().getPokemonVisibilityRange();
-	}
-	
 	/**
 	 * Returns whether this pokestop has an active lure.
 	 *
@@ -88,7 +86,8 @@ public class Pokestop extends Fort {
 			}
 			return false;
 		}
-		return getFortData().getActiveFortModifierList().contains(ItemIdOuterClass.ItemId.ITEM_TROY_DISK);
+
+		return fortData.getActiveFortModifierList().contains(ItemIdOuterClass.ItemId.ITEM_TROY_DISK);
 	}
 
 	@Override

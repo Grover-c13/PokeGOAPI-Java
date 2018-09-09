@@ -27,7 +27,7 @@ public class Medal {
 
 	@Getter
 	@Setter
-	private int rank;
+	public int rank;
 	@Getter
 	private BadgeType type;
 
@@ -59,7 +59,7 @@ public class Medal {
 	 * @return the settings
 	 */
 	public BadgeSettings getSettings() {
-		return api.getItemTemplates().getBadgeSettings(type);
+		return api.itemTemplates.getBadgeSettings(type);
 	}
 
 	@Override

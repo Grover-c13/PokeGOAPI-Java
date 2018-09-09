@@ -47,7 +47,7 @@ public class EggIncubator {
 	 * @return the attributes of this incubator, null if there are none
 	 */
 	public EggIncubatorAttributes getAttributes() {
-		ItemSettings settings = api.getItemTemplates().getItemSettings(proto.getItemId());
+		ItemSettings settings = api.itemTemplates.getItemSettings(proto.getItemId());
 		if (settings != null) {
 			return settings.getEggIncubator();
 		}
@@ -78,7 +78,7 @@ public class EggIncubator {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_EGG_INCUBATOR, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest, true);
+		api.requestHandler.sendServerRequests(serverRequest, true);
 
 		UseItemEggIncubatorResponse response;
 		try {
@@ -87,7 +87,7 @@ public class EggIncubator {
 			throw new RequestFailedException(e);
 		}
 
-		api.getInventories().updateInventories(true);
+		api.inventories.updateInventories();
 
 		return response.getResult();
 	}
@@ -153,7 +153,7 @@ public class EggIncubator {
 	 * @return distance walked with the current incubated egg (km)
 	 */
 	public double getKmCurrentlyWalked() {
-		return api.getPlayerProfile().getStats().getKmWalked() - getKmStart();
+		return api.playerProfile.getStats().getKmWalked() - getKmStart();
 	}
 
 	/**
@@ -162,7 +162,7 @@ public class EggIncubator {
 	 * @return distance to walk before hatch (km)
 	 */
 	public double getKmLeftToWalk() {
-		return getKmTarget() - api.getPlayerProfile().getStats().getKmWalked();
+		return getKmTarget() - api.playerProfile.getStats().getKmWalked();
 	}
 
 	/**
@@ -171,7 +171,7 @@ public class EggIncubator {
 	 * @return currently used or not
 	 */
 	public boolean isInUse() {
-		return getKmTarget() > api.getPlayerProfile().getStats().getKmWalked();
+		return getKmTarget() > api.playerProfile.getStats().getKmWalked();
 	}
 
 	@Override

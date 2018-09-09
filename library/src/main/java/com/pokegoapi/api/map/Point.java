@@ -16,19 +16,15 @@
 package com.pokegoapi.api.map;
 
 import POGOProtos.Map.SpawnPointOuterClass;
-
 import com.pokegoapi.util.MapPoint;
-
 import lombok.Getter;
 import lombok.Setter;
 
 public class Point implements MapPoint {
-	@Getter
 	@Setter
-	private double longitude;
-	@Getter
+	public double longitude;
 	@Setter
-	private double latitude;
+	public double latitude;
 
 	public Point(double latitude, double longitude) {
 		this.latitude = latitude;
@@ -47,5 +43,13 @@ public class Point implements MapPoint {
 		builder.append(", ");
 		builder.append(this.longitude);
 		return builder.toString();
+	}
+
+	public double getLatitude() {
+		return this.latitude;
+	}
+
+	public double getLongitude() {
+		return this.longitude;
 	}
 }

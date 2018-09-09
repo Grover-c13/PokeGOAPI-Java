@@ -51,19 +51,19 @@ public class Inventories {
 
 	private final PokemonGo api;
 	@Getter
-	private ItemBag itemBag;
+	public ItemBag itemBag;
 	@Getter
-	private PokeBank pokebank;
+	public PokeBank pokebank;
 	@Getter
-	private CandyJar candyjar;
+	public CandyJar candyjar;
 	@Getter
 	private Pokedex pokedex;
 	@Getter
-	private final List<EggIncubator> incubators = Collections.synchronizedList(new ArrayList<EggIncubator>());
+	public final List<EggIncubator> incubators = Collections.synchronizedList(new ArrayList<EggIncubator>());
 	@Getter
-	private Hatchery hatchery;
+	public Hatchery hatchery;
 	@Getter
-	private long lastInventoryUpdate = 0;
+	public long lastInventoryUpdate = 0;
 
 	private Map<ItemId, AppliedItem> appliedItems = new HashMap<>();
 
@@ -120,7 +120,7 @@ public class Inventories {
 				.setLastTimestampMs(lastInventoryUpdate)
 				.build();
 		ServerRequest inventoryRequest = new ServerRequest(RequestType.GET_HOLOHOLO_INVENTORY, invReqMsg);
-		api.getRequestHandler().sendServerRequests(inventoryRequest, false);
+		api.requestHandler.sendServerRequests(inventoryRequest, false);
 
 		GetHoloInventoryResponse response;
 		try {
@@ -178,7 +178,7 @@ public class Inventories {
 
 			// player stats
 			if (itemData.hasPlayerStats()) {
-				api.getPlayerProfile().setStats(new Stats(itemData.getPlayerStats()));
+				api.playerProfile.setStats(new Stats(itemData.getPlayerStats()));
 			}
 
 			// pokedex

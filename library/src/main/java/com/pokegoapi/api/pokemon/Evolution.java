@@ -31,7 +31,7 @@ public class Evolution {
 	@Getter
 	private List<PokemonId> evolutions = new ArrayList<>();
 	@Getter
-	private List<EvolutionBranch> evolutionBranch;
+	public List<EvolutionBranch> evolutionBranch;
 
 	/**
 	 * Constructor for this evolution class

@@ -92,7 +92,7 @@ public class PlayerProfile {
 	private int level = 1;
 
 	@Getter
-	private boolean banned;
+	public boolean banned;
 
 	@Getter
 	private boolean warned = false;
@@ -116,7 +116,7 @@ public class PlayerProfile {
 				.build();
 
 		ServerRequest request = new ServerRequest(RequestType.GET_PLAYER, message);
-		api.getRequestHandler().sendServerRequests(request, false);
+		api.requestHandler.sendServerRequests(request, false);
 
 		try {
 			updateProfile(GetPlayerResponse.parseFrom(request.getData()));
@@ -182,7 +182,7 @@ public class PlayerProfile {
 		GetPlayerProfileMessage profileMessage = GetPlayerProfileMessage.newBuilder().setPlayerName("").build();
 
 		ServerRequest profileRequest = new ServerRequest(RequestType.GET_PLAYER_PROFILE, profileMessage);
-		api.getRequestHandler().sendServerRequests(profileRequest, true);
+		api.requestHandler.sendServerRequests(profileRequest, true);
 
 		try {
 			GetPlayerProfileResponse response = GetPlayerProfileResponse.parseFrom(profileRequest.getData());
@@ -220,7 +220,7 @@ public class PlayerProfile {
 				.setLevel(level)
 				.build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.LEVEL_UP_REWARDS, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest, true);
+		api.requestHandler.sendServerRequests(serverRequest, true);
 		LevelUpRewardsResponse response;
 		try {
 			response = LevelUpRewardsResponse.parseFrom(serverRequest.getData());
@@ -228,7 +228,7 @@ public class PlayerProfile {
 			throw new RequestFailedException(e);
 		}
 		// Add the awarded items to our bag
-		ItemBag bag = api.getInventories().getItemBag();
+		ItemBag bag = api.inventories.itemBag;
 		bag.addAwardedItems(response);
 		// Build a new rewards object and return it
 		return new PlayerLevelUpRewards(response);
@@ -261,7 +261,7 @@ public class PlayerProfile {
 	public void checkAndEquipBadges() throws RequestFailedException {
 		CheckAwardedBadgesMessage msg = CheckAwardedBadgesMessage.newBuilder().build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.CHECK_AWARDED_BADGES, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest, false);
+		api.requestHandler.sendServerRequests(serverRequest, false);
 		CheckAwardedBadgesResponse response;
 		try {
 			response = CheckAwardedBadgesResponse.parseFrom(serverRequest.getData());
@@ -299,7 +299,7 @@ public class PlayerProfile {
 				int level = response.getAwardedBadgeLevels(i);
 				Medal medal = medals.get(type);
 				if (medal != null) {
-					medal.setRank(level);
+					medal.rank = level;
 					for (PlayerListener listener : listeners) {
 						listener.onMedalAwarded(api, this, medal);
 					}
@@ -420,7 +420,7 @@ public class PlayerProfile {
 				.setPokemonId(pokemon.getId())
 				.build();
 		ServerRequest request = new ServerRequest(RequestType.SET_BUDDY_POKEMON, message);
-		api.getRequestHandler().sendServerRequests(request, true);
+		api.requestHandler.sendServerRequests(request, true);
 		try {
 			SetBuddyPokemonResponse response = SetBuddyPokemonResponse.parseFrom(request.getData());
 			buddy = new Buddy(api, response.getUpdatedBuddy());
@@ -468,12 +468,12 @@ public class PlayerProfile {
 		}
 
 		final SetAvatarMessage setAvatarMessage = SetAvatarMessage.newBuilder()
-				.setPlayerAvatar(avatar.getAvatar())
+				.setPlayerAvatar(avatar.avatar)
 				.build();
 
 		ServerRequest request = new ServerRequest(RequestType.SET_AVATAR, setAvatarMessage);
 
-		api.getRequestHandler().sendServerRequests(request, true);
+		api.requestHandler.sendServerRequests(request, true);
 
 		try {
 			SetAvatarResponse setAvatarResponse = SetAvatarResponse.parseFrom(request.getData());
@@ -509,18 +509,18 @@ public class PlayerProfile {
 
 		final EncounterTutorialCompleteMessage.Builder builder =
 				EncounterTutorialCompleteMessage.newBuilder()
-						.setPokemonId(starter.getPokemon());
+						.setPokemonId(starter.pokemon);
 
 		ServerRequest request = new ServerRequest(RequestType.ENCOUNTER_TUTORIAL_COMPLETE, builder.build());
 
-		api.getRequestHandler().sendServerRequests(request, true);
+		api.requestHandler.sendServerRequests(request, true);
 
 		final GetPlayerMessage getPlayerReqMsg = GetPlayerMessage.newBuilder()
 				.setPlayerLocale(playerLocale.getPlayerLocale())
 				.build();
 		request = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
 
-		api.getRequestHandler().sendServerRequests(request, true);
+		api.requestHandler.sendServerRequests(request, true);
 
 		try {
 			updateProfile(GetPlayerResponse.parseFrom(request.getData()));
@@ -569,7 +569,7 @@ public class PlayerProfile {
 
 		ServerRequest request = new ServerRequest(RequestType.CLAIM_CODENAME, claimCodenameMessage);
 
-		api.getRequestHandler().sendServerRequests(request, true);
+		api.requestHandler.sendServerRequests(request, true);
 
 		String updatedCodename;
 		try {
@@ -591,7 +591,7 @@ public class PlayerProfile {
 						.build();
 				request = new ServerRequest(RequestType.GET_PLAYER, getPlayerReqMsg);
 
-				api.getRequestHandler().sendServerRequests(request, true);
+				api.requestHandler.sendServerRequests(request, true);
 
 				updateProfile(GetPlayerResponse.parseFrom(request.getData()));
 			}
@@ -635,7 +635,7 @@ public class PlayerProfile {
 
 		ServerRequest request = new ServerRequest(RequestType.MARK_TUTORIAL_COMPLETE, tutorialMessage);
 
-		api.getRequestHandler().sendServerRequests(request, true);
+		api.requestHandler.sendServerRequests(request, true);
 
 		try {
 			playerData = MarkTutorialCompleteResponse.parseFrom(request.getData()).getPlayerData();

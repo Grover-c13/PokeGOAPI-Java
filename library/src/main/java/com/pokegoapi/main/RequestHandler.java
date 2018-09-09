@@ -242,8 +242,8 @@ public class RequestHandler implements Runnable {
 					ByteString returned = responseEnvelope.getReturns(i);
 					ServerRequest serverRequest = requests[i];
 					if (returned != null) {
-						serverResponse.addResponse(serverRequest.getType(), returned);
-						if (serverRequest.getType() == RequestType.GET_PLAYER) {
+						serverResponse.addResponse(serverRequest.type, returned);
+						if (serverRequest.type == RequestType.GET_PLAYER) {
 							if (GetPlayerResponse.parseFrom(returned).getBanned()) {
 								throw new BannedException("Cannot send request, your account has been banned!");
 							}
@@ -277,7 +277,7 @@ public class RequestHandler implements Runnable {
 					// API_ENDPOINT was not correctly set, should be at this point, though, so redo the request
 					return sendInternal(serverResponse, requests, platformRequests, builder);
 				} else if (statusCode == StatusCode.BAD_REQUEST) {
-					if (api.getPlayerProfile().isBanned()) {
+					if (api.playerProfile.banned) {
 						throw new BannedException("Cannot send request, your account has been banned!");
 					} else {
 						throw new BadRequestException("A bad request was sent!");
@@ -301,10 +301,10 @@ public class RequestHandler implements Runnable {
 		resetBuilder(builder);
 
 		for (ServerRequest serverRequest : requests) {
-			ByteString data = serverRequest.getRequest().toByteString();
+			ByteString data = serverRequest.request.toByteString();
 			Request request = Request.newBuilder()
 					.setRequestMessage(data)
-					.setRequestType(serverRequest.getType())
+					.setRequestType(serverRequest.type)
 					.build();
 			builder.addRequests(request);
 		}
@@ -312,9 +312,9 @@ public class RequestHandler implements Runnable {
 		Signature.setSignature(api, builder);
 
 		for (ServerPlatformRequest platformRequest : platformRequests) {
-			ByteString data = platformRequest.getRequest();
+			ByteString data = platformRequest.request;
 			Builder request = PlatformRequest.newBuilder()
-					.setType(platformRequest.getType())
+					.setType(platformRequest.type)
 					.setRequestMessage(data);
 			builder.addPlatformRequests(request);
 		}
@@ -333,9 +333,9 @@ public class RequestHandler implements Runnable {
 			builder.setAuthInfo(api.getAuthInfo(refresh));
 		}
 		builder.setMsSinceLastLocationfix(random.nextInt(1651) + 149);
-		double latitude = api.getLatitude();
-		double longitude = api.getLongitude();
-		double accuracy = api.getAccuracy();
+		double latitude = api.latitude;
+		double longitude = api.longitude;
+		double accuracy = api.accuracy;
 		if (Double.isNaN(latitude)) {
 			latitude = 0.0;
 		}
@@ -377,11 +377,11 @@ public class RequestHandler implements Runnable {
 
 				List<ServerRequest> requests = new ArrayList<>();
 
-				if (envelope.getRequest() != null) {
-					envelope.setRequest(addRequest(envelope, requests, envelope.getRequest()));
+				if (envelope.request != null) {
+					envelope.setRequest(addRequest(envelope, requests, envelope.request));
 				}
 
-				List<ServerRequest> commons = new ArrayList<>(envelope.getCommons());
+				List<ServerRequest> commons = new ArrayList<>(envelope.commons);
 				for (ServerRequest commonRequest : commons) {
 					ServerRequest adaptedRequest = addRequest(envelope, requests, commonRequest);
 					if (adaptedRequest != null) {
@@ -391,7 +391,7 @@ public class RequestHandler implements Runnable {
 				}
 
 				ServerRequest[] arrayRequests = requests.toArray(new ServerRequest[requests.size()]);
-				List<ServerPlatformRequest> platformRequests = envelope.getPlatformRequests();
+				List<ServerPlatformRequest> platformRequests = envelope.platformRequests;
 				ServerPlatformRequest[] arrayPlatformRequests = platformRequests
 						.toArray(new ServerPlatformRequest[platformRequests.size()]);
 
@@ -399,7 +399,7 @@ public class RequestHandler implements Runnable {
 				try {
 					response = sendInternal(response, arrayRequests, arrayPlatformRequests);
 				} catch (RequestFailedException e) {
-					response.setException(e);
+					response.exception = e;
 				}
 
 				envelope.handleResponse(response);
@@ -412,7 +412,7 @@ public class RequestHandler implements Runnable {
 				try {
 					CommonRequests.handleCommons(api, response);
 				} catch (RequestFailedException | InvalidProtocolBufferException e) {
-					response.setException(e);
+					response.exception = e;
 				}
 
 				envelope.notifyResponse(response);

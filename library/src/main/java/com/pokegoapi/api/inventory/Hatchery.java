@@ -35,7 +35,7 @@ import java.util.Set;
 
 public class Hatchery {
 	@Getter
-	private final Set<EggPokemon> eggs = Collections.synchronizedSet(new HashSet<EggPokemon>());
+	public final Set<EggPokemon> eggs = Collections.synchronizedSet(new HashSet<EggPokemon>());
 	@Getter
 	private final Set<HatchedEgg> hatchedEggs = Collections.synchronizedSet(new HashSet<HatchedEgg>());
 	@Getter
@@ -63,7 +63,7 @@ public class Hatchery {
 	 * @param egg the egg to add
 	 */
 	public void addEgg(EggPokemon egg) {
-		egg.setApi(api);
+		egg.api = api;
 		synchronized (this.lock) {
 			eggs.add(egg);
 		}
@@ -133,7 +133,7 @@ public class Hatchery {
 			throws RequestFailedException {
 		GetHatchedEggsMessage msg = GetHatchedEggsMessage.newBuilder().build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.GET_HATCHED_EGGS, msg);
-		api.getRequestHandler().sendServerRequests(serverRequest, false);
+		api.requestHandler.sendServerRequests(serverRequest, false);
 
 		GetHatchedEggsResponse response;
 		try {
@@ -141,7 +141,7 @@ public class Hatchery {
 		} catch (InvalidProtocolBufferException e) {
 			throw new RequestFailedException(e);
 		}
-		api.getInventories().updateInventories();
+		api.inventories.updateInventories();
 		return updateHatchedEggs(response);
 	}
 

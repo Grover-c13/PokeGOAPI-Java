@@ -90,7 +90,7 @@ public class PokemonCpUtils {
 	 * @throws NoSuchItemException If the PokemonId value cannot be found in the {@link ItemTemplates}.
 	 */
 	public static int getAbsoluteMaxCp(PokemonGo api, PokemonId id) throws NoSuchItemException {
-		PokemonSettings settings = api.getItemTemplates().getPokemonSettings(id);
+		PokemonSettings settings = api.itemTemplates.getPokemonSettings(id);
 		if (settings == null) {
 			throw new NoSuchItemException("Cannot find meta data for " + id);
 		}
@@ -113,7 +113,7 @@ public class PokemonCpUtils {
 	 */
 	public static int getMaxCpForPlayer(PokemonGo api, int attack, int defense, int stamina, int playerLevel) {
 		float maxLevel = Math.min(playerLevel + 1.5F, 40.0F);
-		double maxCpMultplier = api.getItemTemplates().getLevelCpMultiplier(maxLevel);
+		double maxCpMultplier = api.itemTemplates.getLevelCpMultiplier(maxLevel);
 		return getCp(attack, defense, stamina, maxCpMultplier);
 	}
 
@@ -150,7 +150,7 @@ public class PokemonCpUtils {
 	public static double getAdditionalCpMultiplierAfterPowerup(PokemonGo api,
 			double cpMultiplier, double additionalCpMultiplier) {
 		float nextLevel = getLevelFromCpMultiplier(cpMultiplier + additionalCpMultiplier) + .5f;
-		return api.getItemTemplates().getLevelCpMultiplier(nextLevel) - cpMultiplier;
+		return api.itemTemplates.getLevelCpMultiplier(nextLevel) - cpMultiplier;
 	}
 
 	/**
@@ -161,7 +161,7 @@ public class PokemonCpUtils {
 	 * @return Amount of stardust
 	 */
 	public static int getStartdustCostsForPowerup(PokemonGo api, double combinedCpMultiplier) {
-		PokemonUpgradeSettings upgradeSettings = api.getItemTemplates().getUpgradeSettings();
+		PokemonUpgradeSettings upgradeSettings = api.itemTemplates.upgradeSettings;
 		int level = (int) getLevelFromCpMultiplier(combinedCpMultiplier);
 		if (level < upgradeSettings.getStardustCostCount()) {
 			return upgradeSettings.getStardustCost(level);
@@ -178,6 +178,6 @@ public class PokemonCpUtils {
 	 */
 	public static int getCandyCostsForPowerup(PokemonGo api, double combinedCpMultiplier) {
 		int level = (int) getLevelFromCpMultiplier(combinedCpMultiplier);
-		return api.getItemTemplates().getUpgradeSettings().getCandyCost(level);
+		return api.itemTemplates.upgradeSettings.getCandyCost(level);
 	}
 }

@@ -107,7 +107,7 @@ public class PokemonDetails {
 	 * @return the amount of candy available for this pokemon
 	 */
 	public int getCandy() {
-		return api.getInventories().getCandyjar().getCandies(getPokemonFamily());
+		return api.inventories.candyjar.getCandies(getPokemonFamily());
 	}
 
 	public PokemonFamilyIdOuterClass.PokemonFamilyId getPokemonFamily() {
@@ -278,16 +278,16 @@ public class PokemonDetails {
 	 * @return candy needed to evolve
 	 */
 	public int getCandiesToEvolve() {
-		Evolution evolution = api.getItemTemplates().getEvolutions().getEvolution(pokemonId);
-		if (evolution.getEvolutionBranch() != null && evolution.getEvolutionBranch().size() > 0) {
-			return evolution.getEvolutionBranch().get(0).getCandyCost();
+		Evolution evolution = api.itemTemplates.evolutions.getEvolution(pokemonId);
+		if (evolution.evolutionBranch != null && evolution.evolutionBranch.size() > 0) {
+			return evolution.evolutionBranch.get(0).getCandyCost();
 		}
 		return 0;
 	}
 	
 	public List<EvolutionBranch> getEvolutionBranch() {
-		Evolution evolution = api.getItemTemplates().getEvolutions().getEvolution(pokemonId);
-		return evolution.getEvolutionBranch();
+		Evolution evolution = api.itemTemplates.evolutions.getEvolution(pokemonId);
+		return evolution.evolutionBranch;
 	}
 
 	public double getBaseFleeRate() {
@@ -305,7 +305,7 @@ public class PokemonDetails {
 	 */
 	public PokemonSettingsOuterClass.PokemonSettings getSettings() {
 		if (settings == null) {
-			settings = api.getItemTemplates().getPokemonSettings(pokemonId);
+			settings = api.itemTemplates.getPokemonSettings(pokemonId);
 		}
 
 		return settings;
@@ -340,7 +340,7 @@ public class PokemonDetails {
 		int attack = getIndividualAttack() + settings.getStats().getBaseAttack();
 		int defense = getIndividualDefense() + settings.getStats().getBaseDefense();
 		int stamina = getIndividualStamina() + settings.getStats().getBaseStamina();
-		int playerLevel = api.getPlayerProfile().getStats().getLevel();
+		int playerLevel = api.playerProfile.getStats().getLevel();
 		return PokemonCpUtils.getMaxCpForPlayer(api, attack, defense, stamina, playerLevel);
 	}
 
@@ -371,7 +371,7 @@ public class PokemonDetails {
 	 * @return Max cp of this pokemon
 	 */
 	public int getMaxCpFullEvolveAndPowerupForPlayer(PokemonId highestEvolution) {
-		return getMaxCpFullEvolveAndPowerup(api.getPlayerProfile().getStats().getLevel(), highestEvolution);
+		return getMaxCpFullEvolveAndPowerup(api.playerProfile.getStats().getLevel(), highestEvolution);
 	}
 
 	/**
@@ -382,7 +382,7 @@ public class PokemonDetails {
 	 * @return Max cp of this pokemon
 	 */
 	private int getMaxCpFullEvolveAndPowerup(int playerLevel, PokemonId highestEvolution) {
-		PokemonSettings settings = api.getItemTemplates().getPokemonSettings(highestEvolution);
+		PokemonSettings settings = api.itemTemplates.getPokemonSettings(highestEvolution);
 		StatsAttributes stats = settings.getStats();
 		int attack = getIndividualAttack() + stats.getBaseAttack();
 		int defense = getIndividualDefense() + stats.getBaseDefense();
@@ -397,7 +397,7 @@ public class PokemonDetails {
 	 * @return New CP after evolve
 	 */
 	public int getCpAfterEvolve(PokemonId evolution) {
-		PokemonSettings settings = api.getItemTemplates().getPokemonSettings(evolution);
+		PokemonSettings settings = api.itemTemplates.getPokemonSettings(evolution);
 		StatsAttributes stats = settings.getStats();
 		int attack = getIndividualAttack() + stats.getBaseAttack();
 		int defense = getIndividualDefense() + stats.getBaseDefense();
@@ -412,7 +412,7 @@ public class PokemonDetails {
 	 * @return New CP after evolve
 	 */
 	public int getCpAfterFullEvolve(PokemonId highestEvolution) {
-		PokemonSettings settings = api.getItemTemplates().getPokemonSettings(highestEvolution);
+		PokemonSettings settings = api.itemTemplates.getPokemonSettings(highestEvolution);
 		StatsAttributes stats = settings.getStats();
 		int attack = getIndividualAttack() + stats.getBaseAttack();
 		int defense = getIndividualDefense() + stats.getBaseDefense();

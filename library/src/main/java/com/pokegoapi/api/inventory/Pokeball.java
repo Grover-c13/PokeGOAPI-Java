@@ -25,9 +25,9 @@ public enum Pokeball {
 	MASTERBALL(ItemId.ITEM_MASTER_BALL, 0.0);
 
 	@Getter
-	private final ItemId ballType;
+	public final ItemId ballType;
 	@Getter
-	private final double captureProbability;
+	public final double captureProbability;
 
 	Pokeball(ItemId type, double probability) {
 		ballType = type;

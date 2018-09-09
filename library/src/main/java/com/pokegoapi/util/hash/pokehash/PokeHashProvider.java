@@ -66,7 +66,7 @@ public class PokeHashProvider implements HashProvider {
 	public PokeHashProvider(PokeHashKey key, boolean awaitRequest) {
 		this.key = key;
 		this.awaitRequests = awaitRequest;
-		if (key == null || key.getKey() == null) {
+		if (key == null || key.key == null) {
 			throw new IllegalArgumentException("Key cannot be null!");
 		}
 	}
@@ -96,8 +96,8 @@ public class PokeHashProvider implements HashProvider {
 				}
 			} else {
 				long time = System.currentTimeMillis();
-				long timeLeft = time - key.getRatePeriodEnd();
-				if (key.getRequestsRemaining() <= 0 && timeLeft > 0) {
+				long timeLeft = time - key.ratePeriodEnd;
+				if (key.requestsRemaining <= 0 && timeLeft > 0) {
 					throw new HashLimitExceededException(
 							"Exceeded hash request limit! Period ends in " + timeLeft + "ms");
 				}
@@ -108,7 +108,7 @@ public class PokeHashProvider implements HashProvider {
 		try {
 			HttpURLConnection connection = (HttpURLConnection) new URL(endpoint).openConnection();
 			connection.setRequestMethod("POST");
-			connection.setRequestProperty("X-AuthToken", key.getKey());
+			connection.setRequestProperty("X-AuthToken", key.key);
 			connection.setRequestProperty("content-type", "application/json");
 			connection.setRequestProperty("User-Agent", "PokeGOAPI-Java");
 			connection.setDoOutput(true);
@@ -135,11 +135,11 @@ public class PokeHashProvider implements HashProvider {
 					}
 					in.close();
 					Response response = MOSHI.adapter(Response.class).fromJson(builder.toString());
-					long locationAuth = response.getLocationAuthHash();
-					long location = response.getLocationHash();
+					long locationAuth = response.locationAuthHash;
+					long location = response.locationHash;
 					int locationAuthHash = (int) ((locationAuth & 0xFFFFFFFFL) ^ (locationAuth >>> 32));
 					int locationHash = (int) ((location & 0xFFFFFFFFL) ^ (location >>> 32));
-					return new Hash(locationAuthHash, locationHash, response.getRequestHashes());
+					return new Hash(locationAuthHash, locationHash, response.requestHashes);
 				case HttpURLConnection.HTTP_BAD_REQUEST:
 					if (error.length() > 0) {
 						throw new HashException(error);
@@ -203,11 +203,11 @@ public class PokeHashProvider implements HashProvider {
 
 	private static class Response {
 		@Getter
-		private long locationAuthHash;
+		public long locationAuthHash;
 		@Getter
-		private long locationHash;
+		public long locationHash;
 		@Getter
-		private List<Long> requestHashes;
+		public List<Long> requestHashes;
 	}
 
 	private static class Request {

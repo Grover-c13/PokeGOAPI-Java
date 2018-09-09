@@ -75,9 +75,9 @@ public class Heartbeat {
 	 * Performs a single heartbeat
 	 */
 	public void beat() {
-		MapSettings mapSettings = api.getSettings().getMapSettings();
-		minMapRefresh = (long) mapSettings.getMinRefresh();
-		maxMapRefresh = (long) mapSettings.getMaxRefresh();
+		MapSettings mapSettings = api.settings.mapSettings;
+		minMapRefresh = (long) mapSettings.minRefresh;
+		maxMapRefresh = (long) mapSettings.maxRefresh;
 
 		List<HeartbeatListener> listeners = api.getListeners(HeartbeatListener.class);
 		long time = api.currentTimeMillis();
@@ -95,7 +95,7 @@ public class Heartbeat {
 					nextMapUpdate = time + minMapRefresh;
 				}
 				for (HeartbeatListener listener : listeners) {
-					listener.onMapUpdate(api, map.getMapObjects());
+					listener.onMapUpdate(api, map.mapObjects);
 				}
 			} catch (Exception exception) {
 				for (HeartbeatListener listener : listeners) {

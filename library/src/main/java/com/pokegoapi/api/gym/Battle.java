@@ -79,7 +79,7 @@ public class Battle {
 			= new PriorityBlockingQueue<>(11, new Comparator<ServerAction>() {
 				@Override
 				public int compare(ServerAction o1, ServerAction o2) {
-					return Long.compare(o1.getStart(), o2.getStart());
+					return Long.compare(o1.start, o2.start);
 				}
 			});
 
@@ -200,8 +200,8 @@ public class Battle {
 
 		if (attackers.size() > 0 && defenderIndex < defenderCount) {
 			StartGymBattleMessage.Builder builder = StartGymBattleMessage.newBuilder()
-					.setPlayerLatitude(api.getLatitude())
-					.setPlayerLongitude(api.getLongitude())
+					.setPlayerLatitude(api.latitude)
+					.setPlayerLongitude(api.longitude)
 					.setGymId(gym.getId())
 					.setDefendingPokemonId(gym.getDefendingPokemon().get(defenderIndex).getPokemon().getId());
 			for (Pokemon pokemon : attackers) {
@@ -219,7 +219,7 @@ public class Battle {
 				StartGymBattleMessage message = builder.build();
 				ServerRequest request = new ServerRequest(RequestType.GYM_START_SESSION, message);
 
-				api.getRequestHandler().sendServerRequests(request, true);
+				api.requestHandler.sendServerRequests(request, true);
 				StartGymBattleResponse response = StartGymBattleResponse.parseFrom(request.getData());
 
 				if (response.getResult() == StartGymBattleResponse.Result.SUCCESS) {
@@ -254,7 +254,7 @@ public class Battle {
 		long time = api.currentTimeMillis();
 		while (serverActionQueue.size() > 0) {
 			ServerAction action = serverActionQueue.element();
-			if (time >= action.getStart()) {
+			if (time >= action.start) {
 				handler.onActionStart(api, this, action);
 				activeActions.add(serverActionQueue.remove());
 				handleAction(handler, action);
@@ -264,17 +264,17 @@ public class Battle {
 		}
 		Set<ServerAction> completedActions = new HashSet<>();
 		for (ServerAction action : activeActions) {
-			if (time >= action.getEnd()) {
+			if (time >= action.end) {
 				handler.onActionEnd(api, this, action);
 				completedActions.add(action);
 			} else {
 				if (damagingActions.contains(action)) {
-					if (time > action.getDamageWindowEnd()) {
+					if (time > action.damageWindowEnd) {
 						handler.onDamageEnd(api, this, action);
 						damagingActions.remove(action);
 					}
 				} else {
-					if (time > action.getDamageWindowStart()) {
+					if (time > action.damageWindowStart) {
 						damagingActions.add(action);
 						handler.onDamageStart(api, this, action);
 					}
@@ -358,7 +358,7 @@ public class Battle {
 			}
 			if (!active) {
 				try {
-					api.getInventories().updateInventories(true);
+					api.inventories.updateInventories();
 				} catch (Exception e) {
 					handler.onException(api, this, e);
 				}
@@ -384,7 +384,7 @@ public class Battle {
 	 * @param action the action being handled
 	 */
 	private void handleAction(BattleHandler handler, ServerAction action) {
-		switch (action.getType()) {
+		switch (action.type) {
 			case ACTION_PLAYER_JOIN:
 				onPlayerJoin(handler, action);
 				break;
@@ -415,10 +415,10 @@ public class Battle {
 	 * @param action the join action
 	 */
 	private void onPlayerJoin(BattleHandler handler, ServerAction action) {
-		BattleParticipant joined = action.getJoined();
+		BattleParticipant joined = action.joined;
 		String name = joined.getTrainerPublicProfile().getName();
 		participants.put(name, joined);
-		participantIndices.put(action.getTargetIndex(), joined);
+		participantIndices.put(action.targetIndex, joined);
 		activePokemon.put(joined, new BattlePokemon(joined.getActivePokemon()));
 		handler.onPlayerJoin(api, this, joined, action);
 	}
@@ -430,10 +430,10 @@ public class Battle {
 	 * @param action the quit action
 	 */
 	private void onPlayerQuit(BattleHandler handler, ServerAction action) {
-		BattleParticipant left = action.getLeft();
+		BattleParticipant left = action.left;
 		String name = left.getTrainerPublicProfile().getName();
 		BattleParticipant remove = participants.remove(name);
-		participantIndices.remove(action.getTargetIndex());
+		participantIndices.remove(action.targetIndex);
 		activePokemon.remove(remove);
 		handler.onPlayerLeave(api, this, left, action);
 	}
@@ -445,15 +445,15 @@ public class Battle {
 	 * @param action the attack action
 	 */
 	private void handleAttack(BattleHandler handler, ServerAction action) {
-		BattlePokemon attacked = getActivePokemon(action.getTargetIndex(), true);
-		BattlePokemon attacker = getActivePokemon(action.getAttackerIndex(), false);
-		if (action.getAttackerIndex() == 0) {
+		BattlePokemon attacked = getActivePokemon(action.targetIndex, true);
+		BattlePokemon attacker = getActivePokemon(action.attackerIndex, false);
+		if (action.attackerIndex == 0) {
 			attacker = activeAttacker;
 		}
 
-		long damageWindowStart = action.getDamageWindowStart();
-		long damageWindowEnd = action.getDamageWindowEnd();
-		int duration = action.getDuration();
+		long damageWindowStart = action.damageWindowStart;
+		long damageWindowEnd = action.damageWindowEnd;
+		int duration = action.duration;
 
 		handler.onAttacked(api, this, attacked, attacker, duration, damageWindowStart, damageWindowEnd, action);
 	}
@@ -465,15 +465,15 @@ public class Battle {
 	 * @param action the attack action
 	 */
 	private void handleSpecialAttack(BattleHandler handler, ServerAction action) {
-		BattlePokemon attacked = getActivePokemon(action.getTargetIndex(), false);
-		BattlePokemon attacker = getActivePokemon(action.getAttackerIndex(), true);
-		if (action.getAttackerIndex() == 0) {
+		BattlePokemon attacked = getActivePokemon(action.targetIndex, false);
+		BattlePokemon attacker = getActivePokemon(action.attackerIndex, true);
+		if (action.attackerIndex == 0) {
 			attacker = activeAttacker;
 		}
 
-		long damageWindowStart = action.getDamageWindowStart();
-		long damageWindowEnd = action.getDamageWindowEnd();
-		int duration = action.getDuration();
+		long damageWindowStart = action.damageWindowStart;
+		long damageWindowEnd = action.damageWindowEnd;
+		int duration = action.duration;
 
 		handler.onAttackedSpecial(api, this, attacked, attacker, duration, damageWindowStart, damageWindowEnd, action);
 	}
@@ -485,15 +485,15 @@ public class Battle {
 	 * @param action the faint action
 	 */
 	private void handleFaint(BattleHandler handler, ServerAction action) {
-		BattlePokemon pokemon = getActivePokemon(action.getAttackerIndex(), true);
-		if (action.getAttackerIndex() == 0) {
+		BattlePokemon pokemon = getActivePokemon(action.attackerIndex, true);
+		if (action.attackerIndex == 0) {
 			pokemon = activeAttacker;
 		}
 
-		int duration = action.getDuration();
+		int duration = action.duration;
 		handler.onFaint(api, this, pokemon, duration, action);
 
-		faintedPokemon.add(pokemon.getPokemon().getId());
+		faintedPokemon.add(pokemon.pokemon.getId());
 	}
 
 	/**
@@ -503,12 +503,12 @@ public class Battle {
 	 * @param action the dodge action
 	 */
 	private void handleDodge(BattleHandler handler, ServerAction action) {
-		BattlePokemon pokemon = getActivePokemon(action.getAttackerIndex(), true);
-		if (action.getAttackerIndex() == 0) {
+		BattlePokemon pokemon = getActivePokemon(action.attackerIndex, true);
+		if (action.attackerIndex == 0) {
 			pokemon = activeAttacker;
 		}
 
-		int duration = action.getDuration();
+		int duration = action.duration;
 		handler.onDodge(api, this, pokemon, duration, action);
 	}
 
@@ -544,26 +544,26 @@ public class Battle {
 		AttackGymMessage.Builder builder = AttackGymMessage.newBuilder()
 				.setGymId(gym.getId())
 				.setBattleId(battleId)
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude());
+				.setPlayerLatitude(api.latitude)
+				.setPlayerLongitude(api.longitude);
 		while (queuedActions.size() > 0) {
 			ClientAction action = queuedActions.element();
-			if (action.getEndTime() < lastSendTime) {
+			if (action.endTime < lastSendTime) {
 				queuedActions.remove();
-				long activePokemon = activeAttacker.getPokemon().getId();
-				if (action.getPokemon() != null) {
-					activePokemon = action.getPokemon().getId();
+				long activePokemon = activeAttacker.pokemon.getId();
+				if (action.pokemon != null) {
+					activePokemon = action.pokemon.getId();
 				}
-				long start = action.getStartTime();
+				long start = action.startTime;
 				BattleAction.Builder actionBuilder = BattleAction.newBuilder()
 						.setActionStartMs(start)
-						.setDurationMs(action.getDuration())
+						.setDurationMs(action.duration)
 						.setTargetIndex(-1)
 						.setActivePokemonId(activePokemon)
-						.setType(action.getType());
-				if (action.isHasDamageWindow()) {
-					long damageWindowsStart = start + action.getDamageWindowStart();
-					long damageWindowEnd = start + action.getDamageWindowEnd();
+						.setType(action.type);
+				if (action.hasDamageWindow) {
+					long damageWindowsStart = start + action.damageWindowStart;
+					long damageWindowEnd = start + action.damageWindowEnd;
 					actionBuilder.setDamageWindowsStartTimestampMs(damageWindowsStart);
 					actionBuilder.setDamageWindowsEndTimestampMs(damageWindowEnd);
 				}
@@ -578,7 +578,7 @@ public class Battle {
 		if (builder.getAttackActionsCount() > 0) {
 			AttackGymMessage message = builder.build();
 			ServerRequest request = new ServerRequest(RequestType.GYM_BATTLE_ATTACK, message);
-			api.getRequestHandler().sendServerRequests(request, true);
+			api.requestHandler.sendServerRequests(request, true);
 			boolean nextDefender;
 			try {
 				AttackGymResponse response = AttackGymResponse.parseFrom(request.getData());
@@ -607,20 +607,20 @@ public class Battle {
 			activeAttacker = new BattlePokemon(response.getActiveAttacker());
 			activeDefender = new BattlePokemon(response.getActiveDefender());
 
-			if (lastAttacker == null || lastAttacker.getPokemon().getId() != activeAttacker.getPokemon().getId()) {
+			if (lastAttacker == null || lastAttacker.pokemon.getId() != activeAttacker.pokemon.getId()) {
 				handler.onAttackerSwap(api, this, activeAttacker);
 			}
 
-			if (lastDefender == null || lastDefender.getPokemon().getId() != activeDefender.getPokemon().getId()) {
+			if (lastDefender == null || lastDefender.pokemon.getId() != activeDefender.pokemon.getId()) {
 				handler.onDefenderSwap(api, this, activeDefender);
 			}
 
-			int lastAttackerHealth = lastAttacker.getHealth();
-			int lastDefenderHealth = lastDefender.getHealth();
-			int attackerHealth = activeAttacker.getHealth();
-			int defenderHealth = activeDefender.getHealth();
-			int attackerMaxHealth = activeAttacker.getMaxHealth();
-			int defenderMaxHealth = activeDefender.getMaxHealth();
+			int lastAttackerHealth = lastAttacker.health;
+			int lastDefenderHealth = lastDefender.health;
+			int attackerHealth = activeAttacker.health;
+			int defenderHealth = activeDefender.health;
+			int attackerMaxHealth = activeAttacker.maxHealth;
+			int defenderMaxHealth = activeDefender.maxHealth;
 			handler.onAttackerHealthUpdate(api, this, lastAttackerHealth, attackerHealth, attackerMaxHealth);
 			handler.onDefenderHealthUpdate(api, this, lastDefenderHealth, defenderHealth, defenderMaxHealth);
 
@@ -704,9 +704,9 @@ public class Battle {
 	 * @return the duration of this attack
 	 */
 	public int attack() {
-		PokemonData pokemon = activeAttacker.getPokemon();
+		PokemonData pokemon = activeAttacker.pokemon;
 		PokemonMove move = pokemon.getMove1();
-		MoveSettingsOuterClass.MoveSettings moveSettings = api.getItemTemplates().getMoveSettings(move);
+		MoveSettingsOuterClass.MoveSettings moveSettings = api.itemTemplates.getMoveSettings(move);
 		int duration = moveSettings.getDurationMs();
 		long time = api.currentTimeMillis();
 		ClientAction action = new ClientAction(BattleActionType.ACTION_ATTACK, time, duration);
@@ -721,11 +721,11 @@ public class Battle {
 	 * @return the duration of this attack
 	 */
 	public int attackSpecial() {
-		PokemonData pokemon = activeAttacker.getPokemon();
+		PokemonData pokemon = activeAttacker.pokemon;
 		PokemonMove move = pokemon.getMove2();
-		MoveSettingsOuterClass.MoveSettings moveSettings = api.getItemTemplates().getMoveSettings(move);
+		MoveSettingsOuterClass.MoveSettings moveSettings = api.itemTemplates.getMoveSettings(move);
 		int duration = moveSettings.getDurationMs();
-		if (activeAttacker.getEnergy() >= -moveSettings.getEnergyDelta()) {
+		if (activeAttacker.energy >= -moveSettings.getEnergyDelta()) {
 			long time = api.currentTimeMillis();
 			ClientAction action = new ClientAction(BattleActionType.ACTION_SPECIAL_ATTACK, time, duration);
 			action.setDamageWindow(moveSettings.getDamageWindowStartMs(), moveSettings.getDamageWindowEndMs());
@@ -742,7 +742,7 @@ public class Battle {
 	 * @return the duration of this action
 	 */
 	public int dodge() {
-		int duration = api.getItemTemplates().getBattleSettings().getDodgeDurationMs();
+		int duration = api.itemTemplates.battleSettings.getDodgeDurationMs();
 		performAction(BattleActionType.ACTION_DODGE, duration);
 		return duration;
 	}
@@ -754,10 +754,10 @@ public class Battle {
 	 * @return the duration of this action
 	 */
 	public int swap(Pokemon pokemon) {
-		int duration = api.getItemTemplates().getBattleSettings().getSwapDurationMs();
+		int duration = api.itemTemplates.battleSettings.getSwapDurationMs();
 		ClientAction action = new ClientAction(BattleActionType.ACTION_SWAP_POKEMON, api.currentTimeMillis(),
 				duration);
-		action.setPokemon(pokemon);
+		action.pokemon = pokemon;
 		queuedActions.add(action);
 		return duration;
 	}
@@ -816,8 +816,8 @@ public class Battle {
 		public boolean equals(Object obj) {
 			if (obj instanceof ServerAction) {
 				ServerAction action = (ServerAction) obj;
-				return action.getType() == type && action.getStart() == start && action.getDuration() == duration
-						&& action.getAttackerIndex() == attackerIndex && action.getTargetIndex() == targetIndex;
+				return action.type == type && action.start == start && action.duration == duration
+						&& action.attackerIndex == attackerIndex && action.targetIndex == targetIndex;
 			}
 			return false;
 		}

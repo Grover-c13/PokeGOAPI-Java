@@ -36,7 +36,7 @@ public class Map {
 	private int defaultCellWidth = 3;
 
 	@Getter
-	private MapObjects mapObjects;
+	public MapObjects mapObjects;
 
 	@Getter
 	private long mapUpdateTime;
@@ -61,7 +61,7 @@ public class Map {
 	 */
 	public boolean update() throws RequestFailedException {
 		boolean updated = false;
-		if (!(Double.isNaN(api.getLatitude()) || Double.isNaN(api.getLongitude()))) {
+		if (!(Double.isNaN(api.latitude) || Double.isNaN(api.longitude))) {
 			this.mapObjects = requestMapObjects();
 			updated = true;
 		}
@@ -81,14 +81,14 @@ public class Map {
 			throws RequestFailedException {
 		List<Long> cells = getDefaultCells();
 		GetMapObjectsMessage.Builder builder = GetMapObjectsMessage.newBuilder();
-		builder.setLatitude(api.getLatitude());
-		builder.setLongitude(api.getLongitude());
+		builder.setLatitude(api.latitude);
+		builder.setLongitude(api.longitude);
 		for (Long cell : cells) {
 			builder.addCellId(cell);
 			builder.addSinceTimestampMs(0);
 		}
 		ServerRequest request = new ServerRequest(RequestType.GET_MAP_OBJECTS, builder.build());
-		api.getRequestHandler().sendServerRequests(request, true);
+		api.requestHandler.sendServerRequests(request, true);
 		try {
 			long updateTime = mapUpdateTime;
 			GetMapObjectsResponse response = GetMapObjectsResponse.parseFrom(request.getData());
@@ -108,7 +108,7 @@ public class Map {
 	 * @return a list of all default cells
 	 */
 	private List<Long> getDefaultCells() {
-		return getCellIds(api.getLatitude(), api.getLongitude(), defaultCellWidth);
+		return getCellIds(api.latitude, api.longitude, defaultCellWidth);
 	}
 
 	/**

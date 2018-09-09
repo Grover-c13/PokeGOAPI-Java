@@ -13,7 +13,7 @@ public class FortSettings {
 	 *
 	 * @return distance in meters.
 	 */
-	private double interactionRangeInMeters;
+	public double interactionRangeInMeters;
 
 	@Getter
 	/**

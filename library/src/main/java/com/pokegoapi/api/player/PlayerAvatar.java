@@ -24,7 +24,7 @@ import java.security.SecureRandom;
 @Data
 public class PlayerAvatar {
 	@Getter
-	private PlayerAvatarOuterClass.PlayerAvatar avatar;
+	public PlayerAvatarOuterClass.PlayerAvatar avatar;
 
 	public PlayerAvatar(PlayerAvatarOuterClass.PlayerAvatar data) {
 		avatar = data;

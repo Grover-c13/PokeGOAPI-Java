@@ -98,10 +98,10 @@ public class CommonRequests {
 		defaultCommons.add(CommonRequests.getHatchedEggs());
 		defaultCommons.add(CommonRequests.getInventory(api));
 		defaultCommons.add(CommonRequests.checkAwardedBadges());
-		if (api.isLoggingIn()) {
+		if (api.loggingIn) {
 			defaultCommons.add(CommonRequests.downloadSettings(api));
 		}
-		if (api.getInventories().getItemBag().isIncenseActive()) {
+		if (api.inventories.itemBag.isIncenseActive()) {
 			defaultCommons.add(CommonRequests.getIncensePokemon(api));
 		}
 		if (api.hasTemplates()) {
@@ -122,7 +122,7 @@ public class CommonRequests {
 		if (response.has(RequestType.DOWNLOAD_SETTINGS)) {
 			ByteString data = response.get(RequestType.DOWNLOAD_SETTINGS);
 			DownloadSettingsResponse settings = DownloadSettingsResponse.parseFrom(data);
-			api.getSettings().updateSettings(settings);
+			api.settings.updateSettings(settings);
 		}
 		if (response.has(RequestType.CHECK_CHALLENGE)) {
 			ByteString data = response.get(RequestType.CHECK_CHALLENGE);
@@ -132,17 +132,17 @@ public class CommonRequests {
 		if (response.has(RequestType.GET_HOLOHOLO_INVENTORY)) {
 			ByteString data = response.get(RequestType.GET_HOLOHOLO_INVENTORY);
 			GetHoloInventoryResponse inventory = GetHoloInventoryResponse.parseFrom(data);
-			api.getInventories().updateInventories(inventory);
+			api.inventories.updateInventories(inventory);
 		}
 		if (response.has(RequestType.CHECK_AWARDED_BADGES)) {
 			ByteString data = response.get(RequestType.CHECK_AWARDED_BADGES);
 			CheckAwardedBadgesResponse awardedBadges = CheckAwardedBadgesResponse.parseFrom(data);
-			api.getPlayerProfile().updateAwardedMedals(awardedBadges);
+			api.playerProfile.updateAwardedMedals(awardedBadges);
 		}
 		if (response.has(RequestType.GET_HATCHED_EGGS)) {
 			ByteString data = response.get(RequestType.GET_HATCHED_EGGS);
 			GetHatchedEggsResponse hatchedEggs = GetHatchedEggsResponse.parseFrom(data);
-			api.getInventories().getHatchery().updateHatchedEggs(hatchedEggs);
+			api.inventories.hatchery.updateHatchedEggs(hatchedEggs);
 		}
 		if (response.has(RequestType.GET_BUDDY_WALKED)) {
 			ByteString data = response.get(RequestType.GET_BUDDY_WALKED);
@@ -158,7 +158,7 @@ public class CommonRequests {
 		if (response.has(RequestType.GET_INCENSE_POKEMON)) {
 			ByteString data = response.get(RequestType.GET_INCENSE_POKEMON);
 			GetIncensePokemonResponse incense = GetIncensePokemonResponse.parseFrom(data);
-			api.getMap().getMapObjects().addIncensePokemon(incense);
+			api.getMap().mapObjects.addIncensePokemon(incense);
 		}
 	}
 
@@ -187,7 +187,7 @@ public class CommonRequests {
 	 * @return the constructed request
 	 */
 	public static ServerRequest getInventory(PokemonGo api) {
-		long lastUpdate = api.getInventories().getLastInventoryUpdate();
+		long lastUpdate = api.inventories.lastInventoryUpdate;
 		GetHoloInventoryMessage message = GetHoloInventoryMessage.newBuilder().setLastTimestampMs(lastUpdate).build();
 		return new ServerRequest(RequestType.GET_HOLOHOLO_INVENTORY, message);
 	}
@@ -208,7 +208,7 @@ public class CommonRequests {
 	 * @return the constructed request
 	 */
 	public static ServerRequest downloadSettings(PokemonGo api) {
-		String hash = api.getSettings().getHash();
+		String hash = api.settings.hash;
 		DownloadSettingsMessage message = DownloadSettingsMessage.newBuilder().setHash(hash).build();
 		return new ServerRequest(RequestType.DOWNLOAD_SETTINGS, message);
 	}
@@ -221,8 +221,8 @@ public class CommonRequests {
 	 */
 	public static ServerRequest getIncensePokemon(PokemonGo api) {
 		GetIncensePokemonMessage message = GetIncensePokemonMessage.newBuilder()
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
+				.setPlayerLatitude(api.latitude)
+				.setPlayerLongitude(api.longitude)
 				.build();
 		return new ServerRequest(RequestType.GET_INCENSE_POKEMON, message);
 	}

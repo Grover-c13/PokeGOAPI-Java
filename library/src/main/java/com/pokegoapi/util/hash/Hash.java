@@ -21,11 +21,11 @@ import java.util.List;
 
 public class Hash {
 	@Getter
-	private final int locationAuthHash;
+	public final int locationAuthHash;
 	@Getter
-	private final int locationHash;
+	public final int locationHash;
 	@Getter
-	private final List<Long> requestHashes;
+	public final List<Long> requestHashes;
 
 	/**
 	 * Creates a hash object

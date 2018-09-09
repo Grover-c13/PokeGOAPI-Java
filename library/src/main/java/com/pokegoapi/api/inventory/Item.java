@@ -33,7 +33,7 @@ public class Item {
 	private final ItemSettings settings;
 
 	@Getter
-	private int count;
+	public int count;
 
 	@Getter
 	private ItemBag itemBag;
@@ -57,7 +57,7 @@ public class Item {
 		this.proto = proto;
 		this.count = proto.getCount();
 		this.itemBag = itemBag;
-		this.settings = api.getItemTemplates().getItemSettings(getItemId());
+		this.settings = api.itemTemplates.getItemSettings(getItemId());
 	}
 
 	public ItemId getItemId() {

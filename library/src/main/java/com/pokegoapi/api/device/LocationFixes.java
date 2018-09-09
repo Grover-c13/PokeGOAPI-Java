@@ -40,7 +40,7 @@ public class LocationFixes extends ArrayList<LocationFix> {
 	 */
 	public static LocationFixes getDefault(PokemonGo api, RequestEnvelopeOuterClass.RequestEnvelope.Builder builder,
 			long currentTime, Random random) {
-		if (Double.isNaN(api.getLatitude()) || Double.isNaN(api.getLongitude())) {
+		if (Double.isNaN(api.latitude) || Double.isNaN(api.longitude)) {
 			return new LocationFixes();
 		}
 
@@ -60,9 +60,9 @@ public class LocationFixes extends ArrayList<LocationFix> {
 
 		int chance = random.nextInt(100);
 		LocationFixes locationFixes;
-		if (api.getLocationFixes() == null) {
+		if (api.locationFixes == null) {
 			locationFixes = new LocationFixes();
-			api.setLocationFixes(locationFixes);
+			api.locationFixes = locationFixes;
 			providerCount = pn < 75 ? 6 : pn < 95 ? 5 : 8;
 			if (providerCount != 8) {
 				// a 5% chance that the second provider got a negative value else it should be the first only
@@ -77,12 +77,12 @@ public class LocationFixes extends ArrayList<LocationFix> {
 				}
 			}
 		} else {
-			locationFixes = api.getLocationFixes();
+			locationFixes = api.locationFixes;
 			locationFixes.clear();
 
-			boolean expired = currentTime - locationFixes.getTimestampCreate() < (random.nextInt(10000) + 5000);
+			boolean expired = currentTime - locationFixes.timestampCreate < (random.nextInt(10000) + 5000);
 			if (empty || (!hasMapUpdate && expired)) {
-				locationFixes.setTimestampCreate(currentTime);
+				locationFixes.timestampCreate = currentTime;
 				return locationFixes;
 			} else if (hasMapUpdate) {
 				providerCount = chance >= 90 ? 2 : 1;
@@ -91,17 +91,17 @@ public class LocationFixes extends ArrayList<LocationFix> {
 			}
 		}
 
-		locationFixes.setTimestampCreate(currentTime);
+		locationFixes.timestampCreate = currentTime;
 
 		for (int i = 0; i < providerCount; i++) {
-			float latitude = (float) api.getLatitude();
-			float longitude = (float) api.getLongitude();
+			float latitude = (float) api.latitude;
+			float longitude = (float) api.longitude;
 			if (i < providerCount - 1) {
-				latitude = offsetOnLatLong(api.getLatitude(), random.nextInt(100) + 10);
-				longitude = offsetOnLatLong(api.getLongitude(), random.nextInt(100) + 10);
+				latitude = offsetOnLatLong(api.latitude, random.nextInt(100) + 10);
+				longitude = offsetOnLatLong(api.longitude, random.nextInt(100) + 10);
 			}
 
-			float altitude = (float) api.getAltitude();
+			float altitude = (float) api.altitude;
 			float verticalAccuracy = (float) (15 + (23 - 15) * random.nextDouble());
 
 			// Fake errors
@@ -121,11 +121,11 @@ public class LocationFixes extends ArrayList<LocationFix> {
 					.setTimestampSnapshot(
 							contains(negativeSnapshotProviders, i)
 									? random.nextInt(1000) - 3000
-									: currentTime - api.getStartTime()
+									: currentTime - api.startTime
 											+ (150 * (i + 1) + random.nextInt(250 * (i + 1) - (150 * (i + 1)))))
 					.setLatitude(latitude)
 					.setLongitude(longitude)
-					.setHorizontalAccuracy((float) api.getAccuracy())
+					.setHorizontalAccuracy((float) api.accuracy)
 					.setAltitude(altitude)
 					.setVerticalAccuracy(verticalAccuracy)
 					.setProviderStatus(3L)

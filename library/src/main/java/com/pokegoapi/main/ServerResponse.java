@@ -28,7 +28,7 @@ public class ServerResponse {
 	private final EnumMap<PlatformRequestType, ByteString> platformResponses = new EnumMap<>(PlatformRequestType.class);
 	@Getter
 	@Setter
-	private Exception exception;
+	public Exception exception;
 
 	/**
 	 * Creates a blank {@link ServerResponse}

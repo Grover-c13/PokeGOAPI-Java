@@ -18,7 +18,7 @@ public class Settings {
 	 *
 	 * @return MapSettings instance.
 	 */
-	private final MapSettings mapSettings;
+	public final MapSettings mapSettings;
 
 	@Getter
 	/**
@@ -34,7 +34,7 @@ public class Settings {
 	 *
 	 * @return LevelUpSettings instance.
 	 */
-	private final FortSettings fortSettings;
+	public final FortSettings fortSettings;
 
 
 	@Getter
@@ -58,7 +58,7 @@ public class Settings {
 	 *
 	 * @return String hash.
 	 */
-	private String hash;
+	public String hash;
 
 	/**
 	 * Settings object that hold different configuration aspect of the game.

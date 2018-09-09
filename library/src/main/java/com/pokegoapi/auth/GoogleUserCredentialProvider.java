@@ -158,17 +158,17 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 		GoogleAuthTokenJson googleAuthTokenJson = null;
 		try {
 			googleAuthTokenJson = moshi.adapter(GoogleAuthTokenJson.class).fromJson(response.body().string());
-			Log.d(TAG, "" + googleAuthTokenJson.getExpiresIn());
+			Log.d(TAG, "" + googleAuthTokenJson.expiresIn);
 		} catch (IOException e) {
 			throw new LoginFailedException("Failed to unmarshal the Json response to fetch refreshed tokenId", e);
 		}
-		if (googleAuthTokenJson.getError() != null) {
-			throw new LoginFailedException(googleAuthTokenJson.getError());
+		if (googleAuthTokenJson.error != null) {
+			throw new LoginFailedException(googleAuthTokenJson.error);
 		} else {
-			Log.d(TAG, "Refreshed Token " + googleAuthTokenJson.getIdToken());
+			Log.d(TAG, "Refreshed Token " + googleAuthTokenJson.idToken);
 			expiresTimestamp = time.currentTimeMillis()
-					+ (googleAuthTokenJson.getExpiresIn() * 1000 - REFRESH_TOKEN_BUFFER_TIME);
-			tokenId = googleAuthTokenJson.getIdToken();
+					+ (googleAuthTokenJson.expiresIn * 1000 - REFRESH_TOKEN_BUFFER_TIME);
+			tokenId = googleAuthTokenJson.idToken;
 		}
 	}
 
@@ -210,17 +210,17 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 		GoogleAuthTokenJson googleAuth = null;
 		try {
 			googleAuth = moshi.adapter(GoogleAuthTokenJson.class).fromJson(response.body().string());
-			Log.d(TAG, "" + googleAuth.getExpiresIn());
+			Log.d(TAG, "" + googleAuth.expiresIn);
 		} catch (IOException e) {
 			throw new LoginFailedException("Failed to unmarshell the Json response to fetch tokenId", e);
 		}
 
-		Log.d(TAG, "Got token: " + googleAuth.getAccessToken());
+		Log.d(TAG, "Got token: " + googleAuth.accessToken);
 
 		expiresTimestamp = time.currentTimeMillis()
-				+ (googleAuth.getExpiresIn() * 1000 - REFRESH_TOKEN_BUFFER_TIME);
-		tokenId = googleAuth.getIdToken();
-		refreshToken = googleAuth.getRefreshToken();
+				+ (googleAuth.expiresIn * 1000 - REFRESH_TOKEN_BUFFER_TIME);
+		tokenId = googleAuth.idToken;
+		refreshToken = googleAuth.refreshToken;
 
 		authbuilder = AuthInfo.newBuilder();
 	}
@@ -250,11 +250,6 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 		authbuilder.setProvider("google");
 		authbuilder.setToken(AuthInfo.JWT.newBuilder().setContents(tokenId).setUnknown2(0).build());
 		return authbuilder.build();
-	}
-
-	@Override
-	public boolean isTokenIdExpired() {
-		return isTokenIdInvalid();
 	}
 
 	@Override

@@ -23,9 +23,9 @@ import lombok.Getter;
 
 public class ServerRequest {
 	@Getter
-	private final RequestType type;
+	public final RequestType type;
 	@Getter
-	private final Message request;
+	public final Message request;
 
 	private final Object responseLock = new Object();
 

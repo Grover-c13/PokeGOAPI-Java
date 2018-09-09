@@ -50,16 +50,16 @@ public class Signature {
 			requestData[i] = builder.getRequests(i).toByteArray();
 			RequestType requestType = builder.getRequests(i).getRequestType();
 			if (requestType == RequestType.GET_PLAYER) {
-				usePtr8 |= api.isFirstGP();
-				api.setFirstGP(false);
+				usePtr8 |= api.firstGP;
+				api.firstGP = false;
 			} else if (requestType == RequestType.GET_MAP_OBJECTS) {
-				usePtr8 |= !api.isFirstGMO();
-				api.setFirstGMO(false);
+				usePtr8 |= !api.firstGMO;
+				api.firstGMO = false;
 			}
 		}
-		double latitude = api.getLatitude();
-		double longitude = api.getLongitude();
-		double accuracy = api.getAccuracy();
+		double latitude = api.latitude;
+		double longitude = api.longitude;
+		double accuracy = api.accuracy;
 		if (Double.isNaN(latitude)) {
 			latitude = 0.0;
 		}
@@ -77,15 +77,15 @@ public class Signature {
 		}
 
 		long currentTimeMillis = api.currentTimeMillis();
-		byte[] sessionHash = api.getSessionHash();
-		HashProvider provider = api.getHashProvider();
+		byte[] sessionHash = api.settings.hash.getBytes();//.getSessionHash();
+		HashProvider provider = api.hashProvider;
 		Hash hash = provider.provide(currentTimeMillis, latitude, longitude, accuracy, authTicket, sessionHash,
 				requestData);
 
-		long timeSinceStart = currentTimeMillis - api.getStartTime();
+		long timeSinceStart = currentTimeMillis - api.startTime;
 		SignatureOuterClass.Signature.Builder signatureBuilder = SignatureOuterClass.Signature.newBuilder()
-				.setLocationHash1(hash.getLocationAuthHash())
-				.setLocationHash2(hash.getLocationHash())
+				.setLocationHash1(hash.locationAuthHash)
+				.setLocationHash2(hash.locationHash)
 				.setSessionHash(ByteString.copyFrom(sessionHash))
 				.setTimestamp(currentTimeMillis)
 				.setTimestampSinceStart(timeSinceStart)
@@ -101,7 +101,7 @@ public class Signature {
 		if (sensorInfo != null)
 			signatureBuilder.addSensorInfo(sensorInfo);
 
-		List<Long> requestHashes = hash.getRequestHashes();
+		List<Long> requestHashes = hash.requestHashes;
 		for (int i = 0; i < builder.getRequestsCount(); i++)
 			signatureBuilder.addRequestHash(requestHashes.get(i));
 
