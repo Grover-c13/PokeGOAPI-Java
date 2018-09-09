@@ -37,7 +37,7 @@ public class Evolutions {
 	public Evolutions(ItemTemplates templates) {
 		itemTemplates = templates;
 		evolutions.clear();
-		for (ItemTemplate template : templates.getTemplates()) {
+		for (ItemTemplate template : templates.templates) {
 			if (template.hasPokemonSettings()) {
 				PokemonSettings settings = template.getPokemonSettings();
 				PokemonId pokemon = settings.getPokemonId();
@@ -57,7 +57,7 @@ public class Evolutions {
 	private void addEvolution(PokemonId parent, PokemonId pokemon) {
 		Evolution evolution = new Evolution(itemTemplates, parent, pokemon);
 		evolutions.put(pokemon, evolution);
-		for (PokemonId poke : evolution.getEvolutions()) {
+		for (PokemonId poke : evolution.evolutions) {
 			addEvolution(pokemon, poke);
 		}
 	}
@@ -81,7 +81,7 @@ public class Evolutions {
 	public List<PokemonId> getEvolutions(PokemonId pokemon) {
 		Evolution evolution = getEvolution(pokemon);
 		if (evolution != null) {
-			return evolution.getEvolutions();
+			return evolution.evolutions;
 		}
 		return new ArrayList<>();
 	}
@@ -96,8 +96,8 @@ public class Evolutions {
 		List<PokemonId> basic = new ArrayList<>();
 		Evolution evolution = getEvolution(pokemon);
 		if (evolution != null) {
-			if (evolution.getParent() != null) {
-				basic.add(evolution.getParent());
+			if (evolution.parent != null) {
+				basic.add(evolution.parent);
 			} else {
 				basic.add(pokemon);
 			}
@@ -118,8 +118,8 @@ public class Evolutions {
 		List<PokemonId> highest = new ArrayList<>();
 		Evolution evolution = getEvolution(pokemon);
 		if (evolution != null) {
-			if (evolution.getEvolutions() != null && evolution.getEvolutions().size() > 0) {
-				for (PokemonId child : evolution.getEvolutions()) {
+			if (evolution.evolutions != null && evolution.evolutions.size() > 0) {
+				for (PokemonId child : evolution.evolutions) {
 					highest.addAll(getHighest(child));
 				}
 			} else {
@@ -140,6 +140,6 @@ public class Evolutions {
 	 */
 	public boolean canEvolve(PokemonId pokemon) {
 		Evolution evolution = getEvolution(pokemon);
-		return evolution != null && evolution.getEvolutions() != null && evolution.getEvolutions().size() > 0;
+		return evolution != null && evolution.evolutions != null && evolution.evolutions.size() > 0;
 	}
 }

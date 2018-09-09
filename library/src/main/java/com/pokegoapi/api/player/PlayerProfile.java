@@ -80,7 +80,7 @@ public class PlayerProfile {
 	private long startTime;
 
 	@Getter
-	private Buddy buddy;
+	public Buddy buddy;
 
 	private Stats stats;
 	private TutorialState tutorialState;

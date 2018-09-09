@@ -23,14 +23,14 @@ public class DiskEncounter extends Encounter {
 	@Override
 	public EncounterResult encounter() throws RequestFailedException {
 		DiskEncounterMessage message = DiskEncounterMessage.newBuilder()
-				.setEncounterId(pokemon.getEncounterId())
-				.setFortId(pokemon.getSpawnPointId())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
+				.setEncounterId(pokemon.encounterId)
+				.setFortId(pokemon.spawnPointId)
+				.setPlayerLatitude(api.latitude)
+				.setPlayerLongitude(api.longitude)
 				.build();
 
 		ServerRequest request = new ServerRequest(RequestType.DISK_ENCOUNTER, message);
-		ByteString responseData = api.getRequestHandler().sendServerRequests(request, true);
+		ByteString responseData = api.requestHandler.sendServerRequests(request, true);
 
 		try {
 			DiskEncounterResponse response = DiskEncounterResponse.parseFrom(responseData);

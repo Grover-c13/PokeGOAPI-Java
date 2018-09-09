@@ -85,7 +85,7 @@ public class Pokemon extends PokemonDetails {
 		ReleasePokemonMessage reqMsg = ReleasePokemonMessage.newBuilder().setPokemonId(getId()).build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.RELEASE_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest, true);
+		api.requestHandler.sendServerRequests(serverRequest, true);
 
 		ReleasePokemonResponse response;
 		try {
@@ -95,7 +95,7 @@ public class Pokemon extends PokemonDetails {
 		}
 
 		if (response.getResult() == Result.SUCCESS) {
-			api.getInventories().getPokebank().removePokemon(this);
+			api.inventories.pokebank.removePokemon(this);
 		}
 
 		return response.getResult();
@@ -116,7 +116,7 @@ public class Pokemon extends PokemonDetails {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.NICKNAME_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest, true);
+		api.requestHandler.sendServerRequests(serverRequest, true);
 
 		NicknamePokemonResponse response;
 		try {
@@ -128,7 +128,7 @@ public class Pokemon extends PokemonDetails {
 			throw new RequestFailedException(e);
 		}
 
-		api.getInventories().getPokebank().removePokemon(this);
+		api.inventories.pokebank.removePokemon(this);
 
 		return response.getResult();
 	}
@@ -148,7 +148,7 @@ public class Pokemon extends PokemonDetails {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.SET_FAVORITE_POKEMON, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest, true);
+		api.requestHandler.sendServerRequests(serverRequest, true);
 
 		SetFavoritePokemonResponse response;
 		try {
@@ -160,7 +160,7 @@ public class Pokemon extends PokemonDetails {
 			throw new RequestFailedException(e);
 		}
 
-		api.getInventories().getPokebank().removePokemon(this);
+		api.inventories.pokebank.removePokemon(this);
 
 		return response.getResult();
 	}
@@ -171,7 +171,7 @@ public class Pokemon extends PokemonDetails {
 	 * @return the boolean
 	 */
 	public boolean canPowerUp() {
-		return getCandy() >= getCandyCostsForPowerup() && api.getPlayerProfile()
+		return getCandy() >= getCandyCostsForPowerup() && api.playerProfile
 				.getCurrency(PlayerProfile.Currency.STARDUST) >= getStardustCostsForPowerup();
 	}
 
@@ -197,7 +197,7 @@ public class Pokemon extends PokemonDetails {
 	 * @return the boolean
 	 */
 	public boolean canEvolve() {
-		Evolutions evolutions = api.getItemTemplates().getEvolutions();
+		Evolutions evolutions = api.itemTemplates.evolutions;
 		return evolutions.canEvolve(getPokemonId()) && (getCandy() >= getCandiesToEvolve());
 	}
 
@@ -222,7 +222,7 @@ public class Pokemon extends PokemonDetails {
 		UpgradePokemonMessage reqMsg = UpgradePokemonMessage.newBuilder().setPokemonId(getId()).build();
 		ServerRequest serverRequest = new ServerRequest(RequestType.UPGRADE_POKEMON, reqMsg);
 
-		return api.getRequestHandler().sendAsyncServerRequests(serverRequest, true).map(
+		return api.requestHandler.sendAsyncServerRequests(serverRequest, true).map(
 				new Func1<ByteString, UpgradePokemonResponse.Result>() {
 					@Override
 					public UpgradePokemonResponse.Result call(ByteString result) {
@@ -266,7 +266,7 @@ public class Pokemon extends PokemonDetails {
 		}
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.EVOLVE_POKEMON, messageBuilder.build());
-		api.getRequestHandler().sendServerRequests(serverRequest, true);
+		api.requestHandler.sendServerRequests(serverRequest, true);
 
 		EvolvePokemonResponse response;
 		try {
@@ -308,16 +308,16 @@ public class Pokemon extends PokemonDetails {
 		if (!isInjured() || isFainted())
 			return UseItemPotionResponse.Result.ERROR_CANNOT_USE;
 
-		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_POTION).getCount() > 0)
+		if (api.inventories.itemBag.getItem(ItemId.ITEM_POTION).count > 0)
 			return usePotion(ItemId.ITEM_POTION);
 
-		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_SUPER_POTION).getCount() > 0)
+		if (api.inventories.itemBag.getItem(ItemId.ITEM_SUPER_POTION).count > 0)
 			return usePotion(ItemId.ITEM_SUPER_POTION);
 
-		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_HYPER_POTION).getCount() > 0)
+		if (api.inventories.itemBag.getItem(ItemId.ITEM_HYPER_POTION).count > 0)
 			return usePotion(ItemId.ITEM_HYPER_POTION);
 
-		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_MAX_POTION).getCount() > 0)
+		if (api.inventories.itemBag.getItem(ItemId.ITEM_MAX_POTION).count > 0)
 			return usePotion(ItemId.ITEM_MAX_POTION);
 
 		return UseItemPotionResponse.Result.ERROR_CANNOT_USE;
@@ -334,9 +334,9 @@ public class Pokemon extends PokemonDetails {
 	public UseItemPotionResponse.Result usePotion(ItemId itemId)
 			throws RequestFailedException {
 
-		Item potion = api.getInventories().getItemBag().getItem(itemId);
+		Item potion = api.inventories.itemBag.getItem(itemId);
 		//some sanity check, to prevent wrong use of this call
-		if (!potion.isPotion() || potion.getCount() < 1 || !isInjured())
+		if (!potion.isPotion() || potion.count < 1 || !isInjured())
 			return UseItemPotionResponse.Result.ERROR_CANNOT_USE;
 
 		UseItemPotionMessageOuterClass.UseItemPotionMessage reqMsg = UseItemPotionMessageOuterClass
@@ -347,14 +347,14 @@ public class Pokemon extends PokemonDetails {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_POTION, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest, true);
+		api.requestHandler.sendServerRequests(serverRequest, true);
 
 		UseItemPotionResponse response;
 		try {
 			response = UseItemPotionResponse.parseFrom(serverRequest.getData());
 			if (response.getResult() == UseItemPotionResponse.Result.SUCCESS) {
-				potion.setCount(potion.getCount() - 1);
-				setStamina(response.getStamina());
+				potion.setCount(potion.count - 1);
+				this.stamina = response.getStamina();
 			}
 			return response.getResult();
 		} catch (InvalidProtocolBufferException e) {
@@ -374,10 +374,10 @@ public class Pokemon extends PokemonDetails {
 		if (!isFainted())
 			return UseItemReviveResponse.Result.ERROR_CANNOT_USE;
 
-		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_REVIVE).getCount() > 0)
+		if (api.inventories.itemBag.getItem(ItemId.ITEM_REVIVE).count > 0)
 			return useRevive(ItemId.ITEM_REVIVE);
 
-		if (api.getInventories().getItemBag().getItem(ItemId.ITEM_MAX_REVIVE).getCount() > 0)
+		if (api.inventories.itemBag.getItem(ItemId.ITEM_MAX_REVIVE).count > 0)
 			return useRevive(ItemId.ITEM_MAX_REVIVE);
 
 		return UseItemReviveResponse.Result.ERROR_CANNOT_USE;
@@ -394,8 +394,8 @@ public class Pokemon extends PokemonDetails {
 	public UseItemReviveResponse.Result useRevive(ItemId itemId)
 			throws RequestFailedException {
 
-		Item item = api.getInventories().getItemBag().getItem(itemId);
-		if (!item.isRevive() || item.getCount() < 1 || !isFainted())
+		Item item = api.inventories.itemBag.getItem(itemId);
+		if (!item.isRevive() || item.count < 1 || !isFainted())
 			return UseItemReviveResponse.Result.ERROR_CANNOT_USE;
 
 		UseItemReviveMessage reqMsg = UseItemReviveMessage
@@ -405,14 +405,14 @@ public class Pokemon extends PokemonDetails {
 				.build();
 
 		ServerRequest serverRequest = new ServerRequest(RequestType.USE_ITEM_REVIVE, reqMsg);
-		api.getRequestHandler().sendServerRequests(serverRequest, true);
+		api.requestHandler.sendServerRequests(serverRequest, true);
 
 		UseItemReviveResponse response;
 		try {
 			response = UseItemReviveResponse.parseFrom(serverRequest.getData());
 			if (response.getResult() == UseItemReviveResponse.Result.SUCCESS) {
-				item.setCount(item.getCount() - 1);
-				setStamina(response.getStamina());
+				item.setCount(item.count - 1);
+				this.stamina = response.getStamina();
 			}
 			return response.getResult();
 		} catch (InvalidProtocolBufferException e) {
@@ -424,7 +424,7 @@ public class Pokemon extends PokemonDetails {
 	 * @return the evolution metadata for this pokemon, or null if it doesn't exist
 	 */
 	public Evolution getEvolution() {
-		return api.getItemTemplates().getEvolutions().getEvolution(this.getPokemonId());
+		return api.itemTemplates.evolutions.getEvolution(this.getPokemonId());
 	}
 
 	/**
@@ -479,7 +479,7 @@ public class Pokemon extends PokemonDetails {
 	 * @return true if this pokemon is your current buddy
 	 */
 	public boolean isBuddy() {
-		PlayerProfile profile = api.getPlayerProfile();
-		return profile.hasBuddy() && profile.getBuddy().getPokemon().getId() == this.getId();
+		PlayerProfile profile = api.playerProfile;
+		return profile.hasBuddy() && profile.buddy.getPokemon().getId() == this.getId();
 	}
 }

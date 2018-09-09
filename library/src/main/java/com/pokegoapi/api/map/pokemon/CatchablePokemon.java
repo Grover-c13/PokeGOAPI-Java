@@ -35,9 +35,9 @@ import lombok.ToString;
 public class CatchablePokemon implements MapPoint {
 	private final PokemonGo api;
 	@Getter
-	private final String spawnPointId;
+	public final String spawnPointId;
 	@Getter
-	private final long encounterId;
+	public final long encounterId;
 	@Getter
 	private final PokemonId pokemonId;
 	@Getter

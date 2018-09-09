@@ -48,7 +48,7 @@ public class ItemTemplates {
 	private final ItemTemplateProvider provider;
 
 	@Getter
-	private List<ItemTemplate> templates = new ArrayList<>();
+	public List<ItemTemplate> templates = new ArrayList<>();
 	private Map<PokemonId, PokemonSettings> pokemonSettings = new HashMap<>();
 	private Map<PokemonMove, MoveSettings> moveSettings = new HashMap<>();
 	private Map<BadgeType, BadgeSettings> badgeSettings = new HashMap<>();
