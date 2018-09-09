@@ -4,11 +4,11 @@ import lombok.Getter;
 
 public class ThrowProperties {
 	@Getter
-	private double normalizedHitPosition;
+	public double normalizedHitPosition;
 	@Getter
-	private double normalizedReticleSize;
+	public double normalizedReticleSize;
 	@Getter
-	private double spinModifier;
+	public double spinModifier;
 	private boolean hitPokemon = true;
 
 	private ThrowProperties() {

@@ -23,12 +23,12 @@ public class IncenseEncounter extends Encounter {
 	@Override
 	public EncounterResult encounter() throws RequestFailedException {
 		IncenseEncounterMessage message = IncenseEncounterMessage.newBuilder()
-				.setEncounterId(pokemon.getEncounterId())
-				.setEncounterLocation(pokemon.getSpawnPointId())
+				.setEncounterId(pokemon.encounterId)
+				.setEncounterLocation(pokemon.spawnPointId)
 				.build();
 
 		ServerRequest request = new ServerRequest(RequestType.INCENSE_ENCOUNTER, message);
-		ByteString responseData = api.getRequestHandler().sendServerRequests(request, true);
+		ByteString responseData = api.requestHandler.sendServerRequests(request, true);
 
 		try {
 			IncenseEncounterResponse response = IncenseEncounterResponse.parseFrom(responseData);

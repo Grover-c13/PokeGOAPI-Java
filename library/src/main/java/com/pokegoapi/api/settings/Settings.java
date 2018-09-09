@@ -11,7 +11,6 @@ public class Settings {
 
 	private final PokemonGo api;
 
-
 	@Getter
 	/**
 	 * Settings for various parameters on map

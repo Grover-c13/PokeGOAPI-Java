@@ -77,14 +77,14 @@ public class Encounter {
 	 */
 	protected EncounterResult encounter() throws RequestFailedException {
 		EncounterMessage message = EncounterMessage.newBuilder()
-				.setEncounterId(pokemon.getEncounterId())
-				.setSpawnPointId(pokemon.getSpawnPointId())
-				.setPlayerLatitude(api.getLatitude())
-				.setPlayerLongitude(api.getLongitude())
+				.setEncounterId(pokemon.encounterId)
+				.setSpawnPointId(pokemon.spawnPointId)
+				.setPlayerLatitude(api.latitude)
+				.setPlayerLongitude(api.longitude)
 				.build();
 
 		ServerRequest request = new ServerRequest(RequestType.ENCOUNTER, message);
-		ByteString responseData = api.getRequestHandler().sendServerRequests(request, true);
+		ByteString responseData = api.requestHandler.sendServerRequests(request, true);
 
 		try {
 			EncounterResponse response = EncounterResponse.parseFrom(responseData);
@@ -110,10 +110,10 @@ public class Encounter {
 	 */
 	public CatchPokemonResponse.CatchStatus throwPokeball(PokeballSelector selector, ThrowProperties throwProperties)
 			throws RequestFailedException, NoSuchItemException {
-		List<Pokeball> pokeballs = api.getInventories().getItemBag().getUsablePokeballs();
+		List<Pokeball> pokeballs = api.inventories.itemBag.getUsablePokeballs();
 		if (pokeballs.size() > 0) {
 			Pokeball pokeball = selector.select(pokeballs, getCaptureProbability());
-			return throwPokeball(pokeball.getBallType(), throwProperties);
+			return throwPokeball(pokeball.ballType, throwProperties);
 		} else {
 			throw new NoSuchItemException();
 		}
@@ -131,21 +131,21 @@ public class Encounter {
 	public CatchPokemonResponse.CatchStatus throwPokeball(ItemId pokeball, ThrowProperties throwProperties)
 			throws RequestFailedException, NoSuchItemException {
 		if (isActive()) {
-			ItemBag bag = api.getInventories().getItemBag();
+			ItemBag bag = api.inventories.itemBag;
 			Item item = bag.getItem(pokeball);
-			if (item.getCount() > 0) {
+			if (item.count > 0) {
 				CatchPokemonMessage message = CatchPokemonMessage.newBuilder()
-						.setEncounterId(pokemon.getEncounterId())
-						.setSpawnPointId(pokemon.getSpawnPointId())
+						.setEncounterId(pokemon.encounterId)
+						.setSpawnPointId(pokemon.spawnPointId)
 						.setPokeball(pokeball)
-						.setNormalizedHitPosition(throwProperties.getNormalizedHitPosition())
-						.setNormalizedReticleSize(throwProperties.getNormalizedReticleSize())
-						.setSpinModifier(throwProperties.getSpinModifier())
+						.setNormalizedHitPosition(throwProperties.normalizedHitPosition)
+						.setNormalizedReticleSize(throwProperties.normalizedReticleSize)
+						.setSpinModifier(throwProperties.spinModifier)
 						.setHitPokemon(throwProperties.shouldHitPokemon())
 						.build();
 
 				ServerRequest request = new ServerRequest(RequestType.CATCH_POKEMON, message);
-				ByteString responseData = api.getRequestHandler().sendServerRequests(request, true);
+				ByteString responseData = api.requestHandler.sendServerRequests(request, true);
 
 				try {
 					CatchPokemonResponse response = CatchPokemonResponse.parseFrom(responseData);
@@ -158,8 +158,8 @@ public class Encounter {
 					}
 
 					if (status == CatchStatus.CATCH_SUCCESS || status == CatchStatus.CATCH_FLEE) {
-						pokemon.setDespawned(true);
-						api.getPlayerProfile().updateProfile();
+						pokemon.despawned = true;
+						api.playerProfile.updateProfile();
 					}
 
 					if (status == CatchStatus.CATCH_ESCAPE) {
@@ -167,7 +167,7 @@ public class Encounter {
 					}
 
 					if (status != CatchStatus.CATCH_ERROR) {
-						item.setCount(item.getCount() - 1);
+						item.setCount(item.count - 1);
 					}
 				} catch (InvalidProtocolBufferException e) {
 					throw new RequestFailedException(e);
@@ -188,25 +188,25 @@ public class Encounter {
 	 */
 	public UseItemEncounterResponse.Status useItem(ItemId itemId) throws RequestFailedException {
 		if (isActive()) {
-			ItemBag bag = api.getInventories().getItemBag();
+			ItemBag bag = api.inventories.itemBag;
 			Item item = bag.getItem(itemId);
-			if (item.getCount() > 0) {
+			if (item.count > 0) {
 				if (getActiveItem() == null) {
 					UseItemEncounterMessage message = UseItemEncounterMessage.newBuilder()
-							.setEncounterId(pokemon.getEncounterId())
-							.setSpawnPointGuid(pokemon.getSpawnPointId())
+							.setEncounterId(pokemon.encounterId)
+							.setSpawnPointGuid(pokemon.spawnPointId)
 							.setItem(itemId)
 							.build();
 
 					ServerRequest request = new ServerRequest(RequestType.USE_ITEM_ENCOUNTER, message);
-					ByteString responseData = api.getRequestHandler().sendServerRequests(request, true);
+					ByteString responseData = api.requestHandler.sendServerRequests(request, true);
 
 					try {
 						UseItemEncounterResponse response = UseItemEncounterResponse.parseFrom(responseData);
 						activeItem = response.getActiveItem();
 						captureProbabilities = response.getCaptureProbability();
 						if (response.getStatus() == Status.SUCCESS) {
-							item.setCount(item.getCount() - 1);
+							item.setCount(item.count - 1);
 						}
 						return response.getStatus();
 					} catch (InvalidProtocolBufferException e) {

@@ -25,11 +25,11 @@ import java.util.List;
 
 public class Evolution {
 	@Getter
-	private PokemonId parent;
+	public PokemonId parent;
 	@Getter
 	private PokemonId pokemon;
 	@Getter
-	private List<PokemonId> evolutions = new ArrayList<>();
+	public List<PokemonId> evolutions = new ArrayList<>();
 	@Getter
 	public List<EvolutionBranch> evolutionBranch;
 
