@@ -82,10 +82,10 @@ public class CatchPokemonAtAreaExample {
 			// Catch all pokemon in the current area
 			catchArea(api);
 
-			MapObjects mapObjects = api.getMap().getMapObjects();
+			MapObjects mapObjects = api.getMap().mapObjects;
 			//Find all pokestops with pokemon nearby
 			List<Pokestop> travelPokestops = new ArrayList<>();
-			Set<NearbyPokemon> nearby = mapObjects.getNearby();
+			Set<NearbyPokemon> nearby = mapObjects.nearby;
 			for (NearbyPokemon nearbyPokemon : nearby) {
 				String fortId = nearbyPokemon.getFortId();
 				//Check if nearby pokemon is near a pokestop
@@ -102,8 +102,8 @@ public class CatchPokemonAtAreaExample {
 			Collections.sort(travelPokestops, new Comparator<Pokestop>() {
 				@Override
 				public int compare(Pokestop primary, Pokestop secondary) {
-					double lat = api.getLatitude();
-					double lng = api.getLongitude();
+					double lat = api.latitude;
+					double lng = api.longitude;
 					double distance1 = MapUtil.distFrom(primary.getLatitude(), primary.getLongitude(), lat, lng);
 					double distance2 = MapUtil.distFrom(secondary.getLatitude(), secondary.getLongitude(), lat, lng);
 					return Double.compare(distance1, distance2);
@@ -118,7 +118,7 @@ public class CatchPokemonAtAreaExample {
 				System.out.println("Traveling to " + destination + " at 20KMPH!");
 				path.start(api);
 				try {
-					while (!path.isComplete()) {
+					while (!path.complete) {
 						//Calculate the desired intermediate point for the current time
 						Point point = path.calculateIntermediate(api);
 						//Set the API location to that point
@@ -139,16 +139,16 @@ public class CatchPokemonAtAreaExample {
 	}
 
 	private static void catchArea(PokemonGo api) throws RequestFailedException, NoSuchItemException {
-		ItemBag bag = api.getInventories().getItemBag();
+		ItemBag bag = api.inventories.itemBag;
 		try {
 			//Wait until map is updated for the current location
 			api.getMap().awaitUpdate();
 
-			Set<CatchablePokemon> catchablePokemon = api.getMap().getMapObjects().getPokemon();
+			Set<CatchablePokemon> catchablePokemon = api.getMap().mapObjects.getPokemon();
 			System.out.println("Pokemon in area: " + catchablePokemon.size());
 
 			Random random = new Random();
-			PokeBank pokebank = api.getInventories().getPokebank();
+			PokeBank pokebank = api.inventories.pokebank;
 
 			for (CatchablePokemon cp : catchablePokemon) {
 				// Encounter this pokemon
@@ -156,7 +156,7 @@ public class CatchPokemonAtAreaExample {
 
 				// If the encounter was successful, attempt to catch this pokemon
 				if (encounter.isSuccessful()) {
-					System.out.println("Encountered: " + cp.getPokemonId());
+					System.out.println("Encountered: " + cp.pokemonId);
 
 					List<Pokeball> usablePokeballs = bag.getUsablePokeballs();
 
@@ -164,7 +164,7 @@ public class CatchPokemonAtAreaExample {
 						//Select pokeball with smart selector to print what pokeball is used
 						double probability = encounter.getCaptureProbability();
 						Pokeball pokeball = PokeballSelector.SMART.select(usablePokeballs, probability);
-						System.out.println("Attempting to catch: " + cp.getPokemonId() + " with " + pokeball
+						System.out.println("Attempting to catch: " + cp.pokemonId + " with " + pokeball
 								+ " (" + probability + ")");
 
 						// Throw pokeballs until capture or flee
@@ -173,7 +173,7 @@ public class CatchPokemonAtAreaExample {
 							Thread.sleep(500 + random.nextInt(1000));
 
 							// If no item is active, use a razzberry
-							int razzberryCount = bag.getItem(ItemId.ITEM_RAZZ_BERRY).getCount();
+							int razzberryCount = bag.getItem(POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId.ITEM_RAZZ_BERRY).count;
 							if (encounter.getActiveItem() == null && razzberryCount > 0) {
 								encounter.useItem(ItemId.ITEM_RAZZ_BERRY);
 							}
@@ -181,9 +181,9 @@ public class CatchPokemonAtAreaExample {
 							// Throw pokeball with random properties
 							encounter.throwPokeball(PokeballSelector.SMART, ThrowProperties.random());
 
-							if (encounter.getStatus() == CatchStatus.CATCH_SUCCESS) {
+							if (encounter.status == CatchStatus.CATCH_SUCCESS) {
 								// Print pokemon stats
-								Pokemon pokemon = pokebank.getPokemonById(encounter.getCapturedPokemon());
+								Pokemon pokemon = pokebank.getPokemonById(encounter.capturedPokemon);
 								if (pokemon != null) {
 									double iv = pokemon.getIvInPercentage();
 									int number = pokemon.getPokemonId().getNumber();
@@ -211,7 +211,7 @@ public class CatchPokemonAtAreaExample {
 					// Wait for animation before catching next pokemon
 					Thread.sleep(3000 + random.nextInt(1000));
 				} else {
-					System.out.println("Failed to encounter pokemon: " + encounter.getEncounterResult());
+					System.out.println("Failed to encounter pokemon: " + encounter.encounterResult);
 				}
 			}
 		} catch (InterruptedException e) {

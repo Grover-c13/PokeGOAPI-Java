@@ -44,7 +44,7 @@ public class GoogleUserInteractionExample {
 			
 			// we should be able to login with this token
 			provider.login(access);
-			System.out.println("Refresh token:" + provider.getRefreshToken());
+			System.out.println("Refresh token:" + provider.refreshToken);
 			
 		} catch (RequestFailedException e) {
 			e.printStackTrace();

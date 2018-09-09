@@ -43,7 +43,7 @@ public class CheckEvolutionExample {
 			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD), hasher);
 
 			//Get the evolution meta from the item templates received from the game server
-			Evolutions evolutionMeta = api.getItemTemplates().getEvolutions();
+			Evolutions evolutionMeta = api.itemTemplates.evolutions;
 
 			System.out.println("Evolutions: ");
 			for (PokemonId pokemon : PokemonId.values()) {

@@ -54,7 +54,7 @@ public class Battle {
 	private final PokemonGo api;
 
 	@Getter
-	private final Gym gym;
+	public final Gym gym;
 
 	@Getter
 	private Pokemon[] team;
@@ -70,7 +70,7 @@ public class Battle {
 	private BattleState battleState;
 
 	@Getter
-	private boolean active;
+	public boolean active;
 
 	@Getter
 	private long serverTimeOffset;
@@ -97,7 +97,7 @@ public class Battle {
 	@Getter
 	private BattlePokemon activeDefender;
 	@Getter
-	private BattlePokemon activeAttacker;
+	public BattlePokemon activeAttacker;
 
 	@Getter
 	private long startTime;
@@ -771,7 +771,7 @@ public class Battle {
 
 	public class ServerAction {
 		@Getter
-		private final BattleActionType type;
+		public final BattleActionType type;
 		@Getter
 		private final long start;
 		@Getter
@@ -781,7 +781,7 @@ public class Battle {
 		@Getter
 		private final int energyDelta;
 		@Getter
-		private final int attackerIndex;
+		public final int attackerIndex;
 		@Getter
 		private final int targetIndex;
 		@Getter
@@ -864,7 +864,7 @@ public class Battle {
 
 	public class BattlePokemon {
 		@Getter
-		private final PokemonData pokemon;
+		public final PokemonData pokemon;
 		@Setter
 		@Getter
 		private int health;
@@ -872,7 +872,7 @@ public class Battle {
 		private int maxHealth;
 		@Setter
 		@Getter
-		private int energy;
+		public int energy;
 
 		BattlePokemon(BattlePokemonInfo activePokemon) {
 			this.health = activePokemon.getCurrentHealth();

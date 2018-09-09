@@ -59,7 +59,7 @@ public class TravelToPokestopExample {
 			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD), hasher);
 			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 
-			Set<Pokestop> pokestops = api.getMap().getMapObjects().getPokestops();
+			Set<Pokestop> pokestops = api.getMap().mapObjects.pokestops;
 			System.out.println("Found " + pokestops.size() + " pokestops in the current area.");
 
 			Pokestop destinationPokestop = null;
@@ -79,7 +79,7 @@ public class TravelToPokestopExample {
 				System.out.println("Traveling to " + destination + " at 20KMPH!");
 				path.start(api);
 				try {
-					while (!path.isComplete()) {
+					while (!path.complete) {
 						//Calculate the desired intermediate point for the current time
 						Point point = path.calculateIntermediate(api);
 						//Set the API location to that point

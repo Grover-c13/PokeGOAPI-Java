@@ -36,10 +36,10 @@ public class Encounter {
 	protected final CatchablePokemon pokemon;
 
 	@Getter
-	protected CatchPokemonResponse.CatchStatus status = CatchStatus.UNRECOGNIZED;
+	public CatchPokemonResponse.CatchStatus status = CatchStatus.UNRECOGNIZED;
 
 	@Getter
-	protected EncounterResult encounterResult;
+	public EncounterResult encounterResult;
 
 	protected ItemId activeItem;
 
@@ -53,7 +53,7 @@ public class Encounter {
 	protected CaptureReason captureReason;
 
 	@Getter
-	protected long capturedPokemon;
+	public long capturedPokemon;
 
 	@Getter
 	protected PokemonData encounteredPokemon;

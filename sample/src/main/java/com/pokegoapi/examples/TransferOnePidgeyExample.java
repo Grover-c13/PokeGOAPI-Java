@@ -41,7 +41,7 @@ public class TransferOnePidgeyExample {
 			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 
 			List<Pokemon> pidgeys =
-					api.getInventories().getPokebank().getPokemonByPokemonId(PokemonIdOuterClass.PokemonId.PIDGEY);
+					api.inventories.pokebank.getPokemonByPokemonId(PokemonIdOuterClass.PokemonId.PIDGEY);
 
 			if (pidgeys.size() > 0) {
 				Pokemon pest = pidgeys.get(0);

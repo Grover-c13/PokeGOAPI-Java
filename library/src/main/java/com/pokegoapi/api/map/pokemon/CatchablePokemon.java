@@ -39,7 +39,7 @@ public class CatchablePokemon implements MapPoint {
 	@Getter
 	public final long encounterId;
 	@Getter
-	private final PokemonId pokemonId;
+	public final PokemonId pokemonId;
 	@Getter
 	private final int pokemonIdValue;
 	@Getter

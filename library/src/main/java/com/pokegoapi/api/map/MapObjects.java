@@ -48,16 +48,16 @@ public class MapObjects {
 	}
 
 	@Getter
-	private Set<NearbyPokemon> nearby = new HashSet<>();
+	public Set<NearbyPokemon> nearby = new HashSet<>();
 	private Set<CatchablePokemon> pokemon = new HashSet<>();
 	@Getter
 	private Set<Point> spawnpoints = new HashSet<>();
 	@Getter
 	private Set<Point> decimatedSpawnPoints = new HashSet<>();
 	@Getter
-	private Set<Pokestop> pokestops = new HashSet<>();
+	public Set<Pokestop> pokestops = new HashSet<>();
 	@Getter
-	private Set<Gym> gyms = new HashSet<>();
+	public Set<Gym> gyms = new HashSet<>();
 	@Getter
 	private Set<Raid> raids = new HashSet<>();
 

@@ -52,7 +52,7 @@ public class UseIncenseExample {
 			HashProvider hasher = ExampleConstants.getHashProvider();
 			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD), hasher);
 			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
-			api.getInventories().getItemBag().useIncense();
+			api.inventories.itemBag.useIncense();
 		} catch (RequestFailedException e) {
 			// failed to login, invalid credentials, auth issue or server issue.
 			Log.e("Main", "Failed to login, captcha or server issue: ", e);

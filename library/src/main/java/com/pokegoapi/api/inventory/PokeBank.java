@@ -47,7 +47,7 @@ import java.util.Map;
 
 public class PokeBank {
 	@Getter
-	private final List<Pokemon> pokemons = Collections.synchronizedList(new ArrayList<Pokemon>());
+	public final List<Pokemon> pokemons = Collections.synchronizedList(new ArrayList<Pokemon>());
 	@Getter
 	private final Object lock = new Object();
 	@Getter

@@ -56,7 +56,7 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 	protected String tokenId;
 
 	@Getter
-	protected String refreshToken;
+	public String refreshToken;
 
 	protected AuthInfo.Builder authbuilder;
 

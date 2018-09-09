@@ -44,8 +44,8 @@ public class TransferMultiplePokemon {
 			api.login(new PtcCredentialProvider(http, ExampleConstants.LOGIN, ExampleConstants.PASSWORD), hasher);
 			api.setLocation(ExampleConstants.LATITUDE, ExampleConstants.LONGITUDE, ExampleConstants.ALTITUDE);
 
-			PokeBank pokebank = api.getInventories().getPokebank();
-			List<Pokemon> pokemons = pokebank.getPokemons();
+			PokeBank pokebank = api.inventories.pokebank;
+			List<Pokemon> pokemons = pokebank.pokemons;
 			List<Pokemon> transferPokemons = new ArrayList<>();
 			//Find all pokemon of bad types or with IV less than 25%
 			for (Pokemon pokemon : pokemons) {

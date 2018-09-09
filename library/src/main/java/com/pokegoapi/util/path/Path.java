@@ -30,7 +30,7 @@ public class Path {
 	@Getter
 	private long totalTime;
 	@Getter
-	private boolean complete;
+	public boolean complete;
 
 	/**
 	 * Creates a Path with the given positions
