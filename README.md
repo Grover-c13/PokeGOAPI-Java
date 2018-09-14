@@ -4,6 +4,8 @@ Pokemon GO Java API
 
 [![Build Status](https://travis-ci.org/Grover-c13/PokeGOAPI-Java.svg?branch=master)](https://travis-ci.org/Grover-c13/PokeGOAPI-Java)
 [![](https://jitpack.io/v/Grover-c13/PokeGOAPI-Java.svg)](https://jitpack.io/#Grover-c13/PokeGOAPI-Java)
+[![Code Quality: Java](https://img.shields.io/lgtm/grade/java/g/Grover-c13/PokeGOAPI-Java.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Grover-c13/PokeGOAPI-Java/context:java)
+[![Total Alerts](https://img.shields.io/lgtm/alerts/g/Grover-c13/PokeGOAPI-Java.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Grover-c13/PokeGOAPI-Java/alerts)
 
 Javadocs : [CLICK ME](https://jitpack.io/com/github/Grover-c13/PokeGOAPI-Java/a2828da60d/javadoc/) 
 ___
