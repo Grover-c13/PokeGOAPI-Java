@@ -155,9 +155,9 @@ public class PlayerProfile {
 		contactSettings = new ContactSettings(playerData.getContactSettings());
 
 		// maybe something more graceful?
-		for (CurrencyOuterClass.Currency currency : playerData.getCurrenciesList()) {
+		for (CurrencyOuterClass.Currency currency : playerData.getCurrencyBalanceList()) {
 			try {
-				addCurrency(currency.getName(), currency.getAmount());
+				addCurrency(currency.getCurrencyType(), currency.getQuantity());
 			} catch (InvalidCurrencyException e) {
 				Log.w(TAG, "Error adding currency. You can probably ignore this.", e);
 			}
