@@ -119,7 +119,7 @@ public class Inventories {
 		GetHoloInventoryMessage invReqMsg = GetHoloInventoryMessage.newBuilder()
 				.setLastTimestampMs(lastInventoryUpdate)
 				.build();
-		ServerRequest inventoryRequest = new ServerRequest(RequestType.GET_HOLOHOLO_INVENTORY, invReqMsg);
+		ServerRequest inventoryRequest = new ServerRequest(RequestType.GET_HOLO_INVENTORY, invReqMsg);
 		api.requestHandler.sendServerRequests(inventoryRequest, false);
 
 		GetHoloInventoryResponse response;

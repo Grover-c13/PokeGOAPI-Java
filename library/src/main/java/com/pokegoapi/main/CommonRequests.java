@@ -129,8 +129,8 @@ public class CommonRequests {
 			CheckChallengeResponse checkChallenge = CheckChallengeResponse.parseFrom(data);
 			api.updateChallenge(checkChallenge.getChallengeUrl(), checkChallenge.getShowChallenge());
 		}
-		if (response.has(RequestType.GET_HOLOHOLO_INVENTORY)) {
-			ByteString data = response.get(RequestType.GET_HOLOHOLO_INVENTORY);
+		if (response.has(RequestType.GET_HOLO_INVENTORY)) {
+			ByteString data = response.get(RequestType.GET_HOLO_INVENTORY);
 			GetHoloInventoryResponse inventory = GetHoloInventoryResponse.parseFrom(data);
 			api.inventories.updateInventories(inventory);
 		}
@@ -189,7 +189,7 @@ public class CommonRequests {
 	public static ServerRequest getInventory(PokemonGo api) {
 		long lastUpdate = api.inventories.lastInventoryUpdate;
 		GetHoloInventoryMessage message = GetHoloInventoryMessage.newBuilder().setLastTimestampMs(lastUpdate).build();
-		return new ServerRequest(RequestType.GET_HOLOHOLO_INVENTORY, message);
+		return new ServerRequest(RequestType.GET_HOLO_INVENTORY, message);
 	}
 
 	/**
