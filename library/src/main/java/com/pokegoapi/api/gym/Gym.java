@@ -70,9 +70,11 @@ public class Gym extends Fort implements MapPoint {
 		return fortData.getGuardPokemonId();
 	}
 
+	/*
 	public int getGuardPokemonCp() {
 		return fortData.getGuardPokemonCp();
 	}
+	*/
 
 	public long getPoints() {
 		return points;
