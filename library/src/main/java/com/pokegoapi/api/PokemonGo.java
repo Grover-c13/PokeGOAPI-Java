@@ -19,7 +19,7 @@ import POGOProtos.Enums.TutorialStateOuterClass.TutorialState;
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo;
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Platform.PlatformRequestTypeOuterClass.PlatformRequestType;
-import POGOProtos.Networking.Platform.Requests.GetStoreItemsRequestOuterClass.GetStoreItemsRequest;
+//import POGOProtos.Networking.Platform.Requests.GetStoreItemsRequestOuterClass.GetStoreItemsRequest;
 import POGOProtos.Networking.Requests.Messages.CheckChallengeMessageOuterClass.CheckChallengeMessage;
 import POGOProtos.Networking.Requests.Messages.FetchAllNewsMessageOuterClass;
 import POGOProtos.Networking.Requests.Messages.GetAssetDigestMessageOuterClass.GetAssetDigestMessage;
@@ -287,9 +287,10 @@ public class PokemonGo {
 			throw new RequestFailedException(e);
 		}
 
-		ByteString getStoreItems = GetStoreItemsRequest.newBuilder().build().toByteString();
+
+		//ByteString getStoreItems = GetStoreItemsRequest.newBuilder().build().toByteString();
 		ServerRequestEnvelope envelope = ServerRequestEnvelope.create();
-		envelope.addPlatform(new ServerPlatformRequest(PlatformRequestType.GET_STORE_ITEMS, getStoreItems));
+		//envelope.addPlatform(new ServerPlatformRequest(PlatformRequestType.GET_STORE_ITEMS, getStoreItems));
 
 		requestHandler.sendServerRequests(envelope);
 

@@ -155,7 +155,7 @@ public class PlayerProfile {
 		contactSettings = new ContactSettings(playerData.getContactSettings());
 
 		// maybe something more graceful?
-		for (CurrencyOuterClass.Currency currency : playerData.getCurrencyBalanceList()) {
+		for (POGOProtos.Data.Store.CurrencyQuantityOuterClass.CurrencyQuantity currency : playerData.getCurrencyBalanceList()) {
 			try {
 				addCurrency(currency.getCurrencyType(), currency.getQuantity());
 			} catch (InvalidCurrencyException e) {

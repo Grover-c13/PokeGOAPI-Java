@@ -65,7 +65,7 @@ public class Fort {
 	public Fort(PokemonGo api, FortDataOuterClass.FortData fortData) {
 		this.api = api;
 		this.fortData = fortData;
-		this.cooldownCompleteTimestampMs = fortData.getCooldownCompleteTimestampMs();
+		this.cooldownCompleteTimestampMs = fortData.getCooldownCompleteMs();
 	}
 
 	/**

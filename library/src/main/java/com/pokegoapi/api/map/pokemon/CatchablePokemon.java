@@ -17,7 +17,7 @@ package com.pokegoapi.api.map.pokemon;
 
 import POGOProtos.Enums.PokemonIdOuterClass.PokemonId;
 import POGOProtos.Map.Fort.FortDataOuterClass.FortData;
-import POGOProtos.Map.Fort.FortLureInfoOuterClass.FortLureInfo;
+//import POGOProtos.Map.Fort.FortLureInfoOuterClass.FortLureInfo;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon;
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon;
 import POGOProtos.Networking.Responses.GetIncensePokemonResponseOuterClass.GetIncensePokemonResponse;
@@ -35,15 +35,15 @@ import lombok.ToString;
 public class CatchablePokemon implements MapPoint {
 	private final PokemonGo api;
 	@Getter
-	public final String spawnPointId;
+	public String spawnPointId = null;
 	@Getter
-	public final long encounterId;
+	public long encounterId = 0;
 	@Getter
-	public final PokemonId pokemonId;
+	public PokemonId pokemonId = POGOProtos.Enums.PokemonIdOuterClass.PokemonId.MISSINGNO;
 	@Getter
-	private final int pokemonIdValue;
+	private int pokemonIdValue = 0;
 	@Getter
-	public final long expirationTimestampMs;
+	public long expirationTimestampMs = 0;
 	private final double latitude;
 	private final double longitude;
 	private final EncounterKind encounterKind;
@@ -63,9 +63,9 @@ public class CatchablePokemon implements MapPoint {
 		this.encounterKind = EncounterKind.NORMAL;
 		this.spawnPointId = proto.getSpawnPointId();
 		this.encounterId = proto.getEncounterId();
-		this.pokemonId = proto.getPokemonId();
-		this.pokemonIdValue = proto.getPokemonIdValue();
-		this.expirationTimestampMs = proto.getExpirationTimestampMs();
+		this.pokemonId = proto.getPokedexTypeId();//.getPokemonId();
+		this.pokemonIdValue = proto.getPokedexTypeIdValue();//.getPokemonIdValue();
+		this.expirationTimestampMs = proto.getExpirationTimeMs();
 		this.latitude = proto.getLatitude();
 		this.longitude = proto.getLongitude();
 	}
@@ -95,16 +95,16 @@ public class CatchablePokemon implements MapPoint {
 	 * @param proto the proto
 	 */
 	public CatchablePokemon(PokemonGo api, FortData proto) {
-		if (!proto.hasLureInfo()) {
-			throw new IllegalArgumentException("Fort does not have lure");
-		}
-		FortLureInfo lureInfo = proto.getLureInfo();
+		//if (!proto.hasLureInfo()) {
+		//	throw new IllegalArgumentException("Fort does not have lure");
+		//}
+		//FortLureInfo lureInfo = proto.getLureInfo();
 		this.api = api;
-		this.spawnPointId = lureInfo.getFortId();
-		this.encounterId = lureInfo.getEncounterId();
-		this.pokemonId = lureInfo.getActivePokemonId();
-		this.pokemonIdValue = lureInfo.getActivePokemonIdValue();
-		this.expirationTimestampMs = lureInfo.getLureExpiresTimestampMs();
+		//this.spawnPointId = lureInfo.getFortId();
+		//this.encounterId = lureInfo.getEncounterId();
+		//this.pokemonId = lureInfo.getActivePokemonId();
+		//this.pokemonIdValue = lureInfo.getActivePokemonIdValue();
+		//this.expirationTimestampMs = lureInfo.getLureExpiresTimestampMs();
 		this.latitude = proto.getLatitude();
 		this.longitude = proto.getLongitude();
 		this.encounterKind = EncounterKind.DISK;

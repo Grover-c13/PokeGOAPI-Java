@@ -42,10 +42,11 @@ public class Pokestop extends Fort {
 	 *
 	 * @return lure status
 	 */
+	/*
 	@Deprecated
 	public boolean hasLurePokemon() {
 		return fortData.hasLureInfo() && fortData.getLureInfo().getLureExpiresTimestampMs() > api.startTime;
-	}
+	}*/
 
 	/**
 	 * Returns whether or not the lured pokemon is in range.

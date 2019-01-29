@@ -137,9 +137,9 @@ public class MapObjects {
 				default:
 					break;
 			}
-			if (fortData.hasLureInfo()) {
+			/*if (fortData.hasLureInfo()) {
 				this.pokemon.add(new CatchablePokemon(api, fortData));
-			}
+			}*/
 		}
 	}
 

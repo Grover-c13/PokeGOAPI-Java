@@ -19,7 +19,7 @@ import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope
 import POGOProtos.Networking.Envelopes.SignatureOuterClass;
 import POGOProtos.Networking.Platform.PlatformRequestTypeOuterClass.PlatformRequestType;
 import POGOProtos.Networking.Platform.Requests.SendEncryptedSignatureRequestOuterClass.SendEncryptedSignatureRequest;
-import POGOProtos.Networking.Platform.Requests.UnknownPtr8RequestOuterClass;
+//import POGOProtos.Networking.Platform.Requests.UnknownPtr8RequestOuterClass;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass.RequestType;
 import com.google.protobuf.ByteString;
 import com.pokegoapi.api.PokemonGo;
@@ -120,7 +120,7 @@ public class Signature {
 				.build();
 		builder.addPlatformRequests(signatureRequest);
 
-		if (usePtr8) {
+		/*if (usePtr8) {
 			ByteString ptr8 = UnknownPtr8RequestOuterClass.UnknownPtr8Request.newBuilder()
 					.setMessage("15c79df0558009a4242518d2ab65de2a59e09499")
 					.build()
@@ -129,5 +129,6 @@ public class Signature {
 					.setType(PlatformRequestType.UNKNOWN_PTR_8)
 					.setRequestMessage(ptr8).build());
 		}
+		*/
 	}
 }
