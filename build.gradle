@@ -1,4 +1,12 @@
 allprojects {
+    tasks.withType(Test).configureEach {
+        maxParallelForks = 4
+        if (!project.hasProperty("createReports")) {
+            reports.html.required = false
+            reports.junitXml.required = false
+        }
+    }
+
     apply plugin: 'java'
     group = 'com.pokegoapi'
     version = '0.4.1'
